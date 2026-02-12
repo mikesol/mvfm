@@ -14,6 +14,32 @@
 const ILO = Symbol.for("ilo");
 
 /**
+ * Base fields present on every Expr regardless of T.
+ * Kept as an interface so the ILO symbol key works.
+ */
+interface ExprBase<T> {
+  readonly [ILO]: true;
+  readonly __type: T; // phantom — never read at runtime
+  readonly __node: ASTNode; // the underlying AST node
+}
+
+/**
+ * Conditional mapped fields for Expr<T>.
+ *
+ * - never        → {} (no property access — forces schema declaration)
+ * - T[]          → permissive index sig (array typing deferred, see #18)
+ * - Record type  → mapped { K: Expr<T[K]> } (type-preserving proxy)
+ * - leaf (string, number, etc.) → {} (no extra properties)
+ */
+type ExprFields<T> = [T] extends [never]
+  ? {}
+  : [T] extends [readonly any[]]
+    ? { readonly [key: string]: any }
+    : T extends Record<string, unknown>
+      ? { readonly [K in keyof T as K extends `__${string}` | symbol ? never : K]: Expr<T[K]> }
+      : {};
+
+/**
  * Expr<T> is the phantom-typed wrapper around every value in
  * the DSL. At runtime it's a Proxy. At the type level it
  * carries T so your IDE gives you completions and errors.
@@ -21,14 +47,7 @@ const ILO = Symbol.for("ilo");
  * The brand symbol lets plugins detect "is this already a
  * Ilo value or a raw JS primitive?"
  */
-export interface Expr<T> {
-  readonly [ILO]: true;
-  readonly __type: T; // phantom — never read at runtime
-  readonly __node: ASTNode; // the underlying AST node
-  // Proxy makes all property access work at runtime.
-  // This index sig tells TS "trust me, any prop returns an Expr"
-  readonly [key: string]: any;
-}
+export type Expr<T> = ExprBase<T> & ExprFields<T>;
 
 // ---- AST -------------------------------------------------
 
@@ -305,9 +324,9 @@ type MergePlugins<Plugins extends readonly any[]> = UnionToIntersection<
 >;
 
 // Core $ methods that are always available
-interface CoreDollar {
-  /** Input parameters to the program */
-  input: Expr<Record<string, unknown>>;
+interface CoreDollar<I = never> {
+  /** Input parameters to the program — typed when I is provided */
+  input: Expr<I>;
 
   /** Conditional branching (returns a branch builder) */
   cond(predicate: Expr<boolean>): {
@@ -353,7 +372,9 @@ interface CoreDollar {
  *   const myProgram = serverless(($) => { ... })
  */
 export function ilo<P extends PluginDefinition<any>[]>(...plugins: P) {
-  return function define<R>(fn: ($: CoreDollar & MergePlugins<P>) => Expr<R> | R): Program {
+  return function define<I = never>(
+    fn: ($: CoreDollar<I> & MergePlugins<P>) => Expr<any> | any,
+  ): Program {
     const statements: ASTNode[] = [];
     const registry = new Map<number, ASTNode>(); // id -> node
 
@@ -373,8 +394,8 @@ export function ilo<P extends PluginDefinition<any>[]>(...plugins: P) {
     };
 
     // Build core $ methods
-    const core: CoreDollar = {
-      input: makeExprProxy<Record<string, unknown>>({ kind: "core/input" }, ctx),
+    const core: CoreDollar<I> = {
+      input: makeExprProxy<I>({ kind: "core/input" }, ctx),
 
       cond(predicate: Expr<boolean>) {
         let thenNode: ASTNode | null = null;
@@ -482,12 +503,12 @@ export function ilo<P extends PluginDefinition<any>[]>(...plugins: P) {
     );
 
     // Assemble $
-    const dollar = { ...core, ...pluginContributions } as CoreDollar & MergePlugins<P>;
+    const dollar = { ...core, ...pluginContributions } as CoreDollar<I> & MergePlugins<P>;
 
     // Run the closure — this builds the AST
     const result = fn(dollar);
     const resultNode = isExpr(result)
-      ? (result as Expr<R>).__node
+      ? (result as Expr<unknown>).__node
       : autoLift(result, ctx.expr).__node;
 
     // Build the final program
