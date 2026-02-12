@@ -1,4 +1,4 @@
-import type { ASTNode, Expr, PluginContext, PluginDefinition, TraitImpl } from "../core";
+import type { ASTNode, Expr, PluginContext, PluginDefinition, TraitImpl } from "../../core";
 
 export interface EqMethods {
   eq(a: Expr<number> | number, b: Expr<number> | number): Expr<boolean>;

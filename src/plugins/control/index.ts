@@ -1,4 +1,4 @@
-import type { ASTNode, Expr, PluginContext, PluginDefinition } from "../core";
+import type { ASTNode, Expr, PluginContext, PluginDefinition } from "../../core";
 
 export interface ControlMethods {
   each<T>(collection: Expr<T[]>, body: (item: Expr<T>) => void): void;

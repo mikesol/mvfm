@@ -1,4 +1,4 @@
-import type { Expr, PluginContext, PluginDefinition } from "../core";
+import type { Expr, PluginContext, PluginDefinition } from "../../core";
 
 export interface NumMethods {
   add(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;

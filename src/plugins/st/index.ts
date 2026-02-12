@@ -1,4 +1,4 @@
-import type { Expr, PluginContext, PluginDefinition } from "../core";
+import type { Expr, PluginContext, PluginDefinition } from "../../core";
 
 export interface StMethods {
   let<T>(initial: Expr<T> | T): {

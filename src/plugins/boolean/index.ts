@@ -1,4 +1,4 @@
-import type { Expr, PluginContext, PluginDefinition } from "../core";
+import type { Expr, PluginContext, PluginDefinition } from "../../core";
 
 export interface BooleanMethods {
   and(a: Expr<boolean>, b: Expr<boolean>): Expr<boolean>;
