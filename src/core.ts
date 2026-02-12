@@ -14,6 +14,32 @@
 const ILO = Symbol.for("ilo");
 
 /**
+ * Base fields present on every Expr regardless of T.
+ * Kept as an interface so the ILO symbol key works.
+ */
+interface ExprBase<T> {
+  readonly [ILO]: true;
+  readonly __type: T; // phantom — never read at runtime
+  readonly __node: ASTNode; // the underlying AST node
+}
+
+/**
+ * Conditional mapped fields for Expr<T>.
+ *
+ * - never        → {} (no property access — forces schema declaration)
+ * - T[]          → permissive index sig (array typing deferred, see #18)
+ * - Record type  → mapped { K: Expr<T[K]> } (type-preserving proxy)
+ * - leaf (string, number, etc.) → {} (no extra properties)
+ */
+type ExprFields<T> = [T] extends [never]
+  ? {}
+  : [T] extends [readonly any[]]
+    ? { readonly [key: string]: any }
+    : T extends Record<string, unknown>
+      ? { readonly [K in keyof T as K extends `__${string}` | symbol ? never : K]: Expr<T[K]> }
+      : {};
+
+/**
  * Expr<T> is the phantom-typed wrapper around every value in
  * the DSL. At runtime it's a Proxy. At the type level it
  * carries T so your IDE gives you completions and errors.
@@ -21,14 +47,7 @@ const ILO = Symbol.for("ilo");
  * The brand symbol lets plugins detect "is this already a
  * Ilo value or a raw JS primitive?"
  */
-export interface Expr<T> {
-  readonly [ILO]: true;
-  readonly __type: T; // phantom — never read at runtime
-  readonly __node: ASTNode; // the underlying AST node
-  // Proxy makes all property access work at runtime.
-  // This index sig tells TS "trust me, any prop returns an Expr"
-  readonly [key: string]: any;
-}
+export type Expr<T> = ExprBase<T> & ExprFields<T>;
 
 // ---- AST -------------------------------------------------
 
