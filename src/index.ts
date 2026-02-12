@@ -41,6 +41,8 @@ export { ord } from "./plugins/ord";
 export { ordInterpreter } from "./plugins/ord/interpreter";
 export type { PostgresConfig, PostgresMethods } from "./plugins/postgres/3.4.8";
 export { postgres } from "./plugins/postgres/3.4.8";
+export type { PostgresClient } from "./plugins/postgres/3.4.8/interpreter";
+export { postgresInterpreter } from "./plugins/postgres/3.4.8/interpreter";
 export type { SemigroupMethods } from "./plugins/semigroup";
 export { semigroup } from "./plugins/semigroup";
 export type { SemiringMethods } from "./plugins/semiring";
