@@ -12,7 +12,10 @@ export type {
   TraitImpl,
 } from "./core";
 export { composeInterpreters, ilo } from "./core";
+export { booleanInterpreter } from "./interpreters/boolean";
 export { coreInterpreter } from "./interpreters/core";
+export { numInterpreter } from "./interpreters/num";
+export { strInterpreter } from "./interpreters/str";
 export type { BooleanMethods } from "./plugins/boolean";
 export { boolean } from "./plugins/boolean";
 export type { ControlMethods } from "./plugins/control";
