@@ -144,6 +144,36 @@ describe("postgres: transactions", () => {
   });
 });
 
+describe("postgres: cursor", () => {
+  it("$.sql.cursor() produces postgres/cursor node", () => {
+    const prog = app(($) => {
+      const query = $.sql`select * from users`;
+      return $.sql.cursor(query, 100, (batch: any) => {
+        return $.sql`insert into archive ${$.sql.insert(batch)}`;
+      });
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.kind).toBe("postgres/cursor");
+    expect(ast.result.query.kind).toBe("postgres/query");
+    expect(ast.result.batchSize.kind).toBe("core/literal");
+    expect(ast.result.batchSize.value).toBe(100);
+    expect(ast.result.body.kind).toBe("postgres/query");
+  });
+
+  it("cursor batch parameter is a postgres/cursor_batch node", () => {
+    const prog = app(($) => {
+      const query = $.sql`select * from users`;
+      return $.sql.cursor(query, 50, (batch: any) => {
+        return batch; // just return the batch proxy itself
+      });
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.kind).toBe("postgres/cursor");
+    expect(ast.result.body.kind).toBe("postgres/cursor_batch");
+    expect(ast.result.batchSize.value).toBe(50);
+  });
+});
+
 describe("postgres: integration with $.do()", () => {
   it("side-effecting queries wrapped in $.do() are reachable", () => {
     expect(() => {
