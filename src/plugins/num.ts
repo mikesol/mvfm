@@ -38,7 +38,9 @@ export const num: PluginDefinition<NumMethods> = {
     "num/round",
     "num/min",
     "num/max",
+    "num/eq",
   ],
+  traits: { eq: { type: "number", nodeKind: "num/eq" } },
   build(ctx: PluginContext): NumMethods {
     const binop = (kind: string) => (a: Expr<number> | number, b: Expr<number> | number) =>
       ctx.expr<number>({

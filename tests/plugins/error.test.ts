@@ -63,13 +63,13 @@ describe("error: $.try().finally()", () => {
 describe("error: $.fail()", () => {
   it("produces error/fail node", () => {
     const prog = app(($) => {
-      return $.cond($.eq($.input.x, null))
-        .t($.fail({ code: 404, message: "not found" }))
-        .f($.input.x);
+      return $.cond($.gt($.input.x, 0))
+        .t($.input.x)
+        .f($.fail({ code: 404, message: "not found" }));
     });
     const ast = strip(prog.ast) as any;
-    expect(ast.result.then.kind).toBe("error/fail");
-    expect(ast.result.then.error.kind).toBe("core/record");
+    expect(ast.result.else.kind).toBe("error/fail");
+    expect(ast.result.else.error.kind).toBe("core/record");
   });
 });
 
@@ -88,7 +88,7 @@ describe("error: $.attempt()", () => {
   it("produces error/attempt node", () => {
     const prog = app(($) => {
       const result = $.attempt($.sql`select * from users where id = ${$.input.id}`);
-      return $.cond($.eq(result.err, null))
+      return $.cond($.gt($.input.id, 0))
         .t({ found: true, user: result.ok })
         .f({ found: false, error: result.err });
     });

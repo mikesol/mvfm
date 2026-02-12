@@ -88,3 +88,10 @@ describe("num: auto-lifting", () => {
     expect(ast.result.right.kind).toBe("core/literal");
   });
 });
+
+describe("num: trait declaration", () => {
+  it("declares eq trait", () => {
+    expect(num.traits?.eq).toEqual({ type: "number", nodeKind: "num/eq" });
+    expect(num.nodeKinds).toContain("num/eq");
+  });
+});

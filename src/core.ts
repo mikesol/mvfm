@@ -1,3 +1,5 @@
+import type { InferSchema, SchemaShape } from "./schema";
+
 // ============================================================
 // ILO — Extensible Tagless Final DSL via Proxy
 // ============================================================
@@ -75,7 +77,7 @@ export interface Program {
   ast: ASTNode;
   hash: string;
   plugins: string[];
-  inputSchema: Record<string, string>;
+  inputSchema: Record<string, unknown>;
 }
 
 // ---- Plugin Interface ------------------------------------
@@ -111,12 +113,26 @@ export interface PluginContext {
    * Used for reachability analysis — NOT for building the AST.
    */
   _registry: Map<number, ASTNode>;
+
+  /** All resolved plugin definitions loaded in this program */
+  plugins: PluginDefinition[];
+
+  /** Runtime schema passed via the schema overload, if any */
+  inputSchema?: Record<string, unknown>;
+}
+
+export interface TraitImpl {
+  type: string;
+  nodeKind: string;
 }
 
 export interface PluginDefinition<T = any> {
   name: string;
   nodeKinds: string[];
   build: (ctx: PluginContext) => T;
+  traits?: {
+    eq?: TraitImpl;
+  };
 }
 
 /**
@@ -334,9 +350,6 @@ interface CoreDollar<I = never> {
     f: (els: Expr<any> | any) => { t: (then: Expr<any> | any) => Expr<any> };
   };
 
-  /** Equality */
-  eq<T>(a: Expr<T> | T, b: Expr<T> | T): Expr<boolean>;
-
   /**
    * Sequence side effects with a final return value.
    * All arguments are included in the program.
@@ -372,11 +385,22 @@ interface CoreDollar<I = never> {
  *   const myProgram = serverless(($) => { ... })
  */
 export function ilo<P extends PluginDefinition<any>[]>(...plugins: P) {
-  return function define<I = never>(
-    fn: ($: CoreDollar<I> & MergePlugins<P>) => Expr<any> | any,
-  ): Program {
+  function define<S extends SchemaShape>(
+    schema: S,
+    fn: ($: CoreDollar<InferSchema<S>> & MergePlugins<P>) => Expr<any> | any,
+  ): Program;
+  function define<I = never>(fn: ($: CoreDollar<I> & MergePlugins<P>) => Expr<any> | any): Program;
+  function define(schemaOrFn: SchemaShape | (($: any) => any), maybeFn?: ($: any) => any): Program {
+    const schema = typeof schemaOrFn === "function" ? undefined : (schemaOrFn as SchemaShape);
+    const fn = typeof schemaOrFn === "function" ? schemaOrFn : maybeFn!;
+
     const statements: ASTNode[] = [];
     const registry = new Map<number, ASTNode>(); // id -> node
+
+    // Resolve plugins BEFORE building ctx
+    const resolvedPlugins = plugins.map((p) =>
+      typeof p === "function" && !("name" in p) ? (p as () => PluginDefinition<any>)() : p,
+    ) as PluginDefinition<any>[];
 
     // Build the plugin context
     const ctx: PluginContext = {
@@ -391,11 +415,13 @@ export function ilo<P extends PluginDefinition<any>[]>(...plugins: P) {
       emit: (node: ASTNode) => statements.push(node),
       statements,
       _registry: registry,
+      plugins: resolvedPlugins,
+      inputSchema: schema,
     };
 
     // Build core $ methods
-    const core: CoreDollar<I> = {
-      input: makeExprProxy<I>({ kind: "core/input" }, ctx),
+    const core: CoreDollar<any> = {
+      input: makeExprProxy<any>({ kind: "core/input" }, ctx),
 
       cond(predicate: Expr<boolean>) {
         let thenNode: ASTNode | null = null;
@@ -435,17 +461,6 @@ export function ilo<P extends PluginDefinition<any>[]>(...plugins: P) {
             };
           },
         };
-      },
-
-      eq<T>(a: Expr<T> | T, b: Expr<T> | T): Expr<boolean> {
-        return makeExprProxy<boolean>(
-          {
-            kind: "core/eq",
-            left: ctx.lift(a).__node,
-            right: ctx.lift(b).__node,
-          },
-          ctx,
-        );
       },
 
       do(...exprs: (Expr<any> | any)[]) {
@@ -488,11 +503,6 @@ export function ilo<P extends PluginDefinition<any>[]>(...plugins: P) {
       },
     };
 
-    // Resolve plugins
-    const resolvedPlugins = plugins.map((p) =>
-      typeof p === "function" && !("name" in p) ? (p as () => PluginDefinition<any>)() : p,
-    ) as PluginDefinition<any>[];
-
     // Build each plugin's contribution to $
     const pluginContributions = resolvedPlugins.reduce(
       (acc, plugin) => {
@@ -503,7 +513,7 @@ export function ilo<P extends PluginDefinition<any>[]>(...plugins: P) {
     );
 
     // Assemble $
-    const dollar = { ...core, ...pluginContributions } as CoreDollar<I> & MergePlugins<P>;
+    const dollar = { ...core, ...pluginContributions } as CoreDollar<any> & MergePlugins<P>;
 
     // Run the closure — this builds the AST
     const result = fn(dollar);
@@ -593,9 +603,11 @@ export function ilo<P extends PluginDefinition<any>[]>(...plugins: P) {
       ast,
       hash,
       plugins: resolvedPlugins.map((p) => p.name),
-      inputSchema: {}, // TODO: infer from $.input usage
+      inputSchema: schema ?? {},
     };
-  };
+  }
+
+  return define;
 }
 
 /**

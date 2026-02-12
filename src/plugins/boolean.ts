@@ -8,7 +8,8 @@ export interface BooleanMethods {
 
 export const boolean: PluginDefinition<BooleanMethods> = {
   name: "boolean",
-  nodeKinds: ["boolean/and", "boolean/or", "boolean/not"],
+  nodeKinds: ["boolean/and", "boolean/or", "boolean/not", "boolean/eq"],
+  traits: { eq: { type: "boolean", nodeKind: "boolean/eq" } },
   build(ctx: PluginContext): BooleanMethods {
     return {
       and(a, b) {

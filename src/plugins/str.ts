@@ -41,7 +41,9 @@ export const str: PluginDefinition<StrMethods> = {
     "str/join",
     "str/replace",
     "str/len",
+    "str/eq",
   ],
+  traits: { eq: { type: "string", nodeKind: "str/eq" } },
   build(ctx: PluginContext): StrMethods {
     return {
       str(strings: TemplateStringsArray, ...exprs: (Expr<any> | string | number)[]) {

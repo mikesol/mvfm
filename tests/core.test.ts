@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
+import type { PluginDefinition } from "../src/core";
 import { ilo } from "../src/core";
+import { boolean } from "../src/plugins/boolean";
+import { eq } from "../src/plugins/eq";
 import { num } from "../src/plugins/num";
 import { str } from "../src/plugins/str";
 
@@ -36,10 +39,10 @@ describe("core: $.do()", () => {
 });
 
 describe("core: $.cond()", () => {
-  const app = ilo(num);
+  const app = ilo(num, eq);
 
   it("produces a core/cond node with both branches via .t().f()", () => {
-    const prog = app(($) => {
+    const prog = app({ x: "number" }, ($) => {
       return $.cond($.eq($.input.x, 1)).t($.add(1, 2)).f($.add(3, 4));
     });
     const ast = strip(prog.ast) as any;
@@ -49,7 +52,7 @@ describe("core: $.cond()", () => {
   });
 
   it("works with .f().t() order", () => {
-    const prog = app(($) => {
+    const prog = app({ x: "number" }, ($) => {
       return $.cond($.eq($.input.x, 1)).f($.add(3, 4)).t($.add(1, 2));
     });
     const ast = strip(prog.ast) as any;
@@ -59,7 +62,7 @@ describe("core: $.cond()", () => {
   });
 
   it("auto-lifts raw values in branches", () => {
-    const prog = app(($) => {
+    const prog = app({ x: "number" }, ($) => {
       return $.cond($.eq($.input.x, 1)).t("yes").f("no");
     });
     const ast = strip(prog.ast) as any;
@@ -70,20 +73,9 @@ describe("core: $.cond()", () => {
   });
 });
 
-describe("core: $.eq()", () => {
-  const app = ilo(num);
-
-  it("$.eq produces core/eq", () => {
-    const prog = app(($) => $.eq($.input.x, 1));
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/eq");
-    expect(ast.result.right.kind).toBe("core/literal");
-    expect(ast.result.right.value).toBe(1);
-  });
-});
-
 describe("core: auto-lifting", () => {
   const app = ilo(num);
+  const appWithEq = ilo(str, eq);
 
   it("lifts raw numbers to core/literal", () => {
     const prog = app(($) => $.add(1, 2));
@@ -95,7 +87,7 @@ describe("core: auto-lifting", () => {
   });
 
   it("lifts raw strings to core/literal", () => {
-    const prog = app(($) => $.eq($.input.name, "alice"));
+    const prog = appWithEq({ name: "string" }, ($) => $.eq($.input.name, "alice"));
     const ast = strip(prog.ast) as any;
     expect(ast.result.right.kind).toBe("core/literal");
     expect(ast.result.right.value).toBe("alice");
@@ -144,6 +136,7 @@ describe("core: proxy property access", () => {
 
 describe("core: array methods produce core/lambda", () => {
   const app = ilo(num);
+  const appWithEq = ilo(num, boolean, eq);
 
   it(".map() produces core/method_call with core/lambda", () => {
     const prog = app(($) => {
@@ -157,7 +150,7 @@ describe("core: array methods produce core/lambda", () => {
   });
 
   it(".filter() produces core/method_call with core/lambda", () => {
-    const prog = app(($) => {
+    const prog = appWithEq(($) => {
       return $.input.items.filter((item: any) => $.eq(item.active, true));
     });
     const ast = strip(prog.ast) as any;
@@ -270,5 +263,52 @@ describe("core: program metadata", () => {
     const app = ilo();
     const prog = app(($) => $.input.x);
     expect(prog.plugins).toEqual([]);
+  });
+});
+
+describe("core: trait protocol", () => {
+  it("plugins field on PluginContext exposes loaded plugins", () => {
+    let capturedPlugins: any[] = [];
+    const spy: PluginDefinition<{}> = {
+      name: "spy",
+      nodeKinds: [],
+      build(ctx) {
+        capturedPlugins = ctx.plugins;
+        return {};
+      },
+    };
+    const app = ilo(num, spy);
+    app(($) => $.add(1, 2));
+    expect(capturedPlugins).toHaveLength(2);
+    expect(capturedPlugins[0].name).toBe("num");
+    expect(capturedPlugins[1].name).toBe("spy");
+  });
+
+  it("inputSchema on PluginContext exposes runtime schema", () => {
+    let capturedSchema: any;
+    const spy: PluginDefinition<{}> = {
+      name: "spy",
+      nodeKinds: [],
+      build(ctx) {
+        capturedSchema = ctx.inputSchema;
+        return {};
+      },
+    };
+    const app = ilo(num, spy);
+    app({ x: "number" }, ($) => $.add($.input.x, 1));
+    expect(capturedSchema).toEqual({ x: "number" });
+  });
+
+  it("traits field on PluginDefinition is accessible", () => {
+    const p: PluginDefinition<{}> = {
+      name: "test",
+      nodeKinds: ["test/eq"],
+      traits: { eq: { type: "number", nodeKind: "test/eq" } },
+      build() {
+        return {};
+      },
+    };
+    expect(p.traits?.eq?.type).toBe("number");
+    expect(p.traits?.eq?.nodeKind).toBe("test/eq");
   });
 });

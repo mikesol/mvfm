@@ -1,11 +1,27 @@
 // Public API
 
-export type { ASTNode, Expr, Plugin, PluginContext, PluginDefinition, Program } from "./core";
-export { ilo } from "./core";
+export type {
+  ASTNode,
+  Expr,
+  Interpreter,
+  InterpreterFragment,
+  Plugin,
+  PluginContext,
+  PluginDefinition,
+  Program,
+  TraitImpl,
+} from "./core";
+export { composeInterpreters, ilo } from "./core";
+export { booleanInterpreter } from "./interpreters/boolean";
+export { coreInterpreter } from "./interpreters/core";
+export { numInterpreter } from "./interpreters/num";
+export { strInterpreter } from "./interpreters/str";
 export type { BooleanMethods } from "./plugins/boolean";
 export { boolean } from "./plugins/boolean";
 export type { ControlMethods } from "./plugins/control";
 export { control } from "./plugins/control";
+export type { EqMethods } from "./plugins/eq";
+export { eq, inferType, resolveSchemaType } from "./plugins/eq";
 export type { ErrorMethods } from "./plugins/error";
 export { error } from "./plugins/error";
 export type { FiberMethods } from "./plugins/fiber";
@@ -18,3 +34,12 @@ export type { StMethods } from "./plugins/st";
 export { st } from "./plugins/st";
 export type { StrMethods } from "./plugins/str";
 export { str } from "./plugins/str";
+export type {
+  ArraySchema,
+  InferSchema,
+  NullableSchema,
+  SchemaShape,
+  SchemaTag,
+  SchemaType,
+} from "./schema";
+export { array, nullable } from "./schema";
