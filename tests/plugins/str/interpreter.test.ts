@@ -42,3 +42,34 @@ describe("str interpreter", () => {
     expect(run(prog, { name: "alice" })).toBe("ALICE");
   });
 });
+
+describe("str interpreter: show", () => {
+  it("str/show passes through string value", () => {
+    const ast = {
+      kind: "str/show",
+      operand: { kind: "core/literal", value: "hello", __id: "t" },
+    };
+    const interp = composeInterpreters([coreInterpreter, strInterpreter]);
+    expect(interp(ast)).toBe("hello");
+  });
+});
+
+describe("str interpreter: semigroup", () => {
+  it("str/append concatenates two strings", () => {
+    const ast = {
+      kind: "str/append",
+      left: { kind: "core/literal", value: "foo", __id: "t1" },
+      right: { kind: "core/literal", value: "bar", __id: "t2" },
+    };
+    const interp = composeInterpreters([coreInterpreter, strInterpreter]);
+    expect(interp(ast)).toBe("foobar");
+  });
+});
+
+describe("str interpreter: monoid", () => {
+  it("str/mempty returns empty string", () => {
+    const ast = { kind: "str/mempty" };
+    const interp = composeInterpreters([coreInterpreter, strInterpreter]);
+    expect(interp(ast)).toBe("");
+  });
+});

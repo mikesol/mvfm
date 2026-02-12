@@ -12,9 +12,14 @@ export const boolean: PluginDefinition<BooleanMethods> = {
     "boolean/ff",
     "boolean/tt",
     "boolean/implies",
+    "boolean/show",
+    "boolean/top",
+    "boolean/bottom",
   ],
   traits: {
     eq: { type: "boolean", nodeKinds: { eq: "boolean/eq" } },
+    show: { type: "boolean", nodeKinds: { show: "boolean/show" } },
+    bounded: { type: "boolean", nodeKinds: { top: "boolean/top", bottom: "boolean/bottom" } },
     heytingAlgebra: {
       type: "boolean",
       nodeKinds: {

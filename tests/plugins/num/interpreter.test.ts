@@ -55,3 +55,28 @@ describe("num interpreter: with input", () => {
     expect(run(prog, { x: 10, y: 20 })).toBe(30);
   });
 });
+
+describe("num interpreter: show", () => {
+  it("num/show converts number to string", () => {
+    const ast = {
+      kind: "num/show",
+      operand: { kind: "core/literal", value: 42, __id: "t" },
+    };
+    const interp = composeInterpreters([coreInterpreter, numInterpreter, ordInterpreter]);
+    expect(interp(ast)).toBe("42");
+  });
+});
+
+describe("num interpreter: bounded", () => {
+  it("num/top returns Infinity", () => {
+    const ast = { kind: "num/top" };
+    const interp = composeInterpreters([coreInterpreter, numInterpreter, ordInterpreter]);
+    expect(interp(ast)).toBe(Infinity);
+  });
+
+  it("num/bottom returns -Infinity", () => {
+    const ast = { kind: "num/bottom" };
+    const interp = composeInterpreters([coreInterpreter, numInterpreter, ordInterpreter]);
+    expect(interp(ast)).toBe(-Infinity);
+  });
+});

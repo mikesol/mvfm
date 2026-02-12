@@ -50,6 +50,12 @@ export const numInterpreter: InterpreterFragment = {
         return 0;
       case "num/one":
         return 1;
+      case "num/show":
+        return String(recurse(node.operand as ASTNode));
+      case "num/top":
+        return Infinity;
+      case "num/bottom":
+        return -Infinity;
       default:
         throw new Error(`Num interpreter: unknown node kind "${node.kind}"`);
     }

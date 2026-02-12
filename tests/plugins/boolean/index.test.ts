@@ -56,4 +56,18 @@ describe("boolean: trait declarations", () => {
     expect(boolean.traits?.heytingAlgebra?.nodeKinds.disj).toBe("boolean/or");
     expect(boolean.traits?.heytingAlgebra?.nodeKinds.not).toBe("boolean/not");
   });
+
+  it("declares show trait", () => {
+    expect(boolean.traits?.show).toEqual({ type: "boolean", nodeKinds: { show: "boolean/show" } });
+    expect(boolean.nodeKinds).toContain("boolean/show");
+  });
+
+  it("declares bounded trait", () => {
+    expect(boolean.traits?.bounded).toEqual({
+      type: "boolean",
+      nodeKinds: { top: "boolean/top", bottom: "boolean/bottom" },
+    });
+    expect(boolean.nodeKinds).toContain("boolean/top");
+    expect(boolean.nodeKinds).toContain("boolean/bottom");
+  });
 });

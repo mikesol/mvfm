@@ -135,6 +135,10 @@ export interface PluginDefinition<T = any> {
     ord?: TraitImpl;
     semiring?: TraitImpl;
     heytingAlgebra?: TraitImpl;
+    show?: TraitImpl;
+    semigroup?: TraitImpl;
+    monoid?: TraitImpl;
+    bounded?: TraitImpl;
   };
 }
 

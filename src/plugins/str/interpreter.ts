@@ -60,6 +60,14 @@ export const strInterpreter: InterpreterFragment = {
         return (recurse(node.operand as ASTNode) as string).length;
       case "str/eq":
         return recurse(node.left as ASTNode) === recurse(node.right as ASTNode);
+      case "str/show":
+        return recurse(node.operand as ASTNode) as string;
+      case "str/append":
+        return (
+          (recurse(node.left as ASTNode) as string) + (recurse(node.right as ASTNode) as string)
+        );
+      case "str/mempty":
+        return "";
       default:
         throw new Error(`Str interpreter: unknown node kind "${node.kind}"`);
     }

@@ -42,8 +42,16 @@ export const str: PluginDefinition<StrMethods> = {
     "str/replace",
     "str/len",
     "str/eq",
+    "str/show",
+    "str/append",
+    "str/mempty",
   ],
-  traits: { eq: { type: "string", nodeKinds: { eq: "str/eq" } } },
+  traits: {
+    eq: { type: "string", nodeKinds: { eq: "str/eq" } },
+    show: { type: "string", nodeKinds: { show: "str/show" } },
+    semigroup: { type: "string", nodeKinds: { append: "str/append" } },
+    monoid: { type: "string", nodeKinds: { mempty: "str/mempty" } },
+  },
   build(ctx: PluginContext): StrMethods {
     return {
       str(strings: TemplateStringsArray, ...exprs: (Expr<any> | string | number)[]) {

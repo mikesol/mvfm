@@ -91,4 +91,18 @@ describe("num: trait declarations", () => {
     expect(num.nodeKinds).toContain("num/add");
     expect(num.nodeKinds).toContain("num/mul");
   });
+
+  it("declares show trait", () => {
+    expect(num.traits?.show).toEqual({ type: "number", nodeKinds: { show: "num/show" } });
+    expect(num.nodeKinds).toContain("num/show");
+  });
+
+  it("declares bounded trait", () => {
+    expect(num.traits?.bounded).toEqual({
+      type: "number",
+      nodeKinds: { top: "num/top", bottom: "num/bottom" },
+    });
+    expect(num.nodeKinds).toContain("num/top");
+    expect(num.nodeKinds).toContain("num/bottom");
+  });
 });

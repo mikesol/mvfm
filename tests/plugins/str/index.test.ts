@@ -111,3 +111,20 @@ describe("str: trait declaration", () => {
     expect(str.nodeKinds).toContain("str/eq");
   });
 });
+
+describe("str: trait declarations", () => {
+  it("declares show trait", () => {
+    expect(str.traits?.show).toEqual({ type: "string", nodeKinds: { show: "str/show" } });
+    expect(str.nodeKinds).toContain("str/show");
+  });
+
+  it("declares semigroup trait", () => {
+    expect(str.traits?.semigroup).toEqual({ type: "string", nodeKinds: { append: "str/append" } });
+    expect(str.nodeKinds).toContain("str/append");
+  });
+
+  it("declares monoid trait", () => {
+    expect(str.traits?.monoid).toEqual({ type: "string", nodeKinds: { mempty: "str/mempty" } });
+    expect(str.nodeKinds).toContain("str/mempty");
+  });
+});

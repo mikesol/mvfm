@@ -25,6 +25,12 @@ export const booleanInterpreter: InterpreterFragment = {
         return (
           !(recurse(node.left as ASTNode) as boolean) || (recurse(node.right as ASTNode) as boolean)
         );
+      case "boolean/show":
+        return String(recurse(node.operand as ASTNode));
+      case "boolean/top":
+        return true;
+      case "boolean/bottom":
+        return false;
       default:
         throw new Error(`Boolean interpreter: unknown node kind "${node.kind}"`);
     }
