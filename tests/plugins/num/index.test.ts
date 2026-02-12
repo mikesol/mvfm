@@ -10,9 +10,7 @@ const app = ilo(num);
 
 describe("num: binary operations", () => {
   it.each([
-    ["add", "num/add"],
     ["sub", "num/sub"],
-    ["mul", "num/mul"],
     ["div", "num/div"],
     ["mod", "num/mod"],
   ] as const)("$.%s produces %s node", (method, kind) => {
@@ -21,21 +19,6 @@ describe("num: binary operations", () => {
     expect(ast.result.kind).toBe(kind);
     expect(ast.result.left.kind).toBe("core/prop_access");
     expect(ast.result.right.kind).toBe("core/prop_access");
-  });
-});
-
-describe("num: comparison operations", () => {
-  it.each([
-    ["gt", "num/gt"],
-    ["gte", "num/gte"],
-    ["lt", "num/lt"],
-    ["lte", "num/lte"],
-  ] as const)("$.%s produces %s node", (method, kind) => {
-    const prog = app(($) => ($[method] as any)($.input.a, 10));
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe(kind);
-    expect(ast.result.right.kind).toBe("core/literal");
-    expect(ast.result.right.value).toBe(10);
   });
 });
 
@@ -73,7 +56,7 @@ describe("num: variadic operations", () => {
 
 describe("num: auto-lifting", () => {
   it("lifts raw numbers on both sides", () => {
-    const prog = app(($) => $.add(1, 2));
+    const prog = app(($) => $.sub(1, 2));
     const ast = strip(prog.ast) as any;
     expect(ast.result.left.kind).toBe("core/literal");
     expect(ast.result.left.value).toBe(1);
@@ -82,16 +65,30 @@ describe("num: auto-lifting", () => {
   });
 
   it("passes through Expr values without wrapping", () => {
-    const prog = app(($) => $.add($.input.x, 1));
+    const prog = app(($) => $.sub($.input.x, 1));
     const ast = strip(prog.ast) as any;
     expect(ast.result.left.kind).toBe("core/prop_access");
     expect(ast.result.right.kind).toBe("core/literal");
   });
 });
 
-describe("num: trait declaration", () => {
+describe("num: trait declarations", () => {
   it("declares eq trait", () => {
-    expect(num.traits?.eq).toEqual({ type: "number", nodeKind: "num/eq" });
+    expect(num.traits?.eq).toEqual({ type: "number", nodeKinds: { eq: "num/eq" } });
     expect(num.nodeKinds).toContain("num/eq");
+  });
+
+  it("declares ord trait", () => {
+    expect(num.traits?.ord).toEqual({ type: "number", nodeKinds: { compare: "num/compare" } });
+    expect(num.nodeKinds).toContain("num/compare");
+  });
+
+  it("declares semiring trait", () => {
+    expect(num.traits?.semiring).toEqual({
+      type: "number",
+      nodeKinds: { add: "num/add", zero: "num/zero", mul: "num/mul", one: "num/one" },
+    });
+    expect(num.nodeKinds).toContain("num/add");
+    expect(num.nodeKinds).toContain("num/mul");
   });
 });

@@ -4,6 +4,7 @@ import { coreInterpreter } from "../../../src/interpreters/core";
 import { boolean } from "../../../src/plugins/boolean";
 import { booleanInterpreter } from "../../../src/plugins/boolean/interpreter";
 import { eq } from "../../../src/plugins/eq";
+import { eqInterpreter } from "../../../src/plugins/eq/interpreter";
 import { num } from "../../../src/plugins/num";
 import { numInterpreter } from "../../../src/plugins/num/interpreter";
 import { str } from "../../../src/plugins/str";
@@ -20,7 +21,13 @@ function injectInput(node: any, input: Record<string, unknown>): any {
   return result;
 }
 
-const fragments = [coreInterpreter, numInterpreter, strInterpreter, booleanInterpreter];
+const fragments = [
+  coreInterpreter,
+  numInterpreter,
+  strInterpreter,
+  booleanInterpreter,
+  eqInterpreter,
+];
 
 function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
@@ -97,5 +104,19 @@ describe("eq + cond interpretation: end-to-end", () => {
     );
     expect(run(prog, { name: "alice" })).toBe("found");
     expect(run(prog, { name: "bob" })).toBe("not found");
+  });
+});
+
+describe("eq interpretation: neq", () => {
+  const app = ilo(num, eq);
+
+  it("neq(1, 2) returns true", () => {
+    const prog = app(($) => $.neq(1, 2));
+    expect(run(prog)).toBe(true);
+  });
+
+  it("neq(42, 42) returns false", () => {
+    const prog = app(($) => $.neq(42, 42));
+    expect(run(prog)).toBe(false);
   });
 });

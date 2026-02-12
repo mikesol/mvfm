@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import { ilo } from "../../../src/core";
 import { control } from "../../../src/plugins/control";
 import { num } from "../../../src/plugins/num";
+import { ord } from "../../../src/plugins/ord";
+import { semiring } from "../../../src/plugins/semiring";
 import { st } from "../../../src/plugins/st";
 
 function strip(ast: unknown): unknown {
@@ -9,7 +11,7 @@ function strip(ast: unknown): unknown {
 }
 
 describe("control: $.each()", () => {
-  const app = ilo(num, st, control);
+  const app = ilo(num, semiring, ord, st, control);
 
   it("produces control/each with collection and body", () => {
     const prog = app(($) => {
@@ -28,7 +30,7 @@ describe("control: $.each()", () => {
 });
 
 describe("control: $.while()", () => {
-  const app = ilo(num, st, control);
+  const app = ilo(num, semiring, ord, st, control);
 
   it("produces control/while with condition and body", () => {
     const prog = app(($) => {
@@ -39,6 +41,6 @@ describe("control: $.while()", () => {
     const ast = strip(prog.ast) as any;
     const whileNode = ast.statements.find((s: any) => s.kind === "control/while");
     expect(whileNode).toBeDefined();
-    expect(whileNode.condition.kind).toBe("num/lt");
+    expect(whileNode.condition.kind).toBe("ord/lt");
   });
 });

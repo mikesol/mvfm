@@ -3,6 +3,9 @@ import { composeInterpreters, ilo } from "../../../src/core";
 import { coreInterpreter } from "../../../src/interpreters/core";
 import { num } from "../../../src/plugins/num";
 import { numInterpreter } from "../../../src/plugins/num/interpreter";
+import { ord } from "../../../src/plugins/ord";
+import { ordInterpreter } from "../../../src/plugins/ord/interpreter";
+import { semiring } from "../../../src/plugins/semiring";
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
@@ -17,11 +20,11 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 
 function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
-  const interp = composeInterpreters([coreInterpreter, numInterpreter]);
+  const interp = composeInterpreters([coreInterpreter, numInterpreter, ordInterpreter]);
   return interp(ast.result);
 }
 
-const app = ilo(num);
+const app = ilo(num, semiring, ord);
 
 describe("num interpreter: arithmetic", () => {
   it("add", () => expect(run(app(($) => $.add(3, 4)))).toBe(7));

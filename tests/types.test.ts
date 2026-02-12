@@ -1,8 +1,8 @@
-import { describe, expectTypeOf, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import type { Expr } from "../src";
-import { ilo, num, str } from "../src";
+import { ilo, num, semiring, str } from "../src";
 
-const app = ilo(num, str);
+const app = ilo(num, str, semiring);
 
 describe("typed inputs (generic parameter)", () => {
   it("$.input.name resolves to Expr<string> when schema declares name: string", () => {
@@ -64,9 +64,11 @@ describe("typed inputs (runtime schema)", () => {
   });
 
   it("$.add($.input.name, 1) is a type error when name: 'string'", () => {
-    app({ name: "string" }, ($) => {
-      // @ts-expect-error — name is Expr<string>, not Expr<number>
-      return $.add($.input.name, 1);
-    });
+    expect(() =>
+      app({ name: "string" }, ($) => {
+        // @ts-expect-error — name is Expr<string>, not Expr<number>
+        return $.add($.input.name, 1);
+      }),
+    ).toThrow();
   });
 });

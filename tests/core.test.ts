@@ -3,7 +3,9 @@ import type { PluginDefinition } from "../src/core";
 import { ilo } from "../src/core";
 import { boolean } from "../src/plugins/boolean";
 import { eq } from "../src/plugins/eq";
+import { heytingAlgebra } from "../src/plugins/heyting-algebra";
 import { num } from "../src/plugins/num";
+import { semiring } from "../src/plugins/semiring";
 import { str } from "../src/plugins/str";
 
 // Helper: strip __id from AST for snapshot-stable assertions
@@ -12,7 +14,7 @@ function strip(ast: unknown): unknown {
 }
 
 describe("core: $.do()", () => {
-  const app = ilo(num, str);
+  const app = ilo(num, str, semiring);
 
   it("sequences side effects with last arg as return value", () => {
     const prog = app(($) => {
@@ -39,7 +41,7 @@ describe("core: $.do()", () => {
 });
 
 describe("core: $.cond()", () => {
-  const app = ilo(num, eq);
+  const app = ilo(num, eq, semiring);
 
   it("produces a core/cond node with both branches via .t().f()", () => {
     const prog = app({ x: "number" }, ($) => {
@@ -74,7 +76,7 @@ describe("core: $.cond()", () => {
 });
 
 describe("core: auto-lifting", () => {
-  const app = ilo(num);
+  const app = ilo(num, semiring);
   const appWithEq = ilo(str, eq);
 
   it("lifts raw numbers to core/literal", () => {
@@ -135,8 +137,8 @@ describe("core: proxy property access", () => {
 });
 
 describe("core: array methods produce core/lambda", () => {
-  const app = ilo(num);
-  const appWithEq = ilo(num, boolean, eq);
+  const app = ilo(num, semiring);
+  const appWithEq = ilo(num, boolean, eq, semiring, heytingAlgebra);
 
   it(".map() produces core/method_call with core/lambda", () => {
     const prog = app(($) => {
@@ -174,7 +176,7 @@ describe("core: array methods produce core/lambda", () => {
 });
 
 describe("core: reachability analysis", () => {
-  const app = ilo(num, str);
+  const app = ilo(num, str, semiring);
 
   it("rejects orphaned expressions", () => {
     expect(() => {
@@ -237,7 +239,7 @@ describe("core: reachability analysis", () => {
 });
 
 describe("core: content hashing", () => {
-  const app = ilo(num);
+  const app = ilo(num, semiring);
 
   it("identical programs produce identical hashes", () => {
     const prog1 = app(($) => $.add($.input.x, 1));
@@ -254,9 +256,9 @@ describe("core: content hashing", () => {
 
 describe("core: program metadata", () => {
   it("lists plugin names", () => {
-    const app = ilo(num, str);
+    const app = ilo(num, str, semiring);
     const prog = app(($) => $.add(1, 2));
-    expect(prog.plugins).toEqual(["num", "str"]);
+    expect(prog.plugins).toEqual(["num", "str", "semiring"]);
   });
 
   it("works with no plugins", () => {
@@ -277,11 +279,12 @@ describe("core: trait protocol", () => {
         return {};
       },
     };
-    const app = ilo(num, spy);
+    const app = ilo(num, semiring, spy);
     app(($) => $.add(1, 2));
-    expect(capturedPlugins).toHaveLength(2);
+    expect(capturedPlugins).toHaveLength(3);
     expect(capturedPlugins[0].name).toBe("num");
-    expect(capturedPlugins[1].name).toBe("spy");
+    expect(capturedPlugins[1].name).toBe("semiring");
+    expect(capturedPlugins[2].name).toBe("spy");
   });
 
   it("inputSchema on PluginContext exposes runtime schema", () => {
@@ -294,7 +297,7 @@ describe("core: trait protocol", () => {
         return {};
       },
     };
-    const app = ilo(num, spy);
+    const app = ilo(num, semiring, spy);
     app({ x: "number" }, ($) => $.add($.input.x, 1));
     expect(capturedSchema).toEqual({ x: "number" });
   });
@@ -303,12 +306,12 @@ describe("core: trait protocol", () => {
     const p: PluginDefinition<{}> = {
       name: "test",
       nodeKinds: ["test/eq"],
-      traits: { eq: { type: "number", nodeKind: "test/eq" } },
+      traits: { eq: { type: "number", nodeKinds: { eq: "test/eq" } } },
       build() {
         return {};
       },
     };
     expect(p.traits?.eq?.type).toBe("number");
-    expect(p.traits?.eq?.nodeKind).toBe("test/eq");
+    expect(p.traits?.eq?.nodeKinds.eq).toBe("test/eq");
   });
 });

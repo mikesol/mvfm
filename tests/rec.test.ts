@@ -2,12 +2,13 @@ import { describe, expect, it } from "vitest";
 import { ilo } from "../src/core";
 import { eq } from "../src/plugins/eq";
 import { num } from "../src/plugins/num";
+import { semiring } from "../src/plugins/semiring";
 
 function strip(ast: unknown): unknown {
   return JSON.parse(JSON.stringify(ast, (k, v) => (k === "__id" ? undefined : v)));
 }
 
-const app = ilo(num, eq);
+const app = ilo(num, eq, semiring);
 
 describe("rec: basic structure", () => {
   it("produces core/rec with param and body", () => {

@@ -11,7 +11,7 @@ function strip(ast: unknown): unknown {
 
 const app = ilo(num, boolean, eq, heytingAlgebra);
 
-describe("boolean: $.and()", () => {
+describe("heytingAlgebra: $.and()", () => {
   it("produces boolean/and", () => {
     const prog = app({ x: "number", y: "number" }, ($) =>
       $.and($.eq($.input.x, 1), $.eq($.input.y, 2)),
@@ -23,19 +23,17 @@ describe("boolean: $.and()", () => {
   });
 });
 
-describe("boolean: $.or()", () => {
+describe("heytingAlgebra: $.or()", () => {
   it("produces boolean/or", () => {
     const prog = app({ x: "number", y: "number" }, ($) =>
       $.or($.eq($.input.x, 1), $.eq($.input.y, 2)),
     );
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("boolean/or");
-    expect(ast.result.left.kind).toBe("num/eq");
-    expect(ast.result.right.kind).toBe("num/eq");
   });
 });
 
-describe("boolean: $.not()", () => {
+describe("heytingAlgebra: $.not()", () => {
   it("produces boolean/not", () => {
     const prog = app({ x: "number" }, ($) => $.not($.eq($.input.x, 1)));
     const ast = strip(prog.ast) as any;
@@ -44,14 +42,10 @@ describe("boolean: $.not()", () => {
   });
 });
 
-describe("boolean: trait declarations", () => {
-  it("declares eq trait", () => {
-    expect(boolean.traits?.eq).toEqual({ type: "boolean", nodeKinds: { eq: "boolean/eq" } });
-    expect(boolean.nodeKinds).toContain("boolean/eq");
-  });
-
-  it("declares heytingAlgebra trait", () => {
+describe("heytingAlgebra: trait declaration", () => {
+  it("boolean declares heytingAlgebra trait", () => {
     expect(boolean.traits?.heytingAlgebra).toBeDefined();
+    expect(boolean.traits?.heytingAlgebra?.type).toBe("boolean");
     expect(boolean.traits?.heytingAlgebra?.nodeKinds.conj).toBe("boolean/and");
     expect(boolean.traits?.heytingAlgebra?.nodeKinds.disj).toBe("boolean/or");
     expect(boolean.traits?.heytingAlgebra?.nodeKinds.not).toBe("boolean/not");

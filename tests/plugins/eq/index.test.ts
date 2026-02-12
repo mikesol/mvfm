@@ -3,6 +3,7 @@ import { ilo } from "../../../src/core";
 import { boolean } from "../../../src/plugins/boolean";
 import { eq } from "../../../src/plugins/eq";
 import { num } from "../../../src/plugins/num";
+import { semiring } from "../../../src/plugins/semiring";
 import { str } from "../../../src/plugins/str";
 
 function strip(ast: unknown): unknown {
@@ -10,7 +11,7 @@ function strip(ast: unknown): unknown {
 }
 
 describe("eq: dispatch to num/eq", () => {
-  const app = ilo(num, eq);
+  const app = ilo(num, semiring, eq);
 
   it("$.eq(literal, literal) dispatches to num/eq", () => {
     const prog = app(($) => $.eq(1, 2));
@@ -91,9 +92,30 @@ describe("eq: error cases", () => {
     expect(() => app(($) => $.eq(1, 2))).toThrow(/No eq implementation for type/);
   });
 
-  it("throws when both args are untyped (no schema)", () => {
+  it("falls back to sole impl when both args are untyped (single provider)", () => {
     const app = ilo(num, eq);
-    // Both args are input refs with no schema — can't infer types
+    // Only one eq provider (num) — falls back without type inference
+    const prog = app(($) => $.eq($.input.x, $.input.y));
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.kind).toBe("num/eq");
+  });
+
+  it("throws when both args are untyped with multiple providers", () => {
+    const app = ilo(num, str, boolean, eq);
+    // Multiple eq providers — can't disambiguate
     expect(() => app(($) => $.eq($.input.x, $.input.y))).toThrow(/Cannot infer type for eq/);
+  });
+});
+
+describe("eq: neq dispatch", () => {
+  const app = ilo(num, eq);
+
+  it("$.neq(literal, literal) wraps num/eq in eq/neq", () => {
+    const prog = app(($) => $.neq(1, 2));
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.kind).toBe("eq/neq");
+    expect(ast.result.inner.kind).toBe("num/eq");
+    expect(ast.result.inner.left.value).toBe(1);
+    expect(ast.result.inner.right.value).toBe(2);
   });
 });

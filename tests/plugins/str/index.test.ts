@@ -107,7 +107,7 @@ describe("str: split, join, replace, len", () => {
 
 describe("str: trait declaration", () => {
   it("declares eq trait", () => {
-    expect(str.traits?.eq).toEqual({ type: "string", nodeKind: "str/eq" });
+    expect(str.traits?.eq).toEqual({ type: "string", nodeKinds: { eq: "str/eq" } });
     expect(str.nodeKinds).toContain("str/eq");
   });
 });

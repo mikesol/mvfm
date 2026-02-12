@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { ilo } from "../../../src/core";
 import { error } from "../../../src/plugins/error";
 import { num } from "../../../src/plugins/num";
+import { ord } from "../../../src/plugins/ord";
 import { postgres } from "../../../src/plugins/postgres/3.4.8";
 
 function strip(ast: unknown): unknown {
@@ -10,7 +11,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, postgres("postgres://localhost/test"), error);
+const app = ilo(num, ord, postgres("postgres://localhost/test"), error);
 
 describe("error: $.try().catch()", () => {
   it("produces error/try with catch branch", () => {
@@ -113,7 +114,7 @@ describe("error: $.guard()", () => {
     const ast = strip(prog.ast) as any;
     const guardNode = ast.result.steps[0];
     expect(guardNode.kind).toBe("error/guard");
-    expect(guardNode.condition.kind).toBe("num/gt");
+    expect(guardNode.condition.kind).toBe("ord/gt");
     expect(guardNode.error.kind).toBe("core/record");
   });
 });

@@ -3,7 +3,9 @@ import { ilo } from "../src/core";
 import { error } from "../src/plugins/error";
 import { fiber } from "../src/plugins/fiber";
 import { num } from "../src/plugins/num";
+import { ord } from "../src/plugins/ord";
 import { postgres } from "../src/plugins/postgres/3.4.8";
+import { semiring } from "../src/plugins/semiring";
 import { str } from "../src/plugins/str";
 
 function strip(ast: unknown): unknown {
@@ -12,7 +14,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, str, postgres("postgres://localhost/test"), fiber, error);
+const app = ilo(num, str, ord, semiring, postgres("postgres://localhost/test"), fiber, error);
 
 describe("composition: postgres + fiber", () => {
   it("$.par wrapping postgres queries nests correctly", () => {

@@ -18,12 +18,17 @@ export const semiring: PluginDefinition<SemiringMethods> = {
         const bNode = ctx.lift(b).__node;
         const type =
           inferType(aNode, impls, ctx.inputSchema) ?? inferType(bNode, impls, ctx.inputSchema);
-        if (!type) {
-          throw new Error(`Cannot infer type for ${op} — both arguments are untyped`);
-        }
-        const impl = impls.find((i) => i.type === type);
+        const impl = type
+          ? impls.find((i) => i.type === type)
+          : impls.length === 1
+            ? impls[0]
+            : undefined;
         if (!impl) {
-          throw new Error(`No semiring implementation for type: ${type}`);
+          throw new Error(
+            type
+              ? `No semiring implementation for type: ${type}`
+              : `Cannot infer type for ${op} — both arguments are untyped`,
+          );
         }
         return ctx.expr<number>({
           kind: impl.nodeKinds[op],
