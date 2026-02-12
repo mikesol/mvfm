@@ -97,6 +97,9 @@ The AST (with internal IDs stripped) is hashed to produce a deterministic progra
 |--------|-----------|-------------------|
 | `num` | `num/` | Arithmetic (`add`, `sub`, `mul`, `div`, `mod`), comparison (`gt`, `gte`, `lt`, `lte`), rounding (`floor`, `ceil`, `round`, `abs`), variadic (`min`, `max`), negation |
 | `str` | `str/` | Tagged template `` $.str`...` ``, `concat`, `upper`, `lower`, `trim`, `slice`, `includes`, `startsWith`, `endsWith`, `split`, `join`, `replace`, `len` |
+| `boolean` | `boolean/` | Logical operators (`and`, `or`, `not`). Sugar over `$.cond` but with dedicated AST nodes for clarity. |
+| `control` | `control/` | Imperative control flow (`each`, `while`). Expressible via `$.rec` but provided as ergonomic primitives. |
+| `st` | `st/` | Mutable state (ST monad). `$.let(initial)` returns `.get()`, `.set()`, `.push()`. Scoped mutable bindings for imperative accumulation patterns. |
 | `fiber` | `fiber/` | Concurrency primitives. Parallel execution (`par` — tuple and bounded map forms), sequential (`seq`), first-wins (`race`), `timeout` with fallback, `retry` with attempts/delay. Concurrency limits are always explicit. |
 | `error` | `error/` | Structured error handling. `try`/`.catch`/`.match`/`.finally`, explicit failure (`fail`), default-on-error (`orElse`), Either-style (`attempt`), assertions (`guard`), collect-all (`settle`). |
 
@@ -134,7 +137,10 @@ The resulting `$` is the intersection of all plugin contributions. A `postgres/q
 ```
 Layer       Plugin     Provides           PureScript equivalent
 ─────       ──────     ────────           ─────────────────────
-pure        core       $.do, $.cond       Identity
+pure        core       $.do, $.cond, $.rec Identity
+logic       boolean    $.and, $.or, $.not Boolean combinators
+state       st         $.let, .get, .set  ST
+control     control    $.each, $.while    Control.Monad
 concurrency fiber      $.par, $.retry     Aff
 failure     error      $.try, $.guard     ExceptT
 database    postgres   $.sql`...`         postgres FFI

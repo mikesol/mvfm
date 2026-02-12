@@ -318,29 +318,6 @@ interface CoreDollar {
   /** Equality */
   eq<T>(a: Expr<T> | T, b: Expr<T> | T): Expr<boolean>;
 
-  /** Boolean operators */
-  and(a: Expr<boolean>, b: Expr<boolean>): Expr<boolean>;
-  or(a: Expr<boolean>, b: Expr<boolean>): Expr<boolean>;
-  not(a: Expr<boolean>): Expr<boolean>;
-
-  /** Mutable binding */
-  let<T>(initial: Expr<T> | T): {
-    get: () => Expr<T>;
-    set: (value: Expr<T> | T) => void;
-    push: (value: Expr<T>) => void; // for arrays
-  };
-
-  /** Iteration (statement-level) */
-  each<T>(collection: Expr<T[]>, body: (item: Expr<T>) => void): void;
-
-  /** While loop */
-  while(condition: Expr<boolean>): {
-    body: (...statements: unknown[]) => void;
-  };
-
-  /** No-op */
-  noop: Expr<void>;
-
   /**
    * Sequence side effects with a final return value.
    * All arguments are included in the program.
@@ -449,68 +426,6 @@ export function ilo<P extends PluginDefinition<any>[]>(...plugins: P) {
           ctx,
         );
       },
-
-      and(a, b) {
-        return makeExprProxy<boolean>({ kind: "core/and", left: a.__node, right: b.__node }, ctx);
-      },
-
-      or(a, b) {
-        return makeExprProxy<boolean>({ kind: "core/or", left: a.__node, right: b.__node }, ctx);
-      },
-
-      not(a) {
-        return makeExprProxy<boolean>({ kind: "core/not", operand: a.__node }, ctx);
-      },
-
-      let<T>(initial: Expr<T> | T) {
-        const ref = `let_${statements.length}`;
-        const initNode = ctx.lift(initial).__node;
-        ctx.emit({ kind: "core/let", ref, initial: initNode });
-
-        return {
-          get: () => makeExprProxy<T>({ kind: "core/let_get", ref }, ctx),
-          set: (value: Expr<T> | T) =>
-            ctx.emit({
-              kind: "core/let_set",
-              ref,
-              value: ctx.lift(value).__node,
-            }),
-          push: (value: Expr<T>) =>
-            ctx.emit({
-              kind: "core/let_push",
-              ref,
-              value: value.__node,
-            }),
-        };
-      },
-
-      each<T>(collection: Expr<T[]>, body: (item: Expr<T>) => void) {
-        const paramNode: ASTNode = { kind: "core/lambda_param", name: "item" };
-        const paramProxy = makeExprProxy<T>(paramNode, ctx);
-        const prevLen = statements.length;
-        body(paramProxy);
-        const bodyStatements = statements.splice(prevLen);
-        ctx.emit({
-          kind: "core/each",
-          collection: collection.__node,
-          param: paramNode,
-          body: bodyStatements,
-        });
-      },
-
-      while(condition: Expr<boolean>) {
-        return {
-          body: (..._stmts: unknown[]) => {
-            ctx.emit({
-              kind: "core/while",
-              condition: condition.__node,
-              body: _stmts.filter((s) => isExpr(s)).map((s) => (s as Expr<unknown>).__node),
-            });
-          },
-        };
-      },
-
-      noop: makeExprProxy<void>({ kind: "core/noop" }, ctx),
 
       do(...exprs: (Expr<any> | any)[]) {
         const nodes = exprs.map((e) => (isExpr(e) ? e.__node : autoLift(e, ctx.expr).__node));
@@ -670,9 +585,8 @@ function isInternalNode(node: ASTNode): boolean {
   return (
     node.kind === "core/input" ||
     node.kind === "core/literal" ||
-    node.kind === "core/noop" ||
     node.kind === "core/lambda_param" ||
-    node.kind.startsWith("core/let")
+    node.kind.startsWith("st/")
   );
 }
 

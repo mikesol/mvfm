@@ -70,7 +70,7 @@ describe("core: $.cond()", () => {
   });
 });
 
-describe("core: $.eq(), $.and(), $.or(), $.not()", () => {
+describe("core: $.eq()", () => {
   const app = ilo(num);
 
   it("$.eq produces core/eq", () => {
@@ -79,25 +79,6 @@ describe("core: $.eq(), $.and(), $.or(), $.not()", () => {
     expect(ast.result.kind).toBe("core/eq");
     expect(ast.result.right.kind).toBe("core/literal");
     expect(ast.result.right.value).toBe(1);
-  });
-
-  it("$.and produces core/and", () => {
-    const prog = app(($) => $.and($.eq($.input.x, 1), $.eq($.input.y, 2)));
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/and");
-  });
-
-  it("$.or produces core/or", () => {
-    const prog = app(($) => $.or($.eq($.input.x, 1), $.eq($.input.y, 2)));
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/or");
-  });
-
-  it("$.not produces core/not", () => {
-    const prog = app(($) => $.not($.eq($.input.x, 1)));
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/not");
-    expect(ast.result.operand.kind).toBe("core/eq");
   });
 });
 
@@ -252,11 +233,11 @@ describe("core: reachability analysis", () => {
     }).not.toThrow();
   });
 
-  it("does not false-positive on $.input or $.noop", () => {
+  it("does not false-positive on $.input", () => {
     expect(() => {
       app(($) => {
         $.input.unused; // accessing input doesn't create orphans
-        return $.noop;
+        return $.input.x;
       });
     }).not.toThrow();
   });
