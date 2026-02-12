@@ -8,7 +8,7 @@
 //
 // ============================================================
 
-import type { PluginDefinition, PluginContext, Expr } from "./core";
+import type { Expr, PluginContext, PluginDefinition } from "./core";
 
 // ---- Step 1: Define your type interface -------------------
 //
@@ -17,7 +17,11 @@ import type { PluginDefinition, PluginContext, Expr } from "./core";
 
 export interface StripeMethods {
   stripe: {
-    charge(amount: Expr<number> | number, currency: Expr<string> | string, customerId: Expr<string> | string): Expr<{ id: string; status: string }>;
+    charge(
+      amount: Expr<number> | number,
+      currency: Expr<string> | string,
+      customerId: Expr<string> | string,
+    ): Expr<{ id: string; status: string }>;
     refund(chargeId: Expr<string> | string): Expr<{ id: string; status: string }>;
     getCustomer(id: Expr<string> | string): Expr<Record<string, unknown>>;
   };
@@ -37,9 +41,7 @@ export interface StripeMethods {
 //   ctx.emit(node)     — add a statement-level node
 //   ctx.statements     — the current statement list
 
-export function stripe(config: {
-  publishableKey?: string;
-}): PluginDefinition<StripeMethods> {
+export function stripe(config: { publishableKey?: string }): PluginDefinition<StripeMethods> {
   // Config is captured in the closure — it'll be baked
   // into the AST nodes so the interpreter knows how
   // to execute them.
@@ -91,7 +93,7 @@ export function stripe(config: {
 
 import type { InterpreterFragment } from "./core";
 
-export function stripeInterpreter(secretKey: string): InterpreterFragment {
+export function stripeInterpreter(_secretKey: string): InterpreterFragment {
   return {
     pluginName: "stripe",
     canHandle: (node) => node.kind.startsWith("stripe/"),

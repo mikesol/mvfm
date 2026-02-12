@@ -31,7 +31,7 @@
 //
 // ============================================================
 
-import type { PluginDefinition, PluginContext, Expr, ASTNode } from "../core";
+import type { ASTNode, Expr, PluginContext, PluginDefinition } from "../core";
 
 // ---- What the plugin adds to $ ----------------------------
 
@@ -147,9 +147,7 @@ interface TryBuilder<T> {
    *       '_':         (err) => $.fail(err)  // re-throw
    *     })
    */
-  match<U>(
-    cases: Record<string, (err: Expr<any>) => Expr<U> | U>
-  ): Expr<T | U>;
+  match<U>(cases: Record<string, (err: Expr<any>) => Expr<U> | U>): Expr<T | U>;
 
   /**
    * Run a cleanup action regardless of success or failure.
@@ -167,18 +165,12 @@ interface TryBuilder<T> {
 
 export const error: PluginDefinition<ErrorMethods> = {
   name: "error",
-  nodeKinds: [
-    "error/try",
-    "error/fail",
-    "error/attempt",
-    "error/guard",
-    "error/settle",
-  ],
+  nodeKinds: ["error/try", "error/fail", "error/attempt", "error/guard", "error/settle"],
 
   build(ctx: PluginContext): ErrorMethods {
     function buildTryBuilder<T>(
       exprNode: ASTNode,
-      finallyNode: ASTNode | null = null
+      finallyNode: ASTNode | null = null,
     ): TryBuilder<T> {
       return {
         catch<U>(fn: (err: Expr<any>) => Expr<U> | U): Expr<T | U> {
@@ -203,9 +195,7 @@ export const error: PluginDefinition<ErrorMethods> = {
           });
         },
 
-        match<U>(
-          cases: Record<string, (err: Expr<any>) => Expr<U> | U>
-        ): Expr<T | U> {
+        match<U>(cases: Record<string, (err: Expr<any>) => Expr<U> | U>): Expr<T | U> {
           const errParam: ASTNode = {
             kind: "core/lambda_param",
             name: "err",
@@ -215,9 +205,7 @@ export const error: PluginDefinition<ErrorMethods> = {
           const branches: Record<string, ASTNode> = {};
           for (const [key, fn] of Object.entries(cases)) {
             const result = fn(errProxy);
-            branches[key] = ctx.isExpr(result)
-              ? result.__node
-              : ctx.lift(result).__node;
+            branches[key] = ctx.isExpr(result) ? result.__node : ctx.lift(result).__node;
           }
 
           return ctx.expr<T | U>({
@@ -245,16 +233,12 @@ export const error: PluginDefinition<ErrorMethods> = {
       fail(error: Expr<any> | any): Expr<never> {
         return ctx.expr<never>({
           kind: "error/fail",
-          error: ctx.isExpr(error)
-            ? error.__node
-            : ctx.lift(error).__node,
+          error: ctx.isExpr(error) ? error.__node : ctx.lift(error).__node,
         });
       },
 
       orElse<T>(expr: Expr<T>, fallback: Expr<T> | T): Expr<T> {
-        const fallbackNode = ctx.isExpr(fallback)
-          ? fallback.__node
-          : ctx.lift(fallback).__node;
+        const fallbackNode = ctx.isExpr(fallback) ? fallback.__node : ctx.lift(fallback).__node;
 
         // Sugar: desugars to try/catch that ignores the error
         return ctx.expr<T>({
@@ -268,25 +252,18 @@ export const error: PluginDefinition<ErrorMethods> = {
         });
       },
 
-      attempt<T>(
-        expr: Expr<T>
-      ): Expr<{ ok: T | null; err: any | null }> {
+      attempt<T>(expr: Expr<T>): Expr<{ ok: T | null; err: any | null }> {
         return ctx.expr({
           kind: "error/attempt",
           expr: expr.__node,
         });
       },
 
-      guard(
-        condition: Expr<boolean>,
-        error: Expr<any> | any
-      ): Expr<void> {
+      guard(condition: Expr<boolean>, error: Expr<any> | any): Expr<void> {
         return ctx.expr<void>({
           kind: "error/guard",
           condition: condition.__node,
-          error: ctx.isExpr(error)
-            ? error.__node
-            : ctx.lift(error).__node,
+          error: ctx.isExpr(error) ? error.__node : ctx.lift(error).__node,
         });
       },
 
