@@ -508,7 +508,7 @@ export function ilo<P extends PluginDefinition<any>[]>(...plugins: P) {
     // Run the closure — this builds the AST
     const result = fn(dollar);
     const resultNode = isExpr(result)
-      ? (result as Expr<any>).__node
+      ? (result as Expr<unknown>).__node
       : autoLift(result, ctx.expr).__node;
 
     // Build the final program
