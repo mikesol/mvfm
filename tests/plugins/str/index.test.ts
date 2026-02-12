@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../src/core";
-import { str } from "../../src/plugins/str";
+import { ilo } from "../../../src/core";
+import { str } from "../../../src/plugins/str";
 
 function strip(ast: unknown): unknown {
   return JSON.parse(JSON.stringify(ast, (k, v) => (k === "__id" ? undefined : v)));
