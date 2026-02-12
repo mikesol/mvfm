@@ -28,7 +28,7 @@
 //
 // ============================================================
 
-import type { PluginDefinition, PluginContext, Expr, ASTNode } from "../core";
+import type { ASTNode, Expr, PluginContext, PluginDefinition } from "../core";
 
 // ---- What the plugin adds to $ ----------------------------
 
@@ -113,7 +113,7 @@ interface ParFn {
   <T, R>(
     collection: Expr<T[]>,
     opts: { concurrency: number },
-    fn: (item: Expr<T>) => Expr<R>
+    fn: (item: Expr<T>) => Expr<R>,
   ): Expr<R[]>;
 }
 
@@ -150,9 +150,7 @@ export const fiber: PluginDefinition<FiberMethods> = {
         };
         const paramProxy = ctx.expr(paramNode);
         const bodyResult = fn(paramProxy);
-        const bodyNode = ctx.isExpr(bodyResult)
-          ? bodyResult.__node
-          : ctx.lift(bodyResult).__node;
+        const bodyNode = ctx.isExpr(bodyResult) ? bodyResult.__node : ctx.lift(bodyResult).__node;
 
         return ctx.expr({
           kind: "fiber/par_map",
@@ -166,9 +164,7 @@ export const fiber: PluginDefinition<FiberMethods> = {
       // Tuple form: $.par(a, b, c)
       return ctx.expr({
         kind: "fiber/par",
-        branches: args.map((a: any) =>
-          ctx.isExpr(a) ? a.__node : ctx.lift(a).__node
-        ),
+        branches: args.map((a: any) => (ctx.isExpr(a) ? a.__node : ctx.lift(a).__node)),
       });
     }) as ParFn;
 
@@ -176,9 +172,7 @@ export const fiber: PluginDefinition<FiberMethods> = {
       par: parFn,
 
       seq(...exprs: (Expr<any> | any)[]) {
-        const nodes = exprs.map((e) =>
-          ctx.isExpr(e) ? e.__node : ctx.lift(e).__node
-        );
+        const nodes = exprs.map((e) => (ctx.isExpr(e) ? e.__node : ctx.lift(e).__node));
         return ctx.expr({
           kind: "fiber/seq",
           steps: nodes.slice(0, -1),
@@ -198,9 +192,7 @@ export const fiber: PluginDefinition<FiberMethods> = {
           kind: "fiber/timeout",
           expr: expr.__node,
           ms: ctx.isExpr(ms) ? (ms as Expr<number>).__node : { kind: "core/literal", value: ms },
-          fallback: ctx.isExpr(fallback)
-            ? fallback.__node
-            : ctx.lift(fallback).__node,
+          fallback: ctx.isExpr(fallback) ? fallback.__node : ctx.lift(fallback).__node,
         });
       },
 

@@ -18,7 +18,7 @@
 //
 // ============================================================
 
-import type { PluginDefinition, PluginContext, Expr, ASTNode } from "../core";
+import type { Expr, PluginContext, PluginDefinition } from "../core";
 
 // ---- What the plugin adds to $ ----------------------------
 
@@ -71,7 +71,7 @@ interface PostgresSql {
    */
   insert(
     data: Expr<Record<string, any>> | Expr<Record<string, any>[]>,
-    columns?: string[]
+    columns?: string[],
   ): Expr<any>;
 
   /**
@@ -85,10 +85,7 @@ interface PostgresSql {
    * it out from context. We can't do that because we're building an AST,
    * not sending to postgres. The interpreter needs to know the intent.
    */
-  set(
-    data: Expr<Record<string, any>>,
-    columns?: string[]
-  ): Expr<any>;
+  set(data: Expr<Record<string, any>>, columns?: string[]): Expr<any>;
 
   /**
    * Transaction block.
@@ -172,9 +169,7 @@ interface PostgresSql {
    * But `const [user] = ...` doesn't because JS destructuring
    * calls Symbol.iterator which we can't meaningfully proxy.
    */
-  begin<T>(
-    fn: (sql: PostgresTxSql) => Expr<T> | Expr<any>[]
-  ): Expr<T>;
+  begin<T>(fn: (sql: PostgresTxSql) => Expr<T> | Expr<any>[]): Expr<T>;
 }
 
 /**
@@ -192,9 +187,7 @@ interface PostgresTxSql {
   insert(data: Expr<any>, columns?: string[]): Expr<any>;
   set(data: Expr<any>, columns?: string[]): Expr<any>;
 
-  savepoint<T>(
-    fn: (sql: PostgresTxSql) => Expr<T> | Expr<any>[]
-  ): Expr<T>;
+  savepoint<T>(fn: (sql: PostgresTxSql) => Expr<T> | Expr<any>[]): Expr<T>;
 }
 
 // ---- Configuration ----------------------------------------
@@ -215,13 +208,9 @@ export interface PostgresConfig {
 
 // ---- Plugin implementation --------------------------------
 
-export function postgres(
-  config?: PostgresConfig | string
-): PluginDefinition<PostgresMethods> {
+export function postgres(config?: PostgresConfig | string): PluginDefinition<PostgresMethods> {
   const resolvedConfig: PostgresConfig =
-    typeof config === "string"
-      ? { connectionString: config }
-      : config ?? {};
+    typeof config === "string" ? { connectionString: config } : (config ?? {});
 
   return {
     name: "postgres",
@@ -238,15 +227,12 @@ export function postgres(
       // Build a sql tagged template function + helpers
       function makeSql(scope: "top" | "transaction" | "savepoint"): any {
         // The tagged template function itself
-        const sqlFn = (
-          strings: TemplateStringsArray,
-          ...values: any[]
-        ) => {
+        const sqlFn = (strings: TemplateStringsArray, ...values: any[]) => {
           return ctx.expr({
             kind: "postgres/query",
             strings: Array.from(strings),
             params: values.map((v) =>
-              ctx.isExpr(v) ? v.__node : { kind: "core/literal", value: v }
+              ctx.isExpr(v) ? v.__node : { kind: "core/literal", value: v },
             ),
             config: resolvedConfig,
           });
@@ -287,17 +273,13 @@ export function postgres(
               ? {
                   kind: "postgres/begin" as const,
                   mode: "pipeline" as const,
-                  queries: result.map((r: any) =>
-                    ctx.isExpr(r) ? r.__node : ctx.lift(r).__node
-                  ),
+                  queries: result.map((r: any) => (ctx.isExpr(r) ? r.__node : ctx.lift(r).__node)),
                   config: resolvedConfig,
                 }
               : {
                   kind: "postgres/begin" as const,
                   mode: "callback" as const,
-                  body: ctx.isExpr(result)
-                    ? result.__node
-                    : ctx.lift(result).__node,
+                  body: ctx.isExpr(result) ? result.__node : ctx.lift(result).__node,
                   config: resolvedConfig,
                 };
 
@@ -315,16 +297,12 @@ export function postgres(
               ? {
                   kind: "postgres/savepoint" as const,
                   mode: "pipeline" as const,
-                  queries: result.map((r: any) =>
-                    ctx.isExpr(r) ? r.__node : ctx.lift(r).__node
-                  ),
+                  queries: result.map((r: any) => (ctx.isExpr(r) ? r.__node : ctx.lift(r).__node)),
                 }
               : {
                   kind: "postgres/savepoint" as const,
                   mode: "callback" as const,
-                  body: ctx.isExpr(result)
-                    ? result.__node
-                    : ctx.lift(result).__node,
+                  body: ctx.isExpr(result) ? result.__node : ctx.lift(result).__node,
                 };
 
             return ctx.expr(body);

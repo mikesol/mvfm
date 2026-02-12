@@ -1,12 +1,12 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { ilo } from "../../src/core";
-import { num } from "../../src/plugins/num";
 import { fiber } from "../../src/plugins/fiber";
+import { num } from "../../src/plugins/num";
 import { postgres } from "../../src/plugins/postgres";
 
 function strip(ast: unknown): unknown {
   return JSON.parse(
-    JSON.stringify(ast, (k, v) => (k === "__id" || k === "config" ? undefined : v))
+    JSON.stringify(ast, (k, v) => (k === "__id" || k === "config" ? undefined : v)),
   );
 }
 
@@ -15,10 +15,7 @@ const app = ilo(num, postgres("postgres://localhost/test"), fiber);
 describe("fiber: $.par() tuple form", () => {
   it("produces fiber/par node with branches", () => {
     const prog = app(($) => {
-      return $.par(
-        $.sql`select count(*) from users`,
-        $.sql`select count(*) from posts`
-      );
+      return $.par($.sql`select count(*) from users`, $.sql`select count(*) from posts`);
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fiber/par");
@@ -29,11 +26,7 @@ describe("fiber: $.par() tuple form", () => {
 
   it("works with 3+ branches", () => {
     const prog = app(($) => {
-      return $.par(
-        $.sql`select 1`,
-        $.sql`select 2`,
-        $.sql`select 3`
-      );
+      return $.par($.sql`select 1`, $.sql`select 2`, $.sql`select 3`);
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.branches).toHaveLength(3);
@@ -44,8 +37,10 @@ describe("fiber: $.par() map form", () => {
   it("produces fiber/par_map with concurrency and lambda", () => {
     const prog = app(($) => {
       const users = $.sql`select * from users where active = true`;
-      return $.par(users, { concurrency: 5 }, (user) =>
-        $.sql`select * from posts where user_id = ${user.id}`
+      return $.par(
+        users,
+        { concurrency: 5 },
+        (user) => $.sql`select * from posts where user_id = ${user.id}`,
       );
     });
     const ast = strip(prog.ast) as any;
@@ -63,7 +58,7 @@ describe("fiber: $.seq()", () => {
       return $.seq(
         $.sql`insert into log (msg) values ('start')`,
         $.sql`insert into log (msg) values ('end')`,
-        $.sql`select * from log`
+        $.sql`select * from log`,
       );
     });
     const ast = strip(prog.ast) as any;
@@ -78,7 +73,7 @@ describe("fiber: $.race()", () => {
     const prog = app(($) => {
       return $.race(
         $.sql`select * from users_primary where id = ${$.input.id}`,
-        $.sql`select * from users_replica where id = ${$.input.id}`
+        $.sql`select * from users_replica where id = ${$.input.id}`,
       );
     });
     const ast = strip(prog.ast) as any;
@@ -90,11 +85,7 @@ describe("fiber: $.race()", () => {
 describe("fiber: $.timeout()", () => {
   it("produces fiber/timeout with ms and fallback", () => {
     const prog = app(($) => {
-      return $.timeout(
-        $.sql`select * from slow_view`,
-        5000,
-        { error: "timeout" }
-      );
+      return $.timeout($.sql`select * from slow_view`, 5000, { error: "timeout" });
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fiber/timeout");
@@ -115,10 +106,7 @@ describe("fiber: $.timeout()", () => {
 describe("fiber: $.retry()", () => {
   it("produces fiber/retry with attempts and delay", () => {
     const prog = app(($) => {
-      return $.retry(
-        $.sql`select * from flaky_service`,
-        { attempts: 3, delay: 1000 }
-      );
+      return $.retry($.sql`select * from flaky_service`, { attempts: 3, delay: 1000 });
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fiber/retry");
@@ -143,10 +131,10 @@ describe("fiber: nested composition", () => {
         $.retry(
           $.par(
             $.sql`select * from posts where user_id = ${user.id}`,
-            $.sql`select * from comments where user_id = ${user.id}`
+            $.sql`select * from comments where user_id = ${user.id}`,
           ),
-          { attempts: 2, delay: 500 }
-        )
+          { attempts: 2, delay: 500 },
+        ),
       );
     });
     const ast = strip(prog.ast) as any;

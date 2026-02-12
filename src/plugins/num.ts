@@ -1,4 +1,4 @@
-import type { PluginDefinition, PluginContext, Expr } from "../core";
+import type { Expr, PluginContext, PluginDefinition } from "../core";
 
 export interface NumMethods {
   add(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
@@ -22,10 +22,22 @@ export interface NumMethods {
 export const num: PluginDefinition<NumMethods> = {
   name: "num",
   nodeKinds: [
-    "num/add", "num/sub", "num/mul", "num/div", "num/mod",
-    "num/gt", "num/gte", "num/lt", "num/lte",
-    "num/neg", "num/abs", "num/floor", "num/ceil", "num/round",
-    "num/min", "num/max",
+    "num/add",
+    "num/sub",
+    "num/mul",
+    "num/div",
+    "num/mod",
+    "num/gt",
+    "num/gte",
+    "num/lt",
+    "num/lte",
+    "num/neg",
+    "num/abs",
+    "num/floor",
+    "num/ceil",
+    "num/round",
+    "num/min",
+    "num/max",
   ],
   build(ctx: PluginContext): NumMethods {
     const binop = (kind: string) => (a: Expr<number> | number, b: Expr<number> | number) =>

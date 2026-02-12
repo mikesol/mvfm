@@ -1,14 +1,14 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { ilo } from "../src/core";
-import { num } from "../src/plugins/num";
-import { str } from "../src/plugins/str";
-import { postgres } from "../src/plugins/postgres";
-import { fiber } from "../src/plugins/fiber";
 import { error } from "../src/plugins/error";
+import { fiber } from "../src/plugins/fiber";
+import { num } from "../src/plugins/num";
+import { postgres } from "../src/plugins/postgres";
+import { str } from "../src/plugins/str";
 
 function strip(ast: unknown): unknown {
   return JSON.parse(
-    JSON.stringify(ast, (k, v) => (k === "__id" || k === "config" ? undefined : v))
+    JSON.stringify(ast, (k, v) => (k === "__id" || k === "config" ? undefined : v)),
   );
 }
 
@@ -17,10 +17,7 @@ const app = ilo(num, str, postgres("postgres://localhost/test"), fiber, error);
 describe("composition: postgres + fiber", () => {
   it("$.par wrapping postgres queries nests correctly", () => {
     const prog = app(($) => {
-      return $.par(
-        $.sql`select count(*) from users`,
-        $.sql`select count(*) from posts`
-      );
+      return $.par($.sql`select count(*) from users`, $.sql`select count(*) from posts`);
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fiber/par");
@@ -31,8 +28,10 @@ describe("composition: postgres + fiber", () => {
   it("$.par map form over postgres query results", () => {
     const prog = app(($) => {
       const users = $.sql`select * from users`;
-      return $.par(users, { concurrency: 5 }, (user) =>
-        $.sql`select * from posts where user_id = ${user.id}`
+      return $.par(
+        users,
+        { concurrency: 5 },
+        (user) => $.sql`select * from posts where user_id = ${user.id}`,
       );
     });
     const ast = strip(prog.ast) as any;
@@ -45,8 +44,9 @@ describe("composition: postgres + fiber", () => {
 describe("composition: postgres + error", () => {
   it("$.try wrapping postgres query produces correct nesting", () => {
     const prog = app(($) => {
-      return $.try($.sql`select * from users where id = ${$.input.id}`)
-        .catch((err) => ({ error: err.message }));
+      return $.try($.sql`select * from users where id = ${$.input.id}`).catch((err) => ({
+        error: err.message,
+      }));
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("error/try");
@@ -60,7 +60,7 @@ describe("composition: postgres + error", () => {
         return $.do(
           $.guard($.gt(from[0].balance, $.input.amount), { code: "INSUFFICIENT" }),
           sql`update accounts set balance = balance - ${$.input.amount} where id = ${$.input.fromId}`,
-          { success: true }
+          { success: true },
         );
       });
     });
@@ -75,12 +75,9 @@ describe("composition: postgres + error", () => {
 describe("composition: postgres + fiber + error (full stack)", () => {
   it("$.try($.par(...)).catch() — the full monty", () => {
     const prog = app(($) => {
-      return $.try(
-        $.par(
-          $.sql`select * from service_a`,
-          $.sql`select * from service_b`
-        )
-      ).catch((_err) => []);
+      return $.try($.par($.sql`select * from service_a`, $.sql`select * from service_b`)).catch(
+        (_err) => [],
+      );
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("error/try");
@@ -95,12 +92,12 @@ describe("composition: postgres + fiber + error (full stack)", () => {
         $.guard($.gt(users.length, 0), { code: 404, message: "no users" }),
         $.par(users, { concurrency: 5 }, (user) =>
           $.try(
-            $.retry(
-              $.sql`select * from posts where user_id = ${user.id}`,
-              { attempts: 2, delay: 500 }
-            )
-          ).catch((_err) => [])
-        )
+            $.retry($.sql`select * from posts where user_id = ${user.id}`, {
+              attempts: 2,
+              delay: 500,
+            }),
+          ).catch((_err) => []),
+        ),
       );
     });
     const ast = strip(prog.ast) as any;
@@ -126,9 +123,9 @@ describe("composition: postgres + fiber + error (full stack)", () => {
               success: true,
               fromBalance: $.sub(from[0].balance, $.input.amount),
               toBalance: $.add(to[0].balance, $.input.amount),
-            }
+            },
           );
-        })
+        }),
       ).catch((err) => ({ success: false, error: err }));
     });
     const ast = strip(prog.ast) as any;

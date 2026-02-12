@@ -1,12 +1,12 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { ilo } from "../../src/core";
-import { num } from "../../src/plugins/num";
 import { error } from "../../src/plugins/error";
+import { num } from "../../src/plugins/num";
 import { postgres } from "../../src/plugins/postgres";
 
 function strip(ast: unknown): unknown {
   return JSON.parse(
-    JSON.stringify(ast, (k, v) => (k === "__id" || k === "config" ? undefined : v))
+    JSON.stringify(ast, (k, v) => (k === "__id" || k === "config" ? undefined : v)),
   );
 }
 
@@ -15,8 +15,10 @@ const app = ilo(num, postgres("postgres://localhost/test"), error);
 describe("error: $.try().catch()", () => {
   it("produces error/try with catch branch", () => {
     const prog = app(($) => {
-      return $.try($.sql`select * from users where id = ${$.input.id}`)
-        .catch((err) => ({ error: err.message, data: null }));
+      return $.try($.sql`select * from users where id = ${$.input.id}`).catch((err) => ({
+        error: err.message,
+        data: null,
+      }));
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("error/try");
@@ -29,12 +31,11 @@ describe("error: $.try().catch()", () => {
 describe("error: $.try().match()", () => {
   it("produces error/try with match branches", () => {
     const prog = app(($) => {
-      return $.try($.sql`select * from users where id = ${$.input.id}`)
-        .match({
-          not_found: (_err) => "default_user",
-          timeout: (_err) => "cached_user",
-          _: (err) => $.fail(err),
-        });
+      return $.try($.sql`select * from users where id = ${$.input.id}`).match({
+        not_found: (_err) => "default_user",
+        timeout: (_err) => "cached_user",
+        _: (err) => $.fail(err),
+      });
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("error/try");
@@ -75,10 +76,7 @@ describe("error: $.fail()", () => {
 describe("error: $.orElse()", () => {
   it("produces error/try with catch that returns fallback", () => {
     const prog = app(($) => {
-      return $.orElse(
-        $.sql`select * from users where id = ${$.input.id}`,
-        [{ name: "anonymous" }]
-      );
+      return $.orElse($.sql`select * from users where id = ${$.input.id}`, [{ name: "anonymous" }]);
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("error/try");
@@ -109,7 +107,7 @@ describe("error: $.guard()", () => {
           message: "insufficient funds",
         }),
         $.sql`update accounts set balance = balance - ${$.input.amount}`,
-        { success: true }
+        { success: true },
       );
     });
     const ast = strip(prog.ast) as any;
@@ -126,7 +124,7 @@ describe("error: $.settle()", () => {
       return $.settle(
         $.sql`select 1 from users limit 1`,
         $.sql`select 1 from posts limit 1`,
-        $.sql`select 1 from comments limit 1`
+        $.sql`select 1 from comments limit 1`,
       );
     });
     const ast = strip(prog.ast) as any;

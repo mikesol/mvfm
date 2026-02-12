@@ -1,12 +1,12 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { ilo } from "../../src/core";
 import { num } from "../../src/plugins/num";
-import { str } from "../../src/plugins/str";
 import { postgres } from "../../src/plugins/postgres";
+import { str } from "../../src/plugins/str";
 
 function strip(ast: unknown): unknown {
   return JSON.parse(
-    JSON.stringify(ast, (k, v) => (k === "__id" || k === "config" ? undefined : v))
+    JSON.stringify(ast, (k, v) => (k === "__id" || k === "config" ? undefined : v)),
   );
 }
 
@@ -149,10 +149,7 @@ describe("postgres: integration with $.do()", () => {
     expect(() => {
       app(($) => {
         const user = $.sql`select * from users where id = ${$.input.id}`;
-        return $.do(
-          $.sql`update users set last_seen = now() where id = ${$.input.id}`,
-          user[0]
-        );
+        return $.do($.sql`update users set last_seen = now() where id = ${$.input.id}`, user[0]);
       });
     }).not.toThrow();
   });

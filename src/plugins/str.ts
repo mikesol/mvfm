@@ -1,4 +1,4 @@
-import type { PluginDefinition, PluginContext, Expr } from "../core";
+import type { Expr, PluginContext, PluginDefinition } from "../core";
 
 export interface StrMethods {
   /** Tagged template literal: $.str`hello ${name}` */
@@ -7,22 +7,40 @@ export interface StrMethods {
   upper(s: Expr<string> | string): Expr<string>;
   lower(s: Expr<string> | string): Expr<string>;
   trim(s: Expr<string> | string): Expr<string>;
-  slice(s: Expr<string> | string, start: Expr<number> | number, end?: Expr<number> | number): Expr<string>;
+  slice(
+    s: Expr<string> | string,
+    start: Expr<number> | number,
+    end?: Expr<number> | number,
+  ): Expr<string>;
   includes(haystack: Expr<string> | string, needle: Expr<string> | string): Expr<boolean>;
   startsWith(s: Expr<string> | string, prefix: Expr<string> | string): Expr<boolean>;
   endsWith(s: Expr<string> | string, suffix: Expr<string> | string): Expr<boolean>;
   split(s: Expr<string> | string, delimiter: Expr<string> | string): Expr<string[]>;
   join(arr: Expr<string[]>, separator: Expr<string> | string): Expr<string>;
-  replace(s: Expr<string> | string, search: Expr<string> | string, replacement: Expr<string> | string): Expr<string>;
+  replace(
+    s: Expr<string> | string,
+    search: Expr<string> | string,
+    replacement: Expr<string> | string,
+  ): Expr<string>;
   len(s: Expr<string> | string): Expr<number>;
 }
 
 export const str: PluginDefinition<StrMethods> = {
   name: "str",
   nodeKinds: [
-    "str/template", "str/concat", "str/upper", "str/lower",
-    "str/trim", "str/slice", "str/includes", "str/startsWith",
-    "str/endsWith", "str/split", "str/join", "str/replace", "str/len",
+    "str/template",
+    "str/concat",
+    "str/upper",
+    "str/lower",
+    "str/trim",
+    "str/slice",
+    "str/includes",
+    "str/startsWith",
+    "str/endsWith",
+    "str/split",
+    "str/join",
+    "str/replace",
+    "str/len",
   ],
   build(ctx: PluginContext): StrMethods {
     return {

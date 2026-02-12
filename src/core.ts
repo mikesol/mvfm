@@ -109,9 +109,7 @@ export interface PluginDefinition<T = any> {
  * Plugins with no config are just bare PluginDefinition factories.
  * Plugins with config are functions that return a PluginDefinition.
  */
-export type Plugin<T = any> =
-  | PluginDefinition<T>
-  | (() => PluginDefinition<T>);
+export type Plugin<T = any> = PluginDefinition<T> | (() => PluginDefinition<T>);
 
 // ---- Interpreter Interface -------------------------------
 
@@ -132,9 +130,7 @@ export type Interpreter = (program: Program) => {
 /**
  * Compose interpreter fragments into a full interpreter.
  */
-export function composeInterpreters(
-  fragments: InterpreterFragment[]
-): (node: ASTNode) => unknown {
+export function composeInterpreters(fragments: InterpreterFragment[]): (node: ASTNode) => unknown {
   return function recurse(node: ASTNode): unknown {
     const fragment = fragments.find((f) => f.canHandle(node));
     if (!fragment) {
@@ -147,11 +143,7 @@ export function composeInterpreters(
 // ---- The Proxy Engine ------------------------------------
 
 function isExpr(value: unknown): value is Expr<unknown> {
-  return (
-    value !== null &&
-    typeof value === "object" &&
-    ILO in (value as Record<symbol, unknown>)
-  );
+  return value !== null && typeof value === "object" && ILO in (value as Record<symbol, unknown>);
 }
 
 function autoLift<T>(value: T | Expr<T>, exprFn: PluginContext["expr"]): Expr<T> {
@@ -159,12 +151,7 @@ function autoLift<T>(value: T | Expr<T>, exprFn: PluginContext["expr"]): Expr<T>
 
   // Raw primitive — auto-lift to a Literal node
   const jsType = typeof value;
-  if (
-    jsType === "number" ||
-    jsType === "string" ||
-    jsType === "boolean" ||
-    value === null
-  ) {
+  if (jsType === "number" || jsType === "string" || jsType === "boolean" || value === null) {
     return exprFn<T>({ kind: "core/literal", value });
   }
 
@@ -178,18 +165,17 @@ function autoLift<T>(value: T | Expr<T>, exprFn: PluginContext["expr"]): Expr<T>
 
   // Raw object with Expr values — lift to a Record node
   if (jsType === "object") {
-    const entries = Object.entries(value as Record<string, unknown>).map(
-      ([k, v]) => [k, isExpr(v) ? (v as Expr<unknown>).__node : autoLift(v, exprFn).__node]
-    );
+    const entries = Object.entries(value as Record<string, unknown>).map(([k, v]) => [
+      k,
+      isExpr(v) ? (v as Expr<unknown>).__node : autoLift(v, exprFn).__node,
+    ]);
     return exprFn<T>({
       kind: "core/record",
       fields: Object.fromEntries(entries),
     });
   }
 
-  throw new Error(
-    `Cannot auto-lift value of type ${jsType} into Ilo expression`
-  );
+  throw new Error(`Cannot auto-lift value of type ${jsType} into Ilo expression`);
 }
 
 /**
@@ -259,9 +245,7 @@ function makeExprProxy<T>(node: ASTNode, ctx: PluginContext): Expr<T> {
                 return {
                   kind: "core/lambda" as const,
                   params: [accNode, itemNode],
-                  body: isExpr(result)
-                    ? result.__node
-                    : autoLift(result, ctx.expr).__node,
+                  body: isExpr(result) ? result.__node : autoLift(result, ctx.expr).__node,
                 };
               }
 
@@ -269,13 +253,13 @@ function makeExprProxy<T>(node: ASTNode, ctx: PluginContext): Expr<T> {
               return {
                 kind: "core/lambda" as const,
                 params: [paramNode],
-                body: isExpr(result)
-                  ? result.__node
-                  : autoLift(result, ctx.expr).__node,
+                body: isExpr(result) ? result.__node : autoLift(result, ctx.expr).__node,
               };
             }
             // Non-callback args (like initial value for reduce)
-            return isExpr(arg) ? (arg as Expr<unknown>).__node : { kind: "core/literal", value: arg };
+            return isExpr(arg)
+              ? (arg as Expr<unknown>).__node
+              : { kind: "core/literal", value: arg };
           });
 
           return makeExprProxy(
@@ -285,7 +269,7 @@ function makeExprProxy<T>(node: ASTNode, ctx: PluginContext): Expr<T> {
               method: prop,
               args: processedArgs,
             },
-            ctx
+            ctx,
           );
         };
       }
@@ -297,7 +281,7 @@ function makeExprProxy<T>(node: ASTNode, ctx: PluginContext): Expr<T> {
           object: node,
           property: prop,
         },
-        ctx
+        ctx,
       );
     },
   }) as unknown as Expr<T>;
@@ -305,20 +289,20 @@ function makeExprProxy<T>(node: ASTNode, ctx: PluginContext): Expr<T> {
 
 // ---- ilo() — the main entry point ----------------------
 
-type ExtractPluginType<P> = P extends PluginDefinition<infer T>
-  ? T
-  : P extends (...args: any[]) => PluginDefinition<infer T>
+type ExtractPluginType<P> =
+  P extends PluginDefinition<infer T>
     ? T
-    : {};
+    : P extends (...args: any[]) => PluginDefinition<infer T>
+      ? T
+      : {};
 
-type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
-  k: infer I
-) => void
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void
   ? I
   : never;
 
-type MergePlugins<Plugins extends readonly any[]> =
-  UnionToIntersection<ExtractPluginType<Plugins[number]>>;
+type MergePlugins<Plugins extends readonly any[]> = UnionToIntersection<
+  ExtractPluginType<Plugins[number]>
+>;
 
 // Core $ methods that are always available
 interface CoreDollar {
@@ -378,10 +362,8 @@ interface CoreDollar {
  *   const serverless = ilo(num, str, db('postgres://...'))
  *   const myProgram = serverless(($) => { ... })
  */
-export function ilo<P extends (PluginDefinition<any>)[]>(...plugins: P) {
-  return function define<R>(
-    fn: ($: CoreDollar & MergePlugins<P>) => Expr<R> | R
-  ): Program {
+export function ilo<P extends PluginDefinition<any>[]>(...plugins: P) {
+  return function define<R>(fn: ($: CoreDollar & MergePlugins<P>) => Expr<R> | R): Program {
     const statements: ASTNode[] = [];
     const registry = new Map<number, ASTNode>(); // id -> node
 
@@ -402,10 +384,7 @@ export function ilo<P extends (PluginDefinition<any>)[]>(...plugins: P) {
 
     // Build core $ methods
     const core: CoreDollar = {
-      input: makeExprProxy<Record<string, unknown>>(
-        { kind: "core/input" },
-        ctx
-      ),
+      input: makeExprProxy<Record<string, unknown>>({ kind: "core/input" }, ctx),
 
       cond(predicate: Expr<boolean>) {
         let thenNode: ASTNode | null = null;
@@ -420,7 +399,7 @@ export function ilo<P extends (PluginDefinition<any>)[]>(...plugins: P) {
                 then: thenNode,
                 else: elseNode,
               },
-              ctx
+              ctx,
             );
           }
         };
@@ -454,29 +433,20 @@ export function ilo<P extends (PluginDefinition<any>)[]>(...plugins: P) {
             left: ctx.lift(a).__node,
             right: ctx.lift(b).__node,
           },
-          ctx
+          ctx,
         );
       },
 
       and(a, b) {
-        return makeExprProxy<boolean>(
-          { kind: "core/and", left: a.__node, right: b.__node },
-          ctx
-        );
+        return makeExprProxy<boolean>({ kind: "core/and", left: a.__node, right: b.__node }, ctx);
       },
 
       or(a, b) {
-        return makeExprProxy<boolean>(
-          { kind: "core/or", left: a.__node, right: b.__node },
-          ctx
-        );
+        return makeExprProxy<boolean>({ kind: "core/or", left: a.__node, right: b.__node }, ctx);
       },
 
       not(a) {
-        return makeExprProxy<boolean>(
-          { kind: "core/not", operand: a.__node },
-          ctx
-        );
+        return makeExprProxy<boolean>({ kind: "core/not", operand: a.__node }, ctx);
       },
 
       let<T>(initial: Expr<T> | T) {
@@ -485,8 +455,7 @@ export function ilo<P extends (PluginDefinition<any>)[]>(...plugins: P) {
         ctx.emit({ kind: "core/let", ref, initial: initNode });
 
         return {
-          get: () =>
-            makeExprProxy<T>({ kind: "core/let_get", ref }, ctx),
+          get: () => makeExprProxy<T>({ kind: "core/let_get", ref }, ctx),
           set: (value: Expr<T> | T) =>
             ctx.emit({
               kind: "core/let_set",
@@ -522,9 +491,7 @@ export function ilo<P extends (PluginDefinition<any>)[]>(...plugins: P) {
             ctx.emit({
               kind: "core/while",
               condition: condition.__node,
-              body: _stmts
-                .filter((s) => isExpr(s))
-                .map((s) => (s as Expr<unknown>).__node),
+              body: _stmts.filter((s) => isExpr(s)).map((s) => (s as Expr<unknown>).__node),
             });
           },
         };
@@ -533,9 +500,7 @@ export function ilo<P extends (PluginDefinition<any>)[]>(...plugins: P) {
       noop: makeExprProxy<void>({ kind: "core/noop" }, ctx),
 
       do(...exprs: (Expr<any> | any)[]) {
-        const nodes = exprs.map((e) =>
-          isExpr(e) ? e.__node : autoLift(e, ctx.expr).__node
-        );
+        const nodes = exprs.map((e) => (isExpr(e) ? e.__node : autoLift(e, ctx.expr).__node));
         const steps = nodes.slice(0, -1);
         const result = nodes[nodes.length - 1];
         return makeExprProxy(
@@ -544,14 +509,14 @@ export function ilo<P extends (PluginDefinition<any>)[]>(...plugins: P) {
             steps,
             result,
           },
-          ctx
+          ctx,
         );
       },
     };
 
     // Resolve plugins
     const resolvedPlugins = plugins.map((p) =>
-      typeof p === "function" && !("name" in p) ? (p as () => PluginDefinition<any>)() : p
+      typeof p === "function" && !("name" in p) ? (p as () => PluginDefinition<any>)() : p,
     ) as PluginDefinition<any>[];
 
     // Build each plugin's contribution to $
@@ -560,12 +525,11 @@ export function ilo<P extends (PluginDefinition<any>)[]>(...plugins: P) {
         const contribution = plugin.build(ctx);
         return { ...acc, ...contribution };
       },
-      {} as Record<string, unknown>
+      {} as Record<string, unknown>,
     );
 
     // Assemble $
-    const dollar = { ...core, ...pluginContributions } as CoreDollar &
-      MergePlugins<P>;
+    const dollar = { ...core, ...pluginContributions } as CoreDollar & MergePlugins<P>;
 
     // Run the closure — this builds the AST
     const result = fn(dollar);
@@ -634,22 +598,22 @@ export function ilo<P extends (PluginDefinition<any>)[]>(...plugins: P) {
         .join("\n");
       throw new Error(
         `Ilo build error: ${orphans.length} unreachable node(s) detected.\n` +
-        `These expressions were created but are not part of the return tree.\n` +
-        `Wrap side effects in $.do():\n\n` +
-        `  return $.do(\n` +
-        `    $.db.exec('...'),  // side effect\n` +
-        `    result             // return value\n` +
-        `  )\n\n` +
-        `Orphaned nodes:\n${details}`
+          `These expressions were created but are not part of the return tree.\n` +
+          `Wrap side effects in $.do():\n\n` +
+          `  return $.do(\n` +
+          `    $.db.exec('...'),  // side effect\n` +
+          `    result             // return value\n` +
+          `  )\n\n` +
+          `Orphaned nodes:\n${details}`,
       );
     }
 
     // Simple hash (in production, use SHA-256)
     // Strip __id fields before hashing — they're internal and
     // would cause identical programs to hash differently.
-    const hash = simpleHash(JSON.stringify(ast, (key, value) =>
-      key === "__id" ? undefined : value
-    ));
+    const hash = simpleHash(
+      JSON.stringify(ast, (key, value) => (key === "__id" ? undefined : value)),
+    );
 
     return {
       ast,

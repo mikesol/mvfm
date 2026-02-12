@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { ilo } from "../src/core";
 import { num } from "../src/plugins/num";
 import { str } from "../src/plugins/str";
@@ -40,9 +40,7 @@ describe("core: $.cond()", () => {
 
   it("produces a core/cond node with both branches via .t().f()", () => {
     const prog = app(($) => {
-      return $.cond($.eq($.input.x, 1))
-        .t($.add(1, 2))
-        .f($.add(3, 4));
+      return $.cond($.eq($.input.x, 1)).t($.add(1, 2)).f($.add(3, 4));
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("core/cond");
@@ -52,9 +50,7 @@ describe("core: $.cond()", () => {
 
   it("works with .f().t() order", () => {
     const prog = app(($) => {
-      return $.cond($.eq($.input.x, 1))
-        .f($.add(3, 4))
-        .t($.add(1, 2));
+      return $.cond($.eq($.input.x, 1)).f($.add(3, 4)).t($.add(1, 2));
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("core/cond");
@@ -191,10 +187,7 @@ describe("core: array methods produce core/lambda", () => {
 
   it(".reduce() produces core/lambda with accumulator and item params", () => {
     const prog = app(($) => {
-      return $.input.items.reduce(
-        (sum: any, item: any) => $.add(sum, item.price),
-        0
-      );
+      return $.input.items.reduce((sum: any, item: any) => $.add(sum, item.price), 0);
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("core/method_call");
