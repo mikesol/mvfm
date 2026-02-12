@@ -2,11 +2,10 @@
   "name": "ilo",
   "version": "0.0.1",
   "description": "Extensible tagless final DSL for deterministic, verifiable programs in TypeScript",
-  "main": "dist/core.js",
-  "types": "dist/core.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "demo": "tsc && node dist/demo.js"
+    "build": "tsc"
   },
   "devDependencies": {
     "typescript": "^5.3.0"
