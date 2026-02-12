@@ -70,9 +70,9 @@ After the closure executes, ilo walks the return tree and all emitted statements
 
 The DSL needs recursion for tree traversal, recursive data processing, and any program that can't be expressed as a flat map/filter/reduce. Native JS recursion doesn't work — a function calling itself would re-execute the closure and build a new AST.
 
-The approach: a Y combinator injected into the AST. Something like `$.rec(self => ...)` where `self` is a proxy representing "call this function again." The recursive call becomes an AST node (`core/rec_call`), and the interpreter implements the actual recursion. This keeps the AST finite and inspectable even for recursive programs.
+The approach: a Y combinator injected into the AST. `$.rec((self, n) => ...)` where `self` is a function that produces `core/rec_call` nodes and `n` is the input parameter. The recursive call becomes an AST node referencing the enclosing `core/rec` by ID, and the interpreter implements the actual recursion. This keeps the AST finite and inspectable even for recursive programs.
 
-**Status:** Not yet implemented. This is a core capability gap.
+**Status:** Implemented. `$.rec()` produces `core/rec` and `core/rec_call` nodes.
 
 ### Content hashing
 

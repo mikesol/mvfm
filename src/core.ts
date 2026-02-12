@@ -353,6 +353,19 @@ interface CoreDollar {
    *   )
    */
   do(...exprs: (Expr<any> | any)[]): Expr<any>;
+
+  /**
+   * Recursion via Y combinator. The callback receives `self`
+   * (a function that produces recursive call nodes) and `param`
+   * (the input to the recursive function).
+   *
+   *   const factorial = app(($) =>
+   *     $.rec((self, n) =>
+   *       $.cond($.eq(n, 0)).t(1).f($.mul(n, self($.sub(n, 1))))
+   *     )
+   *   )
+   */
+  rec<T, R>(fn: (self: (arg: Expr<T> | T) => Expr<R>, param: Expr<T>) => Expr<R> | R): Expr<R>;
 }
 
 /**
@@ -512,6 +525,31 @@ export function ilo<P extends PluginDefinition<any>[]>(...plugins: P) {
           ctx,
         );
       },
+
+      rec<T, R>(fn: (self: (arg: Expr<T> | T) => Expr<R>, param: Expr<T>) => Expr<R> | R): Expr<R> {
+        const recId = `rec_${nextNodeId()}`;
+        const paramNode: ASTNode = { kind: "core/lambda_param", name: "rec_param" };
+        const paramProxy = makeExprProxy<T>(paramNode, ctx);
+
+        // `self` is a function that produces rec_call nodes
+        const self = (arg: Expr<T> | T): Expr<R> => {
+          const argNode = isExpr(arg) ? arg.__node : autoLift(arg, ctx.expr).__node;
+          return makeExprProxy<R>({ kind: "core/rec_call", recId, arg: argNode }, ctx);
+        };
+
+        const result = fn(self, paramProxy);
+        const bodyNode = isExpr(result) ? result.__node : autoLift(result, ctx.expr).__node;
+
+        return makeExprProxy<R>(
+          {
+            kind: "core/rec",
+            recId,
+            param: paramNode,
+            body: bodyNode,
+          },
+          ctx,
+        );
+      },
     };
 
     // Resolve plugins
@@ -609,10 +647,10 @@ export function ilo<P extends PluginDefinition<any>[]>(...plugins: P) {
     }
 
     // Simple hash (in production, use SHA-256)
-    // Strip __id fields before hashing — they're internal and
-    // would cause identical programs to hash differently.
+    // Strip __id and recId fields before hashing — they're internal
+    // counters that would cause identical programs to hash differently.
     const hash = simpleHash(
-      JSON.stringify(ast, (key, value) => (key === "__id" ? undefined : value)),
+      JSON.stringify(ast, (key, value) => (key === "__id" || key === "recId" ? undefined : value)),
     );
 
     return {
