@@ -18,7 +18,7 @@
 //
 // ============================================================
 
-import type { Expr, PluginContext, PluginDefinition } from "../core";
+import type { Expr, PluginContext, PluginDefinition } from "../../../core";
 
 // ---- What the plugin adds to $ ----------------------------
 

@@ -3,7 +3,7 @@ import { ilo } from "../src/core";
 import { error } from "../src/plugins/error";
 import { fiber } from "../src/plugins/fiber";
 import { num } from "../src/plugins/num";
-import { postgres } from "../src/plugins/postgres";
+import { postgres } from "../src/plugins/postgres/3.4.8";
 import { str } from "../src/plugins/str";
 
 function strip(ast: unknown): unknown {
