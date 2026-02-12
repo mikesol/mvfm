@@ -324,9 +324,9 @@ type MergePlugins<Plugins extends readonly any[]> = UnionToIntersection<
 >;
 
 // Core $ methods that are always available
-interface CoreDollar {
-  /** Input parameters to the program */
-  input: Expr<Record<string, unknown>>;
+interface CoreDollar<I = never> {
+  /** Input parameters to the program — typed when I is provided */
+  input: Expr<I>;
 
   /** Conditional branching (returns a branch builder) */
   cond(predicate: Expr<boolean>): {
@@ -372,7 +372,9 @@ interface CoreDollar {
  *   const myProgram = serverless(($) => { ... })
  */
 export function ilo<P extends PluginDefinition<any>[]>(...plugins: P) {
-  return function define<R>(fn: ($: CoreDollar & MergePlugins<P>) => Expr<R> | R): Program {
+  return function define<I = never>(
+    fn: ($: CoreDollar<I> & MergePlugins<P>) => Expr<any> | any,
+  ): Program {
     const statements: ASTNode[] = [];
     const registry = new Map<number, ASTNode>(); // id -> node
 
@@ -392,8 +394,8 @@ export function ilo<P extends PluginDefinition<any>[]>(...plugins: P) {
     };
 
     // Build core $ methods
-    const core: CoreDollar = {
-      input: makeExprProxy<Record<string, unknown>>({ kind: "core/input" }, ctx),
+    const core: CoreDollar<I> = {
+      input: makeExprProxy<I>({ kind: "core/input" }, ctx),
 
       cond(predicate: Expr<boolean>) {
         let thenNode: ASTNode | null = null;
@@ -501,12 +503,12 @@ export function ilo<P extends PluginDefinition<any>[]>(...plugins: P) {
     );
 
     // Assemble $
-    const dollar = { ...core, ...pluginContributions } as CoreDollar & MergePlugins<P>;
+    const dollar = { ...core, ...pluginContributions } as CoreDollar<I> & MergePlugins<P>;
 
     // Run the closure — this builds the AST
     const result = fn(dollar);
     const resultNode = isExpr(result)
-      ? (result as Expr<R>).__node
+      ? (result as Expr<any>).__node
       : autoLift(result, ctx.expr).__node;
 
     // Build the final program
