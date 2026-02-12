@@ -1,4 +1,4 @@
-import type { ASTNode, InterpreterFragment } from "../core";
+import type { ASTNode, InterpreterFragment } from "../../core";
 
 export const booleanInterpreter: InterpreterFragment = {
   pluginName: "boolean",

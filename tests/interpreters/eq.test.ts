@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { composeInterpreters, ilo } from "../../src/core";
-import { booleanInterpreter } from "../../src/interpreters/boolean";
 import { coreInterpreter } from "../../src/interpreters/core";
-import { numInterpreter } from "../../src/interpreters/num";
-import { strInterpreter } from "../../src/interpreters/str";
 import { boolean } from "../../src/plugins/boolean";
+import { booleanInterpreter } from "../../src/plugins/boolean/interpreter";
 import { eq } from "../../src/plugins/eq";
 import { num } from "../../src/plugins/num";
+import { numInterpreter } from "../../src/plugins/num/interpreter";
 import { str } from "../../src/plugins/str";
+import { strInterpreter } from "../../src/plugins/str/interpreter";
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;

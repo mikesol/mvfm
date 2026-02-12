@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { composeInterpreters, ilo } from "../../src/core";
 import { coreInterpreter } from "../../src/interpreters/core";
-import { numInterpreter } from "../../src/interpreters/num";
 import { num } from "../../src/plugins/num";
+import { numInterpreter } from "../../src/plugins/num/interpreter";
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
