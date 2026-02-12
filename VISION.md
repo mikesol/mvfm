@@ -91,25 +91,35 @@ The AST (with internal IDs stripped) is hashed to produce a deterministic progra
 
 ## 5. Current Plugins
 
-### Core plugins (in `src/plugins.ts`)
+### Structural plugins
 
 | Plugin | Namespace | What it adds to $ |
 |--------|-----------|-------------------|
 | `num` | `num/` | Arithmetic (`add`, `sub`, `mul`, `div`, `mod`), comparison (`gt`, `gte`, `lt`, `lte`), rounding (`floor`, `ceil`, `round`, `abs`), variadic (`min`, `max`), negation |
 | `str` | `str/` | Tagged template `` $.str`...` ``, `concat`, `upper`, `lower`, `trim`, `slice`, `includes`, `startsWith`, `endsWith`, `split`, `join`, `replace`, `len` |
-| `db` | `db/` | SQL queries (`one`, `many`, `exec`). Generic — not tied to any specific database. |
-| `api` | `api/` | HTTP methods (`get`, `post`, `put`, `delete`) |
-| `jwt` | `jwt/` | Token verification (`verify`), claims extraction (`claims`), role checking (`hasRole`). Configurable: issuer, audience. |
-| `crypto` | `crypto/` | Hashing: `sha256`, `sha512`, `hmac` |
-| `kv` | `kv/` | Key-value store: `get`, `set` (with optional TTL), `del`, `incr`. Configurable: url. |
-
-### Standalone plugins (separate files)
-
-| Plugin | Namespace | What it adds to $ |
-|--------|-----------|-------------------|
-| `postgres` | `postgres/` | postgres.js-compatible API. Tagged template queries (`` $.sql`...` ``), dynamic identifiers (`$.sql.id()`), insert/set helpers (`$.sql.insert()`, `$.sql.set()`), transactions (`$.sql.begin()`), savepoints. **Not supported:** cursors, streaming, COPY, LISTEN/NOTIFY. |
 | `fiber` | `fiber/` | Concurrency primitives. Parallel execution (`par` — tuple and bounded map forms), sequential (`seq`), first-wins (`race`), `timeout` with fallback, `retry` with attempts/delay. Concurrency limits are always explicit. |
 | `error` | `error/` | Structured error handling. `try`/`.catch`/`.match`/`.finally`, explicit failure (`fail`), default-on-error (`orElse`), Either-style (`attempt`), assertions (`guard`), collect-all (`settle`). |
+
+### Real-world plugins
+
+Real-world plugins mirror specific, widely-used libraries. An LLM (or developer) who knows the target library should be able to write Ilo programs with near-zero learning curve.
+
+| Plugin | Namespace | Models | What it adds to $ |
+|--------|-----------|--------|-------------------|
+| `postgres` | `postgres/` | [postgres.js](https://github.com/porsager/postgres) | Tagged template queries (`` $.sql`...` ``), dynamic identifiers (`$.sql.id()`), insert/set helpers (`$.sql.insert()`, `$.sql.set()`), transactions (`$.sql.begin()`), savepoints. **Not supported:** cursors, streaming, COPY, LISTEN/NOTIFY. |
+
+### Planned real-world plugins
+
+These don't exist yet. Each should mirror a specific real-world library as closely as the DSL allows.
+
+| Target | Library to model | Notes |
+|--------|-----------------|-------|
+| MySQL | mysql2 or similar | Same approach as postgres — tagged templates where possible |
+| SQLite | better-sqlite3 or similar | Sync API maps well to DSL |
+| Redis | ioredis or similar | Replaces the removed generic `kv` plugin |
+| HTTP | fetch / axios | Replaces the removed generic `api` plugin |
+| JWT | jose | Replaces the removed generic `jwt` plugin |
+| Web Crypto | Web Crypto API | Replaces the removed generic `crypto` plugin |
 
 ### Composition model
 
@@ -158,14 +168,10 @@ src/
 ├── plugins/
 │   ├── num.ts                 — arithmetic, comparison, rounding
 │   ├── str.ts                 — string ops, tagged templates
-│   ├── db.ts                  — generic SQL (one, many, exec)
-│   ├── api.ts                 — HTTP methods
-│   ├── jwt.ts                 — token verification
-│   ├── crypto.ts              — hashing
-│   ├── kv.ts                  — key-value store
-│   ├── postgres.ts            — postgres.js-compatible
 │   ├── fiber.ts               — concurrency primitives
-│   └── error.ts               — structured error handling
+│   ├── error.ts               — structured error handling
+│   ├── postgres.ts            — postgres.js-compatible
+│   └── (future real-world plugins: mysql, redis, fetch, jose, webcrypto)
 ├── plugin-authoring-guide.ts  — worked example (stripe)
 └── index.ts                   — public API re-exports
 tests/

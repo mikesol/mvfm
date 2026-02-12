@@ -18,7 +18,7 @@
 //
 // ============================================================
 
-import type { PluginDefinition, PluginContext, Expr, ASTNode } from "./core";
+import type { PluginDefinition, PluginContext, Expr, ASTNode } from "../core";
 
 // ---- What the plugin adds to $ ----------------------------
 

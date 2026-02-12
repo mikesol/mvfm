@@ -127,17 +127,18 @@ export function stripeInterpreter(secretKey: string): InterpreterFragment {
 
 // ---- Step 4: Use it! --------------------------------------
 //
-// import { ilo } from 'ilo'
-// import { num, str, db } from 'ilo/plugins'
+// import { ilo, num, str, postgres } from 'ilo'
 // import { stripe } from './my-stripe-plugin'
 //
-// const checkout = ilo(num, str, db('...'), stripe({ publishableKey: 'pk_...' }))
+// const checkout = ilo(num, str, postgres('postgres://...'), stripe({ publishableKey: 'pk_...' }))
 //
 // const processPayment = checkout(($) => {
-//   const order = $.db.one('SELECT * FROM orders WHERE id = $1', [$.input.orderId])
-//   const charge = $.stripe.charge(order.total, 'usd', order.customerId)
-//   $.db.exec('UPDATE orders SET charge_id = $1 WHERE id = $2', [charge.id, order.id])
-//   return charge
+//   const order = $.sql`select * from orders where id = ${$.input.orderId}`
+//   const charge = $.stripe.charge(order[0].total, 'usd', order[0].customerId)
+//   return $.do(
+//     $.sql`update orders set charge_id = ${charge.id} where id = ${order[0].id}`,
+//     charge
+//   )
 // })
 
 // ---- Plugin Design Guidelines -----------------------------
