@@ -40,6 +40,18 @@ jobs:
           node-version: 22
           cache: npm
 
-      - uses: andresz1/size-limit-action@v1
+      - run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Check size budgets
+        run: npx size-limit
+
+      - name: Size comparison
+        if: always()
+        uses: andresz1/size-limit-action@v1
+        continue-on-error: true
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          skip_step: install
