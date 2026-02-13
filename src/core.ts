@@ -187,8 +187,19 @@ export type Interpreter = (program: Program) => {
   run: (input: Record<string, unknown>) => Promise<unknown>;
 };
 
+/**
+ * A callable interpreter function returned by {@link composeInterpreters}.
+ *
+ * Evaluates an AST node using the composed interpreter fragments, with
+ * WeakMap-based memoization so shared (DAG) references are only evaluated once.
+ *
+ * Call `fresh()` to obtain a new instance with an empty cache — used by
+ * retry logic so each attempt re-executes from scratch.
+ */
 export interface RecurseFn {
+  /** Evaluate an AST node, returning its result. Memoized by object identity. */
   (node: ASTNode): Promise<unknown>;
+  /** Create a new RecurseFn with a fresh (empty) memoization cache. */
   fresh(): RecurseFn;
 }
 

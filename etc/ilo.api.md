@@ -43,7 +43,7 @@ export const bounded: PluginDefinition<BoundedMethods>;
 export type BoundedMethods = {};
 
 // @public
-export function composeInterpreters(fragments: InterpreterFragment[]): (node: ASTNode) => Promise<unknown>;
+export function composeInterpreters(fragments: InterpreterFragment[]): RecurseFn;
 
 // @public
 export const control: PluginDefinition<ControlMethods>;
@@ -323,6 +323,12 @@ export interface Program {
 }
 
 // @public
+export interface RecurseFn {
+    (node: ASTNode): Promise<unknown>;
+    fresh(): RecurseFn;
+}
+
+// @public
 export function resolveSchemaType(node: ASTNode, schema?: Record<string, unknown>): string | null;
 
 // @public
@@ -414,8 +420,8 @@ export function wrapPostgresJs(sql: Sql | TransactionSql): PostgresClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/core.d.ts:196:5 - (ae-forgotten-export) The symbol "CoreDollar" needs to be exported by the entry point index.d.ts
-// dist/core.d.ts:196:5 - (ae-forgotten-export) The symbol "MergePlugins" needs to be exported by the entry point index.d.ts
+// dist/core.d.ts:214:5 - (ae-forgotten-export) The symbol "CoreDollar" needs to be exported by the entry point index.d.ts
+// dist/core.d.ts:214:5 - (ae-forgotten-export) The symbol "MergePlugins" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 
