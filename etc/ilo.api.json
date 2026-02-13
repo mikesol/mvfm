@@ -578,12 +578,12 @@
             },
             {
               "kind": "Reference",
-              "text": "BoundedMethods",
-              "canonicalReference": "ilo!BoundedMethods:type"
+              "text": "TypeclassSlot",
+              "canonicalReference": "ilo!TypeclassSlot:interface"
             },
             {
               "kind": "Content",
-              "text": ">"
+              "text": "<\"bounded\">>"
             }
           ],
           "fileUrlPath": "dist/plugins/bounded/index.d.ts",
@@ -596,30 +596,34 @@
           }
         },
         {
-          "kind": "TypeAlias",
-          "canonicalReference": "ilo!BoundedMethods:type",
-          "docComment": "/**\n * Bounded typeclass plugin — marker plugin that enables `top` and `bottom` dispatch for types with registered bounded traits.\n */\n",
+          "kind": "Interface",
+          "canonicalReference": "ilo!BoundedFor:interface",
+          "docComment": "/**\n * Bounded typeclass template — placeholder for future top/bottom methods for type T. Currently a marker plugin; dispatched through trait implementations registered by type plugins (e.g. `num`, `boolean`).\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export type BoundedMethods = "
-            },
-            {
-              "kind": "Content",
-              "text": "{}"
-            },
-            {
-              "kind": "Content",
-              "text": ";"
+              "text": "export interface BoundedFor<_T> "
             }
           ],
           "fileUrlPath": "dist/plugins/bounded/index.d.ts",
           "releaseTag": "Public",
-          "name": "BoundedMethods",
-          "typeTokenRange": {
-            "startIndex": 1,
-            "endIndex": 2
-          }
+          "typeParameters": [
+            {
+              "typeParameterName": "_T",
+              "constraintTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "name": "BoundedFor",
+          "preserveMemberOrder": false,
+          "members": [],
+          "extendsTokenRanges": []
         },
         {
           "kind": "Function",
@@ -3522,12 +3526,12 @@
             },
             {
               "kind": "Reference",
-              "text": "MonoidMethods",
-              "canonicalReference": "ilo!MonoidMethods:type"
+              "text": "TypeclassSlot",
+              "canonicalReference": "ilo!TypeclassSlot:interface"
             },
             {
               "kind": "Content",
-              "text": ">"
+              "text": "<\"monoid\">>"
             }
           ],
           "fileUrlPath": "dist/plugins/monoid/index.d.ts",
@@ -3540,30 +3544,34 @@
           }
         },
         {
-          "kind": "TypeAlias",
-          "canonicalReference": "ilo!MonoidMethods:type",
-          "docComment": "/**\n * Monoid typeclass plugin — extends Semigroup with an identity element. No direct methods; dispatched through trait implementations.\n */\n",
+          "kind": "Interface",
+          "canonicalReference": "ilo!MonoidFor:interface",
+          "docComment": "/**\n * Monoid typeclass template — extends Semigroup with an identity element for type T. Currently a marker plugin; dispatched through trait implementations.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export type MonoidMethods = "
-            },
-            {
-              "kind": "Content",
-              "text": "{}"
-            },
-            {
-              "kind": "Content",
-              "text": ";"
+              "text": "export interface MonoidFor<_T> "
             }
           ],
           "fileUrlPath": "dist/plugins/monoid/index.d.ts",
           "releaseTag": "Public",
-          "name": "MonoidMethods",
-          "typeTokenRange": {
-            "startIndex": 1,
-            "endIndex": 2
-          }
+          "typeParameters": [
+            {
+              "typeParameterName": "_T",
+              "constraintTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "name": "MonoidFor",
+          "preserveMemberOrder": false,
+          "members": [],
+          "extendsTokenRanges": []
         },
         {
           "kind": "Function",
@@ -10316,6 +10324,1289 @@
         },
         {
           "kind": "Function",
+          "canonicalReference": "ilo!twilio:function(1)",
+          "docComment": "/**\n * Twilio plugin factory. Namespace: `twilio/`.\n *\n * Creates a plugin that exposes messages and calls resource methods for building parameterized Twilio API call AST nodes.\n *\n * @param config - A {@link TwilioConfig} with accountSid and authToken.\n *\n * @returns A {@link PluginDefinition} for the twilio plugin.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function twilio(config: "
+            },
+            {
+              "kind": "Reference",
+              "text": "TwilioConfig",
+              "canonicalReference": "ilo!TwilioConfig:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "PluginDefinition",
+              "canonicalReference": "ilo!PluginDefinition:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TwilioMethods",
+              "canonicalReference": "ilo!TwilioMethods:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/plugins/twilio/5.5.1/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 7
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "config",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "twilio"
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "ilo!TwilioCallContext:interface",
+          "docComment": "/**\n * Context returned by `$.twilio.calls(sid)` — mirrors twilio-node's CallContext.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface TwilioCallContext "
+            }
+          ],
+          "fileUrlPath": "dist/plugins/twilio/5.5.1/index.d.ts",
+          "releaseTag": "Public",
+          "name": "TwilioCallContext",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "MethodSignature",
+              "canonicalReference": "ilo!TwilioCallContext#fetch:member(1)",
+              "docComment": "/**\n * Fetch this call by its SID.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "fetch(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Expr",
+                  "canonicalReference": "ilo!Expr:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string, unknown>>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [],
+              "name": "fetch"
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "ilo!TwilioCallsResource:interface",
+          "docComment": "/**\n * The calls resource — callable to get a context, with create/list methods. Mirrors twilio-node: `client.calls.create(...)` and `client.calls(sid).fetch()`.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface TwilioCallsResource "
+            }
+          ],
+          "fileUrlPath": "dist/plugins/twilio/5.5.1/index.d.ts",
+          "releaseTag": "Public",
+          "name": "TwilioCallsResource",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "CallSignature",
+              "canonicalReference": "ilo!TwilioCallsResource:call(1)",
+              "docComment": "/**\n * Get a call context by SID (for .fetch()).\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "(sid: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Expr",
+                  "canonicalReference": "ilo!Expr:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string> | string"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "TwilioCallContext",
+                  "canonicalReference": "ilo!TwilioCallContext:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "returnTypeTokenRange": {
+                "startIndex": 4,
+                "endIndex": 5
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "sid",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 3
+                  },
+                  "isOptional": false
+                }
+              ]
+            },
+            {
+              "kind": "MethodSignature",
+              "canonicalReference": "ilo!TwilioCallsResource#create:member(1)",
+              "docComment": "/**\n * Initiate an outbound call.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "create(params: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Expr",
+                  "canonicalReference": "ilo!Expr:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string, unknown>> | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string, unknown>"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Expr",
+                  "canonicalReference": "ilo!Expr:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string, unknown>>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "returnTypeTokenRange": {
+                "startIndex": 8,
+                "endIndex": 12
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "params",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 7
+                  },
+                  "isOptional": false
+                }
+              ],
+              "name": "create"
+            },
+            {
+              "kind": "MethodSignature",
+              "canonicalReference": "ilo!TwilioCallsResource#list:member(1)",
+              "docComment": "/**\n * List calls with optional filter params.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "list(params?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Expr",
+                  "canonicalReference": "ilo!Expr:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string, unknown>> | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string, unknown>"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Expr",
+                  "canonicalReference": "ilo!Expr:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string, unknown>>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "returnTypeTokenRange": {
+                "startIndex": 8,
+                "endIndex": 12
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "params",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 7
+                  },
+                  "isOptional": true
+                }
+              ],
+              "name": "list"
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "ilo!TwilioClient:interface",
+          "docComment": "/**\n * Twilio client interface consumed by the twilio handler.\n *\n * Abstracts over the actual Twilio SDK so handlers can be tested with mock clients.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface TwilioClient "
+            }
+          ],
+          "fileUrlPath": "dist/plugins/twilio/5.5.1/interpreter.d.ts",
+          "releaseTag": "Public",
+          "name": "TwilioClient",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "MethodSignature",
+              "canonicalReference": "ilo!TwilioClient#request:member(1)",
+              "docComment": "/**\n * Execute a Twilio API request and return the parsed response.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "request(method: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", path: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", params?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string, unknown>"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Promise",
+                  "canonicalReference": "!Promise:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<unknown>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "returnTypeTokenRange": {
+                "startIndex": 8,
+                "endIndex": 10
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "method",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "path",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 3,
+                    "endIndex": 4
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "params",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 5,
+                    "endIndex": 7
+                  },
+                  "isOptional": true
+                }
+              ],
+              "name": "request"
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "ilo!twilioClientHandler:function(1)",
+          "docComment": "/**\n * Creates a client-side {@link StepHandler} that sends effects as JSON to a remote server endpoint for execution.\n *\n * Each effect is sent as a POST request to `{baseUrl}/ilo/execute` with the contract hash, step index, path, and effect payload. The server is expected to return `{ result: unknown }` in the response body.\n *\n * @param options - Configuration for the client handler.\n *\n * @returns A {@link StepHandler} that tracks step indices.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function clientHandler(options: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ClientHandlerOptions",
+              "canonicalReference": "ilo!TwilioClientHandlerOptions:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "StepHandler",
+              "canonicalReference": "ilo!StepHandler:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "ClientHandlerState",
+              "canonicalReference": "ilo!TwilioClientHandlerState:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/plugins/twilio/5.5.1/handler.client.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 7
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "options",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "twilioClientHandler"
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "ilo!TwilioClientHandlerOptions:interface",
+          "docComment": "/**\n * Options for configuring the client-side handler.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface ClientHandlerOptions "
+            }
+          ],
+          "fileUrlPath": "dist/plugins/twilio/5.5.1/handler.client.d.ts",
+          "releaseTag": "Public",
+          "name": "TwilioClientHandlerOptions",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "ilo!TwilioClientHandlerOptions#baseUrl:member",
+              "docComment": "/**\n * Base URL of the server endpoint (e.g., \"https://api.example.com\").\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "baseUrl: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "baseUrl",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "ilo!TwilioClientHandlerOptions#contractHash:member",
+              "docComment": "/**\n * Contract hash from the program, used for verification.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "contractHash: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "contractHash",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "ilo!TwilioClientHandlerOptions#fetch:member",
+              "docComment": "/**\n * Custom fetch implementation (defaults to global fetch).\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "fetch?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "typeof "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "globalThis.fetch",
+                  "canonicalReference": "!fetch:function"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "fetch",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "ilo!TwilioClientHandlerOptions#headers:member",
+              "docComment": "/**\n * Additional headers to include in requests.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "headers?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string, string>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "headers",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "ilo!TwilioClientHandlerState:interface",
+          "docComment": "/**\n * State tracked by the client handler across steps.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface ClientHandlerState "
+            }
+          ],
+          "fileUrlPath": "dist/plugins/twilio/5.5.1/handler.client.d.ts",
+          "releaseTag": "Public",
+          "name": "TwilioClientHandlerState",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "ilo!TwilioClientHandlerState#stepIndex:member",
+              "docComment": "/**\n * The current step index, incremented after each effect.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "stepIndex: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "stepIndex",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "ilo!TwilioConfig:interface",
+          "docComment": "/**\n * Configuration for the twilio plugin.\n *\n * Requires accountSid and authToken for Basic auth against the Twilio REST API.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface TwilioConfig "
+            }
+          ],
+          "fileUrlPath": "dist/plugins/twilio/5.5.1/index.d.ts",
+          "releaseTag": "Public",
+          "name": "TwilioConfig",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "ilo!TwilioConfig#accountSid:member",
+              "docComment": "/**\n * Twilio Account SID (e.g. `ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`).\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "accountSid: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "accountSid",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "ilo!TwilioConfig#authToken:member",
+              "docComment": "/**\n * Twilio Auth Token.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "authToken: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "authToken",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "ilo!twilioInterpreter:var",
+          "docComment": "/**\n * Generator-based interpreter fragment for twilio plugin nodes.\n *\n * Yields `twilio/api_call` effects for all 6 operations. Each effect contains the HTTP method, API path, and optional params matching the Twilio REST API v2010 conventions.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "twilioInterpreter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "InterpreterFragment",
+              "canonicalReference": "ilo!InterpreterFragment:interface"
+            }
+          ],
+          "fileUrlPath": "dist/plugins/twilio/5.5.1/interpreter.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "twilioInterpreter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "ilo!TwilioMessageContext:interface",
+          "docComment": "/**\n * Context returned by `$.twilio.messages(sid)` — mirrors twilio-node's MessageContext.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface TwilioMessageContext "
+            }
+          ],
+          "fileUrlPath": "dist/plugins/twilio/5.5.1/index.d.ts",
+          "releaseTag": "Public",
+          "name": "TwilioMessageContext",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "MethodSignature",
+              "canonicalReference": "ilo!TwilioMessageContext#fetch:member(1)",
+              "docComment": "/**\n * Fetch this message by its SID.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "fetch(): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Expr",
+                  "canonicalReference": "ilo!Expr:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string, unknown>>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "returnTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [],
+              "name": "fetch"
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "ilo!TwilioMessagesResource:interface",
+          "docComment": "/**\n * The messages resource — callable to get a context, with create/list methods. Mirrors twilio-node: `client.messages.create(...)` and `client.messages(sid).fetch()`.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface TwilioMessagesResource "
+            }
+          ],
+          "fileUrlPath": "dist/plugins/twilio/5.5.1/index.d.ts",
+          "releaseTag": "Public",
+          "name": "TwilioMessagesResource",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "CallSignature",
+              "canonicalReference": "ilo!TwilioMessagesResource:call(1)",
+              "docComment": "/**\n * Get a message context by SID (for .fetch()).\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "(sid: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Expr",
+                  "canonicalReference": "ilo!Expr:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string> | string"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "TwilioMessageContext",
+                  "canonicalReference": "ilo!TwilioMessageContext:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "returnTypeTokenRange": {
+                "startIndex": 4,
+                "endIndex": 5
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "sid",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 3
+                  },
+                  "isOptional": false
+                }
+              ]
+            },
+            {
+              "kind": "MethodSignature",
+              "canonicalReference": "ilo!TwilioMessagesResource#create:member(1)",
+              "docComment": "/**\n * Send an SMS/MMS message.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "create(params: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Expr",
+                  "canonicalReference": "ilo!Expr:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string, unknown>> | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string, unknown>"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Expr",
+                  "canonicalReference": "ilo!Expr:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string, unknown>>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "returnTypeTokenRange": {
+                "startIndex": 8,
+                "endIndex": 12
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "params",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 7
+                  },
+                  "isOptional": false
+                }
+              ],
+              "name": "create"
+            },
+            {
+              "kind": "MethodSignature",
+              "canonicalReference": "ilo!TwilioMessagesResource#list:member(1)",
+              "docComment": "/**\n * List messages with optional filter params.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "list(params?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Expr",
+                  "canonicalReference": "ilo!Expr:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string, unknown>> | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string, unknown>"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Expr",
+                  "canonicalReference": "ilo!Expr:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Record",
+                  "canonicalReference": "!Record:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string, unknown>>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isOptional": false,
+              "returnTypeTokenRange": {
+                "startIndex": 8,
+                "endIndex": 12
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "params",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 7
+                  },
+                  "isOptional": true
+                }
+              ],
+              "name": "list"
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "ilo!TwilioMethods:interface",
+          "docComment": "/**\n * Twilio operations added to the DSL context by the twilio plugin.\n *\n * Mirrors the twilio-node SDK resource API: messages and calls. Each resource exposes create/fetch/list methods that produce namespaced AST nodes.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface TwilioMethods "
+            }
+          ],
+          "fileUrlPath": "dist/plugins/twilio/5.5.1/index.d.ts",
+          "releaseTag": "Public",
+          "name": "TwilioMethods",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "ilo!TwilioMethods#twilio:member",
+              "docComment": "/**\n * Twilio API operations, namespaced under `$.twilio`.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "twilio: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "{\n        messages: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "TwilioMessagesResource",
+                  "canonicalReference": "ilo!TwilioMessagesResource:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";\n        calls: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "TwilioCallsResource",
+                  "canonicalReference": "ilo!TwilioCallsResource:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";\n    }"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "twilio",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 6
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "ilo!twilioServerEvaluate:function(1)",
+          "docComment": "/**\n * Creates a unified evaluation function that evaluates an AST against a Twilio client using the provided interpreter fragments.\n *\n * Convenience wrapper composing fragments + {@link serverHandler} via `runAST`.\n *\n * @param client - The {@link TwilioClient} to execute against.\n *\n * @param fragments - Generator interpreter fragments for evaluating sub-expressions.\n *\n * @returns An async function that evaluates an AST node to its result.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function serverEvaluate(client: "
+            },
+            {
+              "kind": "Reference",
+              "text": "TwilioClient",
+              "canonicalReference": "ilo!TwilioClient:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", fragments: "
+            },
+            {
+              "kind": "Reference",
+              "text": "InterpreterFragment",
+              "canonicalReference": "ilo!InterpreterFragment:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "[]"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Content",
+              "text": "(root: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ASTNode",
+              "canonicalReference": "ilo!ASTNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/plugins/twilio/5.5.1/handler.server.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 6,
+            "endIndex": 11
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "client",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "fragments",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 5
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "twilioServerEvaluate"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "ilo!twilioServerHandler:function(1)",
+          "docComment": "/**\n * Creates a server-side {@link StepHandler} that executes Twilio effects against a real Twilio client.\n *\n * Handles `twilio/api_call` effects by delegating to `client.request(method, path, params)`. Throws on unhandled effect types.\n *\n * @param client - The {@link TwilioClient} to execute against.\n *\n * @returns A {@link StepHandler} for void state.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function serverHandler(client: "
+            },
+            {
+              "kind": "Reference",
+              "text": "TwilioClient",
+              "canonicalReference": "ilo!TwilioClient:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "StepHandler",
+              "canonicalReference": "ilo!StepHandler:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void>"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/plugins/twilio/5.5.1/handler.server.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 5
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "client",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "twilioServerHandler"
+        },
+        {
+          "kind": "Function",
           "canonicalReference": "ilo!wrapPostgresJs:function(1)",
           "docComment": "/**\n * Wraps a `postgres` (v3.4.x) SQL client into a {@link PostgresClient}.\n *\n * @param sql - A postgres-js SQL tagged template function.\n *\n * @returns A {@link PostgresClient} adapter.\n */\n",
           "excerptTokens": [
@@ -10416,6 +11707,53 @@
             }
           ],
           "name": "wrapStripeSdk"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "ilo!wrapTwilioSdk:function(1)",
+          "docComment": "/**\n * Wraps a Twilio SDK client into a {@link TwilioClient}.\n *\n * Uses the SDK's `request()` method to send requests, preserving the SDK's built-in authentication and configuration.\n *\n * For POST requests, params are sent as `data` in the request body. For GET/DELETE requests, params are encoded as query string parameters on the URI.\n *\n * @param client - A Twilio SDK client instance conforming to {@link TwilioSdkClient}.\n *\n * @returns A {@link TwilioClient} adapter.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function wrapTwilioSdk(client: "
+            },
+            {
+              "kind": "Reference",
+              "text": "TwilioSdkClient",
+              "canonicalReference": "ilo!~TwilioSdkClient:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "TwilioClient",
+              "canonicalReference": "ilo!TwilioClient:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/plugins/twilio/5.5.1/client-twilio-sdk.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "client",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "wrapTwilioSdk"
         }
       ]
     }

@@ -45,11 +45,14 @@ export const booleanInterpreter: InterpreterFragment;
 // @public
 export type BooleanMethods = {};
 
+// Warning: (ae-incompatible-release-tags) The symbol "bounded" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
+//
 // @public
-export const bounded: PluginDefinition<BoundedMethods>;
+export const bounded: PluginDefinition<TypeclassSlot<"bounded">>;
 
 // @public
-export type BoundedMethods = {};
+export interface BoundedFor<_T> {
+}
 
 // @public
 export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
@@ -226,11 +229,14 @@ export interface MissingTraitError<_TraitName extends string, Hint extends strin
     readonly __error: Hint;
 }
 
+// Warning: (ae-incompatible-release-tags) The symbol "monoid" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
+//
 // @public
-export const monoid: PluginDefinition<MonoidMethods>;
+export const monoid: PluginDefinition<TypeclassSlot<"monoid">>;
 
 // @public
-export type MonoidMethods = {};
+export interface MonoidFor<_T> {
+}
 
 // @public
 export function nullable(of: SchemaType): NullableSchema;
@@ -601,6 +607,77 @@ export interface TraitImpl {
     type: string;
 }
 
+// @public
+export function twilio(config: TwilioConfig): PluginDefinition<TwilioMethods>;
+
+// @public
+export interface TwilioCallContext {
+    fetch(): Expr<Record<string, unknown>>;
+}
+
+// @public
+export interface TwilioCallsResource {
+    (sid: Expr<string> | string): TwilioCallContext;
+    create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+    list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+}
+
+// @public
+export interface TwilioClient {
+    request(method: string, path: string, params?: Record<string, unknown>): Promise<unknown>;
+}
+
+// @public
+export function twilioClientHandler(options: TwilioClientHandlerOptions): StepHandler<TwilioClientHandlerState>;
+
+// @public
+export interface TwilioClientHandlerOptions {
+    baseUrl: string;
+    contractHash: string;
+    fetch?: typeof globalThis.fetch;
+    headers?: Record<string, string>;
+}
+
+// @public
+export interface TwilioClientHandlerState {
+    stepIndex: number;
+}
+
+// @public
+export interface TwilioConfig {
+    accountSid: string;
+    authToken: string;
+}
+
+// @public
+export const twilioInterpreter: InterpreterFragment;
+
+// @public
+export interface TwilioMessageContext {
+    fetch(): Expr<Record<string, unknown>>;
+}
+
+// @public
+export interface TwilioMessagesResource {
+    (sid: Expr<string> | string): TwilioMessageContext;
+    create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+    list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+}
+
+// @public
+export interface TwilioMethods {
+    twilio: {
+        messages: TwilioMessagesResource;
+        calls: TwilioCallsResource;
+    };
+}
+
+// @public
+export function twilioServerEvaluate(client: TwilioClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+
+// @public
+export function twilioServerHandler(client: TwilioClient): StepHandler<void>;
+
 // Warning: (ae-internal-missing-underscore) The name "TypeclassMapping" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
@@ -623,6 +700,11 @@ export function wrapPostgresJs(sql: Sql | TransactionSql): PostgresClient;
 
 // @public
 export function wrapStripeSdk(stripe: Stripe): StripeClient;
+
+// Warning: (ae-forgotten-export) The symbol "TwilioSdkClient" needs to be exported by the entry point index.d.ts
+//
+// @public
+export function wrapTwilioSdk(client: TwilioSdkClient): TwilioClient;
 
 // Warnings were encountered during analysis:
 //
