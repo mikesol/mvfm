@@ -16,22 +16,22 @@ function injectInput(node: any, input: Record<string, unknown>): any {
   return result;
 }
 
-function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
+async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
   const interp = composeInterpreters([coreInterpreter, numInterpreter]);
-  return interp(ast.result);
+  return await interp(ast.result);
 }
 
 const app = ilo(num, semiring);
 
 describe("semiring interpreter: arithmetic", () => {
-  it("add", () => expect(run(app(($) => $.add(3, 4)))).toBe(7));
-  it("mul", () => expect(run(app(($) => $.mul(3, 4)))).toBe(12));
+  it("add", async () => expect(await run(app(($) => $.add(3, 4)))).toBe(7));
+  it("mul", async () => expect(await run(app(($) => $.mul(3, 4)))).toBe(12));
 });
 
 describe("semiring interpreter: with input", () => {
-  it("$.add($.input.x, $.input.y)", () => {
+  it("$.add($.input.x, $.input.y)", async () => {
     const prog = app({ x: "number", y: "number" }, ($) => $.add($.input.x, $.input.y));
-    expect(run(prog, { x: 10, y: 20 })).toBe(30);
+    expect(await run(prog, { x: 10, y: 20 })).toBe(30);
   });
 });

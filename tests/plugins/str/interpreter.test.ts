@@ -15,61 +15,65 @@ function injectInput(node: any, input: Record<string, unknown>): any {
   return result;
 }
 
-function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
+async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
   const interp = composeInterpreters([coreInterpreter, strInterpreter]);
-  return interp(ast.result);
+  return await interp(ast.result);
 }
 
 const app = ilo(str);
 
 describe("str interpreter", () => {
-  it("concat", () => expect(run(app(($) => $.concat("hello", " ", "world")))).toBe("hello world"));
-  it("upper", () => expect(run(app(($) => $.upper("hello")))).toBe("HELLO"));
-  it("lower", () => expect(run(app(($) => $.lower("HELLO")))).toBe("hello"));
-  it("trim", () => expect(run(app(($) => $.trim("  hi  ")))).toBe("hi"));
-  it("slice", () => expect(run(app(($) => $.slice("hello", 1, 3)))).toBe("el"));
-  it("includes true", () => expect(run(app(($) => $.includes("hello world", "world")))).toBe(true));
-  it("includes false", () => expect(run(app(($) => $.includes("hello world", "xyz")))).toBe(false));
-  it("startsWith", () => expect(run(app(($) => $.startsWith("hello", "hel")))).toBe(true));
-  it("endsWith", () => expect(run(app(($) => $.endsWith("hello", "llo")))).toBe(true));
-  it("len", () => expect(run(app(($) => $.len("hello")))).toBe(5));
-  it("replace", () =>
-    expect(run(app(($) => $.replace("hello world", "world", "ilo")))).toBe("hello ilo"));
+  it("concat", async () =>
+    expect(await run(app(($) => $.concat("hello", " ", "world")))).toBe("hello world"));
+  it("upper", async () => expect(await run(app(($) => $.upper("hello")))).toBe("HELLO"));
+  it("lower", async () => expect(await run(app(($) => $.lower("HELLO")))).toBe("hello"));
+  it("trim", async () => expect(await run(app(($) => $.trim("  hi  ")))).toBe("hi"));
+  it("slice", async () => expect(await run(app(($) => $.slice("hello", 1, 3)))).toBe("el"));
+  it("includes true", async () =>
+    expect(await run(app(($) => $.includes("hello world", "world")))).toBe(true));
+  it("includes false", async () =>
+    expect(await run(app(($) => $.includes("hello world", "xyz")))).toBe(false));
+  it("startsWith", async () =>
+    expect(await run(app(($) => $.startsWith("hello", "hel")))).toBe(true));
+  it("endsWith", async () => expect(await run(app(($) => $.endsWith("hello", "llo")))).toBe(true));
+  it("len", async () => expect(await run(app(($) => $.len("hello")))).toBe(5));
+  it("replace", async () =>
+    expect(await run(app(($) => $.replace("hello world", "world", "ilo")))).toBe("hello ilo"));
 
-  it("with input", () => {
+  it("with input", async () => {
     const prog = app({ name: "string" }, ($) => $.upper($.input.name));
-    expect(run(prog, { name: "alice" })).toBe("ALICE");
+    expect(await run(prog, { name: "alice" })).toBe("ALICE");
   });
 });
 
 describe("str interpreter: show", () => {
-  it("str/show passes through string value", () => {
+  it("str/show passes through string value", async () => {
     const ast = {
       kind: "str/show",
       operand: { kind: "core/literal", value: "hello", __id: "t" },
     };
     const interp = composeInterpreters([coreInterpreter, strInterpreter]);
-    expect(interp(ast)).toBe("hello");
+    expect(await interp(ast)).toBe("hello");
   });
 });
 
 describe("str interpreter: semigroup", () => {
-  it("str/append concatenates two strings", () => {
+  it("str/append concatenates two strings", async () => {
     const ast = {
       kind: "str/append",
       left: { kind: "core/literal", value: "foo", __id: "t1" },
       right: { kind: "core/literal", value: "bar", __id: "t2" },
     };
     const interp = composeInterpreters([coreInterpreter, strInterpreter]);
-    expect(interp(ast)).toBe("foobar");
+    expect(await interp(ast)).toBe("foobar");
   });
 });
 
 describe("str interpreter: monoid", () => {
-  it("str/mempty returns empty string", () => {
+  it("str/mempty returns empty string", async () => {
     const ast = { kind: "str/mempty" };
     const interp = composeInterpreters([coreInterpreter, strInterpreter]);
-    expect(interp(ast)).toBe("");
+    expect(await interp(ast)).toBe("");
   });
 });
