@@ -3,16 +3,22 @@
 export type {
   ASTNode,
   Expr,
+  GeneratorInterpreterFragment,
   Interpreter,
   InterpreterFragment,
+  LegacyInterpreterFragment,
   Plugin,
   PluginContext,
   PluginDefinition,
   Program,
   RecurseFn,
+  Step,
+  StepContext,
+  StepEffect,
+  StepHandler,
   TraitImpl,
 } from "./core";
-export { composeInterpreters, ilo } from "./core";
+export { adaptLegacy, composeInterpreters, foldAST, ilo, runAST, Stepper } from "./core";
 export { coreInterpreter } from "./interpreters/core";
 export type { BooleanMethods } from "./plugins/boolean";
 export { boolean } from "./plugins/boolean";

@@ -190,6 +190,53 @@
       "members": [
         {
           "kind": "Function",
+          "canonicalReference": "ilo!adaptLegacy:function(1)",
+          "docComment": "/**\n * Wraps a {@link LegacyInterpreterFragment} as a {@link GeneratorInterpreterFragment}.\n *\n * The adapted fragment yields a single `__legacy` effect, which the evaluator intercepts and executes using the original callback-based `visit` method.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function adaptLegacy(fragment: "
+            },
+            {
+              "kind": "Reference",
+              "text": "LegacyInterpreterFragment",
+              "canonicalReference": "ilo!LegacyInterpreterFragment:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "GeneratorInterpreterFragment",
+              "canonicalReference": "ilo!GeneratorInterpreterFragment:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/core.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "fragment",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "adaptLegacy"
+        },
+        {
+          "kind": "Function",
           "canonicalReference": "ilo!array:function(1)",
           "docComment": "/**\n * Creates an array schema type.\n *\n * @param of - The element schema type.\n *\n * @returns An {@link ArraySchema} descriptor.\n *\n * @example\n * ```ts\n * const schema = { tags: array(\"string\") };\n * ```\n *\n */\n",
           "excerptTokens": [
@@ -577,11 +624,15 @@
         {
           "kind": "Function",
           "canonicalReference": "ilo!composeInterpreters:function(1)",
-          "docComment": "/**\n * Compose interpreter fragments into a full interpreter. Uses WeakMap memoization so shared AST nodes (DAG references) are only evaluated once. Volatile nodes (lambda_param, cursor_batch) are tracked as \"tainted\" and their ancestors are not cached.\n */\n",
+          "docComment": "/**\n * Compose interpreter fragments into a full interpreter. Uses WeakMap memoization so shared AST nodes (DAG references) are only evaluated once. Volatile nodes (lambda_param, cursor_batch) are tracked as \"tainted\" and their ancestors are not cached.\n *\n * Accepts both {@link InterpreterFragment} (legacy) and {@link GeneratorInterpreterFragment} (generator-based) fragments. Generator fragments are detected by checking if `visit` is a GeneratorFunction; all others are treated as legacy.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
               "text": "export declare function composeInterpreters(fragments: "
+            },
+            {
+              "kind": "Content",
+              "text": "("
             },
             {
               "kind": "Reference",
@@ -590,7 +641,16 @@
             },
             {
               "kind": "Content",
-              "text": "[]"
+              "text": " | "
+            },
+            {
+              "kind": "Reference",
+              "text": "GeneratorInterpreterFragment",
+              "canonicalReference": "ilo!GeneratorInterpreterFragment:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ")[]"
             },
             {
               "kind": "Content",
@@ -608,8 +668,8 @@
           ],
           "fileUrlPath": "dist/core.d.ts",
           "returnTypeTokenRange": {
-            "startIndex": 4,
-            "endIndex": 5
+            "startIndex": 7,
+            "endIndex": 8
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
@@ -618,7 +678,7 @@
               "parameterName": "fragments",
               "parameterTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 3
+                "endIndex": 6
               },
               "isOptional": false
             }
@@ -2314,6 +2374,267 @@
           "extendsTokenRanges": []
         },
         {
+          "kind": "Function",
+          "canonicalReference": "ilo!foldAST:function(1)",
+          "docComment": "/**\n * Build a {@link RecurseFn} from generator-based fragments and a map of effect handlers.\n *\n * `foldAST` is the generator-based replacement for {@link composeInterpreters}. It returns a `RecurseFn` with the same API (callable + `.fresh()`), so it can be used as a drop-in replacement in existing interpreter pipelines.\n *\n * @param fragments - Generator interpreter fragments.\n *\n * @param handlers - Map from effect type string to async handler function. Each handler receives the effect and returns a value.\n *\n * @returns A {@link RecurseFn} that evaluates AST nodes.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function foldAST(fragments: "
+            },
+            {
+              "kind": "Reference",
+              "text": "GeneratorInterpreterFragment",
+              "canonicalReference": "ilo!GeneratorInterpreterFragment:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "[]"
+            },
+            {
+              "kind": "Content",
+              "text": ", handlers: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, (effect: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StepEffect",
+              "canonicalReference": "ilo!StepEffect:type"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>>"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "RecurseFn",
+              "canonicalReference": "ilo!RecurseFn:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/core.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 11,
+            "endIndex": 12
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "fragments",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "handlers",
+              "parameterTypeTokenRange": {
+                "startIndex": 4,
+                "endIndex": 10
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "foldAST"
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "ilo!GeneratorInterpreterFragment:interface",
+          "docComment": "/**\n * A generator-based interpreter fragment that yields effects instead of directly calling a recurse callback.\n *\n * Generator fragments enable the step evaluator to pause, inspect, and resume evaluation — the foundation for middleware, debugging, and IO interception.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface GeneratorInterpreterFragment "
+            }
+          ],
+          "fileUrlPath": "dist/core.d.ts",
+          "releaseTag": "Public",
+          "name": "GeneratorInterpreterFragment",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "ilo!GeneratorInterpreterFragment#canHandle:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "canHandle: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(node: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ASTNode",
+                  "canonicalReference": "ilo!ASTNode:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ") => boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "canHandle",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 4
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "ilo!GeneratorInterpreterFragment#isVolatile:member",
+              "docComment": "/**\n * Returns true if the node should never be cached (e.g., lambda params).\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "isVolatile?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(node: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ASTNode",
+                  "canonicalReference": "ilo!ASTNode:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ") => boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "isVolatile",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 4
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "ilo!GeneratorInterpreterFragment#pluginName:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "pluginName: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "pluginName",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "ilo!GeneratorInterpreterFragment#visit:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "visit: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(node: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ASTNode",
+                  "canonicalReference": "ilo!ASTNode:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ") => "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Generator",
+                  "canonicalReference": "!Generator:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "StepEffect",
+                  "canonicalReference": "ilo!StepEffect:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", unknown, unknown>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "visit",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 8
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
           "kind": "Variable",
           "canonicalReference": "ilo!heytingAlgebra:var",
           "docComment": "/**\n * Heyting algebra typeclass plugin. Dispatches `and`, `or`, `not` to type-specific implementations.\n */\n",
@@ -3051,6 +3372,150 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "ilo!InterpreterFragment#visit:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "visit: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(node: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ASTNode",
+                  "canonicalReference": "ilo!ASTNode:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", recurse: (node: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ASTNode",
+                  "canonicalReference": "ilo!ASTNode:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ") => "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Promise",
+                  "canonicalReference": "!Promise:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<unknown>) => "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Promise",
+                  "canonicalReference": "!Promise:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<unknown>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "visit",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 10
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "ilo!LegacyInterpreterFragment:interface",
+          "docComment": "/**\n * A legacy interpreter fragment using callback-based recursion.\n *\n * This is the original interpreter interface. New code should prefer {@link GeneratorInterpreterFragment}, but legacy fragments remain fully supported via {@link adaptLegacy}.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface LegacyInterpreterFragment "
+            }
+          ],
+          "fileUrlPath": "dist/core.d.ts",
+          "releaseTag": "Public",
+          "name": "LegacyInterpreterFragment",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "ilo!LegacyInterpreterFragment#canHandle:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "canHandle: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(node: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ASTNode",
+                  "canonicalReference": "ilo!ASTNode:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ") => boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "canHandle",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 4
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "ilo!LegacyInterpreterFragment#pluginName:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "pluginName: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "pluginName",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "ilo!LegacyInterpreterFragment#visit:member",
               "docComment": "",
               "excerptTokens": [
                 {
@@ -6159,6 +6624,128 @@
           "name": "resolveSchemaType"
         },
         {
+          "kind": "Function",
+          "canonicalReference": "ilo!runAST:function(1)",
+          "docComment": "/**\n * Evaluate an AST using generator-based fragments with a custom effect handler.\n *\n * `runAST` auto-handles `recurse` effects by descending into child nodes. All other effects (IO, custom) are delegated to the provided {@link StepHandler}. The `\"__legacy\"` effect is handled internally for backward compatibility with {@link LegacyInterpreterFragment}s.\n *\n * @param root - The root AST node to evaluate.\n *\n * @param fragments - Generator interpreter fragments.\n *\n * @param handler - Handler for non-recurse effects.\n *\n * @param initialState - Initial user state.\n *\n * @typeParam S - User-defined state threaded through the evaluation.\n *\n * @returns The final value and state after evaluation.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function runAST<S>(root: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ASTNode",
+              "canonicalReference": "ilo!ASTNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", fragments: "
+            },
+            {
+              "kind": "Reference",
+              "text": "GeneratorInterpreterFragment",
+              "canonicalReference": "ilo!GeneratorInterpreterFragment:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "[]"
+            },
+            {
+              "kind": "Content",
+              "text": ", handler: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StepHandler",
+              "canonicalReference": "ilo!StepHandler:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<S>"
+            },
+            {
+              "kind": "Content",
+              "text": ", initialState: "
+            },
+            {
+              "kind": "Content",
+              "text": "S"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    value: unknown;\n    state: S;\n}>"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/core.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 11,
+            "endIndex": 13
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "root",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "fragments",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 5
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "handler",
+              "parameterTypeTokenRange": {
+                "startIndex": 6,
+                "endIndex": 8
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "initialState",
+              "parameterTypeTokenRange": {
+                "startIndex": 9,
+                "endIndex": 10
+              },
+              "isOptional": false
+            }
+          ],
+          "typeParameters": [
+            {
+              "typeParameterName": "S",
+              "constraintTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "name": "runAST"
+        },
+        {
           "kind": "TypeAlias",
           "canonicalReference": "ilo!SchemaShape:type",
           "docComment": "/**\n * A record mapping field names to schema types, used to declare program input shapes.\n */\n",
@@ -6876,6 +7463,524 @@
             "startIndex": 1,
             "endIndex": 5
           }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "ilo!Step:type",
+          "docComment": "/**\n * A single step in the evaluation of an AST node.\n *\n * When `done` is `true`, the node has been fully evaluated and `value` contains the result. When `done` is `false`, the evaluator has yielded an effect that must be resolved before evaluation can continue.\n *\n * @typeParam S - User-defined state threaded through the evaluation.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type Step<S> = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    done: true;\n    value: unknown;\n    state: S;\n} | {\n    done: false;\n    node: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ASTNode",
+              "canonicalReference": "ilo!ASTNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    effect: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StepEffect",
+              "canonicalReference": "ilo!StepEffect:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    context: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StepContext",
+              "canonicalReference": "ilo!StepContext:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    state: S;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/core.d.ts",
+          "releaseTag": "Public",
+          "name": "Step",
+          "typeParameters": [
+            {
+              "typeParameterName": "S",
+              "constraintTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 8
+          }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "ilo!StepContext:interface",
+          "docComment": "/**\n * Contextual information about the current position in the AST during step-by-step evaluation.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface StepContext "
+            }
+          ],
+          "fileUrlPath": "dist/core.d.ts",
+          "releaseTag": "Public",
+          "name": "StepContext",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "ilo!StepContext#depth:member",
+              "docComment": "/**\n * How many levels deep from the root this evaluation is.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "depth: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "depth",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "ilo!StepContext#parentNode:member",
+              "docComment": "/**\n * The parent AST node, if any.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "parentNode?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ASTNode",
+                  "canonicalReference": "ilo!ASTNode:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "parentNode",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "ilo!StepContext#path:member",
+              "docComment": "/**\n * Path of node kinds from root to the current node.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "path: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "path",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "ilo!StepEffect:type",
+          "docComment": "/**\n * Describes a side effect produced during AST evaluation.\n *\n * A `\"recurse\"` effect signals the evaluator to descend into a child node. Any other `type` string represents an IO or custom effect to be handled externally (e.g., `\"query\"`, `\"http\"`, `\"log\"`).\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type StepEffect = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    type: \"recurse\";\n    child: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ASTNode",
+              "canonicalReference": "ilo!ASTNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n} | {\n    type: string;\n    [key: string]: unknown;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/core.d.ts",
+          "releaseTag": "Public",
+          "name": "StepEffect",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "ilo!StepHandler:type",
+          "docComment": "/**\n * Handles an effect produced during AST evaluation, returning the resolved value and updated state.\n *\n * @typeParam S - User-defined state threaded through the evaluation.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type StepHandler<S> = "
+            },
+            {
+              "kind": "Content",
+              "text": "(effect: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StepEffect",
+              "canonicalReference": "ilo!StepEffect:type"
+            },
+            {
+              "kind": "Content",
+              "text": ", context: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StepContext",
+              "canonicalReference": "ilo!StepContext:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", state: S) => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<{\n    value: unknown;\n    state: S;\n}>"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/core.d.ts",
+          "releaseTag": "Public",
+          "name": "StepHandler",
+          "typeParameters": [
+            {
+              "typeParameterName": "S",
+              "constraintTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 8
+          }
+        },
+        {
+          "kind": "Class",
+          "canonicalReference": "ilo!Stepper:class",
+          "docComment": "/**\n * A trampoline-based AST evaluator that advances one step at a time.\n *\n * The Stepper maintains an explicit stack of generator frames on the heap, enabling step-by-step evaluation with full control over scheduling, caching, and effect interception.\n *\n * Use {@link runAST} or {@link foldAST} for higher-level evaluation; the Stepper is exposed for advanced use cases (debuggers, profilers).\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare class Stepper "
+            }
+          ],
+          "fileUrlPath": "dist/core.d.ts",
+          "releaseTag": "Public",
+          "isAbstract": false,
+          "name": "Stepper",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "Constructor",
+              "canonicalReference": "ilo!Stepper:constructor(1)",
+              "docComment": "/**\n * Constructs a new instance of the `Stepper` class\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "constructor(fragments: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "GeneratorInterpreterFragment",
+                  "canonicalReference": "ilo!GeneratorInterpreterFragment:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", root: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ASTNode",
+                  "canonicalReference": "ilo!ASTNode:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ");"
+                }
+              ],
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "fragments",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 3
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "root",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 4,
+                    "endIndex": 5
+                  },
+                  "isOptional": false
+                }
+              ]
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "ilo!Stepper#descend:member(1)",
+              "docComment": "/**\n * Push a child node onto the evaluation stack (descend into it).\n *\n * If the child has a cached result and is not tainted, returns the cached value immediately via a done step.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "descend(child: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ASTNode",
+                  "canonicalReference": "ilo!ASTNode:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", parentNode: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ASTNode",
+                  "canonicalReference": "ilo!ASTNode:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " | undefined"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Step",
+                  "canonicalReference": "ilo!Step:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<undefined> | null"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 6,
+                "endIndex": 8
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "child",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "parentNode",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 3,
+                    "endIndex": 5
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "descend"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "ilo!Stepper#fresh:member(1)",
+              "docComment": "/**\n * Create a new Stepper for the given root with an empty cache.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "fresh(root: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ASTNode",
+                  "canonicalReference": "ilo!ASTNode:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Stepper",
+                  "canonicalReference": "ilo!Stepper:class"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "root",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "fresh"
+            },
+            {
+              "kind": "Method",
+              "canonicalReference": "ilo!Stepper#tick:member(1)",
+              "docComment": "/**\n * Advance the evaluation by one step.\n *\n * @param lastResult - The resolved value of the previous effect (if any).\n *\n * @returns A {@link Step} describing what happened, or `null` if evaluation is complete.\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "tick(lastResult?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "unknown"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Step",
+                  "canonicalReference": "ilo!Step:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<undefined> | null"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isStatic": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 5
+              },
+              "releaseTag": "Public",
+              "isProtected": false,
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "lastResult",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": true
+                }
+              ],
+              "isOptional": false,
+              "isAbstract": false,
+              "name": "tick"
+            }
+          ],
+          "implementsTokenRanges": []
         },
         {
           "kind": "Interface",
