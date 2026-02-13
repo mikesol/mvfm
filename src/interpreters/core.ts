@@ -1,5 +1,6 @@
 import type { ASTNode, InterpreterFragment } from "../core";
 
+/** Interpreter fragment for core node kinds (literal, input, prop_access, cond, do, program, tuple, record). */
 export const coreInterpreter: InterpreterFragment = {
   pluginName: "core",
   canHandle: (node) => node.kind.startsWith("core/"),

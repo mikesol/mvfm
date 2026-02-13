@@ -20,6 +20,7 @@ function injectLambdaParam(node: any, param: { name: string }, value: unknown): 
   }
 }
 
+/** Interpreter fragment for `error/` node kinds. */
 export const errorInterpreter: InterpreterFragment = {
   pluginName: "error",
   canHandle: (node) => node.kind.startsWith("error/"),

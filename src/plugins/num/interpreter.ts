@@ -1,5 +1,6 @@
 import type { ASTNode, InterpreterFragment } from "../../core";
 
+/** Interpreter fragment for `num/` node kinds. */
 export const numInterpreter: InterpreterFragment = {
   pluginName: "num",
   canHandle: (node) => node.kind.startsWith("num/"),

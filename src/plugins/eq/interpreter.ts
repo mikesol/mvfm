@@ -1,5 +1,6 @@
 import type { ASTNode, InterpreterFragment } from "../../core";
 
+/** Interpreter fragment for `eq/` node kinds. */
 export const eqInterpreter: InterpreterFragment = {
   pluginName: "eq",
   canHandle: (node) => node.kind.startsWith("eq/"),

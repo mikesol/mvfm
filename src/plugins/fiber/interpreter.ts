@@ -20,6 +20,7 @@ function injectLambdaParam(node: any, name: string, value: unknown): void {
   }
 }
 
+/** Interpreter fragment for `fiber/` node kinds. */
 export const fiberInterpreter: InterpreterFragment = {
   pluginName: "fiber",
   canHandle: (node) => node.kind.startsWith("fiber/"),

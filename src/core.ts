@@ -26,12 +26,12 @@ interface ExprBase<T> {
 }
 
 /**
- * Conditional mapped fields for Expr<T>.
+ * Conditional mapped fields for `Expr<T>`.
  *
- * - never        → {} (no property access — forces schema declaration)
- * - T[]          → permissive index sig (array typing deferred, see #18)
- * - Record type  → mapped { K: Expr<T[K]> } (type-preserving proxy)
- * - leaf (string, number, etc.) → {} (no extra properties)
+ * - `never`        → `{}` (no property access — forces schema declaration)
+ * - `T[]`          → permissive index sig (array typing deferred, see #18)
+ * - Record type  → mapped `{ K: Expr<T[K]> }` (type-preserving proxy)
+ * - leaf (string, number, etc.) → `{}` (no extra properties)
  */
 type ExprFields<T> = [T] extends [never]
   ? {}
@@ -121,11 +121,30 @@ export interface PluginContext {
   inputSchema?: Record<string, unknown>;
 }
 
+/**
+ * Declares a typeclass trait implementation for a plugin's type.
+ *
+ * Maps a runtime type string (e.g. `"number"`) to the AST node kinds
+ * that implement each operation in the trait.
+ */
 export interface TraitImpl {
   type: string;
   nodeKinds: Record<string, string>;
 }
 
+/**
+ * Defines a plugin's contract: its name, the AST node kinds it emits,
+ * and a build function that returns the methods it contributes to `$`.
+ *
+ * @example
+ * ```ts
+ * const myPlugin: PluginDefinition<MyMethods> = {
+ *   name: "my",
+ *   nodeKinds: ["my/op"],
+ *   build(ctx) { return { op: (a) => ctx.expr({ kind: "my/op", a: ctx.lift(a).__node }) }; }
+ * };
+ * ```
+ */
 export interface PluginDefinition<T = any> {
   name: string;
   nodeKinds: string[];
@@ -143,13 +162,8 @@ export interface PluginDefinition<T = any> {
 }
 
 /**
- * A PluginFactory is what users import and optionally configure.
- *
- *   import { db } from 'ilo/plugins/db'
- *   const myStack = ilo(num, str, db('postgres://...'))
- *
- * Plugins with no config are just bare PluginDefinition factories.
- * Plugins with config are functions that return a PluginDefinition.
+ * A plugin export: either a bare {@link PluginDefinition} or a factory
+ * function that returns one (for plugins requiring configuration).
  */
 export type Plugin<T = any> = PluginDefinition<T> | (() => PluginDefinition<T>);
 
@@ -165,6 +179,10 @@ export interface InterpreterFragment {
   canHandle: (node: ASTNode) => boolean;
 }
 
+/**
+ * An interpreter is a function that takes a {@link Program} and returns
+ * a runner with an async `run` method.
+ */
 export type Interpreter = (program: Program) => {
   run: (input: Record<string, unknown>) => Promise<unknown>;
 };
@@ -449,8 +467,8 @@ interface CoreDollar<I = never> {
  * Create a ilo program builder with the given plugins.
  *
  * Usage:
- *   const serverless = ilo(num, str, db('postgres://...'))
- *   const myProgram = serverless(($) => { ... })
+ *   `const serverless = ilo(num, str, db('postgres://...'))`
+ *   `const myProgram = serverless(($) => { ... })`
  */
 export function ilo<P extends PluginDefinition<any>[]>(...plugins: P) {
   function define<S extends SchemaShape>(

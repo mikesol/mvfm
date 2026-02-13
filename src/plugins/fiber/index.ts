@@ -32,38 +32,49 @@ import type { ASTNode, Expr, PluginContext, PluginDefinition } from "../../core"
 
 // ---- What the plugin adds to $ ----------------------------
 
+/**
+ * Concurrency primitives added to the DSL context.
+ *
+ * Provides par, seq, race, timeout, and retry combinators that
+ * describe concurrency structure in the AST for the interpreter
+ * to execute.
+ */
 export interface FiberMethods {
   /**
    * Run expressions in parallel, return all results.
-   * This is the safe Promise.all — with mandatory concurrency limit.
+   * This is the safe `Promise.all` -- with mandatory concurrency limit.
    *
-   *   // Run 3 things concurrently (default concurrency = Infinity for tuple form)
-   *   const [users, posts, stats] = $.par(
-   *     $.sql`select * from users`,
-   *     $.sql`select * from posts`,
-   *     $.fetch`https://api.example.com/stats`
-   *   )
+   * ```
+   * // Run 3 things concurrently (default concurrency = Infinity for tuple form)
+   * const [users, posts, stats] = $.par(
+   *   $.sql`select * from users`,
+   *   $.sql`select * from posts`,
+   *   $.fetch`https://api.example.com/stats`
+   * )
    *
-   *   // Map over a collection with bounded concurrency
-   *   const details = $.par(userIds, { concurrency: 5 }, (id) =>
-   *     $.sql`select * from details where user_id = ${id}`
-   *   )
+   * // Map over a collection with bounded concurrency
+   * const details = $.par(userIds, { concurrency: 5 }, (id) =>
+   *   $.sql`select * from details where user_id = ${id}`
+   * )
+   * ```
    */
   par: ParFn;
 
   /**
    * Run expressions sequentially, return last result.
-   * This is $.do() with fiber awareness — each step is
+   * This is `$.do()` with fiber awareness -- each step is
    * guaranteed to complete before the next starts.
    *
-   * Alias for $.do() but makes the intent clearer in
+   * Alias for `$.do()` but makes the intent clearer in
    * a concurrent context.
    *
-   *   $.seq(
-   *     $.sql`insert into users ...`,
-   *     $.sql`insert into accounts ...`,
-   *     $.sql`select * from users where ...`  // returned
-   *   )
+   * ```
+   * $.seq(
+   *   $.sql`insert into users ...`,
+   *   $.sql`insert into accounts ...`,
+   *   $.sql`select * from users where ...`  // returned
+   * )
+   * ```
    */
   seq(...exprs: (Expr<any> | any)[]): Expr<any>;
 
@@ -82,21 +93,25 @@ export interface FiberMethods {
    * Timeout an expression. If it doesn't complete within
    * the given milliseconds, the fallback is used.
    *
-   *   const data = $.timeout(
-   *     $.fetch`https://slow.api.com/data`,
-   *     5000,
-   *     { error: 'timeout' }  // fallback value
-   *   )
+   * ```
+   * const data = $.timeout(
+   *   $.fetch`https://slow.api.com/data`,
+   *   5000,
+   *   { error: 'timeout' }  // fallback value
+   * )
+   * ```
    */
   timeout(expr: Expr<any>, ms: number | Expr<number>, fallback: Expr<any> | any): Expr<any>;
 
   /**
    * Retry an expression up to N times with optional delay.
    *
-   *   const data = $.retry(
-   *     $.fetch`https://flaky.api.com/data`,
-   *     { attempts: 3, delay: 1000 }
-   *   )
+   * ```
+   * const data = $.retry(
+   *   $.fetch`https://flaky.api.com/data`,
+   *   { attempts: 3, delay: 1000 }
+   * )
+   * ```
    */
   retry(expr: Expr<any>, opts: { attempts: number; delay?: number }): Expr<any>;
 }
@@ -119,6 +134,12 @@ interface ParFn {
 
 // ---- Plugin implementation --------------------------------
 
+/**
+ * Concurrency plugin. Namespace: `fiber/`.
+ *
+ * Provides `par` for parallel execution, `seq` for sequential execution,
+ * `race` for first-to-complete, `timeout`, and `retry` combinators.
+ */
 export const fiber: PluginDefinition<FiberMethods> = {
   name: "fiber",
   nodeKinds: ["fiber/par_map", "fiber/race", "fiber/timeout", "fiber/retry"],

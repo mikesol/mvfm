@@ -1,30 +1,53 @@
 import type { Expr, PluginContext, PluginDefinition } from "../../core";
 
+/**
+ * String manipulation operations.
+ *
+ * All methods accept raw strings or `Expr<string>` (auto-lifted).
+ */
 export interface StrMethods {
-  /** Tagged template literal: $.str`hello ${name}` */
+  /** Tagged template literal for string interpolation. */
   str(strings: TemplateStringsArray, ...exprs: (Expr<any> | string | number)[]): Expr<string>;
+  /** Concatenate multiple string values. */
   concat(...parts: (Expr<string> | string)[]): Expr<string>;
+  /** Convert to uppercase. */
   upper(s: Expr<string> | string): Expr<string>;
+  /** Convert to lowercase. */
   lower(s: Expr<string> | string): Expr<string>;
+  /** Remove leading and trailing whitespace. */
   trim(s: Expr<string> | string): Expr<string>;
+  /** Extract a substring by start/end index. */
   slice(
     s: Expr<string> | string,
     start: Expr<number> | number,
     end?: Expr<number> | number,
   ): Expr<string>;
+  /** Test whether a string contains a substring. */
   includes(haystack: Expr<string> | string, needle: Expr<string> | string): Expr<boolean>;
+  /** Test whether a string starts with a prefix. */
   startsWith(s: Expr<string> | string, prefix: Expr<string> | string): Expr<boolean>;
+  /** Test whether a string ends with a suffix. */
   endsWith(s: Expr<string> | string, suffix: Expr<string> | string): Expr<boolean>;
+  /** Split a string by delimiter into an array. */
   split(s: Expr<string> | string, delimiter: Expr<string> | string): Expr<string[]>;
+  /** Join an array of strings with a separator. */
   join(arr: Expr<string[]>, separator: Expr<string> | string): Expr<string>;
+  /** Replace the first occurrence of a search string. */
   replace(
     s: Expr<string> | string,
     search: Expr<string> | string,
     replacement: Expr<string> | string,
   ): Expr<string>;
+  /** Get the length of a string. */
   len(s: Expr<string> | string): Expr<number>;
 }
 
+/**
+ * String operations plugin. Namespace: `str/`.
+ *
+ * Provides template literals, concatenation, case conversion, search, and
+ * splitting. Registers trait implementations for eq, show, semigroup, and monoid.
+ */
 export const str: PluginDefinition<StrMethods> = {
   name: "str",
   nodeKinds: [

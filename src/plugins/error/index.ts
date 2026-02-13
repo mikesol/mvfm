@@ -35,16 +35,24 @@ import type { ASTNode, Expr, PluginContext, PluginDefinition } from "../../core"
 
 // ---- What the plugin adds to $ ----------------------------
 
+/**
+ * Structured error handling operations added to the DSL context.
+ *
+ * Provides try/catch, fail, orElse, attempt, guard, and settle
+ * combinators for explicit, AST-level error handling.
+ */
 export interface ErrorMethods {
   /**
    * Attempt an expression that might fail.
-   * Returns a builder with .catch() and .finally().
+   * Returns a builder with `.catch()` and `.finally()`.
    *
-   *   $.try($.sql`select * from users where id = ${id}`)
-   *     .catch(err => ({ error: err.message, data: null }))
+   * ```
+   * $.try($.sql`select * from users where id = ${id}`)
+   *   .catch(err => ({ error: err.message, data: null }))
+   * ```
    *
-   * Without .catch(), an unhandled failure propagates up
-   * (equivalent to re-throwing). The .catch() provides
+   * Without `.catch()`, an unhandled failure propagates up
+   * (equivalent to re-throwing). The `.catch()` provides
    * the recovery branch.
    */
   try<T>(expr: Expr<T>): TryBuilder<T>;
@@ -53,36 +61,42 @@ export interface ErrorMethods {
    * Explicitly fail with an error value.
    * This is `throw` for the DSL.
    *
-   *   $.cond($.eq(user, null))
-   *     .t($.fail({ code: 404, message: 'not found' }))
-   *     .f(user)
+   * ```
+   * $.cond($.eq(user, null))
+   *   .t($.fail({ code: 404, message: 'not found' }))
+   *   .f(user)
+   * ```
    */
   fail(error: Expr<any> | any): Expr<never>;
 
   /**
    * Unwrap an attempted expression, providing a default
-   * on failure. Sugar for $.try(expr).catch(() => default).
+   * on failure. Sugar for `$.try(expr).catch(() => default)`.
    *
-   *   const user = $.orElse(
-   *     $.sql`select * from users where id = ${id}`,
-   *     { name: 'anonymous', id: 0 }
-   *   )
+   * ```
+   * const user = $.orElse(
+   *   $.sql`select * from users where id = ${id}`,
+   *   { name: 'anonymous', id: 0 }
+   * )
+   * ```
    */
   orElse<T>(expr: Expr<T>, fallback: Expr<T> | T): Expr<T>;
 
   /**
    * Attempt an expression and return an Either-style result.
-   * The result has .ok and .err properties.
+   * The result has `.ok` and `.err` properties.
    *
-   *   const result = $.attempt(
-   *     $.sql`select * from users where id = ${id}`
-   *   )
-   *   // result.ok  — Expr<T | null>  (null if failed)
-   *   // result.err — Expr<Error | null> (null if succeeded)
+   * ```
+   * const result = $.attempt(
+   *   $.sql`select * from users where id = ${id}`
+   * )
+   * // result.ok  — Expr<T | null>  (null if failed)
+   * // result.err — Expr<Error | null> (null if succeeded)
    *
-   *   return $.cond($.eq(result.err, null))
-   *     .t(transform(result.ok))
-   *     .f({ error: result.err })
+   * return $.cond($.eq(result.err, null))
+   *   .t(transform(result.ok))
+   *   .f({ error: result.err })
+   * ```
    */
   attempt<T>(expr: Expr<T>): Expr<{ ok: T | null; err: any | null }>;
 
@@ -90,16 +104,20 @@ export interface ErrorMethods {
    * Validate a condition, failing if it's false.
    * Like an assertion in the program.
    *
-   *   $.guard($.gt(user.age, 18), { code: 403, message: 'must be 18+' })
+   * ```
+   * $.guard($.gt(user.age, 18), { code: 403, message: 'must be 18+' })
+   * ```
    *
    * If the condition is true, continues. If false, fails
-   * with the given error. Useful in $.do() chains:
+   * with the given error. Useful in `$.do()` chains:
    *
-   *   return $.do(
-   *     $.guard($.gt(balance, amount), 'insufficient funds'),
-   *     $.sql`update accounts set balance = balance - ${amount}`,
-   *     { success: true }
-   *   )
+   * ```
+   * return $.do(
+   *   $.guard($.gt(balance, amount), 'insufficient funds'),
+   *   $.sql`update accounts set balance = balance - ${amount}`,
+   *   { success: true }
+   * )
+   * ```
    */
   guard(condition: Expr<boolean>, error: Expr<any> | any): Expr<void>;
 
@@ -107,15 +125,17 @@ export interface ErrorMethods {
    * Collect results from multiple expressions, accumulating
    * both successes and failures instead of failing fast.
    *
-   *   const results = $.settle(
-   *     $.sql`select * from service_a`,
-   *     $.sql`select * from service_b`,
-   *     $.sql`select * from service_c`
-   *   )
-   *   // results.fulfilled — array of successful values
-   *   // results.rejected  — array of errors
+   * ```
+   * const results = $.settle(
+   *   $.sql`select * from service_a`,
+   *   $.sql`select * from service_b`,
+   *   $.sql`select * from service_c`
+   * )
+   * // results.fulfilled — array of successful values
+   * // results.rejected  — array of errors
+   * ```
    *
-   * This is Promise.allSettled for the DSL.
+   * This is `Promise.allSettled` for the DSL.
    */
   settle(...exprs: Expr<any>[]): Expr<{
     fulfilled: any[];
@@ -129,10 +149,12 @@ interface TryBuilder<T> {
   /**
    * Provide a recovery function for failures.
    *
-   *   $.try(riskyQuery)
-   *     .catch(err => fallbackValue)
+   * ```
+   * $.try(riskyQuery)
+   *   .catch(err => fallbackValue)
+   * ```
    *
-   * The err parameter is an Expr representing the error.
+   * The `err` parameter is an Expr representing the error.
    * The callback returns the recovery value.
    */
   catch<U>(fn: (err: Expr<any>) => Expr<U> | U): Expr<T | U>;
@@ -140,29 +162,39 @@ interface TryBuilder<T> {
   /**
    * Match on specific error shapes.
    *
-   *   $.try(riskyQuery)
-   *     .match({
-   *       'not_found': (err) => defaultUser,
-   *       'timeout':   (err) => cachedUser,
-   *       '_':         (err) => $.fail(err)  // re-throw
-   *     })
+   * ```
+   * $.try(riskyQuery)
+   *   .match({
+   *     'not_found': (err) => defaultUser,
+   *     'timeout':   (err) => cachedUser,
+   *     '_':         (err) => $.fail(err)  // re-throw
+   *   })
+   * ```
    */
   match<U>(cases: Record<string, (err: Expr<any>) => Expr<U> | U>): Expr<T | U>;
 
   /**
    * Run a cleanup action regardless of success or failure.
    * The cleanup expression is always executed but its result
-   * is discarded — the try result (or catch result) is returned.
+   * is discarded -- the try result (or catch result) is returned.
    *
-   *   $.try(riskyQuery)
-   *     .catch(err => fallback)
-   *     .finally($.sql`update audit_log set ...`)
+   * ```
+   * $.try(riskyQuery)
+   *   .catch(err => fallback)
+   *   .finally($.sql`update audit_log set ...`)
+   * ```
    */
   finally(cleanup: Expr<any>): TryBuilder<T>;
 }
 
 // ---- Plugin implementation --------------------------------
 
+/**
+ * Error handling plugin. Namespace: `error/`.
+ *
+ * Makes failures explicit in the AST via try/catch, fail, attempt,
+ * guard, and settle combinators.
+ */
 export const error: PluginDefinition<ErrorMethods> = {
   name: "error",
   nodeKinds: ["error/try", "error/fail", "error/attempt", "error/guard", "error/settle"],

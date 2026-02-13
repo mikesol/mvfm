@@ -1,12 +1,19 @@
 import type { Expr, PluginContext, PluginDefinition } from "../../core";
 import { inferType } from "../../trait-utils";
 
+/**
+ * Show typeclass operations for converting values to their string representation.
+ */
 export interface ShowMethods {
+  /** Convert a value to its string representation via the Show typeclass. */
   show(a: Expr<number> | number): Expr<string>;
+  /** Convert a value to its string representation via the Show typeclass. */
   show(a: Expr<string> | string): Expr<string>;
+  /** Convert a value to its string representation via the Show typeclass. */
   show(a: Expr<boolean> | boolean): Expr<string>;
 }
 
+/** Show typeclass plugin. Dispatches to type-specific `show` implementations. */
 export const show: PluginDefinition<ShowMethods> = {
   name: "show",
   nodeKinds: [],

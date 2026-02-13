@@ -1,14 +1,30 @@
 import type { Expr, PluginContext, PluginDefinition } from "../../core";
 import { inferType } from "../../trait-utils";
 
+/**
+ * Ordering comparison operations dispatched via the Ord typeclass.
+ *
+ * Provides `compare` (returns -1/0/1) and derived boolean comparisons.
+ */
 export interface OrdMethods {
+  /** Three-way comparison returning -1, 0, or 1. */
   compare(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
+  /** Greater than. */
   gt(a: Expr<number> | number, b: Expr<number> | number): Expr<boolean>;
+  /** Greater than or equal. */
   gte(a: Expr<number> | number, b: Expr<number> | number): Expr<boolean>;
+  /** Less than. */
   lt(a: Expr<number> | number, b: Expr<number> | number): Expr<boolean>;
+  /** Less than or equal. */
   lte(a: Expr<number> | number, b: Expr<number> | number): Expr<boolean>;
 }
 
+/**
+ * Ordering typeclass plugin. Namespace: `ord/`.
+ *
+ * Dispatches comparisons to type-specific implementations. Derives
+ * `gt`, `gte`, `lt`, `lte` from the base `compare` operation.
+ */
 export const ord: PluginDefinition<OrdMethods> = {
   name: "ord",
   nodeKinds: ["ord/gt", "ord/gte", "ord/lt", "ord/lte"],

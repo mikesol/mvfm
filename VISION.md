@@ -109,7 +109,7 @@ Real-world plugins mirror specific, widely-used libraries. An LLM (or developer)
 
 | Plugin | Namespace | Models | What it adds to $ |
 |--------|-----------|--------|-------------------|
-| `postgres` | `postgres/` | [postgres.js](https://github.com/porsager/postgres) | Tagged template queries (`` $.sql`...` ``), dynamic identifiers (`$.sql.id()`), insert/set helpers (`$.sql.insert()`, `$.sql.set()`), transactions (`$.sql.begin()`), savepoints. **Not supported:** cursors, streaming, COPY, LISTEN/NOTIFY. |
+| `postgres` | `postgres/` | [postgres.js](https://github.com/porsager/postgres) | Tagged template queries (`` $.sql`...` ``), dynamic identifiers (`$.sql.id()`), insert/set helpers (`$.sql.insert()`, `$.sql.set()`), transactions (`$.sql.begin()`), savepoints. Cursor callback form supported. **Not supported:** COPY (streaming in postgres.js), LISTEN/NOTIFY (push-based), cursor async-iterable form (requires runtime iteration). |
 
 ### Planned real-world plugins
 

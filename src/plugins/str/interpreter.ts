@@ -1,5 +1,6 @@
 import type { ASTNode, InterpreterFragment } from "../../core";
 
+/** Interpreter fragment for `str/` node kinds. */
 export const strInterpreter: InterpreterFragment = {
   pluginName: "str",
   canHandle: (node) => node.kind.startsWith("str/"),

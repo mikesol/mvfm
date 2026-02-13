@@ -1,5 +1,6 @@
 import type { ASTNode, InterpreterFragment } from "../../core";
 
+/** Interpreter fragment for `boolean/` node kinds. */
 export const booleanInterpreter: InterpreterFragment = {
   pluginName: "boolean",
   canHandle: (node) => node.kind.startsWith("boolean/"),

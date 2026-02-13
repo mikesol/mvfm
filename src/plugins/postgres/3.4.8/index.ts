@@ -22,6 +22,13 @@ import type { ASTNode, Expr, PluginContext, PluginDefinition } from "../../../co
 
 // ---- What the plugin adds to $ ----------------------------
 
+/**
+ * Database operations added to the DSL context by the postgres plugin.
+ *
+ * Mirrors the postgres.js (porsager/postgres) v3.4.x API as closely
+ * as possible: tagged template queries, dynamic identifiers, insert/set
+ * helpers, transactions, savepoints, and cursors.
+ */
 export interface PostgresMethods {
   /**
    * Tagged template query — the core of postgres.js.
@@ -32,7 +39,7 @@ export interface PostgresMethods {
    * Ilo:
    *   const users = $.sql`select * from users where age > ${age}`
    *
-   * Returns Expr<Row[]> — an array of result rows.
+   * Returns `Expr<Row[]>` — an array of result rows.
    */
   sql: PostgresSql;
 }
@@ -219,6 +226,13 @@ interface PostgresTxSql {
 
 // ---- Configuration ----------------------------------------
 
+/**
+ * Connection configuration for the postgres plugin.
+ *
+ * Accepts the same options as postgres.js: connection string or
+ * individual host/port/database/username/password fields, plus
+ * SSL, connection pool size, and column name transforms.
+ */
 export interface PostgresConfig {
   connectionString?: string;
   host?: string;
@@ -235,6 +249,16 @@ export interface PostgresConfig {
 
 // ---- Plugin implementation --------------------------------
 
+/**
+ * Postgres plugin factory. Namespace: `postgres/`.
+ *
+ * Creates a plugin that exposes a `sql` tagged template for building
+ * parameterized queries, plus helpers for identifiers, inserts, updates,
+ * transactions, savepoints, and cursors.
+ *
+ * @param config - A connection string or {@link PostgresConfig} object.
+ * @returns A {@link PluginDefinition} for the postgres plugin.
+ */
 export function postgres(config?: PostgresConfig | string): PluginDefinition<PostgresMethods> {
   const resolvedConfig: PostgresConfig =
     typeof config === "string" ? { connectionString: config } : (config ?? {});

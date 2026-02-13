@@ -1,6 +1,15 @@
 import type { Expr, PluginContext, PluginDefinition } from "../../core";
 
+/**
+ * Mutable state operations for local variables within a program.
+ */
 export interface StMethods {
+  /**
+   * Declare a mutable local variable.
+   *
+   * @param initial - The initial value.
+   * @returns An object with `get`, `set`, and `push` methods.
+   */
   let<T>(initial: Expr<T> | T): {
     get: () => Expr<T>;
     set: (value: Expr<T> | T) => void;
@@ -8,6 +17,11 @@ export interface StMethods {
   };
 }
 
+/**
+ * Mutable state plugin. Namespace: `st/`.
+ *
+ * Provides `let` for declaring local mutable variables with get/set/push access.
+ */
 export const st: PluginDefinition<StMethods> = {
   name: "st",
   nodeKinds: ["st/let", "st/get", "st/set", "st/push"],
