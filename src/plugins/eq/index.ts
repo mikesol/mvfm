@@ -1,15 +1,33 @@
 import type { Expr, PluginContext, PluginDefinition } from "../../core";
 import { inferType } from "../../trait-utils";
 
+/**
+ * Equality comparison operations dispatched via the Eq typeclass.
+ *
+ * Supports any type that has an eq trait implementation registered
+ * (e.g. number via `num`, string via `str`, boolean via `boolean`).
+ */
 export interface EqMethods {
+  /** Test structural equality of two values of the same type. */
   eq(a: Expr<number> | number, b: Expr<number> | number): Expr<boolean>;
+  /** Test structural equality of two values of the same type. */
   eq(a: Expr<string> | string, b: Expr<string> | string): Expr<boolean>;
+  /** Test structural equality of two values of the same type. */
   eq(a: Expr<boolean> | boolean, b: Expr<boolean> | boolean): Expr<boolean>;
+  /** Test structural inequality (negated eq). */
   neq(a: Expr<number> | number, b: Expr<number> | number): Expr<boolean>;
+  /** Test structural inequality (negated eq). */
   neq(a: Expr<string> | string, b: Expr<string> | string): Expr<boolean>;
+  /** Test structural inequality (negated eq). */
   neq(a: Expr<boolean> | boolean, b: Expr<boolean> | boolean): Expr<boolean>;
 }
 
+/**
+ * Equality typeclass plugin. Namespace: `eq/`.
+ *
+ * Dispatches `eq` and `neq` to the appropriate type-specific implementation
+ * based on runtime type inference.
+ */
 export const eq: PluginDefinition<EqMethods> = {
   name: "eq",
   nodeKinds: ["eq/neq"],

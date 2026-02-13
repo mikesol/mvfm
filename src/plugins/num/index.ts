@@ -1,18 +1,41 @@
 import type { Expr, PluginContext, PluginDefinition } from "../../core";
 
+/**
+ * Numeric operations beyond what the semiring typeclass provides.
+ *
+ * Includes subtraction, division, modular arithmetic, rounding, and min/max.
+ * All methods accept raw numbers or `Expr<number>` (auto-lifted).
+ */
 export interface NumMethods {
+  /** Subtract two numbers. */
   sub(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
+  /** Divide two numbers. */
   div(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
+  /** Modulo (remainder) of two numbers. */
   mod(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
+  /** Negate a number. */
   neg(a: Expr<number> | number): Expr<number>;
+  /** Absolute value. */
   abs(a: Expr<number> | number): Expr<number>;
+  /** Round down to nearest integer. */
   floor(a: Expr<number> | number): Expr<number>;
+  /** Round up to nearest integer. */
   ceil(a: Expr<number> | number): Expr<number>;
+  /** Round to nearest integer. */
   round(a: Expr<number> | number): Expr<number>;
+  /** Minimum of one or more numbers. */
   min(...values: (Expr<number> | number)[]): Expr<number>;
+  /** Maximum of one or more numbers. */
   max(...values: (Expr<number> | number)[]): Expr<number>;
 }
 
+/**
+ * Numeric operations plugin. Namespace: `num/`.
+ *
+ * Provides arithmetic beyond semiring (sub, div, mod), rounding, and
+ * min/max. Also registers trait implementations for eq, ord, semiring,
+ * show, and bounded.
+ */
 export const num: PluginDefinition<NumMethods> = {
   name: "num",
   nodeKinds: [
