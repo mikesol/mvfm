@@ -45,11 +45,14 @@ export const booleanInterpreter: InterpreterFragment;
 // @public
 export type BooleanMethods = {};
 
+// Warning: (ae-incompatible-release-tags) The symbol "bounded" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
+//
 // @public
-export const bounded: PluginDefinition<BoundedMethods>;
+export const bounded: PluginDefinition<TypeclassSlot<"bounded">>;
 
 // @public
-export type BoundedMethods = {};
+export interface BoundedFor<_T> {
+}
 
 // @public
 export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
@@ -226,11 +229,14 @@ export interface MissingTraitError<_TraitName extends string, Hint extends strin
     readonly __error: Hint;
 }
 
+// Warning: (ae-incompatible-release-tags) The symbol "monoid" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
+//
 // @public
-export const monoid: PluginDefinition<MonoidMethods>;
+export const monoid: PluginDefinition<TypeclassSlot<"monoid">>;
 
 // @public
-export type MonoidMethods = {};
+export interface MonoidFor<_T> {
+}
 
 // @public
 export function nullable(of: SchemaType): NullableSchema;
