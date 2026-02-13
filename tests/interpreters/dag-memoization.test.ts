@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { type ASTNode, composeInterpreters, type InterpreterFragment } from "../../src/core";
+import {
+  type ASTNode,
+  composeInterpreters,
+  type InterpreterFragment,
+  type StepEffect,
+} from "../../src/core";
 import { coreInterpreter } from "../../src/interpreters/core";
 import { errorInterpreter } from "../../src/plugins/error/interpreter";
 import { fiberInterpreter } from "../../src/plugins/fiber/interpreter";
@@ -14,25 +19,31 @@ function createTrackingFragment(): {
     fragment: {
       pluginName: "track",
       canHandle: (node) => node.kind.startsWith("track/"),
-      async visit(node: ASTNode, recurse: (n: ASTNode) => Promise<unknown>) {
+      *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
         const id = (node as any).id as string;
         visitCount.set(id, (visitCount.get(id) ?? 0) + 1);
         switch (node.kind) {
           case "track/value":
             return node.value;
           case "track/add": {
-            const left = (await recurse(node.left as ASTNode)) as number;
-            const right = (await recurse(node.right as ASTNode)) as number;
+            const left = (yield { type: "recurse", child: node.left as ASTNode }) as number;
+            const right = (yield { type: "recurse", child: node.right as ASTNode }) as number;
             return left + right;
           }
           case "track/pair": {
-            const a = await recurse(node.a as ASTNode);
-            const b = await recurse(node.b as ASTNode);
+            const a = yield { type: "recurse", child: node.a as ASTNode };
+            const b = yield { type: "recurse", child: node.b as ASTNode };
             return [a, b];
           }
           case "track/parallel": {
+            // Generator-based fragments evaluate children sequentially via yield.
+            // For testing parallel-like behavior, we just evaluate all elements.
             const elements = node.elements as ASTNode[];
-            return Promise.all(elements.map((e) => recurse(e)));
+            const results: unknown[] = [];
+            for (const e of elements) {
+              results.push(yield { type: "recurse", child: e });
+            }
+            return results;
           }
           default:
             throw new Error(`Unknown track node: ${node.kind}`);
@@ -265,7 +276,8 @@ describe("DAG memoization: adversarial cases", () => {
     const failOnce: InterpreterFragment = {
       pluginName: "fx",
       canHandle: (node) => node.kind === "fx/flaky",
-      async visit() {
+      // biome-ignore lint/correctness/useYield: test fragment throws immediately without yielding
+      *visit(_node: ASTNode): Generator<StepEffect, unknown, unknown> {
         callCount++;
         throw new Error("boom");
       },
@@ -275,9 +287,10 @@ describe("DAG memoization: adversarial cases", () => {
 
     const node: ASTNode = { kind: "fx/flaky" };
     await expect(interp(node)).rejects.toThrow("boom");
-    // Second call: same node, should return cached rejected promise
+    // Second call: same node — the foldAST cache stores values (not promises),
+    // so rejected errors are NOT cached. Each call re-evaluates.
     await expect(interp(node)).rejects.toThrow("boom");
-    expect(callCount).toBe(1); // cached, not re-executed
+    expect(callCount).toBe(2);
   });
 
   it("deeply nested shared node in parallel branches", async () => {
@@ -297,7 +310,7 @@ describe("DAG memoization: adversarial cases", () => {
       right: { kind: "track/value", value: 3, id: "l2b" },
       id: "mid2",
     };
-    // mid1 and mid2 share "deep", run in parallel
+    // mid1 and mid2 share "deep", evaluated sequentially via generator
     const root: ASTNode = { kind: "track/parallel", elements: [mid1, mid2], id: "root" };
 
     const result = await interp(root);
@@ -312,7 +325,8 @@ describe("DAG memoization: retry with fresh cache", () => {
     const sideEffectFragment: InterpreterFragment = {
       pluginName: "fx",
       canHandle: (node) => node.kind === "fx/call",
-      async visit(_node: ASTNode, _recurse: (n: ASTNode) => Promise<unknown>) {
+      // biome-ignore lint/correctness/useYield: test fragment returns/throws without yielding
+      *visit(_node: ASTNode): Generator<StepEffect, unknown, unknown> {
         callCount++;
         if (callCount < 3) throw new Error("not yet");
         return "success";
@@ -342,7 +356,8 @@ describe("DAG memoization: retry with fresh cache", () => {
     const alwaysFails: InterpreterFragment = {
       pluginName: "fx",
       canHandle: (node) => node.kind === "fx/call",
-      async visit() {
+      // biome-ignore lint/correctness/useYield: test fragment throws without yielding
+      *visit(_node: ASTNode): Generator<StepEffect, unknown, unknown> {
         callCount++;
         throw new Error("always fails");
       },

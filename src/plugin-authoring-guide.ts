@@ -90,21 +90,24 @@ export function stripe(config: { publishableKey?: string }): PluginDefinition<St
 //
 // If you want your plugin to be executable (not just
 // AST-producing), provide an interpreter fragment.
+//
+// Interpreter fragments use generators. Yield a "recurse" effect
+// to evaluate a child node; yield other effects for IO (handled
+// externally by foldAST/runAST).
 
-import type { InterpreterFragment } from "./core";
+import type { ASTNode, InterpreterFragment, StepEffect } from "./core";
 
 export function stripeInterpreter(_secretKey: string): InterpreterFragment {
   return {
     pluginName: "stripe",
     canHandle: (node) => node.kind.startsWith("stripe/"),
-    async visit(node, recurse) {
+    *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
       switch (node.kind) {
         case "stripe/charge": {
-          // In a real interpreter, this would call the Stripe API.
-          // `recurse` lets you evaluate sub-expressions first.
-          const amount = await recurse(node.amount as any);
-          const currency = await recurse(node.currency as any);
-          const customerId = await recurse(node.customerId as any);
+          // Yield recurse effects to evaluate sub-expressions first.
+          const amount = yield { type: "recurse", child: node.amount as ASTNode };
+          const currency = yield { type: "recurse", child: node.currency as ASTNode };
+          const customerId = yield { type: "recurse", child: node.customerId as ASTNode };
           return {
             _interpreterNote: "would call Stripe API",
             amount,
@@ -113,11 +116,11 @@ export function stripeInterpreter(_secretKey: string): InterpreterFragment {
           };
         }
         case "stripe/refund": {
-          const chargeId = await recurse(node.chargeId as any);
+          const chargeId = yield { type: "recurse", child: node.chargeId as ASTNode };
           return { _interpreterNote: "would refund", chargeId };
         }
         case "stripe/getCustomer": {
-          const customerId = await recurse(node.customerId as any);
+          const customerId = yield { type: "recurse", child: node.customerId as ASTNode };
           return { _interpreterNote: "would fetch customer", customerId };
         }
         default:

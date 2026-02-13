@@ -3,16 +3,24 @@
 export type {
   ASTNode,
   Expr,
+  GeneratorInterpreterFragment,
   Interpreter,
   InterpreterFragment,
+  LegacyInterpreterFragment,
   Plugin,
   PluginContext,
   PluginDefinition,
   Program,
   RecurseFn,
+  Step,
+  StepContext,
+  StepEffect,
+  StepHandler,
   TraitImpl,
 } from "./core";
-export { composeInterpreters, ilo } from "./core";
+// Note: GeneratorInterpreterFragment is kept as an export for backward
+// compatibility — it is now a type alias for InterpreterFragment.
+export { adaptLegacy, composeInterpreters, foldAST, ilo, runAST, Stepper } from "./core";
 export { coreInterpreter } from "./interpreters/core";
 export type { BooleanMethods } from "./plugins/boolean";
 export { boolean } from "./plugins/boolean";
@@ -43,8 +51,18 @@ export { ordInterpreter } from "./plugins/ord/interpreter";
 export type { PostgresConfig, PostgresMethods } from "./plugins/postgres/3.4.8";
 export { postgres } from "./plugins/postgres/3.4.8";
 export { wrapPostgresJs } from "./plugins/postgres/3.4.8/client-postgres-js";
+export type {
+  ClientHandlerOptions,
+  ClientHandlerState,
+} from "./plugins/postgres/3.4.8/handler.client";
+export { clientHandler } from "./plugins/postgres/3.4.8/handler.client";
+export { serverEvaluate, serverHandler } from "./plugins/postgres/3.4.8/handler.server";
 export type { PostgresClient } from "./plugins/postgres/3.4.8/interpreter";
-export { postgresInterpreter } from "./plugins/postgres/3.4.8/interpreter";
+export {
+  escapeIdentifier,
+  findCursorBatch,
+  postgresInterpreter,
+} from "./plugins/postgres/3.4.8/interpreter";
 export type { SemigroupMethods } from "./plugins/semigroup";
 export { semigroup } from "./plugins/semigroup";
 export type { SemiringMethods } from "./plugins/semiring";

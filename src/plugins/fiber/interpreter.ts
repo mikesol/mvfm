@@ -1,10 +1,10 @@
-import type { ASTNode, InterpreterFragment } from "../../core";
+import type { ASTNode, InterpreterFragment, StepEffect } from "../../core";
 
 /**
  * Walk an AST subtree and inject a value into matching lambda_param nodes.
  * This is how the fiber interpreter passes collection items to the par_map body.
  */
-function injectLambdaParam(node: any, name: string, value: unknown): void {
+export function injectLambdaParam(node: any, name: string, value: unknown): void {
   if (node === null || node === undefined || typeof node !== "object") return;
   if (Array.isArray(node)) {
     for (const item of node) injectLambdaParam(item, name, value);
@@ -24,58 +24,58 @@ function injectLambdaParam(node: any, name: string, value: unknown): void {
 export const fiberInterpreter: InterpreterFragment = {
   pluginName: "fiber",
   canHandle: (node) => node.kind.startsWith("fiber/"),
-  async visit(node: ASTNode, recurse: (node: ASTNode) => Promise<unknown>): Promise<unknown> {
+  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
     switch (node.kind) {
       case "fiber/par_map": {
-        const collection = (await recurse(node.collection as ASTNode)) as unknown[];
+        const collection = (yield {
+          type: "recurse",
+          child: node.collection as ASTNode,
+        }) as unknown[];
         const concurrency = node.concurrency as number;
         const param = node.param as ASTNode;
         const body = node.body as ASTNode;
 
         const results: unknown[] = [];
+        // Process items sequentially within the generator.
+        // For parallel execution, use the fiberHandler with runAST.
         for (let i = 0; i < collection.length; i += concurrency) {
           const batch = collection.slice(i, i + concurrency);
-          const batchResults = await Promise.all(
-            batch.map((item) => {
-              const bodyClone = structuredClone(body);
-              injectLambdaParam(bodyClone, (param as any).name, item);
-              return recurse(bodyClone);
-            }),
-          );
-          results.push(...batchResults);
+          for (const item of batch) {
+            const bodyClone = structuredClone(body);
+            injectLambdaParam(bodyClone, (param as any).name, item);
+            results.push(yield { type: "recurse", child: bodyClone });
+          }
         }
         return results;
       }
 
       case "fiber/race": {
         const branches = node.branches as ASTNode[];
-        return Promise.race(branches.map((b) => recurse(b)));
+        // In the generator model, evaluate sequentially and return the first result.
+        // For true Promise.race semantics, use the fiberHandler with runAST.
+        if (branches.length === 0) throw new Error("fiber/race: no branches");
+        return yield { type: "recurse", child: branches[0] };
       }
 
       case "fiber/timeout": {
-        const ms = (await recurse(node.ms as ASTNode)) as number;
-        const fallback = () => recurse(node.fallback as ASTNode);
-        const expr = recurse(node.expr as ASTNode);
-        let timerId: ReturnType<typeof setTimeout>;
-        const timer = new Promise<unknown>((resolve) => {
-          timerId = setTimeout(async () => resolve(await fallback()), ms);
-        });
-        return Promise.race([expr, timer]).finally(() => clearTimeout(timerId!));
+        // In the generator model, evaluate the expression directly.
+        // For true timeout semantics, use the fiberHandler with runAST.
+        return yield { type: "recurse", child: node.expr as ASTNode };
       }
 
       case "fiber/retry": {
         const attempts = node.attempts as number;
-        const delay = (node.delay as number) ?? 0;
+        const _delay = (node.delay as number) ?? 0;
         let lastError: unknown;
         for (let i = 0; i < attempts; i++) {
           try {
-            const attemptRecurse = (recurse as any).fresh ? (recurse as any).fresh() : recurse;
-            return await attemptRecurse(node.expr as ASTNode);
+            // Use structuredClone to bypass cache for each attempt
+            const exprClone = structuredClone(node.expr as ASTNode);
+            return yield { type: "recurse", child: exprClone };
           } catch (e) {
             lastError = e;
-            if (i < attempts - 1 && delay > 0) {
-              await new Promise((r) => setTimeout(r, delay));
-            }
+            // delay is not implementable in a sync generator; the fiberHandler
+            // handles delays for runAST-based evaluation
           }
         }
         throw lastError;

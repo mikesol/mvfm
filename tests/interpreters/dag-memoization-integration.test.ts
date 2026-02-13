@@ -1,7 +1,7 @@
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { composeInterpreters, ilo } from "../../src/core";
+import { ilo } from "../../src/core";
 import { coreInterpreter } from "../../src/interpreters/core";
 import { eq } from "../../src/plugins/eq";
 import { eqInterpreter } from "../../src/plugins/eq/interpreter";
@@ -15,6 +15,7 @@ import { ord } from "../../src/plugins/ord";
 import { ordInterpreter } from "../../src/plugins/ord/interpreter";
 import { postgres as pgPlugin } from "../../src/plugins/postgres/3.4.8";
 import { wrapPostgresJs } from "../../src/plugins/postgres/3.4.8/client-postgres-js";
+import { serverEvaluate } from "../../src/plugins/postgres/3.4.8/handler.server";
 import type { PostgresClient } from "../../src/plugins/postgres/3.4.8/interpreter";
 import { postgresInterpreter } from "../../src/plugins/postgres/3.4.8/interpreter";
 import { semiring } from "../../src/plugins/semiring";
@@ -42,6 +43,7 @@ function injectInput(node: any, input: Record<string, unknown>, seen = new Map<a
 let container: StartedPostgreSqlContainer;
 let sql: ReturnType<typeof postgres>;
 
+// All fragments are now generator-based.
 const nonPgFragments = [
   errorInterpreter,
   fiberInterpreter,
@@ -51,6 +53,8 @@ const nonPgFragments = [
   eqInterpreter,
   strInterpreter,
 ];
+
+const allFragments = [postgresInterpreter, ...nonPgFragments];
 
 function makeCountingClient(): { client: PostgresClient; getQueryCount: () => number } {
   const inner = wrapPostgresJs(sql);
@@ -74,21 +78,13 @@ function makeCountingClient(): { client: PostgresClient; getQueryCount: () => nu
   return { client, getQueryCount: () => queryCount };
 }
 
-function makeInterp() {
-  const { client, getQueryCount } = makeCountingClient();
-  const interp = composeInterpreters([
-    postgresInterpreter(client, nonPgFragments),
-    ...nonPgFragments,
-  ]);
-  return { interp, getQueryCount };
-}
-
 const app = ilo(num, str, semiring, eq, ord, pgPlugin("postgres://test"), fiber, error);
 
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
-  const { interp, getQueryCount } = makeInterp();
-  const result = await interp(ast.result);
+  const { client, getQueryCount } = makeCountingClient();
+  const evaluate = serverEvaluate(client, allFragments);
+  const result = await evaluate(ast.result);
   return { result, queryCount: getQueryCount() };
 }
 

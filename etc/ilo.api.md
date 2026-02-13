@@ -7,6 +7,9 @@
 import type { default as postgres_2 } from 'postgres';
 
 // @public
+export function adaptLegacy(fragment: LegacyInterpreterFragment): InterpreterFragment;
+
+// @public
 export function array(of: SchemaType): ArraySchema;
 
 // @public
@@ -41,6 +44,22 @@ export const bounded: PluginDefinition<BoundedMethods>;
 
 // @public
 export type BoundedMethods = {};
+
+// @public
+export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
+
+// @public
+export interface ClientHandlerOptions {
+    baseUrl: string;
+    contractHash: string;
+    fetch?: typeof globalThis.fetch;
+    headers?: Record<string, string>;
+}
+
+// @public
+export interface ClientHandlerState {
+    stepIndex: number;
+}
 
 // @public
 export function composeInterpreters(fragments: InterpreterFragment[]): RecurseFn;
@@ -98,6 +117,9 @@ export interface ErrorMethods {
     try<T>(expr: Expr<T>): TryBuilder<T>;
 }
 
+// @public
+export function escapeIdentifier(name: string): string;
+
 // Warning: (ae-forgotten-export) The symbol "ExprBase" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "ExprFields" needs to be exported by the entry point index.d.ts
 //
@@ -122,6 +144,15 @@ export interface FiberMethods {
     seq(...exprs: (Expr<any> | any)[]): Expr<any>;
     timeout(expr: Expr<any>, ms: number | Expr<number>, fallback: Expr<any> | any): Expr<any>;
 }
+
+// @public
+export function findCursorBatch(node: any): any | null;
+
+// @public
+export function foldAST(fragments: InterpreterFragment[], handlers: Record<string, (effect: StepEffect) => Promise<unknown>>): RecurseFn;
+
+// @public @deprecated
+export type GeneratorInterpreterFragment = InterpreterFragment;
 
 // @public
 export const heytingAlgebra: PluginDefinition<HeytingAlgebraMethods>;
@@ -162,6 +193,17 @@ export type Interpreter = (program: Program) => {
 
 // @public
 export interface InterpreterFragment {
+    // (undocumented)
+    canHandle: (node: ASTNode) => boolean;
+    isVolatile?: (node: ASTNode) => boolean;
+    // (undocumented)
+    pluginName: string;
+    // (undocumented)
+    visit: (node: ASTNode) => Generator<StepEffect, unknown, unknown>;
+}
+
+// @public
+export interface LegacyInterpreterFragment {
     // (undocumented)
     canHandle: (node: ASTNode) => boolean;
     // (undocumented)
@@ -302,7 +344,7 @@ export interface PostgresConfig {
 }
 
 // @public
-export function postgresInterpreter(client: PostgresClient, outerFragments?: InterpreterFragment[]): InterpreterFragment;
+export const postgresInterpreter: InterpreterFragment;
 
 // @public
 export interface PostgresMethods {
@@ -330,6 +372,12 @@ export interface RecurseFn {
 
 // @public
 export function resolveSchemaType(node: ASTNode, schema?: Record<string, unknown>): string | null;
+
+// @public
+export function runAST<S>(root: ASTNode, fragments: InterpreterFragment[], handler: StepHandler<S>, initialState: S): Promise<{
+    value: unknown;
+    state: S;
+}>;
 
 // @public
 export type SchemaShape = Record<string, SchemaType>;
@@ -360,6 +408,12 @@ export interface SemiringMethods {
 }
 
 // @public
+export function serverEvaluate(client: PostgresClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+
+// @public
+export function serverHandler(client: PostgresClient, fragments: InterpreterFragment[]): StepHandler<void>;
+
+// @public
 export const show: PluginDefinition<ShowMethods>;
 
 // @public
@@ -371,6 +425,49 @@ export interface ShowMethods {
 
 // @public
 export const st: PluginDefinition<StMethods>;
+
+// @public
+export type Step<S> = {
+    done: true;
+    value: unknown;
+    state: S;
+} | {
+    done: false;
+    node: ASTNode;
+    effect: StepEffect;
+    context: StepContext;
+    state: S;
+};
+
+// @public
+export interface StepContext {
+    depth: number;
+    parentNode?: ASTNode;
+    path: string[];
+}
+
+// @public
+export type StepEffect = {
+    type: "recurse";
+    child: ASTNode;
+} | {
+    type: string;
+    [key: string]: unknown;
+};
+
+// @public
+export type StepHandler<S> = (effect: StepEffect, context: StepContext, state: S) => Promise<{
+    value: unknown;
+    state: S;
+}>;
+
+// @public
+export class Stepper {
+    constructor(fragments: InterpreterFragment[], root: ASTNode);
+    descend(child: ASTNode, parentNode: ASTNode | undefined): Step<undefined> | null;
+    fresh(root: ASTNode): Stepper;
+    tick(lastResult?: unknown): Step<undefined> | null;
+}
 
 // @public
 export interface StMethods {
@@ -420,8 +517,8 @@ export function wrapPostgresJs(sql: Sql | TransactionSql): PostgresClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/core.d.ts:214:5 - (ae-forgotten-export) The symbol "CoreDollar" needs to be exported by the entry point index.d.ts
-// dist/core.d.ts:214:5 - (ae-forgotten-export) The symbol "MergePlugins" needs to be exported by the entry point index.d.ts
+// dist/core.d.ts:384:5 - (ae-forgotten-export) The symbol "CoreDollar" needs to be exported by the entry point index.d.ts
+// dist/core.d.ts:384:5 - (ae-forgotten-export) The symbol "MergePlugins" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 
