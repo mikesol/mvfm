@@ -25,7 +25,7 @@ Analyzed `@cloudflare/workers-types@4.20260213.0` — the `KVNamespace` interfac
 
 ### Plugin Size
 
-SMALL — 5 node kinds, 4 user-facing operations (get, getJson, put, delete, list). Fully implemented in one pass.
+SMALL — 5 node kinds, 4 user-facing operations (get, put, delete, list). Fully implemented in one pass.
 
 ## Architecture
 
@@ -63,7 +63,8 @@ function cloudflareKv(config: CloudflareKvConfig): PluginDefinition<CloudflareKv
 interface CloudflareKvMethods {
   kv: {
     get(key: Expr<string> | string): Expr<string | null>;
-    getJson<T = unknown>(key: Expr<string> | string): Expr<T | null>;
+    get(key: Expr<string> | string, type: "text"): Expr<string | null>;
+    get<T = unknown>(key: Expr<string> | string, type: "json"): Expr<T | null>;
     put(key: Expr<string> | string, value: Expr<string> | string, options?: Expr<KvPutOptions> | KvPutOptions): Expr<void>;
     delete(key: Expr<string> | string): Expr<void>;
     list(options?: Expr<KvListOptions> | KvListOptions): Expr<KvListResult>;
