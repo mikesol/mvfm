@@ -1,13 +1,24 @@
-import type { PluginContext, PluginDefinition } from "../../core";
+import type { PluginContext, PluginDefinition, TypeclassSlot } from "../../core";
 
-/** Bounded typeclass plugin — marker plugin that enables `top` and `bottom` dispatch for types with registered bounded traits. */
-export type BoundedMethods = {};
+/**
+ * Bounded typeclass template — placeholder for future top/bottom methods for type T.
+ * Currently a marker plugin; dispatched through trait implementations
+ * registered by type plugins (e.g. `num`, `boolean`).
+ */
+export interface BoundedFor<_T> {}
+
+// Register with the typeclass mapping
+declare module "../../core" {
+  interface TypeclassMapping<T> {
+    bounded: BoundedFor<T>;
+  }
+}
 
 /** Bounded typeclass plugin. No direct methods; dispatched through trait implementations registered by type plugins (e.g. `num`, `boolean`). */
-export const bounded: PluginDefinition<BoundedMethods> = {
+export const bounded: PluginDefinition<TypeclassSlot<"bounded">> = {
   name: "bounded",
   nodeKinds: [],
-  build(_ctx: PluginContext): BoundedMethods {
+  build(_ctx: PluginContext): any {
     return {};
   },
 };

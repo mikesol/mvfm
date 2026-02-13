@@ -42,6 +42,6 @@ describe("show: dispatch", () => {
 describe("show: error cases", () => {
   it("throws when no show impl for inferred type", () => {
     const app = ilo(show);
-    expect(() => app(($) => $.show(42))).toThrow(/No show implementation for type/);
+    expect(() => app(($) => ($ as any).show(42))).toThrow(/No show implementation for type/);
   });
 });

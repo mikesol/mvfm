@@ -37,6 +37,8 @@ describe("semigroup: dispatch to str", () => {
 describe("semigroup: error cases", () => {
   it("throws when no semigroup impl for inferred type", () => {
     const app = ilo(semigroup);
-    expect(() => app(($) => $.append("a", "b"))).toThrow(/No semigroup implementation for type/);
+    expect(() => app(($) => ($ as any).append("a", "b"))).toThrow(
+      /No semigroup implementation for type/,
+    );
   });
 });

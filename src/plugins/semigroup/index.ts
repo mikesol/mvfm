@@ -1,23 +1,31 @@
-import type { Expr, PluginContext, PluginDefinition } from "../../core";
+import type { Expr, PluginContext, PluginDefinition, TypeclassSlot } from "../../core";
 import { inferType } from "../../trait-utils";
 
 /**
- * Semigroup typeclass operations for associative binary combination.
+ * Semigroup typeclass template — generates append method for a specific type T.
+ * Resolved by MergePlugins based on which type plugins are loaded.
  */
-export interface SemigroupMethods {
+export interface SemigroupFor<T> {
   /** Combine two values using the semigroup's associative operation. */
-  append(a: Expr<string> | string, b: Expr<string> | string): Expr<string>;
+  append(a: Expr<T> | T, b: Expr<T> | T): Expr<T>;
+}
+
+// Register with the typeclass mapping
+declare module "../../core" {
+  interface TypeclassMapping<T> {
+    semigroup: SemigroupFor<T>;
+  }
 }
 
 /** Semigroup typeclass plugin. Dispatches `append` to type-specific implementations. */
-export const semigroup: PluginDefinition<SemigroupMethods> = {
+export const semigroup: PluginDefinition<TypeclassSlot<"semigroup">> = {
   name: "semigroup",
   nodeKinds: [],
-  build(ctx: PluginContext): SemigroupMethods {
+  build(ctx: PluginContext): any {
     const impls = ctx.plugins.filter((p) => p.traits?.semigroup).map((p) => p.traits!.semigroup!);
 
     return {
-      append(a: any, b: any): Expr<string> {
+      append(a: any, b: any) {
         const aNode = ctx.lift(a).__node;
         const bNode = ctx.lift(b).__node;
         const type =
@@ -34,12 +42,12 @@ export const semigroup: PluginDefinition<SemigroupMethods> = {
               : "Cannot infer type for append — both arguments are untyped",
           );
         }
-        return ctx.expr<string>({
+        return ctx.expr({
           kind: impl.nodeKinds.append,
           left: aNode,
           right: bNode,
         });
       },
-    } as SemigroupMethods;
+    };
   },
 };

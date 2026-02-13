@@ -41,6 +41,6 @@ describe("semiring: dispatch to num", () => {
 describe("semiring: error cases", () => {
   it("throws when no semiring impl for inferred type", () => {
     const app = ilo(semiring);
-    expect(() => app(($) => $.add(1, 2))).toThrow(/No semiring implementation for type/);
+    expect(() => app(($) => ($ as any).add(1, 2))).toThrow(/No semiring implementation for type/);
   });
 });

@@ -53,6 +53,6 @@ describe("ord: derived operations wrap compare", () => {
 describe("ord: error cases", () => {
   it("throws when no ord impl for inferred type", () => {
     const app = ilo(ord);
-    expect(() => app(($) => $.gt(1, 2))).toThrow(/No ord implementation for type/);
+    expect(() => app(($) => ($ as any).gt(1, 2))).toThrow(/No ord implementation for type/);
   });
 });

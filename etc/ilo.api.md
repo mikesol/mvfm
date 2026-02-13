@@ -32,7 +32,12 @@ export interface ASTNode {
 }
 
 // @public
-export const boolean: PluginDefinition<BooleanMethods>;
+export const boolean: PluginDefinition<BooleanMethods, {
+    eq: boolean;
+    show: boolean;
+    heytingAlgebra: boolean;
+    bounded: boolean;
+}>;
 
 // @public
 export const booleanInterpreter: InterpreterFragment;
@@ -79,21 +84,19 @@ export interface ControlMethods {
 // @public
 export const coreInterpreter: InterpreterFragment;
 
+// Warning: (ae-incompatible-release-tags) The symbol "eq" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
+//
 // @public
-export const eq: PluginDefinition<EqMethods>;
+export const eq: PluginDefinition<TypeclassSlot<"eq">>;
+
+// @public
+export interface EqFor<T> {
+    eq(a: Expr<T> | T, b: Expr<T> | T): Expr<boolean>;
+    neq(a: Expr<T> | T, b: Expr<T> | T): Expr<boolean>;
+}
 
 // @public
 export const eqInterpreter: InterpreterFragment;
-
-// @public
-export interface EqMethods {
-    eq(a: Expr<number> | number, b: Expr<number> | number): Expr<boolean>;
-    eq(a: Expr<string> | string, b: Expr<string> | string): Expr<boolean>;
-    eq(a: Expr<boolean> | boolean, b: Expr<boolean> | boolean): Expr<boolean>;
-    neq(a: Expr<number> | number, b: Expr<number> | number): Expr<boolean>;
-    neq(a: Expr<string> | string, b: Expr<string> | string): Expr<boolean>;
-    neq(a: Expr<boolean> | boolean, b: Expr<boolean> | boolean): Expr<boolean>;
-}
 
 // @public
 export const error: PluginDefinition<ErrorMethods>;
@@ -155,18 +158,20 @@ export function foldAST(fragments: InterpreterFragment[], handlers: Record<strin
 // @public @deprecated
 export type GeneratorInterpreterFragment = InterpreterFragment;
 
+// Warning: (ae-incompatible-release-tags) The symbol "heytingAlgebra" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
+//
 // @public
-export const heytingAlgebra: PluginDefinition<HeytingAlgebraMethods>;
+export const heytingAlgebra: PluginDefinition<TypeclassSlot<"heytingAlgebra">>;
 
 // @public
-export interface HeytingAlgebraMethods {
-    and(a: Expr<boolean>, b: Expr<boolean>): Expr<boolean>;
-    not(a: Expr<boolean>): Expr<boolean>;
-    or(a: Expr<boolean>, b: Expr<boolean>): Expr<boolean>;
+export interface HeytingAlgebraFor<T> {
+    and(a: Expr<T>, b: Expr<T>): Expr<T>;
+    not(a: Expr<T>): Expr<T>;
+    or(a: Expr<T>, b: Expr<T>): Expr<T>;
 }
 
 // @public
-export function ilo<P extends PluginDefinition<any>[]>(...plugins: P): {
+export function ilo<P extends PluginDefinition<any, any>[]>(...plugins: P): {
     <S extends SchemaShape>(schema: S, fn: ($: CoreDollar<InferSchema<S>> & MergePlugins<P>) => Expr<any> | any): Program;
     <I = never>(fn: ($: CoreDollar<I> & MergePlugins<P>) => Expr<any> | any): Program;
 };
@@ -213,6 +218,14 @@ export interface LegacyInterpreterFragment {
     visit: (node: ASTNode, recurse: (node: ASTNode) => Promise<unknown>) => Promise<unknown>;
 }
 
+// Warning: (ae-internal-missing-underscore) The name "MissingTraitError" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export interface MissingTraitError<_TraitName extends string, Hint extends string> {
+    // @deprecated (undocumented)
+    readonly __error: Hint;
+}
+
 // @public
 export const monoid: PluginDefinition<MonoidMethods>;
 
@@ -231,7 +244,13 @@ export interface NullableSchema {
 }
 
 // @public
-export const num: PluginDefinition<NumMethods>;
+export const num: PluginDefinition<NumMethods, {
+    eq: number;
+    ord: number;
+    semiring: number;
+    show: number;
+    bounded: number;
+}>;
 
 // @public
 export const numInterpreter: InterpreterFragment;
@@ -250,23 +269,25 @@ export interface NumMethods {
     sub(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
 }
 
+// Warning: (ae-incompatible-release-tags) The symbol "ord" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
+//
 // @public
-export const ord: PluginDefinition<OrdMethods>;
+export const ord: PluginDefinition<TypeclassSlot<"ord">>;
+
+// @public
+export interface OrdFor<T> {
+    compare(a: Expr<T> | T, b: Expr<T> | T): Expr<number>;
+    gt(a: Expr<T> | T, b: Expr<T> | T): Expr<boolean>;
+    gte(a: Expr<T> | T, b: Expr<T> | T): Expr<boolean>;
+    lt(a: Expr<T> | T, b: Expr<T> | T): Expr<boolean>;
+    lte(a: Expr<T> | T, b: Expr<T> | T): Expr<boolean>;
+}
 
 // @public
 export const ordInterpreter: InterpreterFragment;
 
 // @public
-export interface OrdMethods {
-    compare(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
-    gt(a: Expr<number> | number, b: Expr<number> | number): Expr<boolean>;
-    gte(a: Expr<number> | number, b: Expr<number> | number): Expr<boolean>;
-    lt(a: Expr<number> | number, b: Expr<number> | number): Expr<boolean>;
-    lte(a: Expr<number> | number, b: Expr<number> | number): Expr<boolean>;
-}
-
-// @public
-type Plugin_2<T = any> = PluginDefinition<T> | (() => PluginDefinition<T>);
+type Plugin_2<T = any, Traits extends Record<string, unknown> = {}> = PluginDefinition<T, Traits> | (() => PluginDefinition<T, Traits>);
 export { Plugin_2 as Plugin }
 
 // @public
@@ -282,7 +303,7 @@ export interface PluginContext {
 }
 
 // @public
-export interface PluginDefinition<T = any> {
+export interface PluginDefinition<T = any, Traits extends Record<string, unknown> = {}> {
     // (undocumented)
     build: (ctx: PluginContext) => T;
     // (undocumented)
@@ -391,21 +412,25 @@ export type SchemaType = SchemaTag | ArraySchema | NullableSchema | {
     readonly [key: string]: SchemaType;
 };
 
+// Warning: (ae-incompatible-release-tags) The symbol "semigroup" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
+//
 // @public
-export const semigroup: PluginDefinition<SemigroupMethods>;
+export const semigroup: PluginDefinition<TypeclassSlot<"semigroup">>;
 
 // @public
-export interface SemigroupMethods {
-    append(a: Expr<string> | string, b: Expr<string> | string): Expr<string>;
+export interface SemigroupFor<T> {
+    append(a: Expr<T> | T, b: Expr<T> | T): Expr<T>;
 }
 
+// Warning: (ae-incompatible-release-tags) The symbol "semiring" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
+//
 // @public
-export const semiring: PluginDefinition<SemiringMethods>;
+export const semiring: PluginDefinition<TypeclassSlot<"semiring">>;
 
 // @public
-export interface SemiringMethods {
-    add(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
-    mul(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
+export interface SemiringFor<T> {
+    add(a: Expr<T> | T, b: Expr<T> | T): Expr<T>;
+    mul(a: Expr<T> | T, b: Expr<T> | T): Expr<T>;
 }
 
 // @public
@@ -414,14 +439,14 @@ export function serverEvaluate(client: PostgresClient, fragments: InterpreterFra
 // @public
 export function serverHandler(client: PostgresClient, fragments: InterpreterFragment[]): StepHandler<void>;
 
+// Warning: (ae-incompatible-release-tags) The symbol "show" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
+//
 // @public
-export const show: PluginDefinition<ShowMethods>;
+export const show: PluginDefinition<TypeclassSlot<"show">>;
 
 // @public
-export interface ShowMethods {
-    show(a: Expr<number> | number): Expr<string>;
-    show(a: Expr<string> | string): Expr<string>;
-    show(a: Expr<boolean> | boolean): Expr<string>;
+export interface ShowFor<T> {
+    show(a: Expr<T> | T): Expr<string>;
 }
 
 // @public
@@ -480,7 +505,12 @@ export interface StMethods {
 }
 
 // @public
-export const str: PluginDefinition<StrMethods>;
+export const str: PluginDefinition<StrMethods, {
+    eq: string;
+    show: string;
+    semigroup: string;
+    monoid: string;
+}>;
 
 // @public
 export const strInterpreter: InterpreterFragment;
@@ -571,6 +601,20 @@ export interface TraitImpl {
     type: string;
 }
 
+// Warning: (ae-internal-missing-underscore) The name "TypeclassMapping" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export interface TypeclassMapping<T> {
+}
+
+// Warning: (ae-internal-missing-underscore) The name "TypeclassSlot" should be prefixed with an underscore because the declaration is marked as @internal
+//
+// @internal
+export interface TypeclassSlot<Name extends string> {
+    // (undocumented)
+    readonly __typeclassSlot: Name;
+}
+
 // Warning: (ae-forgotten-export) The symbol "Sql" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "TransactionSql" needs to be exported by the entry point index.d.ts
 //
@@ -582,8 +626,8 @@ export function wrapStripeSdk(stripe: Stripe): StripeClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/core.d.ts:384:5 - (ae-forgotten-export) The symbol "CoreDollar" needs to be exported by the entry point index.d.ts
-// dist/core.d.ts:384:5 - (ae-forgotten-export) The symbol "MergePlugins" needs to be exported by the entry point index.d.ts
+// dist/core.d.ts:419:5 - (ae-forgotten-export) The symbol "CoreDollar" needs to be exported by the entry point index.d.ts
+// dist/core.d.ts:419:5 - (ae-forgotten-export) The symbol "MergePlugins" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

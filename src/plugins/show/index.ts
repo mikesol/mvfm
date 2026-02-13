@@ -1,23 +1,27 @@
-import type { Expr, PluginContext, PluginDefinition } from "../../core";
+import type { Expr, PluginContext, PluginDefinition, TypeclassSlot } from "../../core";
 import { inferType } from "../../trait-utils";
 
 /**
- * Show typeclass operations for converting values to their string representation.
+ * Show typeclass template — generates show method for a specific type T.
+ * Resolved by MergePlugins based on which type plugins are loaded.
  */
-export interface ShowMethods {
+export interface ShowFor<T> {
   /** Convert a value to its string representation via the Show typeclass. */
-  show(a: Expr<number> | number): Expr<string>;
-  /** Convert a value to its string representation via the Show typeclass. */
-  show(a: Expr<string> | string): Expr<string>;
-  /** Convert a value to its string representation via the Show typeclass. */
-  show(a: Expr<boolean> | boolean): Expr<string>;
+  show(a: Expr<T> | T): Expr<string>;
+}
+
+// Register with the typeclass mapping
+declare module "../../core" {
+  interface TypeclassMapping<T> {
+    show: ShowFor<T>;
+  }
 }
 
 /** Show typeclass plugin. Dispatches to type-specific `show` implementations. */
-export const show: PluginDefinition<ShowMethods> = {
+export const show: PluginDefinition<TypeclassSlot<"show">> = {
   name: "show",
   nodeKinds: [],
-  build(ctx: PluginContext): ShowMethods {
+  build(ctx: PluginContext): any {
     const impls = ctx.plugins.filter((p) => p.traits?.show).map((p) => p.traits!.show!);
 
     return {
@@ -41,6 +45,6 @@ export const show: PluginDefinition<ShowMethods> = {
           operand: aNode,
         });
       },
-    } as ShowMethods;
+    };
   },
 };
