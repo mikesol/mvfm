@@ -1,11 +1,17 @@
 import type { Expr, PluginContext, PluginDefinition } from "../../core";
 import { inferType } from "../../trait-utils";
 
+/**
+ * Semiring typeclass operations providing addition and multiplication.
+ */
 export interface SemiringMethods {
+  /** Add two values via the semiring typeclass. */
   add(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
+  /** Multiply two values via the semiring typeclass. */
   mul(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
 }
 
+/** Semiring typeclass plugin. Dispatches `add` and `mul` to type-specific implementations. */
 export const semiring: PluginDefinition<SemiringMethods> = {
   name: "semiring",
   nodeKinds: [],

@@ -1,12 +1,19 @@
 import type { Expr, PluginContext, PluginDefinition } from "../../core";
 import { inferType } from "../../trait-utils";
 
+/**
+ * Heyting algebra typeclass operations for lattice-based boolean logic.
+ */
 export interface HeytingAlgebraMethods {
+  /** Logical conjunction (AND). */
   and(a: Expr<boolean>, b: Expr<boolean>): Expr<boolean>;
+  /** Logical disjunction (OR). */
   or(a: Expr<boolean>, b: Expr<boolean>): Expr<boolean>;
+  /** Logical negation (NOT). */
   not(a: Expr<boolean>): Expr<boolean>;
 }
 
+/** Heyting algebra typeclass plugin. Dispatches `and`, `or`, `not` to type-specific implementations. */
 export const heytingAlgebra: PluginDefinition<HeytingAlgebraMethods> = {
   name: "heytingAlgebra",
   nodeKinds: [],

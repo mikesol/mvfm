@@ -1,10 +1,15 @@
 import type { Expr, PluginContext, PluginDefinition } from "../../core";
 import { inferType } from "../../trait-utils";
 
+/**
+ * Semigroup typeclass operations for associative binary combination.
+ */
 export interface SemigroupMethods {
+  /** Combine two values using the semigroup's associative operation. */
   append(a: Expr<string> | string, b: Expr<string> | string): Expr<string>;
 }
 
+/** Semigroup typeclass plugin. Dispatches `append` to type-specific implementations. */
 export const semigroup: PluginDefinition<SemigroupMethods> = {
   name: "semigroup",
   nodeKinds: [],
