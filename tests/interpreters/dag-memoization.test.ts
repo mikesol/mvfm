@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { type ASTNode, composeInterpreters, type InterpreterFragment } from "../../src/core";
+import { coreInterpreter } from "../../src/interpreters/core";
 
 function createTrackingFragment(): {
   fragment: InterpreterFragment;
@@ -114,5 +115,82 @@ describe("DAG memoization", () => {
     const result = await recurse(root);
     expect(result).toEqual([8, 9]);
     expect(visitCount.get("shared")).toBe(1);
+  });
+});
+
+describe("DAG memoization: taint tracking", () => {
+  it("volatile node (lambda_param) is not cached", async () => {
+    const { fragment } = createTrackingFragment();
+    const interp = composeInterpreters([coreInterpreter, fragment]);
+
+    const param: ASTNode = { kind: "core/lambda_param", name: "x" } as any;
+    (param as any).__value = 42;
+
+    const root: ASTNode = {
+      kind: "track/add",
+      left: param,
+      right: { kind: "track/value", value: 1, id: "one" },
+      id: "root",
+    };
+
+    const result = await interp(root);
+    expect(result).toBe(43);
+
+    // Change value and re-evaluate — root depends on volatile, so re-evaluates
+    (param as any).__value = 100;
+    const result2 = await interp(root);
+    expect(result2).toBe(101);
+  });
+
+  it("taint propagates: node depending on volatile is not cached, independent node is cached", async () => {
+    const { fragment, visitCount } = createTrackingFragment();
+    const interp = composeInterpreters([coreInterpreter, fragment]);
+
+    const param: ASTNode = { kind: "core/lambda_param", name: "x" } as any;
+    (param as any).__value = 10;
+
+    const addNode: ASTNode = {
+      kind: "track/add",
+      left: param,
+      right: { kind: "track/value", value: 5, id: "five" },
+      id: "add",
+    };
+    const stable: ASTNode = { kind: "track/value", value: 99, id: "stable" };
+    const root: ASTNode = { kind: "track/pair", a: addNode, b: stable, id: "root" };
+
+    await interp(root);
+    expect(visitCount.get("stable")).toBe(1);
+
+    (param as any).__value = 20;
+    const result2 = await interp(root);
+    expect(result2).toEqual([25, 99]);
+    expect(visitCount.get("stable")).toBe(1); // still cached
+    expect(visitCount.get("add")).toBe(2); // re-evaluated
+  });
+
+  it("independent branch is cached even when sibling is tainted", async () => {
+    const { fragment, visitCount } = createTrackingFragment();
+    const interp = composeInterpreters([coreInterpreter, fragment]);
+
+    const param: ASTNode = { kind: "core/lambda_param", name: "x" } as any;
+    (param as any).__value = 1;
+
+    const taintedBranch: ASTNode = {
+      kind: "track/add",
+      left: param,
+      right: { kind: "track/value", value: 0, id: "zero" },
+      id: "tainted",
+    };
+    const stableBranch: ASTNode = { kind: "track/value", value: 42, id: "stable" };
+    const root: ASTNode = { kind: "track/pair", a: taintedBranch, b: stableBranch, id: "root" };
+
+    await interp(root);
+    (param as any).__value = 2;
+    await interp(root);
+    (param as any).__value = 3;
+    await interp(root);
+
+    expect(visitCount.get("tainted")).toBe(3); // re-evaluated each time
+    expect(visitCount.get("stable")).toBe(1); // cached from first evaluation
   });
 });
