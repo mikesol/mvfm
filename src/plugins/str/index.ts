@@ -6,7 +6,7 @@ import type { Expr, PluginContext, PluginDefinition } from "../../core";
  * All methods accept raw strings or `Expr<string>` (auto-lifted).
  */
 export interface StrMethods {
-  /** Tagged template literal for string interpolation: `$.str\`hello ${name}\`` */
+  /** Tagged template literal for string interpolation. */
   str(strings: TemplateStringsArray, ...exprs: (Expr<any> | string | number)[]): Expr<string>;
   /** Concatenate multiple string values. */
   concat(...parts: (Expr<string> | string)[]): Expr<string>;
