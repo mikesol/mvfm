@@ -3,7 +3,7 @@
 // ============================================================
 //
 // Implementation status: FULL (all 9 operations)
-// Plugin size: MEDIUM — covers messages, batches, and models
+// Plugin size: SMALL — fully implemented (9 operations)
 //
 // Implemented:
 //   - Messages: create, countTokens
