@@ -121,14 +121,7 @@ interface ParFn {
 
 export const fiber: PluginDefinition<FiberMethods> = {
   name: "fiber",
-  nodeKinds: [
-    "fiber/par",
-    "fiber/par_map",
-    "fiber/seq",
-    "fiber/race",
-    "fiber/timeout",
-    "fiber/retry",
-  ],
+  nodeKinds: ["fiber/par_map", "fiber/race", "fiber/timeout", "fiber/retry"],
 
   build(ctx: PluginContext): FiberMethods {
     const parFn: ParFn = ((...args: any[]) => {
@@ -163,8 +156,8 @@ export const fiber: PluginDefinition<FiberMethods> = {
 
       // Tuple form: $.par(a, b, c)
       return ctx.expr({
-        kind: "fiber/par",
-        branches: args.map((a: any) => (ctx.isExpr(a) ? a.__node : ctx.lift(a).__node)),
+        kind: "core/tuple",
+        elements: args.map((a: any) => (ctx.isExpr(a) ? a.__node : ctx.lift(a).__node)),
       });
     }) as ParFn;
 
@@ -173,10 +166,12 @@ export const fiber: PluginDefinition<FiberMethods> = {
 
       seq(...exprs: (Expr<any> | any)[]) {
         const nodes = exprs.map((e) => (ctx.isExpr(e) ? e.__node : ctx.lift(e).__node));
+        const steps = nodes.slice(0, -1);
+        const result = nodes[nodes.length - 1];
         return ctx.expr({
-          kind: "fiber/seq",
-          steps: nodes.slice(0, -1),
-          result: nodes[nodes.length - 1],
+          kind: "core/do",
+          steps,
+          result,
         });
       },
 

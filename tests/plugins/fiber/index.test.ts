@@ -13,23 +13,23 @@ function strip(ast: unknown): unknown {
 const app = ilo(num, postgres("postgres://localhost/test"), fiber);
 
 describe("fiber: $.par() tuple form", () => {
-  it("produces fiber/par node with branches", () => {
+  it("produces core/tuple node with elements", () => {
     const prog = app(($) => {
       return $.par($.sql`select count(*) from users`, $.sql`select count(*) from posts`);
     });
     const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("fiber/par");
-    expect(ast.result.branches).toHaveLength(2);
-    expect(ast.result.branches[0].kind).toBe("postgres/query");
-    expect(ast.result.branches[1].kind).toBe("postgres/query");
+    expect(ast.result.kind).toBe("core/tuple");
+    expect(ast.result.elements).toHaveLength(2);
+    expect(ast.result.elements[0].kind).toBe("postgres/query");
+    expect(ast.result.elements[1].kind).toBe("postgres/query");
   });
 
-  it("works with 3+ branches", () => {
+  it("works with 3+ elements", () => {
     const prog = app(($) => {
       return $.par($.sql`select 1`, $.sql`select 2`, $.sql`select 3`);
     });
     const ast = strip(prog.ast) as any;
-    expect(ast.result.branches).toHaveLength(3);
+    expect(ast.result.elements).toHaveLength(3);
   });
 });
 
@@ -53,7 +53,7 @@ describe("fiber: $.par() map form", () => {
 });
 
 describe("fiber: $.seq()", () => {
-  it("produces fiber/seq with steps and result", () => {
+  it("produces core/do with steps and result", () => {
     const prog = app(($) => {
       return $.seq(
         $.sql`insert into log (msg) values ('start')`,
@@ -62,7 +62,7 @@ describe("fiber: $.seq()", () => {
       );
     });
     const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("fiber/seq");
+    expect(ast.result.kind).toBe("core/do");
     expect(ast.result.steps).toHaveLength(2);
     expect(ast.result.result.kind).toBe("postgres/query");
   });
@@ -140,7 +140,7 @@ describe("fiber: nested composition", () => {
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fiber/par_map");
     expect(ast.result.body.kind).toBe("fiber/retry");
-    expect(ast.result.body.expr.kind).toBe("fiber/par");
-    expect(ast.result.body.expr.branches).toHaveLength(2);
+    expect(ast.result.body.expr.kind).toBe("core/tuple");
+    expect(ast.result.body.expr.elements).toHaveLength(2);
   });
 });
