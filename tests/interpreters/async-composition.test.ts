@@ -1,7 +1,7 @@
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { composeInterpreters, ilo } from "../../src/core";
+import { adaptLegacy, ilo } from "../../src/core";
 import { coreInterpreter } from "../../src/interpreters/core";
 import { eq } from "../../src/plugins/eq";
 import { eqInterpreter } from "../../src/plugins/eq/interpreter";
@@ -15,6 +15,7 @@ import { ord } from "../../src/plugins/ord";
 import { ordInterpreter } from "../../src/plugins/ord/interpreter";
 import { postgres as pgPlugin } from "../../src/plugins/postgres/3.4.8";
 import { wrapPostgresJs } from "../../src/plugins/postgres/3.4.8/client-postgres-js";
+import { serverEvaluate } from "../../src/plugins/postgres/3.4.8/handler.server";
 import { postgresInterpreter } from "../../src/plugins/postgres/3.4.8/interpreter";
 import { semiring } from "../../src/plugins/semiring";
 import { str } from "../../src/plugins/str";
@@ -34,27 +35,26 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 let container: StartedPostgreSqlContainer;
 let sql: ReturnType<typeof postgres>;
 
+// Non-postgres fragments are still legacy-style; wrap them with adaptLegacy
 const nonPgFragments = [
-  errorInterpreter,
-  fiberInterpreter,
+  adaptLegacy(errorInterpreter),
+  adaptLegacy(fiberInterpreter),
   coreInterpreter,
-  numInterpreter,
-  ordInterpreter,
-  eqInterpreter,
-  strInterpreter,
+  adaptLegacy(numInterpreter),
+  adaptLegacy(ordInterpreter),
+  adaptLegacy(eqInterpreter),
+  adaptLegacy(strInterpreter),
 ];
 
-function makeInterp() {
-  const client = wrapPostgresJs(sql);
-  return composeInterpreters([postgresInterpreter(client, nonPgFragments), ...nonPgFragments]);
-}
+const allFragments = [postgresInterpreter, ...nonPgFragments];
 
 const app = ilo(num, str, semiring, eq, ord, pgPlugin("postgres://test"), fiber, error);
 
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
-  const interp = makeInterp();
-  return await interp(ast.result);
+  const client = wrapPostgresJs(sql);
+  const evaluate = serverEvaluate(client, allFragments);
+  return await evaluate(ast.result);
 }
 
 beforeAll(async () => {

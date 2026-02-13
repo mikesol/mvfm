@@ -46,6 +46,22 @@ export const bounded: PluginDefinition<BoundedMethods>;
 export type BoundedMethods = {};
 
 // @public
+export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
+
+// @public
+export interface ClientHandlerOptions {
+    baseUrl: string;
+    contractHash: string;
+    fetch?: typeof globalThis.fetch;
+    headers?: Record<string, string>;
+}
+
+// @public
+export interface ClientHandlerState {
+    stepIndex: number;
+}
+
+// @public
 export function composeInterpreters(fragments: (InterpreterFragment | GeneratorInterpreterFragment)[]): RecurseFn;
 
 // @public
@@ -60,7 +76,7 @@ export interface ControlMethods {
 }
 
 // @public
-export const coreInterpreter: InterpreterFragment;
+export const coreInterpreter: GeneratorInterpreterFragment;
 
 // @public
 export const eq: PluginDefinition<EqMethods>;
@@ -101,6 +117,9 @@ export interface ErrorMethods {
     try<T>(expr: Expr<T>): TryBuilder<T>;
 }
 
+// @public
+export function escapeIdentifier(name: string): string;
+
 // Warning: (ae-forgotten-export) The symbol "ExprBase" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "ExprFields" needs to be exported by the entry point index.d.ts
 //
@@ -125,6 +144,9 @@ export interface FiberMethods {
     seq(...exprs: (Expr<any> | any)[]): Expr<any>;
     timeout(expr: Expr<any>, ms: number | Expr<number>, fallback: Expr<any> | any): Expr<any>;
 }
+
+// @public
+export function findCursorBatch(node: any): any | null;
 
 // @public
 export function foldAST(fragments: GeneratorInterpreterFragment[], handlers: Record<string, (effect: StepEffect) => Promise<unknown>>): RecurseFn;
@@ -329,7 +351,7 @@ export interface PostgresConfig {
 }
 
 // @public
-export function postgresInterpreter(client: PostgresClient, outerFragments?: InterpreterFragment[]): InterpreterFragment;
+export const postgresInterpreter: GeneratorInterpreterFragment;
 
 // @public
 export interface PostgresMethods {
@@ -391,6 +413,12 @@ export interface SemiringMethods {
     add(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
     mul(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
 }
+
+// @public
+export function serverEvaluate(client: PostgresClient, fragments: GeneratorInterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+
+// @public
+export function serverHandler(client: PostgresClient, fragments: GeneratorInterpreterFragment[]): StepHandler<void>;
 
 // @public
 export const show: PluginDefinition<ShowMethods>;

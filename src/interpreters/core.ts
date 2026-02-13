@@ -1,10 +1,10 @@
-import type { ASTNode, InterpreterFragment } from "../core";
+import type { ASTNode, GeneratorInterpreterFragment, StepEffect } from "../core";
 
-/** Interpreter fragment for core node kinds (literal, input, prop_access, cond, do, program, tuple, record). */
-export const coreInterpreter: InterpreterFragment = {
+/** Generator-based interpreter fragment for core node kinds (literal, input, prop_access, cond, do, program, tuple, record). */
+export const coreInterpreter: GeneratorInterpreterFragment = {
   pluginName: "core",
   canHandle: (node) => node.kind.startsWith("core/"),
-  async visit(node: ASTNode, recurse: (node: ASTNode) => Promise<unknown>): Promise<unknown> {
+  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
     switch (node.kind) {
       case "core/literal":
         return node.value;
@@ -13,42 +13,48 @@ export const coreInterpreter: InterpreterFragment = {
         return (node as any).__inputData;
 
       case "core/prop_access": {
-        const obj = (await recurse(node.object as ASTNode)) as Record<string, unknown>;
+        const obj = (yield { type: "recurse", child: node.object as ASTNode }) as Record<
+          string,
+          unknown
+        >;
         return obj[node.property as string];
       }
 
       case "core/record": {
         const fields = node.fields as Record<string, ASTNode>;
-        const entries = Object.entries(fields);
-        const values = await Promise.all(entries.map(([, fieldNode]) => recurse(fieldNode)));
         const result: Record<string, unknown> = {};
-        for (let i = 0; i < entries.length; i++) {
-          result[entries[i][0]] = values[i];
+        for (const [key, fieldNode] of Object.entries(fields)) {
+          result[key] = yield { type: "recurse", child: fieldNode };
         }
         return result;
       }
 
       case "core/cond": {
-        const predicate = await recurse(node.predicate as ASTNode);
-        return predicate
-          ? await recurse(node.then as ASTNode)
-          : await recurse(node.else as ASTNode);
+        const predicate = yield { type: "recurse", child: node.predicate as ASTNode };
+        if (predicate) {
+          return yield { type: "recurse", child: node.then as ASTNode };
+        }
+        return yield { type: "recurse", child: node.else as ASTNode };
       }
 
       case "core/do": {
         const steps = node.steps as ASTNode[];
         for (const step of steps) {
-          await recurse(step);
+          yield { type: "recurse", child: step };
         }
-        return await recurse(node.result as ASTNode);
+        return yield { type: "recurse", child: node.result as ASTNode };
       }
 
       case "core/program":
-        return await recurse(node.result as ASTNode);
+        return yield { type: "recurse", child: node.result as ASTNode };
 
       case "core/tuple": {
         const elements = node.elements as ASTNode[];
-        return await Promise.all(elements.map((el) => recurse(el)));
+        const results: unknown[] = [];
+        for (const el of elements) {
+          results.push(yield { type: "recurse", child: el });
+        }
+        return results;
       }
 
       case "core/lambda_param":
@@ -58,4 +64,5 @@ export const coreInterpreter: InterpreterFragment = {
         throw new Error(`Core interpreter: unknown node kind "${node.kind}"`);
     }
   },
+  isVolatile: (node) => node.kind === "core/lambda_param",
 };
