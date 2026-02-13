@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
 import type { Expr } from "../src";
-import { eq, ilo, num, semiring, str } from "../src";
+import { boolean, eq, ilo, num, semiring, str } from "../src";
 
 const app = ilo(num, str, semiring);
 
@@ -74,17 +74,71 @@ describe("typed inputs (runtime schema)", () => {
 });
 
 describe("typeclass type safety — negative tests", () => {
-  // Skip until eq plugin is converted to use TypeclassSlot (Task 2).
-  // The @ts-expect-error directives below require eq to declare
-  // TypeclassSlot<"eq"> instead of hardcoded EqMethods overloads.
-  it.skip("eq without type plugins is a type error", () => {
+  it("eq without type plugins is a type error", () => {
     const app = ilo(eq);
-    app(($) => {
-      // @ts-expect-error — no type plugin provides eq
-      $.eq(1, 2);
-      // @ts-expect-error — no type plugin provides neq
-      $.neq(1, 2);
-      return $.input;
+    // Runtime: ilo(eq) with no type plugins throws when eq is actually called.
+    // We only verify the type-level error here; wrap in expect().toThrow()
+    // since the @ts-expect-error-suppressed calls still execute at runtime.
+    expect(() =>
+      app(($) => {
+        // @ts-expect-error — no type plugin provides eq
+        $.eq(1, 2);
+        // @ts-expect-error — no type plugin provides neq
+        $.neq(1, 2);
+        return $.input;
+      }),
+    ).toThrow();
+  });
+
+  it("eq with only num rejects string arguments", () => {
+    const app = ilo(num, eq);
+    // Verify num eq typechecks and works at runtime
+    const prog = app(($) => {
+      const result = $.eq(1, 2);
+      expectTypeOf(result).toEqualTypeOf<Expr<boolean>>();
+      return result;
     });
+    expect(prog.ast).toBeDefined();
+    // Verify string eq is rejected at the type level (and throws at runtime)
+    expect(() =>
+      app(($) => {
+        // @ts-expect-error — str not loaded, no eq for string
+        return $.eq("a", "b");
+      }),
+    ).toThrow();
+  });
+
+  it("eq with num and str accepts both", () => {
+    const app = ilo(num, str, eq);
+    // Verify both num and str eq typecheck and work at runtime
+    const prog = app(($) => {
+      const r1 = $.eq(1, 2);
+      const r2 = $.eq("a", "b");
+      expectTypeOf(r1).toEqualTypeOf<Expr<boolean>>();
+      expectTypeOf(r2).toEqualTypeOf<Expr<boolean>>();
+      return $.do(r1, r2);
+    });
+    expect(prog.ast).toBeDefined();
+    // Verify boolean eq is rejected at the type level (and throws at runtime)
+    expect(() =>
+      app(($) => {
+        // @ts-expect-error — boolean plugin not loaded
+        return $.eq(true, false);
+      }),
+    ).toThrow();
+  });
+
+  it("eq with all three type plugins accepts all", () => {
+    const app = ilo(num, str, boolean, eq);
+    const prog = app(($) => {
+      const r1 = $.eq(1, 2);
+      const r2 = $.eq("a", "b");
+      const r3 = $.eq(true, false);
+      expectTypeOf(r1).toEqualTypeOf<Expr<boolean>>();
+      expectTypeOf(r2).toEqualTypeOf<Expr<boolean>>();
+      expectTypeOf(r3).toEqualTypeOf<Expr<boolean>>();
+      return $.do(r1, r2, r3);
+    });
+    expect(prog.ast).toBeDefined();
   });
 });

@@ -157,7 +157,7 @@ export interface MissingTraitError<_TraitName extends string, Hint extends strin
  * @internal
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export type TypeclassMapping<T> = {};
+export interface TypeclassMapping<T> {}
 
 /**
  * Defines a plugin's contract: its name, the AST node kinds it emits,
