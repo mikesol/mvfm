@@ -399,6 +399,63 @@ export interface RecurseFn {
 }
 
 // @public
+export function resend(config: ResendConfig): PluginDefinition<ResendMethods>;
+
+// @public
+export interface ResendClient {
+    request(method: string, path: string, params?: unknown): Promise<unknown>;
+}
+
+// @public
+export function resendClientHandler(options: ResendClientHandlerOptions): StepHandler<ResendClientHandlerState>;
+
+// @public
+export interface ResendClientHandlerOptions {
+    baseUrl: string;
+    contractHash: string;
+    fetch?: typeof globalThis.fetch;
+    headers?: Record<string, string>;
+}
+
+// @public
+export interface ResendClientHandlerState {
+    stepIndex: number;
+}
+
+// @public
+export interface ResendConfig {
+    apiKey: string;
+}
+
+// @public
+export const resendInterpreter: InterpreterFragment;
+
+// @public
+export interface ResendMethods {
+    resend: {
+        emails: {
+            send(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            get(id: Expr<string> | string): Expr<Record<string, unknown>>;
+        };
+        batch: {
+            send(emails: Expr<Record<string, unknown>[]> | Record<string, unknown>[]): Expr<Record<string, unknown>>;
+        };
+        contacts: {
+            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            get(id: Expr<string> | string): Expr<Record<string, unknown>>;
+            list(): Expr<Record<string, unknown>>;
+            remove(id: Expr<string> | string): Expr<Record<string, unknown>>;
+        };
+    };
+}
+
+// @public
+export function resendServerEvaluate(client: ResendClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+
+// @public
+export function resendServerHandler(client: ResendClient): StepHandler<void>;
+
+// @public
 export function resolveSchemaType(node: ASTNode, schema?: Record<string, unknown>): string | null;
 
 // @public
@@ -697,6 +754,11 @@ export interface TypeclassSlot<Name extends string> {
 //
 // @public
 export function wrapPostgresJs(sql: Sql | TransactionSql): PostgresClient;
+
+// Warning: (ae-forgotten-export) The symbol "ResendSdk" needs to be exported by the entry point index.d.ts
+//
+// @public
+export function wrapResendSdk(resend: ResendSdk): ResendClient;
 
 // @public
 export function wrapStripeSdk(stripe: Stripe): StripeClient;

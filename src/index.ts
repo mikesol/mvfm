@@ -80,6 +80,20 @@ export {
   findCursorBatch,
   postgresInterpreter,
 } from "./plugins/postgres/3.4.8/interpreter";
+export type { ResendConfig, ResendMethods } from "./plugins/resend/6.9.2";
+export { resend } from "./plugins/resend/6.9.2";
+export { wrapResendSdk } from "./plugins/resend/6.9.2/client-resend-sdk";
+export type {
+  ClientHandlerOptions as ResendClientHandlerOptions,
+  ClientHandlerState as ResendClientHandlerState,
+} from "./plugins/resend/6.9.2/handler.client";
+export { clientHandler as resendClientHandler } from "./plugins/resend/6.9.2/handler.client";
+export {
+  serverEvaluate as resendServerEvaluate,
+  serverHandler as resendServerHandler,
+} from "./plugins/resend/6.9.2/handler.server";
+export type { ResendClient } from "./plugins/resend/6.9.2/interpreter";
+export { resendInterpreter } from "./plugins/resend/6.9.2/interpreter";
 export type { SemigroupFor } from "./plugins/semigroup";
 export { semigroup } from "./plugins/semigroup";
 export type { SemiringFor } from "./plugins/semiring";
