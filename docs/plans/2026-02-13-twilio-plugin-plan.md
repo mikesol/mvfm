@@ -4,7 +4,7 @@
 
 **Goal:** Implement the `twilio` plugin (issue #55) modeling twilio-node v5.5.1 with Messages and Calls resources.
 
-**Architecture:** External-service plugin at `src/plugins/twilio/5.5.1/` following the Stripe plugin pattern exactly. Configured factory function, uniform `twilio/api_call` effect, 6 node kinds (create/fetch/list for Messages and Calls). All REST request-response, no scoping.
+**Architecture:** External-service plugin at `src/plugins/twilio/5.5.1/` following the Stripe plugin pattern. Configured factory function, uniform `twilio/api_call` effect, 6 node kinds (create/fetch/list for Messages and Calls). All REST request-response, no scoping. **Key ergonomic difference from Stripe:** Twilio SDK uses `client.messages(sid).fetch()` callable pattern, not flat `messages.fetch(sid)`. We match this exactly using `Object.assign` to make `$.twilio.messages` both callable and have `.create()`/`.list()` properties.
 
 **Tech Stack:** TypeScript, vitest, ilo core (`Expr`, `PluginContext`, `PluginDefinition`, `InterpreterFragment`, `StepHandler`, `foldAST`, `runAST`)
 
@@ -88,10 +88,10 @@ describe("twilio: messages.create", () => {
   });
 });
 
-describe("twilio: messages.fetch", () => {
+describe("twilio: messages(sid).fetch", () => {
   it("produces twilio/fetch_message node with literal sid", () => {
     const prog = app(($) => {
-      return $.twilio.messages.fetch("SM800f449d0399ed014aae2bcc0cc2f2ec");
+      return $.twilio.messages("SM800f449d0399ed014aae2bcc0cc2f2ec").fetch();
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("twilio/fetch_message");
@@ -101,7 +101,7 @@ describe("twilio: messages.fetch", () => {
 
   it("accepts Expr<string> sid", () => {
     const prog = app(($) => {
-      return $.twilio.messages.fetch($.input.messageSid);
+      return $.twilio.messages($.input.messageSid).fetch();
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("twilio/fetch_message");
@@ -151,10 +151,10 @@ describe("twilio: calls.create", () => {
   });
 });
 
-describe("twilio: calls.fetch", () => {
+describe("twilio: calls(sid).fetch", () => {
   it("produces twilio/fetch_call node with literal sid", () => {
     const prog = app(($) => {
-      return $.twilio.calls.fetch("CA42ed11f93dc08b952027ffbc406d0868");
+      return $.twilio.calls("CA42ed11f93dc08b952027ffbc406d0868").fetch();
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("twilio/fetch_call");
@@ -210,7 +210,7 @@ describe("twilio: integration with $.do()", () => {
   it("orphaned operations are rejected", () => {
     expect(() => {
       app(($) => {
-        const msg = $.twilio.messages.fetch("SM_123");
+        const msg = $.twilio.messages("SM_123").fetch();
         $.twilio.messages.create({ to: "+1", from: "+2", body: "orphan" }); // orphan!
         return msg;
       });
@@ -226,7 +226,7 @@ describe("twilio: cross-operation dependencies", () => {
         from: "+15559876543",
         body: "Hello",
       });
-      const fetched = $.twilio.messages.fetch((msg as any).sid);
+      const fetched = $.twilio.messages((msg as any).sid).fetch();
       return $.do(msg, fetched);
     });
     const ast = strip(prog.ast) as any;
@@ -310,33 +310,59 @@ import type { Expr, PluginContext, PluginDefinition } from "../../../core";
  * Each resource exposes create/fetch/list methods that produce
  * namespaced AST nodes.
  */
+/** Context returned by `$.twilio.messages(sid)` — mirrors twilio-node's MessageContext. */
+export interface TwilioMessageContext {
+  /** Fetch this message by its SID. */
+  fetch(): Expr<Record<string, unknown>>;
+}
+
+/** Context returned by `$.twilio.calls(sid)` — mirrors twilio-node's CallContext. */
+export interface TwilioCallContext {
+  /** Fetch this call by its SID. */
+  fetch(): Expr<Record<string, unknown>>;
+}
+
+/**
+ * The messages resource — callable to get a context, with create/list methods.
+ * Mirrors twilio-node: `client.messages.create(...)` and `client.messages(sid).fetch()`.
+ */
+export interface TwilioMessagesResource {
+  /** Get a message context by SID (for .fetch()). */
+  (sid: Expr<string> | string): TwilioMessageContext;
+  /** Send an SMS/MMS message. */
+  create(
+    params: Expr<Record<string, unknown>> | Record<string, unknown>,
+  ): Expr<Record<string, unknown>>;
+  /** List messages with optional filter params. */
+  list(
+    params?: Expr<Record<string, unknown>> | Record<string, unknown>,
+  ): Expr<Record<string, unknown>>;
+}
+
+/**
+ * The calls resource — callable to get a context, with create/list methods.
+ * Mirrors twilio-node: `client.calls.create(...)` and `client.calls(sid).fetch()`.
+ */
+export interface TwilioCallsResource {
+  /** Get a call context by SID (for .fetch()). */
+  (sid: Expr<string> | string): TwilioCallContext;
+  /** Initiate an outbound call. */
+  create(
+    params: Expr<Record<string, unknown>> | Record<string, unknown>,
+  ): Expr<Record<string, unknown>>;
+  /** List calls with optional filter params. */
+  list(
+    params?: Expr<Record<string, unknown>> | Record<string, unknown>,
+  ): Expr<Record<string, unknown>>;
+}
+
 export interface TwilioMethods {
   /** Twilio API operations, namespaced under `$.twilio`. */
   twilio: {
-    messages: {
-      /** Send an SMS/MMS message. */
-      create(
-        params: Expr<Record<string, unknown>> | Record<string, unknown>,
-      ): Expr<Record<string, unknown>>;
-      /** Fetch a message by SID. */
-      fetch(sid: Expr<string> | string): Expr<Record<string, unknown>>;
-      /** List messages with optional filter params. */
-      list(
-        params?: Expr<Record<string, unknown>> | Record<string, unknown>,
-      ): Expr<Record<string, unknown>>;
-    };
-    calls: {
-      /** Initiate an outbound call. */
-      create(
-        params: Expr<Record<string, unknown>> | Record<string, unknown>,
-      ): Expr<Record<string, unknown>>;
-      /** Fetch a call by SID. */
-      fetch(sid: Expr<string> | string): Expr<Record<string, unknown>>;
-      /** List calls with optional filter params. */
-      list(
-        params?: Expr<Record<string, unknown>> | Record<string, unknown>,
-      ): Expr<Record<string, unknown>>;
-    };
+    /** Messages resource. Callable: `messages(sid).fetch()`, or `messages.create(...)`. */
+    messages: TwilioMessagesResource;
+    /** Calls resource. Callable: `calls(sid).fetch()`, or `calls.create(...)`. */
+    calls: TwilioCallsResource;
   };
 }
 
@@ -387,60 +413,67 @@ export function twilio(config: TwilioConfig): PluginDefinition<TwilioMethods> {
         return ctx.lift(params).__node;
       }
 
-      return {
-        twilio: {
-          messages: {
-            create(params) {
-              return ctx.expr({
-                kind: "twilio/create_message",
-                params: resolveParams(params),
-                config,
-              });
-            },
-
-            fetch(sid) {
-              return ctx.expr({
-                kind: "twilio/fetch_message",
-                sid: resolveSid(sid),
-                config,
-              });
-            },
-
-            list(params?) {
-              return ctx.expr({
-                kind: "twilio/list_messages",
-                params: params != null ? resolveParams(params) : null,
-                config,
-              });
-            },
+      // Build messages resource: callable + .create() + .list()
+      // Mirrors twilio-node: client.messages(sid).fetch() AND client.messages.create(...)
+      const messages = Object.assign(
+        (sid: Expr<string> | string): TwilioMessageContext => ({
+          fetch() {
+            return ctx.expr({
+              kind: "twilio/fetch_message",
+              sid: resolveSid(sid),
+              config,
+            });
           },
-
-          calls: {
-            create(params) {
-              return ctx.expr({
-                kind: "twilio/create_call",
-                params: resolveParams(params),
-                config,
-              });
-            },
-
-            fetch(sid) {
-              return ctx.expr({
-                kind: "twilio/fetch_call",
-                sid: resolveSid(sid),
-                config,
-              });
-            },
-
-            list(params?) {
-              return ctx.expr({
-                kind: "twilio/list_calls",
-                params: params != null ? resolveParams(params) : null,
-                config,
-              });
-            },
+        }),
+        {
+          create(params: Expr<Record<string, unknown>> | Record<string, unknown>) {
+            return ctx.expr({
+              kind: "twilio/create_message",
+              params: resolveParams(params),
+              config,
+            });
+          },
+          list(params?: Expr<Record<string, unknown>> | Record<string, unknown>) {
+            return ctx.expr({
+              kind: "twilio/list_messages",
+              params: params != null ? resolveParams(params) : null,
+              config,
+            });
           },
         },
+      ) as TwilioMessagesResource;
+
+      // Build calls resource: same pattern
+      const calls = Object.assign(
+        (sid: Expr<string> | string): TwilioCallContext => ({
+          fetch() {
+            return ctx.expr({
+              kind: "twilio/fetch_call",
+              sid: resolveSid(sid),
+              config,
+            });
+          },
+        }),
+        {
+          create(params: Expr<Record<string, unknown>> | Record<string, unknown>) {
+            return ctx.expr({
+              kind: "twilio/create_call",
+              params: resolveParams(params),
+              config,
+            });
+          },
+          list(params?: Expr<Record<string, unknown>> | Record<string, unknown>) {
+            return ctx.expr({
+              kind: "twilio/list_calls",
+              params: params != null ? resolveParams(params) : null,
+              config,
+            });
+          },
+        },
+      ) as TwilioCallsResource;
+
+      return {
+        twilio: { messages, calls },
       };
     },
   };
@@ -466,13 +499,13 @@ export function twilio(config: TwilioConfig): PluginDefinition<TwilioMethods> {
 //    Ilo:   $.twilio.messages.create(...)
 //    The nested resource pattern maps 1:1.
 //
-// WORKS BUT DIFFERENT:
+// WORKS GREAT (cont.):
 //
 // 4. Fetch by SID:
 //    Real:  client.messages('SM123').fetch()
-//    Ilo:   $.twilio.messages.fetch('SM123')
-//    Ilo passes SID as a parameter rather than using a sub-context.
-//    Same deviation as Stripe plugin.
+//    Ilo:   $.twilio.messages('SM123').fetch()
+//    1:1 match. Uses Object.assign to make messages both callable
+//    and have .create()/.list() properties, just like twilio-node.
 //
 // 5. Return types:
 //    Real twilio-node has typed response classes (MessageInstance,
@@ -580,7 +613,7 @@ describe("twilio interpreter: create_message", () => {
 
 describe("twilio interpreter: fetch_message", () => {
   it("yields GET to Messages/{Sid}.json", async () => {
-    const prog = app(($) => $.twilio.messages.fetch("SM800f449d"));
+    const prog = app(($) => $.twilio.messages("SM800f449d").fetch());
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
     expect(captured[0].type).toBe("twilio/api_call");
@@ -641,7 +674,7 @@ describe("twilio interpreter: create_call", () => {
 
 describe("twilio interpreter: fetch_call", () => {
   it("yields GET to Calls/{Sid}.json", async () => {
-    const prog = app(($) => $.twilio.calls.fetch("CA42ed11f9"));
+    const prog = app(($) => $.twilio.calls("CA42ed11f9").fetch());
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
     expect(captured[0].type).toBe("twilio/api_call");
@@ -697,7 +730,7 @@ describe("twilio interpreter: input resolution", () => {
   });
 
   it("resolves input sid for fetch", async () => {
-    const prog = app({ msgSid: "string" }, ($) => $.twilio.messages.fetch($.input.msgSid));
+    const prog = app({ msgSid: "string" }, ($) => $.twilio.messages($.input.msgSid).fetch());
     const { captured } = await run(prog, { msgSid: "SM_dynamic_789" });
     expect(captured).toHaveLength(1);
     expect(captured[0].path).toBe(
@@ -712,7 +745,7 @@ describe("twilio interpreter: input resolution", () => {
 
 describe("twilio interpreter: return value", () => {
   it("returns the handler response as the result", async () => {
-    const prog = app(($) => $.twilio.messages.fetch("SM_123"));
+    const prog = app(($) => $.twilio.messages("SM_123").fetch());
     const { result } = await run(prog);
     expect(result).toEqual({ sid: "mock_sid", status: "mock" });
   });
@@ -1276,7 +1309,7 @@ describe("twilio integration: messages", () => {
   });
 
   it("fetch message", async () => {
-    const prog = app(($) => $.twilio.messages.fetch("SM_mock_123"));
+    const prog = app(($) => $.twilio.messages("SM_mock_123").fetch());
     const result = (await run(prog)) as any;
     expect(result.sid).toBe("SM_mock_123");
     expect(result.status).toBe("delivered");
@@ -1308,7 +1341,7 @@ describe("twilio integration: calls", () => {
   });
 
   it("fetch call", async () => {
-    const prog = app(($) => $.twilio.calls.fetch("CA_mock_456"));
+    const prog = app(($) => $.twilio.calls("CA_mock_456").fetch());
     const result = (await run(prog)) as any;
     expect(result.sid).toBe("CA_mock_456");
     expect(result.status).toBe("completed");
@@ -1333,7 +1366,7 @@ describe("twilio integration: chaining", () => {
         from: "+15559876543",
         body: "Chain test",
       });
-      return $.twilio.messages.fetch((msg as any).sid);
+      return $.twilio.messages((msg as any).sid).fetch();
     });
     const result = (await run(prog)) as any;
     // The fetch uses the mock sid from the create response
