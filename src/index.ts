@@ -25,6 +25,20 @@ export type {
 // compatibility — it is now a type alias for InterpreterFragment.
 export { adaptLegacy, composeInterpreters, foldAST, ilo, runAST, Stepper } from "./core";
 export { coreInterpreter } from "./interpreters/core";
+export type { AnthropicConfig, AnthropicMethods } from "./plugins/anthropic/0.74.0";
+export { anthropic } from "./plugins/anthropic/0.74.0";
+export { wrapAnthropicSdk } from "./plugins/anthropic/0.74.0/client-anthropic-sdk";
+export type {
+  ClientHandlerOptions as AnthropicClientHandlerOptions,
+  ClientHandlerState as AnthropicClientHandlerState,
+} from "./plugins/anthropic/0.74.0/handler.client";
+export { clientHandler as anthropicClientHandler } from "./plugins/anthropic/0.74.0/handler.client";
+export {
+  serverEvaluate as anthropicServerEvaluate,
+  serverHandler as anthropicServerHandler,
+} from "./plugins/anthropic/0.74.0/handler.server";
+export type { AnthropicClient } from "./plugins/anthropic/0.74.0/interpreter";
+export { anthropicInterpreter } from "./plugins/anthropic/0.74.0/interpreter";
 export type { BooleanMethods } from "./plugins/boolean";
 export { boolean } from "./plugins/boolean";
 export { booleanInterpreter } from "./plugins/boolean/interpreter";
