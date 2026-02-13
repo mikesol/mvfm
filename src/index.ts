@@ -9,6 +9,7 @@ export type {
   PluginContext,
   PluginDefinition,
   Program,
+  RecurseFn,
   TraitImpl,
 } from "./core";
 export { composeInterpreters, ilo } from "./core";
