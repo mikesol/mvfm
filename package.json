@@ -4,11 +4,14 @@
   "description": "Extensible tagless final DSL for deterministic, verifiable programs in TypeScript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "sideEffects": false,
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "check": "biome check . && tsc && api-extractor run --local",
     "format": "biome check --write .",
     "test": "vitest run",
+    "size": "size-limit",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -17,10 +20,12 @@
   "devDependencies": {
     "@biomejs/biome": "^2.3.14",
     "@microsoft/api-extractor": "^7.56.3",
+    "@size-limit/preset-small-lib": "^12.0.0",
     "@testcontainers/postgresql": "^11.11.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "postgres": "^3.4.8",
+    "size-limit": "^12.0.0",
     "stripe": "^20.3.1",
     "typescript": "^5.3.0",
     "vitest": "^4.0.18"
