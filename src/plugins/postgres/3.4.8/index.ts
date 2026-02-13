@@ -2,6 +2,13 @@
 // ILO PLUGIN: postgres (porsager/postgres compatible API)
 // ============================================================
 //
+// Implementation status: COMPLETE (modulo known limitations)
+//
+// Known limitations (deliberate omissions):
+//   - No COPY (streaming bulk import/export)
+//   - No LISTEN/NOTIFY (async pub/sub channels)
+//   - No SUBSCRIBE (realtime logical replication)
+//
 // Goal: An LLM that knows postgres.js should be able to write
 // Ilo programs with near-zero learning curve. The API should
 // look like the real postgres.js as closely as possible.
