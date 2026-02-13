@@ -42,7 +42,7 @@ const app = ilo(num, str, fal({ credentials: "key_test_123" }));
 describe("fal: run", () => {
   it("produces fal/run node with literal input", () => {
     const prog = app(($) => {
-      return $.fal.run("fal-ai/flux/dev", { prompt: "a cat" });
+      return $.fal.run("fal-ai/flux/dev", { input: { prompt: "a cat" } });
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fal/run");
@@ -52,16 +52,16 @@ describe("fal: run", () => {
     expect(ast.result.input.fields.prompt.value).toBe("a cat");
   });
 
-  it("accepts Expr params", () => {
+  it("accepts Expr input values", () => {
     const prog = app(($) => {
-      return $.fal.run("fal-ai/flux/dev", { prompt: $.input.prompt });
+      return $.fal.run("fal-ai/flux/dev", { input: { prompt: $.input.prompt } });
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fal/run");
     expect(ast.result.input.fields.prompt.kind).toBe("core/prop_access");
   });
 
-  it("optional input is null when omitted", () => {
+  it("optional options are null when omitted", () => {
     const prog = app(($) => {
       return $.fal.run("fal-ai/flux/dev");
     });
@@ -76,7 +76,7 @@ describe("fal: run", () => {
 describe("fal: subscribe", () => {
   it("produces fal/subscribe node", () => {
     const prog = app(($) => {
-      return $.fal.subscribe("fal-ai/flux/dev", { prompt: "a cat" });
+      return $.fal.subscribe("fal-ai/flux/dev", { input: { prompt: "a cat" } });
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fal/subscribe");
@@ -90,7 +90,7 @@ describe("fal: subscribe", () => {
 describe("fal: queue.submit", () => {
   it("produces fal/queue_submit node", () => {
     const prog = app(($) => {
-      return $.fal.queue.submit("fal-ai/flux/dev", { prompt: "a cat" });
+      return $.fal.queue.submit("fal-ai/flux/dev", { input: { prompt: "a cat" } });
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fal/queue_submit");
@@ -104,7 +104,7 @@ describe("fal: queue.submit", () => {
 describe("fal: queue.status", () => {
   it("produces fal/queue_status node with literal requestId", () => {
     const prog = app(($) => {
-      return $.fal.queue.status("fal-ai/flux/dev", "req_123");
+      return $.fal.queue.status("fal-ai/flux/dev", { requestId: "req_123" });
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fal/queue_status");
@@ -115,8 +115,8 @@ describe("fal: queue.status", () => {
 
   it("accepts Expr requestId from queue.submit result", () => {
     const prog = app(($) => {
-      const queued = $.fal.queue.submit("fal-ai/flux/dev", { prompt: "a cat" });
-      return $.fal.queue.status("fal-ai/flux/dev", queued.request_id);
+      const queued = $.fal.queue.submit("fal-ai/flux/dev", { input: { prompt: "a cat" } });
+      return $.fal.queue.status("fal-ai/flux/dev", { requestId: queued.request_id });
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fal/queue_status");
@@ -129,7 +129,7 @@ describe("fal: queue.status", () => {
 describe("fal: queue.result", () => {
   it("produces fal/queue_result node", () => {
     const prog = app(($) => {
-      return $.fal.queue.result("fal-ai/flux/dev", "req_123");
+      return $.fal.queue.result("fal-ai/flux/dev", { requestId: "req_123" });
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fal/queue_result");
@@ -143,7 +143,7 @@ describe("fal: queue.result", () => {
 describe("fal: queue.cancel", () => {
   it("produces fal/queue_cancel node", () => {
     const prog = app(($) => {
-      return $.fal.queue.cancel("fal-ai/flux/dev", "req_123");
+      return $.fal.queue.cancel("fal-ai/flux/dev", { requestId: "req_123" });
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fal/queue_cancel");
@@ -157,8 +157,8 @@ describe("fal: queue.cancel", () => {
 describe("fal: cross-operation dependencies", () => {
   it("can chain queue.submit result into queue.result", () => {
     const prog = app(($) => {
-      const queued = $.fal.queue.submit("fal-ai/flux/dev", { prompt: "a cat" });
-      return $.fal.queue.result("fal-ai/flux/dev", queued.request_id);
+      const queued = $.fal.queue.submit("fal-ai/flux/dev", { input: { prompt: "a cat" } });
+      return $.fal.queue.result("fal-ai/flux/dev", { requestId: queued.request_id });
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fal/queue_result");
@@ -239,39 +239,49 @@ import type { Expr, PluginContext, PluginDefinition } from "../../../core";
  * Mirrors the @fal-ai/client API: run, subscribe, and queue
  * operations for AI media generation endpoints.
  */
+/** Options for run/subscribe/queue.submit — mirrors real SDK RunOptions. */
+export type FalRunOptions = {
+  input?: Expr<Record<string, unknown>> | Record<string, unknown>;
+};
+
+/** Options for queue.status/result/cancel — mirrors real SDK QueueStatusOptions. */
+export type FalQueueOptions = {
+  requestId: Expr<string> | string;
+};
+
 export interface FalMethods {
   /** Fal API operations, namespaced under `$.fal`. */
   fal: {
-    /** Run an endpoint synchronously. */
+    /** Run an endpoint synchronously. Mirrors `fal.run(endpointId, { input })`. */
     run(
       endpointId: Expr<string> | string,
-      input?: Expr<Record<string, unknown>> | Record<string, unknown>,
+      options?: FalRunOptions,
     ): Expr<Record<string, unknown>>;
-    /** Subscribe to an endpoint (queue submit + poll + result). */
+    /** Subscribe to an endpoint (queue submit + poll + result). Mirrors `fal.subscribe(endpointId, { input })`. */
     subscribe(
       endpointId: Expr<string> | string,
-      input?: Expr<Record<string, unknown>> | Record<string, unknown>,
+      options?: FalRunOptions,
     ): Expr<Record<string, unknown>>;
     queue: {
-      /** Submit a request to the queue. */
+      /** Submit a request to the queue. Mirrors `fal.queue.submit(endpointId, { input })`. */
       submit(
         endpointId: Expr<string> | string,
-        input?: Expr<Record<string, unknown>> | Record<string, unknown>,
+        options?: FalRunOptions,
       ): Expr<Record<string, unknown>>;
-      /** Check the status of a queued request. */
+      /** Check the status of a queued request. Mirrors `fal.queue.status(endpointId, { requestId })`. */
       status(
         endpointId: Expr<string> | string,
-        requestId: Expr<string> | string,
+        options: FalQueueOptions,
       ): Expr<Record<string, unknown>>;
-      /** Retrieve the result of a completed queued request. */
+      /** Retrieve the result of a completed queued request. Mirrors `fal.queue.result(endpointId, { requestId })`. */
       result(
         endpointId: Expr<string> | string,
-        requestId: Expr<string> | string,
+        options: FalQueueOptions,
       ): Expr<Record<string, unknown>>;
-      /** Cancel a queued request. */
+      /** Cancel a queued request. Mirrors `fal.queue.cancel(endpointId, { requestId })`. */
       cancel(
         endpointId: Expr<string> | string,
-        requestId: Expr<string> | string,
+        options: FalQueueOptions,
       ): Expr<Record<string, unknown>>;
     };
   };
@@ -328,7 +338,8 @@ export function fal(config: FalConfig): PluginDefinition<FalMethods> {
 
       return {
         fal: {
-          run(endpointId, input?) {
+          run(endpointId, options?) {
+            const input = options?.input;
             return ctx.expr({
               kind: "fal/run",
               endpointId: resolveEndpointId(endpointId),
@@ -337,7 +348,8 @@ export function fal(config: FalConfig): PluginDefinition<FalMethods> {
             });
           },
 
-          subscribe(endpointId, input?) {
+          subscribe(endpointId, options?) {
+            const input = options?.input;
             return ctx.expr({
               kind: "fal/subscribe",
               endpointId: resolveEndpointId(endpointId),
@@ -347,7 +359,8 @@ export function fal(config: FalConfig): PluginDefinition<FalMethods> {
           },
 
           queue: {
-            submit(endpointId, input?) {
+            submit(endpointId, options?) {
+              const input = options?.input;
               return ctx.expr({
                 kind: "fal/queue_submit",
                 endpointId: resolveEndpointId(endpointId),
@@ -356,29 +369,29 @@ export function fal(config: FalConfig): PluginDefinition<FalMethods> {
               });
             },
 
-            status(endpointId, requestId) {
+            status(endpointId, options) {
               return ctx.expr({
                 kind: "fal/queue_status",
                 endpointId: resolveEndpointId(endpointId),
-                requestId: resolveRequestId(requestId),
+                requestId: resolveRequestId(options.requestId),
                 config,
               });
             },
 
-            result(endpointId, requestId) {
+            result(endpointId, options) {
               return ctx.expr({
                 kind: "fal/queue_result",
                 endpointId: resolveEndpointId(endpointId),
-                requestId: resolveRequestId(requestId),
+                requestId: resolveRequestId(options.requestId),
                 config,
               });
             },
 
-            cancel(endpointId, requestId) {
+            cancel(endpointId, options) {
               return ctx.expr({
                 kind: "fal/queue_cancel",
                 endpointId: resolveEndpointId(endpointId),
-                requestId: resolveRequestId(requestId),
+                requestId: resolveRequestId(options.requestId),
                 config,
               });
             },
@@ -395,29 +408,28 @@ export function fal(config: FalConfig): PluginDefinition<FalMethods> {
 //
 // WORKS GREAT:
 //
-// 1. Direct execution:
+// 1. Direct execution (1:1 signature):
 //    Real:  await fal.run("fal-ai/flux/dev", { input: { prompt: "a cat" } })
-//    Ilo:   $.fal.run("fal-ai/flux/dev", { prompt: "a cat" })
-//    Nearly identical. Only difference is $ prefix, no await, and
-//    no { input: } wrapper.
+//    Ilo:   $.fal.run("fal-ai/flux/dev", { input: { prompt: "a cat" } })
+//    Identical. Only difference is $ prefix and no await.
 //
-// 2. Subscribe (queue-based):
+// 2. Subscribe (1:1 signature):
 //    Real:  await fal.subscribe("fal-ai/flux/dev", { input: { prompt: "a cat" } })
-//    Ilo:   $.fal.subscribe("fal-ai/flux/dev", { prompt: "a cat" })
-//    Same pattern. The handler manages polling internally.
+//    Ilo:   $.fal.subscribe("fal-ai/flux/dev", { input: { prompt: "a cat" } })
+//    Identical.
 //
-// 3. Queue control with proxy chains:
-//    const queued = $.fal.queue.submit("fal-ai/flux/dev", { prompt: "a cat" })
-//    const result = $.fal.queue.result("fal-ai/flux/dev", queued.request_id)
+// 3. Queue control with proxy chains (1:1 signatures):
+//    const queued = $.fal.queue.submit("fal-ai/flux/dev", { input: { prompt: "a cat" } })
+//    const result = $.fal.queue.result("fal-ai/flux/dev", { requestId: queued.request_id })
 //    Proxy chains capture the dependency graph perfectly.
 //
 // WORKS BUT DIFFERENT:
 //
-// 4. Input wrapping:
-//    Real:  fal.run(id, { input: { prompt: "..." }, method: "post" })
-//    Ilo:   $.fal.run(id, { prompt: "..." })
-//    Ilo passes input directly. Runtime options (method, abort,
-//    storage settings) are not AST-representable.
+// 4. Non-modelable options silently ignored:
+//    Real:  fal.run(id, { input: {...}, method: "post", abortSignal: ctrl.signal })
+//    Ilo:   $.fal.run(id, { input: {...} })
+//    The { input } wrapper is preserved 1:1, but runtime options
+//    (method, abort, storage settings) are silently dropped.
 //
 // 5. Return types:
 //    Real @fal-ai/client uses generic Result<OutputType<Id>> with
@@ -516,7 +528,7 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
 
 describe("fal interpreter: run", () => {
   it("yields fal/api_call with endpointId and input", async () => {
-    const prog = app(($) => $.fal.run("fal-ai/flux/dev", { prompt: "a cat" }));
+    const prog = app(($) => $.fal.run("fal-ai/flux/dev", { input: { prompt: "a cat" } }));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
     expect(captured[0].type).toBe("fal/api_call");
@@ -537,7 +549,7 @@ describe("fal interpreter: run", () => {
 
 describe("fal interpreter: subscribe", () => {
   it("yields fal/subscribe with endpointId and input", async () => {
-    const prog = app(($) => $.fal.subscribe("fal-ai/flux/dev", { prompt: "a cat" }));
+    const prog = app(($) => $.fal.subscribe("fal-ai/flux/dev", { input: { prompt: "a cat" } }));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
     expect(captured[0].type).toBe("fal/subscribe");
@@ -550,7 +562,7 @@ describe("fal interpreter: subscribe", () => {
 
 describe("fal interpreter: queue.submit", () => {
   it("yields fal/api_call with method queue_submit", async () => {
-    const prog = app(($) => $.fal.queue.submit("fal-ai/flux/dev", { prompt: "a cat" }));
+    const prog = app(($) => $.fal.queue.submit("fal-ai/flux/dev", { input: { prompt: "a cat" } }));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
     expect(captured[0].type).toBe("fal/api_call");
@@ -564,7 +576,7 @@ describe("fal interpreter: queue.submit", () => {
 
 describe("fal interpreter: queue.status", () => {
   it("yields fal/api_call with method queue_status and requestId", async () => {
-    const prog = app(($) => $.fal.queue.status("fal-ai/flux/dev", "req_123"));
+    const prog = app(($) => $.fal.queue.status("fal-ai/flux/dev", { requestId: "req_123" }));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
     expect(captured[0].type).toBe("fal/api_call");
@@ -578,7 +590,7 @@ describe("fal interpreter: queue.status", () => {
 
 describe("fal interpreter: queue.result", () => {
   it("yields fal/api_call with method queue_result and requestId", async () => {
-    const prog = app(($) => $.fal.queue.result("fal-ai/flux/dev", "req_123"));
+    const prog = app(($) => $.fal.queue.result("fal-ai/flux/dev", { requestId: "req_123" }));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
     expect(captured[0].type).toBe("fal/api_call");
@@ -592,7 +604,7 @@ describe("fal interpreter: queue.result", () => {
 
 describe("fal interpreter: queue.cancel", () => {
   it("yields fal/api_call with method queue_cancel and requestId", async () => {
-    const prog = app(($) => $.fal.queue.cancel("fal-ai/flux/dev", "req_123"));
+    const prog = app(($) => $.fal.queue.cancel("fal-ai/flux/dev", { requestId: "req_123" }));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
     expect(captured[0].type).toBe("fal/api_call");
@@ -607,7 +619,7 @@ describe("fal interpreter: queue.cancel", () => {
 describe("fal interpreter: input resolution", () => {
   it("resolves input params through recurse", async () => {
     const prog = app({ prompt: "string" }, ($) =>
-      $.fal.run("fal-ai/flux/dev", { prompt: $.input.prompt }),
+      $.fal.run("fal-ai/flux/dev", { input: { prompt: $.input.prompt } }),
     );
     const { captured } = await run(prog, { prompt: "a dog" });
     expect(captured).toHaveLength(1);
@@ -616,7 +628,7 @@ describe("fal interpreter: input resolution", () => {
 
   it("resolves dynamic requestId through recurse", async () => {
     const prog = app({ reqId: "string" }, ($) =>
-      $.fal.queue.status("fal-ai/flux/dev", $.input.reqId),
+      $.fal.queue.status("fal-ai/flux/dev", { requestId: $.input.reqId }),
     );
     const { captured } = await run(prog, { reqId: "req_dynamic_456" });
     expect(captured).toHaveLength(1);
@@ -628,7 +640,7 @@ describe("fal interpreter: input resolution", () => {
 
 describe("fal interpreter: return value", () => {
   it("returns the handler response as the result", async () => {
-    const prog = app(($) => $.fal.run("fal-ai/flux/dev", { prompt: "a cat" }));
+    const prog = app(($) => $.fal.run("fal-ai/flux/dev", { input: { prompt: "a cat" } }));
     const { result } = await run(prog);
     expect(result).toEqual({ data: { images: [{ url: "https://fal.ai/mock.png" }] }, requestId: "req_mock" });
   });
@@ -1042,7 +1054,7 @@ Add the following exports to `src/index.ts` in the appropriate section (after th
 
 ```typescript
 // ---- fal plugin ----
-export type { FalConfig, FalMethods } from "./plugins/fal/1.9.1";
+export type { FalConfig, FalMethods, FalRunOptions, FalQueueOptions } from "./plugins/fal/1.9.1";
 export { fal } from "./plugins/fal/1.9.1";
 export { wrapFalSdk } from "./plugins/fal/1.9.1/client-fal-sdk";
 export type {

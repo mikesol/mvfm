@@ -35,28 +35,30 @@ Based on reading the full source of `@fal-ai/client` at https://github.com/fal-a
 
 ### Deviations from Real API
 
-1. **Input wrapping:** Real SDK wraps input in `{ input: ..., method?, abortSignal?, storageSettings? }`. Ilo passes input directly as second parameter. Runtime options (abort, storage settings) are not AST-representable.
+1. **Non-modelable options silently ignored:** Real SDK `RunOptions` includes `method`, `abortSignal`, `storageSettings`, `startTimeout`. Ilo accepts the same `{ input: ... }` shape but only extracts `input` — runtime options are not AST-representable. Similarly, `QueueStatusOptions` includes `logs` and `abortSignal` which are ignored.
 
-2. **Queue status/result/cancel params:** Real SDK takes `{ requestId, logs?, abortSignal? }`. Ilo takes `requestId` directly since it's the only meaningful param for the AST.
+2. **Callbacks dropped:** `subscribe` in the real SDK accepts `onQueueUpdate` and `onEnqueue` callbacks. Not modelable in AST.
 
-### Plugin API
+### Plugin API (1:1 with real SDK)
 
 ```typescript
 // Configuration
 fal({ credentials: "key_..." })
 
-// Direct execution
-const result = $.fal.run("fal-ai/flux/dev", { prompt: "a cat" });
+// Direct execution — same signature as real fal.run()
+const result = $.fal.run("fal-ai/flux/dev", { input: { prompt: "a cat" } });
 
-// Queue-based (subscribe = submit + poll + result)
-const result = $.fal.subscribe("fal-ai/flux/dev", { prompt: "a cat" });
+// Queue-based — same signature as real fal.subscribe()
+const result = $.fal.subscribe("fal-ai/flux/dev", { input: { prompt: "a cat" } });
 
-// Granular queue control
-const queued = $.fal.queue.submit("fal-ai/flux/dev", { prompt: "a cat" });
-const status = $.fal.queue.status("fal-ai/flux/dev", queued.request_id);
-const result = $.fal.queue.result("fal-ai/flux/dev", queued.request_id);
-const cancel = $.fal.queue.cancel("fal-ai/flux/dev", queued.request_id);
+// Granular queue control — same signatures as real fal.queue.*
+const queued = $.fal.queue.submit("fal-ai/flux/dev", { input: { prompt: "a cat" } });
+const status = $.fal.queue.status("fal-ai/flux/dev", { requestId: queued.request_id });
+const result = $.fal.queue.result("fal-ai/flux/dev", { requestId: queued.request_id });
+const cancel = $.fal.queue.cancel("fal-ai/flux/dev", { requestId: queued.request_id });
 ```
+
+The builder methods unwrap the options objects to extract `input` or `requestId` for the AST — the user-facing API matches the real SDK exactly.
 
 ### Node Kinds (6)
 
@@ -106,14 +108,14 @@ export interface FalClient {
 ### Honest Assessment
 
 **Works great:**
-- `fal.run()` and `fal.subscribe()` map nearly 1:1. An LLM that knows @fal-ai/client can write Ilo fal programs immediately.
-- Queue operations (submit/status/result/cancel) map cleanly as individual request-response calls.
-- Proxy chains work for data flow: `queued.request_id` captures the dependency.
+- `fal.run()` and `fal.subscribe()` are 1:1 with real SDK signatures. An LLM trained on @fal-ai/client can write Ilo fal programs with zero adaptation.
+- Queue operations (submit/status/result/cancel) use identical signatures — `{ input: ... }`, `{ requestId: ... }`.
+- Proxy chains work for data flow: `queued.request_id` captures the dependency inside `{ requestId: queued.request_id }`.
 
 **Works but different:**
-- No `RunOptions` wrapper — input goes directly, runtime options (abort, storage) are dropped.
+- Non-modelable RunOptions fields (`method`, `abortSignal`, `storageSettings`) are silently ignored.
 - Return types are `Record<string, unknown>` instead of model-specific output types.
-- `subscribe` in the real SDK accepts `onQueueUpdate` callback — not modelable in AST.
+- `subscribe` callbacks (`onQueueUpdate`, `onEnqueue`) are not modelable in AST.
 
 **Doesn't work / not modeled:**
 - `fal.stream()` — SSE streaming, push-based
