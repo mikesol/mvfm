@@ -68,7 +68,8 @@ export const fiberInterpreter: InterpreterFragment = {
         let lastError: unknown;
         for (let i = 0; i < attempts; i++) {
           try {
-            return await recurse(node.expr as ASTNode);
+            const attemptRecurse = (recurse as any).fresh ? (recurse as any).fresh() : recurse;
+            return await attemptRecurse(node.expr as ASTNode);
           } catch (e) {
             lastError = e;
             if (i < attempts - 1 && delay > 0) {

@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { type ASTNode, composeInterpreters, type InterpreterFragment } from "../../src/core";
 import { coreInterpreter } from "../../src/interpreters/core";
+import { errorInterpreter } from "../../src/plugins/error/interpreter";
+import { fiberInterpreter } from "../../src/plugins/fiber/interpreter";
 
 function createTrackingFragment(): {
   fragment: InterpreterFragment;
@@ -192,5 +194,61 @@ describe("DAG memoization: taint tracking", () => {
 
     expect(visitCount.get("tainted")).toBe(3); // re-evaluated each time
     expect(visitCount.get("stable")).toBe(1); // cached from first evaluation
+  });
+});
+
+describe("DAG memoization: retry with fresh cache", () => {
+  it("retry re-executes on each attempt (not cached)", async () => {
+    let callCount = 0;
+    const sideEffectFragment: InterpreterFragment = {
+      pluginName: "fx",
+      canHandle: (node) => node.kind === "fx/call",
+      async visit(_node: ASTNode, _recurse: (n: ASTNode) => Promise<unknown>) {
+        callCount++;
+        if (callCount < 3) throw new Error("not yet");
+        return "success";
+      },
+    };
+
+    const interp = composeInterpreters([
+      sideEffectFragment,
+      fiberInterpreter,
+      errorInterpreter,
+      coreInterpreter,
+    ]);
+
+    const result = await interp({
+      kind: "fiber/retry",
+      expr: { kind: "fx/call" },
+      attempts: 5,
+      delay: 0,
+    });
+
+    expect(result).toBe("success");
+    expect(callCount).toBe(3); // called 3 times, not 1
+  });
+
+  it("retry exhausts attempts when all fail", async () => {
+    let callCount = 0;
+    const alwaysFails: InterpreterFragment = {
+      pluginName: "fx",
+      canHandle: (node) => node.kind === "fx/call",
+      async visit() {
+        callCount++;
+        throw new Error("always fails");
+      },
+    };
+
+    const interp = composeInterpreters([
+      alwaysFails,
+      fiberInterpreter,
+      errorInterpreter,
+      coreInterpreter,
+    ]);
+
+    await expect(
+      interp({ kind: "fiber/retry", expr: { kind: "fx/call" }, attempts: 3, delay: 0 }),
+    ).rejects.toThrow("always fails");
+    expect(callCount).toBe(3);
   });
 });
