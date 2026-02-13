@@ -4,11 +4,72 @@
 
 ```ts
 
+import type Anthropic from '@anthropic-ai/sdk';
 import type { default as postgres_2 } from 'postgres';
 import type Stripe from 'stripe';
 
 // @public
 export function adaptLegacy(fragment: LegacyInterpreterFragment): InterpreterFragment;
+
+// @public
+export function anthropic(config: AnthropicConfig): PluginDefinition<AnthropicMethods>;
+
+// @public
+export interface AnthropicClient {
+    request(method: string, path: string, params?: Record<string, unknown>): Promise<unknown>;
+}
+
+// @public
+export function anthropicClientHandler(options: AnthropicClientHandlerOptions): StepHandler<AnthropicClientHandlerState>;
+
+// @public
+export interface AnthropicClientHandlerOptions {
+    baseUrl: string;
+    contractHash: string;
+    fetch?: typeof globalThis.fetch;
+    headers?: Record<string, string>;
+}
+
+// @public
+export interface AnthropicClientHandlerState {
+    stepIndex: number;
+}
+
+// @public
+export interface AnthropicConfig {
+    apiKey: string;
+    baseURL?: string;
+}
+
+// @public
+export const anthropicInterpreter: InterpreterFragment;
+
+// @public
+export interface AnthropicMethods {
+    anthropic: {
+        messages: {
+            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            countTokens(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            batches: {
+                create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+                retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
+                list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+                delete(id: Expr<string> | string): Expr<Record<string, unknown>>;
+                cancel(id: Expr<string> | string): Expr<Record<string, unknown>>;
+            };
+        };
+        models: {
+            retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
+            list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        };
+    };
+}
+
+// @public
+export function anthropicServerEvaluate(client: AnthropicClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+
+// @public
+export function anthropicServerHandler(client: AnthropicClient): StepHandler<void>;
 
 // @public
 export function array(of: SchemaType): ArraySchema;
@@ -748,6 +809,9 @@ export interface TypeclassSlot<Name extends string> {
     // (undocumented)
     readonly __typeclassSlot: Name;
 }
+
+// @public
+export function wrapAnthropicSdk(client: Anthropic): AnthropicClient;
 
 // Warning: (ae-forgotten-export) The symbol "Sql" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "TransactionSql" needs to be exported by the entry point index.d.ts
