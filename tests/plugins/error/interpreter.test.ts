@@ -34,7 +34,7 @@ const app = ilo(num, semiring, eq, ord, error);
 
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
-  return await Promise.resolve(interp(ast.result));
+  return await interp(ast.result);
 }
 
 describe("error interpreter: try/catch", () => {

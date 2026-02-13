@@ -97,14 +97,14 @@ export function stripeInterpreter(_secretKey: string): InterpreterFragment {
   return {
     pluginName: "stripe",
     canHandle: (node) => node.kind.startsWith("stripe/"),
-    visit(node, recurse) {
+    async visit(node, recurse) {
       switch (node.kind) {
         case "stripe/charge": {
           // In a real interpreter, this would call the Stripe API.
           // `recurse` lets you evaluate sub-expressions first.
-          const amount = recurse(node.amount as any);
-          const currency = recurse(node.currency as any);
-          const customerId = recurse(node.customerId as any);
+          const amount = await recurse(node.amount as any);
+          const currency = await recurse(node.currency as any);
+          const customerId = await recurse(node.customerId as any);
           return {
             _interpreterNote: "would call Stripe API",
             amount,
@@ -113,11 +113,11 @@ export function stripeInterpreter(_secretKey: string): InterpreterFragment {
           };
         }
         case "stripe/refund": {
-          const chargeId = recurse(node.chargeId as any);
+          const chargeId = await recurse(node.chargeId as any);
           return { _interpreterNote: "would refund", chargeId };
         }
         case "stripe/getCustomer": {
-          const customerId = recurse(node.customerId as any);
+          const customerId = await recurse(node.customerId as any);
           return { _interpreterNote: "would fetch customer", customerId };
         }
         default:

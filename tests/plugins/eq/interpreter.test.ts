@@ -29,94 +29,94 @@ const fragments = [
   eqInterpreter,
 ];
 
-function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
+async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
   const interp = composeInterpreters(fragments);
-  return interp(ast.result);
+  return await interp(ast.result);
 }
 
 describe("eq interpretation: numbers", () => {
   const app = ilo(num, eq);
 
-  it("equal numbers -> true", () => {
+  it("equal numbers -> true", async () => {
     const prog = app(($) => $.eq(42, 42));
-    expect(run(prog)).toBe(true);
+    expect(await run(prog)).toBe(true);
   });
 
-  it("unequal numbers -> false", () => {
+  it("unequal numbers -> false", async () => {
     const prog = app(($) => $.eq(42, 99));
-    expect(run(prog)).toBe(false);
+    expect(await run(prog)).toBe(false);
   });
 
-  it("with input", () => {
+  it("with input", async () => {
     const prog = app({ x: "number", y: "number" }, ($) => $.eq($.input.x, $.input.y));
-    expect(run(prog, { x: 5, y: 5 })).toBe(true);
-    expect(run(prog, { x: 5, y: 6 })).toBe(false);
+    expect(await run(prog, { x: 5, y: 5 })).toBe(true);
+    expect(await run(prog, { x: 5, y: 6 })).toBe(false);
   });
 });
 
 describe("eq interpretation: strings", () => {
   const app = ilo(str, eq);
 
-  it("equal strings -> true", () => {
+  it("equal strings -> true", async () => {
     const prog = app(($) => $.eq("hello", "hello"));
-    expect(run(prog)).toBe(true);
+    expect(await run(prog)).toBe(true);
   });
 
-  it("unequal strings -> false", () => {
+  it("unequal strings -> false", async () => {
     const prog = app(($) => $.eq("hello", "world"));
-    expect(run(prog)).toBe(false);
+    expect(await run(prog)).toBe(false);
   });
 
-  it("with input", () => {
+  it("with input", async () => {
     const prog = app({ name: "string" }, ($) => $.eq($.input.name, "alice"));
-    expect(run(prog, { name: "alice" })).toBe(true);
-    expect(run(prog, { name: "bob" })).toBe(false);
+    expect(await run(prog, { name: "alice" })).toBe(true);
+    expect(await run(prog, { name: "bob" })).toBe(false);
   });
 });
 
 describe("eq interpretation: booleans", () => {
   const app = ilo(boolean, eq);
 
-  it("equal booleans -> true", () => {
+  it("equal booleans -> true", async () => {
     const prog = app(($) => $.eq(true, true));
-    expect(run(prog)).toBe(true);
+    expect(await run(prog)).toBe(true);
   });
 
-  it("unequal booleans -> false", () => {
+  it("unequal booleans -> false", async () => {
     const prog = app(($) => $.eq(true, false));
-    expect(run(prog)).toBe(false);
+    expect(await run(prog)).toBe(false);
   });
 });
 
 describe("eq + cond interpretation: end-to-end", () => {
   const app = ilo(num, str, eq);
 
-  it("cond(eq(input.x, 1)).t('one').f('other') with x=1", () => {
+  it("cond(eq(input.x, 1)).t('one').f('other') with x=1", async () => {
     const prog = app({ x: "number" }, ($) => $.cond($.eq($.input.x, 1)).t("one").f("other"));
-    expect(run(prog, { x: 1 })).toBe("one");
-    expect(run(prog, { x: 2 })).toBe("other");
+    expect(await run(prog, { x: 1 })).toBe("one");
+    expect(await run(prog, { x: 2 })).toBe("other");
   });
 
-  it("cond(eq(input.name, 'alice')).t('found').f('not found')", () => {
+  it("cond(eq(input.name, 'alice')).t('found').f('not found')", async () => {
     const prog = app({ name: "string" }, ($) =>
       $.cond($.eq($.input.name, "alice")).t("found").f("not found"),
     );
-    expect(run(prog, { name: "alice" })).toBe("found");
-    expect(run(prog, { name: "bob" })).toBe("not found");
+    expect(await run(prog, { name: "alice" })).toBe("found");
+    expect(await run(prog, { name: "bob" })).toBe("not found");
   });
 });
 
 describe("eq interpretation: neq", () => {
   const app = ilo(num, eq);
 
-  it("neq(1, 2) returns true", () => {
+  it("neq(1, 2) returns true", async () => {
     const prog = app(($) => $.neq(1, 2));
-    expect(run(prog)).toBe(true);
+    expect(await run(prog)).toBe(true);
   });
 
-  it("neq(42, 42) returns false", () => {
+  it("neq(42, 42) returns false", async () => {
     const prog = app(($) => $.neq(42, 42));
-    expect(run(prog)).toBe(false);
+    expect(await run(prog)).toBe(false);
   });
 });

@@ -56,7 +56,7 @@ const app = ilo(num, str, semiring, eq, ord, pgPlugin("postgres://test"), fiber,
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
   const interp = makeInterp();
-  return await Promise.resolve(interp(ast.result));
+  return await interp(ast.result);
 }
 
 beforeAll(async () => {

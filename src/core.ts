@@ -161,7 +161,7 @@ export type Plugin<T = any> = PluginDefinition<T> | (() => PluginDefinition<T>);
  */
 export interface InterpreterFragment {
   pluginName: string;
-  visit: (node: ASTNode, recurse: (node: ASTNode) => unknown) => unknown;
+  visit: (node: ASTNode, recurse: (node: ASTNode) => Promise<unknown>) => Promise<unknown>;
   canHandle: (node: ASTNode) => boolean;
 }
 
@@ -172,14 +172,17 @@ export type Interpreter = (program: Program) => {
 /**
  * Compose interpreter fragments into a full interpreter.
  */
-export function composeInterpreters(fragments: InterpreterFragment[]): (node: ASTNode) => unknown {
-  return function recurse(node: ASTNode): unknown {
+export function composeInterpreters(
+  fragments: InterpreterFragment[],
+): (node: ASTNode) => Promise<unknown> {
+  async function recurse(node: ASTNode): Promise<unknown> {
     const fragment = fragments.find((f) => f.canHandle(node));
     if (!fragment) {
       throw new Error(`No interpreter for node kind: ${node.kind}`);
     }
-    return fragment.visit(node, recurse);
-  };
+    return await fragment.visit(node, recurse);
+  }
+  return recurse;
 }
 
 // ---- The Proxy Engine ------------------------------------

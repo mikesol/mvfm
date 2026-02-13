@@ -25,7 +25,10 @@ interface BuiltQuery {
 
 // Build parameterized SQL from a postgres/query AST node.
 // Resolves identifier, insert_helper, and set_helper fragments inline.
-function buildSQL(node: ASTNode, recurse: (n: ASTNode) => unknown): BuiltQuery {
+async function buildSQL(
+  node: ASTNode,
+  recurse: (n: ASTNode) => Promise<unknown>,
+): Promise<BuiltQuery> {
   const strings = node.strings as string[];
   const paramNodes = node.params as ASTNode[];
   let sql = "";
@@ -36,10 +39,10 @@ function buildSQL(node: ASTNode, recurse: (n: ASTNode) => unknown): BuiltQuery {
     if (i < paramNodes.length) {
       const param = paramNodes[i];
       if (param.kind === "postgres/identifier") {
-        const name = recurse(param.name as ASTNode) as string;
+        const name = (await recurse(param.name as ASTNode)) as string;
         sql += escapeIdentifier(name);
       } else if (param.kind === "postgres/insert_helper") {
-        const data = recurse(param.data as ASTNode) as
+        const data = (await recurse(param.data as ASTNode)) as
           | Record<string, unknown>
           | Record<string, unknown>[];
         const columns =
@@ -63,7 +66,7 @@ function buildSQL(node: ASTNode, recurse: (n: ASTNode) => unknown): BuiltQuery {
             )
             .join(",");
       } else if (param.kind === "postgres/set_helper") {
-        const data = recurse(param.data as ASTNode) as Record<string, unknown>;
+        const data = (await recurse(param.data as ASTNode)) as Record<string, unknown>;
         const columns = (param.columns as string[] | null) ?? Object.keys(data);
         sql += columns
           .map((col) => {
@@ -73,7 +76,7 @@ function buildSQL(node: ASTNode, recurse: (n: ASTNode) => unknown): BuiltQuery {
           .join(",");
       } else {
         // Regular parameter — recurse to get the value
-        params.push(recurse(param));
+        params.push(await recurse(param));
         sql += `$${params.length}`;
       }
     }
@@ -89,78 +92,70 @@ export function postgresInterpreter(
   return {
     pluginName: "postgres",
     canHandle: (node) => node.kind.startsWith("postgres/"),
-    visit(node: ASTNode, recurse: (node: ASTNode) => unknown): unknown {
+    async visit(node: ASTNode, recurse: (node: ASTNode) => Promise<unknown>): Promise<unknown> {
       switch (node.kind) {
         case "postgres/query": {
-          const { sql, params } = buildSQL(node, recurse);
+          const { sql, params } = await buildSQL(node, recurse);
           return client.query(sql, params);
         }
 
         case "postgres/begin": {
-          const beginExpr = async () => {
-            return client.begin(async (tx) => {
-              const txFragment = postgresInterpreter(tx, outerFragments);
-              const txRecurse: (n: ASTNode) => unknown = outerFragments
-                ? composeInterpreters([txFragment, ...outerFragments])
-                : (n: ASTNode): unknown => {
-                    if (txFragment.canHandle(n)) return txFragment.visit(n, txRecurse);
-                    return recurse(n);
-                  };
+          return client.begin(async (tx) => {
+            const txFragment = postgresInterpreter(tx, outerFragments);
+            const txRecurse: (n: ASTNode) => Promise<unknown> = outerFragments
+              ? composeInterpreters([txFragment, ...outerFragments])
+              : async (n: ASTNode): Promise<unknown> => {
+                  if (txFragment.canHandle(n)) return txFragment.visit(n, txRecurse);
+                  return recurse(n);
+                };
 
-              if (node.mode === "pipeline") {
-                const queries = node.queries as ASTNode[];
-                const results: unknown[] = [];
-                for (const q of queries) {
-                  results.push(await Promise.resolve(txRecurse(q)));
-                }
-                return results;
+            if (node.mode === "pipeline") {
+              const queries = node.queries as ASTNode[];
+              const results: unknown[] = [];
+              for (const q of queries) {
+                results.push(await txRecurse(q));
               }
-              // callback mode
-              return await Promise.resolve(txRecurse(node.body as ASTNode));
-            });
-          };
-          return beginExpr();
+              return results;
+            }
+            // callback mode
+            return await txRecurse(node.body as ASTNode);
+          });
         }
 
         case "postgres/savepoint": {
-          const savepointExpr = async () => {
-            return client.savepoint(async (tx) => {
-              const txFragment = postgresInterpreter(tx, outerFragments);
-              const txRecurse: (n: ASTNode) => unknown = outerFragments
-                ? composeInterpreters([txFragment, ...outerFragments])
-                : (n: ASTNode): unknown => {
-                    if (txFragment.canHandle(n)) return txFragment.visit(n, txRecurse);
-                    return recurse(n);
-                  };
+          return client.savepoint(async (tx) => {
+            const txFragment = postgresInterpreter(tx, outerFragments);
+            const txRecurse: (n: ASTNode) => Promise<unknown> = outerFragments
+              ? composeInterpreters([txFragment, ...outerFragments])
+              : async (n: ASTNode): Promise<unknown> => {
+                  if (txFragment.canHandle(n)) return txFragment.visit(n, txRecurse);
+                  return recurse(n);
+                };
 
-              if (node.mode === "pipeline") {
-                const queries = node.queries as ASTNode[];
-                const results: unknown[] = [];
-                for (const q of queries) {
-                  results.push(await Promise.resolve(txRecurse(q)));
-                }
-                return results;
+            if (node.mode === "pipeline") {
+              const queries = node.queries as ASTNode[];
+              const results: unknown[] = [];
+              for (const q of queries) {
+                results.push(await txRecurse(q));
               }
-              return await Promise.resolve(txRecurse(node.body as ASTNode));
-            });
-          };
-          return savepointExpr();
+              return results;
+            }
+            return await txRecurse(node.body as ASTNode);
+          });
         }
 
         case "postgres/cursor": {
-          const cursorExpr = async () => {
-            const queryNode = node.query as ASTNode;
-            const { sql, params } = buildSQL(queryNode, recurse);
-            const batchSize = (await Promise.resolve(recurse(node.batchSize as ASTNode))) as number;
+          const queryNode = node.query as ASTNode;
+          const { sql, params } = await buildSQL(queryNode, recurse);
+          const batchSize = (await recurse(node.batchSize as ASTNode)) as number;
 
-            await client.cursor(sql, params, batchSize, async (rows) => {
-              const bodyClone = structuredClone(node.body) as ASTNode;
-              injectCursorBatch(bodyClone, rows);
-              await Promise.resolve(recurse(bodyClone));
-              return undefined;
-            });
-          };
-          return cursorExpr();
+          await client.cursor(sql, params, batchSize, async (rows) => {
+            const bodyClone = structuredClone(node.body) as ASTNode;
+            injectCursorBatch(bodyClone, rows);
+            await recurse(bodyClone);
+            return undefined;
+          });
+          return;
         }
 
         case "postgres/cursor_batch":

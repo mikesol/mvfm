@@ -22,9 +22,9 @@ describe("composition: postgres + fiber", () => {
       return $.par($.sql`select count(*) from users`, $.sql`select count(*) from posts`);
     });
     const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("fiber/par");
-    expect(ast.result.branches[0].kind).toBe("postgres/query");
-    expect(ast.result.branches[1].kind).toBe("postgres/query");
+    expect(ast.result.kind).toBe("core/tuple");
+    expect(ast.result.elements[0].kind).toBe("postgres/query");
+    expect(ast.result.elements[1].kind).toBe("postgres/query");
   });
 
   it("$.par map form over postgres query results", () => {
@@ -83,8 +83,8 @@ describe("composition: postgres + fiber + error (full stack)", () => {
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("error/try");
-    expect(ast.result.expr.kind).toBe("fiber/par");
-    expect(ast.result.expr.branches[0].kind).toBe("postgres/query");
+    expect(ast.result.expr.kind).toBe("core/tuple");
+    expect(ast.result.expr.elements[0].kind).toBe("postgres/query");
   });
 
   it("guard → par_map → try → retry → catch nests correctly", () => {

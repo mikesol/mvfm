@@ -16,25 +16,25 @@ function injectInput(node: any, input: Record<string, unknown>): any {
   return result;
 }
 
-function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
+async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
   const interp = composeInterpreters([coreInterpreter, strInterpreter]);
-  return interp(ast.result);
+  return await interp(ast.result);
 }
 
 const app = ilo(str, semigroup);
 
 describe("semigroup interpreter", () => {
-  it("append('foo', 'bar') returns 'foobar'", () => {
-    expect(run(app(($) => $.append("foo", "bar")))).toBe("foobar");
+  it("append('foo', 'bar') returns 'foobar'", async () => {
+    expect(await run(app(($) => $.append("foo", "bar")))).toBe("foobar");
   });
 
-  it("append with empty string", () => {
-    expect(run(app(($) => $.append("hello", "")))).toBe("hello");
+  it("append with empty string", async () => {
+    expect(await run(app(($) => $.append("hello", "")))).toBe("hello");
   });
 
-  it("append with input", () => {
+  it("append with input", async () => {
     const prog = app({ x: "string" }, ($) => $.append($.input.x, "!"));
-    expect(run(prog, { x: "hi" })).toBe("hi!");
+    expect(await run(prog, { x: "hi" })).toBe("hi!");
   });
 });

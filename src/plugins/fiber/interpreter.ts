@@ -23,87 +23,60 @@ function injectLambdaParam(node: any, name: string, value: unknown): void {
 export const fiberInterpreter: InterpreterFragment = {
   pluginName: "fiber",
   canHandle: (node) => node.kind.startsWith("fiber/"),
-  visit(node: ASTNode, recurse: (node: ASTNode) => unknown): unknown {
+  async visit(node: ASTNode, recurse: (node: ASTNode) => Promise<unknown>): Promise<unknown> {
     switch (node.kind) {
-      case "fiber/par": {
-        const branches = node.branches as ASTNode[];
-        return Promise.all(branches.map((b) => Promise.resolve(recurse(b))));
-      }
-
       case "fiber/par_map": {
-        const parMapExpr = async () => {
-          const collection = (await Promise.resolve(
-            recurse(node.collection as ASTNode),
-          )) as unknown[];
-          const concurrency = node.concurrency as number;
-          const param = node.param as ASTNode;
-          const body = node.body as ASTNode;
+        const collection = (await recurse(node.collection as ASTNode)) as unknown[];
+        const concurrency = node.concurrency as number;
+        const param = node.param as ASTNode;
+        const body = node.body as ASTNode;
 
-          const results: unknown[] = [];
-          for (let i = 0; i < collection.length; i += concurrency) {
-            const batch = collection.slice(i, i + concurrency);
-            const batchResults = await Promise.all(
-              batch.map((item) => {
-                const bodyClone = structuredClone(body);
-                injectLambdaParam(bodyClone, (param as any).name, item);
-                return Promise.resolve(recurse(bodyClone));
-              }),
-            );
-            results.push(...batchResults);
-          }
-          return results;
-        };
-        return parMapExpr();
-      }
-
-      case "fiber/seq": {
-        const seqExpr = async () => {
-          const steps = node.steps as ASTNode[];
-          for (const step of steps) {
-            await Promise.resolve(recurse(step));
-          }
-          return await Promise.resolve(recurse(node.result as ASTNode));
-        };
-        return seqExpr();
+        const results: unknown[] = [];
+        for (let i = 0; i < collection.length; i += concurrency) {
+          const batch = collection.slice(i, i + concurrency);
+          const batchResults = await Promise.all(
+            batch.map((item) => {
+              const bodyClone = structuredClone(body);
+              injectLambdaParam(bodyClone, (param as any).name, item);
+              return recurse(bodyClone);
+            }),
+          );
+          results.push(...batchResults);
+        }
+        return results;
       }
 
       case "fiber/race": {
         const branches = node.branches as ASTNode[];
-        return Promise.race(branches.map((b) => Promise.resolve(recurse(b))));
+        return Promise.race(branches.map((b) => recurse(b)));
       }
 
       case "fiber/timeout": {
-        const timeoutExpr = async () => {
-          const ms = (await Promise.resolve(recurse(node.ms as ASTNode))) as number;
-          const fallback = () => Promise.resolve(recurse(node.fallback as ASTNode));
-          const expr = Promise.resolve(recurse(node.expr as ASTNode));
-          let timerId: ReturnType<typeof setTimeout>;
-          const timer = new Promise<unknown>((resolve) => {
-            timerId = setTimeout(async () => resolve(await fallback()), ms);
-          });
-          return Promise.race([expr, timer]).finally(() => clearTimeout(timerId!));
-        };
-        return timeoutExpr();
+        const ms = (await recurse(node.ms as ASTNode)) as number;
+        const fallback = () => recurse(node.fallback as ASTNode);
+        const expr = recurse(node.expr as ASTNode);
+        let timerId: ReturnType<typeof setTimeout>;
+        const timer = new Promise<unknown>((resolve) => {
+          timerId = setTimeout(async () => resolve(await fallback()), ms);
+        });
+        return Promise.race([expr, timer]).finally(() => clearTimeout(timerId!));
       }
 
       case "fiber/retry": {
-        const retryExpr = async () => {
-          const attempts = node.attempts as number;
-          const delay = (node.delay as number) ?? 0;
-          let lastError: unknown;
-          for (let i = 0; i < attempts; i++) {
-            try {
-              return await Promise.resolve(recurse(node.expr as ASTNode));
-            } catch (e) {
-              lastError = e;
-              if (i < attempts - 1 && delay > 0) {
-                await new Promise((r) => setTimeout(r, delay));
-              }
+        const attempts = node.attempts as number;
+        const delay = (node.delay as number) ?? 0;
+        let lastError: unknown;
+        for (let i = 0; i < attempts; i++) {
+          try {
+            return await recurse(node.expr as ASTNode);
+          } catch (e) {
+            lastError = e;
+            if (i < attempts - 1 && delay > 0) {
+              await new Promise((r) => setTimeout(r, delay));
             }
           }
-          throw lastError;
-        };
-        return retryExpr();
+        }
+        throw lastError;
       }
 
       default:

@@ -3,8 +3,8 @@ import type { ASTNode, InterpreterFragment } from "../../core";
 export const ordInterpreter: InterpreterFragment = {
   pluginName: "ord",
   canHandle: (node) => node.kind.startsWith("ord/"),
-  visit(node: ASTNode, recurse: (node: ASTNode) => unknown): unknown {
-    const cmp = recurse(node.operand as ASTNode) as number;
+  async visit(node: ASTNode, recurse: (node: ASTNode) => Promise<unknown>): Promise<unknown> {
+    const cmp = (await recurse(node.operand as ASTNode)) as number;
     switch (node.kind) {
       case "ord/gt":
         return cmp > 0;
