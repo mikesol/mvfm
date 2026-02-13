@@ -15,6 +15,12 @@ import type { Expr, PluginContext, PluginDefinition } from "./core";
 // This is what $ gains when your plugin is included.
 // Keep it flat or nest under a namespace — your call.
 
+// NOTE: A full, production-quality Stripe plugin now exists at
+// src/plugins/stripe/2025-04-30.basil/. This example below is
+// simplified for illustration. See the real plugin for the complete
+// pattern including generator interpreter, server/client handlers,
+// and SDK adapter.
+
 export interface StripeMethods {
   stripe: {
     charge(

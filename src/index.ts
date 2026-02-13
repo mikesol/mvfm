@@ -74,6 +74,20 @@ export { st } from "./plugins/st";
 export type { StrMethods } from "./plugins/str";
 export { str } from "./plugins/str";
 export { strInterpreter } from "./plugins/str/interpreter";
+export type { StripeConfig, StripeMethods } from "./plugins/stripe/2025-04-30.basil";
+export { stripe } from "./plugins/stripe/2025-04-30.basil";
+export { wrapStripeSdk } from "./plugins/stripe/2025-04-30.basil/client-stripe-sdk";
+export type {
+  ClientHandlerOptions as StripeClientHandlerOptions,
+  ClientHandlerState as StripeClientHandlerState,
+} from "./plugins/stripe/2025-04-30.basil/handler.client";
+export { clientHandler as stripeClientHandler } from "./plugins/stripe/2025-04-30.basil/handler.client";
+export {
+  serverEvaluate as stripeServerEvaluate,
+  serverHandler as stripeServerHandler,
+} from "./plugins/stripe/2025-04-30.basil/handler.server";
+export type { StripeClient } from "./plugins/stripe/2025-04-30.basil/interpreter";
+export { stripeInterpreter } from "./plugins/stripe/2025-04-30.basil/interpreter";
 export type {
   ArraySchema,
   InferSchema,

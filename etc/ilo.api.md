@@ -5,6 +5,7 @@
 ```ts
 
 import type { default as postgres_2 } from 'postgres';
+import type Stripe from 'stripe';
 
 // @public
 export function adaptLegacy(fragment: LegacyInterpreterFragment): InterpreterFragment;
@@ -485,6 +486,71 @@ export const str: PluginDefinition<StrMethods>;
 export const strInterpreter: InterpreterFragment;
 
 // @public
+export function stripe(config: StripeConfig): PluginDefinition<StripeMethods>;
+
+// @public
+export interface StripeClient {
+    // (undocumented)
+    request(method: string, path: string, params?: Record<string, unknown>): Promise<unknown>;
+}
+
+// @public
+export function stripeClientHandler(options: StripeClientHandlerOptions): StepHandler<StripeClientHandlerState>;
+
+// @public
+export interface StripeClientHandlerOptions {
+    baseUrl: string;
+    contractHash: string;
+    fetch?: typeof globalThis.fetch;
+    headers?: Record<string, string>;
+}
+
+// @public
+export interface StripeClientHandlerState {
+    stepIndex: number;
+}
+
+// @public
+export interface StripeConfig {
+    // (undocumented)
+    apiKey: string;
+    // (undocumented)
+    apiVersion?: string;
+}
+
+// @public
+export const stripeInterpreter: InterpreterFragment;
+
+// @public
+export interface StripeMethods {
+    // (undocumented)
+    stripe: {
+        paymentIntents: {
+            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
+            confirm(id: Expr<string> | string, params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        };
+        customers: {
+            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
+            update(id: Expr<string> | string, params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        };
+        charges: {
+            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
+            list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        };
+    };
+}
+
+// @public
+export function stripeServerEvaluate(client: StripeClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+
+// @public
+export function stripeServerHandler(client: StripeClient): StepHandler<void>;
+
+// @public
 export interface StrMethods {
     concat(...parts: (Expr<string> | string)[]): Expr<string>;
     endsWith(s: Expr<string> | string, suffix: Expr<string> | string): Expr<boolean>;
@@ -514,6 +580,9 @@ export interface TraitImpl {
 //
 // @public
 export function wrapPostgresJs(sql: Sql | TransactionSql): PostgresClient;
+
+// @public
+export function wrapStripeSdk(stripe: Stripe): StripeClient;
 
 // Warnings were encountered during analysis:
 //
