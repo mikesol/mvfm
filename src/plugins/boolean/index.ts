@@ -4,7 +4,10 @@ import type { PluginDefinition } from "../../core";
 export type BooleanMethods = {};
 
 /** Boolean type plugin. Namespace: `boolean/`. Registers boolean trait implementations for use by typeclass plugins. */
-export const boolean: PluginDefinition<BooleanMethods> = {
+export const boolean: PluginDefinition<
+  BooleanMethods,
+  { eq: boolean; show: boolean; heytingAlgebra: boolean; bounded: boolean }
+> = {
   name: "boolean",
   nodeKinds: [
     "boolean/and",

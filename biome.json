@@ -12,7 +12,8 @@
       "recommended": true,
       "suspicious": {
         "noExplicitAny": "off",
-        "noThenProperty": "off"
+        "noThenProperty": "off",
+        "noEmptyInterface": "off"
       },
       "complexity": {
         "noBannedTypes": "off"

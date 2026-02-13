@@ -36,7 +36,10 @@ export interface NumMethods {
  * min/max. Also registers trait implementations for eq, ord, semiring,
  * show, and bounded.
  */
-export const num: PluginDefinition<NumMethods> = {
+export const num: PluginDefinition<
+  NumMethods,
+  { eq: number; ord: number; semiring: number; show: number; bounded: number }
+> = {
   name: "num",
   nodeKinds: [
     "num/add",

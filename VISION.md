@@ -60,7 +60,7 @@ A plugin provides three things:
 
 The `PluginContext` provides: `expr<T>(node)` to create Exprs, `lift(value)` to auto-lift primitives, `isExpr(value)` to detect existing Exprs, `emit(node)` for statement-level nodes, and `statements` for the current statement list.
 
-See `src/plugin-authoring-guide.ts` for a complete worked example.
+See `docs/plugin-authoring-guide.md` for the complete guide.
 
 ### Reachability analysis
 
@@ -178,7 +178,6 @@ src/
 │   ├── error.ts               — structured error handling
 │   ├── postgres.ts            — postgres.js-compatible
 │   └── (future real-world plugins: mysql, redis, fetch, jose, webcrypto)
-├── plugin-authoring-guide.ts  — worked example (stripe)
 └── index.ts                   — public API re-exports
 tests/
 ├── core.test.ts               — reachability, hashing, $.do, $.cond, $.let, $.each

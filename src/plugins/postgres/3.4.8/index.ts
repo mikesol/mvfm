@@ -3,6 +3,7 @@
 // ============================================================
 //
 // Implementation status: COMPLETE (modulo known limitations)
+// Plugin size: SMALL — fully implemented modulo known limitations
 //
 // Known limitations (deliberate omissions):
 //   - No COPY (streaming bulk import/export)

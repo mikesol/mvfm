@@ -3,6 +3,7 @@
 // ============================================================
 //
 // Implementation status: PARTIAL (3 of 57 top-level resources)
+// Plugin size: LARGE — at pass 1 of 60/30/10 split (3 of 57 resources)
 //
 // Implemented:
 //   - PaymentIntents: create, retrieve, confirm

@@ -133,6 +133,33 @@ export interface TraitImpl {
 }
 
 /**
+ * Phantom marker: a typeclass plugin's contribution depends on which
+ * type plugins provide implementations for the named trait.
+ * @internal
+ */
+export interface TypeclassSlot<Name extends string> {
+  readonly __typeclassSlot: Name;
+}
+
+/**
+ * Error type injected when a typeclass plugin is used without any
+ * type plugin providing the required trait.
+ * @internal
+ */
+export interface MissingTraitError<_TraitName extends string, Hint extends string> {
+  /** @deprecated This typeclass has no provider — see Hint. */
+  readonly __error: Hint;
+}
+
+/**
+ * Registry mapping trait names to their generic template types.
+ * Extended by typeclass plugins via declaration merging.
+ * @internal
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface TypeclassMapping<T> {}
+
+/**
  * Defines a plugin's contract: its name, the AST node kinds it emits,
  * and a build function that returns the methods it contributes to `$`.
  *
@@ -145,7 +172,7 @@ export interface TraitImpl {
  * };
  * ```
  */
-export interface PluginDefinition<T = any> {
+export interface PluginDefinition<T = any, Traits extends Record<string, unknown> = {}> {
   name: string;
   nodeKinds: string[];
   build: (ctx: PluginContext) => T;
@@ -165,7 +192,9 @@ export interface PluginDefinition<T = any> {
  * A plugin export: either a bare {@link PluginDefinition} or a factory
  * function that returns one (for plugins requiring configuration).
  */
-export type Plugin<T = any> = PluginDefinition<T> | (() => PluginDefinition<T>);
+export type Plugin<T = any, Traits extends Record<string, unknown> = {}> =
+  | PluginDefinition<T, Traits>
+  | (() => PluginDefinition<T, Traits>);
 
 // ---- Interpreter Interface -------------------------------
 
@@ -849,19 +878,66 @@ function makeExprProxy<T>(node: ASTNode, ctx: PluginContext): Expr<T> {
 
 // ---- ilo() — the main entry point ----------------------
 
+// ---- Type-level trait resolution ----
+
+/** Extract the methods type T from a plugin or factory */
 type ExtractPluginType<P> =
-  P extends PluginDefinition<infer T>
+  P extends PluginDefinition<infer T, any>
     ? T
-    : P extends (...args: any[]) => PluginDefinition<infer T>
+    : P extends (...args: any[]) => PluginDefinition<infer T, any>
       ? T
+      : {};
+
+/** Extract the Traits record from a plugin or factory */
+type ExtractPluginTraits<P> =
+  P extends PluginDefinition<any, infer Traits>
+    ? Traits
+    : P extends (...args: any[]) => PluginDefinition<any, infer Traits>
+      ? Traits
       : {};
 
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void
   ? I
   : never;
 
+/** Collect trait type for a specific trait name K across all plugins */
+type CollectTrait<Plugins extends readonly any[], K extends string> =
+  ExtractPluginTraits<Plugins[number]> extends infer AllTraits
+    ? AllTraits extends Record<string, unknown>
+      ? K extends keyof AllTraits
+        ? AllTraits[K]
+        : never
+      : never
+    : never;
+
+/**
+ * Resolve a single plugin's contribution to $.
+ * Regular plugins: pass through T unchanged.
+ * TypeclassSlot plugins: resolve against collected traits via TypeclassMapping.
+ */
+type ResolvePlugin<P, Plugins extends readonly any[]> =
+  ExtractPluginType<P> extends TypeclassSlot<infer Name>
+    ? Name extends keyof TypeclassMapping<any>
+      ? [CollectTrait<Plugins, Name>] extends [never]
+        ? MissingTraitError<
+            Name,
+            `No plugin provides trait '${Name}'. Include a type plugin that registers it.`
+          >
+        : UnionToIntersection<
+            CollectTrait<Plugins, Name> extends infer T
+              ? T extends any
+                ? TypeclassMapping<T>[Name]
+                : never
+              : never
+          >
+      : MissingTraitError<
+          Name,
+          `No plugin provides trait '${Name}'. Include a type plugin that registers it.`
+        >
+    : ExtractPluginType<P>;
+
 type MergePlugins<Plugins extends readonly any[]> = UnionToIntersection<
-  ExtractPluginType<Plugins[number]>
+  ResolvePlugin<Plugins[number], Plugins>
 >;
 
 // Core $ methods that are always available
@@ -909,7 +985,7 @@ interface CoreDollar<I = never> {
  *   `const serverless = ilo(num, str, db('postgres://...'))`
  *   `const myProgram = serverless(($) => { ... })`
  */
-export function ilo<P extends PluginDefinition<any>[]>(...plugins: P) {
+export function ilo<P extends PluginDefinition<any, any>[]>(...plugins: P) {
   function define<S extends SchemaShape>(
     schema: S,
     fn: ($: CoreDollar<InferSchema<S>> & MergePlugins<P>) => Expr<any> | any,
@@ -924,8 +1000,8 @@ export function ilo<P extends PluginDefinition<any>[]>(...plugins: P) {
 
     // Resolve plugins BEFORE building ctx
     const resolvedPlugins = plugins.map((p) =>
-      typeof p === "function" && !("name" in p) ? (p as () => PluginDefinition<any>)() : p,
-    ) as PluginDefinition<any>[];
+      typeof p === "function" && !("name" in p) ? (p as () => PluginDefinition<any, any>)() : p,
+    ) as PluginDefinition<any, any>[];
 
     // Build the plugin context
     const ctx: PluginContext = {

@@ -1,25 +1,22 @@
-import type { Expr, PluginContext, PluginDefinition } from "../../core";
+import type { Expr, PluginContext, PluginDefinition, TypeclassSlot } from "../../core";
 import { inferType } from "../../trait-utils";
 
 /**
- * Equality comparison operations dispatched via the Eq typeclass.
- *
- * Supports any type that has an eq trait implementation registered
- * (e.g. number via `num`, string via `str`, boolean via `boolean`).
+ * Eq typeclass template — generates eq/neq methods for a specific type T.
+ * Resolved by MergePlugins based on which type plugins are loaded.
  */
-export interface EqMethods {
-  /** Test structural equality of two values of the same type. */
-  eq(a: Expr<number> | number, b: Expr<number> | number): Expr<boolean>;
-  /** Test structural equality of two values of the same type. */
-  eq(a: Expr<string> | string, b: Expr<string> | string): Expr<boolean>;
-  /** Test structural equality of two values of the same type. */
-  eq(a: Expr<boolean> | boolean, b: Expr<boolean> | boolean): Expr<boolean>;
+export interface EqFor<T> {
+  /** Test structural equality of two values. */
+  eq(a: Expr<T> | T, b: Expr<T> | T): Expr<boolean>;
   /** Test structural inequality (negated eq). */
-  neq(a: Expr<number> | number, b: Expr<number> | number): Expr<boolean>;
-  /** Test structural inequality (negated eq). */
-  neq(a: Expr<string> | string, b: Expr<string> | string): Expr<boolean>;
-  /** Test structural inequality (negated eq). */
-  neq(a: Expr<boolean> | boolean, b: Expr<boolean> | boolean): Expr<boolean>;
+  neq(a: Expr<T> | T, b: Expr<T> | T): Expr<boolean>;
+}
+
+// Register with the typeclass mapping
+declare module "../../core" {
+  interface TypeclassMapping<T> {
+    eq: EqFor<T>;
+  }
 }
 
 /**
@@ -28,10 +25,10 @@ export interface EqMethods {
  * Dispatches `eq` and `neq` to the appropriate type-specific implementation
  * based on runtime type inference.
  */
-export const eq: PluginDefinition<EqMethods> = {
+export const eq: PluginDefinition<TypeclassSlot<"eq">> = {
   name: "eq",
   nodeKinds: ["eq/neq"],
-  build(ctx: PluginContext): EqMethods {
+  build(ctx: PluginContext): any {
     const impls = ctx.plugins.filter((p) => p.traits?.eq).map((p) => p.traits!.eq!);
 
     function dispatchEq(a: any, b: any): Expr<boolean> {
@@ -67,6 +64,6 @@ export const eq: PluginDefinition<EqMethods> = {
           inner: inner.__node,
         });
       },
-    } as EqMethods;
+    };
   },
 };

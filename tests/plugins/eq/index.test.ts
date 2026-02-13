@@ -89,7 +89,7 @@ describe("eq: nested schema resolution", () => {
 describe("eq: error cases", () => {
   it("throws when no eq impl for inferred type", () => {
     const app = ilo(eq);
-    expect(() => app(($) => $.eq(1, 2))).toThrow(/No eq implementation for type/);
+    expect(() => app(($) => ($ as any).eq(1, 2))).toThrow(/No eq implementation for type/);
   });
 
   it("falls back to sole impl when both args are untyped (single provider)", () => {

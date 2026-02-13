@@ -29,7 +29,7 @@ export type { BoundedMethods } from "./plugins/bounded";
 export { bounded } from "./plugins/bounded";
 export type { ControlMethods } from "./plugins/control";
 export { control } from "./plugins/control";
-export type { EqMethods } from "./plugins/eq";
+export type { EqFor } from "./plugins/eq";
 export { eq } from "./plugins/eq";
 export { eqInterpreter } from "./plugins/eq/interpreter";
 export type { ErrorMethods } from "./plugins/error";

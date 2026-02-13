@@ -48,7 +48,10 @@ export interface StrMethods {
  * Provides template literals, concatenation, case conversion, search, and
  * splitting. Registers trait implementations for eq, show, semigroup, and monoid.
  */
-export const str: PluginDefinition<StrMethods> = {
+export const str: PluginDefinition<
+  StrMethods,
+  { eq: string; show: string; semigroup: string; monoid: string }
+> = {
   name: "str",
   nodeKinds: [
     "str/template",
