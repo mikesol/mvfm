@@ -45,11 +45,14 @@ export const booleanInterpreter: InterpreterFragment;
 // @public
 export type BooleanMethods = {};
 
+// Warning: (ae-incompatible-release-tags) The symbol "bounded" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
+//
 // @public
-export const bounded: PluginDefinition<BoundedMethods>;
+export const bounded: PluginDefinition<TypeclassSlot<"bounded">>;
 
 // @public
-export type BoundedMethods = {};
+export interface BoundedFor<_T> {
+}
 
 // @public
 export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
@@ -226,11 +229,14 @@ export interface MissingTraitError<_TraitName extends string, Hint extends strin
     readonly __error: Hint;
 }
 
+// Warning: (ae-incompatible-release-tags) The symbol "monoid" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
+//
 // @public
-export const monoid: PluginDefinition<MonoidMethods>;
+export const monoid: PluginDefinition<TypeclassSlot<"monoid">>;
 
 // @public
-export type MonoidMethods = {};
+export interface MonoidFor<_T> {
+}
 
 // @public
 export function nullable(of: SchemaType): NullableSchema;
@@ -285,6 +291,73 @@ export interface OrdFor<T> {
 
 // @public
 export const ordInterpreter: InterpreterFragment;
+
+// @public
+export function pino(config?: PinoConfig): PluginDefinition<PinoMethods>;
+
+// @public
+export interface PinoClient {
+    log(level: string, bindings: Record<string, unknown>[], mergeObject?: Record<string, unknown>, msg?: string): Promise<void>;
+}
+
+// @public
+export function pinoClientHandler(options: PinoClientHandlerOptions): StepHandler<PinoClientHandlerState>;
+
+// @public
+export interface PinoClientHandlerOptions {
+    baseUrl: string;
+    contractHash: string;
+    fetch?: typeof globalThis.fetch;
+    headers?: Record<string, string>;
+}
+
+// @public
+export interface PinoClientHandlerState {
+    stepIndex: number;
+}
+
+// @public
+export interface PinoConfig {
+    base?: Record<string, unknown>;
+    level?: string;
+}
+
+// @public
+export const pinoInterpreter: InterpreterFragment;
+
+// @public
+export interface PinoLogger {
+    child(bindings: Expr<Record<string, unknown>> | Record<string, unknown>): PinoLogger;
+    debug(msg: Expr<string> | string): Expr<void>;
+    // (undocumented)
+    debug(mergeObject: Expr<Record<string, unknown>> | Record<string, unknown>, msg: Expr<string> | string): Expr<void>;
+    error(msg: Expr<string> | string): Expr<void>;
+    // (undocumented)
+    error(mergeObject: Expr<Record<string, unknown>> | Record<string, unknown>, msg: Expr<string> | string): Expr<void>;
+    fatal(msg: Expr<string> | string): Expr<void>;
+    // (undocumented)
+    fatal(mergeObject: Expr<Record<string, unknown>> | Record<string, unknown>, msg: Expr<string> | string): Expr<void>;
+    info(msg: Expr<string> | string): Expr<void>;
+    // (undocumented)
+    info(mergeObject: Expr<Record<string, unknown>> | Record<string, unknown>, msg: Expr<string> | string): Expr<void>;
+    trace(msg: Expr<string> | string): Expr<void>;
+    // (undocumented)
+    trace(mergeObject: Expr<Record<string, unknown>> | Record<string, unknown>, msg: Expr<string> | string): Expr<void>;
+    warn(msg: Expr<string> | string): Expr<void>;
+    // (undocumented)
+    warn(mergeObject: Expr<Record<string, unknown>> | Record<string, unknown>, msg: Expr<string> | string): Expr<void>;
+}
+
+// @public
+export interface PinoMethods {
+    pino: PinoLogger;
+}
+
+// @public
+export function pinoServerEvaluate(client: PinoClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+
+// @public
+export function pinoServerHandler(client: PinoClient): StepHandler<void>;
 
 // @public
 type Plugin_2<T = any, Traits extends Record<string, unknown> = {}> = PluginDefinition<T, Traits> | (() => PluginDefinition<T, Traits>);
@@ -614,6 +687,11 @@ export interface TypeclassSlot<Name extends string> {
     // (undocumented)
     readonly __typeclassSlot: Name;
 }
+
+// Warning: (ae-forgotten-export) The symbol "PinoInstance" needs to be exported by the entry point index.d.ts
+//
+// @public
+export function wrapPino(logger: PinoInstance): PinoClient;
 
 // Warning: (ae-forgotten-export) The symbol "Sql" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "TransactionSql" needs to be exported by the entry point index.d.ts

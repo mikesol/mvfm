@@ -51,6 +51,21 @@ export { numInterpreter } from "./plugins/num/interpreter";
 export type { OrdFor } from "./plugins/ord";
 export { ord } from "./plugins/ord";
 export { ordInterpreter } from "./plugins/ord/interpreter";
+// ---- pino ----
+export type { PinoConfig, PinoLogger, PinoMethods } from "./plugins/pino/10.3.1";
+export { pino } from "./plugins/pino/10.3.1";
+export { wrapPino } from "./plugins/pino/10.3.1/client-pino";
+export type {
+  ClientHandlerOptions as PinoClientHandlerOptions,
+  ClientHandlerState as PinoClientHandlerState,
+} from "./plugins/pino/10.3.1/handler.client";
+export { clientHandler as pinoClientHandler } from "./plugins/pino/10.3.1/handler.client";
+export {
+  serverEvaluate as pinoServerEvaluate,
+  serverHandler as pinoServerHandler,
+} from "./plugins/pino/10.3.1/handler.server";
+export type { PinoClient } from "./plugins/pino/10.3.1/interpreter";
+export { pinoInterpreter } from "./plugins/pino/10.3.1/interpreter";
 export type { PostgresConfig, PostgresMethods } from "./plugins/postgres/3.4.8";
 export { postgres } from "./plugins/postgres/3.4.8";
 export { wrapPostgresJs } from "./plugins/postgres/3.4.8/client-postgres-js";
