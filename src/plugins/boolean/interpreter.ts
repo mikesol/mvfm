@@ -1,7 +1,7 @@
-import type { ASTNode, GeneratorInterpreterFragment, StepEffect } from "../../core";
+import type { ASTNode, InterpreterFragment, StepEffect } from "../../core";
 
 /** Interpreter fragment for `boolean/` node kinds. */
-export const booleanInterpreter: GeneratorInterpreterFragment = {
+export const booleanInterpreter: InterpreterFragment = {
   pluginName: "boolean",
   canHandle: (node) => node.kind.startsWith("boolean/"),
   *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {

@@ -1,4 +1,4 @@
-import type { ASTNode, GeneratorInterpreterFragment, StepEffect } from "../../core";
+import type { ASTNode, InterpreterFragment, StepEffect } from "../../core";
 
 /**
  * Walk an AST subtree and inject a value into matching lambda_param nodes.
@@ -21,7 +21,7 @@ export function injectLambdaParam(node: any, param: { name: string }, value: unk
 }
 
 /** Interpreter fragment for `error/` node kinds. */
-export const errorInterpreter: GeneratorInterpreterFragment = {
+export const errorInterpreter: InterpreterFragment = {
   pluginName: "error",
   canHandle: (node) => node.kind.startsWith("error/"),
   *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {

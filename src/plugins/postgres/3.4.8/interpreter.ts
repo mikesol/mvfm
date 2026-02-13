@@ -1,4 +1,4 @@
-import type { ASTNode, GeneratorInterpreterFragment, StepEffect } from "../../../core";
+import type { ASTNode, InterpreterFragment, StepEffect } from "../../../core";
 
 /**
  * Database client interface consumed by the postgres handler.
@@ -100,7 +100,7 @@ function* buildSQL(node: ASTNode): Generator<StepEffect, BuiltQuery, unknown> {
  * `cursor`) that are handled by a {@link StepHandler} (e.g. the server
  * handler or client handler).
  */
-export const postgresInterpreter: GeneratorInterpreterFragment = {
+export const postgresInterpreter: InterpreterFragment = {
   pluginName: "postgres",
   canHandle: (node) => node.kind.startsWith("postgres/"),
   *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {

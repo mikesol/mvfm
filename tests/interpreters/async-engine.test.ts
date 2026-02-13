@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ASTNode, InterpreterFragment } from "../../src/core";
+import type { ASTNode, InterpreterFragment, StepEffect } from "../../src/core";
 import { composeInterpreters } from "../../src/core";
 
 describe("async engine: composeInterpreters", () => {
@@ -7,7 +7,8 @@ describe("async engine: composeInterpreters", () => {
     const fragment: InterpreterFragment = {
       pluginName: "test",
       canHandle: (node) => node.kind === "test/literal",
-      async visit(node: ASTNode, _recurse: (n: ASTNode) => Promise<unknown>) {
+      // biome-ignore lint/correctness/useYield: leaf node returns directly without yielding
+      *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
         return node.value;
       },
     };
@@ -22,15 +23,16 @@ describe("async engine: composeInterpreters", () => {
     const inner: InterpreterFragment = {
       pluginName: "inner",
       canHandle: (node) => node.kind === "inner/value",
-      async visit(node: ASTNode, _recurse: (n: ASTNode) => Promise<unknown>) {
+      // biome-ignore lint/correctness/useYield: leaf node returns directly without yielding
+      *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
         return node.value;
       },
     };
     const outer: InterpreterFragment = {
       pluginName: "outer",
       canHandle: (node) => node.kind === "outer/double",
-      async visit(node: ASTNode, recurse: (n: ASTNode) => Promise<unknown>) {
-        const val = (await recurse(node.inner as ASTNode)) as number;
+      *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
+        const val = (yield { type: "recurse", child: node.inner as ASTNode }) as number;
         return val * 2;
       },
     };

@@ -191,7 +191,7 @@
         {
           "kind": "Function",
           "canonicalReference": "ilo!adaptLegacy:function(1)",
-          "docComment": "/**\n * Wraps a {@link LegacyInterpreterFragment} as a {@link GeneratorInterpreterFragment}.\n *\n * The adapted fragment yields a single `__legacy` effect, which the evaluator intercepts and executes using the original callback-based `visit` method.\n */\n",
+          "docComment": "/**\n * Wraps a {@link LegacyInterpreterFragment} as an {@link InterpreterFragment}.\n *\n * The adapted fragment yields a single `__legacy` effect, which the evaluator intercepts and executes using the original callback-based `visit` method.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -208,8 +208,8 @@
             },
             {
               "kind": "Reference",
-              "text": "GeneratorInterpreterFragment",
-              "canonicalReference": "ilo!GeneratorInterpreterFragment:interface"
+              "text": "InterpreterFragment",
+              "canonicalReference": "ilo!InterpreterFragment:interface"
             },
             {
               "kind": "Content",
@@ -865,15 +865,11 @@
         {
           "kind": "Function",
           "canonicalReference": "ilo!composeInterpreters:function(1)",
-          "docComment": "/**\n * Compose interpreter fragments into a full interpreter. Uses WeakMap memoization so shared AST nodes (DAG references) are only evaluated once. Volatile nodes (lambda_param, cursor_batch) are tracked as \"tainted\" and their ancestors are not cached.\n *\n * Accepts both {@link InterpreterFragment} (legacy) and {@link GeneratorInterpreterFragment} (generator-based) fragments. Generator fragments are detected by checking if `visit` is a GeneratorFunction; all others are treated as legacy.\n */\n",
+          "docComment": "/**\n * Compose interpreter fragments into a full interpreter. Uses WeakMap memoization so shared AST nodes (DAG references) are only evaluated once. Volatile nodes (lambda_param, cursor_batch) are tracked as \"tainted\" and their ancestors are not cached.\n *\n * Delegates to {@link foldAST} with no effect handlers — all effects are expected to be `recurse` (or `__legacy` from adapted fragments). For IO effects, use {@link foldAST} directly with handlers.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
               "text": "export declare function composeInterpreters(fragments: "
-            },
-            {
-              "kind": "Content",
-              "text": "("
             },
             {
               "kind": "Reference",
@@ -882,16 +878,7 @@
             },
             {
               "kind": "Content",
-              "text": " | "
-            },
-            {
-              "kind": "Reference",
-              "text": "GeneratorInterpreterFragment",
-              "canonicalReference": "ilo!GeneratorInterpreterFragment:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ")[]"
+              "text": "[]"
             },
             {
               "kind": "Content",
@@ -909,8 +896,8 @@
           ],
           "fileUrlPath": "dist/core.d.ts",
           "returnTypeTokenRange": {
-            "startIndex": 7,
-            "endIndex": 8
+            "startIndex": 4,
+            "endIndex": 5
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
@@ -919,7 +906,7 @@
               "parameterName": "fragments",
               "parameterTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 6
+                "endIndex": 3
               },
               "isOptional": false
             }
@@ -1122,7 +1109,7 @@
         {
           "kind": "Variable",
           "canonicalReference": "ilo!coreInterpreter:var",
-          "docComment": "/**\n * Generator-based interpreter fragment for core node kinds (literal, input, prop_access, cond, do, program, tuple, record).\n */\n",
+          "docComment": "/**\n * Interpreter fragment for core node kinds (literal, input, prop_access, cond, do, program, tuple, record).\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -1130,8 +1117,8 @@
             },
             {
               "kind": "Reference",
-              "text": "GeneratorInterpreterFragment",
-              "canonicalReference": "ilo!GeneratorInterpreterFragment:interface"
+              "text": "InterpreterFragment",
+              "canonicalReference": "ilo!InterpreterFragment:interface"
             }
           ],
           "fileUrlPath": "dist/interpreters/core.d.ts",
@@ -2707,7 +2694,7 @@
         {
           "kind": "Function",
           "canonicalReference": "ilo!foldAST:function(1)",
-          "docComment": "/**\n * Build a {@link RecurseFn} from generator-based fragments and a map of effect handlers.\n *\n * `foldAST` is the generator-based replacement for {@link composeInterpreters}. It returns a `RecurseFn` with the same API (callable + `.fresh()`), so it can be used as a drop-in replacement in existing interpreter pipelines.\n *\n * @param fragments - Generator interpreter fragments.\n *\n * @param handlers - Map from effect type string to async handler function. Each handler receives the effect and returns a value.\n *\n * @returns A {@link RecurseFn} that evaluates AST nodes.\n */\n",
+          "docComment": "/**\n * Build a {@link RecurseFn} from generator-based fragments and a map of effect handlers.\n *\n * `foldAST` is the generator-based replacement for {@link composeInterpreters}. It returns a `RecurseFn` with the same API (callable + `.fresh()`), so it can be used as a drop-in replacement in existing interpreter pipelines.\n *\n * @param fragments - Interpreter fragments.\n *\n * @param handlers - Map from effect type string to async handler function. Each handler receives the effect and returns a value.\n *\n * @returns A {@link RecurseFn} that evaluates AST nodes.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -2715,8 +2702,8 @@
             },
             {
               "kind": "Reference",
-              "text": "GeneratorInterpreterFragment",
-              "canonicalReference": "ilo!GeneratorInterpreterFragment:interface"
+              "text": "InterpreterFragment",
+              "canonicalReference": "ilo!InterpreterFragment:interface"
             },
             {
               "kind": "Content",
@@ -2795,175 +2782,31 @@
           "name": "foldAST"
         },
         {
-          "kind": "Interface",
-          "canonicalReference": "ilo!GeneratorInterpreterFragment:interface",
-          "docComment": "/**\n * A generator-based interpreter fragment that yields effects instead of directly calling a recurse callback.\n *\n * Generator fragments enable the step evaluator to pause, inspect, and resume evaluation — the foundation for middleware, debugging, and IO interception.\n */\n",
+          "kind": "TypeAlias",
+          "canonicalReference": "ilo!GeneratorInterpreterFragment:type",
+          "docComment": "/**\n * Type alias for backward compatibility.\n *\n * `GeneratorInterpreterFragment` is now identical to {@link InterpreterFragment}. New code should use `InterpreterFragment` directly.\n *\n * @deprecated\n *\n * Use {@link InterpreterFragment} instead.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export interface GeneratorInterpreterFragment "
+              "text": "export type GeneratorInterpreterFragment = "
+            },
+            {
+              "kind": "Reference",
+              "text": "InterpreterFragment",
+              "canonicalReference": "ilo!InterpreterFragment:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
             }
           ],
           "fileUrlPath": "dist/core.d.ts",
           "releaseTag": "Public",
           "name": "GeneratorInterpreterFragment",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "ilo!GeneratorInterpreterFragment#canHandle:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "canHandle: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(node: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ASTNode",
-                  "canonicalReference": "ilo!ASTNode:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => boolean"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "canHandle",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 4
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "ilo!GeneratorInterpreterFragment#isVolatile:member",
-              "docComment": "/**\n * Returns true if the node should never be cached (e.g., lambda params).\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "isVolatile?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(node: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ASTNode",
-                  "canonicalReference": "ilo!ASTNode:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => boolean"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "isVolatile",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 4
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "ilo!GeneratorInterpreterFragment#pluginName:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "pluginName: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "pluginName",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "ilo!GeneratorInterpreterFragment#visit:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "visit: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(node: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ASTNode",
-                  "canonicalReference": "ilo!ASTNode:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Generator",
-                  "canonicalReference": "!Generator:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "StepEffect",
-                  "canonicalReference": "ilo!StepEffect:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", unknown, unknown>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "visit",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 8
-              }
-            }
-          ],
-          "extendsTokenRanges": []
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
         },
         {
           "kind": "Variable",
@@ -3625,7 +3468,7 @@
         {
           "kind": "Interface",
           "canonicalReference": "ilo!InterpreterFragment:interface",
-          "docComment": "/**\n * An Interpreter is a visitor over AST nodes. Each plugin can ship its own interpreter fragment, and they compose.\n */\n",
+          "docComment": "/**\n * A generator-based interpreter fragment that yields effects instead of directly calling a recurse callback.\n *\n * Generator fragments enable the step evaluator to pause, inspect, and resume evaluation — the foundation for middleware, debugging, and IO interception.\n *\n * Each plugin can ship its own interpreter fragment, and they compose via {@link composeInterpreters} or {@link foldAST}.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -3668,6 +3511,42 @@
               "isOptional": false,
               "releaseTag": "Public",
               "name": "canHandle",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 4
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "ilo!InterpreterFragment#isVolatile:member",
+              "docComment": "/**\n * Returns true if the node should never be cached (e.g., lambda params).\n */\n",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "isVolatile?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "(node: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ASTNode",
+                  "canonicalReference": "ilo!ASTNode:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ") => boolean"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "isVolatile",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 4
@@ -3720,34 +3599,25 @@
                 },
                 {
                   "kind": "Content",
-                  "text": ", recurse: (node: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ASTNode",
-                  "canonicalReference": "ilo!ASTNode:interface"
-                },
-                {
-                  "kind": "Content",
                   "text": ") => "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Promise",
-                  "canonicalReference": "!Promise:interface"
+                  "text": "Generator",
+                  "canonicalReference": "!Generator:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<unknown>) => "
+                  "text": "<"
                 },
                 {
                   "kind": "Reference",
-                  "text": "Promise",
-                  "canonicalReference": "!Promise:interface"
+                  "text": "StepEffect",
+                  "canonicalReference": "ilo!StepEffect:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<unknown>"
+                  "text": ", unknown, unknown>"
                 },
                 {
                   "kind": "Content",
@@ -3760,7 +3630,7 @@
               "name": "visit",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 10
+                "endIndex": 8
               }
             }
           ],
@@ -3769,7 +3639,7 @@
         {
           "kind": "Interface",
           "canonicalReference": "ilo!LegacyInterpreterFragment:interface",
-          "docComment": "/**\n * A legacy interpreter fragment using callback-based recursion.\n *\n * This is the original interpreter interface. New code should prefer {@link GeneratorInterpreterFragment}, but legacy fragments remain fully supported via {@link adaptLegacy}.\n */\n",
+          "docComment": "/**\n * A legacy interpreter fragment using callback-based recursion.\n *\n * This type exists only for backward compatibility with {@link adaptLegacy}. New code should use {@link InterpreterFragment} (generator-based).\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -6556,8 +6426,8 @@
             },
             {
               "kind": "Reference",
-              "text": "GeneratorInterpreterFragment",
-              "canonicalReference": "ilo!GeneratorInterpreterFragment:interface"
+              "text": "InterpreterFragment",
+              "canonicalReference": "ilo!InterpreterFragment:interface"
             }
           ],
           "fileUrlPath": "dist/plugins/postgres/3.4.8/interpreter.d.ts",
@@ -6913,7 +6783,7 @@
         {
           "kind": "Function",
           "canonicalReference": "ilo!runAST:function(1)",
-          "docComment": "/**\n * Evaluate an AST using generator-based fragments with a custom effect handler.\n *\n * `runAST` auto-handles `recurse` effects by descending into child nodes. All other effects (IO, custom) are delegated to the provided {@link StepHandler}. The `\"__legacy\"` effect is handled internally for backward compatibility with {@link LegacyInterpreterFragment}s.\n *\n * @param root - The root AST node to evaluate.\n *\n * @param fragments - Generator interpreter fragments.\n *\n * @param handler - Handler for non-recurse effects.\n *\n * @param initialState - Initial user state.\n *\n * @typeParam S - User-defined state threaded through the evaluation.\n *\n * @returns The final value and state after evaluation.\n */\n",
+          "docComment": "/**\n * Evaluate an AST using generator-based fragments with a custom effect handler.\n *\n * `runAST` auto-handles `recurse` effects by descending into child nodes. All other effects (IO, custom) are delegated to the provided {@link StepHandler}. The `\"__legacy\"` effect is handled internally for backward compatibility with {@link LegacyInterpreterFragment}s.\n *\n * @param root - The root AST node to evaluate.\n *\n * @param fragments - Interpreter fragments.\n *\n * @param handler - Handler for non-recurse effects.\n *\n * @param initialState - Initial user state.\n *\n * @typeParam S - User-defined state threaded through the evaluation.\n *\n * @returns The final value and state after evaluation.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -6930,8 +6800,8 @@
             },
             {
               "kind": "Reference",
-              "text": "GeneratorInterpreterFragment",
-              "canonicalReference": "ilo!GeneratorInterpreterFragment:interface"
+              "text": "InterpreterFragment",
+              "canonicalReference": "ilo!InterpreterFragment:interface"
             },
             {
               "kind": "Content",
@@ -7514,8 +7384,8 @@
             },
             {
               "kind": "Reference",
-              "text": "GeneratorInterpreterFragment",
-              "canonicalReference": "ilo!GeneratorInterpreterFragment:interface"
+              "text": "InterpreterFragment",
+              "canonicalReference": "ilo!InterpreterFragment:interface"
             },
             {
               "kind": "Content",
@@ -7599,8 +7469,8 @@
             },
             {
               "kind": "Reference",
-              "text": "GeneratorInterpreterFragment",
-              "canonicalReference": "ilo!GeneratorInterpreterFragment:interface"
+              "text": "InterpreterFragment",
+              "canonicalReference": "ilo!InterpreterFragment:interface"
             },
             {
               "kind": "Content",
@@ -8202,8 +8072,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "GeneratorInterpreterFragment",
-                  "canonicalReference": "ilo!GeneratorInterpreterFragment:interface"
+                  "text": "InterpreterFragment",
+                  "canonicalReference": "ilo!InterpreterFragment:interface"
                 },
                 {
                   "kind": "Content",

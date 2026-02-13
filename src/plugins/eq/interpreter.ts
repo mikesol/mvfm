@@ -1,7 +1,7 @@
-import type { ASTNode, GeneratorInterpreterFragment, StepEffect } from "../../core";
+import type { ASTNode, InterpreterFragment, StepEffect } from "../../core";
 
 /** Interpreter fragment for `eq/` node kinds. */
-export const eqInterpreter: GeneratorInterpreterFragment = {
+export const eqInterpreter: InterpreterFragment = {
   pluginName: "eq",
   canHandle: (node) => node.kind.startsWith("eq/"),
   *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {

@@ -2,7 +2,7 @@ import * as http from "node:http";
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import type { GeneratorInterpreterFragment, StepContext, StepEffect } from "../../../../src/core";
+import type { InterpreterFragment, StepContext } from "../../../../src/core";
 import { ilo, runAST } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { eq } from "../../../../src/plugins/eq";
@@ -73,7 +73,7 @@ beforeAll(async () => {
     const body = JSON.parse(Buffer.concat(chunks).toString());
 
     const client = wrapPostgresJs(sql);
-    const handler = serverHandler(client, allFragments as GeneratorInterpreterFragment[]);
+    const handler = serverHandler(client, allFragments as InterpreterFragment[]);
 
     try {
       const ctx: StepContext = { depth: 0, path: body.path ?? [] };
@@ -106,7 +106,7 @@ describe("round-trip: direct vs proxied", () => {
 
     // Direct: serverEvaluate against real DB
     const client = wrapPostgresJs(sql);
-    const evaluate = serverEvaluate(client, allFragments as GeneratorInterpreterFragment[]);
+    const evaluate = serverEvaluate(client, allFragments as InterpreterFragment[]);
     const direct = await evaluate(prog.ast.result);
 
     // Proxied: clientHandler -> HTTP -> serverHandler -> real DB
@@ -117,7 +117,7 @@ describe("round-trip: direct vs proxied", () => {
     });
     const proxied = await runAST(
       prog.ast.result,
-      allFragments as GeneratorInterpreterFragment[],
+      allFragments as InterpreterFragment[],
       proxyHandler,
       { stepIndex: 0 },
     );
@@ -134,7 +134,7 @@ describe("round-trip: direct vs proxied", () => {
     // Direct path
     const directAst = injectInput(prog.ast, { minPrice: 8 });
     const client = wrapPostgresJs(sql);
-    const evaluate = serverEvaluate(client, allFragments as GeneratorInterpreterFragment[]);
+    const evaluate = serverEvaluate(client, allFragments as InterpreterFragment[]);
     const direct = await evaluate(directAst.result);
 
     // Proxied path (fresh AST copy to avoid shared mutation)
@@ -146,7 +146,7 @@ describe("round-trip: direct vs proxied", () => {
     });
     const proxied = await runAST(
       proxiedAst.result,
-      allFragments as GeneratorInterpreterFragment[],
+      allFragments as InterpreterFragment[],
       proxyHandler,
       { stepIndex: 0 },
     );

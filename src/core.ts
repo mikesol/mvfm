@@ -170,13 +170,22 @@ export type Plugin<T = any> = PluginDefinition<T> | (() => PluginDefinition<T>);
 // ---- Interpreter Interface -------------------------------
 
 /**
- * An Interpreter is a visitor over AST nodes. Each plugin
- * can ship its own interpreter fragment, and they compose.
+ * A generator-based interpreter fragment that yields effects
+ * instead of directly calling a recurse callback.
+ *
+ * Generator fragments enable the step evaluator to pause, inspect,
+ * and resume evaluation — the foundation for middleware, debugging,
+ * and IO interception.
+ *
+ * Each plugin can ship its own interpreter fragment, and they compose
+ * via {@link composeInterpreters} or {@link foldAST}.
  */
 export interface InterpreterFragment {
   pluginName: string;
-  visit: (node: ASTNode, recurse: (node: ASTNode) => Promise<unknown>) => Promise<unknown>;
   canHandle: (node: ASTNode) => boolean;
+  visit: (node: ASTNode) => Generator<StepEffect, unknown, unknown>;
+  /** Returns true if the node should never be cached (e.g., lambda params). */
+  isVolatile?: (node: ASTNode) => boolean;
 }
 
 /**
@@ -266,9 +275,8 @@ export type StepHandler<S> = (
 /**
  * A legacy interpreter fragment using callback-based recursion.
  *
- * This is the original interpreter interface. New code should prefer
- * {@link GeneratorInterpreterFragment}, but legacy fragments remain
- * fully supported via {@link adaptLegacy}.
+ * This type exists only for backward compatibility with {@link adaptLegacy}.
+ * New code should use {@link InterpreterFragment} (generator-based).
  */
 export interface LegacyInterpreterFragment {
   pluginName: string;
@@ -277,29 +285,23 @@ export interface LegacyInterpreterFragment {
 }
 
 /**
- * A generator-based interpreter fragment that yields effects
- * instead of directly calling a recurse callback.
+ * Type alias for backward compatibility.
  *
- * Generator fragments enable the step evaluator to pause, inspect,
- * and resume evaluation — the foundation for middleware, debugging,
- * and IO interception.
+ * `GeneratorInterpreterFragment` is now identical to {@link InterpreterFragment}.
+ * New code should use `InterpreterFragment` directly.
+ *
+ * @deprecated Use {@link InterpreterFragment} instead.
  */
-export interface GeneratorInterpreterFragment {
-  pluginName: string;
-  canHandle: (node: ASTNode) => boolean;
-  visit: (node: ASTNode) => Generator<StepEffect, unknown, unknown>;
-  /** Returns true if the node should never be cached (e.g., lambda params). */
-  isVolatile?: (node: ASTNode) => boolean;
-}
+export type GeneratorInterpreterFragment = InterpreterFragment;
 
 /**
- * Wraps a {@link LegacyInterpreterFragment} as a {@link GeneratorInterpreterFragment}.
+ * Wraps a {@link LegacyInterpreterFragment} as an {@link InterpreterFragment}.
  *
  * The adapted fragment yields a single `__legacy` effect, which the
  * evaluator intercepts and executes using the original callback-based
  * `visit` method.
  */
-export function adaptLegacy(fragment: LegacyInterpreterFragment): GeneratorInterpreterFragment {
+export function adaptLegacy(fragment: LegacyInterpreterFragment): InterpreterFragment {
   return {
     pluginName: fragment.pluginName,
     canHandle: fragment.canHandle,
@@ -331,9 +333,9 @@ export class Stepper {
   private stack: StackFrame[] = [];
   private cache = new WeakMap<ASTNode, unknown>();
   private tainted = new WeakSet<ASTNode>();
-  private fragments: GeneratorInterpreterFragment[];
+  private fragments: InterpreterFragment[];
 
-  constructor(fragments: GeneratorInterpreterFragment[], root: ASTNode) {
+  constructor(fragments: InterpreterFragment[], root: ASTNode) {
     this.fragments = fragments;
     this.pushNode(root, undefined);
   }
@@ -454,14 +456,14 @@ export class Stepper {
  *
  * @typeParam S - User-defined state threaded through the evaluation.
  * @param root - The root AST node to evaluate.
- * @param fragments - Generator interpreter fragments.
+ * @param fragments - Interpreter fragments.
  * @param handler - Handler for non-recurse effects.
  * @param initialState - Initial user state.
  * @returns The final value and state after evaluation.
  */
 export async function runAST<S>(
   root: ASTNode,
-  fragments: GeneratorInterpreterFragment[],
+  fragments: InterpreterFragment[],
   handler: StepHandler<S>,
   initialState: S,
 ): Promise<{ value: unknown; state: S }> {
@@ -472,7 +474,7 @@ export async function runAST<S>(
   const cache = new WeakMap<ASTNode, unknown>();
   const taintedSet = new WeakSet<ASTNode>();
 
-  function findFragment(node: ASTNode): GeneratorInterpreterFragment {
+  function findFragment(node: ASTNode): InterpreterFragment {
     const f = fragments.find((fr) => fr.canHandle(node));
     if (!f) throw new Error(`No interpreter for node kind: ${node.kind}`);
     return f;
@@ -563,13 +565,13 @@ export async function runAST<S>(
  * same API (callable + `.fresh()`), so it can be used as a drop-in
  * replacement in existing interpreter pipelines.
  *
- * @param fragments - Generator interpreter fragments.
+ * @param fragments - Interpreter fragments.
  * @param handlers - Map from effect type string to async handler function.
  *                   Each handler receives the effect and returns a value.
  * @returns A {@link RecurseFn} that evaluates AST nodes.
  */
 export function foldAST(
-  fragments: GeneratorInterpreterFragment[],
+  fragments: InterpreterFragment[],
   handlers: Record<string, (effect: StepEffect) => Promise<unknown>>,
 ): RecurseFn {
   const handler: StepHandler<undefined> = async (effect, _context, state) => {
@@ -584,7 +586,7 @@ export function foldAST(
   const cache = new WeakMap<ASTNode, unknown>();
   const taintedSet = new WeakSet<ASTNode>();
 
-  function findFragment(node: ASTNode): GeneratorInterpreterFragment {
+  function findFragment(node: ASTNode): InterpreterFragment {
     const f = fragments.find((fr) => fr.canHandle(node));
     if (!f) throw new Error(`No interpreter for node kind: ${node.kind}`);
     return f;
@@ -690,101 +692,12 @@ function hasAnyTaintedChild(node: ASTNode, taintSet: WeakSet<ASTNode>): boolean 
  * are only evaluated once. Volatile nodes (lambda_param, cursor_batch)
  * are tracked as "tainted" and their ancestors are not cached.
  *
- * Accepts both {@link InterpreterFragment} (legacy) and
- * {@link GeneratorInterpreterFragment} (generator-based) fragments.
- * Generator fragments are detected by checking if `visit` is a
- * GeneratorFunction; all others are treated as legacy.
+ * Delegates to {@link foldAST} with no effect handlers — all effects
+ * are expected to be `recurse` (or `__legacy` from adapted fragments).
+ * For IO effects, use {@link foldAST} directly with handlers.
  */
-export function composeInterpreters(
-  fragments: (InterpreterFragment | GeneratorInterpreterFragment)[],
-): RecurseFn {
-  // Detect generator fragments by constructor name.
-  // GeneratorFunction has constructor.name === "GeneratorFunction".
-  // All other functions (async, sync) are treated as legacy.
-  const isGeneratorFn = (fn: Function): boolean => fn.constructor.name === "GeneratorFunction";
-
-  const normalizedFragments: InterpreterFragment[] = fragments.map((f) => {
-    if (!isGeneratorFn(f.visit)) {
-      // Legacy fragment — use as-is
-      return f as InterpreterFragment;
-    }
-    // Generator fragment — wrap it in a legacy-compatible shim
-    const genFragment = f as GeneratorInterpreterFragment;
-    return {
-      pluginName: genFragment.pluginName,
-      canHandle: genFragment.canHandle,
-      async visit(node: ASTNode, recurse: (node: ASTNode) => Promise<unknown>): Promise<unknown> {
-        const gen = genFragment.visit(node);
-        let input: unknown;
-        let isError = false;
-        while (true) {
-          const result = isError ? gen.throw(input) : gen.next(input);
-          isError = false;
-          if (result.done) return result.value;
-          const effect = result.value as StepEffect;
-          if (effect.type === "recurse") {
-            try {
-              input = await recurse((effect as { type: "recurse"; child: ASTNode }).child);
-            } catch (e) {
-              input = e;
-              isError = true;
-            }
-          } else if (effect.type === "__legacy") {
-            const legacyEffect = effect as {
-              type: "__legacy";
-              fragment: LegacyInterpreterFragment;
-              node: ASTNode;
-            };
-            try {
-              input = await legacyEffect.fragment.visit(legacyEffect.node, recurse);
-            } catch (e) {
-              input = e;
-              isError = true;
-            }
-          } else {
-            throw new Error(
-              `composeInterpreters cannot handle effect type "${effect.type}". ` +
-                `Use foldAST with effect handlers instead.`,
-            );
-          }
-        }
-      },
-    } as InterpreterFragment;
-  });
-
-  const cache = new WeakMap<ASTNode, Promise<unknown>>();
-  const tainted = new WeakSet<ASTNode>();
-
-  async function recurse(node: ASTNode): Promise<unknown> {
-    if (!tainted.has(node)) {
-      const cached = cache.get(node);
-      if (cached !== undefined) return cached;
-    }
-
-    const fragment = normalizedFragments.find((f) => f.canHandle(node));
-    if (!fragment) {
-      throw new Error(`No interpreter for node kind: ${node.kind}`);
-    }
-
-    const promise = fragment.visit(node, recurse);
-
-    if (!isVolatileDefault(node)) {
-      cache.set(node, promise);
-    }
-
-    const result = await promise;
-
-    if (isVolatileDefault(node) || hasAnyTaintedChild(node, tainted)) {
-      tainted.add(node);
-      cache.delete(node);
-    }
-
-    return result;
-  }
-
-  (recurse as RecurseFn).fresh = () => composeInterpreters(fragments);
-
-  return recurse as RecurseFn;
+export function composeInterpreters(fragments: InterpreterFragment[]): RecurseFn {
+  return foldAST(fragments, {});
 }
 
 // ---- The Proxy Engine ------------------------------------

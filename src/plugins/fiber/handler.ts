@@ -1,4 +1,4 @@
-import type { ASTNode, GeneratorInterpreterFragment, StepEffect, StepHandler } from "../../core";
+import type { ASTNode, InterpreterFragment, StepEffect, StepHandler } from "../../core";
 import { runAST } from "../../core";
 import { injectLambdaParam } from "./interpreter";
 
@@ -17,12 +17,12 @@ import { injectLambdaParam } from "./interpreter";
  * these operations sequentially within the generator. Use this handler with
  * {@link runAST} for true parallel execution.
  *
- * @param fragments - Generator interpreter fragments for evaluating sub-expressions.
+ * @param fragments - Interpreter fragments for evaluating sub-expressions.
  * @param innerHandler - The handler to delegate non-fiber effects to.
  * @returns A composed {@link StepHandler}.
  */
 export function fiberHandler(
-  fragments: GeneratorInterpreterFragment[],
+  fragments: InterpreterFragment[],
   innerHandler: StepHandler<any>,
 ): StepHandler<any> {
   const composedHandler: StepHandler<any> = async (effect: StepEffect, context, state) => {

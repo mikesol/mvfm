@@ -1,4 +1,4 @@
-import type { ASTNode, GeneratorInterpreterFragment, StepEffect } from "../../core";
+import type { ASTNode, InterpreterFragment, StepEffect } from "../../core";
 
 /**
  * Walk an AST subtree and inject a value into matching lambda_param nodes.
@@ -21,7 +21,7 @@ export function injectLambdaParam(node: any, name: string, value: unknown): void
 }
 
 /** Interpreter fragment for `fiber/` node kinds. */
-export const fiberInterpreter: GeneratorInterpreterFragment = {
+export const fiberInterpreter: InterpreterFragment = {
   pluginName: "fiber",
   canHandle: (node) => node.kind.startsWith("fiber/"),
   *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
@@ -65,7 +65,7 @@ export const fiberInterpreter: GeneratorInterpreterFragment = {
 
       case "fiber/retry": {
         const attempts = node.attempts as number;
-        const delay = (node.delay as number) ?? 0;
+        const _delay = (node.delay as number) ?? 0;
         let lastError: unknown;
         for (let i = 0; i < attempts; i++) {
           try {

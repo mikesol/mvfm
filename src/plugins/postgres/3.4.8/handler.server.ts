@@ -1,6 +1,6 @@
 import type {
   ASTNode,
-  GeneratorInterpreterFragment,
+  InterpreterFragment,
   LegacyInterpreterFragment,
   StepEffect,
   StepHandler,
@@ -43,12 +43,12 @@ function hasAnyTaintedChild(node: ASTNode, taintSet: WeakSet<ASTNode>): boolean 
  * reuse cached results from the outer evaluation.
  */
 function buildEvaluate(
-  fragments: GeneratorInterpreterFragment[],
+  fragments: InterpreterFragment[],
   handleEffect: (effect: StepEffect, currentNode: ASTNode) => Promise<unknown>,
   cache: WeakMap<ASTNode, unknown>,
   taintedSet: WeakSet<ASTNode>,
 ): (node: ASTNode) => Promise<unknown> {
-  function findFragment(node: ASTNode): GeneratorInterpreterFragment {
+  function findFragment(node: ASTNode): InterpreterFragment {
     const f = fragments.find((fr) => fr.canHandle(node));
     if (!f) throw new Error(`No interpreter for node kind: ${node.kind}`);
     return f;
@@ -128,7 +128,7 @@ function buildEvaluate(
  */
 function buildEffectHandler(
   client: PostgresClient,
-  fragments: GeneratorInterpreterFragment[],
+  fragments: InterpreterFragment[],
   evaluate: (node: ASTNode) => Promise<unknown>,
 ): (effect: StepEffect, currentNode: ASTNode) => Promise<unknown> {
   return async (effect: StepEffect, _currentNode: ASTNode): Promise<unknown> => {
@@ -217,7 +217,7 @@ function buildEffectHandler(
  */
 function serverEvaluateInternal(
   client: PostgresClient,
-  fragments: GeneratorInterpreterFragment[],
+  fragments: InterpreterFragment[],
 ): (node: ASTNode) => Promise<unknown> {
   const cache = new WeakMap<ASTNode, unknown>();
   const taintedSet = new WeakSet<ASTNode>();
@@ -258,7 +258,7 @@ function serverEvaluateInternal(
  */
 export function serverHandler(
   client: PostgresClient,
-  fragments: GeneratorInterpreterFragment[],
+  fragments: InterpreterFragment[],
 ): StepHandler<void> {
   const evaluate = serverEvaluateInternal(client, fragments);
   const effectHandler = buildEffectHandler(client, fragments, evaluate);
@@ -286,7 +286,7 @@ export function serverHandler(
  */
 export function serverEvaluate(
   client: PostgresClient,
-  fragments: GeneratorInterpreterFragment[],
+  fragments: InterpreterFragment[],
 ): (root: ASTNode) => Promise<unknown> {
   return serverEvaluateInternal(client, fragments);
 }

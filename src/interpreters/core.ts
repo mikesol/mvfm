@@ -1,7 +1,7 @@
-import type { ASTNode, GeneratorInterpreterFragment, StepEffect } from "../core";
+import type { ASTNode, InterpreterFragment, StepEffect } from "../core";
 
-/** Generator-based interpreter fragment for core node kinds (literal, input, prop_access, cond, do, program, tuple, record). */
-export const coreInterpreter: GeneratorInterpreterFragment = {
+/** Interpreter fragment for core node kinds (literal, input, prop_access, cond, do, program, tuple, record). */
+export const coreInterpreter: InterpreterFragment = {
   pluginName: "core",
   canHandle: (node) => node.kind.startsWith("core/"),
   *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {

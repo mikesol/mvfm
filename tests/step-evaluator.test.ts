@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type {
   ASTNode,
-  GeneratorInterpreterFragment,
+  InterpreterFragment,
   LegacyInterpreterFragment,
   Step,
   StepContext,
@@ -13,7 +13,7 @@ import { adaptLegacy, foldAST, runAST, Stepper } from "../src/core";
 // ---- Helpers ---------------------------------------------------
 
 /** A minimal generator fragment for core nodes (literal, add, input, prop_access, cond, do, record). */
-function makeCoreGenFragment(): GeneratorInterpreterFragment {
+function makeCoreGenFragment(): InterpreterFragment {
   return {
     pluginName: "core",
     canHandle: (node) => node.kind.startsWith("core/"),
@@ -62,7 +62,7 @@ function makeCoreGenFragment(): GeneratorInterpreterFragment {
 }
 
 /** A minimal generator fragment for num nodes. */
-function makeNumGenFragment(): GeneratorInterpreterFragment {
+function makeNumGenFragment(): InterpreterFragment {
   return {
     pluginName: "num",
     canHandle: (node) => node.kind.startsWith("num/"),
@@ -86,7 +86,7 @@ function makeNumGenFragment(): GeneratorInterpreterFragment {
 }
 
 /** A fragment that yields a custom "query" IO effect. */
-function makeQueryGenFragment(): GeneratorInterpreterFragment {
+function makeQueryGenFragment(): InterpreterFragment {
   return {
     pluginName: "db",
     canHandle: (node) => node.kind === "db/query",

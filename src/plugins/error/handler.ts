@@ -1,6 +1,5 @@
-import type { ASTNode, GeneratorInterpreterFragment, StepEffect, StepHandler } from "../../core";
+import type { ASTNode, InterpreterFragment, StepEffect, StepHandler } from "../../core";
 import { runAST } from "../../core";
-import { injectLambdaParam } from "./interpreter";
 
 /**
  * Effect handler for error/settle effects.
@@ -21,7 +20,7 @@ import { injectLambdaParam } from "./interpreter";
  * @returns A composed {@link StepHandler}.
  */
 export function errorHandler(
-  fragments: GeneratorInterpreterFragment[],
+  fragments: InterpreterFragment[],
   innerHandler: StepHandler<any>,
 ): StepHandler<any> {
   const composedHandler: StepHandler<any> = async (effect: StepEffect, context, state) => {

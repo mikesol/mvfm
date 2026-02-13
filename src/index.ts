@@ -18,6 +18,8 @@ export type {
   StepHandler,
   TraitImpl,
 } from "./core";
+// Note: GeneratorInterpreterFragment is kept as an export for backward
+// compatibility — it is now a type alias for InterpreterFragment.
 export { adaptLegacy, composeInterpreters, foldAST, ilo, runAST, Stepper } from "./core";
 export { coreInterpreter } from "./interpreters/core";
 export type { BooleanMethods } from "./plugins/boolean";
