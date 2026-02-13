@@ -35,15 +35,16 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 let container: StartedPostgreSqlContainer;
 let sql: ReturnType<typeof postgres>;
 
-// Non-postgres fragments are still legacy-style; wrap them with adaptLegacy
+// error and fiber are still legacy-style; wrap them with adaptLegacy.
+// The rest are already generator-based.
 const nonPgFragments = [
   adaptLegacy(errorInterpreter),
   adaptLegacy(fiberInterpreter),
   coreInterpreter,
-  adaptLegacy(numInterpreter),
-  adaptLegacy(ordInterpreter),
-  adaptLegacy(eqInterpreter),
-  adaptLegacy(strInterpreter),
+  numInterpreter,
+  ordInterpreter,
+  eqInterpreter,
+  strInterpreter,
 ];
 
 const allFragments = [postgresInterpreter, ...nonPgFragments];

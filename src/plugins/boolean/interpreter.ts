@@ -1,33 +1,40 @@
-import type { ASTNode, InterpreterFragment } from "../../core";
+import type { ASTNode, GeneratorInterpreterFragment, StepEffect } from "../../core";
 
 /** Interpreter fragment for `boolean/` node kinds. */
-export const booleanInterpreter: InterpreterFragment = {
+export const booleanInterpreter: GeneratorInterpreterFragment = {
   pluginName: "boolean",
   canHandle: (node) => node.kind.startsWith("boolean/"),
-  async visit(node: ASTNode, recurse: (node: ASTNode) => Promise<unknown>): Promise<unknown> {
+  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
     switch (node.kind) {
       case "boolean/and": {
-        const left = (await recurse(node.left as ASTNode)) as boolean;
-        return left ? ((await recurse(node.right as ASTNode)) as boolean) : false;
+        const left = (yield { type: "recurse", child: node.left as ASTNode }) as boolean;
+        return left
+          ? ((yield { type: "recurse", child: node.right as ASTNode }) as boolean)
+          : false;
       }
       case "boolean/or": {
-        const left = (await recurse(node.left as ASTNode)) as boolean;
-        return left ? true : ((await recurse(node.right as ASTNode)) as boolean);
+        const left = (yield { type: "recurse", child: node.left as ASTNode }) as boolean;
+        return left ? true : ((yield { type: "recurse", child: node.right as ASTNode }) as boolean);
       }
       case "boolean/not":
-        return !((await recurse(node.operand as ASTNode)) as boolean);
+        return !((yield { type: "recurse", child: node.operand as ASTNode }) as boolean);
       case "boolean/eq":
-        return (await recurse(node.left as ASTNode)) === (await recurse(node.right as ASTNode));
+        return (
+          (yield { type: "recurse", child: node.left as ASTNode }) ===
+          (yield { type: "recurse", child: node.right as ASTNode })
+        );
       case "boolean/ff":
         return false;
       case "boolean/tt":
         return true;
       case "boolean/implies": {
-        const left = (await recurse(node.left as ASTNode)) as boolean;
-        return !left ? true : ((await recurse(node.right as ASTNode)) as boolean);
+        const left = (yield { type: "recurse", child: node.left as ASTNode }) as boolean;
+        return !left
+          ? true
+          : ((yield { type: "recurse", child: node.right as ASTNode }) as boolean);
       }
       case "boolean/show":
-        return String(await recurse(node.operand as ASTNode));
+        return String(yield { type: "recurse", child: node.operand as ASTNode });
       case "boolean/top":
         return true;
       case "boolean/bottom":

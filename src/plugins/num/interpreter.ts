@@ -1,67 +1,76 @@
-import type { ASTNode, InterpreterFragment } from "../../core";
+import type { ASTNode, GeneratorInterpreterFragment, StepEffect } from "../../core";
 
 /** Interpreter fragment for `num/` node kinds. */
-export const numInterpreter: InterpreterFragment = {
+export const numInterpreter: GeneratorInterpreterFragment = {
   pluginName: "num",
   canHandle: (node) => node.kind.startsWith("num/"),
-  async visit(node: ASTNode, recurse: (node: ASTNode) => Promise<unknown>): Promise<unknown> {
+  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
     switch (node.kind) {
       case "num/add":
         return (
-          ((await recurse(node.left as ASTNode)) as number) +
-          ((await recurse(node.right as ASTNode)) as number)
+          ((yield { type: "recurse", child: node.left as ASTNode }) as number) +
+          ((yield { type: "recurse", child: node.right as ASTNode }) as number)
         );
       case "num/sub":
         return (
-          ((await recurse(node.left as ASTNode)) as number) -
-          ((await recurse(node.right as ASTNode)) as number)
+          ((yield { type: "recurse", child: node.left as ASTNode }) as number) -
+          ((yield { type: "recurse", child: node.right as ASTNode }) as number)
         );
       case "num/mul":
         return (
-          ((await recurse(node.left as ASTNode)) as number) *
-          ((await recurse(node.right as ASTNode)) as number)
+          ((yield { type: "recurse", child: node.left as ASTNode }) as number) *
+          ((yield { type: "recurse", child: node.right as ASTNode }) as number)
         );
       case "num/div":
         return (
-          ((await recurse(node.left as ASTNode)) as number) /
-          ((await recurse(node.right as ASTNode)) as number)
+          ((yield { type: "recurse", child: node.left as ASTNode }) as number) /
+          ((yield { type: "recurse", child: node.right as ASTNode }) as number)
         );
       case "num/mod":
         return (
-          ((await recurse(node.left as ASTNode)) as number) %
-          ((await recurse(node.right as ASTNode)) as number)
+          ((yield { type: "recurse", child: node.left as ASTNode }) as number) %
+          ((yield { type: "recurse", child: node.right as ASTNode }) as number)
         );
       case "num/compare": {
-        const l = (await recurse(node.left as ASTNode)) as number;
-        const r = (await recurse(node.right as ASTNode)) as number;
+        const l = (yield { type: "recurse", child: node.left as ASTNode }) as number;
+        const r = (yield { type: "recurse", child: node.right as ASTNode }) as number;
         return l < r ? -1 : l === r ? 0 : 1;
       }
       case "num/neg":
-        return -((await recurse(node.operand as ASTNode)) as number);
+        return -((yield { type: "recurse", child: node.operand as ASTNode }) as number);
       case "num/abs":
-        return Math.abs((await recurse(node.operand as ASTNode)) as number);
+        return Math.abs((yield { type: "recurse", child: node.operand as ASTNode }) as number);
       case "num/floor":
-        return Math.floor((await recurse(node.operand as ASTNode)) as number);
+        return Math.floor((yield { type: "recurse", child: node.operand as ASTNode }) as number);
       case "num/ceil":
-        return Math.ceil((await recurse(node.operand as ASTNode)) as number);
+        return Math.ceil((yield { type: "recurse", child: node.operand as ASTNode }) as number);
       case "num/round":
-        return Math.round((await recurse(node.operand as ASTNode)) as number);
+        return Math.round((yield { type: "recurse", child: node.operand as ASTNode }) as number);
       case "num/min": {
-        const values = await Promise.all((node.values as ASTNode[]).map((v) => recurse(v)));
-        return Math.min(...(values as number[]));
+        const values: number[] = [];
+        for (const v of node.values as ASTNode[]) {
+          values.push((yield { type: "recurse", child: v }) as number);
+        }
+        return Math.min(...values);
       }
       case "num/max": {
-        const values = await Promise.all((node.values as ASTNode[]).map((v) => recurse(v)));
-        return Math.max(...(values as number[]));
+        const values: number[] = [];
+        for (const v of node.values as ASTNode[]) {
+          values.push((yield { type: "recurse", child: v }) as number);
+        }
+        return Math.max(...values);
       }
       case "num/eq":
-        return (await recurse(node.left as ASTNode)) === (await recurse(node.right as ASTNode));
+        return (
+          (yield { type: "recurse", child: node.left as ASTNode }) ===
+          (yield { type: "recurse", child: node.right as ASTNode })
+        );
       case "num/zero":
         return 0;
       case "num/one":
         return 1;
       case "num/show":
-        return String(await recurse(node.operand as ASTNode));
+        return String(yield { type: "recurse", child: node.operand as ASTNode });
       case "num/top":
         return Infinity;
       case "num/bottom":

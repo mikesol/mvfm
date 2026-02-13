@@ -3,7 +3,7 @@ import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testconta
 import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { GeneratorInterpreterFragment, StepContext, StepEffect } from "../../../../src/core";
-import { adaptLegacy, ilo, runAST } from "../../../../src/core";
+import { ilo, runAST } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { eq } from "../../../../src/plugins/eq";
 import { eqInterpreter } from "../../../../src/plugins/eq/interpreter";
@@ -28,13 +28,13 @@ let sql: ReturnType<typeof postgres>;
 let httpServer: http.Server;
 let serverPort: number;
 
-// Non-postgres fragments are still legacy-style; wrap them with adaptLegacy
+// All non-postgres fragments are now generator-based
 const nonPgFragments = [
   coreInterpreter,
-  adaptLegacy(numInterpreter),
-  adaptLegacy(strInterpreter),
-  adaptLegacy(eqInterpreter),
-  adaptLegacy(ordInterpreter),
+  numInterpreter,
+  strInterpreter,
+  eqInterpreter,
+  ordInterpreter,
 ];
 
 const allFragments = [postgresInterpreter, ...nonPgFragments];
