@@ -1,6 +1,12 @@
 import type { ASTNode, InterpreterFragment } from "../../../core";
 import { composeInterpreters } from "../../../core";
 
+/**
+ * Database client interface consumed by the postgres interpreter.
+ *
+ * Abstracts over the actual database driver so interpreters can be
+ * tested with mock clients.
+ */
 export interface PostgresClient {
   query(sql: string, params: unknown[]): Promise<unknown[]>;
   begin<T>(fn: (tx: PostgresClient) => Promise<T>): Promise<T>;
@@ -85,6 +91,14 @@ async function buildSQL(
   return { sql, params };
 }
 
+/**
+ * Interpreter fragment for postgres plugin nodes.
+ *
+ * @param client - A {@link PostgresClient} implementation.
+ * @param outerFragments - Optional additional interpreter fragments
+ *   to compose when recursing inside transactions and savepoints.
+ * @returns An {@link InterpreterFragment} handling all `postgres/` node kinds.
+ */
 export function postgresInterpreter(
   client: PostgresClient,
   outerFragments?: InterpreterFragment[],

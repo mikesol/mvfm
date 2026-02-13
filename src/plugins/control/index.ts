@@ -1,12 +1,32 @@
 import type { ASTNode, Expr, PluginContext, PluginDefinition } from "../../core";
 
+/**
+ * Control flow operations for iteration.
+ */
 export interface ControlMethods {
+  /**
+   * Iterate over each element of a collection, executing side effects.
+   *
+   * @param collection - The array expression to iterate.
+   * @param body - Callback receiving each element as an `Expr<T>`.
+   */
   each<T>(collection: Expr<T[]>, body: (item: Expr<T>) => void): void;
+  /**
+   * Loop while a condition is true.
+   *
+   * @param condition - Boolean expression to evaluate each iteration.
+   * @returns A builder with a `body` method for the loop statements.
+   */
   while(condition: Expr<boolean>): {
     body: (...statements: unknown[]) => void;
   };
 }
 
+/**
+ * Control flow plugin. Namespace: `control/`.
+ *
+ * Provides `each` for collection iteration and `while` for conditional loops.
+ */
 export const control: PluginDefinition<ControlMethods> = {
   name: "control",
   nodeKinds: ["control/each", "control/while"],

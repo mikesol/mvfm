@@ -32,6 +32,13 @@ import type { ASTNode, Expr, PluginContext, PluginDefinition } from "../../core"
 
 // ---- What the plugin adds to $ ----------------------------
 
+/**
+ * Concurrency primitives added to the DSL context.
+ *
+ * Provides par, seq, race, timeout, and retry combinators that
+ * describe concurrency structure in the AST for the interpreter
+ * to execute.
+ */
 export interface FiberMethods {
   /**
    * Run expressions in parallel, return all results.
@@ -119,6 +126,12 @@ interface ParFn {
 
 // ---- Plugin implementation --------------------------------
 
+/**
+ * Concurrency plugin. Namespace: `fiber/`.
+ *
+ * Provides `par` for parallel execution, `seq` for sequential execution,
+ * `race` for first-to-complete, `timeout`, and `retry` combinators.
+ */
 export const fiber: PluginDefinition<FiberMethods> = {
   name: "fiber",
   nodeKinds: ["fiber/par_map", "fiber/race", "fiber/timeout", "fiber/retry"],

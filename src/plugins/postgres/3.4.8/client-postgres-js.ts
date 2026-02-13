@@ -4,6 +4,12 @@ import type { PostgresClient } from "./interpreter";
 type Sql = postgres.Sql;
 type TransactionSql = postgres.TransactionSql;
 
+/**
+ * Wraps a `postgres` (v3.4.x) SQL client into a {@link PostgresClient}.
+ *
+ * @param sql - A postgres-js SQL tagged template function.
+ * @returns A {@link PostgresClient} adapter.
+ */
 export function wrapPostgresJs(sql: Sql | TransactionSql): PostgresClient {
   return {
     async query(sqlStr: string, params: unknown[]): Promise<unknown[]> {

@@ -35,6 +35,12 @@ import type { ASTNode, Expr, PluginContext, PluginDefinition } from "../../core"
 
 // ---- What the plugin adds to $ ----------------------------
 
+/**
+ * Structured error handling operations added to the DSL context.
+ *
+ * Provides try/catch, fail, orElse, attempt, guard, and settle
+ * combinators for explicit, AST-level error handling.
+ */
 export interface ErrorMethods {
   /**
    * Attempt an expression that might fail.
@@ -163,6 +169,12 @@ interface TryBuilder<T> {
 
 // ---- Plugin implementation --------------------------------
 
+/**
+ * Error handling plugin. Namespace: `error/`.
+ *
+ * Makes failures explicit in the AST via try/catch, fail, attempt,
+ * guard, and settle combinators.
+ */
 export const error: PluginDefinition<ErrorMethods> = {
   name: "error",
   nodeKinds: ["error/try", "error/fail", "error/attempt", "error/guard", "error/settle"],
