@@ -4,7 +4,7 @@
 
 **Goal:** Implement the redis plugin (Pass 1) modeling ioredis 5.4.1 for caching, rate limiting, and KV store use cases.
 
-**Architecture:** External-service plugin at `src/plugins/redis/5.4.1/` following the same 5-file pattern as postgres and stripe. Single `redis/command` effect type for all 35 operations. Options-object style for SET modifiers (deviation from ioredis positional tokens).
+**Architecture:** External-service plugin at `src/plugins/redis/5.4.1/` following the same 5-file pattern as postgres and stripe. Single `redis/command` effect type for all 35 operations. SET uses ioredis-native positional string tokens (`"EX"`, `"NX"`, etc.) for maximum LLM fluency.
 
 **Tech Stack:** TypeScript, Vitest, ioredis 5.4.1
 
@@ -67,16 +67,25 @@ describe("redis: set", () => {
     expect(ast.result.key.value).toBe("mykey");
     expect(ast.result.value.kind).toBe("core/literal");
     expect(ast.result.value.value).toBe("myvalue");
-    expect(ast.result.options).toBeNull();
+    expect(ast.result.args).toHaveLength(0);
   });
 
-  it("produces redis/set node with options", () => {
-    const prog = app(($) => $.redis.set("mykey", "myvalue", { ex: 60, nx: true }));
+  it("produces redis/set node with EX and NX positional tokens", () => {
+    const prog = app(($) => $.redis.set("mykey", "myvalue", "EX", 60, "NX"));
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("redis/set");
-    expect(ast.result.options.kind).toBe("core/record");
-    expect(ast.result.options.fields.ex.value).toBe(60);
-    expect(ast.result.options.fields.nx.value).toBe(true);
+    expect(ast.result.args).toHaveLength(3);
+    expect(ast.result.args[0].value).toBe("EX");
+    expect(ast.result.args[1].value).toBe(60);
+    expect(ast.result.args[2].value).toBe("NX");
+  });
+
+  it("produces redis/set node with PX token", () => {
+    const prog = app(($) => $.redis.set("mykey", "myvalue", "PX", 5000));
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.args).toHaveLength(2);
+    expect(ast.result.args[0].value).toBe("PX");
+    expect(ast.result.args[1].value).toBe(5000);
   });
 
   it("accepts Expr params", () => {
@@ -506,11 +515,10 @@ Create `src/plugins/redis/5.4.1/index.ts`:
 //   Geo, HyperLogLog, Bit ops.
 //
 // Deviation from ioredis:
-//   SET options use an object ({ ex: 60, nx: true }) instead
-//   of positional string tokens ("EX", 60, "NX"). This produces
-//   a cleaner AST and matches modern Redis client conventions.
 //   MSET and HSET use object-only form (no variadic key-value pairs).
 //   No Buffer variants (runtime concern, not AST-level).
+//   SET uses ioredis-native positional string tokens ("EX", 60, "NX")
+//   for maximum LLM fluency — zero adaptation needed.
 //
 // Based on source-level analysis of ioredis 5.4.1
 // (github.com/redis/ioredis, lib/utils/RedisCommander.ts).
@@ -519,26 +527,6 @@ Create `src/plugins/redis/5.4.1/index.ts`:
 import type { Expr, PluginContext, PluginDefinition } from "../../../core";
 
 // ---- What the plugin adds to $ ----------------------------
-
-/** Options for the SET command. */
-export interface SetOptions {
-  /** TTL in seconds. */
-  ex?: number;
-  /** TTL in milliseconds. */
-  px?: number;
-  /** Expire at unix timestamp (seconds). */
-  exat?: number;
-  /** Expire at unix timestamp (milliseconds). */
-  pxat?: number;
-  /** Preserve the existing TTL. */
-  keepttl?: boolean;
-  /** Only set if key does not exist. */
-  nx?: boolean;
-  /** Only set if key already exists. */
-  xx?: boolean;
-  /** Return the old value stored at key. */
-  get?: boolean;
-}
 
 /**
  * Redis operations added to the DSL context by the redis plugin.
@@ -553,11 +541,14 @@ export interface RedisMethods {
 
     /** Get the value of a key. */
     get(key: Expr<string> | string): Expr<string | null>;
-    /** Set a key to a value, with optional expiry/condition flags. */
+    /**
+     * Set a key to a value with optional positional flags.
+     * Matches ioredis signature: `set(key, value, "EX", 60, "NX")`
+     */
     set(
       key: Expr<string> | string,
       value: Expr<string | number> | string | number,
-      options?: Expr<SetOptions> | SetOptions,
+      ...args: (Expr<string | number> | string | number)[]
     ): Expr<string | null>;
     /** Increment the integer value of a key by one. */
     incr(key: Expr<string> | string): Expr<number>;
@@ -780,12 +771,12 @@ export function redis(config?: RedisConfig | string): PluginDefinition<RedisMeth
             return ctx.expr({ kind: "redis/get", key: resolveKey(key), config: resolvedConfig });
           },
 
-          set(key, value, options?) {
+          set(key, value, ...args) {
             return ctx.expr({
               kind: "redis/set",
               key: resolveKey(key),
               value: resolveValue(value),
-              options: options != null ? resolveValue(options) : null,
+              args: args.map((a) => resolveValue(a)),
               config: resolvedConfig,
             });
           },
@@ -1152,7 +1143,7 @@ describe("redis interpreter: get", () => {
 });
 
 describe("redis interpreter: set", () => {
-  it("yields SET command without options", async () => {
+  it("yields SET command without flags", async () => {
     const prog = app(($) => $.redis.set("mykey", "myvalue"));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
@@ -1160,48 +1151,36 @@ describe("redis interpreter: set", () => {
     expect(captured[0].args).toEqual(["mykey", "myvalue"]);
   });
 
-  it("yields SET command with EX and NX options", async () => {
-    const prog = app(($) => $.redis.set("mykey", "myvalue", { ex: 60, nx: true }));
+  it("yields SET command with EX and NX positional tokens", async () => {
+    const prog = app(($) => $.redis.set("mykey", "myvalue", "EX", 60, "NX"));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
     expect(captured[0].command).toBe("SET");
     expect(captured[0].args).toEqual(["mykey", "myvalue", "EX", 60, "NX"]);
   });
 
-  it("yields SET command with PX option", async () => {
-    const prog = app(($) => $.redis.set("mykey", "myvalue", { px: 5000 }));
+  it("yields SET command with PX token", async () => {
+    const prog = app(($) => $.redis.set("mykey", "myvalue", "PX", 5000));
     const { captured } = await run(prog);
     expect(captured[0].args).toEqual(["mykey", "myvalue", "PX", 5000]);
   });
 
-  it("yields SET command with EXAT option", async () => {
-    const prog = app(($) => $.redis.set("mykey", "myvalue", { exat: 1700000000 }));
+  it("yields SET command with EXAT token", async () => {
+    const prog = app(($) => $.redis.set("mykey", "myvalue", "EXAT", 1700000000));
     const { captured } = await run(prog);
     expect(captured[0].args).toEqual(["mykey", "myvalue", "EXAT", 1700000000]);
   });
 
-  it("yields SET command with PXAT option", async () => {
-    const prog = app(($) => $.redis.set("mykey", "myvalue", { pxat: 1700000000000 }));
-    const { captured } = await run(prog);
-    expect(captured[0].args).toEqual(["mykey", "myvalue", "PXAT", 1700000000000]);
-  });
-
-  it("yields SET command with KEEPTTL option", async () => {
-    const prog = app(($) => $.redis.set("mykey", "myvalue", { keepttl: true }));
+  it("yields SET command with KEEPTTL token", async () => {
+    const prog = app(($) => $.redis.set("mykey", "myvalue", "KEEPTTL"));
     const { captured } = await run(prog);
     expect(captured[0].args).toEqual(["mykey", "myvalue", "KEEPTTL"]);
   });
 
-  it("yields SET command with XX option", async () => {
-    const prog = app(($) => $.redis.set("mykey", "myvalue", { xx: true }));
+  it("yields SET command with XX and GET tokens", async () => {
+    const prog = app(($) => $.redis.set("mykey", "myvalue", "XX", "GET"));
     const { captured } = await run(prog);
-    expect(captured[0].args).toEqual(["mykey", "myvalue", "XX"]);
-  });
-
-  it("yields SET command with GET option", async () => {
-    const prog = app(($) => $.redis.set("mykey", "myvalue", { get: true }));
-    const { captured } = await run(prog);
-    expect(captured[0].args).toEqual(["mykey", "myvalue", "GET"]);
+    expect(captured[0].args).toEqual(["mykey", "myvalue", "XX", "GET"]);
   });
 });
 
@@ -1540,31 +1519,6 @@ export interface RedisClient {
 }
 
 /**
- * Build the Redis SET command args array from resolved values and options.
- *
- * Translates the options object into positional Redis protocol tokens:
- * `SET key value [EX seconds] [PX ms] [EXAT ts] [PXAT ts] [KEEPTTL] [NX|XX] [GET]`
- */
-function buildSetArgs(
-  key: unknown,
-  value: unknown,
-  options: Record<string, unknown> | undefined,
-): unknown[] {
-  const args: unknown[] = [key, value];
-  if (options) {
-    if (options.ex != null) { args.push("EX", options.ex); }
-    else if (options.px != null) { args.push("PX", options.px); }
-    else if (options.exat != null) { args.push("EXAT", options.exat); }
-    else if (options.pxat != null) { args.push("PXAT", options.pxat); }
-    if (options.keepttl) { args.push("KEEPTTL"); }
-    if (options.nx) { args.push("NX"); }
-    else if (options.xx) { args.push("XX"); }
-    if (options.get) { args.push("GET"); }
-  }
-  return args;
-}
-
-/**
  * Flatten an object to alternating key-value array.
  * { a: 1, b: 2 } => ["a", 1, "b", 2]
  */
@@ -1598,11 +1552,11 @@ export const redisInterpreter: InterpreterFragment = {
       case "redis/set": {
         const key = yield { type: "recurse", child: node.key as ASTNode };
         const value = yield { type: "recurse", child: node.value as ASTNode };
-        const options =
-          node.options != null
-            ? (yield { type: "recurse", child: node.options as ASTNode }) as Record<string, unknown>
-            : undefined;
-        return yield { type: "redis/command", command: "SET", args: buildSetArgs(key, value, options) };
+        const extra: unknown[] = [];
+        for (const a of (node.args as ASTNode[]) || []) {
+          extra.push(yield { type: "recurse", child: a });
+        }
+        return yield { type: "redis/command", command: "SET", args: [key, value, ...extra] };
       }
 
       case "redis/incr": {
@@ -2051,7 +2005,7 @@ git commit -m "feat(redis): add server/client handlers and ioredis adapter (#52)
 Add the following after the stripe exports block (after line 93):
 
 ```ts
-export type { RedisConfig, RedisMethods, SetOptions } from "./plugins/redis/5.4.1";
+export type { RedisConfig, RedisMethods } from "./plugins/redis/5.4.1";
 export { redis } from "./plugins/redis/5.4.1";
 export { wrapIoredis } from "./plugins/redis/5.4.1/client-ioredis";
 export type {
