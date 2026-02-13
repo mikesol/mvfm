@@ -72,6 +72,21 @@ export type { SemiringFor } from "./plugins/semiring";
 export { semiring } from "./plugins/semiring";
 export type { ShowFor } from "./plugins/show";
 export { show } from "./plugins/show";
+// ---- Slack plugin (@slack/web-api 7.14.0) ----
+export type { SlackConfig, SlackMethods } from "./plugins/slack/7.14.0";
+export { slack } from "./plugins/slack/7.14.0";
+export { wrapSlackWebClient } from "./plugins/slack/7.14.0/client-slack-web-api";
+export type {
+  ClientHandlerOptions as SlackClientHandlerOptions,
+  ClientHandlerState as SlackClientHandlerState,
+} from "./plugins/slack/7.14.0/handler.client";
+export { clientHandler as slackClientHandler } from "./plugins/slack/7.14.0/handler.client";
+export {
+  serverEvaluate as slackServerEvaluate,
+  serverHandler as slackServerHandler,
+} from "./plugins/slack/7.14.0/handler.server";
+export type { SlackClient } from "./plugins/slack/7.14.0/interpreter";
+export { slackInterpreter } from "./plugins/slack/7.14.0/interpreter";
 export type { StMethods } from "./plugins/st";
 export { st } from "./plugins/st";
 export type { StrMethods } from "./plugins/str";
