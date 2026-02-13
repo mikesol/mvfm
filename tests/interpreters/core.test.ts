@@ -16,58 +16,58 @@ function injectInput(node: any, input: Record<string, unknown>): any {
   return result;
 }
 
-function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
+async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
   const interp = composeInterpreters([coreInterpreter]);
-  return interp(ast.result);
+  return await interp(ast.result);
 }
 
 const app = ilo();
 
 describe("core interpreter: literals", () => {
-  it("number", () => {
+  it("number", async () => {
     const prog = app((_$) => 42);
-    expect(run(prog)).toBe(42);
+    expect(await run(prog)).toBe(42);
   });
 
-  it("string", () => {
+  it("string", async () => {
     const prog = app((_$) => "hello");
-    expect(run(prog)).toBe("hello");
+    expect(await run(prog)).toBe("hello");
   });
 
-  it("boolean", () => {
+  it("boolean", async () => {
     const prog = app((_$) => true);
-    expect(run(prog)).toBe(true);
+    expect(await run(prog)).toBe(true);
   });
 
-  it("null", () => {
+  it("null", async () => {
     const prog = app((_$) => null);
-    expect(run(prog)).toBe(null);
+    expect(await run(prog)).toBe(null);
   });
 });
 
 describe("core interpreter: input + prop_access", () => {
-  it("$.input.x returns input value", () => {
+  it("$.input.x returns input value", async () => {
     const prog = app({ x: "number" }, ($) => $.input.x);
-    expect(run(prog, { x: 42 })).toBe(42);
+    expect(await run(prog, { x: 42 })).toBe(42);
   });
 
-  it("$.input.user.name resolves nested input", () => {
+  it("$.input.user.name resolves nested input", async () => {
     const prog = app({ user: { name: "string" } }, ($) => $.input.user.name);
-    expect(run(prog, { user: { name: "alice" } })).toBe("alice");
+    expect(await run(prog, { user: { name: "alice" } })).toBe("alice");
   });
 });
 
 describe("core interpreter: records", () => {
-  it("constructs object from fields", () => {
+  it("constructs object from fields", async () => {
     const prog = app({ x: "number" }, ($) => ({ a: "label", b: $.input.x }));
-    expect(run(prog, { x: 5 })).toEqual({ a: "label", b: 5 });
+    expect(await run(prog, { x: 5 })).toEqual({ a: "label", b: 5 });
   });
 });
 
 describe("core interpreter: do", () => {
-  it("returns last value", () => {
+  it("returns last value", async () => {
     const prog = app(($) => $.do("step1", "step2", "result"));
-    expect(run(prog)).toBe("result");
+    expect(await run(prog)).toBe("result");
   });
 });
