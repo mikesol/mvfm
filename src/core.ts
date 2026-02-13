@@ -188,19 +188,88 @@ export type Interpreter = (program: Program) => {
 };
 
 /**
- * Compose interpreter fragments into a full interpreter.
+ * A callable interpreter function returned by {@link composeInterpreters}.
+ *
+ * Evaluates an AST node using the composed interpreter fragments, with
+ * WeakMap-based memoization so shared (DAG) references are only evaluated once.
+ *
+ * Call `fresh()` to obtain a new instance with an empty cache — used by
+ * retry logic so each attempt re-executes from scratch.
  */
-export function composeInterpreters(
-  fragments: InterpreterFragment[],
-): (node: ASTNode) => Promise<unknown> {
+export interface RecurseFn {
+  /** Evaluate an AST node, returning its result. Memoized by object identity. */
+  (node: ASTNode): Promise<unknown>;
+  /** Create a new RecurseFn with a fresh (empty) memoization cache. */
+  fresh(): RecurseFn;
+}
+
+function isVolatile(node: ASTNode): boolean {
+  return node.kind === "core/lambda_param" || node.kind === "postgres/cursor_batch";
+}
+
+function isASTLike(value: unknown): boolean {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "kind" in value &&
+    typeof (value as any).kind === "string"
+  );
+}
+
+function hasAnyTaintedChild(node: ASTNode, taintSet: WeakSet<ASTNode>): boolean {
+  for (const value of Object.values(node)) {
+    if (value !== null && typeof value === "object") {
+      if (isASTLike(value) && taintSet.has(value as ASTNode)) return true;
+      if (Array.isArray(value)) {
+        for (const item of value) {
+          if (isASTLike(item) && taintSet.has(item as ASTNode)) return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * Compose interpreter fragments into a full interpreter.
+ * Uses WeakMap memoization so shared AST nodes (DAG references)
+ * are only evaluated once. Volatile nodes (lambda_param, cursor_batch)
+ * are tracked as "tainted" and their ancestors are not cached.
+ */
+export function composeInterpreters(fragments: InterpreterFragment[]): RecurseFn {
+  const cache = new WeakMap<ASTNode, Promise<unknown>>();
+  const tainted = new WeakSet<ASTNode>();
+
   async function recurse(node: ASTNode): Promise<unknown> {
+    if (!tainted.has(node)) {
+      const cached = cache.get(node);
+      if (cached !== undefined) return cached;
+    }
+
     const fragment = fragments.find((f) => f.canHandle(node));
     if (!fragment) {
       throw new Error(`No interpreter for node kind: ${node.kind}`);
     }
-    return await fragment.visit(node, recurse);
+
+    const promise = fragment.visit(node, recurse);
+
+    if (!isVolatile(node)) {
+      cache.set(node, promise);
+    }
+
+    const result = await promise;
+
+    if (isVolatile(node) || hasAnyTaintedChild(node, tainted)) {
+      tainted.add(node);
+      cache.delete(node);
+    }
+
+    return result;
   }
-  return recurse;
+
+  (recurse as RecurseFn).fresh = () => composeInterpreters(fragments);
+
+  return recurse as RecurseFn;
 }
 
 // ---- The Proxy Engine ------------------------------------

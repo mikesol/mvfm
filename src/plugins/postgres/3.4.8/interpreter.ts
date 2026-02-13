@@ -162,11 +162,13 @@ export function postgresInterpreter(
           const queryNode = node.query as ASTNode;
           const { sql, params } = await buildSQL(queryNode, recurse);
           const batchSize = (await recurse(node.batchSize as ASTNode)) as number;
+          const batchNode = findCursorBatch(node.body);
 
           await client.cursor(sql, params, batchSize, async (rows) => {
-            const bodyClone = structuredClone(node.body) as ASTNode;
-            injectCursorBatch(bodyClone, rows);
-            await recurse(bodyClone);
+            if (batchNode) {
+              batchNode.__batchData = rows;
+            }
+            await recurse(node.body as ASTNode);
             return undefined;
           });
           return;
@@ -190,18 +192,21 @@ export function postgresInterpreter(
   };
 }
 
-function injectCursorBatch(node: any, rows: unknown[]): void {
-  if (node === null || node === undefined || typeof node !== "object") return;
+function findCursorBatch(node: any): any | null {
+  if (node === null || node === undefined || typeof node !== "object") return null;
   if (Array.isArray(node)) {
-    for (const item of node) injectCursorBatch(item, rows);
-    return;
+    for (const item of node) {
+      const found = findCursorBatch(item);
+      if (found) return found;
+    }
+    return null;
   }
-  if (node.kind === "postgres/cursor_batch") {
-    node.__batchData = rows;
-  }
+  if (node.kind === "postgres/cursor_batch") return node;
   for (const v of Object.values(node)) {
     if (typeof v === "object" && v !== null) {
-      injectCursorBatch(v, rows);
+      const found = findCursorBatch(v);
+      if (found) return found;
     }
   }
+  return null;
 }
