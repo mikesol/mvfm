@@ -22,11 +22,5 @@
     "path": "dist/index.js",
     "import": "{ stripe, stripeInterpreter }",
     "limit": "750 B"
-  },
-  {
-    "name": "Full bundle",
-    "path": "dist/index.js",
-    "import": "*",
-    "limit": "11 kB"
   }
 ]
