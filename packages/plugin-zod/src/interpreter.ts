@@ -7,6 +7,7 @@ import { dateInterpreter } from "./date";
 import { enumInterpreter } from "./enum";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
 import { toZodError } from "./interpreter-utils";
+import { createIntersectionInterpreter } from "./intersection";
 import { literalInterpreter } from "./literal";
 import { numberInterpreter } from "./number";
 import { createObjectInterpreter } from "./object";
@@ -30,7 +31,7 @@ const leafHandlers: SchemaInterpreterMap = {
   ...primitivesInterpreter,
 };
 
-// Recursive handlers (array, object, union) need buildSchemaGen for inner schemas.
+// Recursive handlers (array, object, union, intersection) need buildSchemaGen for inner schemas.
 // Initialized lazily on first use to break the definition-order cycle.
 let schemaHandlers: SchemaInterpreterMap | undefined;
 
@@ -42,6 +43,7 @@ function getHandlers(): SchemaInterpreterMap {
       ...createObjectInterpreter(buildSchemaGen),
       ...createArrayInterpreter(buildSchemaGen),
       ...createUnionInterpreter(buildSchemaGen),
+      ...createIntersectionInterpreter(buildSchemaGen),
     };
   }
   return schemaHandlers;

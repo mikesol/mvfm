@@ -9,6 +9,8 @@ import type { ZodDateNamespace } from "./date";
 import { dateNamespace, dateNodeKinds } from "./date";
 import type { ZodEnumNamespace } from "./enum";
 import { enumNamespace, enumNodeKinds } from "./enum";
+import type { ZodIntersectionNamespace } from "./intersection";
+import { intersectionNamespace, intersectionNodeKinds } from "./intersection";
 import type { ZodLiteralNamespace } from "./literal";
 import { literalNamespace, literalNodeKinds } from "./literal";
 import type { ZodNumberNamespace } from "./number";
@@ -34,6 +36,7 @@ export { ZodDateBuilder } from "./date";
 export { ZodEnumBuilder, ZodNativeEnumBuilder } from "./enum";
 export { zodInterpreter } from "./interpreter";
 export type { SchemaInterpreterMap } from "./interpreter-utils";
+export { ZodIntersectionBuilder } from "./intersection";
 export { ZodLiteralBuilder } from "./literal";
 export { ZodNumberBuilder } from "./number";
 export type { ShapeInput } from "./object";
@@ -74,6 +77,7 @@ export interface ZodNamespace
     ZodBigIntNamespace,
     ZodDateNamespace,
     ZodEnumNamespace,
+    ZodIntersectionNamespace,
     ZodLiteralNamespace,
     ZodNumberNamespace,
     ZodObjectNamespace,
@@ -122,6 +126,7 @@ export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
     ...bigintNodeKinds,
     ...dateNodeKinds,
     ...enumNodeKinds,
+    ...intersectionNodeKinds,
     ...literalNodeKinds,
     ...numberNodeKinds,
     ...objectNodeKinds,
@@ -141,6 +146,7 @@ export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
         ...bigintNamespace(ctx, parseError),
         ...dateNamespace(ctx, parseError),
         ...enumNamespace(ctx, parseError),
+        ...intersectionNamespace(ctx, parseError),
         ...literalNamespace(ctx),
         ...numberNamespace(ctx, parseError),
         ...objectNamespace(ctx, parseError),
