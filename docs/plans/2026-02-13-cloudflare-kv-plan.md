@@ -2,7 +2,7 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Implement the `cloudflare-kv` plugin (#57) modeling Cloudflare Workers KV with get, get(key, "json"), put, delete, and list operations.
+**Goal:** Implement the `cloudflare-kv` plugin (#57) modeling Cloudflare Workers KV with get, getJson, put, delete, and list operations.
 
 **Architecture:** External-service plugin following the stripe pattern. Factory function `cloudflareKv(config)` returns a `PluginDefinition<CloudflareKvMethods>`. Five node kinds, one unified effect type (`cloudflare-kv/api_call`), generator-based interpreter, server/client handlers, and a thin SDK adapter wrapping the real `KVNamespace`.
 
@@ -37,7 +37,6 @@ Run: `mkdir -p src/plugins/cloudflare-kv/4.20260213.0`
 //
 // Goal: An LLM that knows the Cloudflare Workers KV API should
 // be able to write Ilo programs with near-zero learning curve.
-// The API mirrors the real KVNamespace 1:1 for supported ops.
 //
 // Real KVNamespace API (@cloudflare/workers-types 4.20260213.0):
 //   const value = await KV.get("key")
@@ -46,16 +45,16 @@ Run: `mkdir -p src/plugins/cloudflare-kv/4.20260213.0`
 //   await KV.delete("key")
 //   const list = await KV.list({ prefix: "user:" })
 //
-// Ilo API (1:1 match):
+// Ilo API:
 //   const value = $.kv.get("key")
-//   const json = $.kv.get("key", "json")
+//   const json = $.kv.getJson("key")
 //   $.kv.put("key", "value", { expirationTtl: 3600 })
 //   $.kv.delete("key")
 //   const list = $.kv.list({ prefix: "user:" })
 //
-// No deviations from the real API for supported operations.
-// The "type" parameter on get() is a build-time literal string,
-// so it maps cleanly to distinct AST node kinds internally.
+// Deviation #1: getJson is a separate method instead of
+//   get(key, "json"). This gives each operation a distinct
+//   node kind which is cleaner for the interpreter.
 //
 // Based on source-level analysis of @cloudflare/workers-types
 // v4.20260213.0 — the KVNamespace interface (latest/index.ts
@@ -67,27 +66,19 @@ import type { ASTNode, Expr, PluginContext, PluginDefinition } from "../../../co
 
 // ---- What the plugin adds to $ ----------------------------
 
-/** Return type of `kv.get()` — text or JSON depending on the type parameter. */
-export interface KvGet {
-  /** Get a text value by key. Returns null if key does not exist. */
-  (key: Expr<string> | string): Expr<string | null>;
-  /** Get a text value by key (explicit "text" type). */
-  (key: Expr<string> | string, type: "text"): Expr<string | null>;
-  /** Get a JSON-parsed value by key. Returns null if key does not exist. */
-  <T = unknown>(key: Expr<string> | string, type: "json"): Expr<T | null>;
-}
-
 /**
  * Cloudflare KV operations added to the DSL context.
  *
- * Mirrors the KVNamespace API: get, put, delete, list.
+ * Mirrors the KVNamespace API: get, getJson, put, delete, list.
  * Each method produces a namespaced AST node.
  */
 export interface CloudflareKvMethods {
   /** Cloudflare KV operations, namespaced under `$.kv`. */
   kv: {
-    /** Get a value by key. Pass "json" as second arg to parse JSON. */
-    get: KvGet;
+    /** Get a text value by key. Returns null if key does not exist. */
+    get(key: Expr<string> | string): Expr<string | null>;
+    /** Get a JSON-parsed value by key. Returns null if key does not exist. */
+    getJson<T = unknown>(key: Expr<string> | string): Expr<T | null>;
     /** Store a string value at key with optional expiration settings. */
     put(
       key: Expr<string> | string,
@@ -150,7 +141,7 @@ export interface CloudflareKvConfig {
 /**
  * Cloudflare KV plugin factory. Namespace: `cloudflare-kv/`.
  *
- * Creates a plugin that exposes get, put, delete, and list
+ * Creates a plugin that exposes get, getJson, put, delete, and list
  * methods for building Cloudflare KV AST nodes.
  *
  * @param config - A {@link CloudflareKvConfig} with namespaceId.
@@ -176,16 +167,17 @@ export function cloudflareKv(
 
       return {
         kv: {
-          get(key: Expr<string> | string, type?: "text" | "json") {
-            if (type === "json") {
-              return ctx.expr({
-                kind: "cloudflare-kv/get_json",
-                key: resolveKey(key),
-                config,
-              });
-            }
+          get(key) {
             return ctx.expr({
               kind: "cloudflare-kv/get",
+              key: resolveKey(key),
+              config,
+            });
+          },
+
+          getJson(key) {
+            return ctx.expr({
+              kind: "cloudflare-kv/get_json",
               key: resolveKey(key),
               config,
             });
@@ -239,8 +231,8 @@ export function cloudflareKv(
 //
 // 2. JSON values:
 //    Real:  const data = await KV.get("key", "json")
-//    Ilo:   const data = $.kv.get("key", "json")
-//    1:1 mapping. Same call signature.
+//    Ilo:   const data = $.kv.getJson("key")
+//    Separate method name but same semantics.
 //
 // 3. Put with expiration:
 //    Real:  await KV.put("key", "val", { expirationTtl: 3600 })
@@ -256,24 +248,31 @@ export function cloudflareKv(
 //    const val = $.kv.get($.input.cacheKey)
 //    Proxy chains capture key dependencies perfectly.
 //
+// WORKS BUT DIFFERENT:
+//
+// 6. get type parameter:
+//    Real:  KV.get("key", "json") / KV.get("key", "text")
+//    Ilo:   $.kv.getJson("key") / $.kv.get("key")
+//    Split into separate methods for cleaner AST node kinds.
+//
 // DOESN'T WORK / NOT MODELED:
 //
-// 6. Binary/streaming:
+// 7. Binary/streaming:
 //    Real:  KV.get("key", "arrayBuffer") / KV.get("key", "stream")
 //    Ilo:   Not modeled. Binary data and streams don't fit a
 //           finite, inspectable AST.
 //
-// 7. getWithMetadata:
+// 8. getWithMetadata:
 //    Real:  KV.getWithMetadata("key")
 //    Ilo:   Not yet modeled. Returns {value, metadata, cacheStatus}.
 //           Could be added as cloudflare-kv/get_with_metadata.
 //
-// 8. Batch get:
+// 9. Batch get:
 //    Real:  KV.get(["key1", "key2"])
 //    Ilo:   Not yet modeled. Multi-key fetch returns a Map.
 //           Could be added as cloudflare-kv/get_batch.
 //
-// 9. Metadata on put:
+// 10. Metadata on put:
 //    Real:  KV.put("key", "val", { metadata: { foo: "bar" } })
 //    Ilo:   Partially modeled — the options type includes metadata
 //           but the handler ignores it for now.
@@ -284,9 +283,12 @@ export function cloudflareKv(
 // v4.20260213.0 (KVNamespace interface, latest/index.ts).
 //
 // For the core use case of "store and retrieve string/JSON
-// values by key with optional expiration" — this is a 1:1
-// match with the real KVNamespace API. No deviations for
-// supported operations.
+// values by key with optional expiration" — this is nearly
+// identical to the real KVNamespace API. List with prefix
+// filtering and cursor pagination maps 1:1.
+//
+// The main deviation is getJson as a separate method instead
+// of get(key, "json"). This is cleaner for the AST.
 //
 // Not supported: binary data (arrayBuffer), streaming,
 // getWithMetadata, batch get. These could be added
@@ -298,7 +300,7 @@ export function cloudflareKv(
 
 ```bash
 git add src/plugins/cloudflare-kv/4.20260213.0/index.ts
-git commit -m "feat(cloudflare-kv): add plugin definition with get, put, delete, list (#57)"
+git commit -m "feat(cloudflare-kv): add plugin definition with get, getJson, put, delete, list (#57)"
 ```
 
 ---
@@ -330,23 +332,13 @@ function strip(ast: unknown): unknown {
 const app = ilo(num, str, cloudflareKv({ namespaceId: "MY_KV" }));
 
 // ============================================================
-// get (text)
+// get
 // ============================================================
 
 describe("cloudflare-kv: get", () => {
   it("produces cloudflare-kv/get node with literal key", () => {
     const prog = app(($) => {
       return $.kv.get("my-key");
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("cloudflare-kv/get");
-    expect(ast.result.key.kind).toBe("core/literal");
-    expect(ast.result.key.value).toBe("my-key");
-  });
-
-  it("produces cloudflare-kv/get node with explicit 'text' type", () => {
-    const prog = app(($) => {
-      return $.kv.get("my-key", "text");
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("cloudflare-kv/get");
@@ -365,13 +357,13 @@ describe("cloudflare-kv: get", () => {
 });
 
 // ============================================================
-// get (json)
+// getJson
 // ============================================================
 
-describe("cloudflare-kv: get with json type", () => {
+describe("cloudflare-kv: getJson", () => {
   it("produces cloudflare-kv/get_json node with literal key", () => {
     const prog = app(($) => {
-      return $.kv.get("config-key", "json");
+      return $.kv.getJson("config-key");
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("cloudflare-kv/get_json");
@@ -379,9 +371,9 @@ describe("cloudflare-kv: get with json type", () => {
     expect(ast.result.key.value).toBe("config-key");
   });
 
-  it("accepts Expr<string> key with json type", () => {
+  it("accepts Expr<string> key", () => {
     const prog = app(($) => {
-      return $.kv.get($.input.configKey, "json");
+      return $.kv.getJson($.input.configKey);
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("cloudflare-kv/get_json");
@@ -689,7 +681,7 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
 }
 
 // ============================================================
-// get (text — default)
+// get
 // ============================================================
 
 describe("cloudflare-kv interpreter: get", () => {
@@ -705,12 +697,12 @@ describe("cloudflare-kv interpreter: get", () => {
 });
 
 // ============================================================
-// get (json)
+// getJson
 // ============================================================
 
-describe("cloudflare-kv interpreter: get with json type", () => {
+describe("cloudflare-kv interpreter: getJson", () => {
   it("yields cloudflare-kv/api_call with operation 'get_json'", async () => {
-    const prog = app(($) => $.kv.get("config-key", "json"));
+    const prog = app(($) => $.kv.getJson("config-key"));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
     expect(captured[0].type).toBe("cloudflare-kv/api_call");
@@ -819,8 +811,8 @@ describe("cloudflare-kv interpreter: return value", () => {
     expect(result).toBe("mock-text-value");
   });
 
-  it("returns the handler response for get json", async () => {
-    const prog = app(($) => $.kv.get("key", "json"));
+  it("returns the handler response for getJson", async () => {
+    const prog = app(($) => $.kv.getJson("key"));
     const { result } = await run(prog);
     expect(result).toEqual({ mock: true });
   });
@@ -1139,7 +1131,6 @@ Add these exports to `src/index.ts` (after the existing stripe exports):
 export type {
   CloudflareKvConfig,
   CloudflareKvMethods,
-  KvGet,
   KvPutOptions,
   KvListOptions,
   KvListResult,
@@ -1208,14 +1199,13 @@ Closes #57
 
 ## What this does
 
-Implements the `cloudflare-kv` plugin modeling Cloudflare Workers KV (`@cloudflare/workers-types` v4.20260213.0). Exposes `$.kv.get()`, `$.kv.get(key, "json")`, `$.kv.put()`, `$.kv.delete()`, and `$.kv.list()` — the four core KV operations covering 95%+ of real-world usage. API mirrors the real KVNamespace 1:1 for all supported operations.
+Implements the `cloudflare-kv` plugin modeling Cloudflare Workers KV (`@cloudflare/workers-types` v4.20260213.0). Exposes `$.kv.get()`, `$.kv.getJson()`, `$.kv.put()`, `$.kv.delete()`, and `$.kv.list()` — the four core KV operations covering 95%+ of real-world usage.
 
 ## Design alignment
 
 - **Plugin contract**: Three fields (`name`, `nodeKinds`, `build`), factory function pattern matching stripe plugin.
 - **Namespaced node kinds**: All 5 kinds prefixed with `cloudflare-kv/`.
 - **Source-level analysis**: Analyzed `KVNamespace` interface from `@cloudflare/workers-types` source (not docs). Honest assessment documents what maps cleanly vs. what can't be modeled.
-- **SDK parity**: `get(key, "json")` matches real KVNamespace signature — no deviations for supported ops.
 
 ## Validation performed
 

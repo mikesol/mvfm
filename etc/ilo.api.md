@@ -4,12 +4,73 @@
 
 ```ts
 
-import type OpenAI from 'openai';
+import type Anthropic from '@anthropic-ai/sdk';
 import type { default as postgres_2 } from 'postgres';
 import type Stripe from 'stripe';
+import type { WebClient } from '@slack/web-api';
 
 // @public
 export function adaptLegacy(fragment: LegacyInterpreterFragment): InterpreterFragment;
+
+// @public
+export function anthropic(config: AnthropicConfig): PluginDefinition<AnthropicMethods>;
+
+// @public
+export interface AnthropicClient {
+    request(method: string, path: string, params?: Record<string, unknown>): Promise<unknown>;
+}
+
+// @public
+export function anthropicClientHandler(options: AnthropicClientHandlerOptions): StepHandler<AnthropicClientHandlerState>;
+
+// @public
+export interface AnthropicClientHandlerOptions {
+    baseUrl: string;
+    contractHash: string;
+    fetch?: typeof globalThis.fetch;
+    headers?: Record<string, string>;
+}
+
+// @public
+export interface AnthropicClientHandlerState {
+    stepIndex: number;
+}
+
+// @public
+export interface AnthropicConfig {
+    apiKey: string;
+    baseURL?: string;
+}
+
+// @public
+export const anthropicInterpreter: InterpreterFragment;
+
+// @public
+export interface AnthropicMethods {
+    anthropic: {
+        messages: {
+            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            countTokens(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            batches: {
+                create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+                retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
+                list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+                delete(id: Expr<string> | string): Expr<Record<string, unknown>>;
+                cancel(id: Expr<string> | string): Expr<Record<string, unknown>>;
+            };
+        };
+        models: {
+            retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
+            list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        };
+    };
+}
+
+// @public
+export function anthropicServerEvaluate(client: AnthropicClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+
+// @public
+export function anthropicServerHandler(client: AnthropicClient): StepHandler<void>;
 
 // @public
 export function array(of: SchemaType): ArraySchema;
@@ -276,70 +337,6 @@ export interface NumMethods {
     sub(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
 }
 
-// @public
-export function openai(config: OpenAIConfig): PluginDefinition<OpenAIMethods>;
-
-// @public
-export interface OpenAIClient {
-    request(method: string, path: string, body?: Record<string, unknown>): Promise<unknown>;
-}
-
-// @public
-export function openaiClientHandler(options: OpenAIClientHandlerOptions): StepHandler<OpenAIClientHandlerState>;
-
-// @public
-export interface OpenAIClientHandlerOptions {
-    baseUrl: string;
-    contractHash: string;
-    fetch?: typeof globalThis.fetch;
-    headers?: Record<string, string>;
-}
-
-// @public
-export interface OpenAIClientHandlerState {
-    stepIndex: number;
-}
-
-// @public
-export interface OpenAIConfig {
-    apiKey: string;
-    organization?: string;
-    project?: string;
-}
-
-// @public
-export const openaiInterpreter: InterpreterFragment;
-
-// @public
-export interface OpenAIMethods {
-    openai: {
-        chat: {
-            completions: {
-                create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-                retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
-                list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-                update(id: Expr<string> | string, params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-                delete(id: Expr<string> | string): Expr<Record<string, unknown>>;
-            };
-        };
-        embeddings: {
-            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-        };
-        moderations: {
-            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-        };
-        completions: {
-            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-        };
-    };
-}
-
-// @public
-export function openaiServerEvaluate(client: OpenAIClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
-
-// @public
-export function openaiServerHandler(client: OpenAIClient): StepHandler<void>;
-
 // Warning: (ae-incompatible-release-tags) The symbol "ord" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
 //
 // @public
@@ -464,6 +461,63 @@ export interface RecurseFn {
 }
 
 // @public
+export function resend(config: ResendConfig): PluginDefinition<ResendMethods>;
+
+// @public
+export interface ResendClient {
+    request(method: string, path: string, params?: unknown): Promise<unknown>;
+}
+
+// @public
+export function resendClientHandler(options: ResendClientHandlerOptions): StepHandler<ResendClientHandlerState>;
+
+// @public
+export interface ResendClientHandlerOptions {
+    baseUrl: string;
+    contractHash: string;
+    fetch?: typeof globalThis.fetch;
+    headers?: Record<string, string>;
+}
+
+// @public
+export interface ResendClientHandlerState {
+    stepIndex: number;
+}
+
+// @public
+export interface ResendConfig {
+    apiKey: string;
+}
+
+// @public
+export const resendInterpreter: InterpreterFragment;
+
+// @public
+export interface ResendMethods {
+    resend: {
+        emails: {
+            send(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            get(id: Expr<string> | string): Expr<Record<string, unknown>>;
+        };
+        batch: {
+            send(emails: Expr<Record<string, unknown>[]> | Record<string, unknown>[]): Expr<Record<string, unknown>>;
+        };
+        contacts: {
+            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            get(id: Expr<string> | string): Expr<Record<string, unknown>>;
+            list(): Expr<Record<string, unknown>>;
+            remove(id: Expr<string> | string): Expr<Record<string, unknown>>;
+        };
+    };
+}
+
+// @public
+export function resendServerEvaluate(client: ResendClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+
+// @public
+export function resendServerHandler(client: ResendClient): StepHandler<void>;
+
+// @public
 export function resolveSchemaType(node: ASTNode, schema?: Record<string, unknown>): string | null;
 
 // @public
@@ -519,6 +573,85 @@ export const show: PluginDefinition<TypeclassSlot<"show">>;
 export interface ShowFor<T> {
     show(a: Expr<T> | T): Expr<string>;
 }
+
+// @public
+export function slack(config: SlackConfig): PluginDefinition<SlackMethods>;
+
+// @public
+export interface SlackClient {
+    apiCall(method: string, params?: Record<string, unknown>): Promise<unknown>;
+}
+
+// @public
+export function slackClientHandler(options: SlackClientHandlerOptions): StepHandler<SlackClientHandlerState>;
+
+// @public
+export interface SlackClientHandlerOptions {
+    baseUrl: string;
+    contractHash: string;
+    fetch?: typeof globalThis.fetch;
+    headers?: Record<string, string>;
+}
+
+// @public
+export interface SlackClientHandlerState {
+    stepIndex: number;
+}
+
+// @public
+export interface SlackConfig {
+    token: string;
+}
+
+// @public
+export const slackInterpreter: InterpreterFragment;
+
+// @public
+export interface SlackMethods {
+    slack: {
+        chat: {
+            postMessage(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            update(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            delete(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            postEphemeral(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            scheduleMessage(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            getPermalink(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        };
+        conversations: {
+            list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            info(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            invite(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            history(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            members(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            open(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            replies(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        };
+        users: {
+            info(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            lookupByEmail(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            conversations(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        };
+        reactions: {
+            add(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            get(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            remove(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        };
+        files: {
+            list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            info(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            delete(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        };
+    };
+}
+
+// @public
+export function slackServerEvaluate(client: SlackClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+
+// @public
+export function slackServerHandler(client: SlackClient): StepHandler<void>;
 
 // @public
 export const st: PluginDefinition<StMethods>;
@@ -672,6 +805,77 @@ export interface TraitImpl {
     type: string;
 }
 
+// @public
+export function twilio(config: TwilioConfig): PluginDefinition<TwilioMethods>;
+
+// @public
+export interface TwilioCallContext {
+    fetch(): Expr<Record<string, unknown>>;
+}
+
+// @public
+export interface TwilioCallsResource {
+    (sid: Expr<string> | string): TwilioCallContext;
+    create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+    list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+}
+
+// @public
+export interface TwilioClient {
+    request(method: string, path: string, params?: Record<string, unknown>): Promise<unknown>;
+}
+
+// @public
+export function twilioClientHandler(options: TwilioClientHandlerOptions): StepHandler<TwilioClientHandlerState>;
+
+// @public
+export interface TwilioClientHandlerOptions {
+    baseUrl: string;
+    contractHash: string;
+    fetch?: typeof globalThis.fetch;
+    headers?: Record<string, string>;
+}
+
+// @public
+export interface TwilioClientHandlerState {
+    stepIndex: number;
+}
+
+// @public
+export interface TwilioConfig {
+    accountSid: string;
+    authToken: string;
+}
+
+// @public
+export const twilioInterpreter: InterpreterFragment;
+
+// @public
+export interface TwilioMessageContext {
+    fetch(): Expr<Record<string, unknown>>;
+}
+
+// @public
+export interface TwilioMessagesResource {
+    (sid: Expr<string> | string): TwilioMessageContext;
+    create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+    list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+}
+
+// @public
+export interface TwilioMethods {
+    twilio: {
+        messages: TwilioMessagesResource;
+        calls: TwilioCallsResource;
+    };
+}
+
+// @public
+export function twilioServerEvaluate(client: TwilioClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+
+// @public
+export function twilioServerHandler(client: TwilioClient): StepHandler<void>;
+
 // Warning: (ae-internal-missing-underscore) The name "TypeclassMapping" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
@@ -687,7 +891,7 @@ export interface TypeclassSlot<Name extends string> {
 }
 
 // @public
-export function wrapOpenAISdk(client: OpenAI): OpenAIClient;
+export function wrapAnthropicSdk(client: Anthropic): AnthropicClient;
 
 // Warning: (ae-forgotten-export) The symbol "Sql" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "TransactionSql" needs to be exported by the entry point index.d.ts
@@ -695,8 +899,21 @@ export function wrapOpenAISdk(client: OpenAI): OpenAIClient;
 // @public
 export function wrapPostgresJs(sql: Sql | TransactionSql): PostgresClient;
 
+// Warning: (ae-forgotten-export) The symbol "ResendSdk" needs to be exported by the entry point index.d.ts
+//
+// @public
+export function wrapResendSdk(resend: ResendSdk): ResendClient;
+
+// @public
+export function wrapSlackWebClient(client: WebClient): SlackClient;
+
 // @public
 export function wrapStripeSdk(stripe: Stripe): StripeClient;
+
+// Warning: (ae-forgotten-export) The symbol "TwilioSdkClient" needs to be exported by the entry point index.d.ts
+//
+// @public
+export function wrapTwilioSdk(client: TwilioSdkClient): TwilioClient;
 
 // Warnings were encountered during analysis:
 //

@@ -20,12 +20,12 @@ The SDK is auto-generated from OpenAPI specs. Each resource lives under `src/res
 | Operation | Category | Notes |
 |---|---|---|
 | `messages.create()` | Maps cleanly | POST to `/2010-04-01/Accounts/{AccountSid}/Messages.json` |
-| `messages(sid).fetch()` | Needs deviation | Ilo uses `messages.fetch(sid)` — id as parameter, not sub-context |
+| `messages(sid).fetch()` | Maps cleanly | Ilo uses `messages(sid).fetch()` — 1:1 match via Object.assign pattern |
 | `messages.list()` | Maps cleanly | GET with optional query params (to, from, dateSent, limit) |
 | `messages(sid).remove()` | Maps cleanly | DELETE — omitted from pass 1, trivial to add |
 | `messages(sid).update()` | Maps cleanly | POST — omitted from pass 1, trivial to add |
 | `calls.create()` | Maps cleanly | POST to `/2010-04-01/Accounts/{AccountSid}/Calls.json` |
-| `calls(sid).fetch()` | Needs deviation | Same pattern as messages |
+| `calls(sid).fetch()` | Maps cleanly | Same callable pattern as messages |
 | `calls.list()` | Maps cleanly | GET with optional query params |
 | `calls(sid).update()` | Maps cleanly | POST — omitted from pass 1 |
 | `messages.each()` | Can't model | Async iterator / auto-pagination — push-based |
@@ -59,11 +59,11 @@ const app = ilo(twilio({ accountSid: 'AC...', authToken: '...' }));
 
 const program = app(($) => {
   const msg = $.twilio.messages.create({ to: '+15551234567', from: '+15559876543', body: 'Hello' });
-  const fetched = $.twilio.messages.fetch('SM800f449d...');
+  const fetched = $.twilio.messages('SM800f449d...').fetch();
   const msgs = $.twilio.messages.list({ limit: 10 });
 
   const call = $.twilio.calls.create({ to: '+15551234567', from: '+15559876543', url: 'https://example.com/twiml' });
-  const fetchedCall = $.twilio.calls.fetch('CA42ed11f9...');
+  const fetchedCall = $.twilio.calls('CA42ed11f9...').fetch();
   const calls = $.twilio.calls.list({ limit: 10 });
 
   return $.do(msg, fetched, msgs, call, fetchedCall, calls);
