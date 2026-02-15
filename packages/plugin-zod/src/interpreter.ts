@@ -1,6 +1,7 @@
 import type { ASTNode, InterpreterFragment, StepEffect } from "@mvfm/core";
 import { injectLambdaParam } from "@mvfm/core";
 import type { z } from "zod";
+import { bigintInterpreter } from "./bigint";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
 import { toZodError } from "./interpreter-utils";
 import { numberInterpreter } from "./number";
@@ -14,6 +15,7 @@ import type { ErrorConfig, RefinementDescriptor } from "./types";
 
 const schemaHandlers: SchemaInterpreterMap = {
   ...stringInterpreter,
+  ...bigintInterpreter,
   ...numberInterpreter,
   ...primitivesInterpreter,
 };
