@@ -4,6 +4,7 @@
 
 ```ts
 
+import type OpenAI from 'openai';
 import type { default as postgres_2 } from 'postgres';
 import type Stripe from 'stripe';
 
@@ -274,6 +275,70 @@ export interface NumMethods {
     round(a: Expr<number> | number): Expr<number>;
     sub(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
 }
+
+// @public
+export function openai(config: OpenAIConfig): PluginDefinition<OpenAIMethods>;
+
+// @public
+export interface OpenAIClient {
+    request(method: string, path: string, body?: Record<string, unknown>): Promise<unknown>;
+}
+
+// @public
+export function openaiClientHandler(options: OpenAIClientHandlerOptions): StepHandler<OpenAIClientHandlerState>;
+
+// @public
+export interface OpenAIClientHandlerOptions {
+    baseUrl: string;
+    contractHash: string;
+    fetch?: typeof globalThis.fetch;
+    headers?: Record<string, string>;
+}
+
+// @public
+export interface OpenAIClientHandlerState {
+    stepIndex: number;
+}
+
+// @public
+export interface OpenAIConfig {
+    apiKey: string;
+    organization?: string;
+    project?: string;
+}
+
+// @public
+export const openaiInterpreter: InterpreterFragment;
+
+// @public
+export interface OpenAIMethods {
+    openai: {
+        chat: {
+            completions: {
+                create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+                retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
+                list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+                update(id: Expr<string> | string, params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+                delete(id: Expr<string> | string): Expr<Record<string, unknown>>;
+            };
+        };
+        embeddings: {
+            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        };
+        moderations: {
+            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        };
+        completions: {
+            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        };
+    };
+}
+
+// @public
+export function openaiServerEvaluate(client: OpenAIClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+
+// @public
+export function openaiServerHandler(client: OpenAIClient): StepHandler<void>;
 
 // Warning: (ae-incompatible-release-tags) The symbol "ord" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
 //
@@ -620,6 +685,9 @@ export interface TypeclassSlot<Name extends string> {
     // (undocumented)
     readonly __typeclassSlot: Name;
 }
+
+// @public
+export function wrapOpenAISdk(client: OpenAI): OpenAIClient;
 
 // Warning: (ae-forgotten-export) The symbol "Sql" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "TransactionSql" needs to be exported by the entry point index.d.ts

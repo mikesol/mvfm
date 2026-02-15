@@ -48,6 +48,20 @@ export { monoid } from "./plugins/monoid";
 export type { NumMethods } from "./plugins/num";
 export { num } from "./plugins/num";
 export { numInterpreter } from "./plugins/num/interpreter";
+export type { OpenAIConfig, OpenAIMethods } from "./plugins/openai/6.21.0";
+export { openai } from "./plugins/openai/6.21.0";
+export { wrapOpenAISdk } from "./plugins/openai/6.21.0/client-openai-sdk";
+export type {
+  ClientHandlerOptions as OpenAIClientHandlerOptions,
+  ClientHandlerState as OpenAIClientHandlerState,
+} from "./plugins/openai/6.21.0/handler.client";
+export { clientHandler as openaiClientHandler } from "./plugins/openai/6.21.0/handler.client";
+export {
+  serverEvaluate as openaiServerEvaluate,
+  serverHandler as openaiServerHandler,
+} from "./plugins/openai/6.21.0/handler.server";
+export type { OpenAIClient } from "./plugins/openai/6.21.0/interpreter";
+export { openaiInterpreter } from "./plugins/openai/6.21.0/interpreter";
 export type { OrdFor } from "./plugins/ord";
 export { ord } from "./plugins/ord";
 export { ordInterpreter } from "./plugins/ord/interpreter";
