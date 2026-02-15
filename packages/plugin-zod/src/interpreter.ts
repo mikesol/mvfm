@@ -14,6 +14,7 @@ import { numberInterpreter } from "./number";
 import { createObjectInterpreter } from "./object";
 import { primitivesInterpreter } from "./primitives";
 import { createRecordInterpreter } from "./record";
+import { specialInterpreter } from "./special";
 import { stringInterpreter } from "./string";
 import type { ErrorConfig, RefinementDescriptor } from "./types";
 import { createUnionInterpreter } from "./union";
@@ -31,6 +32,7 @@ const leafHandlers: SchemaInterpreterMap = {
   ...literalInterpreter,
   ...numberInterpreter,
   ...primitivesInterpreter,
+  ...specialInterpreter,
 };
 
 // Recursive handlers (array, object, union, intersection, record, map, set) need buildSchemaGen for inner schemas.
@@ -127,6 +129,10 @@ function* buildSchemaGen(node: ASTNode): Generator<StepEffect, z.ZodType, unknow
       return yield* buildSchemaGen(node.inner as ASTNode);
     }
 
+    // Special types (#157) — promise needs buildSchemaGen for inner schema
+    case "zod/promise":
+      return z.promise(yield* buildSchemaGen(node.inner as ASTNode));
+
     default:
       throw new Error(`Zod interpreter: unknown schema kind "${node.kind}"`);
   }
@@ -142,9 +148,20 @@ function parseErrorOpt(node: ASTNode): { error?: (iss: unknown) => string } {
 
 /**
  * Extract refinements from a schema AST node.
+ * Refinements live on the base schema node, not on wrappers.
+ * For `zod/custom` schemas, the predicate is treated as an additional refinement.
  */
 function extractRefinements(schemaNode: ASTNode): RefinementDescriptor[] {
-  return (schemaNode.refinements as RefinementDescriptor[] | undefined) ?? [];
+  const refinements = (schemaNode.refinements as RefinementDescriptor[] | undefined) ?? [];
+  if (schemaNode.kind === "zod/custom" && schemaNode.predicate) {
+    const predRef: RefinementDescriptor = {
+      kind: "refine",
+      fn: schemaNode.predicate as ASTNode,
+      error: typeof schemaNode.error === "string" ? schemaNode.error : "Custom validation failed",
+    };
+    return [predRef, ...refinements];
+  }
+  return refinements;
 }
 
 /**

@@ -23,6 +23,8 @@ import type { ZodPrimitivesNamespace } from "./primitives";
 import { primitivesNamespace, primitivesNodeKinds } from "./primitives";
 import type { ZodRecordNamespace } from "./record";
 import { recordNamespace, recordNodeKinds } from "./record";
+import type { ZodSpecialNamespace } from "./special";
+import { specialNamespace, specialNodeKinds } from "./special";
 import type { ZodStringNamespace } from "./string";
 import { stringNamespace, stringNodeKinds } from "./string";
 import type { ZodStringFormatsNamespace } from "./string-formats";
@@ -50,6 +52,7 @@ export type { ShapeInput } from "./object";
 export { ZodObjectBuilder } from "./object";
 export { ZodPrimitiveBuilder } from "./primitives";
 export { ZodRecordBuilder } from "./record";
+export { ZodSimpleBuilder } from "./special";
 export { ZodStringBuilder } from "./string";
 export type { ZodIsoNamespace, ZodStringFormatsNamespace } from "./string-formats";
 export { buildStringFormat } from "./string-formats";
@@ -93,6 +96,7 @@ export interface ZodNamespace
     ZodObjectNamespace,
     ZodPrimitivesNamespace,
     ZodRecordNamespace,
+    ZodSpecialNamespace,
     ZodStringFormatsNamespace,
     ZodTransformNamespace,
     ZodTupleNamespace,
@@ -146,6 +150,7 @@ export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
     ...primitivesNodeKinds,
     ...coerceNodeKinds,
     ...recordNodeKinds,
+    ...specialNodeKinds,
     ...stringFormatsNodeKinds,
     ...transformNodeKinds,
     ...tupleNodeKinds,
@@ -169,6 +174,7 @@ export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
         ...primitivesNamespace(ctx, parseError),
         ...coerceNamespace(ctx, parseError),
         ...recordNamespace(ctx, parseError),
+        ...specialNamespace(ctx, parseError),
         ...stringFormatsNamespace(ctx, parseError),
         ...transformNamespace(ctx),
         ...tupleNamespace(ctx, parseError),
