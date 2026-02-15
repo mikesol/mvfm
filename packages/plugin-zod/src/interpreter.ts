@@ -4,6 +4,7 @@ import type { z } from "zod";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
 import { toZodError } from "./interpreter-utils";
 import { numberInterpreter } from "./number";
+import { primitivesInterpreter } from "./primitives";
 import { stringInterpreter } from "./string";
 import type { ErrorConfig, RefinementDescriptor } from "./types";
 
@@ -14,6 +15,7 @@ import type { ErrorConfig, RefinementDescriptor } from "./types";
 const schemaHandlers: SchemaInterpreterMap = {
   ...stringInterpreter,
   ...numberInterpreter,
+  ...primitivesInterpreter,
 };
 
 /**

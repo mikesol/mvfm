@@ -1,6 +1,8 @@
 import type { PluginDefinition } from "@mvfm/core";
 import type { ZodNumberNamespace } from "./number";
 import { numberNamespace, numberNodeKinds } from "./number";
+import type { ZodPrimitivesNamespace } from "./primitives";
+import { primitivesNamespace, primitivesNodeKinds } from "./primitives";
 import type { ZodStringNamespace } from "./string";
 import { stringNamespace, stringNodeKinds } from "./string";
 
@@ -9,6 +11,7 @@ export { ZodSchemaBuilder, ZodWrappedBuilder } from "./base";
 export { zodInterpreter } from "./interpreter";
 export type { SchemaInterpreterMap } from "./interpreter-utils";
 export { ZodNumberBuilder } from "./number";
+export { ZodPrimitiveBuilder } from "./primitives";
 export { ZodStringBuilder } from "./string";
 export type {
   CheckDescriptor,
@@ -29,7 +32,10 @@ export type {
  * for adding checks, refinements, and wrappers. Call `.parse()`
  * or `.safeParse()` to produce a validation AST node.
  */
-export interface ZodNamespace extends ZodStringNamespace, ZodNumberNamespace {
+export interface ZodNamespace
+  extends ZodStringNamespace,
+    ZodNumberNamespace,
+    ZodPrimitivesNamespace {
   // ^^^ Each new schema type adds ONE extends clause here
 }
 
@@ -71,6 +77,7 @@ export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
     ...COMMON_NODE_KINDS,
     ...stringNodeKinds,
     ...numberNodeKinds,
+    ...primitivesNodeKinds,
     // ^^^ Each new schema type adds ONE spread here
   ],
 
@@ -79,6 +86,7 @@ export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
       zod: {
         ...stringNamespace(ctx, parseError),
         ...numberNamespace(ctx, parseError),
+        ...primitivesNamespace(ctx, parseError),
         // ^^^ Each new schema type adds ONE spread here
       } as ZodNamespace,
     };
