@@ -66,6 +66,20 @@ export {
   findCursorBatch,
   postgresInterpreter,
 } from "./plugins/postgres/3.4.8/interpreter";
+export type { S3Config, S3Methods } from "./plugins/s3/3.989.0";
+export { s3 } from "./plugins/s3/3.989.0";
+export { wrapAwsSdk } from "./plugins/s3/3.989.0/client-aws-sdk";
+export type {
+  ClientHandlerOptions as S3ClientHandlerOptions,
+  ClientHandlerState as S3ClientHandlerState,
+} from "./plugins/s3/3.989.0/handler.client";
+export { clientHandler as s3ClientHandler } from "./plugins/s3/3.989.0/handler.client";
+export {
+  serverEvaluate as s3ServerEvaluate,
+  serverHandler as s3ServerHandler,
+} from "./plugins/s3/3.989.0/handler.server";
+export type { S3Client } from "./plugins/s3/3.989.0/interpreter";
+export { s3Interpreter } from "./plugins/s3/3.989.0/interpreter";
 export type { SemigroupFor } from "./plugins/semigroup";
 export { semigroup } from "./plugins/semigroup";
 export type { SemiringFor } from "./plugins/semiring";

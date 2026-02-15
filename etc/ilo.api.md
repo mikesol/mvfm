@@ -5,6 +5,7 @@
 ```ts
 
 import type { default as postgres_2 } from 'postgres';
+import type { S3Client as S3Client_2 } from '@aws-sdk/client-s3';
 import type Stripe from 'stripe';
 
 // @public
@@ -45,11 +46,14 @@ export const booleanInterpreter: InterpreterFragment;
 // @public
 export type BooleanMethods = {};
 
+// Warning: (ae-incompatible-release-tags) The symbol "bounded" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
+//
 // @public
-export const bounded: PluginDefinition<BoundedMethods>;
+export const bounded: PluginDefinition<TypeclassSlot<"bounded">>;
 
 // @public
-export type BoundedMethods = {};
+export interface BoundedFor<_T> {
+}
 
 // @public
 export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
@@ -226,11 +230,14 @@ export interface MissingTraitError<_TraitName extends string, Hint extends strin
     readonly __error: Hint;
 }
 
+// Warning: (ae-incompatible-release-tags) The symbol "monoid" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
+//
 // @public
-export const monoid: PluginDefinition<MonoidMethods>;
+export const monoid: PluginDefinition<TypeclassSlot<"monoid">>;
 
 // @public
-export type MonoidMethods = {};
+export interface MonoidFor<_T> {
+}
 
 // @public
 export function nullable(of: SchemaType): NullableSchema;
@@ -400,6 +407,62 @@ export function runAST<S>(root: ASTNode, fragments: InterpreterFragment[], handl
     value: unknown;
     state: S;
 }>;
+
+// @public
+export function s3(config: S3Config): PluginDefinition<S3Methods>;
+
+// @public
+export interface S3Client {
+    execute(command: string, input: Record<string, unknown>): Promise<unknown>;
+}
+
+// @public
+export function s3ClientHandler(options: S3ClientHandlerOptions): StepHandler<S3ClientHandlerState>;
+
+// @public
+export interface S3ClientHandlerOptions {
+    baseUrl: string;
+    contractHash: string;
+    fetch?: typeof globalThis.fetch;
+    headers?: Record<string, string>;
+}
+
+// @public
+export interface S3ClientHandlerState {
+    stepIndex: number;
+}
+
+// @public
+export interface S3Config {
+    credentials?: {
+        accessKeyId: string;
+        secretAccessKey: string;
+        sessionToken?: string;
+    };
+    endpoint?: string;
+    forcePathStyle?: boolean;
+    region: string;
+}
+
+// @public
+export const s3Interpreter: InterpreterFragment;
+
+// @public
+export interface S3Methods {
+    s3: {
+        putObject(input: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        getObject(input: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        deleteObject(input: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        headObject(input: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        listObjectsV2(input: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+    };
+}
+
+// @public
+export function s3ServerEvaluate(client: S3Client, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+
+// @public
+export function s3ServerHandler(client: S3Client): StepHandler<void>;
 
 // @public
 export type SchemaShape = Record<string, SchemaType>;
@@ -614,6 +677,11 @@ export interface TypeclassSlot<Name extends string> {
     // (undocumented)
     readonly __typeclassSlot: Name;
 }
+
+// Warning: (ae-forgotten-export) The symbol "CommandConstructor" needs to be exported by the entry point index.d.ts
+//
+// @public
+export function wrapAwsSdk(client: S3Client_2, commands: Record<string, CommandConstructor>): S3Client;
 
 // Warning: (ae-forgotten-export) The symbol "Sql" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "TransactionSql" needs to be exported by the entry point index.d.ts
