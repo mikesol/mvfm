@@ -1,24 +1,5 @@
 import type { ASTNode, InterpreterFragment, StepEffect } from "../../core";
-
-/**
- * Walk an AST subtree and inject a value into matching lambda_param nodes.
- * This is how the fiber interpreter passes collection items to the par_map body.
- */
-export function injectLambdaParam(node: any, name: string, value: unknown): void {
-  if (node === null || node === undefined || typeof node !== "object") return;
-  if (Array.isArray(node)) {
-    for (const item of node) injectLambdaParam(item, name, value);
-    return;
-  }
-  if (node.kind === "core/lambda_param" && node.name === name) {
-    node.__value = value;
-  }
-  for (const v of Object.values(node)) {
-    if (typeof v === "object" && v !== null) {
-      injectLambdaParam(v, name, value);
-    }
-  }
-}
+import { injectLambdaParam } from "../../core";
 
 /** Interpreter fragment for `fiber/` node kinds. */
 export const fiberInterpreter: InterpreterFragment = {

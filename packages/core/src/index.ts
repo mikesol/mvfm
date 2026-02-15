@@ -21,7 +21,15 @@ export type {
   TypeclassMapping,
   TypeclassSlot,
 } from "./core";
-export { adaptLegacy, composeInterpreters, foldAST, mvfm, runAST, Stepper } from "./core";
+export {
+  adaptLegacy,
+  composeInterpreters,
+  foldAST,
+  injectLambdaParam,
+  mvfm,
+  runAST,
+  Stepper,
+} from "./core";
 export { coreInterpreter } from "./interpreters/core";
 export type { BooleanMethods } from "./plugins/boolean";
 export { boolean } from "./plugins/boolean";

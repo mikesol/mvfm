@@ -1,24 +1,5 @@
 import type { ASTNode, InterpreterFragment, StepEffect } from "../../core";
-
-/**
- * Walk an AST subtree and inject a value into matching lambda_param nodes.
- * This is how the error interpreter passes the caught error to the catch body.
- */
-export function injectLambdaParam(node: any, param: { name: string }, value: unknown): void {
-  if (node === null || node === undefined || typeof node !== "object") return;
-  if (Array.isArray(node)) {
-    for (const item of node) injectLambdaParam(item, param, value);
-    return;
-  }
-  if (node.kind === "core/lambda_param" && node.name === param.name) {
-    node.__value = value;
-  }
-  for (const v of Object.values(node)) {
-    if (typeof v === "object" && v !== null) {
-      injectLambdaParam(v, param, value);
-    }
-  }
-}
+import { injectLambdaParam } from "../../core";
 
 /** Interpreter fragment for `error/` node kinds. */
 export const errorInterpreter: InterpreterFragment = {
@@ -33,7 +14,7 @@ export const errorInterpreter: InterpreterFragment = {
         } catch (e) {
           if (node.catch) {
             const catchInfo = node.catch as { param: ASTNode; body: ASTNode };
-            injectLambdaParam(catchInfo.body, catchInfo.param as any, e);
+            injectLambdaParam(catchInfo.body, (catchInfo.param as any).name, e);
             return yield { type: "recurse", child: catchInfo.body };
           }
           if (node.match) {
@@ -45,7 +26,7 @@ export const errorInterpreter: InterpreterFragment = {
             const key = typeof errObj === "string" ? errObj : (errObj?.code ?? errObj?.type ?? "_");
             const branch = matchInfo.branches[key] ?? matchInfo.branches._ ?? null;
             if (!branch) throw e;
-            injectLambdaParam(branch, matchInfo.param as any, e);
+            injectLambdaParam(branch, (matchInfo.param as any).name, e);
             return yield { type: "recurse", child: branch };
           }
           throw e;

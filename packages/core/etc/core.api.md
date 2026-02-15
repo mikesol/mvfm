@@ -165,6 +165,9 @@ export type InferSchema<S> = S extends SchemaTag ? TagToType<S> : S extends {
 export function inferType(node: ASTNode, impls: TraitImpl[], schema?: Record<string, unknown>): string | null;
 
 // @public
+export function injectLambdaParam(node: any, name: string, value: unknown): void;
+
+// @public
 export type Interpreter = (program: Program) => {
     run: (input: Record<string, unknown>) => Promise<unknown>;
 };

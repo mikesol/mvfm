@@ -1,6 +1,5 @@
 import type { ASTNode, InterpreterFragment, StepEffect, StepHandler } from "../../core";
-import { runAST } from "../../core";
-import { injectLambdaParam } from "./interpreter";
+import { injectLambdaParam, runAST } from "../../core";
 
 /**
  * Effect handler for fiber/ effects (concurrency).

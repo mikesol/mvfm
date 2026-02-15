@@ -1,6 +1,7 @@
 import type { ASTNode, InterpreterFragment, StepEffect } from "@mvfm/core";
+import { injectLambdaParam } from "@mvfm/core";
 import { z } from "zod";
-import type { CheckDescriptor, ErrorConfig } from "./types";
+import type { CheckDescriptor, ErrorConfig, RefinementDescriptor } from "./types";
 
 /**
  * Convert an ErrorConfig (string or ASTNode) to a Zod-compatible error function.
@@ -107,6 +108,52 @@ function parseErrorOpt(node: ASTNode): { error?: (iss: unknown) => string } {
 }
 
 /**
+ * Extract refinements from a schema AST node.
+ * Refinements live on the base schema node, not on wrappers.
+ */
+function extractRefinements(schemaNode: ASTNode): RefinementDescriptor[] {
+  return (schemaNode.refinements as RefinementDescriptor[] | undefined) ?? [];
+}
+
+/**
+ * Apply refinement descriptors to a validated value via the generator pipeline.
+ * Each refinement's lambda body is cloned, injected with the current value,
+ * and evaluated through the interpreter via recurse effects.
+ *
+ * - `refine` / `check`: predicate must return truthy, else throw
+ * - `overwrite`: result replaces the current value
+ * - `super_refine`: evaluated for side effects (e.g. adding issues)
+ */
+function* applyRefinements(
+  value: unknown,
+  refinements: RefinementDescriptor[],
+): Generator<StepEffect, unknown, unknown> {
+  let current = value;
+  for (const ref of refinements) {
+    const lambda = ref.fn as unknown as { param: { name: string }; body: ASTNode };
+    const bodyClone = structuredClone(lambda.body);
+    injectLambdaParam(bodyClone, lambda.param.name, current);
+    const result = yield { type: "recurse", child: bodyClone };
+
+    switch (ref.kind) {
+      case "refine":
+      case "check":
+        if (!result) {
+          throw new Error(typeof ref.error === "string" ? ref.error : "Refinement failed");
+        }
+        break;
+      case "overwrite":
+        current = result;
+        break;
+      case "super_refine":
+        // Evaluated for side effects; return value ignored
+        break;
+    }
+  }
+  return current;
+}
+
+/**
  * Interpreter fragment for `zod/` node kinds.
  *
  * Handles parsing operation nodes by recursing into schema + input,
@@ -122,24 +169,60 @@ export const zodInterpreter: InterpreterFragment = {
   *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
     switch (node.kind) {
       case "zod/parse": {
-        const schema = yield* buildSchemaGen(node.schema as ASTNode);
+        const schemaNode = node.schema as ASTNode;
+        const schema = yield* buildSchemaGen(schemaNode);
         const input = yield { type: "recurse", child: node.input as ASTNode };
-        return schema.parse(input, parseErrorOpt(node));
+        let value = schema.parse(input, parseErrorOpt(node));
+        const refinements = extractRefinements(schemaNode);
+        if (refinements.length > 0) {
+          value = yield* applyRefinements(value, refinements);
+        }
+        return value;
       }
       case "zod/safe_parse": {
-        const schema = yield* buildSchemaGen(node.schema as ASTNode);
+        const schemaNode = node.schema as ASTNode;
+        const schema = yield* buildSchemaGen(schemaNode);
         const input = yield { type: "recurse", child: node.input as ASTNode };
-        return schema.safeParse(input, parseErrorOpt(node));
+        const result = schema.safeParse(input, parseErrorOpt(node));
+        if (!result.success) return result;
+        const refinements = extractRefinements(schemaNode);
+        if (refinements.length > 0) {
+          try {
+            const refined = yield* applyRefinements(result.data, refinements);
+            return { success: true, data: refined };
+          } catch (e) {
+            return { success: false, error: e };
+          }
+        }
+        return result;
       }
       case "zod/parse_async": {
-        const schema = yield* buildSchemaGen(node.schema as ASTNode);
+        const schemaNode = node.schema as ASTNode;
+        const schema = yield* buildSchemaGen(schemaNode);
         const input = yield { type: "recurse", child: node.input as ASTNode };
-        return schema.parseAsync(input, parseErrorOpt(node));
+        let value = schema.parse(input, parseErrorOpt(node));
+        const refinements = extractRefinements(schemaNode);
+        if (refinements.length > 0) {
+          value = yield* applyRefinements(value, refinements);
+        }
+        return value;
       }
       case "zod/safe_parse_async": {
-        const schema = yield* buildSchemaGen(node.schema as ASTNode);
+        const schemaNode = node.schema as ASTNode;
+        const schema = yield* buildSchemaGen(schemaNode);
         const input = yield { type: "recurse", child: node.input as ASTNode };
-        return schema.safeParseAsync(input, parseErrorOpt(node));
+        const result = schema.safeParse(input, parseErrorOpt(node));
+        if (!result.success) return result;
+        const refinements = extractRefinements(schemaNode);
+        if (refinements.length > 0) {
+          try {
+            const refined = yield* applyRefinements(result.data, refinements);
+            return { success: true, data: refined };
+          } catch (e) {
+            return { success: false, error: e };
+          }
+        }
+        return result;
       }
       default:
         throw new Error(`Zod interpreter: unknown node kind "${node.kind}"`);

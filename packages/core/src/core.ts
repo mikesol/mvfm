@@ -1234,3 +1234,30 @@ function simpleHash(str: string): string {
   }
   return Math.abs(hash).toString(36);
 }
+
+/**
+ * Walk an AST subtree and inject a runtime value into matching `core/lambda_param` nodes.
+ *
+ * This is the standard mechanism for evaluating lambda expressions at runtime:
+ * clone the lambda body, inject the argument value into the param nodes, then
+ * recurse through the interpreter to evaluate the body.
+ *
+ * @param node - AST subtree to walk (typically a cloned lambda body)
+ * @param name - The param name to match against `core/lambda_param` nodes
+ * @param value - The runtime value to inject
+ */
+export function injectLambdaParam(node: any, name: string, value: unknown): void {
+  if (node === null || node === undefined || typeof node !== "object") return;
+  if (Array.isArray(node)) {
+    for (const item of node) injectLambdaParam(item, name, value);
+    return;
+  }
+  if (node.kind === "core/lambda_param" && node.name === name) {
+    node.__value = value;
+  }
+  for (const v of Object.values(node)) {
+    if (typeof v === "object" && v !== null) {
+      injectLambdaParam(v, name, value);
+    }
+  }
+}
