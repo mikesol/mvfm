@@ -430,6 +430,50 @@
           "extendsTokenRanges": []
         },
         {
+          "kind": "TypeAlias",
+          "canonicalReference": "@mvfm/plugin-resend!ExprOrValue:type",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type ExprOrValue<T> = "
+            },
+            {
+              "kind": "Reference",
+              "text": "Expr",
+              "canonicalReference": "@mvfm/plugin-resend!~Expr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<T> | T"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/6.9.2/index.d.ts",
+          "releaseTag": "Public",
+          "name": "ExprOrValue",
+          "typeParameters": [
+            {
+              "typeParameterName": "T",
+              "constraintTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
           "kind": "Function",
           "canonicalReference": "@mvfm/plugin-resend!resend:function(1)",
           "docComment": "/**\n * Resend plugin factory. Namespace: `resend/`.\n *\n * Creates a plugin that exposes email sending, batch sending, and contact management methods for building parameterized Resend API call AST nodes.\n *\n * @param config - A {@link ResendConfig} with apiKey.\n *\n * @returns A PluginDefinition for the resend plugin.\n */\n",
@@ -688,6 +732,24 @@
                 },
                 {
                   "kind": "Reference",
+                  "text": "ExprOrValue",
+                  "canonicalReference": "@mvfm/plugin-resend!ExprOrValue:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "CreateEmailOptions",
+                  "canonicalReference": "resend!CreateEmailOptions:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
+                },
+                {
+                  "kind": "Reference",
                   "text": "Expr",
                   "canonicalReference": "@mvfm/plugin-resend!~Expr:type"
                 },
@@ -697,39 +759,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "CreateEmailResponseSuccess",
+                  "canonicalReference": "resend!CreateEmailResponseSuccess:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-resend!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>>;\n            get(id: "
+                  "text": ">;\n            get(id: "
                 },
                 {
                   "kind": "Reference",
@@ -751,12 +786,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "GetEmailResponseSuccess",
+                  "canonicalReference": "resend!GetEmailResponseSuccess:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n        };\n        batch: {\n            send(emails: "
+                  "text": ">;\n        };\n        batch: {\n            send(emails: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ExprOrValue",
+                  "canonicalReference": "@mvfm/plugin-resend!ExprOrValue:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "CreateBatchOptions",
+                  "canonicalReference": "resend!CreateBatchOptions:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -769,21 +822,39 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "CreateBatchSuccessResponse",
+                  "canonicalReference": "resend!CreateBatchSuccessResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>[]> | "
+                  "text": ">;\n        };\n        contacts: {\n            create(params: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ExprOrValue",
+                  "canonicalReference": "@mvfm/plugin-resend!ExprOrValue:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>[]): "
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "CreateContactOptions",
+                  "canonicalReference": "resend!CreateContactOptions:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": " | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "LegacyCreateContactOptions",
+                  "canonicalReference": "resend!LegacyCreateContactOptions:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -796,57 +867,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "CreateContactResponseSuccess",
+                  "canonicalReference": "resend!CreateContactResponseSuccess:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n        };\n        contacts: {\n            create(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-resend!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-resend!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>>;\n            get(id: "
+                  "text": ">;\n            get(id: "
                 },
                 {
                   "kind": "Reference",
@@ -868,12 +894,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "GetContactResponseSuccess",
+                  "canonicalReference": "resend!GetContactResponseSuccess:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n            list(): "
+                  "text": ">;\n            list(): "
                 },
                 {
                   "kind": "Reference",
@@ -886,12 +912,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ListContactsResponseSuccess",
+                  "canonicalReference": "resend!ListContactsResponseSuccess:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n            remove(id: "
+                  "text": ">;\n            remove(id: "
                 },
                 {
                   "kind": "Reference",
@@ -913,12 +939,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "RemoveContactsResponseSuccess",
+                  "canonicalReference": "resend!RemoveContactsResponseSuccess:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n        };\n    }"
+                  "text": ">;\n        };\n    }"
                 },
                 {
                   "kind": "Content",
@@ -931,7 +957,7 @@
               "name": "resend",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 54
+                "endIndex": 50
               }
             }
           ],

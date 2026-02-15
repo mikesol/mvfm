@@ -4,6 +4,18 @@
 
 ```ts
 
+import type { CreateBatchOptions } from 'resend';
+import type { CreateBatchSuccessResponse } from 'resend';
+import type { CreateContactOptions } from 'resend';
+import type { CreateContactResponseSuccess } from 'resend';
+import type { CreateEmailOptions } from 'resend';
+import type { CreateEmailResponseSuccess } from 'resend';
+import type { GetContactResponseSuccess } from 'resend';
+import type { GetEmailResponseSuccess } from 'resend';
+import type { LegacyCreateContactOptions } from 'resend';
+import type { ListContactsResponseSuccess } from 'resend';
+import type { RemoveContactsResponseSuccess } from 'resend';
+
 // Warning: (ae-forgotten-export) The symbol "StepHandler" needs to be exported by the entry point index.d.ts
 //
 // @public
@@ -21,6 +33,11 @@ export interface ClientHandlerOptions {
 export interface ClientHandlerState {
     stepIndex: number;
 }
+
+// Warning: (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type ExprOrValue<T> = Expr<T> | T;
 
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
@@ -46,17 +63,17 @@ export const resendInterpreter: InterpreterFragment;
 export interface ResendMethods {
     resend: {
         emails: {
-            send(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            get(id: Expr<string> | string): Expr<Record<string, unknown>>;
+            send(params: ExprOrValue<CreateEmailOptions>): Expr<CreateEmailResponseSuccess>;
+            get(id: Expr<string> | string): Expr<GetEmailResponseSuccess>;
         };
         batch: {
-            send(emails: Expr<Record<string, unknown>[]> | Record<string, unknown>[]): Expr<Record<string, unknown>>;
+            send(emails: ExprOrValue<CreateBatchOptions>): Expr<CreateBatchSuccessResponse>;
         };
         contacts: {
-            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            get(id: Expr<string> | string): Expr<Record<string, unknown>>;
-            list(): Expr<Record<string, unknown>>;
-            remove(id: Expr<string> | string): Expr<Record<string, unknown>>;
+            create(params: ExprOrValue<CreateContactOptions | LegacyCreateContactOptions>): Expr<CreateContactResponseSuccess>;
+            get(id: Expr<string> | string): Expr<GetContactResponseSuccess>;
+            list(): Expr<ListContactsResponseSuccess>;
+            remove(id: Expr<string> | string): Expr<RemoveContactsResponseSuccess>;
         };
     };
 }
@@ -73,10 +90,6 @@ export function serverHandler(client: ResendClient): StepHandler<void>;
 //
 // @public
 export function wrapResendSdk(resend: ResendSdk): ResendClient;
-
-// Warnings were encountered during analysis:
-//
-// dist/6.9.2/index.d.ts:14:13 - (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

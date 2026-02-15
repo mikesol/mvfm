@@ -23,6 +23,7 @@
     "@mvfm/core": "workspace:*"
   },
   "devDependencies": {
-    "@mvfm/core": "workspace:*"
+    "@mvfm/core": "workspace:*",
+    "resend": "6.9.2"
   }
 }

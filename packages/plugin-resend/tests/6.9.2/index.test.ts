@@ -223,3 +223,34 @@ describe("resend: cross-operation dependencies", () => {
     expect(getNode.id.kind).toBe("core/prop_access");
   });
 });
+
+describe("resend: compile-time typing guards", () => {
+  it("rejects invalid sdk payload shapes", () => {
+    const typecheckOnly = process.env.MVFM_TYPECHECK_ONLY === "1";
+    if (typecheckOnly) {
+      app(($) => {
+        // @ts-expect-error from must be a string
+        $.resend.emails.send({
+          from: 123,
+          to: "user@example.com",
+          subject: "Hello",
+          html: "<p>x</p>",
+        });
+
+        // @ts-expect-error each batch email must satisfy CreateEmailOptions
+        $.resend.batch.send([
+          { from: "sender@example.com", to: "user@example.com", subject: "Missing body" },
+        ]);
+
+        // @ts-expect-error subscription only allows "opt_in" | "opt_out"
+        $.resend.contacts.create({
+          email: "user@example.com",
+          topics: [{ id: "topic_123", subscription: "invalid" }],
+        });
+
+        return $.resend.contacts.list();
+      });
+    }
+    expect(true).toBe(true);
+  });
+});
