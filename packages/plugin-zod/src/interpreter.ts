@@ -5,6 +5,7 @@ import { bigintInterpreter } from "./bigint";
 import { dateInterpreter } from "./date";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
 import { toZodError } from "./interpreter-utils";
+import { literalInterpreter } from "./literal";
 import { numberInterpreter } from "./number";
 import { primitivesInterpreter } from "./primitives";
 import { stringInterpreter } from "./string";
@@ -18,6 +19,7 @@ const schemaHandlers: SchemaInterpreterMap = {
   ...stringInterpreter,
   ...bigintInterpreter,
   ...dateInterpreter,
+  ...literalInterpreter,
   ...numberInterpreter,
   ...primitivesInterpreter,
 };

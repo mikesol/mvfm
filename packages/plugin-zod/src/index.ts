@@ -3,6 +3,8 @@ import type { ZodBigIntNamespace } from "./bigint";
 import { bigintNamespace, bigintNodeKinds } from "./bigint";
 import type { ZodDateNamespace } from "./date";
 import { dateNamespace, dateNodeKinds } from "./date";
+import type { ZodLiteralNamespace } from "./literal";
+import { literalNamespace, literalNodeKinds } from "./literal";
 import type { ZodNumberNamespace } from "./number";
 import { numberNamespace, numberNodeKinds } from "./number";
 import type { ZodPrimitivesNamespace } from "./primitives";
@@ -16,6 +18,7 @@ export { ZodBigIntBuilder } from "./bigint";
 export { ZodDateBuilder } from "./date";
 export { zodInterpreter } from "./interpreter";
 export type { SchemaInterpreterMap } from "./interpreter-utils";
+export { ZodLiteralBuilder } from "./literal";
 export { ZodNumberBuilder } from "./number";
 export { ZodPrimitiveBuilder } from "./primitives";
 export { ZodStringBuilder } from "./string";
@@ -42,6 +45,7 @@ export interface ZodNamespace
   extends ZodStringNamespace,
     ZodBigIntNamespace,
     ZodDateNamespace,
+    ZodLiteralNamespace,
     ZodNumberNamespace,
     ZodPrimitivesNamespace {
   // ^^^ Each new schema type adds ONE extends clause here
@@ -86,6 +90,7 @@ export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
     ...stringNodeKinds,
     ...bigintNodeKinds,
     ...dateNodeKinds,
+    ...literalNodeKinds,
     ...numberNodeKinds,
     ...primitivesNodeKinds,
     // ^^^ Each new schema type adds ONE spread here
@@ -97,6 +102,7 @@ export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
         ...stringNamespace(ctx, parseError),
         ...bigintNamespace(ctx, parseError),
         ...dateNamespace(ctx, parseError),
+        ...literalNamespace(ctx),
         ...numberNamespace(ctx, parseError),
         ...primitivesNamespace(ctx, parseError),
         // ^^^ Each new schema type adds ONE spread here
