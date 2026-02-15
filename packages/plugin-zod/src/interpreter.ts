@@ -89,6 +89,93 @@ function applyStringChecks(schema: z.ZodString, checks: CheckDescriptor[]): z.Zo
 }
 
 /**
+ * Apply check descriptors to a Zod number schema.
+ * Each check kind maps to the corresponding Zod method.
+ */
+function applyNumberChecks(schema: z.ZodNumber, checks: CheckDescriptor[]): z.ZodNumber {
+  let s = schema;
+  for (const check of checks) {
+    const errOpt = checkErrorOpt(check);
+    switch (check.kind) {
+      case "gt":
+        s = s.gt(check.value as number, errOpt);
+        break;
+      case "gte":
+        s = s.gte(check.value as number, errOpt);
+        break;
+      case "lt":
+        s = s.lt(check.value as number, errOpt);
+        break;
+      case "lte":
+        s = s.lte(check.value as number, errOpt);
+        break;
+      case "positive":
+        s = s.positive(errOpt);
+        break;
+      case "nonnegative":
+        s = s.nonnegative(errOpt);
+        break;
+      case "negative":
+        s = s.negative(errOpt);
+        break;
+      case "nonpositive":
+        s = s.nonpositive(errOpt);
+        break;
+      case "multiple_of":
+        s = s.multipleOf(check.value as number, errOpt);
+        break;
+      case "int":
+        s = s.int(errOpt);
+        break;
+      case "finite":
+        s = s.finite(errOpt);
+        break;
+      case "safe":
+        s = s.safe(errOpt);
+        break;
+      default:
+        throw new Error(`Zod interpreter: unknown number check "${check.kind}"`);
+    }
+  }
+  return s;
+}
+
+/**
+ * Build variant-specific number checks from the variant field.
+ * Returns check descriptors that constrain the number to the variant range.
+ */
+function variantChecks(variant: string | undefined): CheckDescriptor[] {
+  switch (variant) {
+    case "int":
+      return [{ kind: "int" }, { kind: "safe" }];
+    case "int32":
+      return [
+        { kind: "int" },
+        { kind: "gte", value: -2147483648 },
+        { kind: "lte", value: 2147483647 },
+      ];
+    case "int64":
+      // JS can't represent full int64, use safe integer range
+      return [{ kind: "int" }, { kind: "safe" }];
+    case "uint32":
+      return [{ kind: "int" }, { kind: "gte", value: 0 }, { kind: "lte", value: 4294967295 }];
+    case "uint64":
+      // JS can't represent full uint64, use safe integer range with gte(0)
+      return [{ kind: "int" }, { kind: "gte", value: 0 }, { kind: "safe" }];
+    case "float32":
+      return [
+        { kind: "finite" },
+        { kind: "gte", value: -3.4028235e38 },
+        { kind: "lte", value: 3.4028235e38 },
+      ];
+    case "float64":
+      return [{ kind: "finite" }];
+    default:
+      return [];
+  }
+}
+
+/**
  * Build a Zod schema from a schema AST node (generator version).
  * Yields recurse effects for value-carrying wrappers (default, prefault, catch).
  * Simple schema types and non-value wrappers are handled synchronously.
@@ -100,6 +187,21 @@ function* buildSchemaGen(node: ASTNode): Generator<StepEffect, z.ZodType, unknow
       const errorFn = toZodError(node.error as ErrorConfig | undefined);
       const base = errorFn ? z.string({ error: errorFn }) : z.string();
       return applyStringChecks(base, checks) as z.ZodType;
+    }
+
+    case "zod/number": {
+      const variant = node.variant as string | undefined;
+      const explicitChecks = (node.checks as CheckDescriptor[]) ?? [];
+      const vChecks = variantChecks(variant);
+      const allChecks = [...vChecks, ...explicitChecks];
+      const errorFn = toZodError(node.error as ErrorConfig | undefined);
+      const base = errorFn ? z.number({ error: errorFn }) : z.number();
+      return applyNumberChecks(base, allChecks);
+    }
+
+    case "zod/nan": {
+      const errorFn = toZodError(node.error as ErrorConfig | undefined);
+      return errorFn ? z.nan({ error: errorFn }) : z.nan();
     }
 
     // Simple wrappers (no value field)
