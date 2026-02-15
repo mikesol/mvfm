@@ -25,6 +25,20 @@ export type {
 // compatibility — it is now a type alias for InterpreterFragment.
 export { adaptLegacy, composeInterpreters, foldAST, ilo, runAST, Stepper } from "./core";
 export { coreInterpreter } from "./interpreters/core";
+export type { AnthropicConfig, AnthropicMethods } from "./plugins/anthropic/0.74.0";
+export { anthropic } from "./plugins/anthropic/0.74.0";
+export { wrapAnthropicSdk } from "./plugins/anthropic/0.74.0/client-anthropic-sdk";
+export type {
+  ClientHandlerOptions as AnthropicClientHandlerOptions,
+  ClientHandlerState as AnthropicClientHandlerState,
+} from "./plugins/anthropic/0.74.0/handler.client";
+export { clientHandler as anthropicClientHandler } from "./plugins/anthropic/0.74.0/handler.client";
+export {
+  serverEvaluate as anthropicServerEvaluate,
+  serverHandler as anthropicServerHandler,
+} from "./plugins/anthropic/0.74.0/handler.server";
+export type { AnthropicClient } from "./plugins/anthropic/0.74.0/interpreter";
+export { anthropicInterpreter } from "./plugins/anthropic/0.74.0/interpreter";
 export type { BooleanMethods } from "./plugins/boolean";
 export { boolean } from "./plugins/boolean";
 export { booleanInterpreter } from "./plugins/boolean/interpreter";
@@ -91,6 +105,27 @@ export {
 } from "./plugins/stripe/2025-04-30.basil/handler.server";
 export type { StripeClient } from "./plugins/stripe/2025-04-30.basil/interpreter";
 export { stripeInterpreter } from "./plugins/stripe/2025-04-30.basil/interpreter";
+export type {
+  TwilioCallContext,
+  TwilioCallsResource,
+  TwilioConfig,
+  TwilioMessageContext,
+  TwilioMessagesResource,
+  TwilioMethods,
+} from "./plugins/twilio/5.5.1";
+export { twilio } from "./plugins/twilio/5.5.1";
+export { wrapTwilioSdk } from "./plugins/twilio/5.5.1/client-twilio-sdk";
+export type {
+  ClientHandlerOptions as TwilioClientHandlerOptions,
+  ClientHandlerState as TwilioClientHandlerState,
+} from "./plugins/twilio/5.5.1/handler.client";
+export { clientHandler as twilioClientHandler } from "./plugins/twilio/5.5.1/handler.client";
+export {
+  serverEvaluate as twilioServerEvaluate,
+  serverHandler as twilioServerHandler,
+} from "./plugins/twilio/5.5.1/handler.server";
+export type { TwilioClient } from "./plugins/twilio/5.5.1/interpreter";
+export { twilioInterpreter } from "./plugins/twilio/5.5.1/interpreter";
 export type {
   ArraySchema,
   InferSchema,
