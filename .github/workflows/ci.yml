@@ -29,7 +29,14 @@ jobs:
       - name: Check (lint + typecheck + api-extractor)
         run: pnpm run check
 
+      - name: Start LocalStack
+        uses: LocalStack/setup-localstack@v0.2.2
+        with:
+          image-tag: latest
+
       - name: Test
+        env:
+          MVFM_S3_ENDPOINT: http://localhost:4566
         run: pnpm run test
 
   size:
