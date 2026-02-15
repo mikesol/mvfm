@@ -47,10 +47,11 @@ function applyStringChecks(schema: z.ZodString, checks: CheckDescriptor[]): z.Zo
 }
 
 /**
- * Build a Zod schema from a schema AST node.
- * Dispatches on node.kind to construct the appropriate Zod type.
+ * Build a Zod schema from a schema AST node (generator version).
+ * Yields recurse effects for value-carrying wrappers (default, prefault, catch).
+ * Simple schema types and non-value wrappers are handled synchronously.
  */
-function buildSchema(node: ASTNode): z.ZodType {
+function* buildSchemaGen(node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
   switch (node.kind) {
     case "zod/string": {
       const checks = (node.checks as CheckDescriptor[]) ?? [];
@@ -58,6 +59,38 @@ function buildSchema(node: ASTNode): z.ZodType {
       const base = errorFn ? z.string({ error: errorFn }) : z.string();
       return applyStringChecks(base, checks);
     }
+
+    // Simple wrappers (no value field)
+    case "zod/optional":
+      return (yield* buildSchemaGen(node.inner as ASTNode)).optional();
+    case "zod/nullable":
+      return (yield* buildSchemaGen(node.inner as ASTNode)).nullable();
+    case "zod/nullish":
+      return (yield* buildSchemaGen(node.inner as ASTNode)).nullish();
+    case "zod/nonoptional":
+      return (yield* buildSchemaGen(node.inner as ASTNode) as any).nonoptional();
+    case "zod/readonly":
+      return (yield* buildSchemaGen(node.inner as ASTNode)).readonly();
+    case "zod/branded":
+      return (yield* buildSchemaGen(node.inner as ASTNode)).brand(node.brand as string);
+
+    // Value-carrying wrappers — evaluate the value AST node via recurse
+    case "zod/default": {
+      const inner = yield* buildSchemaGen(node.inner as ASTNode);
+      const value = yield { type: "recurse", child: node.value as ASTNode };
+      return inner.default(value);
+    }
+    case "zod/prefault": {
+      const inner = yield* buildSchemaGen(node.inner as ASTNode);
+      const value = yield { type: "recurse", child: node.value as ASTNode };
+      return (inner as any).prefault(value);
+    }
+    case "zod/catch": {
+      const inner = yield* buildSchemaGen(node.inner as ASTNode);
+      const value = yield { type: "recurse", child: node.value as ASTNode };
+      return inner.catch(value);
+    }
+
     // Additional schema types will be added by colocated interpreter issues
     default:
       throw new Error(`Zod interpreter: unknown schema kind "${node.kind}"`);
@@ -79,8 +112,9 @@ function parseErrorOpt(node: ASTNode): { error?: (iss: unknown) => string } {
  * Handles parsing operation nodes by recursing into schema + input,
  * reconstructing the Zod schema from AST, and executing validation.
  *
- * Schema nodes (zod/string, etc.) are handled by `buildSchema` which
- * constructs actual Zod schemas from AST descriptors.
+ * Schema nodes (zod/string, etc.) are handled by `buildSchemaGen` which
+ * constructs actual Zod schemas from AST descriptors, yielding recurse
+ * effects for value-carrying wrappers.
  */
 export const zodInterpreter: InterpreterFragment = {
   pluginName: "zod",
@@ -88,22 +122,22 @@ export const zodInterpreter: InterpreterFragment = {
   *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
     switch (node.kind) {
       case "zod/parse": {
-        const schema = buildSchema(node.schema as ASTNode);
+        const schema = yield* buildSchemaGen(node.schema as ASTNode);
         const input = yield { type: "recurse", child: node.input as ASTNode };
         return schema.parse(input, parseErrorOpt(node));
       }
       case "zod/safe_parse": {
-        const schema = buildSchema(node.schema as ASTNode);
+        const schema = yield* buildSchemaGen(node.schema as ASTNode);
         const input = yield { type: "recurse", child: node.input as ASTNode };
         return schema.safeParse(input, parseErrorOpt(node));
       }
       case "zod/parse_async": {
-        const schema = buildSchema(node.schema as ASTNode);
+        const schema = yield* buildSchemaGen(node.schema as ASTNode);
         const input = yield { type: "recurse", child: node.input as ASTNode };
         return schema.parseAsync(input, parseErrorOpt(node));
       }
       case "zod/safe_parse_async": {
-        const schema = buildSchema(node.schema as ASTNode);
+        const schema = yield* buildSchemaGen(node.schema as ASTNode);
         const input = yield { type: "recurse", child: node.input as ASTNode };
         return schema.safeParseAsync(input, parseErrorOpt(node));
       }
