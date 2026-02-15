@@ -4,12 +4,8 @@
 
 ```ts
 
-import type { ASTNode } from '@mvfm/core';
-import type { Expr } from '@mvfm/core';
-import type { InterpreterFragment } from '@mvfm/core';
-import type { PluginDefinition } from '@mvfm/core';
-import type { StepHandler } from '@mvfm/core';
-
+// Warning: (ae-forgotten-export) The symbol "StepHandler" needs to be exported by the entry point index.d.ts
+//
 // @public
 export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
 
@@ -26,6 +22,8 @@ export interface ClientHandlerState {
     stepIndex: number;
 }
 
+// Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
+//
 // @public
 function fetch_2(config?: FetchConfig): PluginDefinition<FetchMethods>;
 export { fetch_2 as fetch }
@@ -41,11 +39,14 @@ export interface FetchConfig {
     defaultHeaders?: Record<string, string>;
 }
 
+// Warning: (ae-forgotten-export) The symbol "InterpreterFragment" needs to be exported by the entry point index.d.ts
+//
 // @public
 export const fetchInterpreter: InterpreterFragment;
 
 // @public
 export interface FetchMethods {
+    // Warning: (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
     fetch: ((url: Expr<string> | string, init?: Expr<FetchRequestInit> | FetchRequestInit) => Expr<unknown>) & {
         json(response: Expr<unknown>): Expr<unknown>;
         text(response: Expr<unknown>): Expr<string>;
@@ -80,6 +81,8 @@ export interface FetchRequestInit {
     referrerPolicy?: string;
 }
 
+// Warning: (ae-forgotten-export) The symbol "ASTNode" needs to be exported by the entry point index.d.ts
+//
 // @public
 export function serverEvaluate(client: FetchClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
 

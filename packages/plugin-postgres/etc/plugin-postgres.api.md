@@ -4,13 +4,10 @@
 
 ```ts
 
-import type { ASTNode } from '@mvfm/core';
-import type { Expr } from '@mvfm/core';
-import type { InterpreterFragment } from '@mvfm/core';
-import type { PluginDefinition } from '@mvfm/core';
 import type { default as postgres_2 } from 'postgres';
-import type { StepHandler } from '@mvfm/core';
 
+// Warning: (ae-forgotten-export) The symbol "StepHandler" needs to be exported by the entry point index.d.ts
+//
 // @public
 export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
 
@@ -33,6 +30,8 @@ export function escapeIdentifier(name: string): string;
 // @public
 export function findCursorBatch(node: any): any | null;
 
+// Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
+//
 // @public
 export function postgres(config?: PostgresConfig | string): PluginDefinition<PostgresMethods>;
 
@@ -75,6 +74,8 @@ export interface PostgresConfig {
     username?: string;
 }
 
+// Warning: (ae-forgotten-export) The symbol "InterpreterFragment" needs to be exported by the entry point index.d.ts
+//
 // @public
 export const postgresInterpreter: InterpreterFragment;
 
@@ -84,6 +85,8 @@ export interface PostgresMethods {
     sql: PostgresSql;
 }
 
+// Warning: (ae-forgotten-export) The symbol "ASTNode" needs to be exported by the entry point index.d.ts
+//
 // @public
 export function serverEvaluate(client: PostgresClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
 

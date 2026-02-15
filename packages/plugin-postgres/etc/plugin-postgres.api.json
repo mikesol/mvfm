@@ -209,7 +209,7 @@
             {
               "kind": "Reference",
               "text": "StepHandler",
-              "canonicalReference": "@mvfm/core!StepHandler:type"
+              "canonicalReference": "@mvfm/plugin-postgres!~StepHandler:type"
             },
             {
               "kind": "Content",
@@ -544,7 +544,7 @@
             {
               "kind": "Reference",
               "text": "PluginDefinition",
-              "canonicalReference": "@mvfm/core!PluginDefinition:interface"
+              "canonicalReference": "@mvfm/plugin-postgres!~PluginDefinition:interface"
             },
             {
               "kind": "Content",
@@ -1209,7 +1209,7 @@
             {
               "kind": "Reference",
               "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
+              "canonicalReference": "@mvfm/plugin-postgres!~InterpreterFragment:interface"
             }
           ],
           "fileUrlPath": "dist/3.4.8/interpreter.d.ts",
@@ -1288,7 +1288,7 @@
             {
               "kind": "Reference",
               "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
+              "canonicalReference": "@mvfm/plugin-postgres!~InterpreterFragment:interface"
             },
             {
               "kind": "Content",
@@ -1305,7 +1305,7 @@
             {
               "kind": "Reference",
               "text": "ASTNode",
-              "canonicalReference": "@mvfm/core!ASTNode:interface"
+              "canonicalReference": "@mvfm/plugin-postgres!~ASTNode:interface"
             },
             {
               "kind": "Content",
@@ -1373,7 +1373,7 @@
             {
               "kind": "Reference",
               "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
+              "canonicalReference": "@mvfm/plugin-postgres!~InterpreterFragment:interface"
             },
             {
               "kind": "Content",
@@ -1386,7 +1386,7 @@
             {
               "kind": "Reference",
               "text": "StepHandler",
-              "canonicalReference": "@mvfm/core!StepHandler:type"
+              "canonicalReference": "@mvfm/plugin-postgres!~StepHandler:type"
             },
             {
               "kind": "Content",

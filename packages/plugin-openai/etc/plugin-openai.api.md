@@ -4,13 +4,10 @@
 
 ```ts
 
-import type { ASTNode } from '@mvfm/core';
-import type { Expr } from '@mvfm/core';
-import type { InterpreterFragment } from '@mvfm/core';
 import type OpenAI from 'openai';
-import type { PluginDefinition } from '@mvfm/core';
-import type { StepHandler } from '@mvfm/core';
 
+// Warning: (ae-forgotten-export) The symbol "StepHandler" needs to be exported by the entry point index.d.ts
+//
 // @public
 export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
 
@@ -27,6 +24,8 @@ export interface ClientHandlerState {
     stepIndex: number;
 }
 
+// Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
+//
 // @public
 export function openai(config: OpenAIConfig): PluginDefinition<OpenAIMethods>;
 
@@ -42,6 +41,8 @@ export interface OpenAIConfig {
     project?: string;
 }
 
+// Warning: (ae-forgotten-export) The symbol "InterpreterFragment" needs to be exported by the entry point index.d.ts
+//
 // @public
 export const openaiInterpreter: InterpreterFragment;
 
@@ -69,6 +70,8 @@ export interface OpenAIMethods {
     };
 }
 
+// Warning: (ae-forgotten-export) The symbol "ASTNode" needs to be exported by the entry point index.d.ts
+//
 // @public
 export function serverEvaluate(client: OpenAIClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
 
@@ -77,6 +80,10 @@ export function serverHandler(client: OpenAIClient): StepHandler<void>;
 
 // @public
 export function wrapOpenAISdk(client: OpenAI): OpenAIClient;
+
+// Warnings were encountered during analysis:
+//
+// dist/6.21.0/index.d.ts:15:17 - (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

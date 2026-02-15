@@ -209,7 +209,7 @@
             {
               "kind": "Reference",
               "text": "StepHandler",
-              "canonicalReference": "@mvfm/core!StepHandler:type"
+              "canonicalReference": "@mvfm/plugin-openai!~StepHandler:type"
             },
             {
               "kind": "Content",
@@ -450,7 +450,7 @@
             {
               "kind": "Reference",
               "text": "PluginDefinition",
-              "canonicalReference": "@mvfm/core!PluginDefinition:interface"
+              "canonicalReference": "@mvfm/plugin-openai!~PluginDefinition:interface"
             },
             {
               "kind": "Content",
@@ -705,7 +705,7 @@
             {
               "kind": "Reference",
               "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
+              "canonicalReference": "@mvfm/plugin-openai!~InterpreterFragment:interface"
             }
           ],
           "fileUrlPath": "dist/6.21.0/interpreter.d.ts",
@@ -748,7 +748,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-openai!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -775,7 +775,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-openai!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -793,7 +793,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-openai!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -802,7 +802,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-openai!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -820,7 +820,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-openai!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -847,7 +847,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-openai!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -865,7 +865,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-openai!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -874,7 +874,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-openai!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -901,7 +901,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-openai!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -919,7 +919,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-openai!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -928,7 +928,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-openai!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -946,7 +946,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-openai!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -973,7 +973,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-openai!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -991,7 +991,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-openai!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -1018,7 +1018,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-openai!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -1036,7 +1036,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-openai!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -1063,7 +1063,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-openai!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -1116,7 +1116,7 @@
             {
               "kind": "Reference",
               "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
+              "canonicalReference": "@mvfm/plugin-openai!~InterpreterFragment:interface"
             },
             {
               "kind": "Content",
@@ -1133,7 +1133,7 @@
             {
               "kind": "Reference",
               "text": "ASTNode",
-              "canonicalReference": "@mvfm/core!ASTNode:interface"
+              "canonicalReference": "@mvfm/plugin-openai!~ASTNode:interface"
             },
             {
               "kind": "Content",
@@ -1201,7 +1201,7 @@
             {
               "kind": "Reference",
               "text": "StepHandler",
-              "canonicalReference": "@mvfm/core!StepHandler:type"
+              "canonicalReference": "@mvfm/plugin-openai!~StepHandler:type"
             },
             {
               "kind": "Content",

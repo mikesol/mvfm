@@ -4,12 +4,8 @@
 
 ```ts
 
-import type { ASTNode } from '@mvfm/core';
-import type { Expr } from '@mvfm/core';
-import type { InterpreterFragment } from '@mvfm/core';
-import type { PluginDefinition } from '@mvfm/core';
-import type { StepHandler } from '@mvfm/core';
-
+// Warning: (ae-forgotten-export) The symbol "StepHandler" needs to be exported by the entry point index.d.ts
+//
 // @public
 export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
 
@@ -26,6 +22,8 @@ export interface ClientHandlerState {
     stepIndex: number;
 }
 
+// Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
+//
 // @public
 export function pino(config?: PinoConfig): PluginDefinition<PinoMethods>;
 
@@ -70,6 +68,8 @@ export interface PinoInstance {
     warn(msg: string): void;
 }
 
+// Warning: (ae-forgotten-export) The symbol "InterpreterFragment" needs to be exported by the entry point index.d.ts
+//
 // @public
 export const pinoInterpreter: InterpreterFragment;
 
@@ -88,6 +88,7 @@ export interface PinoLogger {
     info(msg: Expr<string> | string): Expr<void>;
     // (undocumented)
     info(mergeObject: Expr<Record<string, unknown>> | Record<string, unknown>, msg: Expr<string> | string): Expr<void>;
+    // Warning: (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
     trace(msg: Expr<string> | string): Expr<void>;
     // (undocumented)
     trace(mergeObject: Expr<Record<string, unknown>> | Record<string, unknown>, msg: Expr<string> | string): Expr<void>;
@@ -101,6 +102,8 @@ export interface PinoMethods {
     pino: PinoLogger;
 }
 
+// Warning: (ae-forgotten-export) The symbol "ASTNode" needs to be exported by the entry point index.d.ts
+//
 // @public
 export function serverEvaluate(client: PinoClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
 

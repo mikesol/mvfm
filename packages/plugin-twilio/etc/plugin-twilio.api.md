@@ -4,12 +4,8 @@
 
 ```ts
 
-import type { ASTNode } from '@mvfm/core';
-import type { Expr } from '@mvfm/core';
-import type { InterpreterFragment } from '@mvfm/core';
-import type { PluginDefinition } from '@mvfm/core';
-import type { StepHandler } from '@mvfm/core';
-
+// Warning: (ae-forgotten-export) The symbol "StepHandler" needs to be exported by the entry point index.d.ts
+//
 // @public
 export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
 
@@ -26,17 +22,23 @@ export interface ClientHandlerState {
     stepIndex: number;
 }
 
+// Warning: (ae-forgotten-export) The symbol "InterpreterFragment" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "ASTNode" needs to be exported by the entry point index.d.ts
+//
 // @public
 export function serverEvaluate(client: TwilioClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
 
 // @public
 export function serverHandler(client: TwilioClient): StepHandler<void>;
 
+// Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
+//
 // @public
 export function twilio(config: TwilioConfig): PluginDefinition<TwilioMethods>;
 
 // @public
 export interface TwilioCallContext {
+    // Warning: (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
     fetch(): Expr<Record<string, unknown>>;
 }
 

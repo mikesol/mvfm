@@ -209,7 +209,7 @@
             {
               "kind": "Reference",
               "text": "PluginDefinition",
-              "canonicalReference": "@mvfm/core!PluginDefinition:interface"
+              "canonicalReference": "@mvfm/plugin-anthropic!~PluginDefinition:interface"
             },
             {
               "kind": "Content",
@@ -437,7 +437,7 @@
             {
               "kind": "Reference",
               "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
+              "canonicalReference": "@mvfm/plugin-anthropic!~InterpreterFragment:interface"
             }
           ],
           "fileUrlPath": "dist/0.74.0/interpreter.d.ts",
@@ -480,7 +480,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-anthropic!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -507,7 +507,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-anthropic!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -525,7 +525,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-anthropic!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -552,7 +552,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-anthropic!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -570,7 +570,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-anthropic!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -597,7 +597,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-anthropic!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -615,7 +615,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-anthropic!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -624,7 +624,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-anthropic!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -642,7 +642,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-anthropic!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -669,7 +669,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-anthropic!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -687,7 +687,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-anthropic!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -696,7 +696,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-anthropic!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -714,7 +714,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-anthropic!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -723,7 +723,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-anthropic!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -741,7 +741,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-anthropic!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -750,7 +750,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-anthropic!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -768,7 +768,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-anthropic!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -795,7 +795,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-anthropic!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -848,7 +848,7 @@
             {
               "kind": "Reference",
               "text": "StepHandler",
-              "canonicalReference": "@mvfm/core!StepHandler:type"
+              "canonicalReference": "@mvfm/plugin-anthropic!~StepHandler:type"
             },
             {
               "kind": "Content",
@@ -1089,7 +1089,7 @@
             {
               "kind": "Reference",
               "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
+              "canonicalReference": "@mvfm/plugin-anthropic!~InterpreterFragment:interface"
             },
             {
               "kind": "Content",
@@ -1106,7 +1106,7 @@
             {
               "kind": "Reference",
               "text": "ASTNode",
-              "canonicalReference": "@mvfm/core!ASTNode:interface"
+              "canonicalReference": "@mvfm/plugin-anthropic!~ASTNode:interface"
             },
             {
               "kind": "Content",
@@ -1174,7 +1174,7 @@
             {
               "kind": "Reference",
               "text": "StepHandler",
-              "canonicalReference": "@mvfm/core!StepHandler:type"
+              "canonicalReference": "@mvfm/plugin-anthropic!~StepHandler:type"
             },
             {
               "kind": "Content",

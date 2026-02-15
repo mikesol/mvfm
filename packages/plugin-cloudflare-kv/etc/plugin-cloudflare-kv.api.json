@@ -209,7 +209,7 @@
             {
               "kind": "Reference",
               "text": "StepHandler",
-              "canonicalReference": "@mvfm/core!StepHandler:type"
+              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~StepHandler:type"
             },
             {
               "kind": "Content",
@@ -450,7 +450,7 @@
             {
               "kind": "Reference",
               "text": "PluginDefinition",
-              "canonicalReference": "@mvfm/core!PluginDefinition:interface"
+              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~PluginDefinition:interface"
             },
             {
               "kind": "Content",
@@ -876,7 +876,7 @@
             {
               "kind": "Reference",
               "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
+              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~InterpreterFragment:interface"
             }
           ],
           "fileUrlPath": "dist/4.20260213.0/interpreter.d.ts",
@@ -928,7 +928,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -937,7 +937,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -946,7 +946,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -973,7 +973,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -982,7 +982,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -991,7 +991,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -1000,7 +1000,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -1027,7 +1027,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -1086,7 +1086,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -1099,7 +1099,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -1139,7 +1139,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -1160,7 +1160,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -1216,7 +1216,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -1237,7 +1237,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -2024,7 +2024,7 @@
             {
               "kind": "Reference",
               "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
+              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~InterpreterFragment:interface"
             },
             {
               "kind": "Content",
@@ -2041,7 +2041,7 @@
             {
               "kind": "Reference",
               "text": "ASTNode",
-              "canonicalReference": "@mvfm/core!ASTNode:interface"
+              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~ASTNode:interface"
             },
             {
               "kind": "Content",
@@ -2109,7 +2109,7 @@
             {
               "kind": "Reference",
               "text": "StepHandler",
-              "canonicalReference": "@mvfm/core!StepHandler:type"
+              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~StepHandler:type"
             },
             {
               "kind": "Content",

@@ -209,7 +209,7 @@
             {
               "kind": "Reference",
               "text": "StepHandler",
-              "canonicalReference": "@mvfm/core!StepHandler:type"
+              "canonicalReference": "@mvfm/plugin-twilio!~StepHandler:type"
             },
             {
               "kind": "Content",
@@ -450,7 +450,7 @@
             {
               "kind": "Reference",
               "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
+              "canonicalReference": "@mvfm/plugin-twilio!~InterpreterFragment:interface"
             },
             {
               "kind": "Content",
@@ -467,7 +467,7 @@
             {
               "kind": "Reference",
               "text": "ASTNode",
-              "canonicalReference": "@mvfm/core!ASTNode:interface"
+              "canonicalReference": "@mvfm/plugin-twilio!~ASTNode:interface"
             },
             {
               "kind": "Content",
@@ -535,7 +535,7 @@
             {
               "kind": "Reference",
               "text": "StepHandler",
-              "canonicalReference": "@mvfm/core!StepHandler:type"
+              "canonicalReference": "@mvfm/plugin-twilio!~StepHandler:type"
             },
             {
               "kind": "Content",
@@ -586,7 +586,7 @@
             {
               "kind": "Reference",
               "text": "PluginDefinition",
-              "canonicalReference": "@mvfm/core!PluginDefinition:interface"
+              "canonicalReference": "@mvfm/plugin-twilio!~PluginDefinition:interface"
             },
             {
               "kind": "Content",
@@ -652,7 +652,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-twilio!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -712,7 +712,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-twilio!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -761,7 +761,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-twilio!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -792,7 +792,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-twilio!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -843,7 +843,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-twilio!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -874,7 +874,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-twilio!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -1105,7 +1105,7 @@
             {
               "kind": "Reference",
               "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
+              "canonicalReference": "@mvfm/plugin-twilio!~InterpreterFragment:interface"
             }
           ],
           "fileUrlPath": "dist/5.5.1/interpreter.d.ts",
@@ -1144,7 +1144,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-twilio!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -1204,7 +1204,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-twilio!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -1253,7 +1253,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-twilio!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -1284,7 +1284,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-twilio!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -1335,7 +1335,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-twilio!~Expr:type"
                 },
                 {
                   "kind": "Content",
@@ -1366,7 +1366,7 @@
                 {
                   "kind": "Reference",
                   "text": "Expr",
-                  "canonicalReference": "@mvfm/core!Expr:type"
+                  "canonicalReference": "@mvfm/plugin-twilio!~Expr:type"
                 },
                 {
                   "kind": "Content",

@@ -4,13 +4,10 @@
 
 ```ts
 
-import type { ASTNode } from '@mvfm/core';
-import type { Expr } from '@mvfm/core';
-import type { InterpreterFragment } from '@mvfm/core';
-import type { PluginDefinition } from '@mvfm/core';
-import type { StepHandler } from '@mvfm/core';
 import type { WebClient } from '@slack/web-api';
 
+// Warning: (ae-forgotten-export) The symbol "StepHandler" needs to be exported by the entry point index.d.ts
+//
 // @public
 export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
 
@@ -27,12 +24,17 @@ export interface ClientHandlerState {
     stepIndex: number;
 }
 
+// Warning: (ae-forgotten-export) The symbol "InterpreterFragment" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "ASTNode" needs to be exported by the entry point index.d.ts
+//
 // @public
 export function serverEvaluate(client: SlackClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
 
 // @public
 export function serverHandler(client: SlackClient): StepHandler<void>;
 
+// Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
+//
 // @public
 export function slack(config: SlackConfig): PluginDefinition<SlackMethods>;
 
@@ -92,6 +94,10 @@ export interface SlackMethods {
 
 // @public
 export function wrapSlackWebClient(client: WebClient): SlackClient;
+
+// Warnings were encountered during analysis:
+//
+// dist/7.14.0/index.d.ts:15:13 - (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

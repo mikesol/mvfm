@@ -4,13 +4,10 @@
 
 ```ts
 
-import type { ASTNode } from '@mvfm/core';
-import type { Expr } from '@mvfm/core';
-import type { InterpreterFragment } from '@mvfm/core';
-import type { PluginDefinition } from '@mvfm/core';
-import type { StepHandler } from '@mvfm/core';
 import type Stripe from 'stripe';
 
+// Warning: (ae-forgotten-export) The symbol "StepHandler" needs to be exported by the entry point index.d.ts
+//
 // @public
 export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
 
@@ -27,12 +24,17 @@ export interface ClientHandlerState {
     stepIndex: number;
 }
 
+// Warning: (ae-forgotten-export) The symbol "InterpreterFragment" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "ASTNode" needs to be exported by the entry point index.d.ts
+//
 // @public
 export function serverEvaluate(client: StripeClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
 
 // @public
 export function serverHandler(client: StripeClient): StepHandler<void>;
 
+// Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
+//
 // @public
 export function stripe(config: StripeConfig): PluginDefinition<StripeMethods>;
 
@@ -74,6 +76,10 @@ export interface StripeMethods {
 
 // @public
 export function wrapStripeSdk(stripe: Stripe): StripeClient;
+
+// Warnings were encountered during analysis:
+//
+// dist/2025-04-30.basil/index.d.ts:14:13 - (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 
