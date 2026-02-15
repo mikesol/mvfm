@@ -26,8 +26,8 @@ function injectInput(node: any, input: Record<string, unknown>): any {
   return result;
 }
 
-let container: StartedTestContainer;
-let awsClient: AwsS3Client;
+let container: StartedTestContainer | undefined;
+let awsClient: AwsS3Client | undefined;
 
 const BUCKET = "test-bucket";
 
@@ -44,6 +44,9 @@ const commands: Record<string, new (input: any) => any> = {
 const app = mvfm(num, str, s3Plugin({ region: "us-east-1" }));
 
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
+  if (!awsClient) {
+    throw new Error("S3 test client was not initialized");
+  }
   const ast = injectInput(prog.ast, input);
   const client = wrapAwsSdk(awsClient, commands);
   const evaluate = serverEvaluate(client, allFragments);
@@ -51,17 +54,24 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
 }
 
 beforeAll(async () => {
-  container = await new GenericContainer("localstack/localstack:latest")
-    .withExposedPorts(4566)
-    .withEnvironment({ SERVICES: "s3" })
-    .start();
+  const endpointFromEnv =
+    process.env.MVFM_S3_ENDPOINT ?? process.env.AWS_ENDPOINT_URL_S3 ?? process.env.AWS_ENDPOINT_URL;
+  let endpoint = endpointFromEnv;
 
-  const host = container.getHost();
-  const port = container.getMappedPort(4566);
+  if (!endpoint) {
+    container = await new GenericContainer("localstack/localstack:latest")
+      .withExposedPorts(4566)
+      .withEnvironment({ SERVICES: "s3" })
+      .start();
+
+    const host = container.getHost();
+    const port = container.getMappedPort(4566);
+    endpoint = `http://${host}:${port}`;
+  }
 
   awsClient = new AwsS3Client({
     region: "us-east-1",
-    endpoint: `http://${host}:${port}`,
+    endpoint,
     forcePathStyle: true,
     credentials: {
       accessKeyId: "test",
@@ -74,8 +84,10 @@ beforeAll(async () => {
 }, 120000);
 
 afterAll(async () => {
-  awsClient.destroy();
-  await container.stop();
+  awsClient?.destroy();
+  if (container) {
+    await container.stop();
+  }
 });
 
 // ============================================================
