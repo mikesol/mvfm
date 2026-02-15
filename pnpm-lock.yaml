@@ -39,7 +39,7 @@ importers:
     devDependencies:
       '@anthropic-ai/sdk':
         specifier: ^0.74.0
-        version: 0.74.0
+        version: 0.74.0(zod@4.3.6)
       '@mvfm/core':
         specifier: workspace:*
         version: link:../core
@@ -72,7 +72,7 @@ importers:
         version: link:../core
       openai:
         specifier: ^6.22.0
-        version: 6.22.0
+        version: 6.22.0(zod@4.3.6)
 
   packages/plugin-pino:
     devDependencies:
@@ -148,6 +148,15 @@ importers:
       '@mvfm/core':
         specifier: workspace:*
         version: link:../core
+
+  packages/plugin-zod:
+    devDependencies:
+      '@mvfm/core':
+        specifier: workspace:*
+        version: link:../core
+      zod:
+        specifier: ^4.0.0
+        version: 4.3.6
 
 packages:
 
@@ -2274,11 +2283,16 @@ packages:
     resolution: {integrity: sha512-zK7YHHz4ZXpW89AHXUPbQVGKI7uvkd3hzusTdotCg1UxyaVtg0zFJSTfW/Dq5f7OBBVnq6cZIaC8Ti4hb6dtCA==}
     engines: {node: '>= 14'}
 
+  zod@4.3.6:
+    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
+
 snapshots:
 
-  '@anthropic-ai/sdk@0.74.0':
+  '@anthropic-ai/sdk@0.74.0(zod@4.3.6)':
     dependencies:
       json-schema-to-ts: 3.1.1
+    optionalDependencies:
+      zod: 4.3.6
 
   '@aws-crypto/crc32@5.2.0':
     dependencies:
@@ -4202,7 +4216,9 @@ snapshots:
     dependencies:
       mimic-function: 5.0.1
 
-  openai@6.22.0: {}
+  openai@6.22.0(zod@4.3.6):
+    optionalDependencies:
+      zod: 4.3.6
 
   p-finally@1.0.0: {}
 
@@ -4768,3 +4784,5 @@ snapshots:
       archiver-utils: 5.0.2
       compress-commons: 6.0.2
       readable-stream: 4.7.0
+
+  zod@4.3.6: {}

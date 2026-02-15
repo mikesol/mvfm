@@ -1,0 +1,29 @@
+{
+  "name": "@mvfm/plugin-zod",
+  "version": "0.0.1",
+  "description": "Zod validation DSL plugin for mvfm",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "biome check --error-on-warnings src tests && tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "files": ["dist"],
+  "peerDependencies": {
+    "@mvfm/core": "workspace:*",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@mvfm/core": "workspace:*",
+    "zod": "^4.0.0"
+  }
+}
