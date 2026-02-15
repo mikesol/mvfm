@@ -5,6 +5,13 @@ import type { ASTNode } from "@mvfm/core";
 // ============================================================
 
 /**
+ * Error configuration accepted by schema constructors, check methods,
+ * and parse operations. Can be a simple string message or an error map
+ * AST node (a DSL expression producing a string from the validation issue).
+ */
+export type ErrorConfig = string | ASTNode;
+
+/**
  * A check descriptor stored inside a schema node's `checks` array.
  *
  * Each check has a `kind` (e.g. `"min_length"`, `"gt"`, `"regex"`)
@@ -14,7 +21,7 @@ export interface CheckDescriptor {
   /** Check kind identifier (e.g. `"min_length"`, `"gt"`, `"regex"`) */
   kind: string;
   /** Optional custom error message or error map AST node */
-  error?: string | ASTNode;
+  error?: ErrorConfig;
   /** If true, validation stops after this check fails */
   abort?: boolean;
   /** Conditional execution predicate (AST node returning boolean) */
@@ -35,7 +42,7 @@ export interface RefinementDescriptor {
   /** Predicate or transform AST expression */
   fn: ASTNode;
   /** Optional custom error */
-  error?: string | ASTNode;
+  error?: ErrorConfig;
   /** If true, validation stops after this refinement fails */
   abort?: boolean;
   /** Error path override */
@@ -58,7 +65,7 @@ export interface SchemaASTNode extends ASTNode {
   /** Accumulated refinement descriptors */
   refinements: RefinementDescriptor[];
   /** Schema-level error config */
-  error?: string | ASTNode;
+  error?: ErrorConfig;
 }
 
 /**
@@ -82,5 +89,5 @@ export interface ValidationASTNode extends ASTNode {
   /** The input expression to validate */
   input: ASTNode;
   /** Optional per-parse error config */
-  parseError?: string | ASTNode;
+  parseError?: ErrorConfig;
 }

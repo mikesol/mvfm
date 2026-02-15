@@ -1,6 +1,6 @@
 import type { ASTNode, PluginContext } from "@mvfm/core";
 import { ZodSchemaBuilder } from "./base";
-import type { CheckDescriptor, RefinementDescriptor } from "./types";
+import type { CheckDescriptor, ErrorConfig, RefinementDescriptor } from "./types";
 
 /**
  * Builder for Zod string schemas.
@@ -16,7 +16,7 @@ export class ZodStringBuilder extends ZodSchemaBuilder<string> {
     ctx: PluginContext,
     checks: readonly CheckDescriptor[] = [],
     refinements: readonly RefinementDescriptor[] = [],
-    error?: string | ASTNode,
+    error?: ErrorConfig,
     extra: Record<string, unknown> = {},
   ) {
     super(ctx, "zod/string", checks, refinements, error, extra);

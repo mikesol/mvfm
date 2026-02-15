@@ -124,4 +124,33 @@ describe("ZodSchemaBuilder base class", () => {
       value: 100,
     });
   });
+
+  it("parse() accepts per-parse error config", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.string().parse($.input, { error: "Parse failed!" });
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.kind).toBe("zod/parse");
+    expect(ast.result.parseError).toBe("Parse failed!");
+  });
+
+  it("safeParse() accepts per-parse error config", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.string().safeParse($.input, { error: "Validation error" });
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.kind).toBe("zod/safe_parse");
+    expect(ast.result.parseError).toBe("Validation error");
+  });
+
+  it("parse() without error option omits parseError from AST", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.string().parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.parseError).toBeUndefined();
+  });
 });

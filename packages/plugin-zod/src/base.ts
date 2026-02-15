@@ -1,5 +1,5 @@
 import type { ASTNode, Expr, PluginContext } from "@mvfm/core";
-import type { CheckDescriptor, RefinementDescriptor, SchemaASTNode } from "./types";
+import type { CheckDescriptor, ErrorConfig, RefinementDescriptor, SchemaASTNode } from "./types";
 
 // ============================================================
 // ZodSchemaBuilder<T> — Base class for all Zod schema types
@@ -41,7 +41,7 @@ export abstract class ZodSchemaBuilder<T> {
   protected readonly _refinements: readonly RefinementDescriptor[];
 
   /** Schema-level error config */
-  protected readonly _error: string | ASTNode | undefined;
+  protected readonly _error: ErrorConfig | undefined;
 
   /** Additional schema-specific fields (e.g. variant, format, shape) */
   protected readonly _extra: Readonly<Record<string, unknown>>;
@@ -51,7 +51,7 @@ export abstract class ZodSchemaBuilder<T> {
     kind: string,
     checks: readonly CheckDescriptor[] = [],
     refinements: readonly RefinementDescriptor[] = [],
-    error?: string | ASTNode,
+    error?: ErrorConfig,
     extra: Record<string, unknown> = {},
   ) {
     this._ctx = ctx;
@@ -90,7 +90,7 @@ export abstract class ZodSchemaBuilder<T> {
   protected abstract _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | ASTNode;
+    error?: ErrorConfig;
     extra?: Record<string, unknown>;
   }): ZodSchemaBuilder<T>;
 
@@ -126,32 +126,56 @@ export abstract class ZodSchemaBuilder<T> {
     }) as this;
   }
 
-  // ---- Parsing operations (implemented by #96) ----
-  // Stubs declared here so TypeScript knows about them.
-  // #96 will provide the actual implementation.
+  // ---- Parsing operations (#96, #97) ----
 
   /**
-   * Validate input and return data or throw. Produces `zod/parse` AST node.
-   * @stub Implemented by #96
+   * Build a validation AST node with the given operation kind.
+   * Handles per-parse error config if provided.
    */
-  parse(input: Expr<unknown> | unknown): Expr<T> {
-    return this._ctx.expr<T>({
-      kind: "zod/parse",
+  private _buildValidationNode(
+    opKind: string,
+    input: Expr<unknown> | unknown,
+    opts?: { error?: ErrorConfig },
+  ): ASTNode {
+    const node: ASTNode & { parseError?: ErrorConfig } = {
+      kind: opKind,
       schema: this._buildSchemaNode(),
       input: this._ctx.lift(input).__node,
-    });
+    };
+    if (opts?.error !== undefined) {
+      node.parseError = opts.error;
+    }
+    return node;
   }
 
-  /**
-   * Validate input and return result object. Produces `zod/safe_parse` AST node.
-   * @stub Implemented by #96
-   */
-  safeParse(input: Expr<unknown> | unknown): Expr<{ success: boolean; data: T; error: unknown }> {
-    return this._ctx.expr<{ success: boolean; data: T; error: unknown }>({
-      kind: "zod/safe_parse",
-      schema: this._buildSchemaNode(),
-      input: this._ctx.lift(input).__node,
-    });
+  /** Validate input and return data or throw. Produces `zod/parse` AST node. */
+  parse(input: Expr<unknown> | unknown, opts?: { error?: ErrorConfig }): Expr<T> {
+    return this._ctx.expr<T>(this._buildValidationNode("zod/parse", input, opts));
+  }
+
+  /** Validate input and return result object. Produces `zod/safe_parse` AST node. */
+  safeParse(
+    input: Expr<unknown> | unknown,
+    opts?: { error?: ErrorConfig },
+  ): Expr<{ success: boolean; data: T; error: unknown }> {
+    return this._ctx.expr<{ success: boolean; data: T; error: unknown }>(
+      this._buildValidationNode("zod/safe_parse", input, opts),
+    );
+  }
+
+  /** Async variant of `parse`. Produces `zod/parse_async` AST node. */
+  parseAsync(input: Expr<unknown> | unknown, opts?: { error?: ErrorConfig }): Expr<Promise<T>> {
+    return this._ctx.expr<Promise<T>>(this._buildValidationNode("zod/parse_async", input, opts));
+  }
+
+  /** Async variant of `safeParse`. Produces `zod/safe_parse_async` AST node. */
+  safeParseAsync(
+    input: Expr<unknown> | unknown,
+    opts?: { error?: ErrorConfig },
+  ): Expr<Promise<{ success: boolean; data: T; error: unknown }>> {
+    return this._ctx.expr<Promise<{ success: boolean; data: T; error: unknown }>>(
+      this._buildValidationNode("zod/safe_parse_async", input, opts),
+    );
   }
 
   // ---- Refinement methods (implemented by #98) ----

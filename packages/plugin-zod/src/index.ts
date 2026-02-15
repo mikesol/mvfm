@@ -6,6 +6,7 @@ export { ZodSchemaBuilder } from "./base";
 export { ZodStringBuilder } from "./string";
 export type {
   CheckDescriptor,
+  ErrorConfig,
   RefinementDescriptor,
   SchemaASTNode,
   ValidationASTNode,
