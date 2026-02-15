@@ -51,7 +51,30 @@
 //
 // ============================================================
 
+import type {
+  DeleteObjectCommandInput,
+  DeleteObjectCommandOutput,
+  GetObjectCommandInput,
+  GetObjectCommandOutput,
+  HeadObjectCommandInput,
+  HeadObjectCommandOutput,
+  ListObjectsV2CommandInput,
+  ListObjectsV2CommandOutput,
+  PutObjectCommandInput,
+  PutObjectCommandOutput,
+} from "@aws-sdk/client-s3";
 import type { Expr, PluginContext, PluginDefinition } from "@mvfm/core";
+
+type PutObjectInput = PutObjectCommandInput;
+type PutObjectResult = PutObjectCommandOutput;
+type GetObjectInput = GetObjectCommandInput;
+type GetObjectResult = GetObjectCommandOutput;
+type DeleteObjectInput = DeleteObjectCommandInput;
+type DeleteObjectResult = DeleteObjectCommandOutput;
+type HeadObjectInput = HeadObjectCommandInput;
+type HeadObjectResult = HeadObjectCommandOutput;
+type ListObjectsV2Input = ListObjectsV2CommandInput;
+type ListObjectsV2Result = ListObjectsV2CommandOutput;
 
 // ---- What the plugin adds to $ ----------------------------
 
@@ -71,9 +94,7 @@ export interface S3Methods {
      * @param input - PutObject input (Bucket, Key, Body required).
      * @returns The PutObject response (ETag, VersionId, etc.).
      */
-    putObject(
-      input: Expr<Record<string, unknown>> | Record<string, unknown>,
-    ): Expr<Record<string, unknown>>;
+    putObject(input: Expr<PutObjectInput> | PutObjectInput): Expr<PutObjectResult>;
 
     /**
      * Download an object from S3.
@@ -81,9 +102,7 @@ export interface S3Methods {
      * @param input - GetObject input (Bucket, Key required).
      * @returns The GetObject response (Body as string, ContentType, etc.).
      */
-    getObject(
-      input: Expr<Record<string, unknown>> | Record<string, unknown>,
-    ): Expr<Record<string, unknown>>;
+    getObject(input: Expr<GetObjectInput> | GetObjectInput): Expr<GetObjectResult>;
 
     /**
      * Delete an object from S3.
@@ -91,9 +110,7 @@ export interface S3Methods {
      * @param input - DeleteObject input (Bucket, Key required).
      * @returns The DeleteObject response (DeleteMarker, VersionId, etc.).
      */
-    deleteObject(
-      input: Expr<Record<string, unknown>> | Record<string, unknown>,
-    ): Expr<Record<string, unknown>>;
+    deleteObject(input: Expr<DeleteObjectInput> | DeleteObjectInput): Expr<DeleteObjectResult>;
 
     /**
      * Check existence and retrieve metadata for an object.
@@ -101,9 +118,7 @@ export interface S3Methods {
      * @param input - HeadObject input (Bucket, Key required).
      * @returns The HeadObject response (ContentLength, ContentType, etc.).
      */
-    headObject(
-      input: Expr<Record<string, unknown>> | Record<string, unknown>,
-    ): Expr<Record<string, unknown>>;
+    headObject(input: Expr<HeadObjectInput> | HeadObjectInput): Expr<HeadObjectResult>;
 
     /**
      * List objects in a bucket (v2).
@@ -111,9 +126,7 @@ export interface S3Methods {
      * @param input - ListObjectsV2 input (Bucket required, Prefix optional).
      * @returns The ListObjectsV2 response (Contents, IsTruncated, etc.).
      */
-    listObjectsV2(
-      input: Expr<Record<string, unknown>> | Record<string, unknown>,
-    ): Expr<Record<string, unknown>>;
+    listObjectsV2(input: Expr<ListObjectsV2Input> | ListObjectsV2Input): Expr<ListObjectsV2Result>;
   };
 }
 
@@ -170,7 +183,7 @@ export function s3(config: S3Config): PluginDefinition<S3Methods> {
     ],
 
     build(ctx: PluginContext): S3Methods {
-      function resolveInput(input: Expr<Record<string, unknown>> | Record<string, unknown>) {
+      function resolveInput<T>(input: Expr<T> | T) {
         return ctx.lift(input).__node;
       }
 

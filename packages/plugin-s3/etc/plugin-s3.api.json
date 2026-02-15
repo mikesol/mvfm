@@ -767,39 +767,21 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "PutObjectInput",
+                  "canonicalReference": "@mvfm/plugin-s3!~PutObjectInput:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": "> | "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "PutObjectInput",
+                  "canonicalReference": "@mvfm/plugin-s3!~PutObjectInput:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-s3!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>>;\n        getObject(input: "
+                  "text": "): "
                 },
                 {
                   "kind": "Reference",
@@ -812,21 +794,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "PutObjectResult",
+                  "canonicalReference": "@mvfm/plugin-s3!~PutObjectResult:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": ">;\n        getObject(input: "
                 },
                 {
                   "kind": "Reference",
@@ -839,12 +812,21 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "GetObjectInput",
+                  "canonicalReference": "@mvfm/plugin-s3!~GetObjectInput:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n        deleteObject(input: "
+                  "text": "> | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "GetObjectInput",
+                  "canonicalReference": "@mvfm/plugin-s3!~GetObjectInput:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
                 },
                 {
                   "kind": "Reference",
@@ -857,21 +839,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "GetObjectResult",
+                  "canonicalReference": "@mvfm/plugin-s3!~GetObjectResult:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": ">;\n        deleteObject(input: "
                 },
                 {
                   "kind": "Reference",
@@ -884,12 +857,21 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "DeleteObjectInput",
+                  "canonicalReference": "@mvfm/plugin-s3!~DeleteObjectInput:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n        headObject(input: "
+                  "text": "> | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "DeleteObjectInput",
+                  "canonicalReference": "@mvfm/plugin-s3!~DeleteObjectInput:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
                 },
                 {
                   "kind": "Reference",
@@ -902,21 +884,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "DeleteObjectResult",
+                  "canonicalReference": "@mvfm/plugin-s3!~DeleteObjectResult:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": ">;\n        headObject(input: "
                 },
                 {
                   "kind": "Reference",
@@ -929,12 +902,21 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "HeadObjectInput",
+                  "canonicalReference": "@mvfm/plugin-s3!~HeadObjectInput:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n        listObjectsV2(input: "
+                  "text": "> | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "HeadObjectInput",
+                  "canonicalReference": "@mvfm/plugin-s3!~HeadObjectInput:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
                 },
                 {
                   "kind": "Reference",
@@ -947,21 +929,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "HeadObjectResult",
+                  "canonicalReference": "@mvfm/plugin-s3!~HeadObjectResult:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": ">;\n        listObjectsV2(input: "
                 },
                 {
                   "kind": "Reference",
@@ -974,12 +947,39 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ListObjectsV2Input",
+                  "canonicalReference": "@mvfm/plugin-s3!~ListObjectsV2Input:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n    }"
+                  "text": "> | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ListObjectsV2Input",
+                  "canonicalReference": "@mvfm/plugin-s3!~ListObjectsV2Input:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Expr",
+                  "canonicalReference": "@mvfm/plugin-s3!~Expr:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ListObjectsV2Result",
+                  "canonicalReference": "@mvfm/plugin-s3!~ListObjectsV2Result:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">;\n    }"
                 },
                 {
                   "kind": "Content",

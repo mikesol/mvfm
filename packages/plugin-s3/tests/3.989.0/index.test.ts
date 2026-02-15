@@ -1,5 +1,8 @@
+import type { GetObjectCommandOutput, PutObjectCommandOutput } from "@aws-sdk/client-s3";
+import type { Expr } from "@mvfm/core";
 import { mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
+import type { S3Methods } from "../../src/3.989.0";
 import { s3 } from "../../src/3.989.0";
 
 function strip(ast: unknown): unknown {
@@ -153,5 +156,34 @@ describe("s3: cross-operation dependencies", () => {
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("core/do");
+  });
+});
+
+// ============================================================
+// Type-level parity with AWS SDK outputs/inputs
+// ============================================================
+
+describe("s3: sdk typing parity", () => {
+  it("exposes typed output fields", () => {
+    app(($) => {
+      const put = $.s3.putObject({ Bucket: "my-bucket", Key: "file.txt", Body: "hello" });
+      const get = $.s3.getObject({ Bucket: "my-bucket", Key: "file.txt" });
+
+      const etag: Expr<PutObjectCommandOutput["ETag"]> = put.ETag;
+      const length: Expr<GetObjectCommandOutput["ContentLength"]> = get.ContentLength;
+
+      expect(etag).toBeDefined();
+      expect(length).toBeDefined();
+      return $.do(put, get);
+    });
+  });
+
+  it("requires command-specific required fields", () => {
+    const verifyTyping = (client: S3Methods["s3"]) => {
+      // @ts-expect-error PutObject requires Bucket and Key
+      client.putObject({ Body: "hello" });
+    };
+
+    expect(typeof verifyTyping).toBe("function");
   });
 });
