@@ -3,10 +3,10 @@
   "packageManager": "pnpm@10.6.3",
   "type": "module",
   "scripts": {
-    "build": "pnpm -r --filter './packages/*' run build",
-    "check": "pnpm -r --filter './packages/*' run check",
-    "test": "pnpm -r --filter './packages/*' run test",
-    "size": "pnpm -r --filter './packages/*' run size",
+    "build": "tsc --build",
+    "check": "pnpm -r --filter '@mvfm/*' run check",
+    "test": "pnpm -r --filter '@mvfm/*' run test",
+    "size": "pnpm -r --filter '@mvfm/*' run size",
     "verify": "pnpm run build && pnpm run check && pnpm run test && pnpm run size"
   },
   "devDependencies": {
