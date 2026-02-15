@@ -46,6 +46,24 @@
 //
 // ============================================================
 
+import type {
+  BatchCreateParams,
+  BatchListParams,
+  DeletedMessageBatch,
+  MessageBatch,
+  MessageBatchesPage,
+} from "@anthropic-ai/sdk/resources/messages/batches";
+import type {
+  Message,
+  MessageCountTokensParams,
+  MessageCreateParamsNonStreaming,
+  MessageTokensCount,
+} from "@anthropic-ai/sdk/resources/messages/messages";
+import type {
+  ModelInfo,
+  ModelInfosPage,
+  ModelListParams,
+} from "@anthropic-ai/sdk/resources/models";
 import type { Expr, PluginContext, PluginDefinition } from "@mvfm/core";
 
 // ---- What the plugin adds to $ ----------------------------
@@ -64,36 +82,30 @@ export interface AnthropicMethods {
     messages: {
       /** Create a message (chat completion). */
       create(
-        params: Expr<Record<string, unknown>> | Record<string, unknown>,
-      ): Expr<Record<string, unknown>>;
+        params: Expr<MessageCreateParamsNonStreaming> | MessageCreateParamsNonStreaming,
+      ): Expr<Message>;
       /** Count tokens for a message request. */
       countTokens(
-        params: Expr<Record<string, unknown>> | Record<string, unknown>,
-      ): Expr<Record<string, unknown>>;
+        params: Expr<MessageCountTokensParams> | MessageCountTokensParams,
+      ): Expr<MessageTokensCount>;
       batches: {
         /** Create a message batch. */
-        create(
-          params: Expr<Record<string, unknown>> | Record<string, unknown>,
-        ): Expr<Record<string, unknown>>;
+        create(params: Expr<BatchCreateParams> | BatchCreateParams): Expr<MessageBatch>;
         /** Retrieve a message batch by ID. */
-        retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
+        retrieve(id: Expr<string> | string): Expr<MessageBatch>;
         /** List message batches with optional filter params. */
-        list(
-          params?: Expr<Record<string, unknown>> | Record<string, unknown>,
-        ): Expr<Record<string, unknown>>;
+        list(params?: Expr<BatchListParams> | BatchListParams): Expr<MessageBatchesPage>;
         /** Delete a message batch by ID. */
-        delete(id: Expr<string> | string): Expr<Record<string, unknown>>;
+        delete(id: Expr<string> | string): Expr<DeletedMessageBatch>;
         /** Cancel a message batch by ID. */
-        cancel(id: Expr<string> | string): Expr<Record<string, unknown>>;
+        cancel(id: Expr<string> | string): Expr<MessageBatch>;
       };
     };
     models: {
       /** Retrieve a model by ID. */
-      retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
+      retrieve(id: Expr<string> | string): Expr<ModelInfo>;
       /** List models with optional filter params. */
-      list(
-        params?: Expr<Record<string, unknown>> | Record<string, unknown>,
-      ): Expr<Record<string, unknown>>;
+      list(params?: Expr<ModelListParams> | ModelListParams): Expr<ModelInfosPage>;
     };
   };
 }
@@ -148,7 +160,7 @@ export function anthropic(config: AnthropicConfig): PluginDefinition<AnthropicMe
 
       // Helper: resolve a params object to an AST node.
       // ctx.lift handles both Expr and raw objects (lifts to core/record).
-      function resolveParams(params: Expr<Record<string, unknown>> | Record<string, unknown>) {
+      function resolveParams<T>(params: Expr<T> | T) {
         return ctx.lift(params).__node;
       }
 
@@ -265,13 +277,14 @@ export function anthropic(config: AnthropicConfig): PluginDefinition<AnthropicMe
 //
 // WORKS BUT DIFFERENT:
 //
-// 5. Return types:
-//    Real @anthropic-ai/sdk has typed response objects (Message,
-//    MessageBatch, ModelInfo, etc.) with precise type definitions.
-//    Mvfm uses Record<string, unknown> for all return types.
-//    Property access still works via proxy (msg.content, batch.id),
-//    but there's no IDE autocomplete for Anthropic-specific fields.
-//    A future enhancement could add typed response interfaces.
+// 5. Return/input types:
+//    Public method signatures use SDK-aligned request/response types
+//    (MessageCreateParamsNonStreaming, MessageBatch, ModelInfo, etc.).
+//    This preserves IDE assistance and catches invalid request shapes.
+//
+//    Note: list methods are typed as SDK page shapes
+//    (MessageBatchesPage/ModelInfosPage), while execution still follows
+//    MVFM's generic interpreter flow (`anthropic/api_call` effects).
 //
 // 6. Sequencing side effects:
 //    Real:  const msg = await anthropic.messages.create(...)
@@ -309,10 +322,9 @@ export function anthropic(config: AnthropicConfig): PluginDefinition<AnthropicMe
 // Resource nesting (messages, messages.batches, models) maps 1:1.
 // Proxy chains capture cross-operation dependencies perfectly.
 //
-// The main gap is typed response objects — we use
-// Record<string, unknown> instead of Anthropic.Message etc.
-// This means no autocomplete on response fields, but property
-// access still works at runtime via proxy.
+// Public input/return types are aligned to SDK request/response
+// definitions where possible. Remaining differences are in execution
+// model (deterministic AST/interpreter flow), not method signatures.
 //
 // Not supported: streaming, tool use loops, beta features,
 // file uploads. These are either runtime concerns (streaming)

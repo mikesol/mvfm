@@ -488,39 +488,21 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "MessageCreateParamsNonStreaming",
+                  "canonicalReference": "@anthropic-ai/sdk!MessageCreateParamsNonStreaming:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": "> | "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "MessageCreateParamsNonStreaming",
+                  "canonicalReference": "@anthropic-ai/sdk!MessageCreateParamsNonStreaming:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-anthropic!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>>;\n            countTokens(params: "
+                  "text": "): "
                 },
                 {
                   "kind": "Reference",
@@ -533,21 +515,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "Message",
+                  "canonicalReference": "@anthropic-ai/sdk!Message:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": ">;\n            countTokens(params: "
                 },
                 {
                   "kind": "Reference",
@@ -560,12 +533,21 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "MessageCountTokensParams",
+                  "canonicalReference": "@anthropic-ai/sdk!MessageCountTokensParams:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n            batches: {\n                create(params: "
+                  "text": "> | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "MessageCountTokensParams",
+                  "canonicalReference": "@anthropic-ai/sdk!MessageCountTokensParams:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
                 },
                 {
                   "kind": "Reference",
@@ -578,21 +560,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "MessageTokensCount",
+                  "canonicalReference": "@anthropic-ai/sdk!MessageTokensCount:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": ">;\n            batches: {\n                create(params: "
                 },
                 {
                   "kind": "Reference",
@@ -605,12 +578,39 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "BatchCreateParams",
+                  "canonicalReference": "@anthropic-ai/sdk!BatchCreateParams:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n                retrieve(id: "
+                  "text": "> | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "BatchCreateParams",
+                  "canonicalReference": "@anthropic-ai/sdk!BatchCreateParams:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Expr",
+                  "canonicalReference": "@mvfm/plugin-anthropic!~Expr:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "MessageBatch",
+                  "canonicalReference": "@anthropic-ai/sdk!MessageBatch:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">;\n                retrieve(id: "
                 },
                 {
                   "kind": "Reference",
@@ -632,12 +632,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "MessageBatch",
+                  "canonicalReference": "@anthropic-ai/sdk!MessageBatch:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n                list(params?: "
+                  "text": ">;\n                list(params?: "
                 },
                 {
                   "kind": "Reference",
@@ -650,21 +650,21 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "BatchListParams",
+                  "canonicalReference": "@anthropic-ai/sdk!BatchListParams:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": "> | "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "BatchListParams",
+                  "canonicalReference": "@anthropic-ai/sdk!BatchListParams:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": "): "
                 },
                 {
                   "kind": "Reference",
@@ -677,12 +677,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "MessageBatchesPage",
+                  "canonicalReference": "@anthropic-ai/sdk!MessageBatchesPage:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n                delete(id: "
+                  "text": ">;\n                delete(id: "
                 },
                 {
                   "kind": "Reference",
@@ -704,12 +704,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "DeletedMessageBatch",
+                  "canonicalReference": "@anthropic-ai/sdk!DeletedMessageBatch:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n                cancel(id: "
+                  "text": ">;\n                cancel(id: "
                 },
                 {
                   "kind": "Reference",
@@ -731,12 +731,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "MessageBatch",
+                  "canonicalReference": "@anthropic-ai/sdk!MessageBatch:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n            };\n        };\n        models: {\n            retrieve(id: "
+                  "text": ">;\n            };\n        };\n        models: {\n            retrieve(id: "
                 },
                 {
                   "kind": "Reference",
@@ -758,12 +758,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ModelInfo",
+                  "canonicalReference": "@anthropic-ai/sdk!ModelInfo:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n            list(params?: "
+                  "text": ">;\n            list(params?: "
                 },
                 {
                   "kind": "Reference",
@@ -776,21 +776,21 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ModelListParams",
+                  "canonicalReference": "@anthropic-ai/sdk!ModelListParams:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": "> | "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ModelListParams",
+                  "canonicalReference": "@anthropic-ai/sdk!ModelListParams:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": "): "
                 },
                 {
                   "kind": "Reference",
@@ -803,12 +803,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ModelInfosPage",
+                  "canonicalReference": "@anthropic-ai/sdk!ModelInfosPage:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n        };\n    }"
+                  "text": ">;\n        };\n    }"
                 },
                 {
                   "kind": "Content",

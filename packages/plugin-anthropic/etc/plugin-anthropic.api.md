@@ -5,6 +5,18 @@
 ```ts
 
 import type Anthropic from '@anthropic-ai/sdk';
+import type { BatchCreateParams } from '@anthropic-ai/sdk/resources/messages/batches';
+import type { BatchListParams } from '@anthropic-ai/sdk/resources/messages/batches';
+import type { DeletedMessageBatch } from '@anthropic-ai/sdk/resources/messages/batches';
+import type { Message } from '@anthropic-ai/sdk/resources/messages/messages';
+import type { MessageBatch } from '@anthropic-ai/sdk/resources/messages/batches';
+import type { MessageBatchesPage } from '@anthropic-ai/sdk/resources/messages/batches';
+import type { MessageCountTokensParams } from '@anthropic-ai/sdk/resources/messages/messages';
+import type { MessageCreateParamsNonStreaming } from '@anthropic-ai/sdk/resources/messages/messages';
+import type { MessageTokensCount } from '@anthropic-ai/sdk/resources/messages/messages';
+import type { ModelInfo } from '@anthropic-ai/sdk/resources/models';
+import type { ModelInfosPage } from '@anthropic-ai/sdk/resources/models';
+import type { ModelListParams } from '@anthropic-ai/sdk/resources/models';
 
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
@@ -31,19 +43,19 @@ export const anthropicInterpreter: InterpreterFragment;
 export interface AnthropicMethods {
     anthropic: {
         messages: {
-            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            countTokens(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            create(params: Expr<MessageCreateParamsNonStreaming> | MessageCreateParamsNonStreaming): Expr<Message>;
+            countTokens(params: Expr<MessageCountTokensParams> | MessageCountTokensParams): Expr<MessageTokensCount>;
             batches: {
-                create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-                retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
-                list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-                delete(id: Expr<string> | string): Expr<Record<string, unknown>>;
-                cancel(id: Expr<string> | string): Expr<Record<string, unknown>>;
+                create(params: Expr<BatchCreateParams> | BatchCreateParams): Expr<MessageBatch>;
+                retrieve(id: Expr<string> | string): Expr<MessageBatch>;
+                list(params?: Expr<BatchListParams> | BatchListParams): Expr<MessageBatchesPage>;
+                delete(id: Expr<string> | string): Expr<DeletedMessageBatch>;
+                cancel(id: Expr<string> | string): Expr<MessageBatch>;
             };
         };
         models: {
-            retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
-            list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            retrieve(id: Expr<string> | string): Expr<ModelInfo>;
+            list(params?: Expr<ModelListParams> | ModelListParams): Expr<ModelInfosPage>;
         };
     };
 }
@@ -79,7 +91,7 @@ export function wrapAnthropicSdk(client: Anthropic): AnthropicClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/0.74.0/index.d.ts:15:13 - (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
+// dist/0.74.0/index.d.ts:18:13 - (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 
