@@ -19,9 +19,5 @@
     "size": "size-limit"
   },
   "files": ["dist", "etc"],
-  "devDependencies": {
-    "@mvfm/plugin-postgres": "workspace:*",
-    "@testcontainers/postgresql": "^11.11.0",
-    "postgres": "^3.4.8"
-  }
+  "devDependencies": {}
 }

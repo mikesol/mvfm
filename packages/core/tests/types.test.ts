@@ -1,4 +1,3 @@
-import { postgres } from "@mvfm/plugin-postgres";
 import { describe, expect, expectTypeOf, it } from "vitest";
 import type { Expr } from "../src";
 import {
@@ -301,16 +300,5 @@ describe("typeclass type safety — negative tests", () => {
       return $.do(r1, r2, r3);
     });
     expect(prog.ast).toBeDefined();
-  });
-});
-
-describe("non-typeclass plugin isolation", () => {
-  it("non-typeclass plugins work without any type plugins", () => {
-    const app = mvfm(postgres("postgres://localhost/test"));
-    app(($) => {
-      const result = $.sql`select 1`;
-      expectTypeOf(result).toEqualTypeOf<Expr<Record<string, any>[]>>();
-      return result;
-    });
   });
 });

@@ -1,28 +1,28 @@
-import type { PostgresClient } from "@mvfm/plugin-postgres";
 import {
-  postgres as pgPlugin,
-  postgresInterpreter,
-  serverEvaluate,
-  wrapPostgresJs,
-} from "@mvfm/plugin-postgres";
+  coreInterpreter,
+  eq,
+  eqInterpreter,
+  error,
+  errorInterpreter,
+  fiber,
+  fiberInterpreter,
+  mvfm,
+  num,
+  numInterpreter,
+  ord,
+  ordInterpreter,
+  semiring,
+  str,
+  strInterpreter,
+} from "@mvfm/core";
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { mvfm } from "../../src/core";
-import { coreInterpreter } from "../../src/interpreters/core";
-import { eq } from "../../src/plugins/eq";
-import { eqInterpreter } from "../../src/plugins/eq/interpreter";
-import { error } from "../../src/plugins/error";
-import { errorInterpreter } from "../../src/plugins/error/interpreter";
-import { fiber } from "../../src/plugins/fiber";
-import { fiberInterpreter } from "../../src/plugins/fiber/interpreter";
-import { num } from "../../src/plugins/num";
-import { numInterpreter } from "../../src/plugins/num/interpreter";
-import { ord } from "../../src/plugins/ord";
-import { ordInterpreter } from "../../src/plugins/ord/interpreter";
-import { semiring } from "../../src/plugins/semiring";
-import { str } from "../../src/plugins/str";
-import { strInterpreter } from "../../src/plugins/str/interpreter";
+import { postgres as pgPlugin } from "../../src/3.4.8";
+import { wrapPostgresJs } from "../../src/3.4.8/client-postgres-js";
+import { serverEvaluate } from "../../src/3.4.8/handler.server";
+import type { PostgresClient } from "../../src/3.4.8/interpreter";
+import { postgresInterpreter } from "../../src/3.4.8/interpreter";
 
 function injectInput(node: any, input: Record<string, unknown>, seen = new Map<any, any>()): any {
   if (node === null || node === undefined || typeof node !== "object") return node;

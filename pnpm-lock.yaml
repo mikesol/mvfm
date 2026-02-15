@@ -33,17 +33,7 @@ importers:
         specifier: ^4.0.18
         version: 4.0.18(@types/node@25.2.3)(yaml@2.8.2)
 
-  packages/core:
-    devDependencies:
-      '@mvfm/plugin-postgres':
-        specifier: workspace:*
-        version: link:../plugin-postgres
-      '@testcontainers/postgresql':
-        specifier: ^11.11.0
-        version: 11.11.0
-      postgres:
-        specifier: ^3.4.8
-        version: 3.4.8
+  packages/core: {}
 
   packages/plugin-anthropic:
     devDependencies:

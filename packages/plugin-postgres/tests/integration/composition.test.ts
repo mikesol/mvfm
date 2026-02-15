@@ -1,12 +1,6 @@
-import { postgres } from "@mvfm/plugin-postgres";
+import { error, fiber, mvfm, num, ord, semiring, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
-import { mvfm } from "../src/core";
-import { error } from "../src/plugins/error";
-import { fiber } from "../src/plugins/fiber";
-import { num } from "../src/plugins/num";
-import { ord } from "../src/plugins/ord";
-import { semiring } from "../src/plugins/semiring";
-import { str } from "../src/plugins/str";
+import { postgres } from "../../src/3.4.8";
 
 function strip(ast: unknown): unknown {
   return JSON.parse(
