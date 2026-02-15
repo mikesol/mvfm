@@ -170,6 +170,38 @@ After the retrofit merges to main, each of the 16 PR branches needs rebasing. Ea
 
 These additions are on independent lines — no merge conflicts between branches.
 
-## Merge Order
+## Merge Discipline
 
-After retrofit: branches can merge in **any order**. No sequential dependency. Each branch touches only its own module file plus independent line additions in the barrels.
+After retrofit, the split pattern eliminates structural conflicts — but PRs still merge **one at a time, sequentially against main**. Main must be clean after every merge.
+
+### Rules
+
+1. **Verify main is clean before every merge.** Run `build + check + test` on main. If anything fails — even if it's not from our work — fix it first. Do not merge onto a broken main. Errors compound.
+2. **Merge one PR.** Squash or merge commit.
+3. **Pull and verify immediately.** `build + check + test` on the updated main. If it fails, fix it NOW as a hotfix commit before touching the next PR.
+4. **Repeat.** No batching, no skipping verification, no "we'll fix it later."
+
+### Why sequential
+
+The split pattern makes conflicts *unlikely* but doesn't make them *impossible*. Sequential merging guarantees each PR is validated against the actual state of main. Parallel merging can mask interaction bugs between schema types that share interpreter infrastructure.
+
+### Suggested order
+
+Start with simpler standalone types, build to complex ones:
+
+1. #166 — boolean/null/undefined/void/symbol
+2. #165 — bigint
+3. #167 — date
+4. #170 — literals
+5. #171 — enum + native enum
+6. #169 — coercion constructors
+7. #168 — string formats
+8. #172 — object
+9. #173 — array
+10. #174 — tuple
+11. #175 — union/xor
+12. #176 — intersection
+13. #177 — record
+14. #178 — map/set
+15. #179 — transform/pipe/preprocess
+16. #180 — any/unknown/never/promise/custom

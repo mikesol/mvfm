@@ -794,3 +794,62 @@ If `string.ts` exceeds 300 lines, extract `applyStringChecks` + `stringInterpret
 git add packages/plugin-zod/src/
 git commit -m "refactor(plugin-zod): split oversized modules to stay under 300-line limit"
 ```
+
+---
+
+### Task 8: Rebase all 16 PR branches onto the new main
+
+Each PR branch must be updated to use the contribution pattern instead of rewriting the monolithic files. For each branch:
+
+1. Rebase onto main: `git rebase main`
+2. Resolve conflicts by adopting the new barrel pattern — delete the monolithic edits to `index.ts` and `interpreter.ts`, keep only the new schema module file
+3. Add the contribution exports (nodeKinds, namespace interface, namespace factory, interpreter map) to the schema module file
+4. Add the barrel lines (import + spread) to `index.ts` and `interpreter.ts`
+5. Verify: `pnpm --filter @mvfm/plugin-zod run build && pnpm --filter @mvfm/plugin-zod run check && pnpm --filter @mvfm/plugin-zod run test`
+6. Force-push the rebased branch
+
+---
+
+### Task 9: Sequential merge to main
+
+**This is the critical discipline. PRs merge ONE AT A TIME against main. Main must be clean after every merge.**
+
+**Procedure for each PR:**
+
+1. **Ensure main is clean before starting.** Run the full verify suite on main:
+   ```
+   git checkout main && pnpm --filter @mvfm/plugin-zod run build && pnpm --filter @mvfm/plugin-zod run check && pnpm --filter @mvfm/plugin-zod run test
+   ```
+   If main is not clean — regardless of whether the failure is from our work or someone else's — **STOP and fix main first**. Do not proceed with any merge until main passes all checks. No exceptions.
+
+2. **Merge the next PR.** Use GitHub's merge button or `gh pr merge <N>`. Prefer squash or merge commit (not rebase) to keep the PR as a single unit.
+
+3. **Pull main and verify immediately:**
+   ```
+   git checkout main && git pull && pnpm --filter @mvfm/plugin-zod run build && pnpm --filter @mvfm/plugin-zod run check && pnpm --filter @mvfm/plugin-zod run test
+   ```
+
+4. **If verification fails, fix it NOW** before merging the next PR. The fix goes directly to main as a hotfix commit. Do not let a broken main accumulate — errors compound.
+
+5. **Repeat for the next PR.** If the next branch has minor conflicts from the previous merge (e.g., adjacent lines in the barrel files), resolve them, verify, and continue.
+
+**Why sequential:** Even though the split pattern makes conflicts unlikely, sequential merging guarantees that each PR is validated against the actual state of main. Parallel merging (even via GitHub's merge queue) can mask interaction bugs between schema types that share interpreter infrastructure.
+
+**Suggested merge order:** Start with simpler, standalone schema types to build confidence, then move to complex ones:
+
+1. #166 — boolean, null, undefined, void, symbol (simple, no checks)
+2. #165 — bigint (similar pattern to number)
+3. #167 — date (simple with min/max)
+4. #170 — literals
+5. #171 — enum + native enum
+6. #169 — coercion constructors
+7. #168 — string formats
+8. #172 — object schemas
+9. #173 — array
+10. #174 — tuple
+11. #175 — union/xor
+12. #176 — intersection
+13. #177 — record
+14. #178 — map/set
+15. #179 — transform/pipe/preprocess
+16. #180 — any/unknown/never/nan/promise/custom
