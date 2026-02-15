@@ -1,5 +1,5 @@
 import type { ASTNode, Expr, PluginContext } from "@mvfm/core";
-import type { CheckDescriptor, RefinementDescriptor, SchemaASTNode } from "./types";
+import type { CheckDescriptor, RefinementDescriptor, SchemaASTNode, WrapperASTNode } from "./types";
 
 // ============================================================
 // ZodSchemaBuilder<T> — Base class for all Zod schema types
@@ -68,7 +68,7 @@ export abstract class ZodSchemaBuilder<T> {
    * Build the final schema AST node from accumulated state.
    * Combines kind + checks + refinements + error + extra fields.
    */
-  protected _buildSchemaNode(): SchemaASTNode {
+  protected _buildSchemaNode(): SchemaASTNode | WrapperASTNode {
     const node: SchemaASTNode = {
       kind: this._kind,
       checks: [...this._checks],
@@ -126,7 +126,7 @@ export abstract class ZodSchemaBuilder<T> {
     }) as this;
   }
 
-  // ---- Parsing operations (implemented by #96) ----
+  // ---- Parsing operations (#96) ----
   // Stubs declared here so TypeScript knows about them.
   // #96 will provide the actual implementation.
 
@@ -175,18 +175,92 @@ export abstract class ZodSchemaBuilder<T> {
     return this._clone();
   }
 
-  // ---- Wrapper methods (implemented by #99) ----
-  // Stubs declared here. #99 will enhance these.
+  // ---- Wrapper methods (#99) ----
 
-  /** @stub Implemented by #99 */
-  optional(): ZodSchemaBuilder<T | undefined> {
-    // Stub — #99 replaces with real implementation
-    return this as unknown as ZodSchemaBuilder<T | undefined>;
+  /**
+   * Build a wrapper node around this schema's AST.
+   * Used internally by wrapper methods.
+   */
+  private _wrap<U>(wrapperKind: string, extra?: Record<string, unknown>): ZodWrappedBuilder<U> {
+    const wrapperNode: WrapperASTNode = {
+      kind: wrapperKind,
+      inner: this._buildSchemaNode(),
+      ...extra,
+    };
+    return new ZodWrappedBuilder<U>(this._ctx, wrapperNode);
   }
 
-  /** @stub Implemented by #99 */
-  nullable(): ZodSchemaBuilder<T | null> {
-    // Stub — #99 replaces with real implementation
-    return this as unknown as ZodSchemaBuilder<T | null>;
+  /** Allow `undefined`. Produces `zod/optional` wrapper node. */
+  optional(): ZodWrappedBuilder<T | undefined> {
+    return this._wrap<T | undefined>("zod/optional");
+  }
+
+  /** Remove optional. Produces `zod/nonoptional` wrapper node. */
+  nonoptional(): ZodWrappedBuilder<NonNullable<T>> {
+    return this._wrap<NonNullable<T>>("zod/nonoptional");
+  }
+
+  /** Allow `null`. Produces `zod/nullable` wrapper node. */
+  nullable(): ZodWrappedBuilder<T | null> {
+    return this._wrap<T | null>("zod/nullable");
+  }
+
+  /** Allow `null` or `undefined`. Produces `zod/nullish` wrapper node. */
+  nullish(): ZodWrappedBuilder<T | null | undefined> {
+    return this._wrap<T | null | undefined>("zod/nullish");
+  }
+
+  /** Provide default value when input is undefined. Produces `zod/default` wrapper node. */
+  default(value: Expr<T> | T): ZodWrappedBuilder<T> {
+    return this._wrap<T>("zod/default", { value: this._ctx.lift(value).__node });
+  }
+
+  /** Pre-parse default (parsed through the schema). Produces `zod/prefault` wrapper node. */
+  prefault(value: Expr<T> | T): ZodWrappedBuilder<T> {
+    return this._wrap<T>("zod/prefault", { value: this._ctx.lift(value).__node });
+  }
+
+  /** Fallback value on validation error. Produces `zod/catch` wrapper node. */
+  catch(value: Expr<T> | T): ZodWrappedBuilder<T> {
+    return this._wrap<T>("zod/catch", { value: this._ctx.lift(value).__node });
+  }
+
+  /** Mark output as readonly. Produces `zod/readonly` wrapper node. */
+  readonly(): ZodWrappedBuilder<Readonly<T>> {
+    return this._wrap<Readonly<T>>("zod/readonly");
+  }
+
+  /** Add a branded type tag (compile-time only). Produces `zod/branded` wrapper node. */
+  brand<B extends string>(brand?: B): ZodWrappedBuilder<T & { __brand: B }> {
+    return this._wrap<T & { __brand: B }>("zod/branded", brand ? { brand } : {});
+  }
+}
+
+/**
+ * Builder for wrapped Zod schemas (optional, nullable, default, etc.).
+ *
+ * Unlike regular schema builders which accumulate checks and produce a
+ * schema node, a wrapped builder holds an already-built inner schema
+ * and wraps it with a modifier node. The wrapped builder still inherits
+ * all base methods (parse, safeParse, optional, nullable, etc.) so
+ * wrappers can be composed: `$.zod.string().optional().nullable()`.
+ *
+ * @typeParam T - The output type after wrapping
+ */
+export class ZodWrappedBuilder<T> extends ZodSchemaBuilder<T> {
+  /** The wrapper AST node (contains the inner schema) */
+  private readonly _wrapperNode: WrapperASTNode;
+
+  constructor(ctx: PluginContext, wrapperNode: WrapperASTNode) {
+    super(ctx, wrapperNode.kind);
+    this._wrapperNode = wrapperNode;
+  }
+
+  protected _buildSchemaNode(): WrapperASTNode {
+    return this._wrapperNode;
+  }
+
+  protected _clone(): ZodWrappedBuilder<T> {
+    return new ZodWrappedBuilder<T>(this._ctx, this._wrapperNode);
   }
 }

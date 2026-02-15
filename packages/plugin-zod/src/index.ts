@@ -2,7 +2,7 @@ import type { PluginDefinition } from "@mvfm/core";
 import { ZodStringBuilder } from "./string";
 
 // Re-export types and builders for consumers
-export { ZodSchemaBuilder } from "./base";
+export { ZodSchemaBuilder, ZodWrappedBuilder } from "./base";
 export { ZodStringBuilder } from "./string";
 export type {
   CheckDescriptor,
