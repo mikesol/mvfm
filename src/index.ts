@@ -25,6 +25,20 @@ export type {
 // compatibility — it is now a type alias for InterpreterFragment.
 export { adaptLegacy, composeInterpreters, foldAST, ilo, runAST, Stepper } from "./core";
 export { coreInterpreter } from "./interpreters/core";
+export type { AnthropicConfig, AnthropicMethods } from "./plugins/anthropic/0.74.0";
+export { anthropic } from "./plugins/anthropic/0.74.0";
+export { wrapAnthropicSdk } from "./plugins/anthropic/0.74.0/client-anthropic-sdk";
+export type {
+  ClientHandlerOptions as AnthropicClientHandlerOptions,
+  ClientHandlerState as AnthropicClientHandlerState,
+} from "./plugins/anthropic/0.74.0/handler.client";
+export { clientHandler as anthropicClientHandler } from "./plugins/anthropic/0.74.0/handler.client";
+export {
+  serverEvaluate as anthropicServerEvaluate,
+  serverHandler as anthropicServerHandler,
+} from "./plugins/anthropic/0.74.0/handler.server";
+export type { AnthropicClient } from "./plugins/anthropic/0.74.0/interpreter";
+export { anthropicInterpreter } from "./plugins/anthropic/0.74.0/interpreter";
 export type { BooleanMethods } from "./plugins/boolean";
 export { boolean } from "./plugins/boolean";
 export { booleanInterpreter } from "./plugins/boolean/interpreter";
@@ -81,12 +95,41 @@ export {
   findCursorBatch,
   postgresInterpreter,
 } from "./plugins/postgres/3.4.8/interpreter";
+export type { ResendConfig, ResendMethods } from "./plugins/resend/6.9.2";
+export { resend } from "./plugins/resend/6.9.2";
+export { wrapResendSdk } from "./plugins/resend/6.9.2/client-resend-sdk";
+export type {
+  ClientHandlerOptions as ResendClientHandlerOptions,
+  ClientHandlerState as ResendClientHandlerState,
+} from "./plugins/resend/6.9.2/handler.client";
+export { clientHandler as resendClientHandler } from "./plugins/resend/6.9.2/handler.client";
+export {
+  serverEvaluate as resendServerEvaluate,
+  serverHandler as resendServerHandler,
+} from "./plugins/resend/6.9.2/handler.server";
+export type { ResendClient } from "./plugins/resend/6.9.2/interpreter";
+export { resendInterpreter } from "./plugins/resend/6.9.2/interpreter";
 export type { SemigroupFor } from "./plugins/semigroup";
 export { semigroup } from "./plugins/semigroup";
 export type { SemiringFor } from "./plugins/semiring";
 export { semiring } from "./plugins/semiring";
 export type { ShowFor } from "./plugins/show";
 export { show } from "./plugins/show";
+// ---- Slack plugin (@slack/web-api 7.14.0) ----
+export type { SlackConfig, SlackMethods } from "./plugins/slack/7.14.0";
+export { slack } from "./plugins/slack/7.14.0";
+export { wrapSlackWebClient } from "./plugins/slack/7.14.0/client-slack-web-api";
+export type {
+  ClientHandlerOptions as SlackClientHandlerOptions,
+  ClientHandlerState as SlackClientHandlerState,
+} from "./plugins/slack/7.14.0/handler.client";
+export { clientHandler as slackClientHandler } from "./plugins/slack/7.14.0/handler.client";
+export {
+  serverEvaluate as slackServerEvaluate,
+  serverHandler as slackServerHandler,
+} from "./plugins/slack/7.14.0/handler.server";
+export type { SlackClient } from "./plugins/slack/7.14.0/interpreter";
+export { slackInterpreter } from "./plugins/slack/7.14.0/interpreter";
 export type { StMethods } from "./plugins/st";
 export { st } from "./plugins/st";
 export type { StrMethods } from "./plugins/str";
@@ -106,6 +149,27 @@ export {
 } from "./plugins/stripe/2025-04-30.basil/handler.server";
 export type { StripeClient } from "./plugins/stripe/2025-04-30.basil/interpreter";
 export { stripeInterpreter } from "./plugins/stripe/2025-04-30.basil/interpreter";
+export type {
+  TwilioCallContext,
+  TwilioCallsResource,
+  TwilioConfig,
+  TwilioMessageContext,
+  TwilioMessagesResource,
+  TwilioMethods,
+} from "./plugins/twilio/5.5.1";
+export { twilio } from "./plugins/twilio/5.5.1";
+export { wrapTwilioSdk } from "./plugins/twilio/5.5.1/client-twilio-sdk";
+export type {
+  ClientHandlerOptions as TwilioClientHandlerOptions,
+  ClientHandlerState as TwilioClientHandlerState,
+} from "./plugins/twilio/5.5.1/handler.client";
+export { clientHandler as twilioClientHandler } from "./plugins/twilio/5.5.1/handler.client";
+export {
+  serverEvaluate as twilioServerEvaluate,
+  serverHandler as twilioServerHandler,
+} from "./plugins/twilio/5.5.1/handler.server";
+export type { TwilioClient } from "./plugins/twilio/5.5.1/interpreter";
+export { twilioInterpreter } from "./plugins/twilio/5.5.1/interpreter";
 export type {
   ArraySchema,
   InferSchema,

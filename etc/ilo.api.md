@@ -4,11 +4,73 @@
 
 ```ts
 
+import type Anthropic from '@anthropic-ai/sdk';
 import type { default as postgres_2 } from 'postgres';
 import type Stripe from 'stripe';
+import type { WebClient } from '@slack/web-api';
 
 // @public
 export function adaptLegacy(fragment: LegacyInterpreterFragment): InterpreterFragment;
+
+// @public
+export function anthropic(config: AnthropicConfig): PluginDefinition<AnthropicMethods>;
+
+// @public
+export interface AnthropicClient {
+    request(method: string, path: string, params?: Record<string, unknown>): Promise<unknown>;
+}
+
+// @public
+export function anthropicClientHandler(options: AnthropicClientHandlerOptions): StepHandler<AnthropicClientHandlerState>;
+
+// @public
+export interface AnthropicClientHandlerOptions {
+    baseUrl: string;
+    contractHash: string;
+    fetch?: typeof globalThis.fetch;
+    headers?: Record<string, string>;
+}
+
+// @public
+export interface AnthropicClientHandlerState {
+    stepIndex: number;
+}
+
+// @public
+export interface AnthropicConfig {
+    apiKey: string;
+    baseURL?: string;
+}
+
+// @public
+export const anthropicInterpreter: InterpreterFragment;
+
+// @public
+export interface AnthropicMethods {
+    anthropic: {
+        messages: {
+            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            countTokens(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            batches: {
+                create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+                retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
+                list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+                delete(id: Expr<string> | string): Expr<Record<string, unknown>>;
+                cancel(id: Expr<string> | string): Expr<Record<string, unknown>>;
+            };
+        };
+        models: {
+            retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
+            list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        };
+    };
+}
+
+// @public
+export function anthropicServerEvaluate(client: AnthropicClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+
+// @public
+export function anthropicServerHandler(client: AnthropicClient): StepHandler<void>;
 
 // @public
 export function array(of: SchemaType): ArraySchema;
@@ -293,73 +355,6 @@ export interface OrdFor<T> {
 export const ordInterpreter: InterpreterFragment;
 
 // @public
-export function pino(config?: PinoConfig): PluginDefinition<PinoMethods>;
-
-// @public
-export interface PinoClient {
-    log(level: string, bindings: Record<string, unknown>[], mergeObject?: Record<string, unknown>, msg?: string): Promise<void>;
-}
-
-// @public
-export function pinoClientHandler(options: PinoClientHandlerOptions): StepHandler<PinoClientHandlerState>;
-
-// @public
-export interface PinoClientHandlerOptions {
-    baseUrl: string;
-    contractHash: string;
-    fetch?: typeof globalThis.fetch;
-    headers?: Record<string, string>;
-}
-
-// @public
-export interface PinoClientHandlerState {
-    stepIndex: number;
-}
-
-// @public
-export interface PinoConfig {
-    base?: Record<string, unknown>;
-    level?: string;
-}
-
-// @public
-export const pinoInterpreter: InterpreterFragment;
-
-// @public
-export interface PinoLogger {
-    child(bindings: Expr<Record<string, unknown>> | Record<string, unknown>): PinoLogger;
-    debug(msg: Expr<string> | string): Expr<void>;
-    // (undocumented)
-    debug(mergeObject: Expr<Record<string, unknown>> | Record<string, unknown>, msg: Expr<string> | string): Expr<void>;
-    error(msg: Expr<string> | string): Expr<void>;
-    // (undocumented)
-    error(mergeObject: Expr<Record<string, unknown>> | Record<string, unknown>, msg: Expr<string> | string): Expr<void>;
-    fatal(msg: Expr<string> | string): Expr<void>;
-    // (undocumented)
-    fatal(mergeObject: Expr<Record<string, unknown>> | Record<string, unknown>, msg: Expr<string> | string): Expr<void>;
-    info(msg: Expr<string> | string): Expr<void>;
-    // (undocumented)
-    info(mergeObject: Expr<Record<string, unknown>> | Record<string, unknown>, msg: Expr<string> | string): Expr<void>;
-    trace(msg: Expr<string> | string): Expr<void>;
-    // (undocumented)
-    trace(mergeObject: Expr<Record<string, unknown>> | Record<string, unknown>, msg: Expr<string> | string): Expr<void>;
-    warn(msg: Expr<string> | string): Expr<void>;
-    // (undocumented)
-    warn(mergeObject: Expr<Record<string, unknown>> | Record<string, unknown>, msg: Expr<string> | string): Expr<void>;
-}
-
-// @public
-export interface PinoMethods {
-    pino: PinoLogger;
-}
-
-// @public
-export function pinoServerEvaluate(client: PinoClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
-
-// @public
-export function pinoServerHandler(client: PinoClient): StepHandler<void>;
-
-// @public
 type Plugin_2<T = any, Traits extends Record<string, unknown> = {}> = PluginDefinition<T, Traits> | (() => PluginDefinition<T, Traits>);
 export { Plugin_2 as Plugin }
 
@@ -466,6 +461,63 @@ export interface RecurseFn {
 }
 
 // @public
+export function resend(config: ResendConfig): PluginDefinition<ResendMethods>;
+
+// @public
+export interface ResendClient {
+    request(method: string, path: string, params?: unknown): Promise<unknown>;
+}
+
+// @public
+export function resendClientHandler(options: ResendClientHandlerOptions): StepHandler<ResendClientHandlerState>;
+
+// @public
+export interface ResendClientHandlerOptions {
+    baseUrl: string;
+    contractHash: string;
+    fetch?: typeof globalThis.fetch;
+    headers?: Record<string, string>;
+}
+
+// @public
+export interface ResendClientHandlerState {
+    stepIndex: number;
+}
+
+// @public
+export interface ResendConfig {
+    apiKey: string;
+}
+
+// @public
+export const resendInterpreter: InterpreterFragment;
+
+// @public
+export interface ResendMethods {
+    resend: {
+        emails: {
+            send(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            get(id: Expr<string> | string): Expr<Record<string, unknown>>;
+        };
+        batch: {
+            send(emails: Expr<Record<string, unknown>[]> | Record<string, unknown>[]): Expr<Record<string, unknown>>;
+        };
+        contacts: {
+            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            get(id: Expr<string> | string): Expr<Record<string, unknown>>;
+            list(): Expr<Record<string, unknown>>;
+            remove(id: Expr<string> | string): Expr<Record<string, unknown>>;
+        };
+    };
+}
+
+// @public
+export function resendServerEvaluate(client: ResendClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+
+// @public
+export function resendServerHandler(client: ResendClient): StepHandler<void>;
+
+// @public
 export function resolveSchemaType(node: ASTNode, schema?: Record<string, unknown>): string | null;
 
 // @public
@@ -521,6 +573,85 @@ export const show: PluginDefinition<TypeclassSlot<"show">>;
 export interface ShowFor<T> {
     show(a: Expr<T> | T): Expr<string>;
 }
+
+// @public
+export function slack(config: SlackConfig): PluginDefinition<SlackMethods>;
+
+// @public
+export interface SlackClient {
+    apiCall(method: string, params?: Record<string, unknown>): Promise<unknown>;
+}
+
+// @public
+export function slackClientHandler(options: SlackClientHandlerOptions): StepHandler<SlackClientHandlerState>;
+
+// @public
+export interface SlackClientHandlerOptions {
+    baseUrl: string;
+    contractHash: string;
+    fetch?: typeof globalThis.fetch;
+    headers?: Record<string, string>;
+}
+
+// @public
+export interface SlackClientHandlerState {
+    stepIndex: number;
+}
+
+// @public
+export interface SlackConfig {
+    token: string;
+}
+
+// @public
+export const slackInterpreter: InterpreterFragment;
+
+// @public
+export interface SlackMethods {
+    slack: {
+        chat: {
+            postMessage(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            update(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            delete(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            postEphemeral(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            scheduleMessage(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            getPermalink(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        };
+        conversations: {
+            list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            info(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            invite(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            history(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            members(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            open(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            replies(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        };
+        users: {
+            info(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            lookupByEmail(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            conversations(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        };
+        reactions: {
+            add(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            get(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            remove(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        };
+        files: {
+            list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            info(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            delete(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        };
+    };
+}
+
+// @public
+export function slackServerEvaluate(client: SlackClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+
+// @public
+export function slackServerHandler(client: SlackClient): StepHandler<void>;
 
 // @public
 export const st: PluginDefinition<StMethods>;
@@ -674,6 +805,77 @@ export interface TraitImpl {
     type: string;
 }
 
+// @public
+export function twilio(config: TwilioConfig): PluginDefinition<TwilioMethods>;
+
+// @public
+export interface TwilioCallContext {
+    fetch(): Expr<Record<string, unknown>>;
+}
+
+// @public
+export interface TwilioCallsResource {
+    (sid: Expr<string> | string): TwilioCallContext;
+    create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+    list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+}
+
+// @public
+export interface TwilioClient {
+    request(method: string, path: string, params?: Record<string, unknown>): Promise<unknown>;
+}
+
+// @public
+export function twilioClientHandler(options: TwilioClientHandlerOptions): StepHandler<TwilioClientHandlerState>;
+
+// @public
+export interface TwilioClientHandlerOptions {
+    baseUrl: string;
+    contractHash: string;
+    fetch?: typeof globalThis.fetch;
+    headers?: Record<string, string>;
+}
+
+// @public
+export interface TwilioClientHandlerState {
+    stepIndex: number;
+}
+
+// @public
+export interface TwilioConfig {
+    accountSid: string;
+    authToken: string;
+}
+
+// @public
+export const twilioInterpreter: InterpreterFragment;
+
+// @public
+export interface TwilioMessageContext {
+    fetch(): Expr<Record<string, unknown>>;
+}
+
+// @public
+export interface TwilioMessagesResource {
+    (sid: Expr<string> | string): TwilioMessageContext;
+    create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+    list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+}
+
+// @public
+export interface TwilioMethods {
+    twilio: {
+        messages: TwilioMessagesResource;
+        calls: TwilioCallsResource;
+    };
+}
+
+// @public
+export function twilioServerEvaluate(client: TwilioClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+
+// @public
+export function twilioServerHandler(client: TwilioClient): StepHandler<void>;
+
 // Warning: (ae-internal-missing-underscore) The name "TypeclassMapping" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal
@@ -688,10 +890,8 @@ export interface TypeclassSlot<Name extends string> {
     readonly __typeclassSlot: Name;
 }
 
-// Warning: (ae-forgotten-export) The symbol "PinoInstance" needs to be exported by the entry point index.d.ts
-//
 // @public
-export function wrapPino(logger: PinoInstance): PinoClient;
+export function wrapAnthropicSdk(client: Anthropic): AnthropicClient;
 
 // Warning: (ae-forgotten-export) The symbol "Sql" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "TransactionSql" needs to be exported by the entry point index.d.ts
@@ -699,8 +899,21 @@ export function wrapPino(logger: PinoInstance): PinoClient;
 // @public
 export function wrapPostgresJs(sql: Sql | TransactionSql): PostgresClient;
 
+// Warning: (ae-forgotten-export) The symbol "ResendSdk" needs to be exported by the entry point index.d.ts
+//
+// @public
+export function wrapResendSdk(resend: ResendSdk): ResendClient;
+
+// @public
+export function wrapSlackWebClient(client: WebClient): SlackClient;
+
 // @public
 export function wrapStripeSdk(stripe: Stripe): StripeClient;
+
+// Warning: (ae-forgotten-export) The symbol "TwilioSdkClient" needs to be exported by the entry point index.d.ts
+//
+// @public
+export function wrapTwilioSdk(client: TwilioSdkClient): TwilioClient;
 
 // Warnings were encountered during analysis:
 //
