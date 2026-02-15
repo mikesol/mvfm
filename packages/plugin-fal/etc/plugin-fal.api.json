@@ -519,11 +519,25 @@
                 },
                 {
                   "kind": "Content",
-                  "text": ", requestId: "
+                  "text": ", options: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Parameters",
+                  "canonicalReference": "!Parameters:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "string"
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "FalSdkQueueClient",
+                  "canonicalReference": "@fal-ai/client!QueueClient:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[\"cancel\"]>[1]"
                 },
                 {
                   "kind": "Content",
@@ -545,8 +559,8 @@
               ],
               "isOptional": false,
               "returnTypeTokenRange": {
-                "startIndex": 5,
-                "endIndex": 7
+                "startIndex": 8,
+                "endIndex": 10
               },
               "releaseTag": "Public",
               "overloadIndex": 1,
@@ -560,10 +574,10 @@
                   "isOptional": false
                 },
                 {
-                  "parameterName": "requestId",
+                  "parameterName": "options",
                   "parameterTypeTokenRange": {
                     "startIndex": 3,
-                    "endIndex": 4
+                    "endIndex": 7
                   },
                   "isOptional": false
                 }
@@ -585,11 +599,25 @@
                 },
                 {
                   "kind": "Content",
-                  "text": ", requestId: "
+                  "text": ", options: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Parameters",
+                  "canonicalReference": "!Parameters:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "string"
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "FalSdkQueueClient",
+                  "canonicalReference": "@fal-ai/client!QueueClient:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[\"result\"]>[1]"
                 },
                 {
                   "kind": "Content",
@@ -611,8 +639,8 @@
               ],
               "isOptional": false,
               "returnTypeTokenRange": {
-                "startIndex": 5,
-                "endIndex": 7
+                "startIndex": 8,
+                "endIndex": 10
               },
               "releaseTag": "Public",
               "overloadIndex": 1,
@@ -626,10 +654,10 @@
                   "isOptional": false
                 },
                 {
-                  "parameterName": "requestId",
+                  "parameterName": "options",
                   "parameterTypeTokenRange": {
                     "startIndex": 3,
-                    "endIndex": 4
+                    "endIndex": 7
                   },
                   "isOptional": false
                 }
@@ -651,11 +679,25 @@
                 },
                 {
                   "kind": "Content",
-                  "text": ", requestId: "
+                  "text": ", options: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Parameters",
+                  "canonicalReference": "!Parameters:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "string"
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "FalSdkQueueClient",
+                  "canonicalReference": "@fal-ai/client!QueueClient:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[\"status\"]>[1]"
                 },
                 {
                   "kind": "Content",
@@ -668,7 +710,16 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<unknown>"
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "QueueStatus",
+                  "canonicalReference": "@fal-ai/client!QueueStatus:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">"
                 },
                 {
                   "kind": "Content",
@@ -677,8 +728,8 @@
               ],
               "isOptional": false,
               "returnTypeTokenRange": {
-                "startIndex": 5,
-                "endIndex": 7
+                "startIndex": 8,
+                "endIndex": 12
               },
               "releaseTag": "Public",
               "overloadIndex": 1,
@@ -692,10 +743,10 @@
                   "isOptional": false
                 },
                 {
-                  "parameterName": "requestId",
+                  "parameterName": "options",
                   "parameterTypeTokenRange": {
                     "startIndex": 3,
-                    "endIndex": 4
+                    "endIndex": 7
                   },
                   "isOptional": false
                 }
@@ -717,16 +768,25 @@
                 },
                 {
                   "kind": "Content",
-                  "text": ", input?: "
+                  "text": ", options: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "Parameters",
+                  "canonicalReference": "!Parameters:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>"
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "FalSdkQueueClient",
+                  "canonicalReference": "@fal-ai/client!QueueClient:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[\"submit\"]>[1]"
                 },
                 {
                   "kind": "Content",
@@ -748,8 +808,8 @@
               ],
               "isOptional": false,
               "returnTypeTokenRange": {
-                "startIndex": 6,
-                "endIndex": 8
+                "startIndex": 8,
+                "endIndex": 10
               },
               "releaseTag": "Public",
               "overloadIndex": 1,
@@ -763,12 +823,12 @@
                   "isOptional": false
                 },
                 {
-                  "parameterName": "input",
+                  "parameterName": "options",
                   "parameterTypeTokenRange": {
                     "startIndex": 3,
-                    "endIndex": 5
+                    "endIndex": 7
                   },
-                  "isOptional": true
+                  "isOptional": false
                 }
               ],
               "name": "queueSubmit"
@@ -788,16 +848,25 @@
                 },
                 {
                   "kind": "Content",
-                  "text": ", input?: "
+                  "text": ", options?: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "Parameters",
+                  "canonicalReference": "!Parameters:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>"
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "FalSdkClient",
+                  "canonicalReference": "@fal-ai/client!FalClient:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[\"run\"]>[1]"
                 },
                 {
                   "kind": "Content",
@@ -810,7 +879,16 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<unknown>"
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Result",
+                  "canonicalReference": "@fal-ai/client!Result:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<unknown>>"
                 },
                 {
                   "kind": "Content",
@@ -819,8 +897,8 @@
               ],
               "isOptional": false,
               "returnTypeTokenRange": {
-                "startIndex": 6,
-                "endIndex": 8
+                "startIndex": 8,
+                "endIndex": 12
               },
               "releaseTag": "Public",
               "overloadIndex": 1,
@@ -834,10 +912,10 @@
                   "isOptional": false
                 },
                 {
-                  "parameterName": "input",
+                  "parameterName": "options",
                   "parameterTypeTokenRange": {
                     "startIndex": 3,
-                    "endIndex": 5
+                    "endIndex": 7
                   },
                   "isOptional": true
                 }
@@ -859,16 +937,25 @@
                 },
                 {
                   "kind": "Content",
-                  "text": ", input?: "
+                  "text": ", options?: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "Parameters",
+                  "canonicalReference": "!Parameters:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>"
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "FalSdkClient",
+                  "canonicalReference": "@fal-ai/client!FalClient:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[\"subscribe\"]>[1]"
                 },
                 {
                   "kind": "Content",
@@ -881,7 +968,16 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<unknown>"
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Result",
+                  "canonicalReference": "@fal-ai/client!Result:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<unknown>>"
                 },
                 {
                   "kind": "Content",
@@ -890,8 +986,8 @@
               ],
               "isOptional": false,
               "returnTypeTokenRange": {
-                "startIndex": 6,
-                "endIndex": 8
+                "startIndex": 8,
+                "endIndex": 12
               },
               "releaseTag": "Public",
               "overloadIndex": 1,
@@ -905,10 +1001,10 @@
                   "isOptional": false
                 },
                 {
-                  "parameterName": "input",
+                  "parameterName": "options",
                   "parameterTypeTokenRange": {
                     "startIndex": 3,
-                    "endIndex": 5
+                    "endIndex": 7
                   },
                   "isOptional": true
                 }
@@ -1044,12 +1140,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "Awaited",
+                  "canonicalReference": "!Awaited:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n        subscribe(endpointId: "
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReturnType",
+                  "canonicalReference": "!ReturnType:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "FalSdkClient",
+                  "canonicalReference": "@fal-ai/client!FalClient:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[\"run\"]>>>;\n        subscribe(endpointId: "
                 },
                 {
                   "kind": "Reference",
@@ -1062,8 +1176,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "FalRunOptions",
-                  "canonicalReference": "@mvfm/plugin-fal!FalRunOptions:type"
+                  "text": "FalSubscribeOptions",
+                  "canonicalReference": "@mvfm/plugin-fal!FalSubscribeOptions:type"
                 },
                 {
                   "kind": "Content",
@@ -1080,35 +1194,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>>;\n        queue: {\n            submit(endpointId: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-fal!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, options?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "FalRunOptions",
-                  "canonicalReference": "@mvfm/plugin-fal!FalRunOptions:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-fal!~Expr:type"
+                  "text": "Awaited",
+                  "canonicalReference": "!Awaited:type"
                 },
                 {
                   "kind": "Content",
@@ -1116,12 +1203,21 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ReturnType",
+                  "canonicalReference": "!ReturnType:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n            status(endpointId: "
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "FalSdkClient",
+                  "canonicalReference": "@fal-ai/client!FalClient:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[\"subscribe\"]>>>;\n        queue: {\n            submit(endpointId: "
                 },
                 {
                   "kind": "Reference",
@@ -1134,8 +1230,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "FalQueueOptions",
-                  "canonicalReference": "@mvfm/plugin-fal!FalQueueOptions:type"
+                  "text": "FalSubmitOptions",
+                  "canonicalReference": "@mvfm/plugin-fal!FalSubmitOptions:type"
                 },
                 {
                   "kind": "Content",
@@ -1152,12 +1248,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "Awaited",
+                  "canonicalReference": "!Awaited:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n            result(endpointId: "
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReturnType",
+                  "canonicalReference": "!ReturnType:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "FalSdkQueueClient",
+                  "canonicalReference": "@fal-ai/client!QueueClient:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[\"submit\"]>>>;\n            status(endpointId: "
                 },
                 {
                   "kind": "Reference",
@@ -1170,8 +1284,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "FalQueueOptions",
-                  "canonicalReference": "@mvfm/plugin-fal!FalQueueOptions:type"
+                  "text": "FalQueueStatusOptions",
+                  "canonicalReference": "@mvfm/plugin-fal!FalQueueStatusOptions:type"
                 },
                 {
                   "kind": "Content",
@@ -1188,12 +1302,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "Awaited",
+                  "canonicalReference": "!Awaited:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n            cancel(endpointId: "
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReturnType",
+                  "canonicalReference": "!ReturnType:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "FalSdkQueueClient",
+                  "canonicalReference": "@fal-ai/client!QueueClient:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[\"status\"]>>>;\n            result(endpointId: "
                 },
                 {
                   "kind": "Reference",
@@ -1206,8 +1338,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "FalQueueOptions",
-                  "canonicalReference": "@mvfm/plugin-fal!FalQueueOptions:type"
+                  "text": "FalQueueResultOptions",
+                  "canonicalReference": "@mvfm/plugin-fal!FalQueueResultOptions:type"
                 },
                 {
                   "kind": "Content",
@@ -1224,12 +1356,57 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "Awaited",
+                  "canonicalReference": "!Awaited:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n        };\n    }"
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReturnType",
+                  "canonicalReference": "!ReturnType:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "FalSdkQueueClient",
+                  "canonicalReference": "@fal-ai/client!QueueClient:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[\"result\"]>>>;\n            cancel(endpointId: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Expr",
+                  "canonicalReference": "@mvfm/plugin-fal!~Expr:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<string> | string, options: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "FalQueueCancelOptions",
+                  "canonicalReference": "@mvfm/plugin-fal!FalQueueCancelOptions:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Expr",
+                  "canonicalReference": "@mvfm/plugin-fal!~Expr:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<void>;\n        };\n    }"
                 },
                 {
                   "kind": "Content",
@@ -1242,7 +1419,7 @@
               "name": "fal",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 50
+                "endIndex": 68
               }
             }
           ],
@@ -1250,25 +1427,30 @@
         },
         {
           "kind": "TypeAlias",
-          "canonicalReference": "@mvfm/plugin-fal!FalQueueOptions:type",
-          "docComment": "/**\n * Options for queue.status/result/cancel — mirrors real SDK QueueStatusOptions.\n */\n",
+          "canonicalReference": "@mvfm/plugin-fal!FalQueueCancelOptions:type",
+          "docComment": "/**\n * SDK-aligned queue.cancel options, excluding unsupported runtime-only fields.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export type FalQueueOptions = "
-            },
-            {
-              "kind": "Content",
-              "text": "{\n    requestId: "
+              "text": "export type FalQueueCancelOptions = "
             },
             {
               "kind": "Reference",
-              "text": "Expr",
-              "canonicalReference": "@mvfm/plugin-fal!~Expr:type"
+              "text": "Exprify",
+              "canonicalReference": "@mvfm/plugin-fal!~Exprify:type"
             },
             {
               "kind": "Content",
-              "text": "<string> | string;\n}"
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "QueueCancelOptionsShape",
+              "canonicalReference": "@mvfm/plugin-fal!~QueueCancelOptionsShape:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
             },
             {
               "kind": "Content",
@@ -1277,29 +1459,25 @@
           ],
           "fileUrlPath": "dist/1.9.1/index.d.ts",
           "releaseTag": "Public",
-          "name": "FalQueueOptions",
+          "name": "FalQueueCancelOptions",
           "typeTokenRange": {
             "startIndex": 1,
-            "endIndex": 4
+            "endIndex": 5
           }
         },
         {
           "kind": "TypeAlias",
-          "canonicalReference": "@mvfm/plugin-fal!FalRunOptions:type",
-          "docComment": "/**\n * Options for run/subscribe/queue.submit — mirrors real SDK RunOptions.\n */\n",
+          "canonicalReference": "@mvfm/plugin-fal!FalQueueResultOptions:type",
+          "docComment": "/**\n * SDK-aligned queue.result options, excluding unsupported runtime-only fields.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export type FalRunOptions = "
-            },
-            {
-              "kind": "Content",
-              "text": "{\n    input?: "
+              "text": "export type FalQueueResultOptions = "
             },
             {
               "kind": "Reference",
-              "text": "Expr",
-              "canonicalReference": "@mvfm/plugin-fal!~Expr:type"
+              "text": "Exprify",
+              "canonicalReference": "@mvfm/plugin-fal!~Exprify:type"
             },
             {
               "kind": "Content",
@@ -1307,21 +1485,92 @@
             },
             {
               "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
+              "text": "QueueResultOptionsShape",
+              "canonicalReference": "@mvfm/plugin-fal!~QueueResultOptionsShape:type"
             },
             {
               "kind": "Content",
-              "text": "<string, unknown>> | "
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/1.9.1/index.d.ts",
+          "releaseTag": "Public",
+          "name": "FalQueueResultOptions",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@mvfm/plugin-fal!FalQueueStatusOptions:type",
+          "docComment": "/**\n * SDK-aligned queue.status options, excluding unsupported runtime-only fields.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type FalQueueStatusOptions = "
             },
             {
               "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
+              "text": "Exprify",
+              "canonicalReference": "@mvfm/plugin-fal!~Exprify:type"
             },
             {
               "kind": "Content",
-              "text": "<string, unknown>;\n}"
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "QueueStatusOptionsShape",
+              "canonicalReference": "@mvfm/plugin-fal!~QueueStatusOptionsShape:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/1.9.1/index.d.ts",
+          "releaseTag": "Public",
+          "name": "FalQueueStatusOptions",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@mvfm/plugin-fal!FalRunOptions:type",
+          "docComment": "/**\n * SDK-aligned run options, excluding unsupported runtime-only fields.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type FalRunOptions = "
+            },
+            {
+              "kind": "Reference",
+              "text": "Exprify",
+              "canonicalReference": "@mvfm/plugin-fal!~Exprify:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "RunOptionsShape",
+              "canonicalReference": "@mvfm/plugin-fal!~RunOptionsShape:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
             },
             {
               "kind": "Content",
@@ -1333,7 +1582,87 @@
           "name": "FalRunOptions",
           "typeTokenRange": {
             "startIndex": 1,
-            "endIndex": 8
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@mvfm/plugin-fal!FalSubmitOptions:type",
+          "docComment": "/**\n * SDK-aligned queue.submit options, excluding unsupported runtime-only fields.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type FalSubmitOptions = "
+            },
+            {
+              "kind": "Reference",
+              "text": "Exprify",
+              "canonicalReference": "@mvfm/plugin-fal!~Exprify:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "SubmitOptionsShape",
+              "canonicalReference": "@mvfm/plugin-fal!~SubmitOptionsShape:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/1.9.1/index.d.ts",
+          "releaseTag": "Public",
+          "name": "FalSubmitOptions",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@mvfm/plugin-fal!FalSubscribeOptions:type",
+          "docComment": "/**\n * SDK-aligned subscribe options, excluding unsupported runtime-only fields.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type FalSubscribeOptions = "
+            },
+            {
+              "kind": "Reference",
+              "text": "Exprify",
+              "canonicalReference": "@mvfm/plugin-fal!~Exprify:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "SubscribeOptionsShape",
+              "canonicalReference": "@mvfm/plugin-fal!~SubscribeOptionsShape:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/1.9.1/index.d.ts",
+          "releaseTag": "Public",
+          "name": "FalSubscribeOptions",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
           }
         },
         {

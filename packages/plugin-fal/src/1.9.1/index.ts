@@ -50,6 +50,7 @@
 //
 // ============================================================
 
+import type { FalClient as FalSdkClient, QueueClient as FalSdkQueueClient } from "@fal-ai/client";
 import type { Expr, PluginContext, PluginDefinition } from "@mvfm/core";
 
 // ---- What the plugin adds to $ ----------------------------
@@ -57,50 +58,81 @@ import type { Expr, PluginContext, PluginDefinition } from "@mvfm/core";
 /**
  * Fal operations added to the DSL context by the fal plugin.
  *
- * Mirrors the @fal-ai/client API: run, subscribe, and queue
+ * Mirrors the \@fal-ai/client API: run, subscribe, and queue
  * operations for AI media generation endpoints.
  */
-/** Options for run/subscribe/queue.submit — mirrors real SDK RunOptions. */
-export type FalRunOptions = {
-  input?: Expr<Record<string, unknown>> | Record<string, unknown>;
-};
+type Primitive = string | number | boolean | null | undefined;
 
-/** Options for queue.status/result/cancel — mirrors real SDK QueueStatusOptions. */
-export type FalQueueOptions = {
-  requestId: Expr<string> | string;
-};
+type Exprify<T> = T extends Primitive
+  ? T | Expr<T>
+  : T extends Array<infer U>
+    ? Array<Exprify<U>> | Expr<T>
+    : T extends object
+      ? { [K in keyof T]: Exprify<T[K]> } | Expr<T>
+      : T | Expr<T>;
+
+type UnsupportedOptionKeys = "abortSignal";
+
+type RunOptionsShape = Omit<Parameters<FalSdkClient["run"]>[1], UnsupportedOptionKeys>;
+type SubscribeOptionsShape = Omit<Parameters<FalSdkClient["subscribe"]>[1], UnsupportedOptionKeys>;
+type SubmitOptionsShape = Omit<Parameters<FalSdkQueueClient["submit"]>[1], UnsupportedOptionKeys>;
+type QueueStatusOptionsShape = Omit<
+  Parameters<FalSdkQueueClient["status"]>[1],
+  UnsupportedOptionKeys
+>;
+type QueueResultOptionsShape = Omit<
+  Parameters<FalSdkQueueClient["result"]>[1],
+  UnsupportedOptionKeys
+>;
+type QueueCancelOptionsShape = Omit<
+  Parameters<FalSdkQueueClient["cancel"]>[1],
+  UnsupportedOptionKeys
+>;
+
+/** SDK-aligned run options, excluding unsupported runtime-only fields. */
+export type FalRunOptions = Exprify<RunOptionsShape>;
+/** SDK-aligned subscribe options, excluding unsupported runtime-only fields. */
+export type FalSubscribeOptions = Exprify<SubscribeOptionsShape>;
+/** SDK-aligned queue.submit options, excluding unsupported runtime-only fields. */
+export type FalSubmitOptions = Exprify<SubmitOptionsShape>;
+/** SDK-aligned queue.status options, excluding unsupported runtime-only fields. */
+export type FalQueueStatusOptions = Exprify<QueueStatusOptionsShape>;
+/** SDK-aligned queue.result options, excluding unsupported runtime-only fields. */
+export type FalQueueResultOptions = Exprify<QueueResultOptionsShape>;
+/** SDK-aligned queue.cancel options, excluding unsupported runtime-only fields. */
+export type FalQueueCancelOptions = Exprify<QueueCancelOptionsShape>;
 
 export interface FalMethods {
   /** Fal API operations, namespaced under `$.fal`. */
   fal: {
     /** Run an endpoint synchronously. Mirrors `fal.run(endpointId, { input })`. */
-    run(endpointId: Expr<string> | string, options?: FalRunOptions): Expr<Record<string, unknown>>;
+    run(
+      endpointId: Expr<string> | string,
+      options?: FalRunOptions,
+    ): Expr<Awaited<ReturnType<FalSdkClient["run"]>>>;
     /** Subscribe to an endpoint (queue submit + poll + result). Mirrors `fal.subscribe(endpointId, { input })`. */
     subscribe(
       endpointId: Expr<string> | string,
-      options?: FalRunOptions,
-    ): Expr<Record<string, unknown>>;
+      options?: FalSubscribeOptions,
+    ): Expr<Awaited<ReturnType<FalSdkClient["subscribe"]>>>;
     queue: {
       /** Submit a request to the queue. Mirrors `fal.queue.submit(endpointId, { input })`. */
       submit(
         endpointId: Expr<string> | string,
-        options?: FalRunOptions,
-      ): Expr<Record<string, unknown>>;
+        options: FalSubmitOptions,
+      ): Expr<Awaited<ReturnType<FalSdkQueueClient["submit"]>>>;
       /** Check the status of a queued request. Mirrors `fal.queue.status(endpointId, { requestId })`. */
       status(
         endpointId: Expr<string> | string,
-        options: FalQueueOptions,
-      ): Expr<Record<string, unknown>>;
+        options: FalQueueStatusOptions,
+      ): Expr<Awaited<ReturnType<FalSdkQueueClient["status"]>>>;
       /** Retrieve the result of a completed queued request. Mirrors `fal.queue.result(endpointId, { requestId })`. */
       result(
         endpointId: Expr<string> | string,
-        options: FalQueueOptions,
-      ): Expr<Record<string, unknown>>;
+        options: FalQueueResultOptions,
+      ): Expr<Awaited<ReturnType<FalSdkQueueClient["result"]>>>;
       /** Cancel a queued request. Mirrors `fal.queue.cancel(endpointId, { requestId })`. */
-      cancel(
-        endpointId: Expr<string> | string,
-        options: FalQueueOptions,
-      ): Expr<Record<string, unknown>>;
+      cancel(endpointId: Expr<string> | string, options: FalQueueCancelOptions): Expr<void>;
     };
   };
 }
@@ -146,70 +178,63 @@ export function fal(config: FalConfig): PluginDefinition<FalMethods> {
         return ctx.isExpr(endpointId) ? endpointId.__node : ctx.lift(endpointId).__node;
       }
 
-      function resolveRequestId(requestId: Expr<string> | string) {
-        return ctx.isExpr(requestId) ? requestId.__node : ctx.lift(requestId).__node;
-      }
-
-      function resolveInput(input: Expr<Record<string, unknown>> | Record<string, unknown>) {
-        return ctx.lift(input).__node;
+      function resolveOptions(options?: unknown) {
+        return options != null ? ctx.lift(options as any).__node : null;
       }
 
       return {
         fal: {
-          run(endpointId, options?) {
-            const input = options?.input;
-            return ctx.expr({
+          run(endpointId: Expr<string> | string, options?: FalRunOptions) {
+            return ctx.expr<Awaited<ReturnType<FalSdkClient["run"]>>>({
               kind: "fal/run",
               endpointId: resolveEndpointId(endpointId),
-              input: input != null ? resolveInput(input) : null,
+              options: resolveOptions(options),
               config,
             });
           },
 
-          subscribe(endpointId, options?) {
-            const input = options?.input;
-            return ctx.expr({
+          subscribe(endpointId: Expr<string> | string, options?: FalSubscribeOptions) {
+            return ctx.expr<Awaited<ReturnType<FalSdkClient["subscribe"]>>>({
               kind: "fal/subscribe",
               endpointId: resolveEndpointId(endpointId),
-              input: input != null ? resolveInput(input) : null,
+              options: resolveOptions(options),
               config,
             });
           },
 
           queue: {
-            submit(endpointId, options?) {
-              const input = options?.input;
-              return ctx.expr({
+            submit(endpointId: Expr<string> | string, options: FalSubmitOptions) {
+              return ctx.expr<Awaited<ReturnType<FalSdkQueueClient["submit"]>>>({
                 kind: "fal/queue_submit",
                 endpointId: resolveEndpointId(endpointId),
-                input: input != null ? resolveInput(input) : null,
+                options: resolveOptions(options),
                 config,
               });
             },
 
-            status(endpointId, options) {
-              return ctx.expr({
+            status(endpointId: Expr<string> | string, options: FalQueueStatusOptions) {
+              return ctx.expr<Awaited<ReturnType<FalSdkQueueClient["status"]>>>({
                 kind: "fal/queue_status",
                 endpointId: resolveEndpointId(endpointId),
-                requestId: resolveRequestId(options.requestId),
+                options: resolveOptions(options),
                 config,
               });
             },
 
-            result(endpointId, options) {
-              return ctx.expr({
+            result(endpointId: Expr<string> | string, options: FalQueueResultOptions) {
+              return ctx.expr<Awaited<ReturnType<FalSdkQueueClient["result"]>>>({
                 kind: "fal/queue_result",
                 endpointId: resolveEndpointId(endpointId),
-                requestId: resolveRequestId(options.requestId),
+                options: resolveOptions(options),
                 config,
               });
             },
 
-            cancel(endpointId, options) {
-              return ctx.expr({
+            cancel(endpointId: Expr<string> | string, options: FalQueueCancelOptions) {
+              return ctx.expr<void>({
                 kind: "fal/queue_cancel",
                 endpointId: resolveEndpointId(endpointId),
-                requestId: resolveRequestId(options.requestId),
+                options: resolveOptions(options),
                 config,
               });
             },
@@ -243,35 +268,40 @@ export function fal(config: FalConfig): PluginDefinition<FalMethods> {
 //
 // WORKS BUT DIFFERENT:
 //
-// 4. Non-modelable options silently ignored:
-//    Real:  fal.run(id, { input: {...}, method: "post", abortSignal: ctrl.signal })
-//    Mvfm:   $.fal.run(id, { input: {...} })
-//    The { input } wrapper is preserved 1:1, but runtime options
-//    (method, abort, storage settings) are silently dropped.
+// 4. Most implemented-method options are preserved:
+//    Real:  fal.run(id, { input: {...}, method: "post", startTimeout: 30 })
+//    Mvfm:   $.fal.run(id, { input: {...}, method: "post", startTimeout: 30 })
+//    For run/subscribe/queue.submit/status/result/cancel, options are
+//    carried through AST -> interpreter -> handler.
 //
-// 5. Return types:
+// 5. Runtime-only abort signals are excluded:
+//    Real:  fal.run(id, { abortSignal: controller.signal })
+//    Mvfm:   Not supported in AST. Signals are runtime handles and are
+//    intentionally excluded from public option types.
+//
+// 6. Return types:
 //    Real @fal-ai/client uses generic Result<OutputType<Id>> with
 //    per-endpoint typed responses.
-//    Mvfm uses Record<string, unknown> for all return types.
-//    Property access still works via proxy (result.images[0].url).
+//    Mvfm uses SDK Result/queue status shapes, but does not currently
+//    preserve endpoint-specific OutputType<Id> inference.
 //
-// 6. Subscribe callbacks:
+// 7. Subscribe callbacks:
 //    Real:  fal.subscribe(id, { onQueueUpdate: (status) => ... })
 //    Mvfm:   Not modelable. Callbacks are runtime concerns.
 //
 // DOESN'T WORK / NOT MODELED:
 //
-// 7. Streaming (fal.stream):
+// 8. Streaming (fal.stream):
 //    Real:  const stream = await fal.stream(id, { input })
 //           for await (const chunk of stream) { ... }
 //    Mvfm:   Can't model. SSE push-based, no finite AST shape.
 //
-// 8. Realtime (fal.realtime.connect):
+// 9. Realtime (fal.realtime.connect):
 //    Real:  const conn = fal.realtime.connect(app, { onResult, onError })
 //           conn.send(input)
 //    Mvfm:   Can't model. WebSocket bidirectional, stateful.
 //
-// 9. Storage upload:
+// 10. Storage upload:
 //    Real:  const url = await fal.storage.upload(file)
 //    Mvfm:   Deferred. Could be added as fal/storage_upload node kind.
 //

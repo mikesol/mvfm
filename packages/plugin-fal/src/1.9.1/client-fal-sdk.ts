@@ -12,33 +12,51 @@ import type { FalClient } from "./interpreter";
  */
 export function wrapFalSdk(client: FalSdk): FalClient {
   return {
-    async run(endpointId: string, input?: Record<string, unknown>): Promise<unknown> {
-      const result = await client.run(endpointId, { input });
+    async run(
+      endpointId: string,
+      options?: Parameters<FalSdk["run"]>[1],
+    ): Promise<Awaited<ReturnType<FalSdk["run"]>>> {
+      const result = await client.run(endpointId, options as any);
       return result;
     },
 
-    async subscribe(endpointId: string, input?: Record<string, unknown>): Promise<unknown> {
-      const result = await client.subscribe(endpointId, { input });
+    async subscribe(
+      endpointId: string,
+      options?: Parameters<FalSdk["subscribe"]>[1],
+    ): Promise<Awaited<ReturnType<FalSdk["subscribe"]>>> {
+      const result = await client.subscribe(endpointId, options as any);
       return result;
     },
 
-    async queueSubmit(endpointId: string, input?: Record<string, unknown>): Promise<unknown> {
-      const result = await client.queue.submit(endpointId, { input });
+    async queueSubmit(
+      endpointId: string,
+      options: Parameters<FalSdk["queue"]["submit"]>[1],
+    ): Promise<Awaited<ReturnType<FalSdk["queue"]["submit"]>>> {
+      const result = await client.queue.submit(endpointId, options as any);
       return result;
     },
 
-    async queueStatus(endpointId: string, requestId: string): Promise<unknown> {
-      const result = await client.queue.status(endpointId, { requestId });
+    async queueStatus(
+      endpointId: string,
+      options: Parameters<FalSdk["queue"]["status"]>[1],
+    ): Promise<Awaited<ReturnType<FalSdk["queue"]["status"]>>> {
+      const result = await client.queue.status(endpointId, options);
       return result;
     },
 
-    async queueResult(endpointId: string, requestId: string): Promise<unknown> {
-      const result = await client.queue.result(endpointId, { requestId });
+    async queueResult(
+      endpointId: string,
+      options: Parameters<FalSdk["queue"]["result"]>[1],
+    ): Promise<Awaited<ReturnType<FalSdk["queue"]["result"]>>> {
+      const result = await client.queue.result(endpointId, options as any);
       return result;
     },
 
-    async queueCancel(endpointId: string, requestId: string): Promise<void> {
-      await client.queue.cancel(endpointId, { requestId });
+    async queueCancel(
+      endpointId: string,
+      options: Parameters<FalSdk["queue"]["cancel"]>[1],
+    ): Promise<void> {
+      await client.queue.cancel(endpointId, options);
     },
   };
 }

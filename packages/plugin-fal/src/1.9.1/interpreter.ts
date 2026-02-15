@@ -1,3 +1,9 @@
+import type {
+  FalClient as FalSdkClient,
+  QueueClient as FalSdkQueueClient,
+  QueueStatus,
+  Result,
+} from "@fal-ai/client";
 import type { ASTNode, InterpreterFragment, StepEffect } from "@mvfm/core";
 
 /**
@@ -8,17 +14,32 @@ import type { ASTNode, InterpreterFragment, StepEffect } from "@mvfm/core";
  */
 export interface FalClient {
   /** Execute an endpoint synchronously. */
-  run(endpointId: string, input?: Record<string, unknown>): Promise<unknown>;
+  run(endpointId: string, options?: Parameters<FalSdkClient["run"]>[1]): Promise<Result<unknown>>;
   /** Subscribe to an endpoint (queue submit + poll + result). */
-  subscribe(endpointId: string, input?: Record<string, unknown>): Promise<unknown>;
+  subscribe(
+    endpointId: string,
+    options?: Parameters<FalSdkClient["subscribe"]>[1],
+  ): Promise<Result<unknown>>;
   /** Submit a request to the queue. */
-  queueSubmit(endpointId: string, input?: Record<string, unknown>): Promise<unknown>;
+  queueSubmit(
+    endpointId: string,
+    options: Parameters<FalSdkQueueClient["submit"]>[1],
+  ): Promise<unknown>;
   /** Check the status of a queued request. */
-  queueStatus(endpointId: string, requestId: string): Promise<unknown>;
+  queueStatus(
+    endpointId: string,
+    options: Parameters<FalSdkQueueClient["status"]>[1],
+  ): Promise<QueueStatus>;
   /** Retrieve the result of a completed queued request. */
-  queueResult(endpointId: string, requestId: string): Promise<unknown>;
+  queueResult(
+    endpointId: string,
+    options: Parameters<FalSdkQueueClient["result"]>[1],
+  ): Promise<unknown>;
   /** Cancel a queued request. */
-  queueCancel(endpointId: string, requestId: string): Promise<void>;
+  queueCancel(
+    endpointId: string,
+    options: Parameters<FalSdkQueueClient["cancel"]>[1],
+  ): Promise<void>;
 }
 
 /**
@@ -35,69 +56,84 @@ export const falInterpreter: InterpreterFragment = {
     switch (node.kind) {
       case "fal/run": {
         const endpointId = yield { type: "recurse", child: node.endpointId as ASTNode };
-        const input =
-          node.input != null ? yield { type: "recurse", child: node.input as ASTNode } : undefined;
+        const options =
+          node.options != null
+            ? yield { type: "recurse", child: node.options as ASTNode }
+            : undefined;
         return yield {
           type: "fal/api_call",
           endpointId,
           method: "run",
-          ...(input !== undefined ? { input } : {}),
+          ...(options !== undefined ? { options } : {}),
         };
       }
 
       case "fal/subscribe": {
         const endpointId = yield { type: "recurse", child: node.endpointId as ASTNode };
-        const input =
-          node.input != null ? yield { type: "recurse", child: node.input as ASTNode } : undefined;
+        const options =
+          node.options != null
+            ? yield { type: "recurse", child: node.options as ASTNode }
+            : undefined;
         return yield {
           type: "fal/subscribe",
           endpointId,
-          ...(input !== undefined ? { input } : {}),
+          ...(options !== undefined ? { options } : {}),
         };
       }
 
       case "fal/queue_submit": {
         const endpointId = yield { type: "recurse", child: node.endpointId as ASTNode };
-        const input =
-          node.input != null ? yield { type: "recurse", child: node.input as ASTNode } : undefined;
+        const options =
+          node.options != null
+            ? yield { type: "recurse", child: node.options as ASTNode }
+            : undefined;
         return yield {
           type: "fal/api_call",
           endpointId,
           method: "queue_submit",
-          ...(input !== undefined ? { input } : {}),
+          ...(options !== undefined ? { options } : {}),
         };
       }
 
       case "fal/queue_status": {
         const endpointId = yield { type: "recurse", child: node.endpointId as ASTNode };
-        const requestId = yield { type: "recurse", child: node.requestId as ASTNode };
+        const options =
+          node.options != null
+            ? yield { type: "recurse", child: node.options as ASTNode }
+            : undefined;
         return yield {
           type: "fal/api_call",
           endpointId,
           method: "queue_status",
-          requestId,
+          ...(options !== undefined ? { options } : {}),
         };
       }
 
       case "fal/queue_result": {
         const endpointId = yield { type: "recurse", child: node.endpointId as ASTNode };
-        const requestId = yield { type: "recurse", child: node.requestId as ASTNode };
+        const options =
+          node.options != null
+            ? yield { type: "recurse", child: node.options as ASTNode }
+            : undefined;
         return yield {
           type: "fal/api_call",
           endpointId,
           method: "queue_result",
-          requestId,
+          ...(options !== undefined ? { options } : {}),
         };
       }
 
       case "fal/queue_cancel": {
         const endpointId = yield { type: "recurse", child: node.endpointId as ASTNode };
-        const requestId = yield { type: "recurse", child: node.requestId as ASTNode };
+        const options =
+          node.options != null
+            ? yield { type: "recurse", child: node.options as ASTNode }
+            : undefined;
         return yield {
           type: "fal/api_call",
           endpointId,
           method: "queue_cancel",
-          requestId,
+          ...(options !== undefined ? { options } : {}),
         };
       }
 

@@ -37,112 +37,144 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
 // ---- fal.run ----
 
 describe("fal interpreter: run", () => {
-  it("yields fal/api_call with endpointId and input", async () => {
-    const prog = app(($) => $.fal.run("fal-ai/flux/dev", { input: { prompt: "a cat" } }));
+  it("yields fal/api_call with endpointId and full options", async () => {
+    const prog = app(($) =>
+      $.fal.run("fal-ai/flux/dev", {
+        input: { prompt: "a cat" },
+        method: "post",
+        startTimeout: 30,
+      }),
+    );
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
     expect(captured[0].type).toBe("fal/api_call");
     expect(captured[0].endpointId).toBe("fal-ai/flux/dev");
     expect(captured[0].method).toBe("run");
-    expect(captured[0].input).toEqual({ prompt: "a cat" });
+    expect(captured[0].options).toEqual({
+      input: { prompt: "a cat" },
+      method: "post",
+      startTimeout: 30,
+    });
   });
 
-  it("yields fal/api_call with undefined input when omitted", async () => {
+  it("yields fal/api_call with undefined options when omitted", async () => {
     const prog = app(($) => $.fal.run("fal-ai/flux/dev"));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].input).toBeUndefined();
+    expect(captured[0].options).toBeUndefined();
   });
 });
 
 // ---- fal.subscribe ----
 
 describe("fal interpreter: subscribe", () => {
-  it("yields fal/subscribe with endpointId and input", async () => {
-    const prog = app(($) => $.fal.subscribe("fal-ai/flux/dev", { input: { prompt: "a cat" } }));
+  it("yields fal/subscribe with endpointId and full options", async () => {
+    const prog = app(($) =>
+      $.fal.subscribe("fal-ai/flux/dev", {
+        input: { prompt: "a cat" },
+        mode: "polling",
+        logs: true,
+      }),
+    );
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
     expect(captured[0].type).toBe("fal/subscribe");
     expect(captured[0].endpointId).toBe("fal-ai/flux/dev");
-    expect(captured[0].input).toEqual({ prompt: "a cat" });
+    expect(captured[0].options).toEqual({
+      input: { prompt: "a cat" },
+      mode: "polling",
+      logs: true,
+    });
   });
 });
 
 // ---- fal.queue.submit ----
 
 describe("fal interpreter: queue.submit", () => {
-  it("yields fal/api_call with method queue_submit", async () => {
-    const prog = app(($) => $.fal.queue.submit("fal-ai/flux/dev", { input: { prompt: "a cat" } }));
+  it("yields fal/api_call with method queue_submit and options", async () => {
+    const prog = app(($) =>
+      $.fal.queue.submit("fal-ai/flux/dev", {
+        input: { prompt: "a cat" },
+        priority: "low",
+        hint: "gpu",
+      }),
+    );
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
     expect(captured[0].type).toBe("fal/api_call");
     expect(captured[0].endpointId).toBe("fal-ai/flux/dev");
     expect(captured[0].method).toBe("queue_submit");
-    expect(captured[0].input).toEqual({ prompt: "a cat" });
+    expect(captured[0].options).toEqual({
+      input: { prompt: "a cat" },
+      priority: "low",
+      hint: "gpu",
+    });
   });
 });
 
 // ---- fal.queue.status ----
 
 describe("fal interpreter: queue.status", () => {
-  it("yields fal/api_call with method queue_status and requestId", async () => {
-    const prog = app(($) => $.fal.queue.status("fal-ai/flux/dev", { requestId: "req_123" }));
+  it("yields fal/api_call with method queue_status and options", async () => {
+    const prog = app(($) =>
+      $.fal.queue.status("fal-ai/flux/dev", { requestId: "req_123", logs: true }),
+    );
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
     expect(captured[0].type).toBe("fal/api_call");
     expect(captured[0].endpointId).toBe("fal-ai/flux/dev");
     expect(captured[0].method).toBe("queue_status");
-    expect(captured[0].requestId).toBe("req_123");
+    expect(captured[0].options).toEqual({ requestId: "req_123", logs: true });
   });
 });
 
 // ---- fal.queue.result ----
 
 describe("fal interpreter: queue.result", () => {
-  it("yields fal/api_call with method queue_result and requestId", async () => {
+  it("yields fal/api_call with method queue_result and options", async () => {
     const prog = app(($) => $.fal.queue.result("fal-ai/flux/dev", { requestId: "req_123" }));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
     expect(captured[0].type).toBe("fal/api_call");
     expect(captured[0].endpointId).toBe("fal-ai/flux/dev");
     expect(captured[0].method).toBe("queue_result");
-    expect(captured[0].requestId).toBe("req_123");
+    expect(captured[0].options).toEqual({ requestId: "req_123" });
   });
 });
 
 // ---- fal.queue.cancel ----
 
 describe("fal interpreter: queue.cancel", () => {
-  it("yields fal/api_call with method queue_cancel and requestId", async () => {
+  it("yields fal/api_call with method queue_cancel and options", async () => {
     const prog = app(($) => $.fal.queue.cancel("fal-ai/flux/dev", { requestId: "req_123" }));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
     expect(captured[0].type).toBe("fal/api_call");
     expect(captured[0].endpointId).toBe("fal-ai/flux/dev");
     expect(captured[0].method).toBe("queue_cancel");
-    expect(captured[0].requestId).toBe("req_123");
+    expect(captured[0].options).toEqual({ requestId: "req_123" });
   });
 });
 
 // ---- input resolution ----
 
 describe("fal interpreter: input resolution", () => {
-  it("resolves input params through recurse", async () => {
+  it("resolves input params through recurse in options payload", async () => {
     const prog = app({ prompt: "string" }, ($) =>
       $.fal.run("fal-ai/flux/dev", { input: { prompt: $.input.prompt } }),
     );
     const { captured } = await run(prog, { prompt: "a dog" });
     expect(captured).toHaveLength(1);
-    expect(captured[0].input).toEqual({ prompt: "a dog" });
+    expect(captured[0].options).toEqual({ input: { prompt: "a dog" } });
   });
 
-  it("resolves dynamic requestId through recurse", async () => {
+  it("resolves dynamic requestId through recurse in options payload", async () => {
     const prog = app({ reqId: "string" }, ($) =>
       $.fal.queue.status("fal-ai/flux/dev", { requestId: $.input.reqId }),
     );
     const { captured } = await run(prog, { reqId: "req_dynamic_456" });
     expect(captured).toHaveLength(1);
-    expect(captured[0].requestId).toBe("req_dynamic_456");
+    expect(captured[0].options).toEqual({ requestId: "req_dynamic_456" });
   });
 });
 

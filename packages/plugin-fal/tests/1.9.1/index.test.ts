@@ -15,14 +15,21 @@ const app = mvfm(num, str, fal({ credentials: "key_test_123" }));
 describe("fal: run", () => {
   it("produces fal/run node with literal input", () => {
     const prog = app(($) => {
-      return $.fal.run("fal-ai/flux/dev", { input: { prompt: "a cat" } });
+      return $.fal.run("fal-ai/flux/dev", {
+        input: { prompt: "a cat" },
+        method: "post",
+        startTimeout: 30,
+      });
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fal/run");
     expect(ast.result.endpointId.kind).toBe("core/literal");
     expect(ast.result.endpointId.value).toBe("fal-ai/flux/dev");
-    expect(ast.result.input.kind).toBe("core/record");
-    expect(ast.result.input.fields.prompt.value).toBe("a cat");
+    expect(ast.result.options.kind).toBe("core/record");
+    expect(ast.result.options.fields.input.kind).toBe("core/record");
+    expect(ast.result.options.fields.input.fields.prompt.value).toBe("a cat");
+    expect(ast.result.options.fields.method.value).toBe("post");
+    expect(ast.result.options.fields.startTimeout.value).toBe(30);
   });
 
   it("accepts Expr input values", () => {
@@ -31,7 +38,7 @@ describe("fal: run", () => {
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fal/run");
-    expect(ast.result.input.fields.prompt.kind).toBe("core/prop_access");
+    expect(ast.result.options.fields.input.fields.prompt.kind).toBe("core/prop_access");
   });
 
   it("optional options are null when omitted", () => {
@@ -40,7 +47,7 @@ describe("fal: run", () => {
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fal/run");
-    expect(ast.result.input).toBeNull();
+    expect(ast.result.options).toBeNull();
   });
 });
 
@@ -49,12 +56,19 @@ describe("fal: run", () => {
 describe("fal: subscribe", () => {
   it("produces fal/subscribe node", () => {
     const prog = app(($) => {
-      return $.fal.subscribe("fal-ai/flux/dev", { input: { prompt: "a cat" } });
+      return $.fal.subscribe("fal-ai/flux/dev", {
+        input: { prompt: "a cat" },
+        mode: "polling",
+        logs: true,
+      });
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fal/subscribe");
     expect(ast.result.endpointId.kind).toBe("core/literal");
-    expect(ast.result.input.kind).toBe("core/record");
+    expect(ast.result.options.kind).toBe("core/record");
+    expect(ast.result.options.fields.input.kind).toBe("core/record");
+    expect(ast.result.options.fields.mode.value).toBe("polling");
+    expect(ast.result.options.fields.logs.value).toBe(true);
   });
 });
 
@@ -63,12 +77,19 @@ describe("fal: subscribe", () => {
 describe("fal: queue.submit", () => {
   it("produces fal/queue_submit node", () => {
     const prog = app(($) => {
-      return $.fal.queue.submit("fal-ai/flux/dev", { input: { prompt: "a cat" } });
+      return $.fal.queue.submit("fal-ai/flux/dev", {
+        input: { prompt: "a cat" },
+        priority: "low",
+        hint: "gpu",
+      });
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fal/queue_submit");
     expect(ast.result.endpointId.kind).toBe("core/literal");
-    expect(ast.result.input.kind).toBe("core/record");
+    expect(ast.result.options.kind).toBe("core/record");
+    expect(ast.result.options.fields.input.kind).toBe("core/record");
+    expect(ast.result.options.fields.priority.value).toBe("low");
+    expect(ast.result.options.fields.hint.value).toBe("gpu");
   });
 });
 
@@ -77,13 +98,15 @@ describe("fal: queue.submit", () => {
 describe("fal: queue.status", () => {
   it("produces fal/queue_status node with literal requestId", () => {
     const prog = app(($) => {
-      return $.fal.queue.status("fal-ai/flux/dev", { requestId: "req_123" });
+      return $.fal.queue.status("fal-ai/flux/dev", { requestId: "req_123", logs: true });
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fal/queue_status");
     expect(ast.result.endpointId.kind).toBe("core/literal");
-    expect(ast.result.requestId.kind).toBe("core/literal");
-    expect(ast.result.requestId.value).toBe("req_123");
+    expect(ast.result.options.kind).toBe("core/record");
+    expect(ast.result.options.fields.requestId.kind).toBe("core/literal");
+    expect(ast.result.options.fields.requestId.value).toBe("req_123");
+    expect(ast.result.options.fields.logs.value).toBe(true);
   });
 
   it("accepts Expr requestId from queue.submit result", () => {
@@ -93,7 +116,7 @@ describe("fal: queue.status", () => {
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fal/queue_status");
-    expect(ast.result.requestId.kind).toBe("core/prop_access");
+    expect(ast.result.options.fields.requestId.kind).toBe("core/prop_access");
   });
 });
 
@@ -107,7 +130,7 @@ describe("fal: queue.result", () => {
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fal/queue_result");
     expect(ast.result.endpointId.kind).toBe("core/literal");
-    expect(ast.result.requestId.kind).toBe("core/literal");
+    expect(ast.result.options.fields.requestId.kind).toBe("core/literal");
   });
 });
 
@@ -121,7 +144,7 @@ describe("fal: queue.cancel", () => {
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fal/queue_cancel");
     expect(ast.result.endpointId.kind).toBe("core/literal");
-    expect(ast.result.requestId.kind).toBe("core/literal");
+    expect(ast.result.options.fields.requestId.kind).toBe("core/literal");
   });
 });
 
@@ -135,6 +158,6 @@ describe("fal: cross-operation dependencies", () => {
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("fal/queue_result");
-    expect(ast.result.requestId.kind).toBe("core/prop_access");
+    expect(ast.result.options.fields.requestId.kind).toBe("core/prop_access");
   });
 });

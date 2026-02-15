@@ -5,6 +5,9 @@
 ```ts
 
 import type { FalClient as FalClient_2 } from '@fal-ai/client';
+import type { QueueClient } from '@fal-ai/client';
+import type { QueueStatus } from '@fal-ai/client';
+import type { Result } from '@fal-ai/client';
 
 // Warning: (ae-forgotten-export) The symbol "StepHandler" needs to be exported by the entry point index.d.ts
 //
@@ -31,12 +34,12 @@ export function fal(config: FalConfig): PluginDefinition<FalMethods>;
 
 // @public
 export interface FalClient {
-    queueCancel(endpointId: string, requestId: string): Promise<void>;
-    queueResult(endpointId: string, requestId: string): Promise<unknown>;
-    queueStatus(endpointId: string, requestId: string): Promise<unknown>;
-    queueSubmit(endpointId: string, input?: Record<string, unknown>): Promise<unknown>;
-    run(endpointId: string, input?: Record<string, unknown>): Promise<unknown>;
-    subscribe(endpointId: string, input?: Record<string, unknown>): Promise<unknown>;
+    queueCancel(endpointId: string, options: Parameters<QueueClient["cancel"]>[1]): Promise<void>;
+    queueResult(endpointId: string, options: Parameters<QueueClient["result"]>[1]): Promise<unknown>;
+    queueStatus(endpointId: string, options: Parameters<QueueClient["status"]>[1]): Promise<QueueStatus>;
+    queueSubmit(endpointId: string, options: Parameters<QueueClient["submit"]>[1]): Promise<unknown>;
+    run(endpointId: string, options?: Parameters<FalClient_2["run"]>[1]): Promise<Result<unknown>>;
+    subscribe(endpointId: string, options?: Parameters<FalClient_2["subscribe"]>[1]): Promise<Result<unknown>>;
 }
 
 // @public
@@ -52,26 +55,47 @@ export const falInterpreter: InterpreterFragment;
 // @public (undocumented)
 export interface FalMethods {
     fal: {
-        run(endpointId: Expr<string> | string, options?: FalRunOptions): Expr<Record<string, unknown>>;
-        subscribe(endpointId: Expr<string> | string, options?: FalRunOptions): Expr<Record<string, unknown>>;
+        run(endpointId: Expr<string> | string, options?: FalRunOptions): Expr<Awaited<ReturnType<FalClient_2["run"]>>>;
+        subscribe(endpointId: Expr<string> | string, options?: FalSubscribeOptions): Expr<Awaited<ReturnType<FalClient_2["subscribe"]>>>;
         queue: {
-            submit(endpointId: Expr<string> | string, options?: FalRunOptions): Expr<Record<string, unknown>>;
-            status(endpointId: Expr<string> | string, options: FalQueueOptions): Expr<Record<string, unknown>>;
-            result(endpointId: Expr<string> | string, options: FalQueueOptions): Expr<Record<string, unknown>>;
-            cancel(endpointId: Expr<string> | string, options: FalQueueOptions): Expr<Record<string, unknown>>;
+            submit(endpointId: Expr<string> | string, options: FalSubmitOptions): Expr<Awaited<ReturnType<QueueClient["submit"]>>>;
+            status(endpointId: Expr<string> | string, options: FalQueueStatusOptions): Expr<Awaited<ReturnType<QueueClient["status"]>>>;
+            result(endpointId: Expr<string> | string, options: FalQueueResultOptions): Expr<Awaited<ReturnType<QueueClient["result"]>>>;
+            cancel(endpointId: Expr<string> | string, options: FalQueueCancelOptions): Expr<void>;
         };
     };
 }
 
+// Warning: (ae-forgotten-export) The symbol "Exprify" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "QueueCancelOptionsShape" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type FalQueueOptions = {
-    requestId: Expr<string> | string;
-};
+export type FalQueueCancelOptions = Exprify<QueueCancelOptionsShape>;
 
+// Warning: (ae-forgotten-export) The symbol "QueueResultOptionsShape" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type FalRunOptions = {
-    input?: Expr<Record<string, unknown>> | Record<string, unknown>;
-};
+export type FalQueueResultOptions = Exprify<QueueResultOptionsShape>;
+
+// Warning: (ae-forgotten-export) The symbol "QueueStatusOptionsShape" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type FalQueueStatusOptions = Exprify<QueueStatusOptionsShape>;
+
+// Warning: (ae-forgotten-export) The symbol "RunOptionsShape" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type FalRunOptions = Exprify<RunOptionsShape>;
+
+// Warning: (ae-forgotten-export) The symbol "SubmitOptionsShape" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type FalSubmitOptions = Exprify<SubmitOptionsShape>;
+
+// Warning: (ae-forgotten-export) The symbol "SubscribeOptionsShape" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type FalSubscribeOptions = Exprify<SubscribeOptionsShape>;
 
 // Warning: (ae-forgotten-export) The symbol "ASTNode" needs to be exported by the entry point index.d.ts
 //
@@ -86,7 +110,7 @@ export function wrapFalSdk(client: FalClient_2): FalClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/1.9.1/index.d.ts:20:9 - (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
+// dist/1.9.1/index.d.ts:36:9 - (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

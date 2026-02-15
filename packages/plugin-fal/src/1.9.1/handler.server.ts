@@ -15,29 +15,40 @@ import type { FalClient } from "./interpreter";
 export function serverHandler(client: FalClient): StepHandler<void> {
   return async (effect, _context, state) => {
     if (effect.type === "fal/api_call") {
-      const { endpointId, method, input, requestId } = effect as {
+      const { endpointId, method, options } = effect as {
         type: "fal/api_call";
         endpointId: string;
         method: string;
-        input?: Record<string, unknown>;
-        requestId?: string;
+        options?: unknown;
       };
       let value: unknown;
       switch (method) {
         case "run":
-          value = await client.run(endpointId, input);
+          value = await client.run(endpointId, options as Parameters<FalClient["run"]>[1]);
           break;
         case "queue_submit":
-          value = await client.queueSubmit(endpointId, input);
+          value = await client.queueSubmit(
+            endpointId,
+            options as Parameters<FalClient["queueSubmit"]>[1],
+          );
           break;
         case "queue_status":
-          value = await client.queueStatus(endpointId, requestId!);
+          value = await client.queueStatus(
+            endpointId,
+            options as Parameters<FalClient["queueStatus"]>[1],
+          );
           break;
         case "queue_result":
-          value = await client.queueResult(endpointId, requestId!);
+          value = await client.queueResult(
+            endpointId,
+            options as Parameters<FalClient["queueResult"]>[1],
+          );
           break;
         case "queue_cancel":
-          value = await client.queueCancel(endpointId, requestId!);
+          value = await client.queueCancel(
+            endpointId,
+            options as Parameters<FalClient["queueCancel"]>[1],
+          );
           break;
         default:
           throw new Error(`serverHandler: unknown fal method "${method}"`);
@@ -46,12 +57,15 @@ export function serverHandler(client: FalClient): StepHandler<void> {
     }
 
     if (effect.type === "fal/subscribe") {
-      const { endpointId, input } = effect as {
+      const { endpointId, options } = effect as {
         type: "fal/subscribe";
         endpointId: string;
-        input?: Record<string, unknown>;
+        options?: unknown;
       };
-      const value = await client.subscribe(endpointId, input);
+      const value = await client.subscribe(
+        endpointId,
+        options as Parameters<FalClient["subscribe"]>[1],
+      );
       return { value, state };
     }
 
