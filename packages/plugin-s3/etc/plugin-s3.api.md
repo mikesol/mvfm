@@ -4,6 +4,16 @@
 
 ```ts
 
+import type { DeleteObjectCommandInput } from '@aws-sdk/client-s3';
+import type { DeleteObjectCommandOutput } from '@aws-sdk/client-s3';
+import type { GetObjectCommandInput } from '@aws-sdk/client-s3';
+import type { GetObjectCommandOutput } from '@aws-sdk/client-s3';
+import type { HeadObjectCommandInput } from '@aws-sdk/client-s3';
+import type { HeadObjectCommandOutput } from '@aws-sdk/client-s3';
+import type { ListObjectsV2CommandInput } from '@aws-sdk/client-s3';
+import type { ListObjectsV2CommandOutput } from '@aws-sdk/client-s3';
+import type { PutObjectCommandInput } from '@aws-sdk/client-s3';
+import type { PutObjectCommandOutput } from '@aws-sdk/client-s3';
 import type { S3Client as S3Client_2 } from '@aws-sdk/client-s3';
 
 // Warning: (ae-forgotten-export) The symbol "StepHandler" needs to be exported by the entry point index.d.ts
@@ -54,11 +64,11 @@ export const s3Interpreter: InterpreterFragment;
 // @public
 export interface S3Methods {
     s3: {
-        putObject(input: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-        getObject(input: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-        deleteObject(input: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-        headObject(input: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-        listObjectsV2(input: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+        putObject(input: Expr<PutObjectInput> | PutObjectInput): Expr<PutObjectResult>;
+        getObject(input: Expr<GetObjectInput> | GetObjectInput): Expr<GetObjectResult>;
+        deleteObject(input: Expr<DeleteObjectInput> | DeleteObjectInput): Expr<DeleteObjectResult>;
+        headObject(input: Expr<HeadObjectInput> | HeadObjectInput): Expr<HeadObjectResult>;
+        listObjectsV2(input: Expr<ListObjectsV2Input> | ListObjectsV2Input): Expr<ListObjectsV2Result>;
     };
 }
 
@@ -77,7 +87,17 @@ export function wrapAwsSdk(client: S3Client_2, commands: Record<string, CommandC
 
 // Warnings were encountered during analysis:
 //
-// dist/3.989.0/index.d.ts:18:9 - (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
+// dist/3.989.0/index.d.ts:29:9 - (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
+// dist/3.989.0/index.d.ts:29:9 - (ae-forgotten-export) The symbol "PutObjectInput" needs to be exported by the entry point index.d.ts
+// dist/3.989.0/index.d.ts:29:9 - (ae-forgotten-export) The symbol "PutObjectResult" needs to be exported by the entry point index.d.ts
+// dist/3.989.0/index.d.ts:36:9 - (ae-forgotten-export) The symbol "GetObjectInput" needs to be exported by the entry point index.d.ts
+// dist/3.989.0/index.d.ts:36:9 - (ae-forgotten-export) The symbol "GetObjectResult" needs to be exported by the entry point index.d.ts
+// dist/3.989.0/index.d.ts:43:9 - (ae-forgotten-export) The symbol "DeleteObjectInput" needs to be exported by the entry point index.d.ts
+// dist/3.989.0/index.d.ts:43:9 - (ae-forgotten-export) The symbol "DeleteObjectResult" needs to be exported by the entry point index.d.ts
+// dist/3.989.0/index.d.ts:50:9 - (ae-forgotten-export) The symbol "HeadObjectInput" needs to be exported by the entry point index.d.ts
+// dist/3.989.0/index.d.ts:50:9 - (ae-forgotten-export) The symbol "HeadObjectResult" needs to be exported by the entry point index.d.ts
+// dist/3.989.0/index.d.ts:57:9 - (ae-forgotten-export) The symbol "ListObjectsV2Input" needs to be exported by the entry point index.d.ts
+// dist/3.989.0/index.d.ts:57:9 - (ae-forgotten-export) The symbol "ListObjectsV2Result" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 
