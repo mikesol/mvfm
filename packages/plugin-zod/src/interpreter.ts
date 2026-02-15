@@ -13,6 +13,7 @@ import { createObjectInterpreter } from "./object";
 import { primitivesInterpreter } from "./primitives";
 import { stringInterpreter } from "./string";
 import type { ErrorConfig, RefinementDescriptor } from "./types";
+import { createUnionInterpreter } from "./union";
 
 // ---- Schema handler dispatch ----
 // Each schema module exports an interpreter map.
@@ -29,7 +30,7 @@ const leafHandlers: SchemaInterpreterMap = {
   ...primitivesInterpreter,
 };
 
-// Recursive handlers (array, object) need buildSchemaGen for inner schemas.
+// Recursive handlers (array, object, union) need buildSchemaGen for inner schemas.
 // Initialized lazily on first use to break the definition-order cycle.
 let schemaHandlers: SchemaInterpreterMap | undefined;
 
@@ -40,6 +41,7 @@ function getHandlers(): SchemaInterpreterMap {
       ...leafHandlers,
       ...createObjectInterpreter(buildSchemaGen),
       ...createArrayInterpreter(buildSchemaGen),
+      ...createUnionInterpreter(buildSchemaGen),
     };
   }
   return schemaHandlers;

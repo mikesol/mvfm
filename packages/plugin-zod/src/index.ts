@@ -23,6 +23,8 @@ import type { ZodStringFormatsNamespace } from "./string-formats";
 import { stringFormatsNamespace, stringFormatsNodeKinds } from "./string-formats";
 import type { ZodTupleNamespace } from "./tuple";
 import { tupleNamespace, tupleNodeKinds } from "./tuple";
+import type { ZodUnionNamespace } from "./union";
+import { unionNamespace, unionNodeKinds } from "./union";
 
 // Re-export types, builders, and interpreter for consumers
 export { ZodArrayBuilder } from "./array";
@@ -49,6 +51,7 @@ export type {
   ValidationASTNode,
   WrapperASTNode,
 } from "./types";
+export { ZodUnionBuilder } from "./union";
 
 /** Helper to extract error string from the common `errorOrOpts` parameter pattern. */
 function parseError(errorOrOpts?: string | { error?: string }): string | undefined {
@@ -76,7 +79,8 @@ export interface ZodNamespace
     ZodObjectNamespace,
     ZodPrimitivesNamespace,
     ZodStringFormatsNamespace,
-    ZodTupleNamespace {
+    ZodTupleNamespace,
+    ZodUnionNamespace {
   /** Coercion constructors -- convert input before validating. */
   coerce: ZodCoerceNamespace;
   // ^^^ Each new schema type adds ONE extends clause here
@@ -125,6 +129,7 @@ export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
     ...coerceNodeKinds,
     ...stringFormatsNodeKinds,
     ...tupleNodeKinds,
+    ...unionNodeKinds,
     // ^^^ Each new schema type adds ONE spread here
   ],
 
@@ -143,6 +148,7 @@ export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
         ...coerceNamespace(ctx, parseError),
         ...stringFormatsNamespace(ctx, parseError),
         ...tupleNamespace(ctx, parseError),
+        ...unionNamespace(ctx, parseError),
         // ^^^ Each new schema type adds ONE spread here
       } as ZodNamespace,
     };

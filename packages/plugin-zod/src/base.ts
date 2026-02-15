@@ -72,8 +72,8 @@ export abstract class ZodSchemaBuilder<T> {
 
   /**
    * Get the schema AST node for this builder.
-   * Used by composite schemas (object, array, tuple, etc.) to embed
-   * field schemas into their own AST nodes.
+   * Used by composite schemas (object, array, tuple, union, etc.) to embed
+   * inner schemas into their own AST nodes.
    */
   get __schemaNode(): SchemaASTNode | WrapperASTNode {
     return this._buildSchemaNode();
