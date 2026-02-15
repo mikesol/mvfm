@@ -34,6 +34,6 @@
     }
   },
   "files": {
-    "includes": ["src/**", "tests/**"]
+    "includes": ["packages/*/src/**", "packages/*/tests/**"]
   }
 }

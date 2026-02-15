@@ -14,44 +14,40 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
+          cache: pnpm
 
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
 
-      - name: Format & Lint
-        run: npm run check
+      - name: Build
+        run: pnpm run build
 
-      - name: Typecheck
-        run: npx tsc --noEmit
+      - name: Check (lint + typecheck + api-extractor)
+        run: pnpm run check
 
       - name: Test
-        run: npm test
+        run: pnpm run test
 
   size:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
+          cache: pnpm
 
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
       - name: Check size budgets
-        run: npx size-limit
-
-      - name: Size comparison
-        if: always()
-        uses: andresz1/size-limit-action@v1
-        continue-on-error: true
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          skip_step: install
+        run: pnpm run size

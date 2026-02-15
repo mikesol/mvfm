@@ -1,16 +1,19 @@
 {
-  "compilerOptions": {
-    "target": "ES2022",
-    "module": "ES2022",
-    "moduleResolution": "bundler",
-    "lib": ["ES2022", "DOM"],
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "strict": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "declaration": true,
-    "resolveJsonModule": true
-  },
-  "include": ["src/**/*"]
+  "files": [],
+  "references": [
+    { "path": "packages/core" },
+    { "path": "packages/plugin-anthropic" },
+    { "path": "packages/plugin-cloudflare-kv" },
+    { "path": "packages/plugin-fal" },
+    { "path": "packages/plugin-fetch" },
+    { "path": "packages/plugin-openai" },
+    { "path": "packages/plugin-pino" },
+    { "path": "packages/plugin-postgres" },
+    { "path": "packages/plugin-redis" },
+    { "path": "packages/plugin-resend" },
+    { "path": "packages/plugin-s3" },
+    { "path": "packages/plugin-slack" },
+    { "path": "packages/plugin-stripe" },
+    { "path": "packages/plugin-twilio" }
+  ]
 }
