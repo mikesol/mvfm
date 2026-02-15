@@ -52,6 +52,21 @@ export { eqInterpreter } from "./plugins/eq/interpreter";
 export type { ErrorMethods } from "./plugins/error";
 export { error } from "./plugins/error";
 export { errorInterpreter } from "./plugins/error/interpreter";
+// ---- fal plugin ----
+export type { FalConfig, FalMethods, FalQueueOptions, FalRunOptions } from "./plugins/fal/1.9.1";
+export { fal } from "./plugins/fal/1.9.1";
+export { wrapFalSdk } from "./plugins/fal/1.9.1/client-fal-sdk";
+export type {
+  ClientHandlerOptions as FalClientHandlerOptions,
+  ClientHandlerState as FalClientHandlerState,
+} from "./plugins/fal/1.9.1/handler.client";
+export { clientHandler as falClientHandler } from "./plugins/fal/1.9.1/handler.client";
+export {
+  serverEvaluate as falServerEvaluate,
+  serverHandler as falServerHandler,
+} from "./plugins/fal/1.9.1/handler.server";
+export type { FalClient } from "./plugins/fal/1.9.1/interpreter";
+export { falInterpreter } from "./plugins/fal/1.9.1/interpreter";
 export type { FiberMethods } from "./plugins/fiber";
 export { fiber } from "./plugins/fiber";
 export { fiberInterpreter } from "./plugins/fiber/interpreter";
