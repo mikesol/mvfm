@@ -20,11 +20,12 @@ Analyzed ioredis 5.4.1 source at `lib/utils/RedisCommander.ts`. Key findings:
 
 | ioredis API | Ilo API | Rationale |
 |---|---|---|
-| `set(key, val, "EX", 60, "NX")` | `set(key, val, { ex: 60, nx: true })` | Options object produces cleaner AST. Positional string tokens are a Redis protocol artifact. |
-| `mset(k1, v1, k2, v2)` | `mset({ k1: v1, k2: v2 })` | Object-only form for clean AST serialization |
-| `hset(key, f1, v1, f2, v2)` | `hset(key, { f1: v1, f2: v2 })` | Same as MSET |
+| `mset(k1, v1, k2, v2)` | `mset({ k1: v1, k2: v2 })` | Object-only form for clean AST serialization (object form IS valid ioredis) |
+| `hset(key, f1, v1, f2, v2)` | `hset(key, { f1: v1, f2: v2 })` | Same as MSET (object form IS valid ioredis) |
 | `getBuffer()`, `hgetallBuffer()`, etc. | Not modeled | Buffer variants are runtime concerns, not AST-level |
 | Callback overloads | Not modeled | Ilo is AST-based, returns `Expr<T>` |
+
+**SET matches ioredis exactly** — uses positional string tokens (`"EX"`, `"PX"`, `"NX"`, `"XX"`, `"KEEPTTL"`, `"GET"`) so LLMs trained on ioredis produce correct code with zero adaptation.
 
 ## Config
 
@@ -45,22 +46,11 @@ Factory: `redis(config?: RedisConfig | string)` — string form is Redis URL.
 ## DSL API
 
 ```ts
-export interface SetOptions {
-  ex?: number;       // seconds TTL
-  px?: number;       // milliseconds TTL
-  exat?: number;     // unix timestamp seconds
-  pxat?: number;     // unix timestamp milliseconds
-  keepttl?: boolean; // preserve existing TTL
-  nx?: boolean;      // only if not exists
-  xx?: boolean;      // only if exists
-  get?: boolean;     // return old value
-}
-
 export interface RedisMethods {
   redis: {
     // String commands (11)
     get(key): Expr<string | null>;
-    set(key, value, options?): Expr<string | null>;
+    set(key, value, ...args): Expr<string | null>;  // positional tokens: "EX", 60, "NX", etc.
     incr(key): Expr<number>;
     incrby(key, increment): Expr<number>;
     decr(key): Expr<number>;
