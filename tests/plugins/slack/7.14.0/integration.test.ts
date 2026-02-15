@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { error } from "../../../../src/plugins/error";
 import { errorInterpreter } from "../../../../src/plugins/error/interpreter";
@@ -36,7 +36,7 @@ const allFragments = [
   strInterpreter,
 ];
 
-const app = ilo(num, str, slackPlugin({ token: "xoxb-test-token" }), fiber, error);
+const app = mvfm(num, str, slackPlugin({ token: "xoxb-test-token" }), fiber, error);
 
 // Create a mock SlackClient that records calls
 function createMockClient(): SlackClient {

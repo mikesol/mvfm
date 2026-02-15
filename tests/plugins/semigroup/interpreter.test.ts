@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { composeInterpreters, ilo } from "../../../src/core";
+import { composeInterpreters, mvfm } from "../../../src/core";
 import { coreInterpreter } from "../../../src/interpreters/core";
 import { semigroup } from "../../../src/plugins/semigroup";
 import { str } from "../../../src/plugins/str";
@@ -22,7 +22,7 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   return await interp(ast.result);
 }
 
-const app = ilo(str, semigroup);
+const app = mvfm(str, semigroup);
 
 describe("semigroup interpreter", () => {
   it("append('foo', 'bar') returns 'foobar'", async () => {

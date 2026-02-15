@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { composeInterpreters, ilo } from "../../../src/core";
+import { composeInterpreters, mvfm } from "../../../src/core";
 import { coreInterpreter } from "../../../src/interpreters/core";
 import { boolean } from "../../../src/plugins/boolean";
 import { booleanInterpreter } from "../../../src/plugins/boolean/interpreter";
@@ -31,7 +31,7 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   return await interp(ast.result);
 }
 
-const app = ilo(num, str, boolean, show);
+const app = mvfm(num, str, boolean, show);
 
 describe("show interpreter", () => {
   it("show(42) returns '42'", async () => {

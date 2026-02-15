@@ -86,7 +86,7 @@ Every method is request-response `apiCall(method, params)` → 1:1 mapping to `s
 
 ### Needs deviation
 
-- **Node kind naming**: Real SDK uses dot notation (`chat.postMessage`). Ilo uses `slack/chat_postMessage` (underscore) because slashes are the plugin namespace separator.
+- **Node kind naming**: Real SDK uses dot notation (`chat.postMessage`). Mvfm uses `slack/chat_postMessage` (underscore) because slashes are the plugin namespace separator.
 
 ### Can't model
 

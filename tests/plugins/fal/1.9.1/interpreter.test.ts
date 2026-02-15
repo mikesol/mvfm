@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { foldAST, ilo } from "../../../../src/core";
+import { foldAST, mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { fal } from "../../../../src/plugins/fal/1.9.1";
 import { falInterpreter } from "../../../../src/plugins/fal/1.9.1/interpreter";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 
-const app = ilo(num, str, fal({ credentials: "key_test_123" }));
+const app = mvfm(num, str, fal({ credentials: "key_test_123" }));
 const fragments = [falInterpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {

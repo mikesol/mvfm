@@ -23,7 +23,7 @@
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 import { pino } from "../../../../src/plugins/pino/10.3.1";
@@ -34,7 +34,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, str, pino({ level: "info" }));
+const app = mvfm(num, str, pino({ level: "info" }));
 
 // ============================================================
 // Level methods: info
@@ -192,7 +192,7 @@ git commit -m "test: add pino plugin AST construction tests (#58)"
 
 ```ts
 // ============================================================
-// ILO PLUGIN: pino (structured logging)
+// MVFM PLUGIN: pino (structured logging)
 // ============================================================
 //
 // Implementation status: FULL (all core logging operations)
@@ -212,7 +212,7 @@ git commit -m "test: add pino plugin AST construction tests (#58)"
 //
 // ============================================================
 //
-// Goal: An LLM that knows pino should be able to write Ilo
+// Goal: An LLM that knows pino should be able to write Mvfm
 // programs with near-zero learning curve. The API mirrors
 // the real pino logger interface.
 //
@@ -395,15 +395,15 @@ export function pino(config: PinoConfig = {}): PluginDefinition<PinoMethods> {
 //
 // 1. Level methods:
 //    Real:  logger.info({ userId: 123 }, 'user logged in')
-//    Ilo:   $.pino.info({ userId: 123 }, 'user logged in')
+//    Mvfm:   $.pino.info({ userId: 123 }, 'user logged in')
 //    Identical. Only difference is $ prefix.
 //
 //    Real:  logger.info({ userId: 123 })  // object-only, no msg
-//    Ilo:   $.pino.info({ userId: 123 })  // same — raw object = mergeObject
+//    Mvfm:   $.pino.info({ userId: 123 })  // same — raw object = mergeObject
 //
 // 2. Child loggers:
 //    Real:  logger.child({ requestId: 'abc' }).info('handling')
-//    Ilo:   $.pino.child({ requestId: 'abc' }).info('handling')
+//    Mvfm:   $.pino.child({ requestId: 'abc' }).info('handling')
 //    Namespace is $.pino (consistent with $.stripe, $.postgres).
 //    Identical. Bindings accumulate in the AST.
 //
@@ -415,20 +415,20 @@ export function pino(config: PinoConfig = {}): PluginDefinition<PinoMethods> {
 //
 // 4. Transports:
 //    Real:  pino({ transport: { target: 'pino-pretty' } })
-//    Ilo:   Not modeled. Transports are runtime stream config.
+//    Mvfm:   Not modeled. Transports are runtime stream config.
 //
 // 5. Redaction:
 //    Real:  pino({ redact: ['password'] })
-//    Ilo:   Not modeled. Compile-time field transformation.
+//    Mvfm:   Not modeled. Compile-time field transformation.
 //
 // 6. Level filtering:
 //    Real:  logger.isLevelEnabled('debug')
-//    Ilo:   Not modeled. Level filtering is a runtime concern
+//    Mvfm:   Not modeled. Level filtering is a runtime concern
 //           handled by the handler, not the AST.
 //
 // 7. Serializers:
 //    Real:  pino({ serializers: { err: pino.stdSerializers.err } })
-//    Ilo:   Not modeled. Serializers transform objects at write
+//    Mvfm:   Not modeled. Serializers transform objects at write
 //           time — a handler concern.
 //
 // ============================================================
@@ -457,14 +457,14 @@ git commit -m "feat: add pino plugin definition with 6 log levels and child logg
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { foldAST, ilo } from "../../../../src/core";
+import { foldAST, mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 import { pino } from "../../../../src/plugins/pino/10.3.1";
 import { pinoInterpreter } from "../../../../src/plugins/pino/10.3.1/interpreter";
 
-const app = ilo(num, str, pino({ level: "info" }));
+const app = mvfm(num, str, pino({ level: "info" }));
 const fragments = [pinoInterpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {
@@ -901,7 +901,7 @@ export function clientHandler(options: ClientHandlerOptions): StepHandler<Client
     context: StepContext,
     state: ClientHandlerState,
   ): Promise<{ value: unknown; state: ClientHandlerState }> => {
-    const response = await fetchFn(`${baseUrl}/ilo/execute`, {
+    const response = await fetchFn(`${baseUrl}/mvfm/execute`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -956,7 +956,7 @@ These test against a real pino instance (no container needed — pino is a pure 
 ```ts
 import pinoLib from "pino";
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
@@ -977,7 +977,7 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 }
 
 const allFragments = [pinoInterpreter, coreInterpreter];
-const app = ilo(num, str, pino({ level: "trace" }));
+const app = mvfm(num, str, pino({ level: "trace" }));
 
 // Capture log output by writing to a custom destination
 function createCapturingLogger() {

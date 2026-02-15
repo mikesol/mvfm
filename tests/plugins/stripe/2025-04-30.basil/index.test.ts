@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 import { stripe } from "../../../../src/plugins/stripe/2025-04-30.basil";
@@ -10,7 +10,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, str, stripe({ apiKey: "sk_test_123" }));
+const app = mvfm(num, str, stripe({ apiKey: "sk_test_123" }));
 
 // ============================================================
 // Parity tests: Stripe plugin AST builder

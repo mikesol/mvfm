@@ -1,6 +1,6 @@
 import http from "node:http";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { numInterpreter } from "../../../../src/plugins/num/interpreter";
@@ -26,7 +26,7 @@ let server: http.Server;
 let port: number;
 
 const allFragments = [resendInterpreter, coreInterpreter, numInterpreter, strInterpreter];
-const app = ilo(num, str, resendPlugin({ apiKey: "re_test_fake" }));
+const app = mvfm(num, str, resendPlugin({ apiKey: "re_test_fake" }));
 
 function createMockClient(): ResendClient {
   return {

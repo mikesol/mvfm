@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { foldAST, ilo } from "../../../../src/core";
+import { foldAST, mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { fetch } from "../../../../src/plugins/fetch/whatwg";
 import { fetchInterpreter } from "../../../../src/plugins/fetch/whatwg/interpreter";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 
-const app = ilo(num, str, fetch({ baseUrl: "https://api.test.com" }));
+const app = mvfm(num, str, fetch({ baseUrl: "https://api.test.com" }));
 const fragments = [fetchInterpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {

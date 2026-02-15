@@ -1,6 +1,6 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { fetch as fetchPlugin } from "../../../../src/plugins/fetch/whatwg";
 import { wrapFetch } from "../../../../src/plugins/fetch/whatwg/client-fetch";
@@ -94,7 +94,7 @@ afterAll(async () => {
 
 describe("fetch integration: GET + json", () => {
   it("fetches JSON from server", async () => {
-    const app = ilo(num, str, fetchPlugin());
+    const app = mvfm(num, str, fetchPlugin());
     const prog = app(($) => {
       const resp = $.fetch(`${baseUrl}/json`);
       return $.fetch.json(resp);
@@ -114,7 +114,7 @@ describe("fetch integration: GET + json", () => {
 
 describe("fetch integration: GET + text", () => {
   it("fetches text from server", async () => {
-    const app = ilo(num, str, fetchPlugin());
+    const app = mvfm(num, str, fetchPlugin());
     const prog = app(($) => {
       const resp = $.fetch(`${baseUrl}/text`);
       return $.fetch.text(resp);
@@ -133,7 +133,7 @@ describe("fetch integration: GET + text", () => {
 
 describe("fetch integration: GET + status", () => {
   it("returns 200 for successful request", async () => {
-    const app = ilo(num, str, fetchPlugin());
+    const app = mvfm(num, str, fetchPlugin());
     const prog = app(($) => {
       const resp = $.fetch(`${baseUrl}/json`);
       return $.fetch.status(resp);
@@ -146,7 +146,7 @@ describe("fetch integration: GET + status", () => {
   });
 
   it("returns 404 for not-found", async () => {
-    const app = ilo(num, str, fetchPlugin());
+    const app = mvfm(num, str, fetchPlugin());
     const prog = app(($) => {
       const resp = $.fetch(`${baseUrl}/status-404`);
       return $.fetch.status(resp);
@@ -165,7 +165,7 @@ describe("fetch integration: GET + status", () => {
 
 describe("fetch integration: GET + headers", () => {
   it("returns response headers", async () => {
-    const app = ilo(num, str, fetchPlugin());
+    const app = mvfm(num, str, fetchPlugin());
     const prog = app(($) => {
       const resp = $.fetch(`${baseUrl}/text`);
       return $.fetch.headers(resp);
@@ -185,7 +185,7 @@ describe("fetch integration: GET + headers", () => {
 
 describe("fetch integration: POST + json", () => {
   it("sends POST with body and parses JSON response", async () => {
-    const app = ilo(num, str, fetchPlugin());
+    const app = mvfm(num, str, fetchPlugin());
     const prog = app(($) => {
       const resp = $.fetch(`${baseUrl}/echo`, {
         method: "POST",
@@ -209,7 +209,7 @@ describe("fetch integration: POST + json", () => {
 
 describe("fetch integration: baseUrl config", () => {
   it("prepends baseUrl to relative paths", async () => {
-    const app = ilo(num, str, fetchPlugin({ baseUrl }));
+    const app = mvfm(num, str, fetchPlugin({ baseUrl }));
     const prog = app(($) => {
       const resp = $.fetch("/json");
       return $.fetch.json(resp);
@@ -228,7 +228,7 @@ describe("fetch integration: baseUrl config", () => {
 
 describe("fetch integration: defaultHeaders config", () => {
   it("merges default headers into request", async () => {
-    const app = ilo(num, str, fetchPlugin({ defaultHeaders: { "X-Default": "from-config" } }));
+    const app = mvfm(num, str, fetchPlugin({ defaultHeaders: { "X-Default": "from-config" } }));
     const prog = app(($) => {
       const resp = $.fetch(`${baseUrl}/headers-echo`);
       return $.fetch.json(resp);
@@ -247,7 +247,7 @@ describe("fetch integration: defaultHeaders config", () => {
 
 describe("fetch integration: chaining", () => {
   it("uses json result as input to another request", async () => {
-    const app = ilo(num, str, fetchPlugin());
+    const app = mvfm(num, str, fetchPlugin());
     // Fetch JSON, then use a field from it as a header in a second request
     const prog = app(($) => {
       const resp1 = $.fetch(`${baseUrl}/json`);
@@ -271,7 +271,7 @@ describe("fetch integration: chaining", () => {
 
 describe("fetch integration: input resolution", () => {
   it("resolves URL from input", async () => {
-    const app = ilo(num, str, fetchPlugin());
+    const app = mvfm(num, str, fetchPlugin());
     const prog = app({ url: "string" }, ($) => {
       const resp = $.fetch($.input.url);
       return $.fetch.json(resp);

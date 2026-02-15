@@ -8,7 +8,7 @@
 
 **Tech Stack:** TypeScript, vitest, git mv
 
-**Working directory:** `/home/mikesol/Documents/GitHub/ilo/ilo/.worktrees/issue-24`
+**Working directory:** `/home/mikesol/Documents/GitHub/mvfm/mvfm/.worktrees/issue-24`
 
 **Baseline:** 191 tests passing, clean build.
 
@@ -76,15 +76,15 @@ Only interpreter and postgres exports change. Plugin exports like `./plugins/boo
 
 ---
 
-## Task 1: Move ilo-native plugin source files to directories
+## Task 1: Move mvfm-native plugin source files to directories
 
 **Files:**
-- Move: All 8 ilo-native plugins (boolean, control, eq, error, fiber, num, str, st)
+- Move: All 8 mvfm-native plugins (boolean, control, eq, error, fiber, num, str, st)
 
 **Step 1: Create directories and move files**
 
 ```bash
-cd /home/mikesol/Documents/GitHub/ilo/ilo/.worktrees/issue-24
+cd /home/mikesol/Documents/GitHub/mvfm/mvfm/.worktrees/issue-24
 for name in boolean control eq error fiber num str st; do
   mkdir -p src/plugins/$name
   git mv src/plugins/$name.ts src/plugins/$name/index.ts
@@ -115,7 +115,7 @@ Expected: Build passes, 191 tests pass. External imports like `../plugins/boolea
 **Step 4: Commit**
 
 ```bash
-git add -A && git commit -m "refactor: move ilo-native plugins to directory layout"
+git add -A && git commit -m "refactor: move mvfm-native plugins to directory layout"
 ```
 
 ---
@@ -272,7 +272,7 @@ git add -A && git commit -m "refactor: colocate interpreter fragments with their
 ## Task 4: Move plugin test files to directories
 
 **Files:**
-- Move: 8 ilo-native plugin test files + 1 postgres test file
+- Move: 8 mvfm-native plugin test files + 1 postgres test file
 
 **Step 1: Create test directories and move files**
 
@@ -301,12 +301,12 @@ For `tests/plugins/postgres/3.4.8/index.test.ts`:
 In `tests/plugins/boolean/index.test.ts`:
 ```ts
 // Before:
-import { ilo } from "../../src/core";
+import { mvfm } from "../../src/core";
 import { boolean } from "../../src/plugins/boolean";
 import { eq } from "../../src/plugins/eq";
 import { num } from "../../src/plugins/num";
 // After:
-import { ilo } from "../../../src/core";
+import { mvfm } from "../../../src/core";
 import { boolean } from "../../../src/plugins/boolean";
 import { eq } from "../../../src/plugins/eq";
 import { num } from "../../../src/plugins/num";
@@ -315,10 +315,10 @@ import { num } from "../../../src/plugins/num";
 In `tests/plugins/postgres/3.4.8/index.test.ts`:
 ```ts
 // Before (post-Task 2):
-import { ilo } from "../../src/core";
+import { mvfm } from "../../src/core";
 import { postgres } from "../../src/plugins/postgres/3.4.8";
 // After:
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { postgres } from "../../../../src/plugins/postgres/3.4.8";
 ```
 
@@ -361,12 +361,12 @@ These files move from depth 2 (`tests/interpreters/`) to depth 3 (`tests/plugins
 In `tests/plugins/num/interpreter.test.ts`:
 ```ts
 // Before (post-Task 3):
-import { composeInterpreters, ilo } from "../../src/core";
+import { composeInterpreters, mvfm } from "../../src/core";
 import { coreInterpreter } from "../../src/interpreters/core";
 import { numInterpreter } from "../../src/plugins/num/interpreter";
 import { num } from "../../src/plugins/num";
 // After:
-import { composeInterpreters, ilo } from "../../../src/core";
+import { composeInterpreters, mvfm } from "../../../src/core";
 import { coreInterpreter } from "../../../src/interpreters/core";
 import { numInterpreter } from "../../../src/plugins/num/interpreter";
 import { num } from "../../../src/plugins/num";
@@ -375,12 +375,12 @@ import { num } from "../../../src/plugins/num";
 In `tests/plugins/str/interpreter.test.ts`:
 ```ts
 // Before (post-Task 3):
-import { composeInterpreters, ilo } from "../../src/core";
+import { composeInterpreters, mvfm } from "../../src/core";
 import { coreInterpreter } from "../../src/interpreters/core";
 import { strInterpreter } from "../../src/plugins/str/interpreter";
 import { str } from "../../src/plugins/str";
 // After:
-import { composeInterpreters, ilo } from "../../../src/core";
+import { composeInterpreters, mvfm } from "../../../src/core";
 import { coreInterpreter } from "../../../src/interpreters/core";
 import { strInterpreter } from "../../../src/plugins/str/interpreter";
 import { str } from "../../../src/plugins/str";
@@ -389,7 +389,7 @@ import { str } from "../../../src/plugins/str";
 In `tests/plugins/eq/interpreter.test.ts`:
 ```ts
 // Before (post-Task 3):
-import { composeInterpreters, ilo } from "../../src/core";
+import { composeInterpreters, mvfm } from "../../src/core";
 import { booleanInterpreter } from "../../src/plugins/boolean/interpreter";
 import { coreInterpreter } from "../../src/interpreters/core";
 import { numInterpreter } from "../../src/plugins/num/interpreter";
@@ -399,7 +399,7 @@ import { eq } from "../../src/plugins/eq";
 import { num } from "../../src/plugins/num";
 import { str } from "../../src/plugins/str";
 // After:
-import { composeInterpreters, ilo } from "../../../src/core";
+import { composeInterpreters, mvfm } from "../../../src/core";
 import { booleanInterpreter } from "../../../src/plugins/boolean/interpreter";
 import { coreInterpreter } from "../../../src/interpreters/core";
 import { numInterpreter } from "../../../src/plugins/num/interpreter";

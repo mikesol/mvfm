@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { foldAST, ilo } from "../../../../src/core";
+import { foldAST, mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { slack } from "../../../../src/plugins/slack/7.14.0";
 import { slackInterpreter } from "../../../../src/plugins/slack/7.14.0/interpreter";
 import { str } from "../../../../src/plugins/str";
 
-const app = ilo(num, str, slack({ token: "xoxb-test-token" }));
+const app = mvfm(num, str, slack({ token: "xoxb-test-token" }));
 const fragments = [slackInterpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {

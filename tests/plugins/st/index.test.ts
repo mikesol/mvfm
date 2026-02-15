@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../src/core";
+import { mvfm } from "../../../src/core";
 import { num } from "../../../src/plugins/num";
 import { semiring } from "../../../src/plugins/semiring";
 import { st } from "../../../src/plugins/st";
@@ -8,7 +8,7 @@ function strip(ast: unknown): unknown {
   return JSON.parse(JSON.stringify(ast, (k, v) => (k === "__id" ? undefined : v)));
 }
 
-const app = ilo(num, semiring, st);
+const app = mvfm(num, semiring, st);
 
 describe("st: $.let()", () => {
   it("emits st/let statement and st/get returns proxy", () => {

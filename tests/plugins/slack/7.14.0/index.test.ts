@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { num } from "../../../../src/plugins/num";
 import { slack } from "../../../../src/plugins/slack/7.14.0";
 import { str } from "../../../../src/plugins/str";
@@ -10,7 +10,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, str, slack({ token: "xoxb-test-token" }));
+const app = mvfm(num, str, slack({ token: "xoxb-test-token" }));
 
 // ============================================================
 // chat

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { num } from "../../../../src/plugins/num";
 import { postgres } from "../../../../src/plugins/postgres/3.4.8";
 import { str } from "../../../../src/plugins/str";
@@ -10,7 +10,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, str, postgres("postgres://localhost/test"));
+const app = mvfm(num, str, postgres("postgres://localhost/test"));
 
 // ============================================================
 // Parity tests: encoding the Honest Assessment Matrix

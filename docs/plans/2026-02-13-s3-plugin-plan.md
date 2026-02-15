@@ -8,7 +8,7 @@
 
 **Tech Stack:** TypeScript, vitest, `@aws-sdk/client-s3`, testcontainers (LocalStack for integration tests)
 
-**Worktree:** `../ilo-53` (branch `issue-53`)
+**Worktree:** `../mvfm-53` (branch `issue-53`)
 
 **Reference files:** The Stripe plugin is the exact pattern to follow:
 - `src/plugins/stripe/2025-04-30.basil/index.ts` — plugin definition
@@ -32,7 +32,7 @@ Create `tests/plugins/s3/3.989.0/index.test.ts`:
 
 ```typescript
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 import { s3 } from "../../../../src/plugins/s3/3.989.0";
@@ -43,7 +43,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, str, s3({ region: "us-east-1" }));
+const app = mvfm(num, str, s3({ region: "us-east-1" }));
 
 // ============================================================
 // putObject
@@ -194,7 +194,7 @@ describe("s3: cross-operation dependencies", () => {
 
 **Step 2: Run tests to verify they fail**
 
-Run: `cd ../ilo-53 && .venv/bin/python -c "pass" 2>/dev/null; npx vitest run tests/plugins/s3/3.989.0/index.test.ts`
+Run: `cd ../mvfm-53 && .venv/bin/python -c "pass" 2>/dev/null; npx vitest run tests/plugins/s3/3.989.0/index.test.ts`
 Expected: FAIL — cannot find module `../../../../src/plugins/s3/3.989.0`
 
 **Step 3: Write the plugin definition**
@@ -203,7 +203,7 @@ Create `src/plugins/s3/3.989.0/index.ts`:
 
 ```typescript
 // ============================================================
-// ILO PLUGIN: s3 (@aws-sdk/client-s3 compatible API)
+// MVFM PLUGIN: s3 (@aws-sdk/client-s3 compatible API)
 // ============================================================
 //
 // Implementation status: PARTIAL (5 of 108 commands)
@@ -235,7 +235,7 @@ Create `src/plugins/s3/3.989.0/index.ts`:
 // ============================================================
 //
 // Goal: An LLM that knows @aws-sdk/client-s3 should be able
-// to write Ilo programs with near-zero learning curve. The API
+// to write Mvfm programs with near-zero learning curve. The API
 // mirrors the high-level S3 aggregated client (method calls
 // with PascalCase input objects).
 //
@@ -358,7 +358,7 @@ export interface S3Config {
  *
  * @example
  * ```ts
- * const app = ilo(num, str, s3({ region: "us-east-1" }));
+ * const app = mvfm(num, str, s3({ region: "us-east-1" }));
  * const prog = app(($) => $.s3.putObject({ Bucket: "b", Key: "k", Body: "hello" }));
  * ```
  */
@@ -435,7 +435,7 @@ export function s3(config: S3Config): PluginDefinition<S3Methods> {
 //
 // 1. Basic object operations:
 //    Real:  await s3.putObject({ Bucket: 'b', Key: 'k', Body: 'hello' })
-//    Ilo:   $.s3.putObject({ Bucket: 'b', Key: 'k', Body: 'hello' })
+//    Mvfm:   $.s3.putObject({ Bucket: 'b', Key: 'k', Body: 'hello' })
 //    Nearly identical. Only difference is $ prefix and no await.
 //
 // 2. Parameterized operations with proxy values:
@@ -445,20 +445,20 @@ export function s3(config: S3Config): PluginDefinition<S3Methods> {
 //
 // 3. Method and parameter naming:
 //    Real:  s3.putObject({ Bucket, Key, Body, ContentType, Metadata })
-//    Ilo:   $.s3.putObject({ Bucket, Key, Body, ContentType, Metadata })
+//    Mvfm:   $.s3.putObject({ Bucket, Key, Body, ContentType, Metadata })
 //    1:1 match. PascalCase params, camelCase methods.
 //
 // WORKS BUT DIFFERENT:
 //
 // 4. GetObject Body:
 //    Real:  const body = await response.Body.transformToString()
-//    Ilo:   const body = result.Body  (already a string)
+//    Mvfm:   const body = result.Body  (already a string)
 //    The handler converts the stream to string before returning.
 //    More ergonomic but different from the real SDK.
 //
 // 5. Return types:
 //    Real SDK has typed CommandOutput interfaces (PutObjectOutput, etc.)
-//    Ilo uses Record<string, unknown>. Property access works via proxy.
+//    Mvfm uses Record<string, unknown>. Property access works via proxy.
 //
 // DOESN'T WORK / NOT MODELED:
 //
@@ -470,14 +470,14 @@ export function s3(config: S3Config): PluginDefinition<S3Methods> {
 // SUMMARY:
 // For the core 80% use case of "put/get/delete/head/list objects"
 // — nearly identical to the real @aws-sdk/client-s3 high-level API.
-// An LLM trained on the real SDK can write ilo S3 programs immediately.
+// An LLM trained on the real SDK can write mvfm S3 programs immediately.
 // Not supported: streaming, multipart, presigned URLs, waiters.
 // ============================================================
 ```
 
 **Step 4: Run tests to verify they pass**
 
-Run: `cd ../ilo-53 && npx vitest run tests/plugins/s3/3.989.0/index.test.ts`
+Run: `cd ../mvfm-53 && npx vitest run tests/plugins/s3/3.989.0/index.test.ts`
 Expected: All tests PASS
 
 **Step 5: Commit**
@@ -501,14 +501,14 @@ Create `tests/plugins/s3/3.989.0/interpreter.test.ts`:
 
 ```typescript
 import { describe, expect, it } from "vitest";
-import { foldAST, ilo } from "../../../../src/core";
+import { foldAST, mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 import { s3 } from "../../../../src/plugins/s3/3.989.0";
 import { s3Interpreter } from "../../../../src/plugins/s3/3.989.0/interpreter";
 
-const app = ilo(num, str, s3({ region: "us-east-1" }));
+const app = mvfm(num, str, s3({ region: "us-east-1" }));
 const fragments = [s3Interpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {
@@ -685,7 +685,7 @@ describe("s3 interpreter: return value", () => {
 
 **Step 2: Run tests to verify they fail**
 
-Run: `cd ../ilo-53 && npx vitest run tests/plugins/s3/3.989.0/interpreter.test.ts`
+Run: `cd ../mvfm-53 && npx vitest run tests/plugins/s3/3.989.0/interpreter.test.ts`
 Expected: FAIL — cannot find module `s3Interpreter`
 
 **Step 3: Write the interpreter**
@@ -743,7 +743,7 @@ export const s3Interpreter: InterpreterFragment = {
 
 **Step 4: Run tests to verify they pass**
 
-Run: `cd ../ilo-53 && npx vitest run tests/plugins/s3/3.989.0/interpreter.test.ts`
+Run: `cd ../mvfm-53 && npx vitest run tests/plugins/s3/3.989.0/interpreter.test.ts`
 Expected: All tests PASS
 
 **Step 5: Commit**
@@ -923,7 +923,7 @@ export interface ClientHandlerState {
  * Creates a client-side {@link StepHandler} that sends effects as JSON
  * to a remote server endpoint for execution.
  *
- * Each effect is sent as a POST request to `{baseUrl}/ilo/execute` with
+ * Each effect is sent as a POST request to `{baseUrl}/mvfm/execute` with
  * the contract hash, step index, path, and effect payload. The server
  * is expected to return `{ result: unknown }` in the response body.
  *
@@ -939,7 +939,7 @@ export function clientHandler(options: ClientHandlerOptions): StepHandler<Client
     context: StepContext,
     state: ClientHandlerState,
   ): Promise<{ value: unknown; state: ClientHandlerState }> => {
-    const response = await fetchFn(`${baseUrl}/ilo/execute`, {
+    const response = await fetchFn(`${baseUrl}/mvfm/execute`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -990,7 +990,7 @@ Create `tests/plugins/s3/3.989.0/integration.test.ts`:
 import { S3Client as AwsS3Client, CreateBucketCommand, DeleteObjectCommand, GetObjectCommand, HeadObjectCommand, ListObjectsV2Command, PutObjectCommand } from "@aws-sdk/client-s3";
 import { GenericContainer, type StartedTestContainer } from "testcontainers";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { numInterpreter } from "../../../../src/plugins/num/interpreter";
@@ -1032,7 +1032,7 @@ const commands: Record<string, new (input: any) => any> = {
   ListObjectsV2: ListObjectsV2Command,
 };
 
-const app = ilo(num, str, s3Plugin({ region: "us-east-1" }));
+const app = mvfm(num, str, s3Plugin({ region: "us-east-1" }));
 
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
@@ -1160,11 +1160,11 @@ describe("s3 integration: input resolution", () => {
 
 **Step 2: Install @aws-sdk/client-s3 as a dev dependency** (needed for integration tests)
 
-Run: `cd ../ilo-53 && npm install --save-dev @aws-sdk/client-s3`
+Run: `cd ../mvfm-53 && npm install --save-dev @aws-sdk/client-s3`
 
 **Step 3: Run the integration test**
 
-Run: `cd ../ilo-53 && npx vitest run tests/plugins/s3/3.989.0/integration.test.ts --timeout 120000`
+Run: `cd ../mvfm-53 && npx vitest run tests/plugins/s3/3.989.0/integration.test.ts --timeout 120000`
 Expected: All tests PASS (requires Docker for LocalStack)
 
 **Step 4: Commit**
@@ -1204,7 +1204,7 @@ export { s3Interpreter } from "./plugins/s3/3.989.0/interpreter";
 
 **Step 2: Run full build and checks**
 
-Run: `cd ../ilo-53 && npm run build && npm run check && npm test`
+Run: `cd ../mvfm-53 && npm run build && npm run check && npm test`
 Expected: All pass with no errors
 
 **Step 3: Commit**
@@ -1220,7 +1220,7 @@ git commit -m "feat(s3): add public exports (#53)"
 
 **Step 1: Run full validation suite**
 
-Run: `cd ../ilo-53 && npm run build && npm run check && npm test`
+Run: `cd ../mvfm-53 && npm run build && npm run check && npm test`
 Expected: All pass
 
 **Step 2: Create PR**

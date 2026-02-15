@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../src/core";
+import { mvfm } from "../../../src/core";
 import { semigroup } from "../../../src/plugins/semigroup";
 import { str } from "../../../src/plugins/str";
 
@@ -8,7 +8,7 @@ function strip(ast: unknown): unknown {
 }
 
 describe("semigroup: dispatch to str", () => {
-  const app = ilo(str, semigroup);
+  const app = mvfm(str, semigroup);
 
   it("$.append(literal, literal) dispatches to str/append", () => {
     const prog = app(($) => $.append("foo", "bar"));
@@ -36,7 +36,7 @@ describe("semigroup: dispatch to str", () => {
 
 describe("semigroup: error cases", () => {
   it("throws when no semigroup impl for inferred type", () => {
-    const app = ilo(semigroup);
+    const app = mvfm(semigroup);
     expect(() => app(($) => ($ as any).append("a", "b"))).toThrow(
       /No semigroup implementation for type/,
     );

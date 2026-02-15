@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { fal } from "../../../../src/plugins/fal/1.9.1";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
@@ -10,7 +10,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, str, fal({ credentials: "key_test_123" }));
+const app = mvfm(num, str, fal({ credentials: "key_test_123" }));
 
 // ---- fal.run ----
 

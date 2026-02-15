@@ -1,7 +1,7 @@
 import { Writable } from "node:stream";
 import pinoLib from "pino";
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { pino } from "../../../../src/plugins/pino/10.3.1";
@@ -22,7 +22,7 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 }
 
 const allFragments = [pinoInterpreter, coreInterpreter];
-const app = ilo(num, str, pino({ level: "trace" }));
+const app = mvfm(num, str, pino({ level: "trace" }));
 
 function createCapturingLogger() {
   const lines: any[] = [];

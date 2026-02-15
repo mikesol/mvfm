@@ -23,7 +23,7 @@
 **Step 1: Create worktree**
 
 ```bash
-git worktree add ../ilo-51 -b issue-51
+git worktree add ../mvfm-51 -b issue-51
 ```
 
 **Step 2: Assign the issue**
@@ -35,14 +35,14 @@ gh issue edit 51 --add-assignee @me --remove-label ready --add-label in-progress
 **Step 3: Create directory structure**
 
 ```bash
-mkdir -p ../ilo-51/src/plugins/resend/6.9.2
-mkdir -p ../ilo-51/tests/plugins/resend/6.9.2
+mkdir -p ../mvfm-51/src/plugins/resend/6.9.2
+mkdir -p ../mvfm-51/tests/plugins/resend/6.9.2
 ```
 
 **Step 4: Commit**
 
 ```bash
-cd ../ilo-51
+cd ../mvfm-51
 git add -A && git commit -m "chore: scaffold resend plugin directory structure (#51)"
 ```
 
@@ -59,7 +59,7 @@ Create `tests/plugins/resend/6.9.2/index.test.ts`:
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 import { resend } from "../../../../src/plugins/resend/6.9.2";
@@ -70,7 +70,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, str, resend({ apiKey: "re_test_123" }));
+const app = mvfm(num, str, resend({ apiKey: "re_test_123" }));
 
 // ============================================================
 // Emails
@@ -265,7 +265,7 @@ Create `src/plugins/resend/6.9.2/index.ts` — follow the Stripe pattern exactly
 
 ```ts
 // ============================================================
-// ILO PLUGIN: resend (resend-node compatible API)
+// MVFM PLUGIN: resend (resend-node compatible API)
 // ============================================================
 //
 // Implementation status: PARTIAL (3 of 11 resources)
@@ -289,7 +289,7 @@ Create `src/plugins/resend/6.9.2/index.ts` — follow the Stripe pattern exactly
 //   - Templates, Topics, ContactProperties
 //
 // Goal: An LLM that knows resend-node should be able to write
-// Ilo programs with near-zero learning curve.
+// Mvfm programs with near-zero learning curve.
 //
 // Real resend-node API (v6.9.2):
 //   const resend = new Resend('re_123')
@@ -469,7 +469,7 @@ export function resend(config: ResendConfig): PluginDefinition<ResendMethods> {
 //
 // 1. Basic email sending:
 //    Real:  await resend.emails.send({ from: '...', to: '...', subject: '...', html: '...' })
-//    Ilo:   $.resend.emails.send({ from: '...', to: '...', subject: '...', html: '...' })
+//    Mvfm:   $.resend.emails.send({ from: '...', to: '...', subject: '...', html: '...' })
 //    Nearly identical. Only difference is $ prefix and no await.
 //
 // 2. Parameterized operations with proxy values:
@@ -478,25 +478,25 @@ export function resend(config: ResendConfig): PluginDefinition<ResendMethods> {
 //
 // 3. Contact management:
 //    Real:  await resend.contacts.create({ email: '...' })
-//    Ilo:   $.resend.contacts.create({ email: '...' })
+//    Mvfm:   $.resend.contacts.create({ email: '...' })
 //    1:1 mapping.
 //
 // 4. Batch sending:
 //    Real:  await resend.batch.send([{ from: '...', to: '...' }, ...])
-//    Ilo:   $.resend.batch.send([{ from: '...', to: '...' }, ...])
+//    Mvfm:   $.resend.batch.send([{ from: '...', to: '...' }, ...])
 //    Array of emails maps to core/tuple AST node.
 //
 // WORKS BUT DIFFERENT:
 //
 // 5. React email templates:
 //    Real:  resend.emails.send({ react: <MyTemplate /> })
-//    Ilo:   Not supported. Use html or text instead.
+//    Mvfm:   Not supported. Use html or text instead.
 //    React rendering is a build-time side effect that can't be
 //    modeled in the AST.
 //
 // 6. Return types:
 //    Real:  Returns typed { data: { id: string }, error: null }
-//    Ilo:   Returns Record<string, unknown> (data only, unwrapped).
+//    Mvfm:   Returns Record<string, unknown> (data only, unwrapped).
 //    The SDK adapter strips the { data, error } envelope.
 //
 // DOESN'T WORK / NOT MODELED:
@@ -539,14 +539,14 @@ Create `tests/plugins/resend/6.9.2/interpreter.test.ts`:
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { foldAST, ilo } from "../../../../src/core";
+import { foldAST, mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 import { resend } from "../../../../src/plugins/resend/6.9.2";
 import { resendInterpreter } from "../../../../src/plugins/resend/6.9.2/interpreter";
 
-const app = ilo(num, str, resend({ apiKey: "re_test_123" }));
+const app = mvfm(num, str, resend({ apiKey: "re_test_123" }));
 const fragments = [resendInterpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {
@@ -979,7 +979,7 @@ export interface ClientHandlerState {
  * Creates a client-side {@link StepHandler} that sends effects as JSON
  * to a remote server endpoint for execution.
  *
- * Each effect is sent as a POST request to `{baseUrl}/ilo/execute` with
+ * Each effect is sent as a POST request to `{baseUrl}/mvfm/execute` with
  * the contract hash, step index, path, and effect payload. The server
  * is expected to return `{ result: unknown }` in the response body.
  *
@@ -995,7 +995,7 @@ export function clientHandler(options: ClientHandlerOptions): StepHandler<Client
     context: StepContext,
     state: ClientHandlerState,
   ): Promise<{ value: unknown; state: ClientHandlerState }> => {
-    const response = await fetchFn(`${baseUrl}/ilo/execute`, {
+    const response = await fetchFn(`${baseUrl}/mvfm/execute`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1172,7 +1172,7 @@ No official Resend mock container exists. Use a simple HTTP mock server (Node's 
 ```ts
 import http from "node:http";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { numInterpreter } from "../../../../src/plugins/num/interpreter";
@@ -1199,7 +1199,7 @@ let server: http.Server;
 let port: number;
 
 const allFragments = [resendInterpreter, coreInterpreter, numInterpreter, strInterpreter];
-const app = ilo(num, str, resendPlugin({ apiKey: "re_test_fake" }));
+const app = mvfm(num, str, resendPlugin({ apiKey: "re_test_fake" }));
 
 function createMockClient(): ResendClient {
   return {

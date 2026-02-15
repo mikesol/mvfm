@@ -9,7 +9,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { GenericContainer, type StartedTestContainer } from "testcontainers";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { numInterpreter } from "../../../../src/plugins/num/interpreter";
@@ -46,7 +46,7 @@ const commands: Record<string, new (input: any) => any> = {
   ListObjectsV2: ListObjectsV2Command,
 };
 
-const app = ilo(num, str, s3Plugin({ region: "us-east-1" }));
+const app = mvfm(num, str, s3Plugin({ region: "us-east-1" }));
 
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);

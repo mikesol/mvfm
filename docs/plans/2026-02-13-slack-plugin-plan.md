@@ -24,7 +24,7 @@ Create `tests/plugins/slack/7.14.0/index.test.ts`:
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 import { slack } from "../../../../src/plugins/slack/7.14.0";
@@ -35,7 +35,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, str, slack({ token: "xoxb-test-token" }));
+const app = mvfm(num, str, slack({ token: "xoxb-test-token" }));
 
 // ============================================================
 // chat
@@ -498,14 +498,14 @@ Create `tests/plugins/slack/7.14.0/interpreter.test.ts`:
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { foldAST, ilo } from "../../../../src/core";
+import { foldAST, mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 import { slack } from "../../../../src/plugins/slack/7.14.0";
 import { slackInterpreter } from "../../../../src/plugins/slack/7.14.0/interpreter";
 
-const app = ilo(num, str, slack({ token: "xoxb-test-token" }));
+const app = mvfm(num, str, slack({ token: "xoxb-test-token" }));
 const fragments = [slackInterpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {
@@ -937,7 +937,7 @@ Since there's no standard Slack mock container (unlike `stripe/stripe-mock`), th
 ```ts
 import http from "node:http";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { error } from "../../../../src/plugins/error";
 import { errorInterpreter } from "../../../../src/plugins/error/interpreter";
@@ -977,7 +977,7 @@ const allFragments = [
   strInterpreter,
 ];
 
-const app = ilo(num, str, slackPlugin({ token: "xoxb-test-token" }), fiber, error);
+const app = mvfm(num, str, slackPlugin({ token: "xoxb-test-token" }), fiber, error);
 
 // Create a mock SlackClient that records calls
 function createMockClient(): SlackClient {

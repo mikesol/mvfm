@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../src/core";
+import { mvfm } from "../../../src/core";
 import { boolean } from "../../../src/plugins/boolean";
 import { eq } from "../../../src/plugins/eq";
 import { num } from "../../../src/plugins/num";
@@ -11,7 +11,7 @@ function strip(ast: unknown): unknown {
 }
 
 describe("eq: dispatch to num/eq", () => {
-  const app = ilo(num, semiring, eq);
+  const app = mvfm(num, semiring, eq);
 
   it("$.eq(literal, literal) dispatches to num/eq", () => {
     const prog = app(($) => $.eq(1, 2));
@@ -35,7 +35,7 @@ describe("eq: dispatch to num/eq", () => {
 });
 
 describe("eq: dispatch to str/eq", () => {
-  const app = ilo(str, eq);
+  const app = mvfm(str, eq);
 
   it("$.eq(strLiteral, strLiteral) dispatches to str/eq", () => {
     const prog = app(($) => $.eq("hello", "world"));
@@ -51,7 +51,7 @@ describe("eq: dispatch to str/eq", () => {
 });
 
 describe("eq: dispatch to boolean/eq", () => {
-  const app = ilo(boolean, eq);
+  const app = mvfm(boolean, eq);
 
   it("$.eq(true, false) dispatches to boolean/eq", () => {
     const prog = app(($) => $.eq(true, false));
@@ -67,7 +67,7 @@ describe("eq: dispatch to boolean/eq", () => {
 });
 
 describe("eq: nested schema resolution", () => {
-  const app = ilo(num, str, eq);
+  const app = mvfm(num, str, eq);
 
   it("$.eq($.input.user.age, 30) walks nested schema", () => {
     const prog = app({ user: { age: "number", name: "string" } }, ($) =>
@@ -88,12 +88,12 @@ describe("eq: nested schema resolution", () => {
 
 describe("eq: error cases", () => {
   it("throws when no eq impl for inferred type", () => {
-    const app = ilo(eq);
+    const app = mvfm(eq);
     expect(() => app(($) => ($ as any).eq(1, 2))).toThrow(/No eq implementation for type/);
   });
 
   it("falls back to sole impl when both args are untyped (single provider)", () => {
-    const app = ilo(num, eq);
+    const app = mvfm(num, eq);
     // Only one eq provider (num) — falls back without type inference
     const prog = app(($) => $.eq($.input.x, $.input.y));
     const ast = strip(prog.ast) as any;
@@ -101,14 +101,14 @@ describe("eq: error cases", () => {
   });
 
   it("throws when both args are untyped with multiple providers", () => {
-    const app = ilo(num, str, boolean, eq);
+    const app = mvfm(num, str, boolean, eq);
     // Multiple eq providers — can't disambiguate
     expect(() => app(($) => $.eq($.input.x, $.input.y))).toThrow(/Cannot infer type for eq/);
   });
 });
 
 describe("eq: neq dispatch", () => {
-  const app = ilo(num, eq);
+  const app = mvfm(num, eq);
 
   it("$.neq(literal, literal) wraps num/eq in eq/neq", () => {
     const prog = app(($) => $.neq(1, 2));

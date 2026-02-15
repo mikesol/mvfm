@@ -1,8 +1,8 @@
 // ============================================================
-// ILO PLUGIN: fiber — concurrency primitives
+// MVFM PLUGIN: fiber — concurrency primitives
 // ============================================================
 //
-// This plugin provides the concurrency model for Ilo programs.
+// This plugin provides the concurrency model for Mvfm programs.
 // It doesn't know about postgres, fetch, or any specific effect —
 // it just provides combinators that work with any Expr.
 //

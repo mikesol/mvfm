@@ -1,5 +1,5 @@
 // ============================================================
-// ILO PLUGIN: resend (resend-node compatible API)
+// MVFM PLUGIN: resend (resend-node compatible API)
 // ============================================================
 //
 // Implementation status: PARTIAL (3 of 11 resources)
@@ -29,7 +29,7 @@
 // ============================================================
 //
 // Goal: An LLM that knows resend-node should be able to write
-// Ilo programs with near-zero learning curve. The API should
+// Mvfm programs with near-zero learning curve. The API should
 // look like the real resend-node SDK as closely as possible.
 //
 // Real resend-node API (v6.9.2):
@@ -228,17 +228,17 @@ export function resend(config: ResendConfig): PluginDefinition<ResendMethods> {
 //
 // 1. Email sending:
 //    Real:  const { data } = await resend.emails.send({ from: '...', to: '...', subject: '...', html: '...' })
-//    Ilo:   const email = $.resend.emails.send({ from: '...', to: '...', subject: '...', html: '...' })
+//    Mvfm:   const email = $.resend.emails.send({ from: '...', to: '...', subject: '...', html: '...' })
 //    Nearly identical. Only difference is $ prefix and no await/destructuring.
 //
 // 2. Batch sending:
 //    Real:  const { data } = await resend.batch.send([{ from: '...', to: '...' }, ...])
-//    Ilo:   const batch = $.resend.batch.send([{ from: '...', to: '...' }, ...])
+//    Mvfm:   const batch = $.resend.batch.send([{ from: '...', to: '...' }, ...])
 //    Array of email objects maps 1:1. Proxy chains capture dependencies.
 //
 // 3. Contact management:
 //    Real:  const { data } = await resend.contacts.create({ audienceId: '...', email: '...' })
-//    Ilo:   const contact = $.resend.contacts.create({ audienceId: '...', email: '...' })
+//    Mvfm:   const contact = $.resend.contacts.create({ audienceId: '...', email: '...' })
 //    CRUD operations on contacts map directly.
 //
 // 4. Parameterized operations with proxy values:
@@ -249,14 +249,14 @@ export function resend(config: ResendConfig): PluginDefinition<ResendMethods> {
 //
 // 5. React email templates:
 //    Real:  await resend.emails.send({ from: '...', to: '...', react: <EmailTemplate /> })
-//    Ilo:   $.resend.emails.send({ from: '...', to: '...', html: '<p>...</p>' })
+//    Mvfm:   $.resend.emails.send({ from: '...', to: '...', html: '<p>...</p>' })
 //    React rendering is a build-time side effect — JSX must be
 //    rendered to HTML before the AST is built. Use `html` instead.
 //
 // 6. Return types:
 //    Real resend-node has typed response objects (CreateEmailResponse,
 //    GetEmailResponse, etc.) with precise type definitions.
-//    Ilo uses Record<string, unknown> for all return types.
+//    Mvfm uses Record<string, unknown> for all return types.
 //    Property access still works via proxy (email.id, contact.email),
 //    but there's no IDE autocomplete for Resend-specific fields.
 //
@@ -264,18 +264,18 @@ export function resend(config: ResendConfig): PluginDefinition<ResendMethods> {
 //
 // 7. Webhooks:
 //    Real:  Resend sends webhook events (email.sent, email.delivered, etc.)
-//    Ilo:   Not modeled. Webhooks are server-initiated push events,
+//    Mvfm:   Not modeled. Webhooks are server-initiated push events,
 //           not request/response operations. They belong in the
 //           interpreter/runtime layer, not in the AST.
 //
 // 8. Buffer attachments:
 //    Real:  await resend.emails.send({ ..., attachments: [{ content: Buffer.from('...') }] })
-//    Ilo:   Buffer is a runtime construct. Attachments with string
+//    Mvfm:   Buffer is a runtime construct. Attachments with string
 //           content or paths work; binary Buffer content does not.
 //
 // 9. Idempotency keys:
 //    Real:  Resend supports Idempotency-Key header on email send.
-//    Ilo:   Not modeled yet. Could be added as an optional parameter
+//    Mvfm:   Not modeled yet. Could be added as an optional parameter
 //           that becomes an AST field.
 //
 // ============================================================

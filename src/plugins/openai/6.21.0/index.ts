@@ -1,5 +1,5 @@
 // ============================================================
-// ILO PLUGIN: openai (openai-node compatible API)
+// MVFM PLUGIN: openai (openai-node compatible API)
 // ============================================================
 //
 // Implementation status: PARTIAL (4 of 22 top-level resources)
@@ -32,7 +32,7 @@
 // ============================================================
 //
 // Goal: An LLM that knows openai-node should be able to write
-// Ilo programs with near-zero learning curve. The API hugs the
+// Mvfm programs with near-zero learning curve. The API hugs the
 // real openai-node SDK 1:1.
 //
 // Real openai-node API (v6.21.0):
@@ -251,32 +251,32 @@ export function openai(config: OpenAIConfig): PluginDefinition<OpenAIMethods> {
 //
 // 1. Chat completions (non-streaming):
 //    Real:  const c = await openai.chat.completions.create({ model: 'gpt-4o', messages: [...] })
-//    Ilo:   const c = $.openai.chat.completions.create({ model: 'gpt-4o', messages: [...] })
+//    Mvfm:   const c = $.openai.chat.completions.create({ model: 'gpt-4o', messages: [...] })
 //    Nearly identical. Only difference is $ prefix and no await.
 //
 // 2. Embeddings:
 //    Real:  const e = await openai.embeddings.create({ model: 'text-embedding-3-small', input: 'hello' })
-//    Ilo:   const e = $.openai.embeddings.create({ model: 'text-embedding-3-small', input: 'hello' })
+//    Mvfm:   const e = $.openai.embeddings.create({ model: 'text-embedding-3-small', input: 'hello' })
 //    1:1 mapping.
 //
 // 3. Resource method naming:
 //    Real:  openai.chat.completions.create(...)
-//    Ilo:   $.openai.chat.completions.create(...)
+//    Mvfm:   $.openai.chat.completions.create(...)
 //    The nested resource pattern maps 1:1. An LLM that knows
-//    openai-node can write Ilo OpenAI programs immediately.
+//    openai-node can write Mvfm OpenAI programs immediately.
 //
 // WORKS BUT DIFFERENT:
 //
 // 4. Return types:
 //    Real openai-node has typed response objects (ChatCompletion,
-//    Embedding, etc.). Ilo uses Record<string, unknown>.
+//    Embedding, etc.). Mvfm uses Record<string, unknown>.
 //    Property access still works via proxy (completion.choices),
 //    but there's no IDE autocomplete for OpenAI-specific fields.
 //
 // 5. Sequencing side effects:
 //    Real:  await openai.chat.completions.create(...)
 //           await openai.embeddings.create(...)
-//    Ilo:   const c = $.openai.chat.completions.create(...)
+//    Mvfm:   const c = $.openai.chat.completions.create(...)
 //           const e = $.openai.embeddings.create(...)
 //           return $.do(c, e)
 //    Must use $.do() for sequencing.
@@ -286,15 +286,15 @@ export function openai(config: OpenAIConfig): PluginDefinition<OpenAIMethods> {
 // 6. Streaming (stream: true):
 //    Real:  const stream = await openai.chat.completions.create({ stream: true, ... })
 //           for await (const chunk of stream) { ... }
-//    Ilo:   Not modeled. Async iterators are not request-response.
+//    Mvfm:   Not modeled. Async iterators are not request-response.
 //           The stream parameter is omitted entirely.
 //
 // 7. Auto-pagination:
 //    Real:  for await (const c of openai.chat.completions.list()) { ... }
-//    Ilo:   Returns first page only. Use $.rec() with has_more/after.
+//    Mvfm:   Returns first page only. Use $.rec() with has_more/after.
 //
 // 8. RequestOptions (second argument):
 //    Real:  openai.chat.completions.create({...}, { timeout: 5000 })
-//    Ilo:   Not modeled. These are runtime concerns.
+//    Mvfm:   Not modeled. These are runtime concerns.
 //
 // ============================================================

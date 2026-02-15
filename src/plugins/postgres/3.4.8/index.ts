@@ -1,5 +1,5 @@
 // ============================================================
-// ILO PLUGIN: postgres (porsager/postgres compatible API)
+// MVFM PLUGIN: postgres (porsager/postgres compatible API)
 // ============================================================
 //
 // Implementation status: COMPLETE (modulo known limitations)
@@ -11,7 +11,7 @@
 //   - No SUBSCRIBE (realtime logical replication)
 //
 // Goal: An LLM that knows postgres.js should be able to write
-// Ilo programs with near-zero learning curve. The API should
+// Mvfm programs with near-zero learning curve. The API should
 // look like the real postgres.js as closely as possible.
 //
 // Real postgres.js API:
@@ -44,7 +44,7 @@ export interface PostgresMethods {
    * Real postgres.js:
    *   const users = await sql`select * from users where age > ${age}`
    *
-   * Ilo:
+   * Mvfm:
    *   const users = $.sql`select * from users where age > ${age}`
    *
    * Returns `Expr<Row[]>` — an array of result rows.
@@ -63,7 +63,7 @@ interface PostgresSql {
    * Dynamic identifier — column or table name escaping.
    *
    * Real: sql`select ${sql('name')} from ${sql('users')}`
-   * Ilo: $.sql`select ${$.sql.id('name')} from ${$.sql.id('users')}`
+   * Mvfm: $.sql`select ${$.sql.id('name')} from ${$.sql.id('users')}`
    *
    * NOTE: We can't do sql(string) because sql is already the
    * tagged template. In real postgres.js, sql is both callable
@@ -78,7 +78,7 @@ interface PostgresSql {
    * Dynamic insert/update helper.
    *
    * Real: sql`insert into users ${sql(user, 'name', 'age')}`
-   * Ilo: $.sql`insert into users ${$.sql.insert(user, ['name', 'age'])}`
+   * Mvfm: $.sql`insert into users ${$.sql.insert(user, ['name', 'age'])}`
    *
    * Deviation #2: We use .insert() instead of the overloaded
    * sql() call, since we need to distinguish "identifier" from
@@ -93,7 +93,7 @@ interface PostgresSql {
    * Dynamic update helper.
    *
    * Real: sql`update users set ${sql(user, 'name', 'age')} where id = ${id}`
-   * Ilo: $.sql`update users set ${$.sql.set(user, ['name', 'age'])} where id = ${id}`
+   * Mvfm: $.sql`update users set ${$.sql.set(user, ['name', 'age'])} where id = ${id}`
    *
    * Deviation #3: Explicit .set() for updates vs .insert() for inserts.
    * In real postgres.js these are the same call — the database figures
@@ -112,7 +112,7 @@ interface PostgresSql {
    *     return [user, account]
    *   })
    *
-   * Ilo:
+   * Mvfm:
    *   const result = $.sql.begin(sql => {
    *     const user = sql`insert into users (name) values ('Murray') returning *`
    *     const account = sql`insert into accounts (user_id) values (${user[0].user_id}) returning *`
@@ -129,7 +129,7 @@ interface PostgresSql {
    * JS async/await semantics. The SECOND query depends on the
    * RESULT of the first (user.user_id).
    *
-   * In Ilo, there's no await. The callback runs synchronously
+   * In Mvfm, there's no await. The callback runs synchronously
    * to build the AST. So when you write:
    *
    *   const user = sql`insert ... returning *`
@@ -146,7 +146,7 @@ interface PostgresSql {
    * Problem 2: SEQUENTIAL SIDE EFFECTS
    * In the transaction, both inserts are side effects.
    * Neither is "just" a return value. In real postgres.js,
-   * await enforces ordering. In Ilo, the callback just
+   * await enforces ordering. In Mvfm, the callback just
    * builds a tree, so you need $.do() or return an array
    * to capture all the effects.
    *
@@ -156,7 +156,7 @@ interface PostgresSql {
    *     sql`update ...`,
    *   ])
    *
-   * In Ilo this could be:
+   * In Mvfm this could be:
    *   $.sql.begin(sql => [
    *     sql`update ...`,
    *     sql`update ...`,
@@ -168,14 +168,14 @@ interface PostgresSql {
    *
    * Problem 3: ERROR HANDLING / ROLLBACK
    * Real postgres.js: if the callback throws, ROLLBACK is
-   * called. In Ilo, there's no throwing — we're building
+   * called. In Mvfm, there's no throwing — we're building
    * a tree. Rollback semantics are the interpreter's job.
    * The AST just says "these queries are in a transaction."
    * The interpreter wraps them in BEGIN/COMMIT/ROLLBACK.
    *
    * Problem 4: DESTRUCTURING
    * Real: const [user] = await sql`...`
-   * Ilo: can't destructure a proxy meaningfully.
+   * Mvfm: can't destructure a proxy meaningfully.
    * You'd write: const user = sql`...` and access user[0]
    * or use a helper like sql`...`.first()
    *
@@ -190,7 +190,7 @@ interface PostgresSql {
    * Real postgres.js:
    *   await sql`select * from large_table`.cursor(100, async rows => { ... })
    *
-   * Ilo:
+   * Mvfm:
    *   $.sql.cursor($.sql`select * from large_table`, 100, (batch) => {
    *     return $.sql`insert into archive ${$.sql.insert(batch)}`
    *   })
@@ -406,7 +406,7 @@ export function postgres(config?: PostgresConfig | string): PluginDefinition<Pos
 //
 // 1. Basic queries:
 //    Real:  const users = await sql`select * from users where age > ${age}`
-//    Ilo: const users = $.sql`select * from users where age > ${age}`
+//    Mvfm: const users = $.sql`select * from users where age > ${age}`
 //    Nearly identical. The only diff is $ prefix and no await.
 //
 // 2. Parameterized queries with proxy values:
@@ -416,24 +416,24 @@ export function postgres(config?: PostgresConfig | string): PluginDefinition<Pos
 //
 // 3. Dynamic identifiers:
 //    Real:  sql`select ${sql('name')} from ${sql('users')}`
-//    Ilo: $.sql`select ${$.sql.id('name')} from ${$.sql.id('users')}`
+//    Mvfm: $.sql`select ${$.sql.id('name')} from ${$.sql.id('users')}`
 //    Slightly more verbose but unambiguous.
 //
 // 4. Transactions (pipeline mode):
 //    Real:  sql.begin(sql => [sql`update ...`, sql`insert ...`])
-//    Ilo: $.sql.begin(sql => [sql`update ...`, sql`insert ...`])
+//    Mvfm: $.sql.begin(sql => [sql`update ...`, sql`insert ...`])
 //    Identical! Array = sequence of effects.
 //
 // 5. Insert helpers:
 //    Real:  sql`insert into users ${sql(user, 'name', 'age')}`
-//    Ilo: $.sql`insert into users ${$.sql.insert(user, ['name', 'age'])}`
+//    Mvfm: $.sql`insert into users ${$.sql.insert(user, ['name', 'age'])}`
 //    Slightly different call style but same semantics.
 //
 // ⚠️  WORKS BUT DIFFERENT:
 //
 // 6. Destructuring results:
 //    Real:  const [user] = await sql`select ... limit 1`
-//    Ilo: const user = $.sql`select ... limit 1`[0]
+//    Mvfm: const user = $.sql`select ... limit 1`[0]
 //    Or:    const user = $.sql`select ... limit 1`.first  // could add sugar
 //    Can't destructure proxies. [0] index access works though.
 //
@@ -444,7 +444,7 @@ export function postgres(config?: PostgresConfig | string): PluginDefinition<Pos
 //        const [account] = await sql`insert ... values (${user.user_id})`
 //        return [user, account]
 //      })
-//    Ilo:
+//    Mvfm:
 //      const result = $.sql.begin(sql => {
 //        const user = sql`insert ... returning *`
 //        const account = sql`insert ... values (${user[0].user_id})`
@@ -463,7 +463,7 @@ export function postgres(config?: PostgresConfig | string): PluginDefinition<Pos
 //          await sql`insert into audit_log ...`
 //        }
 //      })
-//    Ilo:
+//    Mvfm:
 //      $.sql.begin(sql => {
 //        const user = sql`select * from users where id = ${$.input.id}`
 //        // Can't do native if() on a proxy!
@@ -479,7 +479,7 @@ export function postgres(config?: PostgresConfig | string): PluginDefinition<Pos
 //
 // 9. Error handling:
 //    Real:  sql`...`.catch(err => ...)
-//    Ilo: $.try($.sql`...`).catch(err => fallback)
+//    Mvfm: $.try($.sql`...`).catch(err => fallback)
 //    The error plugin provides $.try(), $.attempt(), $.orElse(),
 //    $.guard(), $.settle(). These compose with postgres queries
 //    to catch real constraint violations, missing tables, etc.
@@ -487,20 +487,20 @@ export function postgres(config?: PostgresConfig | string): PluginDefinition<Pos
 //
 // 10. Cursors:
 //    Real:  sql`...`.cursor(10, rows => ...)
-//    Ilo:   $.sql.cursor($.sql`...`, 10, (batch) => ...)
+//    Mvfm:   $.sql.cursor($.sql`...`, 10, (batch) => ...)
 //    Modeled as postgres/cursor + postgres/cursor_batch AST nodes.
 //    Can't chain .cursor() on query result (no apply trap on Proxy),
 //    so we use a helper method on $.sql instead. (Deviation #5)
 //    Streaming and COPY are still not modelable.
 //
 // 11. .describe(), .raw(), .values():
-//    These are execution modifiers. In Ilo they'd be AST
+//    These are execution modifiers. In Mvfm they'd be AST
 //    annotations that the interpreter reads. Doable but need
 //    to be modeled as method calls on the query proxy.
 //
 // 12. Async/await ordering:
 //    The big one. In real postgres.js, `await` is what gives you
-//    sequential execution. In Ilo, everything runs synchronously
+//    sequential execution. In Mvfm, everything runs synchronously
 //    during AST construction. For pure data dependencies (query B
 //    uses result of query A), the proxy chain captures this. But
 //    for "do A then do B" without data dependency, you need $.do()

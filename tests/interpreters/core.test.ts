@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { composeInterpreters, ilo } from "../../src/core";
+import { composeInterpreters, mvfm } from "../../src/core";
 import { coreInterpreter } from "../../src/interpreters/core";
 
 // Helper to inject input data into core/input nodes throughout an AST
@@ -22,7 +22,7 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   return await interp(ast.result);
 }
 
-const app = ilo();
+const app = mvfm();
 
 describe("core interpreter: literals", () => {
   it("number", async () => {

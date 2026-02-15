@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { composeInterpreters, ilo } from "../../../src/core";
+import { composeInterpreters, mvfm } from "../../../src/core";
 import { coreInterpreter } from "../../../src/interpreters/core";
 import { num } from "../../../src/plugins/num";
 import { numInterpreter } from "../../../src/plugins/num/interpreter";
@@ -24,7 +24,7 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   return await interp(ast.result);
 }
 
-const app = ilo(num, semiring, ord);
+const app = mvfm(num, semiring, ord);
 
 describe("num interpreter: arithmetic", () => {
   it("add", async () => expect(await run(app(($) => $.add(3, 4)))).toBe(7));

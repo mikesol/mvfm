@@ -2,7 +2,7 @@
 
 ## Overview
 
-Stripe plugin for ilo following the postgres reference implementation pattern: AST builder, generator-based interpreter, server handler (wrapping official Stripe SDK), client handler (HTTP proxy), and stripe-mock integration tests.
+Stripe plugin for mvfm following the postgres reference implementation pattern: AST builder, generator-based interpreter, server handler (wrapping official Stripe SDK), client handler (HTTP proxy), and stripe-mock integration tests.
 
 **Issue:** #39
 **API version:** 2025-04-30.basil
@@ -127,7 +127,7 @@ No `buildEvaluate` complexity — every Stripe operation is a single API call wi
 
 ## Client Handler
 
-Identical to postgres client handler — sends effects as JSON to `{baseUrl}/ilo/execute`:
+Identical to postgres client handler — sends effects as JSON to `{baseUrl}/mvfm/execute`:
 
 ```typescript
 export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState> {

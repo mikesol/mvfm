@@ -1,5 +1,5 @@
 // ============================================================
-// ILO PLUGIN: slack (@slack/web-api compatible API)
+// MVFM PLUGIN: slack (@slack/web-api compatible API)
 // ============================================================
 //
 // Implementation status: PARTIAL (5 of 30+ resource groups)
@@ -35,7 +35,7 @@
 // ============================================================
 //
 // Goal: An LLM that knows @slack/web-api should be able to write
-// Ilo programs with near-zero learning curve. The API should
+// Mvfm programs with near-zero learning curve. The API should
 // look like the real @slack/web-api SDK as closely as possible.
 //
 // Real @slack/web-api API (v7.14.0):
@@ -454,7 +454,7 @@ export function slack(config: SlackConfig): PluginDefinition<SlackMethods> {
 //
 // 1. Basic API calls:
 //    Real:  const result = await client.chat.postMessage({ channel: '#general', text: 'Hello' })
-//    Ilo:   const result = $.slack.chat.postMessage({ channel: '#general', text: 'Hello' })
+//    Mvfm:   const result = $.slack.chat.postMessage({ channel: '#general', text: 'Hello' })
 //    Nearly identical. Only difference is $ prefix and no await.
 //
 // 2. Parameterized operations with proxy values:
@@ -464,13 +464,13 @@ export function slack(config: SlackConfig): PluginDefinition<SlackMethods> {
 //
 // 3. Resource method naming:
 //    Real:  client.chat.postMessage(...)
-//    Ilo:   $.slack.chat.postMessage(...)
+//    Mvfm:   $.slack.chat.postMessage(...)
 //    The nested resource pattern maps 1:1. An LLM that knows
-//    @slack/web-api can write Ilo Slack programs immediately.
+//    @slack/web-api can write Mvfm Slack programs immediately.
 //
 // 4. Optional params:
 //    Real:  await client.conversations.list()
-//    Ilo:   $.slack.conversations.list()
+//    Mvfm:   $.slack.conversations.list()
 //    Both work. The AST stores null for omitted optional params.
 //
 // WORKS BUT DIFFERENT:
@@ -479,7 +479,7 @@ export function slack(config: SlackConfig): PluginDefinition<SlackMethods> {
 //    Real @slack/web-api has typed response interfaces
 //    (ChatPostMessageResponse, ConversationsListResponse, etc.)
 //    with precise field definitions.
-//    Ilo uses Record<string, unknown> for all return types.
+//    Mvfm uses Record<string, unknown> for all return types.
 //    Property access still works via proxy (result.ts, result.channel),
 //    but there's no IDE autocomplete for Slack-specific fields.
 //    A future enhancement could add typed response interfaces.
@@ -487,7 +487,7 @@ export function slack(config: SlackConfig): PluginDefinition<SlackMethods> {
 // 6. Sequencing side effects:
 //    Real:  await client.chat.postMessage(...)
 //           await client.reactions.add(...)
-//    Ilo:   const msg = $.slack.chat.postMessage(...)
+//    Mvfm:   const msg = $.slack.chat.postMessage(...)
 //           const reaction = $.slack.reactions.add({ timestamp: msg.ts, ... })
 //           return $.do(msg, reaction)
 //    Must use $.do() for sequencing when there are data dependencies.
@@ -497,12 +497,12 @@ export function slack(config: SlackConfig): PluginDefinition<SlackMethods> {
 //
 // 7. Auto-pagination:
 //    Real:  Paginated results with response_metadata.next_cursor
-//    Ilo:   Returns first page only. For full pagination, use
+//    Mvfm:   Returns first page only. For full pagination, use
 //           $.rec() with cursor logic.
 //
 // 8. File uploads:
 //    Real:  client.files.uploadV2({ channel_id, file, filename })
-//    Ilo:   Not modeled. files.uploadV2 makes 3 internal API calls
+//    Mvfm:   Not modeled. files.uploadV2 makes 3 internal API calls
 //           (getUploadURLExternal, upload, completeUploadExternal).
 //           Not a single AST node.
 //

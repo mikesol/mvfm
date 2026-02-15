@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { num } from "../../../../src/plugins/num";
 import { openai } from "../../../../src/plugins/openai/6.21.0";
 import { str } from "../../../../src/plugins/str";
@@ -10,7 +10,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, str, openai({ apiKey: "sk-test-123" }));
+const app = mvfm(num, str, openai({ apiKey: "sk-test-123" }));
 
 // ============================================================
 // Chat Completions

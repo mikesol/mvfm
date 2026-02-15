@@ -1,5 +1,5 @@
 // ============================================================
-// ILO PLUGIN: s3 (@aws-sdk/client-s3 compatible API)
+// MVFM PLUGIN: s3 (@aws-sdk/client-s3 compatible API)
 // ============================================================
 //
 // Implementation status: PARTIAL (5 of 108 commands)
@@ -31,7 +31,7 @@
 // ============================================================
 //
 // Goal: An LLM that knows @aws-sdk/client-s3 should be able
-// to write Ilo programs with near-zero learning curve. The API
+// to write Mvfm programs with near-zero learning curve. The API
 // mirrors the high-level S3 aggregated client (method calls
 // with PascalCase input objects).
 //
@@ -154,7 +154,7 @@ export interface S3Config {
  *
  * @example
  * ```ts
- * const app = ilo(num, str, s3({ region: "us-east-1" }));
+ * const app = mvfm(num, str, s3({ region: "us-east-1" }));
  * const prog = app(($) => $.s3.putObject({ Bucket: "b", Key: "k", Body: "hello" }));
  * ```
  */
@@ -229,7 +229,7 @@ export function s3(config: S3Config): PluginDefinition<S3Methods> {
 //
 // 1. Basic object operations:
 //    Real:  await s3.putObject({ Bucket: 'b', Key: 'k', Body: 'hello' })
-//    Ilo:   $.s3.putObject({ Bucket: 'b', Key: 'k', Body: 'hello' })
+//    Mvfm:   $.s3.putObject({ Bucket: 'b', Key: 'k', Body: 'hello' })
 //    Nearly identical. Only difference is $ prefix and no await.
 //
 // 2. Parameterized operations with proxy values:
@@ -239,20 +239,20 @@ export function s3(config: S3Config): PluginDefinition<S3Methods> {
 //
 // 3. Method and parameter naming:
 //    Real:  s3.putObject({ Bucket, Key, Body, ContentType, Metadata })
-//    Ilo:   $.s3.putObject({ Bucket, Key, Body, ContentType, Metadata })
+//    Mvfm:   $.s3.putObject({ Bucket, Key, Body, ContentType, Metadata })
 //    1:1 match. PascalCase params, camelCase methods.
 //
 // WORKS BUT DIFFERENT:
 //
 // 4. GetObject Body:
 //    Real:  const body = await response.Body.transformToString()
-//    Ilo:   const body = result.Body  (already a string)
+//    Mvfm:   const body = result.Body  (already a string)
 //    The handler converts the stream to string before returning.
 //    More ergonomic but different from the real SDK.
 //
 // 5. Return types:
 //    Real SDK has typed CommandOutput interfaces (PutObjectOutput, etc.)
-//    Ilo uses Record<string, unknown>. Property access works via proxy.
+//    Mvfm uses Record<string, unknown>. Property access works via proxy.
 //
 // DOESN'T WORK / NOT MODELED:
 //
@@ -264,6 +264,6 @@ export function s3(config: S3Config): PluginDefinition<S3Methods> {
 // SUMMARY:
 // For the core 80% use case of "put/get/delete/head/list objects"
 // — nearly identical to the real @aws-sdk/client-s3 high-level API.
-// An LLM trained on the real SDK can write ilo S3 programs immediately.
+// An LLM trained on the real SDK can write mvfm S3 programs immediately.
 // Not supported: streaming, multipart, presigned URLs, waiters.
 // ============================================================

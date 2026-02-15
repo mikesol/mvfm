@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../src/core";
+import { mvfm } from "../../../src/core";
 import { error } from "../../../src/plugins/error";
 import { num } from "../../../src/plugins/num";
 import { ord } from "../../../src/plugins/ord";
@@ -11,7 +11,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, ord, postgres("postgres://localhost/test"), error);
+const app = mvfm(num, ord, postgres("postgres://localhost/test"), error);
 
 describe("error: $.try().catch()", () => {
   it("produces error/try with catch branch", () => {

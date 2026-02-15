@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../src/core";
+import { mvfm } from "../../../src/core";
 import { control } from "../../../src/plugins/control";
 import { num } from "../../../src/plugins/num";
 import { ord } from "../../../src/plugins/ord";
@@ -11,7 +11,7 @@ function strip(ast: unknown): unknown {
 }
 
 describe("control: $.each()", () => {
-  const app = ilo(num, semiring, ord, st, control);
+  const app = mvfm(num, semiring, ord, st, control);
 
   it("produces control/each with collection and body", () => {
     const prog = app(($) => {
@@ -30,7 +30,7 @@ describe("control: $.each()", () => {
 });
 
 describe("control: $.while()", () => {
-  const app = ilo(num, semiring, ord, st, control);
+  const app = mvfm(num, semiring, ord, st, control);
 
   it("produces control/while with condition and body", () => {
     const prog = app(($) => {

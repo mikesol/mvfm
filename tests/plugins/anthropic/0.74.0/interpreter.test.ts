@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { foldAST, ilo } from "../../../../src/core";
+import { foldAST, mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { anthropic } from "../../../../src/plugins/anthropic/0.74.0";
 import { anthropicInterpreter } from "../../../../src/plugins/anthropic/0.74.0/interpreter";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 
-const app = ilo(num, str, anthropic({ apiKey: "sk-ant-test-123" }));
+const app = mvfm(num, str, anthropic({ apiKey: "sk-ant-test-123" }));
 const fragments = [anthropicInterpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {

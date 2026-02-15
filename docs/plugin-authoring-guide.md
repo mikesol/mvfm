@@ -1,10 +1,10 @@
-# How to Write an Ilo Plugin
+# How to Write an Mvfm Plugin
 
-This guide is the single source of truth for building ilo plugins. Every plugin — whether built by a human or an LLM agent — must follow these patterns exactly. The audience is LLM agents generating plugins. The guide is exhaustive and unambiguous by design.
+This guide is the single source of truth for building mvfm plugins. Every plugin — whether built by a human or an LLM agent — must follow these patterns exactly. The audience is LLM agents generating plugins. The guide is exhaustive and unambiguous by design.
 
 ## Two plugin types
 
-**Ilo-native plugins** (num, str, eq, boolean, ord, semigroup, semiring, monoid, show, etc.) implement operations that are part of ilo itself. They have no external dependencies, no upstream version to track, and live at `src/plugins/<name>/index.ts`.
+**Mvfm-native plugins** (num, str, eq, boolean, ord, semigroup, semiring, monoid, show, etc.) implement operations that are part of mvfm itself. They have no external dependencies, no upstream version to track, and live at `src/plugins/<name>/index.ts`.
 
 **External-service plugins** (postgres, stripe, redis, etc.) wrap a real-world library or API. They track a specific upstream version, require source-level analysis of the real library before any code is written, and live at `src/plugins/<name>/<version>/index.ts`.
 
@@ -33,8 +33,8 @@ Before writing any plugin code for an external service, you must understand the 
 
    | Category | Meaning | Example |
    |----------|---------|---------|
-   | **Maps cleanly** | 1:1 mapping to an ilo AST node | Stripe `paymentIntents.create()` — pure request-response |
-   | **Needs deviation** | Modelable but ilo's API must differ from upstream (document why) | postgres.js `sql(identifier)` — ilo uses `$.sql.id()` because `sql` is already the tagged template |
+   | **Maps cleanly** | 1:1 mapping to an mvfm AST node | Stripe `paymentIntents.create()` — pure request-response |
+   | **Needs deviation** | Modelable but mvfm's API must differ from upstream (document why) | postgres.js `sql(identifier)` — mvfm uses `$.sql.id()` because `sql` is already the tagged template |
    | **Can't model** | Fundamentally incompatible with a finite, inspectable AST | postgres.js LISTEN/NOTIFY — push-based, no request-response shape |
 
 4. **Document the assessment** in the plugin's `index.ts` header comment. Every external-service plugin must have an implementation status header and an honest assessment section. See `src/plugins/postgres/3.4.8/index.ts` and `src/plugins/stripe/2025-04-30.basil/index.ts` for the reference format.
@@ -76,9 +76,9 @@ This tells future authors (and agents) where the plugin is in its lifecycle and 
 
 Create the directory layout before writing any code. The layout differs by plugin type. Do not deviate from these structures.
 
-### Ilo-native plugins
+### Mvfm-native plugins
 
-Ilo-native plugins are unversioned. They live directly under `src/plugins/<name>/`:
+Mvfm-native plugins are unversioned. They live directly under `src/plugins/<name>/`:
 
 ```
 src/plugins/<name>/
@@ -116,7 +116,7 @@ tests/plugins/eq/
   interpreter.test.ts
 ```
 
-Not every ilo-native plugin has an interpreter yet. Some (like `bounded`, `semigroup`, `semiring`) only have `index.ts`. At minimum, create `index.ts`. Add `interpreter.ts` when the plugin has runtime behavior to implement.
+Not every mvfm-native plugin has an interpreter yet. Some (like `bounded`, `semigroup`, `semiring`) only have `index.ts`. At minimum, create `index.ts`. Add `interpreter.ts` when the plugin has runtime behavior to implement.
 
 ### External-service plugins
 
@@ -178,11 +178,11 @@ tests/plugins/stripe/2025-04-30.basil/
 | `interpreter.ts` | Exports the `InterpreterFragment` — a const (not a factory function) that maps node kinds to generator functions. Each generator yields effects or returns values. |
 | `handler.server.ts` | Server-side `StepHandler` that calls the real SDK. Runs in a trusted environment with credentials. |
 | `handler.client.ts` | Client-side `StepHandler` that serializes effects and proxies them over HTTP to the server handler. |
-| `client-<sdk>.ts` | Thin adapter that wraps the real SDK (e.g., `postgres` or `stripe`) into an internal interface the handler consumes. Isolates SDK-specific types from ilo's handler logic. |
+| `client-<sdk>.ts` | Thin adapter that wraps the real SDK (e.g., `postgres` or `stripe`) into an internal interface the handler consumes. Isolates SDK-specific types from mvfm's handler logic. |
 
 ### Versioning rules
 
-1. **Ilo-native plugins are unversioned.** They live at `src/plugins/<name>/` with no version directory. Their API is ilo's API — it evolves with the project.
+1. **Mvfm-native plugins are unversioned.** They live at `src/plugins/<name>/` with no version directory. Their API is mvfm's API — it evolves with the project.
 
 2. **External-service plugins use the upstream version as the directory name.** When postgres.js ships v3.5.0, create a new directory `src/plugins/postgres/3.5.0/` — do not patch `3.4.8/`. The filesystem is the version registry.
 
@@ -190,7 +190,7 @@ tests/plugins/stripe/2025-04-30.basil/
 
 4. **Old versions are never deleted.** A program compiled against postgres 3.4.8 must keep working. New versions are additive.
 
-5. **Cross-version imports are forbidden.** `postgres/3.5.0/` must not import from `postgres/3.4.8/`. Each version directory is self-contained. Shared logic between versions means the shared logic should be extracted into an ilo-native plugin.
+5. **Cross-version imports are forbidden.** `postgres/3.5.0/` must not import from `postgres/3.4.8/`. Each version directory is self-contained. Shared logic between versions means the shared logic should be extracted into an mvfm-native plugin.
 
 ---
 
@@ -232,7 +232,7 @@ The optional **`traits`** field registers typeclass implementations. This is how
 
 ### PluginContext methods
 
-The `PluginContext` object passed to `build()` is your only interface to the ilo runtime. These are its methods and fields:
+The `PluginContext` object passed to `build()` is your only interface to the mvfm runtime. These are its methods and fields:
 
 | Method / Field | Signature | Purpose |
 |---|---|---|
@@ -438,7 +438,7 @@ Every builder method must return `Expr<T>` where `T` accurately reflects the typ
 
 ### Config pattern: configured vs. unconfigured plugins
 
-Ilo plugins come in two shapes:
+Mvfm plugins come in two shapes:
 
 **Unconfigured plugins** need no configuration. They are exported as a `const` that IS the `PluginDefinition`:
 
@@ -464,13 +464,13 @@ export function stripe(config: StripeConfig): PluginDefinition<StripeMethods> {
 }
 ```
 
-The `ilo()` entry point accepts both forms. You compose plugins by passing them as arguments:
+The `mvfm()` entry point accepts both forms. You compose plugins by passing them as arguments:
 
 ```ts
-import { ilo, num, str } from "ilo";
-import { stripe } from "ilo/plugins/stripe/2025-04-30.basil";
+import { mvfm, num, str } from "mvfm";
+import { stripe } from "mvfm/plugins/stripe/2025-04-30.basil";
 
-const app = ilo(num, str, stripe({ apiKey: "sk_test_..." }));
+const app = mvfm(num, str, stripe({ apiKey: "sk_test_..." }));
 
 const program = app(($) => {
   const customer = $.stripe.customers.create({ email: "alice@example.com" });
@@ -479,7 +479,7 @@ const program = app(($) => {
 });
 ```
 
-Notice the difference: `num` and `str` are passed directly (they are already `PluginDefinition` values). `stripe({ apiKey: "..." })` is called first to produce a `PluginDefinition`. Both end up as the same type by the time `ilo()` sees them.
+Notice the difference: `num` and `str` are passed directly (they are already `PluginDefinition` values). `stripe({ apiKey: "..." })` is called first to produce a `PluginDefinition`. Both end up as the same type by the time `mvfm()` sees them.
 
 ---
 
@@ -959,7 +959,7 @@ export function clientHandler(options: ClientHandlerOptions): StepHandler<Client
     context: StepContext,
     state: ClientHandlerState,
   ): Promise<{ value: unknown; state: ClientHandlerState }> => {
-    const response = await fetchFn(`${baseUrl}/ilo/execute`, {
+    const response = await fetchFn(`${baseUrl}/mvfm/execute`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1089,9 +1089,9 @@ For multi-effect plugins, `serverEvaluate` delegates to an internal function (`s
 **The contract:** `serverEvaluate` always has the same signature — it takes a client and interpreter fragments, and returns `(root: ASTNode) => Promise<unknown>`. Callers do not need to know whether the plugin uses the simple or complex pattern. Usage looks the same:
 
 ```ts
-import { stripeInterpreter } from "ilo/plugins/stripe/2025-04-30.basil/interpreter";
-import { serverEvaluate } from "ilo/plugins/stripe/2025-04-30.basil/handler.server";
-import { wrapStripeSdk } from "ilo/plugins/stripe/2025-04-30.basil/client-stripe-sdk";
+import { stripeInterpreter } from "mvfm/plugins/stripe/2025-04-30.basil/interpreter";
+import { serverEvaluate } from "mvfm/plugins/stripe/2025-04-30.basil/handler.server";
+import { wrapStripeSdk } from "mvfm/plugins/stripe/2025-04-30.basil/client-stripe-sdk";
 import Stripe from "stripe";
 
 const sdk = new Stripe("sk_test_...");
@@ -1148,7 +1148,7 @@ This is deliberate. Handler composition is simple function composition — no fr
 
 ## Step 5: Traits
 
-Traits are ilo's typeclass system. They let generic plugins (like `eq`, `ord`, `show`) dispatch to the correct type-specific implementation at build time. If your plugin introduces a type that supports equality, ordering, display, or algebraic operations, you declare traits so that the generic plugins can find your implementation.
+Traits are mvfm's typeclass system. They let generic plugins (like `eq`, `ord`, `show`) dispatch to the correct type-specific implementation at build time. If your plugin introduces a type that supports equality, ordering, display, or algebraic operations, you declare traits so that the generic plugins can find your implementation.
 
 ### When to participate
 
@@ -1327,7 +1327,7 @@ When you discover a missing prelude operation while building a plugin, STOP. Cre
 
 ## Step 6: Tests
 
-Every plugin requires tests. The test strategy has three tiers, each testing a different layer of the stack. Ilo-native plugins need Tiers 1 and 2. External-service plugins need all three.
+Every plugin requires tests. The test strategy has three tiers, each testing a different layer of the stack. Mvfm-native plugins need Tiers 1 and 2. External-service plugins need all three.
 
 ### Tier 1: AST construction (`index.test.ts`)
 
@@ -1341,13 +1341,13 @@ AST construction tests verify that builder methods produce correct AST nodes. Th
 - Cross-operation dependencies (using one result as input to another) produce correct AST references
 - Orphaned side-effecting nodes are rejected (reachability validation)
 
-**Pattern:** Create the `ilo` app with your plugin, call builder methods to construct programs, then inspect the resulting AST. Use a `strip` helper to remove non-deterministic fields (`__id`, `config`) before assertions.
+**Pattern:** Create the `mvfm` app with your plugin, call builder methods to construct programs, then inspect the resulting AST. Use a `strip` helper to remove non-deterministic fields (`__id`, `config`) before assertions.
 
 From `tests/plugins/stripe/2025-04-30.basil/index.test.ts`:
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 import { stripe } from "../../../../src/plugins/stripe/2025-04-30.basil";
@@ -1358,7 +1358,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, str, stripe({ apiKey: "sk_test_123" }));
+const app = mvfm(num, str, stripe({ apiKey: "sk_test_123" }));
 
 describe("stripe: paymentIntents.create", () => {
   it("produces stripe/create_payment_intent node", () => {
@@ -1417,7 +1417,7 @@ Key things to notice:
 1. **The `strip` helper** removes `__id` (non-deterministic internal IDs) and `config` (opaque configuration) so assertions focus on structure.
 2. **Tests assert on node `kind` strings** — confirming the correct plugin/operation mapping.
 3. **Tests assert on child node types** — `core/literal` for raw values, `core/prop_access` for input references, `core/record` for object parameters.
-4. **The orphan test** verifies ilo's reachability analysis catches side-effecting nodes that are not connected to the return value via `$.do()`.
+4. **The orphan test** verifies mvfm's reachability analysis catches side-effecting nodes that are not connected to the return value via `$.do()`.
 
 ### Tier 2: Interpretation (`interpreter.test.ts`)
 
@@ -1436,14 +1436,14 @@ From `tests/plugins/stripe/2025-04-30.basil/interpreter.test.ts`:
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { foldAST, ilo } from "../../../../src/core";
+import { foldAST, mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 import { stripe } from "../../../../src/plugins/stripe/2025-04-30.basil";
 import { stripeInterpreter } from "../../../../src/plugins/stripe/2025-04-30.basil/interpreter";
 
-const app = ilo(num, str, stripe({ apiKey: "sk_test_123" }));
+const app = mvfm(num, str, stripe({ apiKey: "sk_test_123" }));
 const fragments = [stripeInterpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {
@@ -1528,7 +1528,7 @@ Key things to notice:
 
 Integration tests verify the full stack: AST construction, interpretation, handler execution, SDK adapter, and real service interaction. They test the entire pipeline end-to-end against a real (or mock) service running in a container.
 
-**When required:** Only for external-service plugins. Ilo-native plugins (num, str, eq, etc.) do not need integration tests because they have no external service to test against.
+**When required:** Only for external-service plugins. Mvfm-native plugins (num, str, eq, etc.) do not need integration tests because they have no external service to test against.
 
 **What to test:**
 - Each operation succeeds against the real service
@@ -1544,7 +1544,7 @@ From `tests/plugins/stripe/2025-04-30.basil/integration.test.ts`:
 import Stripe from "stripe";
 import { GenericContainer, type StartedTestContainer } from "testcontainers";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { numInterpreter } from "../../../../src/plugins/num/interpreter";
@@ -1559,7 +1559,7 @@ let container: StartedTestContainer;
 let sdk: Stripe;
 
 const allFragments = [stripeInterpreter, coreInterpreter, numInterpreter, strInterpreter];
-const app = ilo(num, str, stripePlugin({ apiKey: "sk_test_fake" }));
+const app = mvfm(num, str, stripePlugin({ apiKey: "sk_test_fake" }));
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   // ... same helper as Tier 2
@@ -1636,10 +1636,10 @@ Key things to notice:
 
 | Plugin type | Tier 1 (AST) | Tier 2 (Interpreter) | Tier 3 (Integration) |
 |------------|:------------:|:-------------------:|:-------------------:|
-| Ilo-native (num, str, eq, ...) | Required | Required | Not needed |
+| Mvfm-native (num, str, eq, ...) | Required | Required | Not needed |
 | External-service (stripe, postgres, ...) | Required | Required | Required |
 
-Ilo-native plugins do not talk to external services, so there is nothing to integration-test. Their Tier 2 tests are sufficient because the interpreter evaluates to final values without yielding IO effects (or yields only `recurse` effects handled by the core interpreter).
+Mvfm-native plugins do not talk to external services, so there is nothing to integration-test. Their Tier 2 tests are sufficient because the interpreter evaluates to final values without yielding IO effects (or yields only `recurse` effects handled by the core interpreter).
 
 ### Container choices for integration tests
 
@@ -1662,7 +1662,7 @@ Every plugin's `index.ts` must begin with a block comment that describes what th
 
 ```ts
 // ============================================================
-// ILO PLUGIN: <name> (<compatible API>)
+// MVFM PLUGIN: <name> (<compatible API>)
 // ============================================================
 //
 // Implementation status: COMPLETE (modulo known limitations)
@@ -1701,7 +1701,7 @@ From `src/plugins/postgres/3.4.8/index.ts`:
 
 ```ts
 // ============================================================
-// ILO PLUGIN: postgres (porsager/postgres compatible API)
+// MVFM PLUGIN: postgres (porsager/postgres compatible API)
 // ============================================================
 //
 // Implementation status: COMPLETE (modulo known limitations)
@@ -1713,7 +1713,7 @@ From `src/plugins/postgres/3.4.8/index.ts`:
 //   - No SUBSCRIBE (realtime logical replication)
 //
 // Goal: An LLM that knows postgres.js should be able to write
-// Ilo programs with near-zero learning curve. The API should
+// Mvfm programs with near-zero learning curve. The API should
 // look like the real postgres.js as closely as possible.
 //
 // Real postgres.js API:
@@ -1735,7 +1735,7 @@ From `src/plugins/stripe/2025-04-30.basil/index.ts`:
 
 ```ts
 // ============================================================
-// ILO PLUGIN: stripe (stripe-node compatible API)
+// MVFM PLUGIN: stripe (stripe-node compatible API)
 // ============================================================
 //
 // Implementation status: PARTIAL (3 of 57 top-level resources)
@@ -1770,7 +1770,7 @@ From `src/plugins/stripe/2025-04-30.basil/index.ts`:
 // ============================================================
 //
 // Goal: An LLM that knows stripe-node should be able to write
-// Ilo programs with near-zero learning curve. The API should
+// Mvfm programs with near-zero learning curve. The API should
 // look like the real stripe-node SDK as closely as possible.
 //
 // Real stripe-node API (v2025-04-30.basil):
@@ -1800,7 +1800,7 @@ Notice the differences: postgres uses `COMPLETE (modulo known limitations)` beca
 
 Every external-service plugin must end its `index.ts` with an honest assessment. This section is for the next developer or agent working on the plugin -- it tells them what works, what is awkward, and what is fundamentally hard. The format has four categories:
 
-- **WORKS GREAT** -- What maps 1:1 with the real SDK. Side-by-side comparisons of real vs. ilo code.
+- **WORKS GREAT** -- What maps 1:1 with the real SDK. Side-by-side comparisons of real vs. mvfm code.
 - **WORKS BUT DIFFERENT** -- What is modelable but requires a different API shape. Must explain why the deviation exists.
 - **DOESN'T WORK / HARD** -- Fundamental gaps. Operations that cannot be expressed as a finite AST, or that would require significant new infrastructure.
 - **SUMMARY** -- A pragmatic coverage assessment. What percentage of the upstream API is covered? What is the main gap? What is the recommended next step?
@@ -1818,7 +1818,7 @@ From the end of `src/plugins/postgres/3.4.8/index.ts`:
 //
 // 1. Basic queries:
 //    Real:  const users = await sql`select * from users where age > ${age}`
-//    Ilo: const users = $.sql`select * from users where age > ${age}`
+//    Mvfm: const users = $.sql`select * from users where age > ${age}`
 //    Nearly identical. The only diff is $ prefix and no await.
 //
 // 2. Parameterized queries with proxy values:
@@ -1828,28 +1828,28 @@ From the end of `src/plugins/postgres/3.4.8/index.ts`:
 //
 // 3. Dynamic identifiers:
 //    Real:  sql`select ${sql('name')} from ${sql('users')}`
-//    Ilo: $.sql`select ${$.sql.id('name')} from ${$.sql.id('users')}`
+//    Mvfm: $.sql`select ${$.sql.id('name')} from ${$.sql.id('users')}`
 //    Slightly more verbose but unambiguous.
 //
 // 4. Transactions (pipeline mode):
 //    Real:  sql.begin(sql => [sql`update ...`, sql`insert ...`])
-//    Ilo: $.sql.begin(sql => [sql`update ...`, sql`insert ...`])
+//    Mvfm: $.sql.begin(sql => [sql`update ...`, sql`insert ...`])
 //    Identical! Array = sequence of effects.
 //
 // 5. Insert helpers:
 //    Real:  sql`insert into users ${sql(user, 'name', 'age')}`
-//    Ilo: $.sql`insert into users ${$.sql.insert(user, ['name', 'age'])}`
+//    Mvfm: $.sql`insert into users ${$.sql.insert(user, ['name', 'age'])}`
 //    Slightly different call style but same semantics.
 //
 // WORKS BUT DIFFERENT:
 //
 // 6. Destructuring results:
 //    Real:  const [user] = await sql`select ... limit 1`
-//    Ilo: const user = $.sql`select ... limit 1`[0]
+//    Mvfm: const user = $.sql`select ... limit 1`[0]
 //    Can't destructure proxies. [0] index access works though.
 //
 // 7. Transactions (callback mode with dependencies):
-//    Ilo requires $.do() to sequence side effects. No destructuring.
+//    Mvfm requires $.do() to sequence side effects. No destructuring.
 //
 // DOESN'T WORK / HARD:
 //
@@ -1858,7 +1858,7 @@ From the end of `src/plugins/postgres/3.4.8/index.ts`:
 //
 // 9. Async/await ordering:
 //    The fundamental mismatch: real postgres.js uses await for
-//    sequencing. Ilo uses proxy chains + $.do(). For pure data
+//    sequencing. Mvfm uses proxy chains + $.do(). For pure data
 //    dependencies this is seamless. For "do A then B" without
 //    data dependency, you need $.do() or array pipeline syntax.
 //
@@ -1883,7 +1883,7 @@ From the end of `src/plugins/stripe/2025-04-30.basil/index.ts`:
 //
 // 1. Basic CRUD operations:
 //    Real:  const pi = await stripe.paymentIntents.create({ amount: 2000, currency: 'usd' })
-//    Ilo:   const pi = $.stripe.paymentIntents.create({ amount: 2000, currency: 'usd' })
+//    Mvfm:   const pi = $.stripe.paymentIntents.create({ amount: 2000, currency: 'usd' })
 //    Nearly identical. Only difference is $ prefix and no await.
 //
 // 2. Parameterized operations with proxy values:
@@ -1893,14 +1893,14 @@ From the end of `src/plugins/stripe/2025-04-30.basil/index.ts`:
 //
 // 3. Resource method naming:
 //    Real:  stripe.paymentIntents.create(...)
-//    Ilo:   $.stripe.paymentIntents.create(...)
+//    Mvfm:   $.stripe.paymentIntents.create(...)
 //    The nested resource pattern maps 1:1.
 //
 // WORKS BUT DIFFERENT:
 //
 // 5. Return types:
 //    Real stripe-node has 100+ typed response interfaces.
-//    Ilo uses Record<string, unknown> for all return types.
+//    Mvfm uses Record<string, unknown> for all return types.
 //    Property access works via proxy but no autocomplete.
 //
 // DOESN'T WORK / NOT MODELED:
@@ -1983,7 +1983,7 @@ export interface PostgresMethods {
    * Real postgres.js:
    *   const users = await sql`select * from users where age > ${age}`
    *
-   * Ilo:
+   * Mvfm:
    *   const users = $.sql`select * from users where age > ${age}`
    *
    * Returns `Expr<Row[]>` -- an array of result rows.
@@ -2032,9 +2032,9 @@ If your plugin needs configuration, export a factory function: `export function 
 
 If an operation could be useful to more than one plugin, it MUST be its own plugin. Equality goes in `eq`, ordering goes in `ord`, null handling goes in `nullable`, string conversion goes in `show`. When you discover a missing prelude operation while building a plugin, STOP. Create an issue for the prelude plugin. Build it. Then resume.
 
-**9. Three test tiers for external-service plugins, two for ilo-native.**
+**9. Three test tiers for external-service plugins, two for mvfm-native.**
 
-External-service plugins require Tier 1 (AST construction), Tier 2 (interpretation with mock handlers), and Tier 3 (integration against real/mock containers). Ilo-native plugins require Tier 1 and Tier 2. No exceptions. See Step 6 for details.
+External-service plugins require Tier 1 (AST construction), Tier 2 (interpretation with mock handlers), and Tier 3 (integration against real/mock containers). Mvfm-native plugins require Tier 1 and Tier 2. No exceptions. See Step 6 for details.
 
 **10. Every public export gets TSDoc.**
 

@@ -6,7 +6,7 @@
 
 **Architecture:** External-service plugin at `src/plugins/twilio/5.5.1/` following the Stripe plugin pattern. Configured factory function, uniform `twilio/api_call` effect, 6 node kinds (create/fetch/list for Messages and Calls). All REST request-response, no scoping. **Key ergonomic difference from Stripe:** Twilio SDK uses `client.messages(sid).fetch()` callable pattern, not flat `messages.fetch(sid)`. We match this exactly using `Object.assign` to make `$.twilio.messages` both callable and have `.create()`/`.list()` properties.
 
-**Tech Stack:** TypeScript, vitest, ilo core (`Expr`, `PluginContext`, `PluginDefinition`, `InterpreterFragment`, `StepHandler`, `foldAST`, `runAST`)
+**Tech Stack:** TypeScript, vitest, mvfm core (`Expr`, `PluginContext`, `PluginDefinition`, `InterpreterFragment`, `StepHandler`, `foldAST`, `runAST`)
 
 **Design doc:** `docs/plans/2026-02-13-twilio-plugin-design.md`
 
@@ -43,7 +43,7 @@ Create `tests/plugins/twilio/5.5.1/index.test.ts`:
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 import { twilio } from "../../../../src/plugins/twilio/5.5.1";
@@ -54,7 +54,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, str, twilio({ accountSid: "AC_test_123", authToken: "auth_test_456" }));
+const app = mvfm(num, str, twilio({ accountSid: "AC_test_123", authToken: "auth_test_456" }));
 
 // ============================================================
 // Messages
@@ -246,7 +246,7 @@ Create `src/plugins/twilio/5.5.1/index.ts`:
 
 ```ts
 // ============================================================
-// ILO PLUGIN: twilio (twilio-node compatible API)
+// MVFM PLUGIN: twilio (twilio-node compatible API)
 // ============================================================
 //
 // Implementation status: PARTIAL (2 of 30+ service domains)
@@ -277,7 +277,7 @@ Create `src/plugins/twilio/5.5.1/index.ts`:
 // ============================================================
 //
 // Goal: An LLM that knows twilio-node should be able to write
-// Ilo programs with near-zero learning curve. The API should
+// Mvfm programs with near-zero learning curve. The API should
 // look like the real twilio-node SDK as closely as possible.
 //
 // Real twilio-node API (v5.5.1):
@@ -487,7 +487,7 @@ export function twilio(config: TwilioConfig): PluginDefinition<TwilioMethods> {
 //
 // 1. Basic CRUD operations:
 //    Real:  const msg = await client.messages.create({ to: '+1...', from: '+1...', body: 'Hello' })
-//    Ilo:   const msg = $.twilio.messages.create({ to: '+1...', from: '+1...', body: 'Hello' })
+//    Mvfm:   const msg = $.twilio.messages.create({ to: '+1...', from: '+1...', body: 'Hello' })
 //    Nearly identical. Only difference is $ prefix and no await.
 //
 // 2. Parameterized operations with proxy values:
@@ -496,21 +496,21 @@ export function twilio(config: TwilioConfig): PluginDefinition<TwilioMethods> {
 //
 // 3. Resource method naming:
 //    Real:  client.messages.create(...)
-//    Ilo:   $.twilio.messages.create(...)
+//    Mvfm:   $.twilio.messages.create(...)
 //    The nested resource pattern maps 1:1.
 //
 // WORKS GREAT (cont.):
 //
 // 4. Fetch by SID:
 //    Real:  client.messages('SM123').fetch()
-//    Ilo:   $.twilio.messages('SM123').fetch()
+//    Mvfm:   $.twilio.messages('SM123').fetch()
 //    1:1 match. Uses Object.assign to make messages both callable
 //    and have .create()/.list() properties, just like twilio-node.
 //
 // 5. Return types:
 //    Real twilio-node has typed response classes (MessageInstance,
 //    CallInstance, etc.) with properties like .sid, .status, .body.
-//    Ilo uses Record<string, unknown> for all return types.
+//    Mvfm uses Record<string, unknown> for all return types.
 //    Property access still works via proxy (msg.sid, call.status),
 //    but no IDE autocomplete for Twilio-specific fields.
 //
@@ -518,7 +518,7 @@ export function twilio(config: TwilioConfig): PluginDefinition<TwilioMethods> {
 //
 // 6. Auto-pagination:
 //    Real:  client.messages.each({ pageSize: 20 }, (msg) => { ... })
-//    Ilo:   Can't model async iterators/callbacks.
+//    Mvfm:   Can't model async iterators/callbacks.
 //
 // 7. Webhooks / status callbacks:
 //    Server-initiated push events, not request/response.
@@ -555,14 +555,14 @@ Create `tests/plugins/twilio/5.5.1/interpreter.test.ts`:
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { foldAST, ilo } from "../../../../src/core";
+import { foldAST, mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 import { twilio } from "../../../../src/plugins/twilio/5.5.1";
 import { twilioInterpreter } from "../../../../src/plugins/twilio/5.5.1/interpreter";
 
-const app = ilo(num, str, twilio({ accountSid: "AC_test_123", authToken: "auth_test_456" }));
+const app = mvfm(num, str, twilio({ accountSid: "AC_test_123", authToken: "auth_test_456" }));
 const fragments = [twilioInterpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {
@@ -990,7 +990,7 @@ export interface ClientHandlerState {
  * Creates a client-side {@link StepHandler} that sends effects as JSON
  * to a remote server endpoint for execution.
  *
- * Each effect is sent as a POST request to `{baseUrl}/ilo/execute` with
+ * Each effect is sent as a POST request to `{baseUrl}/mvfm/execute` with
  * the contract hash, step index, path, and effect payload. The server
  * is expected to return `{ result: unknown }` in the response body.
  *
@@ -1006,7 +1006,7 @@ export function clientHandler(options: ClientHandlerOptions): StepHandler<Client
     context: StepContext,
     state: ClientHandlerState,
   ): Promise<{ value: unknown; state: ClientHandlerState }> => {
-    const response = await fetchFn(`${baseUrl}/ilo/execute`, {
+    const response = await fetchFn(`${baseUrl}/mvfm/execute`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1203,7 +1203,7 @@ Create `tests/plugins/twilio/5.5.1/integration.test.ts`:
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { numInterpreter } from "../../../../src/plugins/num/interpreter";
@@ -1227,7 +1227,7 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 
 const allFragments = [twilioInterpreter, coreInterpreter, numInterpreter, strInterpreter];
 
-const app = ilo(
+const app = mvfm(
   num,
   str,
   twilioPlugin({ accountSid: "AC_test_123", authToken: "auth_test_456" }),

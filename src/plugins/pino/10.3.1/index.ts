@@ -1,5 +1,5 @@
 // ============================================================
-// ILO PLUGIN: pino (structured logging)
+// MVFM PLUGIN: pino (structured logging)
 // ============================================================
 //
 // Implementation status: FULL (all core logging operations)
@@ -20,7 +20,7 @@
 //
 // ============================================================
 //
-// Goal: An LLM that knows pino should be able to write Ilo
+// Goal: An LLM that knows pino should be able to write Mvfm
 // programs with near-zero learning curve. The API mirrors
 // the real pino logger interface.
 //

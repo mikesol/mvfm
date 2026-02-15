@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { foldAST, ilo } from "../../../../src/core";
+import { foldAST, mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { openai } from "../../../../src/plugins/openai/6.21.0";
 import { openaiInterpreter } from "../../../../src/plugins/openai/6.21.0/interpreter";
 import { str } from "../../../../src/plugins/str";
 
-const app = ilo(num, str, openai({ apiKey: "sk-test-123" }));
+const app = mvfm(num, str, openai({ apiKey: "sk-test-123" }));
 const fragments = [openaiInterpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {

@@ -10,20 +10,20 @@
 
 Analyzed ioredis 5.4.1 source at `lib/utils/RedisCommander.ts`. Key findings:
 
-- Every command has callback overloads (irrelevant for Ilo AST)
-- Every string command has `*Buffer` variants (irrelevant — Ilo doesn't model binary)
+- Every command has callback overloads (irrelevant for Mvfm AST)
+- Every string command has `*Buffer` variants (irrelevant — Mvfm doesn't model binary)
 - SET has 100+ overloads for positional string tokens (EX, PX, NX, XX, KEEPTTL, GET)
 - Variadic commands (DEL, MGET, LPUSH, etc.) accept both spread and array forms
 - Class hierarchy: `Redis extends Commander` with `RedisCommander<Context>` mixin
 
 ## Documented Deviations
 
-| ioredis API | Ilo API | Rationale |
+| ioredis API | Mvfm API | Rationale |
 |---|---|---|
 | `mset(k1, v1, k2, v2)` | `mset({ k1: v1, k2: v2 })` | Object-only form for clean AST serialization (object form IS valid ioredis) |
 | `hset(key, f1, v1, f2, v2)` | `hset(key, { f1: v1, f2: v2 })` | Same as MSET (object form IS valid ioredis) |
 | `getBuffer()`, `hgetallBuffer()`, etc. | Not modeled | Buffer variants are runtime concerns, not AST-level |
-| Callback overloads | Not modeled | Ilo is AST-based, returns `Expr<T>` |
+| Callback overloads | Not modeled | Mvfm is AST-based, returns `Expr<T>` |
 
 **SET matches ioredis exactly** — uses positional string tokens (`"EX"`, `"PX"`, `"NX"`, `"XX"`, `"KEEPTTL"`, `"GET"`) so LLMs trained on ioredis produce correct code with zero adaptation.
 
@@ -125,7 +125,7 @@ export interface RedisClient {
 ## Handler
 
 - **Server handler**: Receives `redis/command` effects, dispatches to `RedisClient.command()`
-- **Client handler**: HTTP proxy to `{baseUrl}/ilo/execute` (same pattern as postgres/stripe)
+- **Client handler**: HTTP proxy to `{baseUrl}/mvfm/execute` (same pattern as postgres/stripe)
 - **SDK adapter** (`client-ioredis.ts`): Wraps ioredis instance via `redis.call(command, ...args)`
 
 ## File Structure

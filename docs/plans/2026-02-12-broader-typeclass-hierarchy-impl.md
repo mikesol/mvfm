@@ -2,13 +2,13 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Port PureScript prelude typeclasses (Eq update, Ord, Semiring, HeytingAlgebra) into ilo's trait dispatch system.
+**Goal:** Port PureScript prelude typeclasses (Eq update, Ord, Semiring, HeytingAlgebra) into mvfm's trait dispatch system.
 
 **Architecture:** Data plugins (num, boolean, str) register trait primitives. Trait plugins (eq, ord, semiring, heytingAlgebra) discover implementations and expose user-facing methods. Derived operations (gt/gte/lt/lte from compare, neq from eq) live in the trait plugins as wrapper nodes.
 
 **Tech Stack:** TypeScript, Vitest, Biome
 
-**Working directory:** `/home/mikesol/Documents/GitHub/ilo/ilo/.worktrees/issue-20`
+**Working directory:** `/home/mikesol/Documents/GitHub/mvfm/mvfm/.worktrees/issue-20`
 
 ---
 
@@ -723,7 +723,7 @@ export type {
   Program,
   TraitImpl,
 } from "./core";
-export { composeInterpreters, ilo } from "./core";
+export { composeInterpreters, mvfm } from "./core";
 export { coreInterpreter } from "./interpreters/core";
 export type { BooleanMethods } from "./plugins/boolean";
 export { boolean } from "./plugins/boolean";
@@ -798,22 +798,22 @@ All existing tests that use `$.add`, `$.mul`, `$.gt`, `$.gte`, `$.lt`, `$.lte`, 
 
 Key changes:
 - Add `import { semiring } from "../src/plugins/semiring"` and `import { ord } from "../src/plugins/ord"` and `import { heytingAlgebra } from "../src/plugins/heyting-algebra"`
-- Change `ilo(num)` to `ilo(num, semiring)` wherever `$.add` or `$.mul` is used
-- Change `ilo(num, eq)` to `ilo(num, semiring, eq)` wherever `$.add` is used alongside eq
-- Change `ilo(num, boolean, eq)` to `ilo(num, boolean, eq, heytingAlgebra)` where `$.and`/`$.or` is used
+- Change `mvfm(num)` to `mvfm(num, semiring)` wherever `$.add` or `$.mul` is used
+- Change `mvfm(num, eq)` to `mvfm(num, semiring, eq)` wherever `$.add` is used alongside eq
+- Change `mvfm(num, boolean, eq)` to `mvfm(num, boolean, eq, heytingAlgebra)` where `$.and`/`$.or` is used
 - Update trait protocol test (line 302-313): change `nodeKind` to `nodeKinds: { eq: "test/eq" }` and update assertion
 
 **Step 2: Update tests/rec.test.ts**
 
 Key changes:
 - Add `import { semiring } from "../src/plugins/semiring"`
-- Change `ilo(num, eq)` to `ilo(num, eq, semiring)`
+- Change `mvfm(num, eq)` to `mvfm(num, eq, semiring)`
 
 **Step 3: Update tests/composition.test.ts**
 
 Key changes:
 - Add imports for `ord`, `semiring`
-- Change `ilo(num, str, postgres(...), fiber, error)` to `ilo(num, str, ord, semiring, postgres(...), fiber, error)`
+- Change `mvfm(num, str, postgres(...), fiber, error)` to `mvfm(num, str, ord, semiring, postgres(...), fiber, error)`
 - Lines referencing `$.gt` now produce `ord/gt` wrapping `num/compare` instead of `num/gt` — update assertions:
   - `$.gt(...)` now produces `{ kind: "ord/gt", operand: { kind: "num/compare", left, right } }`
   - The error/guard tests check `$.gt(...)` structure — update expected node kinds
@@ -831,7 +831,7 @@ Key changes:
 
 Key changes:
 - Add `import { semiring } from "../../../src/plugins/semiring"` and `import { ord } from "../../../src/plugins/ord"` and `import { ordInterpreter } from "../../../src/plugins/ord/interpreter"`
-- Change `ilo(num)` to `ilo(num, semiring, ord)`
+- Change `mvfm(num)` to `mvfm(num, semiring, ord)`
 - Add `ordInterpreter` to the interpreter fragments for comparison tests
 - Comparison tests now go through ord wrapper — the end-to-end results should be the same
 
@@ -839,14 +839,14 @@ Key changes:
 
 Key changes:
 - Add `import { heytingAlgebra } from "../../../src/plugins/heyting-algebra"`
-- Change `ilo(num, boolean, eq)` to `ilo(num, boolean, eq, heytingAlgebra)`
+- Change `mvfm(num, boolean, eq)` to `mvfm(num, boolean, eq, heytingAlgebra)`
 - Update trait declaration test: check new `nodeKinds` format
 
 **Step 7: Update tests/plugins/eq/index.test.ts**
 
 Key changes:
 - Add `import { semiring } from "../../../src/plugins/semiring"`
-- Line 24 uses `$.add(1, 2)` — change `ilo(num, eq)` to `ilo(num, semiring, eq)` for that describe block
+- Line 24 uses `$.add(1, 2)` — change `mvfm(num, eq)` to `mvfm(num, semiring, eq)` for that describe block
 - Update assertion on eq dispatch for numExpr: `$.add(1, 2)` still produces a `num/add` node, dispatches to `num/eq` — should still work
 
 **Step 8: Update tests/plugins/eq/interpreter.test.ts**
@@ -885,7 +885,7 @@ git commit -m "test: update existing tests for trait-dispatched operations"
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../src/core";
+import { mvfm } from "../../../src/core";
 import { num } from "../../../src/plugins/num";
 import { ord } from "../../../src/plugins/ord";
 
@@ -894,7 +894,7 @@ function strip(ast: unknown): unknown {
 }
 
 describe("ord: compare dispatch", () => {
-  const app = ilo(num, ord);
+  const app = mvfm(num, ord);
 
   it("$.compare(literal, literal) dispatches to num/compare", () => {
     const prog = app(($) => $.compare(1, 2));
@@ -912,7 +912,7 @@ describe("ord: compare dispatch", () => {
 });
 
 describe("ord: derived operations wrap compare", () => {
-  const app = ilo(num, ord);
+  const app = mvfm(num, ord);
 
   it.each([
     ["gt", "ord/gt"],
@@ -938,7 +938,7 @@ describe("ord: derived operations wrap compare", () => {
 
 describe("ord: error cases", () => {
   it("throws when no ord impl for inferred type", () => {
-    const app = ilo(ord);
+    const app = mvfm(ord);
     expect(() => app(($) => $.gt(1, 2))).toThrow(/No ord implementation for type/);
   });
 });
@@ -950,7 +950,7 @@ describe("ord: error cases", () => {
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { composeInterpreters, ilo } from "../../../src/core";
+import { composeInterpreters, mvfm } from "../../../src/core";
 import { coreInterpreter } from "../../../src/interpreters/core";
 import { num } from "../../../src/plugins/num";
 import { numInterpreter } from "../../../src/plugins/num/interpreter";
@@ -974,7 +974,7 @@ function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   return interp(ast.result);
 }
 
-const app = ilo(num, ord);
+const app = mvfm(num, ord);
 
 describe("ord interpreter: compare", () => {
   it("compare(3, 5) → -1", () => expect(run(app(($) => $.compare(3, 5)))).toBe(-1));
@@ -1009,7 +1009,7 @@ describe("ord interpreter: with input", () => {
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../src/core";
+import { mvfm } from "../../../src/core";
 import { num } from "../../../src/plugins/num";
 import { semiring } from "../../../src/plugins/semiring";
 
@@ -1018,7 +1018,7 @@ function strip(ast: unknown): unknown {
 }
 
 describe("semiring: dispatch to num", () => {
-  const app = ilo(num, semiring);
+  const app = mvfm(num, semiring);
 
   it("$.add(literal, literal) dispatches to num/add", () => {
     const prog = app(($) => $.add(1, 2));
@@ -1050,7 +1050,7 @@ describe("semiring: dispatch to num", () => {
 
 describe("semiring: error cases", () => {
   it("throws when no semiring impl for inferred type", () => {
-    const app = ilo(semiring);
+    const app = mvfm(semiring);
     expect(() => app(($) => $.add(1, 2))).toThrow(/No semiring implementation for type/);
   });
 });
@@ -1062,7 +1062,7 @@ describe("semiring: error cases", () => {
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { composeInterpreters, ilo } from "../../../src/core";
+import { composeInterpreters, mvfm } from "../../../src/core";
 import { coreInterpreter } from "../../../src/interpreters/core";
 import { num } from "../../../src/plugins/num";
 import { numInterpreter } from "../../../src/plugins/num/interpreter";
@@ -1085,7 +1085,7 @@ function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   return interp(ast.result);
 }
 
-const app = ilo(num, semiring);
+const app = mvfm(num, semiring);
 
 describe("semiring interpreter: arithmetic", () => {
   it("add", () => expect(run(app(($) => $.add(3, 4)))).toBe(7));
@@ -1106,7 +1106,7 @@ describe("semiring interpreter: with input", () => {
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../src/core";
+import { mvfm } from "../../../src/core";
 import { boolean } from "../../../src/plugins/boolean";
 import { eq } from "../../../src/plugins/eq";
 import { heytingAlgebra } from "../../../src/plugins/heyting-algebra";
@@ -1116,7 +1116,7 @@ function strip(ast: unknown): unknown {
   return JSON.parse(JSON.stringify(ast, (k, v) => (k === "__id" ? undefined : v)));
 }
 
-const app = ilo(num, boolean, eq, heytingAlgebra);
+const app = mvfm(num, boolean, eq, heytingAlgebra);
 
 describe("heytingAlgebra: $.and()", () => {
   it("produces boolean/and", () => {
@@ -1166,7 +1166,7 @@ describe("heytingAlgebra: trait declaration", () => {
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { composeInterpreters, ilo } from "../../../src/core";
+import { composeInterpreters, mvfm } from "../../../src/core";
 import { coreInterpreter } from "../../../src/interpreters/core";
 import { boolean } from "../../../src/plugins/boolean";
 import { booleanInterpreter } from "../../../src/plugins/boolean/interpreter";
@@ -1192,7 +1192,7 @@ function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   return interp(ast.result);
 }
 
-const app = ilo(num, boolean, eq, heytingAlgebra);
+const app = mvfm(num, boolean, eq, heytingAlgebra);
 
 describe("heytingAlgebra interpreter", () => {
   it("and true", () => {
@@ -1235,7 +1235,7 @@ Append to `tests/plugins/eq/index.test.ts`:
 // Add to existing file:
 
 describe("eq: neq dispatch", () => {
-  const app = ilo(num, eq);
+  const app = mvfm(num, eq);
 
   it("$.neq(literal, literal) wraps num/eq in eq/neq", () => {
     const prog = app(($) => $.neq(1, 2));
@@ -1254,7 +1254,7 @@ Append to `tests/plugins/eq/interpreter.test.ts`:
 // Add eqInterpreter import and to fragments array, then add:
 
 describe("eq interpretation: neq", () => {
-  const app = ilo(num, eq);
+  const app = mvfm(num, eq);
 
   it("neq(1, 2) → true", () => {
     const prog = app(($) => $.neq(1, 2));

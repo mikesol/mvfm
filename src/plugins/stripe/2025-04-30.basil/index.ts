@@ -1,5 +1,5 @@
 // ============================================================
-// ILO PLUGIN: stripe (stripe-node compatible API)
+// MVFM PLUGIN: stripe (stripe-node compatible API)
 // ============================================================
 //
 // Implementation status: PARTIAL (3 of 57 top-level resources)
@@ -34,7 +34,7 @@
 // ============================================================
 //
 // Goal: An LLM that knows stripe-node should be able to write
-// Ilo programs with near-zero learning curve. The API should
+// Mvfm programs with near-zero learning curve. The API should
 // look like the real stripe-node SDK as closely as possible.
 //
 // Real stripe-node API (v2025-04-30.basil):
@@ -274,7 +274,7 @@ export function stripe(config: StripeConfig): PluginDefinition<StripeMethods> {
 //
 // 1. Basic CRUD operations:
 //    Real:  const pi = await stripe.paymentIntents.create({ amount: 2000, currency: 'usd' })
-//    Ilo:   const pi = $.stripe.paymentIntents.create({ amount: 2000, currency: 'usd' })
+//    Mvfm:   const pi = $.stripe.paymentIntents.create({ amount: 2000, currency: 'usd' })
 //    Nearly identical. Only difference is $ prefix and no await.
 //
 // 2. Parameterized operations with proxy values:
@@ -284,13 +284,13 @@ export function stripe(config: StripeConfig): PluginDefinition<StripeMethods> {
 //
 // 3. Resource method naming:
 //    Real:  stripe.paymentIntents.create(...)
-//    Ilo:   $.stripe.paymentIntents.create(...)
+//    Mvfm:   $.stripe.paymentIntents.create(...)
 //    The nested resource pattern maps 1:1. An LLM that knows
-//    stripe-node can write Ilo Stripe programs immediately.
+//    stripe-node can write Mvfm Stripe programs immediately.
 //
 // 4. Optional params:
 //    Real:  await stripe.paymentIntents.confirm('pi_123')
-//    Ilo:   $.stripe.paymentIntents.confirm('pi_123')
+//    Mvfm:   $.stripe.paymentIntents.confirm('pi_123')
 //    Both work. The AST stores null for omitted optional params.
 //
 // WORKS BUT DIFFERENT:
@@ -298,7 +298,7 @@ export function stripe(config: StripeConfig): PluginDefinition<StripeMethods> {
 // 5. Return types:
 //    Real stripe-node has 100+ field response types (PaymentIntent,
 //    Customer, Charge, etc.) with precise type definitions.
-//    Ilo uses Record<string, unknown> for all return types.
+//    Mvfm uses Record<string, unknown> for all return types.
 //    Property access still works via proxy (customer.id, pi.status),
 //    but there's no IDE autocomplete for Stripe-specific fields.
 //    A future enhancement could add typed response interfaces.
@@ -306,7 +306,7 @@ export function stripe(config: StripeConfig): PluginDefinition<StripeMethods> {
 // 6. Sequencing side effects:
 //    Real:  await stripe.customers.create(...)
 //           await stripe.paymentIntents.create(...)
-//    Ilo:   const c = $.stripe.customers.create(...)
+//    Mvfm:   const c = $.stripe.customers.create(...)
 //           const pi = $.stripe.paymentIntents.create({ customer: c.id })
 //           return $.do(c, pi)
 //    Must use $.do() for sequencing when there are data dependencies.
@@ -316,25 +316,25 @@ export function stripe(config: StripeConfig): PluginDefinition<StripeMethods> {
 //
 // 7. Pagination (auto-pagination):
 //    Real:  for await (const customer of stripe.customers.list()) { ... }
-//    Ilo:   Can't model async iterators. $.stripe.customers.list()
+//    Mvfm:   Can't model async iterators. $.stripe.customers.list()
 //           returns the first page. For full pagination, you'd need
 //           $.rec() with has_more / starting_after logic.
 //
 // 8. Webhooks:
 //    Real:  stripe.webhooks.constructEvent(body, sig, secret)
-//    Ilo:   Not modeled. Webhooks are server-initiated push events,
+//    Mvfm:   Not modeled. Webhooks are server-initiated push events,
 //           not request/response operations. They belong in the
 //           interpreter/runtime layer, not in the AST.
 //
 // 9. Idempotency keys, request options:
 //    Real:  stripe.paymentIntents.create({...}, { idempotencyKey: '...' })
-//    Ilo:   Not modeled yet. stripe-node accepts a second RequestOptions
+//    Mvfm:   Not modeled yet. stripe-node accepts a second RequestOptions
 //           argument on every method. This could be added as an optional
 //           second/third parameter that becomes an AST field.
 //
 // 10. Error handling:
 //    Real:  try { await stripe.charges.create(...) } catch (e) { if (e.type === 'card_error') ... }
-//    Ilo:   $.try($.stripe.charges.create(...)).catch(err => fallback)
+//    Mvfm:   $.try($.stripe.charges.create(...)).catch(err => fallback)
 //    Works via the error plugin. Stripe-specific error types
 //    (CardError, InvalidRequestError, etc.) would need interpreter
 //    support to map correctly.

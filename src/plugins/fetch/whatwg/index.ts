@@ -1,5 +1,5 @@
 // ============================================================
-// ILO PLUGIN: fetch (WHATWG Fetch Standard)
+// MVFM PLUGIN: fetch (WHATWG Fetch Standard)
 // ============================================================
 //
 // Implementation status: COMPLETE (5 of 5 core operations)
@@ -17,7 +17,7 @@
 //     no request-response shape
 //   - AbortController/signal — runtime lifecycle management,
 //     not representable in static AST
-//   - Method syntax on response (response.json()) — ilo uses
+//   - Method syntax on response (response.json()) — mvfm uses
 //     $.fetch.json(response) because AST proxies can't model
 //     method calls on opaque handler-returned values
 //
@@ -33,7 +33,7 @@
 // ============================================================
 //
 // Goal: An LLM that knows the Fetch API should be able to
-// write Ilo programs with near-zero learning curve. The API
+// write Mvfm programs with near-zero learning curve. The API
 // mirrors globalThis.fetch() as closely as possible.
 //
 // Real Fetch API:
@@ -43,7 +43,7 @@
 //   const status = response.status
 //   const headers = response.headers
 //
-// Ilo fetch plugin:
+// Mvfm fetch plugin:
 //   const response = $.fetch('https://api.example.com/data')
 //   const data = $.fetch.json(response)
 //   const text = $.fetch.text(response)
@@ -213,22 +213,22 @@ export function fetch(config?: FetchConfig): PluginDefinition<FetchMethods> {
 //
 // 1. Basic GET request:
 //    Real:  const response = await fetch('https://api.example.com/data')
-//    Ilo:   const response = $.fetch('https://api.example.com/data')
+//    Mvfm:   const response = $.fetch('https://api.example.com/data')
 //    Nearly identical. Only difference is $ prefix and no await.
 //
 // 2. POST with body:
 //    Real:  const response = await fetch(url, { method: 'POST', body: JSON.stringify(data) })
-//    Ilo:   const response = $.fetch(url, { method: 'POST', body: JSON.stringify(data) })
+//    Mvfm:   const response = $.fetch(url, { method: 'POST', body: JSON.stringify(data) })
 //    Same pattern, same options object.
 //
 // 3. Custom headers:
 //    Real:  await fetch(url, { headers: { 'Authorization': 'Bearer ...' } })
-//    Ilo:   $.fetch(url, { headers: { 'Authorization': 'Bearer ...' } })
+//    Mvfm:   $.fetch(url, { headers: { 'Authorization': 'Bearer ...' } })
 //    1:1 mapping.
 //
 // 4. Response parsing:
 //    Real:  const data = await response.json()
-//    Ilo:   const data = $.fetch.json(response)
+//    Mvfm:   const data = $.fetch.json(response)
 //    Different syntax (method on $.fetch vs method on response)
 //    but semantically identical.
 //
@@ -243,23 +243,23 @@ export function fetch(config?: FetchConfig): PluginDefinition<FetchMethods> {
 //
 // 6. Response method syntax:
 //    Real:  response.json()
-//    Ilo:   $.fetch.json(response)
-//    Necessary deviation — ilo proxies can't add methods to
-//    opaque handler-returned values. The response object in ilo
+//    Mvfm:   $.fetch.json(response)
+//    Necessary deviation — mvfm proxies can't add methods to
+//    opaque handler-returned values. The response object in mvfm
 //    is an Expr wrapping the fetch/request AST node, not the
 //    real Response object.
 //
 // 7. Response metadata:
 //    Real:  response.status (property access)
-//    Ilo:   $.fetch.status(response) (function call)
-//    Same deviation — ilo models this as a function call that
+//    Mvfm:   $.fetch.status(response) (function call)
+//    Same deviation — mvfm models this as a function call that
 //    produces a new AST node, not property access on the response.
 //
 // DOESN'T WORK / NOT MODELED:
 //
 // 8. Streaming (response.body):
 //    Real:  const reader = response.body.getReader()
-//    Ilo:   Not modeled. ReadableStream is push-based with no
+//    Mvfm:   Not modeled. ReadableStream is push-based with no
 //           request-response shape. Would need a cursor-like
 //           pattern (see postgres cursor) to model.
 //
@@ -267,12 +267,12 @@ export function fetch(config?: FetchConfig): PluginDefinition<FetchMethods> {
 //    Real:  const controller = new AbortController()
 //           fetch(url, { signal: controller.signal })
 //           controller.abort()
-//    Ilo:   Not modeled. Runtime lifecycle management (start,
+//    Mvfm:   Not modeled. Runtime lifecycle management (start,
 //           cancel) is not representable in a static AST.
 //
 // 10. Error handling:
 //    Real:  try { await fetch(url) } catch (e) { ... }
-//    Ilo:   $.attempt($.fetch(url)) via the error plugin.
+//    Mvfm:   $.attempt($.fetch(url)) via the error plugin.
 //           Network errors become { ok: null, err: ... }.
 //           HTTP error statuses (404, 500) do NOT throw in real
 //           fetch — they return a Response with ok=false. Same

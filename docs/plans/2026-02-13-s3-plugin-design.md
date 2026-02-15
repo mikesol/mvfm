@@ -26,7 +26,7 @@ The SDK uses a Smithy-generated command pattern:
 | Category | Operations | Count |
 |----------|-----------|-------|
 | **Maps cleanly** | All object CRUD (PutObject, GetObject, DeleteObject, HeadObject, CopyObject, DeleteObjects, RenameObject), listing (ListObjectsV2, ListBuckets), all bucket config commands | ~100 |
-| **Needs deviation** | GetObject Body — real SDK returns streaming Body; ilo handler converts to string/buffer before returning | 1 |
+| **Needs deviation** | GetObject Body — real SDK returns streaming Body; mvfm handler converts to string/buffer before returning | 1 |
 | **Can't model** | SelectObjectContent (event stream output), multipart upload as a workflow (stateful multi-step) | 2 |
 
 ### Plugin Sizing
@@ -46,15 +46,15 @@ S3 is pure request-response. Every operation sends a command input and gets a co
 
 ### API shape mirrors the aggregated S3 client
 
-The ilo API uses the same method names and parameter shapes as the high-level `S3` class:
+The mvfm API uses the same method names and parameter shapes as the high-level `S3` class:
 
 ```ts
 // Real SDK
 const s3 = new S3({ region: "us-east-1" });
 await s3.putObject({ Bucket: "my-bucket", Key: "file.txt", Body: "hello" });
 
-// Ilo
-const app = ilo(num, str, s3({ region: "us-east-1" }));
+// Mvfm
+const app = mvfm(num, str, s3({ region: "us-east-1" }));
 app(($) => $.s3.putObject({ Bucket: "my-bucket", Key: "file.txt", Body: "hello" }));
 ```
 
@@ -75,7 +75,7 @@ export interface S3Config {
 }
 ```
 
-Config is baked into every AST node (standard ilo pattern).
+Config is baked into every AST node (standard mvfm pattern).
 
 ### Version directory
 
@@ -83,7 +83,7 @@ Config is baked into every AST node (standard ilo pattern).
 
 ### GetObject Body handling
 
-The real SDK returns `Body` as a `ReadableStream`/`Readable`. The ilo handler will call `response.Body.transformToString()` (or `transformToByteArray()` for binary) before returning. The AST result contains the body content directly. This is a deviation but unavoidable — AST results must be serializable.
+The real SDK returns `Body` as a `ReadableStream`/`Readable`. The mvfm handler will call `response.Body.transformToString()` (or `transformToByteArray()` for binary) before returning. The AST result contains the body content directly. This is a deviation but unavoidable — AST results must be serializable.
 
 ## Pass 1 Operations (5 operations, 5 node kinds)
 
@@ -125,25 +125,25 @@ tests/plugins/s3/3.989.0/
 
 ```ts
 // Real:  await s3.putObject({ Bucket: "b", Key: "k", Body: "hello" })
-// Ilo:   $.s3.putObject({ Bucket: "b", Key: "k", Body: "hello" })
+// Mvfm:   $.s3.putObject({ Bucket: "b", Key: "k", Body: "hello" })
 
 // Real:  await s3.getObject({ Bucket: "b", Key: "k" })
-// Ilo:   $.s3.getObject({ Bucket: "b", Key: "k" })
+// Mvfm:   $.s3.getObject({ Bucket: "b", Key: "k" })
 
 // Real:  await s3.listObjectsV2({ Bucket: "b", Prefix: "uploads/" })
-// Ilo:   $.s3.listObjectsV2({ Bucket: "b", Prefix: "uploads/" })
+// Mvfm:   $.s3.listObjectsV2({ Bucket: "b", Prefix: "uploads/" })
 
 // Chaining with proxy:
 // Real:  const obj = await s3.headObject({ Bucket: "b", Key: "k" });
 //        console.log(obj.ContentLength);
-// Ilo:   const obj = $.s3.headObject({ Bucket: "b", Key: "k" });
+// Mvfm:   const obj = $.s3.headObject({ Bucket: "b", Key: "k" });
 //        const size = obj.ContentLength; // proxy chain
 ```
 
 ### WORKS BUT DIFFERENT
 
-- **GetObject Body**: Real SDK returns streaming Body (`response.Body.transformToString()`). Ilo returns body content directly as string.
-- **Return types**: Real SDK has typed response interfaces. Ilo uses `Record<string, unknown>`.
+- **GetObject Body**: Real SDK returns streaming Body (`response.Body.transformToString()`). Mvfm returns body content directly as string.
+- **Return types**: Real SDK has typed response interfaces. Mvfm uses `Record<string, unknown>`.
 
 ### DOESN'T WORK / NOT MODELED (pass 1)
 

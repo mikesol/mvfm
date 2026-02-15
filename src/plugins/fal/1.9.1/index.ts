@@ -1,5 +1,5 @@
 // ============================================================
-// ILO PLUGIN: fal (@fal-ai/client)
+// MVFM PLUGIN: fal (@fal-ai/client)
 // ============================================================
 //
 // Implementation status: PARTIAL (6 of ~10 modelable operations)
@@ -28,7 +28,7 @@
 // ============================================================
 //
 // Goal: An LLM that knows @fal-ai/client should be able to write
-// Ilo programs with near-zero learning curve. The API should
+// Mvfm programs with near-zero learning curve. The API should
 // look like the real fal client as closely as possible.
 //
 // Real @fal-ai/client API (v1.9.1):
@@ -111,7 +111,7 @@ export interface FalMethods {
  * Configuration for the fal plugin.
  *
  * Requires credentials (API key). Uses `FAL_KEY` env var by default
- * in the real SDK, but Ilo requires explicit config.
+ * in the real SDK, but Mvfm requires explicit config.
  */
 export interface FalConfig {
   /** Fal API key (e.g. `key_...`). */
@@ -228,12 +228,12 @@ export function fal(config: FalConfig): PluginDefinition<FalMethods> {
 //
 // 1. Direct execution (1:1 signature):
 //    Real:  await fal.run("fal-ai/flux/dev", { input: { prompt: "a cat" } })
-//    Ilo:   $.fal.run("fal-ai/flux/dev", { input: { prompt: "a cat" } })
+//    Mvfm:   $.fal.run("fal-ai/flux/dev", { input: { prompt: "a cat" } })
 //    Identical. Only difference is $ prefix and no await.
 //
 // 2. Subscribe (1:1 signature):
 //    Real:  await fal.subscribe("fal-ai/flux/dev", { input: { prompt: "a cat" } })
-//    Ilo:   $.fal.subscribe("fal-ai/flux/dev", { input: { prompt: "a cat" } })
+//    Mvfm:   $.fal.subscribe("fal-ai/flux/dev", { input: { prompt: "a cat" } })
 //    Identical.
 //
 // 3. Queue control with proxy chains (1:1 signatures):
@@ -245,34 +245,34 @@ export function fal(config: FalConfig): PluginDefinition<FalMethods> {
 //
 // 4. Non-modelable options silently ignored:
 //    Real:  fal.run(id, { input: {...}, method: "post", abortSignal: ctrl.signal })
-//    Ilo:   $.fal.run(id, { input: {...} })
+//    Mvfm:   $.fal.run(id, { input: {...} })
 //    The { input } wrapper is preserved 1:1, but runtime options
 //    (method, abort, storage settings) are silently dropped.
 //
 // 5. Return types:
 //    Real @fal-ai/client uses generic Result<OutputType<Id>> with
 //    per-endpoint typed responses.
-//    Ilo uses Record<string, unknown> for all return types.
+//    Mvfm uses Record<string, unknown> for all return types.
 //    Property access still works via proxy (result.images[0].url).
 //
 // 6. Subscribe callbacks:
 //    Real:  fal.subscribe(id, { onQueueUpdate: (status) => ... })
-//    Ilo:   Not modelable. Callbacks are runtime concerns.
+//    Mvfm:   Not modelable. Callbacks are runtime concerns.
 //
 // DOESN'T WORK / NOT MODELED:
 //
 // 7. Streaming (fal.stream):
 //    Real:  const stream = await fal.stream(id, { input })
 //           for await (const chunk of stream) { ... }
-//    Ilo:   Can't model. SSE push-based, no finite AST shape.
+//    Mvfm:   Can't model. SSE push-based, no finite AST shape.
 //
 // 8. Realtime (fal.realtime.connect):
 //    Real:  const conn = fal.realtime.connect(app, { onResult, onError })
 //           conn.send(input)
-//    Ilo:   Can't model. WebSocket bidirectional, stateful.
+//    Mvfm:   Can't model. WebSocket bidirectional, stateful.
 //
 // 9. Storage upload:
 //    Real:  const url = await fal.storage.upload(file)
-//    Ilo:   Deferred. Could be added as fal/storage_upload node kind.
+//    Mvfm:   Deferred. Could be added as fal/storage_upload node kind.
 //
 // ============================================================

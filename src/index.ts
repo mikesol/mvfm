@@ -23,7 +23,7 @@ export type {
 } from "./core";
 // Note: GeneratorInterpreterFragment is kept as an export for backward
 // compatibility — it is now a type alias for InterpreterFragment.
-export { adaptLegacy, composeInterpreters, foldAST, ilo, runAST, Stepper } from "./core";
+export { adaptLegacy, composeInterpreters, foldAST, mvfm, runAST, Stepper } from "./core";
 export { coreInterpreter } from "./interpreters/core";
 export type { AnthropicConfig, AnthropicMethods } from "./plugins/anthropic/0.74.0";
 export { anthropic } from "./plugins/anthropic/0.74.0";

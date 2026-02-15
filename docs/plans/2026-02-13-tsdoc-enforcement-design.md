@@ -19,7 +19,7 @@ Every public export in `src/index.ts` gets a TSDoc comment at its declaration si
 - **Method interfaces** (`NumMethods`, `EqMethods`, `OrdMethods`, `StrMethods`, `BooleanMethods`, `ControlMethods`, `StMethods`, `FiberMethods`, `ErrorMethods`, `ShowMethods`, `SemigroupMethods`, `MonoidMethods`, `SemiringMethods`, `HeytingAlgebraMethods`, `BoundedMethods`, `PostgresMethods`, `PostgresConfig`, `PostgresClient`): One-liner on interface, `@param`/`@returns` on each method.
 - **Plugin definitions** (`num`, `eq`, `ord`, `str`, `boolean`, `control`, `st`, `fiber`, `error`, `show`, `semigroup`, `monoid`, `semiring`, `heytingAlgebra`, `bounded`, `postgres`): What the plugin provides, its namespace.
 - **Interpreter exports** (`coreInterpreter`, `numInterpreter`, `strInterpreter`, `booleanInterpreter`, `eqInterpreter`, `ordInterpreter`, `errorInterpreter`, `fiberInterpreter`, `postgresInterpreter`, `wrapPostgresJs`): What they interpret.
-- **Functions** (`composeInterpreters`, `ilo`, `inferType`, `resolveSchemaType`, `array`, `nullable`): `@param`, `@returns`, `@example`.
+- **Functions** (`composeInterpreters`, `mvfm`, `inferType`, `resolveSchemaType`, `array`, `nullable`): `@param`, `@returns`, `@example`.
 - **Schema types** (`SchemaTag`, `ArraySchema`, `NullableSchema`, `SchemaType`, `SchemaShape`, `InferSchema`): What they represent.
 
 Internal/private functions are out of scope.
@@ -39,4 +39,4 @@ Internal/private functions are out of scope.
 
 - `@param` for function/method parameters
 - `@returns` for return values
-- `@example` for non-obvious usage (core `ilo()`, `composeInterpreters`, schema helpers)
+- `@example` for non-obvious usage (core `mvfm()`, `composeInterpreters`, schema helpers)

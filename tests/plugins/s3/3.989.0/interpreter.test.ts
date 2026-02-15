@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { foldAST, ilo } from "../../../../src/core";
+import { foldAST, mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { s3 } from "../../../../src/plugins/s3/3.989.0";
 import { s3Interpreter } from "../../../../src/plugins/s3/3.989.0/interpreter";
 import { str } from "../../../../src/plugins/str";
 
-const app = ilo(num, str, s3({ region: "us-east-1" }));
+const app = mvfm(num, str, s3({ region: "us-east-1" }));
 const fragments = [s3Interpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {

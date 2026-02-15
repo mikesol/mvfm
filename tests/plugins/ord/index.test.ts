@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../src/core";
+import { mvfm } from "../../../src/core";
 import { num } from "../../../src/plugins/num";
 import { ord } from "../../../src/plugins/ord";
 
@@ -8,7 +8,7 @@ function strip(ast: unknown): unknown {
 }
 
 describe("ord: compare dispatch", () => {
-  const app = ilo(num, ord);
+  const app = mvfm(num, ord);
 
   it("$.compare(literal, literal) dispatches to num/compare", () => {
     const prog = app(($) => $.compare(1, 2));
@@ -26,7 +26,7 @@ describe("ord: compare dispatch", () => {
 });
 
 describe("ord: derived operations wrap compare", () => {
-  const app = ilo(num, ord);
+  const app = mvfm(num, ord);
 
   it.each([
     ["gt", "ord/gt"],
@@ -52,7 +52,7 @@ describe("ord: derived operations wrap compare", () => {
 
 describe("ord: error cases", () => {
   it("throws when no ord impl for inferred type", () => {
-    const app = ilo(ord);
+    const app = mvfm(ord);
     expect(() => app(($) => ($ as any).gt(1, 2))).toThrow(/No ord implementation for type/);
   });
 });

@@ -6,7 +6,7 @@
 
 **Architecture:** External-service plugin at `src/plugins/fetch/whatwg/`. Factory function `fetch(config?)` returns `PluginDefinition<FetchMethods>`. Two effect types: `fetch/http_request` for the network call, `fetch/read_body` for parsing response body/metadata. Follows stripe plugin pattern exactly.
 
-**Tech Stack:** TypeScript, vitest, ilo core (PluginDefinition, InterpreterFragment, StepHandler, foldAST, runAST)
+**Tech Stack:** TypeScript, vitest, mvfm core (PluginDefinition, InterpreterFragment, StepHandler, foldAST, runAST)
 
 ---
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../src/core";
+import { mvfm } from "../../../src/core";
 import { boolean } from "../../../src/plugins/boolean";
 import { eq } from "../../../src/plugins/eq";
 import { heytingAlgebra } from "../../../src/plugins/heyting-algebra";
@@ -9,7 +9,7 @@ function strip(ast: unknown): unknown {
   return JSON.parse(JSON.stringify(ast, (k, v) => (k === "__id" ? undefined : v)));
 }
 
-const app = ilo(num, boolean, eq, heytingAlgebra);
+const app = mvfm(num, boolean, eq, heytingAlgebra);
 
 describe("boolean: $.and()", () => {
   it("produces boolean/and", () => {

@@ -6,7 +6,7 @@
 
 ## Problem
 
-The ilo plugin ecosystem will eventually be built by a swarm of 100+ agents porting thousands of libraries. The first 10-20 reference plugins are the training data for those agents. Every shortcut, inconsistency, or missing abstraction gets amplified at scale. The reference plugins must be pristine: full lifecycle (AST + interpreter + traits + tests), correct composition patterns, and zero prelude-level logic buried in plugin code.
+The mvfm plugin ecosystem will eventually be built by a swarm of 100+ agents porting thousands of libraries. The first 10-20 reference plugins are the training data for those agents. Every shortcut, inconsistency, or missing abstraction gets amplified at scale. The reference plugins must be pristine: full lifecycle (AST + interpreter + traits + tests), correct composition patterns, and zero prelude-level logic buried in plugin code.
 
 ## Scope dividing line
 
@@ -64,7 +64,7 @@ tests/plugins/
       interpreter.test.ts
 ```
 
-Unversioned plugins (num, str, boolean, eq, fiber, error, control, st) are ilo-native — they don't track an external package. Versioned plugins track a specific upstream release. The filesystem is the version registry.
+Unversioned plugins (num, str, boolean, eq, fiber, error, control, st) are mvfm-native — they don't track an external package. Versioned plugins track a specific upstream release. The filesystem is the version registry.
 
 ## Interpreter model
 
@@ -98,7 +98,7 @@ This means:
 - Users provide their own client (wrapping pg, postgres.js, Neon, etc.)
 - Tests use a mock client — fast, deterministic, no infrastructure
 
-### Ilo-native plugins
+### Mvfm-native plugins
 
 Plugins like num, str, boolean ship plain interpreter fragments (no factory needed — they have no external dependencies).
 

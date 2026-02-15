@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../src/core";
+import { mvfm } from "../src/core";
 import { error } from "../src/plugins/error";
 import { fiber } from "../src/plugins/fiber";
 import { num } from "../src/plugins/num";
@@ -14,7 +14,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, str, ord, semiring, postgres("postgres://localhost/test"), fiber, error);
+const app = mvfm(num, str, ord, semiring, postgres("postgres://localhost/test"), fiber, error);
 
 describe("composition: postgres + fiber", () => {
   it("$.par wrapping postgres queries nests correctly", () => {

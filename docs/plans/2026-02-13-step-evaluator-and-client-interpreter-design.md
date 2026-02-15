@@ -6,7 +6,7 @@
 
 ## Problem
 
-Ilo programs are portable ASTs, but interpretation is monolithic. The current `composeInterpreters` is a fold (`foldFree` equivalent) — it consumes the entire AST eagerly with no visibility into intermediate steps. This makes it impossible to:
+Mvfm programs are portable ASTs, but interpretation is monolithic. The current `composeInterpreters` is a fold (`foldFree` equivalent) — it consumes the entire AST eagerly with no visibility into intermediate steps. This makes it impossible to:
 
 1. Build a browser-side interpreter that proxies effects over HTTP to a server
 2. Verify execution in a 0-trust environment (server replays browser's steps to confirm correctness)
@@ -19,7 +19,7 @@ The browser interpreter use case (issue #38) revealed that the interpreter archi
 
 PureScript offers a hierarchy of interpretation primitives for free monads:
 
-| Primitive | Expressiveness | Ilo equivalent |
+| Primitive | Expressiveness | Mvfm equivalent |
 |-----------|---------------|----------------|
 | `foldFree` | Least — natural transformation, no step visibility | Current `composeInterpreters` |
 | `runFreeM` | Middle — step-by-step with monadic effect handling | `runAST` (new) |
@@ -306,7 +306,7 @@ function clientHandler(options: {
       : options.headers ?? {};
 
     const res = await (options.fetch ?? globalThis.fetch)(
-      `${options.baseUrl}/ilo/execute`,
+      `${options.baseUrl}/mvfm/execute`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...headers },
@@ -319,7 +319,7 @@ function clientHandler(options: {
       },
     );
 
-    if (!res.ok) throw new Error(`ilo proxy: ${res.status} ${await res.text()}`);
+    if (!res.ok) throw new Error(`mvfm proxy: ${res.status} ${await res.text()}`);
     const data = await res.json();
     return { value: data.result, state: { stepIndex: state.stepIndex + 1 } };
   };

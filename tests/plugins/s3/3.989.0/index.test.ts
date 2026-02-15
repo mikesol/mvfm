@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { num } from "../../../../src/plugins/num";
 import { s3 } from "../../../../src/plugins/s3/3.989.0";
 import { str } from "../../../../src/plugins/str";
@@ -10,7 +10,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, str, s3({ region: "us-east-1" }));
+const app = mvfm(num, str, s3({ region: "us-east-1" }));
 
 // ============================================================
 // putObject

@@ -1,7 +1,7 @@
 import type { InferSchema, SchemaShape } from "./schema";
 
 // ============================================================
-// ILO — Extensible Tagless Final DSL via Proxy
+// MVFM — Extensible Tagless Final DSL via Proxy
 // ============================================================
 //
 // The core idea: $ is assembled from composable plugins.
@@ -13,14 +13,14 @@ import type { InferSchema, SchemaShape } from "./schema";
 
 // ---- Branding & Expr -------------------------------------
 
-const ILO = Symbol.for("ilo");
+const MVFM = Symbol.for("mvfm");
 
 /**
  * Base fields present on every Expr regardless of T.
- * Kept as an interface so the ILO symbol key works.
+ * Kept as an interface so the MVFM symbol key works.
  */
 interface ExprBase<T> {
-  readonly [ILO]: true;
+  readonly [MVFM]: true;
   readonly __type: T; // phantom — never read at runtime
   readonly __node: ASTNode; // the underlying AST node
 }
@@ -47,7 +47,7 @@ type ExprFields<T> = [T] extends [never]
  * carries T so your IDE gives you completions and errors.
  *
  * The brand symbol lets plugins detect "is this already a
- * Ilo value or a raw JS primitive?"
+ * Mvfm value or a raw JS primitive?"
  */
 export type Expr<T> = ExprBase<T> & ExprFields<T>;
 
@@ -70,7 +70,7 @@ function nextNodeId(): number {
 }
 
 /**
- * A Program is what ilo() returns — the complete AST plus
+ * A Program is what mvfm() returns — the complete AST plus
  * a hash for verification.
  */
 export interface Program {
@@ -732,7 +732,7 @@ export function composeInterpreters(fragments: InterpreterFragment[]): RecurseFn
 // ---- The Proxy Engine ------------------------------------
 
 function isExpr(value: unknown): value is Expr<unknown> {
-  return value !== null && typeof value === "object" && ILO in (value as Record<symbol, unknown>);
+  return value !== null && typeof value === "object" && MVFM in (value as Record<symbol, unknown>);
 }
 
 function autoLift<T>(value: T | Expr<T>, exprFn: PluginContext["expr"]): Expr<T> {
@@ -764,7 +764,7 @@ function autoLift<T>(value: T | Expr<T>, exprFn: PluginContext["expr"]): Expr<T>
     });
   }
 
-  throw new Error(`Cannot auto-lift value of type ${jsType} into Ilo expression`);
+  throw new Error(`Cannot auto-lift value of type ${jsType} into Mvfm expression`);
 }
 
 /**
@@ -775,7 +775,7 @@ function autoLift<T>(value: T | Expr<T>, exprFn: PluginContext["expr"]): Expr<T>
  */
 function makeExprProxy<T>(node: ASTNode, ctx: PluginContext): Expr<T> {
   const target = {
-    [ILO]: true as const,
+    [MVFM]: true as const,
     __type: undefined as unknown as T,
     __node: node,
   };
@@ -783,7 +783,7 @@ function makeExprProxy<T>(node: ASTNode, ctx: PluginContext): Expr<T> {
   return new Proxy(target, {
     get(_target, prop) {
       // Internal access — return real values
-      if (prop === ILO) return true;
+      if (prop === MVFM) return true;
       if (prop === "__node") return node;
       if (prop === "__type") return undefined;
 
@@ -876,7 +876,7 @@ function makeExprProxy<T>(node: ASTNode, ctx: PluginContext): Expr<T> {
   }) as unknown as Expr<T>;
 }
 
-// ---- ilo() — the main entry point ----------------------
+// ---- mvfm() — the main entry point ----------------------
 
 // ---- Type-level trait resolution ----
 
@@ -979,13 +979,13 @@ interface CoreDollar<I = never> {
 }
 
 /**
- * Create a ilo program builder with the given plugins.
+ * Create a mvfm program builder with the given plugins.
  *
  * Usage:
- *   `const serverless = ilo(num, str, db('postgres://...'))`
+ *   `const serverless = mvfm(num, str, db('postgres://...'))`
  *   `const myProgram = serverless(($) => { ... })`
  */
-export function ilo<P extends PluginDefinition<any, any>[]>(...plugins: P) {
+export function mvfm<P extends PluginDefinition<any, any>[]>(...plugins: P) {
   function define<S extends SchemaShape>(
     schema: S,
     fn: ($: CoreDollar<InferSchema<S>> & MergePlugins<P>) => Expr<any> | any,
@@ -1182,7 +1182,7 @@ export function ilo<P extends PluginDefinition<any, any>[]>(...plugins: P) {
         .map((n) => `  - ${n.kind}${n.sql ? `: ${n.sql}` : ""}${n.url ? `: ${n.url}` : ""}`)
         .join("\n");
       throw new Error(
-        `Ilo build error: ${orphans.length} unreachable node(s) detected.\n` +
+        `Mvfm build error: ${orphans.length} unreachable node(s) detected.\n` +
           `These expressions were created but are not part of the return tree.\n` +
           `Wrap side effects in $.do():\n\n` +
           `  return $.do(\n` +

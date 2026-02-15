@@ -20,7 +20,7 @@ The SDK is auto-generated from OpenAPI specs. Each resource lives under `src/res
 | Operation | Category | Notes |
 |---|---|---|
 | `messages.create()` | Maps cleanly | POST to `/2010-04-01/Accounts/{AccountSid}/Messages.json` |
-| `messages(sid).fetch()` | Maps cleanly | Ilo uses `messages(sid).fetch()` — 1:1 match via Object.assign pattern |
+| `messages(sid).fetch()` | Maps cleanly | Mvfm uses `messages(sid).fetch()` — 1:1 match via Object.assign pattern |
 | `messages.list()` | Maps cleanly | GET with optional query params (to, from, dateSent, limit) |
 | `messages(sid).remove()` | Maps cleanly | DELETE — omitted from pass 1, trivial to add |
 | `messages(sid).update()` | Maps cleanly | POST — omitted from pass 1, trivial to add |
@@ -55,7 +55,7 @@ The SDK is auto-generated from OpenAPI specs. Each resource lives under `src/res
 ## DSL API
 
 ```ts
-const app = ilo(twilio({ accountSid: 'AC...', authToken: '...' }));
+const app = mvfm(twilio({ accountSid: 'AC...', authToken: '...' }));
 
 const program = app(($) => {
   const msg = $.twilio.messages.create({ to: '+15551234567', from: '+15559876543', body: 'Hello' });

@@ -1,17 +1,17 @@
-# Ilo — Vision 0.2.0
+# Mvfm — Vision 0.2.0
 
 *Extensible tagless final DSL for deterministic, verifiable TypeScript programs.*
 
-*Toki Pona "ilo": tool. A tool that builds tools — composable, inspectable, inert until interpreted.*
+*Toki Pona "mvfm": tool. A tool that builds tools — composable, inspectable, inert until interpreted.*
 
 ---
 
-## 1. What Ilo Is
+## 1. What Mvfm Is
 
-Ilo is a **library** for building programs that are data. You compose a set of plugins, write a closure, and get back a deterministic AST with a content hash. Nothing executes. The AST is a complete, self-contained description of what the program *would* do — an interpreter gives it meaning.
+Mvfm is a **library** for building programs that are data. You compose a set of plugins, write a closure, and get back a deterministic AST with a content hash. Nothing executes. The AST is a complete, self-contained description of what the program *would* do — an interpreter gives it meaning.
 
 ```ts
-const serverless = ilo(num, str, postgres('postgres://...'), fiber, error)
+const serverless = mvfm(num, str, postgres('postgres://...'), fiber, error)
 
 const getUser = serverless(($) => {
   const user = $.sql`select * from users where id = ${$.input.userId}`
@@ -33,9 +33,9 @@ The `$` object is assembled from plugins. Each plugin contributes methods, AST n
 
 **2. Side effects are explicit.** Every expression that does something (DB write, API call, KV mutation) must appear in the return tree via `$.do()`. The build phase runs reachability analysis and rejects orphaned side-effecting nodes. If you created it but didn't return it, that's a bug.
 
-**3. Plugins are the only extension mechanism.** There are no hooks, middleware, lifecycle events, or monkey-patching. To add capability to `$`, you write a plugin: `{ name, nodeKinds, build(ctx) }`. Plugins compose via `ilo(a, b, c(...))`.
+**3. Plugins are the only extension mechanism.** There are no hooks, middleware, lifecycle events, or monkey-patching. To add capability to `$`, you write a plugin: `{ name, nodeKinds, build(ctx) }`. Plugins compose via `mvfm(a, b, c(...))`.
 
-**4. The interpreter is someone else's problem.** Ilo produces ASTs. Execution is the interpreter's job. An interpreter can target Cloudflare Workers, a local Node process, a test harness, or a visual debugger. Ilo doesn't care. It ships `composeInterpreters()` as a convenience, not a requirement.
+**4. The interpreter is someone else's problem.** Mvfm produces ASTs. Execution is the interpreter's job. An interpreter can target Cloudflare Workers, a local Node process, a test harness, or a visual debugger. Mvfm doesn't care. It ships `composeInterpreters()` as a convenience, not a requirement.
 
 **5. LLM-first authorship.** The DSL is designed so that an LLM can generate correct programs from natural language. Plugin methods accept `Expr<T> | T` (auto-lifting raw values). Proxy-based property access means `user.firstName` just works. Error messages explain what went wrong and how to fix it, with code examples.
 
@@ -64,7 +64,7 @@ See `docs/plugin-authoring-guide.md` for the complete guide.
 
 ### Reachability analysis
 
-After the closure executes, ilo walks the return tree and all emitted statements. Any registered node not reachable from the root is an orphan — likely a forgotten side effect. The build fails with a diagnostic error listing the orphaned nodes.
+After the closure executes, mvfm walks the return tree and all emitted statements. Any registered node not reachable from the root is an orphan — likely a forgotten side effect. The build fails with a diagnostic error listing the orphaned nodes.
 
 ### Recursion via Y combinator
 
@@ -80,10 +80,10 @@ The AST (with internal IDs stripped) is hashed to produce a deterministic progra
 
 ---
 
-## 4. What Ilo Is NOT
+## 4. What Mvfm Is NOT
 
-- **Not a runtime.** Ilo produces ASTs. It does not execute them.
-- **Not a framework.** There is no application lifecycle, no middleware stack, no request/response model. Ilo is a library you call.
+- **Not a runtime.** Mvfm produces ASTs. It does not execute them.
+- **Not a framework.** There is no application lifecycle, no middleware stack, no request/response model. Mvfm is a library you call.
 - **Not an ORM.** The `postgres` plugin builds AST nodes containing SQL strings. It doesn't generate queries, manage connections, or migrate schemas.
 - **Not a compiler.** There is no codegen step. The output is a runtime JavaScript object (`Program`) that you can inspect, serialize, or hand to an interpreter.
 
@@ -105,7 +105,7 @@ The AST (with internal IDs stripped) is hashed to produce a deterministic progra
 
 ### Real-world plugins
 
-Real-world plugins mirror specific, widely-used libraries. An LLM (or developer) who knows the target library should be able to write Ilo programs with near-zero learning curve.
+Real-world plugins mirror specific, widely-used libraries. An LLM (or developer) who knows the target library should be able to write Mvfm programs with near-zero learning curve.
 
 | Plugin | Namespace | Models | What it adds to $ |
 |--------|-----------|--------|-------------------|
@@ -129,7 +129,7 @@ These don't exist yet. Each should mirror a specific real-world library as close
 Plugins don't depend on each other. They compose at the user level:
 
 ```ts
-const app = ilo(num, str, postgres('postgres://...'), fiber, error)
+const app = mvfm(num, str, postgres('postgres://...'), fiber, error)
 ```
 
 The resulting `$` is the intersection of all plugin contributions. A `postgres/query` node can be wrapped in `fiber/retry`, which can be wrapped in `error/try` — the AST captures the full structure. This is a monad stack without the ceremony:
@@ -156,7 +156,7 @@ Vitest. No alternatives considered — it's the standard for modern TS projects.
 
 ### Two categories of tests
 
-**1. Parity tests** — for plugins that model real-world systems. The `postgres` plugin models the postgres.js API. Tests should verify that every pattern in the "Honest Assessment Matrix" (documented in the plugin source) produces the correct AST shape. If postgres.js supports `sql.begin(sql => [...])`, the ilo equivalent must produce a `postgres/begin` node with `mode: "pipeline"`. The matrix documents what works, what's different, and what's unsupported — tests encode that matrix.
+**1. Parity tests** — for plugins that model real-world systems. The `postgres` plugin models the postgres.js API. Tests should verify that every pattern in the "Honest Assessment Matrix" (documented in the plugin source) produces the correct AST shape. If postgres.js supports `sql.begin(sql => [...])`, the mvfm equivalent must produce a `postgres/begin` node with `mode: "pipeline"`. The matrix documents what works, what's different, and what's unsupported — tests encode that matrix.
 
 **2. Structural tests** — for plugins with no real-world analogue. `fiber` and `error` are structural (concurrency and error handling aren't "copying" a specific library). Tests verify AST shape, composition behavior, and reachability analysis. Example: `$.par(a, b)` inside `$.try().catch()` must produce the right nesting.
 
@@ -170,7 +170,7 @@ Tests do not execute programs. There is no interpreter in the test suite. Tests 
 
 ```
 src/
-├── core.ts                    — Expr, ASTNode, ilo(), plugin contract
+├── core.ts                    — Expr, ASTNode, mvfm(), plugin contract
 ├── plugins/
 │   ├── num.ts                 — arithmetic, comparison, rounding
 │   ├── str.ts                 — string ops, tagged templates

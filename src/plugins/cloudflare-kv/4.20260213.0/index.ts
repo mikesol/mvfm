@@ -1,5 +1,5 @@
 // ============================================================
-// ILO PLUGIN: cloudflare-kv (@cloudflare/workers-types KVNamespace)
+// MVFM PLUGIN: cloudflare-kv (@cloudflare/workers-types KVNamespace)
 // ============================================================
 //
 // Implementation status: COMPLETE (modulo known limitations)
@@ -12,7 +12,7 @@
 //   - No cacheTtl option on get
 //
 // Goal: An LLM that knows the Cloudflare Workers KV API should
-// be able to write Ilo programs with near-zero learning curve.
+// be able to write Mvfm programs with near-zero learning curve.
 // The API mirrors the real KVNamespace 1:1 for supported ops.
 //
 // Real KVNamespace API (@cloudflare/workers-types 4.20260213.0):
@@ -22,7 +22,7 @@
 //   await KV.delete("key")
 //   const list = await KV.list({ prefix: "user:" })
 //
-// Ilo API (1:1 match):
+// Mvfm API (1:1 match):
 //   const value = $.kv.get("key")
 //   const json = $.kv.get("key", "json")
 //   $.kv.put("key", "value", { expirationTtl: 3600 })
@@ -204,22 +204,22 @@ export function cloudflareKv(config: CloudflareKvConfig): PluginDefinition<Cloud
 //
 // 1. Basic get/put/delete:
 //    Real:  const val = await KV.get("key")
-//    Ilo:   const val = $.kv.get("key")
+//    Mvfm:   const val = $.kv.get("key")
 //    Nearly identical. Only difference is $ prefix and no await.
 //
 // 2. JSON values:
 //    Real:  const data = await KV.get("key", "json")
-//    Ilo:   const data = $.kv.get("key", "json")
+//    Mvfm:   const data = $.kv.get("key", "json")
 //    1:1 mapping. Same call signature.
 //
 // 3. Put with expiration:
 //    Real:  await KV.put("key", "val", { expirationTtl: 3600 })
-//    Ilo:   $.kv.put("key", "val", { expirationTtl: 3600 })
+//    Mvfm:   $.kv.put("key", "val", { expirationTtl: 3600 })
 //    1:1 mapping.
 //
 // 4. List with prefix/cursor:
 //    Real:  const result = await KV.list({ prefix: "user:" })
-//    Ilo:   const result = $.kv.list({ prefix: "user:" })
+//    Mvfm:   const result = $.kv.list({ prefix: "user:" })
 //    1:1 mapping. Pagination via cursor works naturally.
 //
 // 5. Parameterized keys:
@@ -230,22 +230,22 @@ export function cloudflareKv(config: CloudflareKvConfig): PluginDefinition<Cloud
 //
 // 6. Binary/streaming:
 //    Real:  KV.get("key", "arrayBuffer") / KV.get("key", "stream")
-//    Ilo:   Not modeled. Binary data and streams don't fit a
+//    Mvfm:   Not modeled. Binary data and streams don't fit a
 //           finite, inspectable AST.
 //
 // 7. getWithMetadata:
 //    Real:  KV.getWithMetadata("key")
-//    Ilo:   Not yet modeled. Returns {value, metadata, cacheStatus}.
+//    Mvfm:   Not yet modeled. Returns {value, metadata, cacheStatus}.
 //           Could be added as cloudflare-kv/get_with_metadata.
 //
 // 8. Batch get:
 //    Real:  KV.get(["key1", "key2"])
-//    Ilo:   Not yet modeled. Multi-key fetch returns a Map.
+//    Mvfm:   Not yet modeled. Multi-key fetch returns a Map.
 //           Could be added as cloudflare-kv/get_batch.
 //
 // 9. Metadata on put:
 //    Real:  KV.put("key", "val", { metadata: { foo: "bar" } })
-//    Ilo:   Partially modeled — the options type includes metadata
+//    Mvfm:   Partially modeled — the options type includes metadata
 //           but the handler ignores it for now.
 //
 // ============================================================

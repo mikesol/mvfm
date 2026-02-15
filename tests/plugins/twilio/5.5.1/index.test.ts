@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 import { twilio } from "../../../../src/plugins/twilio/5.5.1";
@@ -10,7 +10,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, str, twilio({ accountSid: "AC_test_123", authToken: "auth_test_456" }));
+const app = mvfm(num, str, twilio({ accountSid: "AC_test_123", authToken: "auth_test_456" }));
 
 // ============================================================
 // Messages

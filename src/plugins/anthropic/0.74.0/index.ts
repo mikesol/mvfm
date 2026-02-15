@@ -1,5 +1,5 @@
 // ============================================================
-// ILO PLUGIN: anthropic (@anthropic-ai/sdk compatible API)
+// MVFM PLUGIN: anthropic (@anthropic-ai/sdk compatible API)
 // ============================================================
 //
 // Implementation status: FULL (all 9 operations)
@@ -26,7 +26,7 @@
 // ============================================================
 //
 // Goal: An LLM that knows @anthropic-ai/sdk should be able to
-// write Ilo programs with near-zero learning curve. The API
+// write Mvfm programs with near-zero learning curve. The API
 // should look like the real Anthropic SDK as closely as possible.
 //
 // Real @anthropic-ai/sdk API (v0.74.0):
@@ -245,7 +245,7 @@ export function anthropic(config: AnthropicConfig): PluginDefinition<AnthropicMe
 //
 // 1. Basic message creation:
 //    Real:  const msg = await anthropic.messages.create({ model: '...', max_tokens: 1024, messages: [...] })
-//    Ilo:   const msg = $.anthropic.messages.create({ model: '...', max_tokens: 1024, messages: [...] })
+//    Mvfm:   const msg = $.anthropic.messages.create({ model: '...', max_tokens: 1024, messages: [...] })
 //    Nearly identical. Only difference is $ prefix and no await.
 //
 // 2. Parameterized operations with proxy values:
@@ -254,13 +254,13 @@ export function anthropic(config: AnthropicConfig): PluginDefinition<AnthropicMe
 //
 // 3. Resource method naming:
 //    Real:  anthropic.messages.create(...)
-//    Ilo:   $.anthropic.messages.create(...)
+//    Mvfm:   $.anthropic.messages.create(...)
 //    The nested resource pattern maps 1:1. An LLM that knows
-//    @anthropic-ai/sdk can write Ilo Anthropic programs immediately.
+//    @anthropic-ai/sdk can write Mvfm Anthropic programs immediately.
 //
 // 4. Batch operations:
 //    Real:  await anthropic.messages.batches.create({ requests: [...] })
-//    Ilo:   $.anthropic.messages.batches.create({ requests: [...] })
+//    Mvfm:   $.anthropic.messages.batches.create({ requests: [...] })
 //    The 3-level nesting (messages.batches.create) works naturally.
 //
 // WORKS BUT DIFFERENT:
@@ -268,14 +268,14 @@ export function anthropic(config: AnthropicConfig): PluginDefinition<AnthropicMe
 // 5. Return types:
 //    Real @anthropic-ai/sdk has typed response objects (Message,
 //    MessageBatch, ModelInfo, etc.) with precise type definitions.
-//    Ilo uses Record<string, unknown> for all return types.
+//    Mvfm uses Record<string, unknown> for all return types.
 //    Property access still works via proxy (msg.content, batch.id),
 //    but there's no IDE autocomplete for Anthropic-specific fields.
 //    A future enhancement could add typed response interfaces.
 //
 // 6. Sequencing side effects:
 //    Real:  const msg = await anthropic.messages.create(...)
-//    Ilo:   const msg = $.anthropic.messages.create(...)
+//    Mvfm:   const msg = $.anthropic.messages.create(...)
 //           return $.do(msg)
 //    Must use $.do() for sequencing when there are data dependencies.
 //
@@ -284,19 +284,19 @@ export function anthropic(config: AnthropicConfig): PluginDefinition<AnthropicMe
 // 7. Streaming:
 //    Real:  const stream = await anthropic.messages.create({ ..., stream: true })
 //           for await (const event of stream) { ... }
-//    Ilo:   Can't model async iterators/streams. Create returns
+//    Mvfm:   Can't model async iterators/streams. Create returns
 //           the complete response. Streaming belongs in the
 //           interpreter/runtime layer.
 //
 // 8. Tool use / function calling:
 //    Real:  anthropic.messages.create({ ..., tools: [...] })
-//    Ilo:   The params object can include tools, but tool execution
+//    Mvfm:   The params object can include tools, but tool execution
 //           loops (check stop_reason, call tool, send result back)
 //           would need $.rec() for the iterative loop pattern.
 //
 // 9. Beta features (prompt caching, computer use):
 //    Real:  anthropic.beta.promptCaching.messages.create(...)
-//    Ilo:   Not modeled. Beta APIs change frequently and belong
+//    Mvfm:   Not modeled. Beta APIs change frequently and belong
 //           in a separate beta plugin or version bump.
 //
 // ============================================================

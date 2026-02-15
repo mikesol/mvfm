@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { fetch } from "../../../../src/plugins/fetch/whatwg";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
@@ -10,7 +10,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, str, fetch());
+const app = mvfm(num, str, fetch());
 
 // ============================================================
 // fetch/request — $.fetch(url, init?)
@@ -183,7 +183,7 @@ describe("fetch: cross-operation dependencies", () => {
 
 describe("fetch: config baked into AST", () => {
   it("stores config on fetch/request nodes", () => {
-    const appWithConfig = ilo(
+    const appWithConfig = mvfm(
       num,
       str,
       fetch({ baseUrl: "https://api.example.com", defaultHeaders: { "X-Api-Key": "test" } }),

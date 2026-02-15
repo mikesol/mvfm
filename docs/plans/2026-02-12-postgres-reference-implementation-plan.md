@@ -65,7 +65,7 @@ Create `tests/plugins/error/interpreter.test.ts`:
 
 ```typescript
 import { describe, expect, it } from "vitest";
-import { composeInterpreters, ilo } from "../../../src/core";
+import { composeInterpreters, mvfm } from "../../../src/core";
 import { coreInterpreter } from "../../../src/interpreters/core";
 import { error } from "../../../src/plugins/error";
 import { errorInterpreter } from "../../../src/plugins/error/interpreter";
@@ -91,7 +91,7 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 const interp = composeInterpreters([
   errorInterpreter, coreInterpreter, numInterpreter, ordInterpreter, eqInterpreter,
 ]);
-const app = ilo(num, semiring, eq, ord, error);
+const app = mvfm(num, semiring, eq, ord, error);
 
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
@@ -351,7 +351,7 @@ Create `tests/plugins/fiber/interpreter.test.ts`:
 
 ```typescript
 import { describe, expect, it } from "vitest";
-import { composeInterpreters, ilo } from "../../../src/core";
+import { composeInterpreters, mvfm } from "../../../src/core";
 import { coreInterpreter } from "../../../src/interpreters/core";
 import { error } from "../../../src/plugins/error";
 import { errorInterpreter } from "../../../src/plugins/error/interpreter";
@@ -375,7 +375,7 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 const interp = composeInterpreters([
   errorInterpreter, fiberInterpreter, coreInterpreter, numInterpreter,
 ]);
-const app = ilo(num, semiring, fiber, error);
+const app = mvfm(num, semiring, fiber, error);
 
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
@@ -1008,7 +1008,7 @@ Create `tests/plugins/postgres/3.4.8/interpreter.test.ts`:
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import postgres from "postgres";
-import { composeInterpreters, ilo } from "../../../../src/core";
+import { composeInterpreters, mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { error } from "../../../../src/plugins/error";
 import { errorInterpreter } from "../../../../src/plugins/error/interpreter";
@@ -1058,7 +1058,7 @@ function makeInterp() {
   ]);
 }
 
-const app = ilo(num, str, semiring, eq, ord, pgPlugin("postgres://test"), fiber, error);
+const app = mvfm(num, str, semiring, eq, ord, pgPlugin("postgres://test"), fiber, error);
 
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);

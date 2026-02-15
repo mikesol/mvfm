@@ -23,7 +23,7 @@ Run: `mkdir -p src/plugins/cloudflare-kv/4.20260213.0`
 
 ```ts
 // ============================================================
-// ILO PLUGIN: cloudflare-kv (@cloudflare/workers-types KVNamespace)
+// MVFM PLUGIN: cloudflare-kv (@cloudflare/workers-types KVNamespace)
 // ============================================================
 //
 // Implementation status: COMPLETE (modulo known limitations)
@@ -36,7 +36,7 @@ Run: `mkdir -p src/plugins/cloudflare-kv/4.20260213.0`
 //   - No cacheTtl option on get
 //
 // Goal: An LLM that knows the Cloudflare Workers KV API should
-// be able to write Ilo programs with near-zero learning curve.
+// be able to write Mvfm programs with near-zero learning curve.
 //
 // Real KVNamespace API (@cloudflare/workers-types 4.20260213.0):
 //   const value = await KV.get("key")
@@ -45,7 +45,7 @@ Run: `mkdir -p src/plugins/cloudflare-kv/4.20260213.0`
 //   await KV.delete("key")
 //   const list = await KV.list({ prefix: "user:" })
 //
-// Ilo API:
+// Mvfm API:
 //   const value = $.kv.get("key")
 //   const json = $.kv.getJson("key")
 //   $.kv.put("key", "value", { expirationTtl: 3600 })
@@ -226,22 +226,22 @@ export function cloudflareKv(
 //
 // 1. Basic get/put/delete:
 //    Real:  const val = await KV.get("key")
-//    Ilo:   const val = $.kv.get("key")
+//    Mvfm:   const val = $.kv.get("key")
 //    Nearly identical. Only difference is $ prefix and no await.
 //
 // 2. JSON values:
 //    Real:  const data = await KV.get("key", "json")
-//    Ilo:   const data = $.kv.getJson("key")
+//    Mvfm:   const data = $.kv.getJson("key")
 //    Separate method name but same semantics.
 //
 // 3. Put with expiration:
 //    Real:  await KV.put("key", "val", { expirationTtl: 3600 })
-//    Ilo:   $.kv.put("key", "val", { expirationTtl: 3600 })
+//    Mvfm:   $.kv.put("key", "val", { expirationTtl: 3600 })
 //    1:1 mapping.
 //
 // 4. List with prefix/cursor:
 //    Real:  const result = await KV.list({ prefix: "user:" })
-//    Ilo:   const result = $.kv.list({ prefix: "user:" })
+//    Mvfm:   const result = $.kv.list({ prefix: "user:" })
 //    1:1 mapping. Pagination via cursor works naturally.
 //
 // 5. Parameterized keys:
@@ -252,29 +252,29 @@ export function cloudflareKv(
 //
 // 6. get type parameter:
 //    Real:  KV.get("key", "json") / KV.get("key", "text")
-//    Ilo:   $.kv.getJson("key") / $.kv.get("key")
+//    Mvfm:   $.kv.getJson("key") / $.kv.get("key")
 //    Split into separate methods for cleaner AST node kinds.
 //
 // DOESN'T WORK / NOT MODELED:
 //
 // 7. Binary/streaming:
 //    Real:  KV.get("key", "arrayBuffer") / KV.get("key", "stream")
-//    Ilo:   Not modeled. Binary data and streams don't fit a
+//    Mvfm:   Not modeled. Binary data and streams don't fit a
 //           finite, inspectable AST.
 //
 // 8. getWithMetadata:
 //    Real:  KV.getWithMetadata("key")
-//    Ilo:   Not yet modeled. Returns {value, metadata, cacheStatus}.
+//    Mvfm:   Not yet modeled. Returns {value, metadata, cacheStatus}.
 //           Could be added as cloudflare-kv/get_with_metadata.
 //
 // 9. Batch get:
 //    Real:  KV.get(["key1", "key2"])
-//    Ilo:   Not yet modeled. Multi-key fetch returns a Map.
+//    Mvfm:   Not yet modeled. Multi-key fetch returns a Map.
 //           Could be added as cloudflare-kv/get_batch.
 //
 // 10. Metadata on put:
 //    Real:  KV.put("key", "val", { metadata: { foo: "bar" } })
-//    Ilo:   Partially modeled — the options type includes metadata
+//    Mvfm:   Partially modeled — the options type includes metadata
 //           but the handler ignores it for now.
 //
 // ============================================================
@@ -318,7 +318,7 @@ Run: `mkdir -p tests/plugins/cloudflare-kv/4.20260213.0`
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 import { cloudflareKv } from "../../../../src/plugins/cloudflare-kv/4.20260213.0";
@@ -329,7 +329,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, str, cloudflareKv({ namespaceId: "MY_KV" }));
+const app = mvfm(num, str, cloudflareKv({ namespaceId: "MY_KV" }));
 
 // ============================================================
 // get
@@ -633,14 +633,14 @@ git commit -m "feat(cloudflare-kv): add interpreter fragment (#57)"
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { foldAST, ilo } from "../../../../src/core";
+import { foldAST, mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 import { cloudflareKv } from "../../../../src/plugins/cloudflare-kv/4.20260213.0";
 import { cloudflareKvInterpreter } from "../../../../src/plugins/cloudflare-kv/4.20260213.0/interpreter";
 
-const app = ilo(num, str, cloudflareKv({ namespaceId: "MY_KV" }));
+const app = mvfm(num, str, cloudflareKv({ namespaceId: "MY_KV" }));
 const fragments = [cloudflareKvInterpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {
@@ -965,7 +965,7 @@ export interface ClientHandlerState {
  * Creates a client-side {@link StepHandler} that sends Cloudflare KV
  * effects as JSON to a remote server endpoint for execution.
  *
- * Each effect is sent as a POST request to `{baseUrl}/ilo/execute` with
+ * Each effect is sent as a POST request to `{baseUrl}/mvfm/execute` with
  * the contract hash, step index, path, and effect payload.
  *
  * @param options - Configuration for the client handler.
@@ -980,7 +980,7 @@ export function clientHandler(options: ClientHandlerOptions): StepHandler<Client
     context: StepContext,
     state: ClientHandlerState,
   ): Promise<{ value: unknown; state: ClientHandlerState }> => {
-    const response = await fetchFn(`${baseUrl}/ilo/execute`, {
+    const response = await fetchFn(`${baseUrl}/mvfm/execute`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

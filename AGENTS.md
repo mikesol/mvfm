@@ -1,4 +1,4 @@
-# Ilo
+# Mvfm
 
 Extensible tagless final DSL for deterministic, verifiable TypeScript programs. See `VISION.md` for architecture.
 
@@ -11,7 +11,7 @@ gh issue list --milestone "<current phase>" --label "ready" --assignee ""
 Pick an issue. Read it fully — especially **"Not in scope"**. Then:
 
 1. Assign yourself: `gh issue edit <N> --add-assignee @me --remove-label ready --add-label in-progress`
-2. Create a worktree: `git worktree add ../ilo-<N> -b issue-<N>`
+2. Create a worktree: `git worktree add ../mvfm-<N> -b issue-<N>`
 3. Work in that worktree
 4. PR back to main: `gh pr create` referencing `Closes #<N>`
 
@@ -55,13 +55,13 @@ After creating a PR, bot reviewers (CodeRabbit, Copilot) will leave comments. Tr
 
 ```bash
 # Get review comment IDs
-gh api repos/mikesol/ilo/pulls/<N>/comments --jq '.[] | {id, user: .user.login, path, line, body: .body[:80]}'
+gh api repos/mikesol/mvfm/pulls/<N>/comments --jq '.[] | {id, user: .user.login, path, line, body: .body[:80]}'
 
 # Reply to a review comment (in_reply_to creates a thread reply)
-gh api repos/mikesol/ilo/pulls/<N>/comments -f body="Your reply" -F in_reply_to=<comment_id>
+gh api repos/mikesol/mvfm/pulls/<N>/comments -f body="Your reply" -F in_reply_to=<comment_id>
 
 # Get thread IDs for resolving
-gh api graphql -f query='{ repository(owner: "mikesol", name: "ilo") { pullRequest(number: <N>) { reviewThreads(first: 50) { nodes { id isResolved } } } } }'
+gh api graphql -f query='{ repository(owner: "mikesol", name: "mvfm") { pullRequest(number: <N>) { reviewThreads(first: 50) { nodes { id isResolved } } } } }'
 
 # Resolve a thread
 gh api graphql -f query='mutation { resolveReviewThread(input: {threadId: "<thread_id>"}) { thread { isResolved } } }'

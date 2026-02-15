@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 import { GenericContainer, type StartedTestContainer } from "testcontainers";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { error } from "../../../../src/plugins/error";
 import { errorInterpreter } from "../../../../src/plugins/error/interpreter";
@@ -39,7 +39,7 @@ const allFragments = [
   strInterpreter,
 ];
 
-const app = ilo(num, str, stripePlugin({ apiKey: "sk_test_fake" }), fiber, error);
+const app = mvfm(num, str, stripePlugin({ apiKey: "sk_test_fake" }), fiber, error);
 
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);

@@ -22,8 +22,8 @@
 
 ```bash
 gh issue edit 50 --add-assignee @me --remove-label ready --add-label in-progress
-git worktree add ../ilo-50 -b issue-50
-cd ../ilo-50
+git worktree add ../mvfm-50 -b issue-50
+cd ../mvfm-50
 ```
 
 **Step 2: Create directories**
@@ -54,7 +54,7 @@ Create `tests/plugins/anthropic/0.74.0/index.test.ts`:
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 import { anthropic } from "../../../../src/plugins/anthropic/0.74.0";
@@ -65,7 +65,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, str, anthropic({ apiKey: "sk-ant-test-123" }));
+const app = mvfm(num, str, anthropic({ apiKey: "sk-ant-test-123" }));
 
 // ============================================================
 // Messages
@@ -302,7 +302,7 @@ Create `src/plugins/anthropic/0.74.0/index.ts`:
 
 ```ts
 // ============================================================
-// ILO PLUGIN: anthropic (@anthropic-ai/sdk compatible API)
+// MVFM PLUGIN: anthropic (@anthropic-ai/sdk compatible API)
 // ============================================================
 //
 // Implementation status: COMPLETE (9 of 9 modelable operations)
@@ -326,7 +326,7 @@ Create `src/plugins/anthropic/0.74.0/index.ts`:
 // ============================================================
 //
 // Goal: An LLM that knows @anthropic-ai/sdk should be able to
-// write Ilo programs with near-zero learning curve. The API
+// write Mvfm programs with near-zero learning curve. The API
 // mirrors the real SDK: client.messages.create(...) becomes
 // $.anthropic.messages.create(...).
 //
@@ -541,17 +541,17 @@ export function anthropic(config: AnthropicConfig): PluginDefinition<AnthropicMe
 //
 // 1. Non-streaming message creation:
 //    Real:  const msg = await client.messages.create({ model: '...', max_tokens: 1024, messages: [...] })
-//    Ilo:   const msg = $.anthropic.messages.create({ model: '...', max_tokens: 1024, messages: [...] })
+//    Mvfm:   const msg = $.anthropic.messages.create({ model: '...', max_tokens: 1024, messages: [...] })
 //    Nearly identical. Only difference is $ prefix and no await.
 //
 // 2. Token counting:
 //    Real:  const count = await client.messages.countTokens({ model: '...', messages: [...] })
-//    Ilo:   const count = $.anthropic.messages.countTokens({ model: '...', messages: [...] })
+//    Mvfm:   const count = $.anthropic.messages.countTokens({ model: '...', messages: [...] })
 //    1:1 mapping.
 //
 // 3. Batch operations:
 //    Real:  const batch = await client.messages.batches.create({ requests: [...] })
-//    Ilo:   const batch = $.anthropic.messages.batches.create({ requests: [...] })
+//    Mvfm:   const batch = $.anthropic.messages.batches.create({ requests: [...] })
 //    Nested resource pattern maps directly.
 //
 // 4. Cross-operation dependencies:
@@ -563,22 +563,22 @@ export function anthropic(config: AnthropicConfig): PluginDefinition<AnthropicMe
 //
 // 5. Return types:
 //    Real SDK has typed responses (Message, MessageTokensCount, etc.)
-//    Ilo uses Record<string, unknown>. Property access works via proxy
+//    Mvfm uses Record<string, unknown>. Property access works via proxy
 //    but no IDE autocomplete for Anthropic-specific fields.
 //
 // DOESN'T WORK / NOT MODELED:
 //
 // 6. Streaming:
 //    Real:  const stream = client.messages.stream({ ... })
-//    Ilo:   Can't model SSE/async iterators. Only non-streaming create.
+//    Mvfm:   Can't model SSE/async iterators. Only non-streaming create.
 //
 // 7. Structured output (parse):
 //    Real:  const msg = await client.messages.parse({ ..., output_config: { format: zodOutputFormat(...) } })
-//    Ilo:   Not modeled. parse() is a client-side Zod wrapper over create().
+//    Mvfm:   Not modeled. parse() is a client-side Zod wrapper over create().
 //
 // 8. Batch results streaming:
 //    Real:  for await (const result of client.messages.batches.results('...')) { ... }
-//    Ilo:   Not modeled. JSONL streaming.
+//    Mvfm:   Not modeled. JSONL streaming.
 //
 // ============================================================
 ```
@@ -612,14 +612,14 @@ Create `tests/plugins/anthropic/0.74.0/interpreter.test.ts`:
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { foldAST, ilo } from "../../../../src/core";
+import { foldAST, mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 import { anthropic } from "../../../../src/plugins/anthropic/0.74.0";
 import { anthropicInterpreter } from "../../../../src/plugins/anthropic/0.74.0/interpreter";
 
-const app = ilo(num, str, anthropic({ apiKey: "sk-ant-test-123" }));
+const app = mvfm(num, str, anthropic({ apiKey: "sk-ant-test-123" }));
 const fragments = [anthropicInterpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {
@@ -1180,7 +1180,7 @@ export interface ClientHandlerState {
  * Creates a client-side {@link StepHandler} that sends effects as JSON
  * to a remote server endpoint for execution.
  *
- * Each effect is sent as a POST request to `{baseUrl}/ilo/execute` with
+ * Each effect is sent as a POST request to `{baseUrl}/mvfm/execute` with
  * the contract hash, step index, path, and effect payload. The server
  * is expected to return `{ result: unknown }` in the response body.
  *
@@ -1196,7 +1196,7 @@ export function clientHandler(options: ClientHandlerOptions): StepHandler<Client
     context: StepContext,
     state: ClientHandlerState,
   ): Promise<{ value: unknown; state: ClientHandlerState }> => {
-    const response = await fetchFn(`${baseUrl}/ilo/execute`, {
+    const response = await fetchFn(`${baseUrl}/mvfm/execute`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -1,7 +1,7 @@
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { ilo } from "../../src/core";
+import { mvfm } from "../../src/core";
 import { coreInterpreter } from "../../src/interpreters/core";
 import { eq } from "../../src/plugins/eq";
 import { eqInterpreter } from "../../src/plugins/eq/interpreter";
@@ -48,7 +48,7 @@ const nonPgFragments = [
 
 const allFragments = [postgresInterpreter, ...nonPgFragments];
 
-const app = ilo(num, str, semiring, eq, ord, pgPlugin("postgres://test"), fiber, error);
+const app = mvfm(num, str, semiring, eq, ord, pgPlugin("postgres://test"), fiber, error);
 
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);

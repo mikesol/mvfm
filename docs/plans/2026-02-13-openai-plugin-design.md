@@ -10,7 +10,7 @@
 
 Implement the `openai` plugin wrapping the [openai-node](https://github.com/openai/openai-node) SDK. Scoped to "AI text" operations: chat completions, embeddings, moderations, and legacy completions.
 
-The API must hug the real openai-node SDK 1:1. An LLM trained on the real SDK should be able to write ilo OpenAI programs with near-zero learning curve.
+The API must hug the real openai-node SDK 1:1. An LLM trained on the real SDK should be able to write mvfm OpenAI programs with near-zero learning curve.
 
 ## API Surface
 
@@ -28,10 +28,10 @@ await openai.moderations.create({ model: "omni-moderation-latest", input: "some 
 await openai.completions.create({ model: "gpt-3.5-turbo-instruct", prompt: "Say hello" })
 ```
 
-### Ilo equivalent (1:1)
+### Mvfm equivalent (1:1)
 
 ```ts
-const app = ilo(openai({ apiKey: "sk-..." }));
+const app = mvfm(openai({ apiKey: "sk-..." }));
 app(($) => {
   $.openai.chat.completions.create({ model: "gpt-4o", messages: [...] })
   $.openai.chat.completions.retrieve("cmpl_123")
@@ -67,7 +67,7 @@ export interface OpenAIConfig {
 }
 ```
 
-`apiKey` is required. `organization` and `project` are optional overrides (the SDK reads them from env vars by default, but ilo bakes them into AST nodes). Runtime-only options (baseURL, timeout, maxRetries, fetch) belong in the SDK adapter / handler, not in the AST.
+`apiKey` is required. `organization` and `project` are optional overrides (the SDK reads them from env vars by default, but mvfm bakes them into AST nodes). Runtime-only options (baseURL, timeout, maxRetries, fetch) belong in the SDK adapter / handler, not in the AST.
 
 ## Architecture
 
@@ -168,7 +168,7 @@ Based on source-level analysis of openai-node v6.21.0 (cloned at `/tmp/openai-no
 
 ### Works but different from SDK
 
-| Aspect | Real SDK | Ilo |
+| Aspect | Real SDK | Mvfm |
 |---|---|---|
 | Sequencing | `await` chains | `$.do()` for explicit sequencing |
 | Return types | `ChatCompletion`, `Embedding`, etc. (typed) | `Record<string, unknown>` (untyped, proxy access) |

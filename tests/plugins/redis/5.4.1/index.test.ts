@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { num } from "../../../../src/plugins/num";
 import { redis } from "../../../../src/plugins/redis/5.4.1";
 import { str } from "../../../../src/plugins/str";
@@ -10,7 +10,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, str, redis({ host: "127.0.0.1", port: 6379 }));
+const app = mvfm(num, str, redis({ host: "127.0.0.1", port: 6379 }));
 
 // ============================================================
 // String commands
@@ -444,7 +444,7 @@ describe("redis: cross-operation dependencies", () => {
 
 describe("redis: string URL config", () => {
   it("accepts string config", () => {
-    const urlApp = ilo(num, str, redis("redis://localhost:6379/0"));
+    const urlApp = mvfm(num, str, redis("redis://localhost:6379/0"));
     const prog = urlApp(($) => $.redis.get("test"));
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("redis/get");

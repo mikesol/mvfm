@@ -1,5 +1,5 @@
 // ============================================================
-// ILO PLUGIN: twilio (twilio-node compatible API)
+// MVFM PLUGIN: twilio (twilio-node compatible API)
 // ============================================================
 //
 // Implementation status: PARTIAL (2 of 30+ service domains)
@@ -30,7 +30,7 @@
 // ============================================================
 //
 // Goal: An LLM that knows twilio-node should be able to write
-// Ilo programs with near-zero learning curve. The API should
+// Mvfm programs with near-zero learning curve. The API should
 // look like the real twilio-node SDK as closely as possible.
 //
 // Real twilio-node API (v5.5.1):
@@ -240,7 +240,7 @@ export function twilio(config: TwilioConfig): PluginDefinition<TwilioMethods> {
 //
 // 1. Basic CRUD operations:
 //    Real:  const msg = await client.messages.create({ to: '+1...', from: '+1...', body: 'Hello' })
-//    Ilo:   const msg = $.twilio.messages.create({ to: '+1...', from: '+1...', body: 'Hello' })
+//    Mvfm:   const msg = $.twilio.messages.create({ to: '+1...', from: '+1...', body: 'Hello' })
 //    Nearly identical. Only difference is $ prefix and no await.
 //
 // 2. Parameterized operations with proxy values:
@@ -249,21 +249,21 @@ export function twilio(config: TwilioConfig): PluginDefinition<TwilioMethods> {
 //
 // 3. Resource method naming:
 //    Real:  client.messages.create(...)
-//    Ilo:   $.twilio.messages.create(...)
+//    Mvfm:   $.twilio.messages.create(...)
 //    The nested resource pattern maps 1:1.
 //
 // WORKS GREAT (cont.):
 //
 // 4. Fetch by SID:
 //    Real:  client.messages('SM123').fetch()
-//    Ilo:   $.twilio.messages('SM123').fetch()
+//    Mvfm:   $.twilio.messages('SM123').fetch()
 //    1:1 match. Uses Object.assign to make messages both callable
 //    and have .create()/.list() properties, just like twilio-node.
 //
 // 5. Return types:
 //    Real twilio-node has typed response classes (MessageInstance,
 //    CallInstance, etc.) with properties like .sid, .status, .body.
-//    Ilo uses Record<string, unknown> for all return types.
+//    Mvfm uses Record<string, unknown> for all return types.
 //    Property access still works via proxy (msg.sid, call.status),
 //    but no IDE autocomplete for Twilio-specific fields.
 //
@@ -271,7 +271,7 @@ export function twilio(config: TwilioConfig): PluginDefinition<TwilioMethods> {
 //
 // 6. Auto-pagination:
 //    Real:  client.messages.each({ pageSize: 20 }, (msg) => { ... })
-//    Ilo:   Can't model async iterators/callbacks.
+//    Mvfm:   Can't model async iterators/callbacks.
 //
 // 7. Webhooks / status callbacks:
 //    Server-initiated push events, not request/response.

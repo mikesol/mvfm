@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../src/core";
+import { mvfm } from "../../../src/core";
 import { fiber } from "../../../src/plugins/fiber";
 import { num } from "../../../src/plugins/num";
 import { postgres } from "../../../src/plugins/postgres/3.4.8";
@@ -10,7 +10,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, postgres("postgres://localhost/test"), fiber);
+const app = mvfm(num, postgres("postgres://localhost/test"), fiber);
 
 describe("fiber: $.par() tuple form", () => {
   it("produces core/tuple node with elements", () => {

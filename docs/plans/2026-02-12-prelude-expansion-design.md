@@ -184,9 +184,9 @@ export { bounded } from "./plugins/bounded";
 ## Usage After
 
 ```ts
-import { ilo, num, str, boolean, show, semigroup } from "ilo";
+import { mvfm, num, str, boolean, show, semigroup } from "mvfm";
 
-const app = ilo(num, str, boolean, show, semigroup);
+const app = mvfm(num, str, boolean, show, semigroup);
 
 app({ x: "number", y: "string" }, ($) => {
   const label = $.show($.input.x);              // show → num/show → "42"

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { composeInterpreters, ilo } from "../../../src/core";
+import { composeInterpreters, mvfm } from "../../../src/core";
 import { coreInterpreter } from "../../../src/interpreters/core";
 import { str } from "../../../src/plugins/str";
 import { strInterpreter } from "../../../src/plugins/str/interpreter";
@@ -21,7 +21,7 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   return await interp(ast.result);
 }
 
-const app = ilo(str);
+const app = mvfm(str);
 
 describe("str interpreter", () => {
   it("concat", async () =>
@@ -39,7 +39,7 @@ describe("str interpreter", () => {
   it("endsWith", async () => expect(await run(app(($) => $.endsWith("hello", "llo")))).toBe(true));
   it("len", async () => expect(await run(app(($) => $.len("hello")))).toBe(5));
   it("replace", async () =>
-    expect(await run(app(($) => $.replace("hello world", "world", "ilo")))).toBe("hello ilo"));
+    expect(await run(app(($) => $.replace("hello world", "world", "mvfm")))).toBe("hello mvfm"));
 
   it("with input", async () => {
     const prog = app({ name: "string" }, ($) => $.upper($.input.name));

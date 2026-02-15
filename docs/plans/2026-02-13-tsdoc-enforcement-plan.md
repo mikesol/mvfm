@@ -76,7 +76,7 @@ This will produce many warnings about missing documentation. Note the output —
 
 **Step 5: Create etc/ directory and generate initial API report**
 
-The first run creates `etc/ilo.api.md`. Add this directory to git tracking.
+The first run creates `etc/mvfm.api.md`. Add this directory to git tracking.
 
 **Step 6: Commit**
 
@@ -145,7 +145,7 @@ export type Plugin<T = any> = PluginDefinition<T> | (() => PluginDefinition<T>);
 export type Interpreter = (program: Program) => {
 ```
 
-**Step 5: Verify existing TSDoc on `Expr`, `ASTNode`, `Program`, `PluginContext`, `InterpreterFragment`, `composeInterpreters`, `ilo` — these already have TSDoc, no changes needed unless gaps found.**
+**Step 5: Verify existing TSDoc on `Expr`, `ASTNode`, `Program`, `PluginContext`, `InterpreterFragment`, `composeInterpreters`, `mvfm` — these already have TSDoc, no changes needed unless gaps found.**
 
 Review and confirm all exports from this file have comments.
 
@@ -845,7 +845,7 @@ git commit -m "docs: add TSDoc to all interpreter exports (#31)"
 ### Task 14: Regenerate API report and final validation
 
 **Files:**
-- Modify: `etc/ilo.api.md` (regenerated)
+- Modify: `etc/mvfm.api.md` (regenerated)
 
 **Step 1: Full build + api-extractor**
 

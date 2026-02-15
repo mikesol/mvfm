@@ -4,7 +4,7 @@ import {
   boolean,
   eq,
   heytingAlgebra,
-  ilo,
+  mvfm,
   num,
   ord,
   postgres,
@@ -14,7 +14,7 @@ import {
   str,
 } from "../src";
 
-const app = ilo(num, str, semiring);
+const app = mvfm(num, str, semiring);
 
 describe("typed inputs (generic parameter)", () => {
   it("$.input.name resolves to Expr<string> when schema declares name: string", () => {
@@ -87,8 +87,8 @@ describe("typed inputs (runtime schema)", () => {
 
 describe("typeclass type safety — negative tests", () => {
   it("eq without type plugins is a type error", () => {
-    const app = ilo(eq);
-    // Runtime: ilo(eq) with no type plugins throws when eq is actually called.
+    const app = mvfm(eq);
+    // Runtime: mvfm(eq) with no type plugins throws when eq is actually called.
     // We only verify the type-level error here; wrap in expect().toThrow()
     // since the @ts-expect-error-suppressed calls still execute at runtime.
     expect(() =>
@@ -103,7 +103,7 @@ describe("typeclass type safety — negative tests", () => {
   });
 
   it("eq with only num rejects string arguments", () => {
-    const app = ilo(num, eq);
+    const app = mvfm(num, eq);
     // Verify num eq typechecks and works at runtime
     const prog = app(($) => {
       const result = $.eq(1, 2);
@@ -121,7 +121,7 @@ describe("typeclass type safety — negative tests", () => {
   });
 
   it("eq with num and str accepts both", () => {
-    const app = ilo(num, str, eq);
+    const app = mvfm(num, str, eq);
     // Verify both num and str eq typecheck and work at runtime
     const prog = app(($) => {
       const r1 = $.eq(1, 2);
@@ -141,7 +141,7 @@ describe("typeclass type safety — negative tests", () => {
   });
 
   it("eq with all three type plugins accepts all", () => {
-    const app = ilo(num, str, boolean, eq);
+    const app = mvfm(num, str, boolean, eq);
     const prog = app(($) => {
       const r1 = $.eq(1, 2);
       const r2 = $.eq("a", "b");
@@ -155,7 +155,7 @@ describe("typeclass type safety — negative tests", () => {
   });
 
   it("ord without type plugins is a type error", () => {
-    const app = ilo(ord);
+    const app = mvfm(ord);
     expect(() =>
       app(($) => {
         // @ts-expect-error — no type plugin provides ord
@@ -166,7 +166,7 @@ describe("typeclass type safety — negative tests", () => {
   });
 
   it("ord with num accepts number arguments", () => {
-    const app = ilo(num, ord);
+    const app = mvfm(num, ord);
     const prog = app(($) => {
       const r1 = $.gt(1, 2);
       const r2 = $.lt(1, 2);
@@ -191,7 +191,7 @@ describe("typeclass type safety — negative tests", () => {
   });
 
   it("show without type plugins is a type error", () => {
-    const app = ilo(show);
+    const app = mvfm(show);
     expect(() =>
       app(($) => {
         // @ts-expect-error — no type plugin provides show
@@ -202,7 +202,7 @@ describe("typeclass type safety — negative tests", () => {
   });
 
   it("show with num accepts numbers only", () => {
-    const app = ilo(num, show);
+    const app = mvfm(num, show);
     const prog = app(($) => {
       const result = $.show(1);
       expectTypeOf(result).toEqualTypeOf<Expr<string>>();
@@ -219,7 +219,7 @@ describe("typeclass type safety — negative tests", () => {
   });
 
   it("show with all three type plugins accepts all", () => {
-    const app = ilo(num, str, boolean, show);
+    const app = mvfm(num, str, boolean, show);
     const prog = app(($) => {
       const r1 = $.show(1);
       const r2 = $.show("hello");
@@ -233,7 +233,7 @@ describe("typeclass type safety — negative tests", () => {
   });
 
   it("semiring without type plugins is a type error", () => {
-    const app = ilo(semiring);
+    const app = mvfm(semiring);
     expect(() =>
       app(($) => {
         // @ts-expect-error — no type plugin provides semiring
@@ -244,7 +244,7 @@ describe("typeclass type safety — negative tests", () => {
   });
 
   it("semiring with num accepts numbers", () => {
-    const app = ilo(num, semiring);
+    const app = mvfm(num, semiring);
     const prog = app(($) => {
       const r1 = $.add(1, 2);
       const r2 = $.mul(1, 2);
@@ -256,7 +256,7 @@ describe("typeclass type safety — negative tests", () => {
   });
 
   it("semigroup without str is a type error", () => {
-    const app = ilo(num, semigroup);
+    const app = mvfm(num, semigroup);
     expect(() =>
       app(($) => {
         // @ts-expect-error — num doesn't provide semigroup
@@ -267,7 +267,7 @@ describe("typeclass type safety — negative tests", () => {
   });
 
   it("semigroup with str accepts strings", () => {
-    const app = ilo(str, semigroup);
+    const app = mvfm(str, semigroup);
     const prog = app(($) => {
       const result = $.append("a", "b");
       expectTypeOf(result).toEqualTypeOf<Expr<string>>();
@@ -277,7 +277,7 @@ describe("typeclass type safety — negative tests", () => {
   });
 
   it("heytingAlgebra without boolean is a type error", () => {
-    const app = ilo(num, eq, heytingAlgebra);
+    const app = mvfm(num, eq, heytingAlgebra);
     expect(() =>
       app(($) => {
         // @ts-expect-error — num doesn't provide heytingAlgebra
@@ -288,7 +288,7 @@ describe("typeclass type safety — negative tests", () => {
   });
 
   it("heytingAlgebra with boolean accepts boolean arguments", () => {
-    const app = ilo(num, boolean, eq, heytingAlgebra);
+    const app = mvfm(num, boolean, eq, heytingAlgebra);
     const prog = app({ x: "number", y: "number" }, ($) => {
       const a = $.eq($.input.x, 1);
       const b = $.eq($.input.y, 2);
@@ -306,7 +306,7 @@ describe("typeclass type safety — negative tests", () => {
 
 describe("non-typeclass plugin isolation", () => {
   it("non-typeclass plugins work without any type plugins", () => {
-    const app = ilo(postgres("postgres://localhost/test"));
+    const app = mvfm(postgres("postgres://localhost/test"));
     app(($) => {
       const result = $.sql`select 1`;
       expectTypeOf(result).toEqualTypeOf<Expr<Record<string, any>[]>>();

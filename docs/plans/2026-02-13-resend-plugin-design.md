@@ -104,8 +104,8 @@ await resend.contacts.get('contact_id');
 await resend.contacts.list();
 await resend.contacts.remove('contact_id');
 
-// Ilo:
-const app = ilo(num, str, resend({ apiKey: 're_123' }));
+// Mvfm:
+const app = mvfm(num, str, resend({ apiKey: 're_123' }));
 app(($) => {
   const email = $.resend.emails.send({ from: '...', to: '...', subject: '...', html: '...' });
   const fetched = $.resend.emails.get('email_id');
@@ -120,7 +120,7 @@ app(($) => {
 
 ### Design decisions
 
-1. **Error handling:** SDK adapter unwraps `{ data, error }` — returns `data` on success, throws on error. Ilo's error plugin handles errors at the DSL level.
+1. **Error handling:** SDK adapter unwraps `{ data, error }` — returns `data` on success, throws on error. Mvfm's error plugin handles errors at the DSL level.
 2. **No react support:** Documented as deviation. Users pass `html` or `text`.
 3. **`batch.send` takes array param:** Interpreter resolves via recurse, posts to `/emails/batch`.
 4. **`contacts.get` takes string ID:** Simple case only. Overloaded `{ id?, email?, audienceId? }` form deferred to pass 2.

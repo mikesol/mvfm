@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { composeInterpreters, ilo } from "../../../src/core";
+import { composeInterpreters, mvfm } from "../../../src/core";
 import { coreInterpreter } from "../../../src/interpreters/core";
 import { eq } from "../../../src/plugins/eq";
 import { eqInterpreter } from "../../../src/plugins/eq/interpreter";
@@ -30,7 +30,7 @@ const interp = composeInterpreters([
   eqInterpreter,
 ]);
 
-const app = ilo(num, semiring, eq, ord, error);
+const app = mvfm(num, semiring, eq, ord, error);
 
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);

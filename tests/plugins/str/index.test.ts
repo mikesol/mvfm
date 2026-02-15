@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../src/core";
+import { mvfm } from "../../../src/core";
 import { str } from "../../../src/plugins/str";
 
 function strip(ast: unknown): unknown {
   return JSON.parse(JSON.stringify(ast, (k, v) => (k === "__id" ? undefined : v)));
 }
 
-const app = ilo(str);
+const app = mvfm(str);
 
 describe("str: tagged template", () => {
   it("produces str/template node", () => {

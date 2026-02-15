@@ -35,7 +35,7 @@ Based on reading the full source of `@fal-ai/client` at https://github.com/fal-a
 
 ### Deviations from Real API
 
-1. **Non-modelable options silently ignored:** Real SDK `RunOptions` includes `method`, `abortSignal`, `storageSettings`, `startTimeout`. Ilo accepts the same `{ input: ... }` shape but only extracts `input` — runtime options are not AST-representable. Similarly, `QueueStatusOptions` includes `logs` and `abortSignal` which are ignored.
+1. **Non-modelable options silently ignored:** Real SDK `RunOptions` includes `method`, `abortSignal`, `storageSettings`, `startTimeout`. Mvfm accepts the same `{ input: ... }` shape but only extracts `input` — runtime options are not AST-representable. Similarly, `QueueStatusOptions` includes `logs` and `abortSignal` which are ignored.
 
 2. **Callbacks dropped:** `subscribe` in the real SDK accepts `onQueueUpdate` and `onEnqueue` callbacks. Not modelable in AST.
 
@@ -108,7 +108,7 @@ export interface FalClient {
 ### Honest Assessment
 
 **Works great:**
-- `fal.run()` and `fal.subscribe()` are 1:1 with real SDK signatures. An LLM trained on @fal-ai/client can write Ilo fal programs with zero adaptation.
+- `fal.run()` and `fal.subscribe()` are 1:1 with real SDK signatures. An LLM trained on @fal-ai/client can write Mvfm fal programs with zero adaptation.
 - Queue operations (submit/status/result/cancel) use identical signatures — `{ input: ... }`, `{ requestId: ... }`.
 - Proxy chains work for data flow: `queued.request_id` captures the dependency inside `{ requestId: queued.request_id }`.
 

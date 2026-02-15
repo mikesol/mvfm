@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { cloudflareKv } from "../../../../src/plugins/cloudflare-kv/4.20260213.0";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
@@ -10,7 +10,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, str, cloudflareKv({ namespaceId: "MY_KV" }));
+const app = mvfm(num, str, cloudflareKv({ namespaceId: "MY_KV" }));
 
 // ============================================================
 // get (text)

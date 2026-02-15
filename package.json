@@ -1,5 +1,5 @@
 {
-  "name": "ilo",
+  "name": "mvfm",
   "version": "0.0.1",
   "description": "Extensible tagless final DSL for deterministic, verifiable programs in TypeScript",
   "main": "dist/index.js",

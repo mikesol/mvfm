@@ -24,7 +24,7 @@ logger.info({ userId: 123 }, "user logged in");
 logger.info({ userId: 123 });  // object-only, no message
 logger.child({ requestId: "abc" }).warn("slow query");
 
-// Ilo pino
+// Mvfm pino
 const p = pino({ level: "info" });
 // in program:
 $.pino.info("hello");
@@ -35,7 +35,7 @@ $.pino.child({ requestId: $.input.reqId }).warn("slow query");
 
 ### Argument disambiguation (single-arg heuristic)
 
-Real pino distinguishes `logger.info("msg")` from `logger.info({ key: val })` by argument type. Ilo uses a build-time heuristic:
+Real pino distinguishes `logger.info("msg")` from `logger.info({ key: val })` by argument type. Mvfm uses a build-time heuristic:
 
 - Raw `string` → message (no merge object)
 - Raw `object` → merge object (no message)

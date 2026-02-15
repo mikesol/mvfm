@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { foldAST, ilo } from "../../../../src/core";
+import { foldAST, mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 import { stripe } from "../../../../src/plugins/stripe/2025-04-30.basil";
 import { stripeInterpreter } from "../../../../src/plugins/stripe/2025-04-30.basil/interpreter";
 
-const app = ilo(num, str, stripe({ apiKey: "sk_test_123" }));
+const app = mvfm(num, str, stripe({ apiKey: "sk_test_123" }));
 const fragments = [stripeInterpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {

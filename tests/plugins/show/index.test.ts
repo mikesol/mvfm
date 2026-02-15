@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../src/core";
+import { mvfm } from "../../../src/core";
 import { boolean } from "../../../src/plugins/boolean";
 import { num } from "../../../src/plugins/num";
 import { show } from "../../../src/plugins/show";
@@ -10,7 +10,7 @@ function strip(ast: unknown): unknown {
 }
 
 describe("show: dispatch", () => {
-  const app = ilo(num, str, boolean, show);
+  const app = mvfm(num, str, boolean, show);
 
   it("$.show(number) dispatches to num/show", () => {
     const prog = app(($) => $.show(42));
@@ -41,7 +41,7 @@ describe("show: dispatch", () => {
 
 describe("show: error cases", () => {
   it("throws when no show impl for inferred type", () => {
-    const app = ilo(show);
+    const app = mvfm(show);
     expect(() => app(($) => ($ as any).show(42))).toThrow(/No show implementation for type/);
   });
 });

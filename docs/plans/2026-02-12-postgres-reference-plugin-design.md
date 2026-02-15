@@ -18,7 +18,7 @@ fromAff :: Aff a -> Effect (Promise b)  -- Aff → Promise
 toAff :: Promise a -> Aff a              -- Promise → Aff
 ```
 
-This means ilo does NOT need an explicit monad stack. JavaScript's native `Promise` already provides:
+This means mvfm does NOT need an explicit monad stack. JavaScript's native `Promise` already provides:
 - **MonadThrow**: `throw` / `Promise.reject`
 - **MonadError**: `try/catch` / `.catch()`
 - **Parallel**: `Promise.all`, `Promise.race`, `Promise.allSettled`

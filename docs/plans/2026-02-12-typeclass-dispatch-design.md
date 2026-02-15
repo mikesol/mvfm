@@ -39,7 +39,7 @@ const prog = app({ name: "string", age: "number", active: "boolean" }, $ => {
 Nested records are plain objects. Arrays and nullable use imported helpers:
 
 ```ts
-import { array, nullable } from 'ilo'
+import { array, nullable } from 'mvfm'
 
 const prog = app({
   name: "string",
@@ -76,7 +76,7 @@ TypeScript infers literal types from the schema value when passed to a generic f
 
 ### API change
 
-The `define` function returned by `ilo()` gains an overload:
+The `define` function returned by `mvfm()` gains an overload:
 
 ```ts
 function define<S extends SchemaShape>(
@@ -327,7 +327,7 @@ const strInterpreter: InterpreterFragment = {
 
 ```ts
 describe("eq interpretation", () => {
-  const app = ilo(num, str, eq);
+  const app = mvfm(num, str, eq);
   const run = (prog: Program, input: Record<string, unknown>) => {
     const interp = composeInterpreters([coreInterpreter, numInterpreter, strInterpreter]);
     // Inject input data into the core/input node
@@ -366,7 +366,7 @@ describe("eq interpretation", () => {
 ### core/eq removal
 
 - `CoreDollar<I>` loses its `eq` method
-- The `eq` implementation inside `ilo()` is deleted
+- The `eq` implementation inside `mvfm()` is deleted
 - `"core/eq"` is no longer a valid node kind
 
 ### Test migration
@@ -375,11 +375,11 @@ Every test using `$.eq` adds the `eq` plugin and (if using `$.input`) a schema:
 
 ```ts
 // Before:
-const app = ilo(num, str)
+const app = mvfm(num, str)
 app($ => $.eq($.input.x, 1))
 
 // After:
-const app = ilo(num, str, eq)
+const app = mvfm(num, str, eq)
 app({ x: "number" }, $ => $.eq($.input.x, 1))
 ```
 
@@ -388,7 +388,7 @@ Tests not using `$.eq` or `$.input` don't change.
 ## Future work
 
 - **#20**: Broader typeclasses (Ord, Semiring, HeytingAlgebra) — same trait protocol, new trait names
-- **#22**: Zod bridge — `fromZod(zodSchema)` produces an ilo schema object
+- **#22**: Zod bridge — `fromZod(zodSchema)` produces an mvfm schema object
 - Plugin authoring guide update for trait registration
 
 ## Risks

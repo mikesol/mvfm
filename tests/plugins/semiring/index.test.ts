@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../src/core";
+import { mvfm } from "../../../src/core";
 import { num } from "../../../src/plugins/num";
 import { semiring } from "../../../src/plugins/semiring";
 
@@ -8,7 +8,7 @@ function strip(ast: unknown): unknown {
 }
 
 describe("semiring: dispatch to num", () => {
-  const app = ilo(num, semiring);
+  const app = mvfm(num, semiring);
 
   it("$.add(literal, literal) dispatches to num/add", () => {
     const prog = app(($) => $.add(1, 2));
@@ -40,7 +40,7 @@ describe("semiring: dispatch to num", () => {
 
 describe("semiring: error cases", () => {
   it("throws when no semiring impl for inferred type", () => {
-    const app = ilo(semiring);
+    const app = mvfm(semiring);
     expect(() => app(($) => ($ as any).add(1, 2))).toThrow(/No semiring implementation for type/);
   });
 });

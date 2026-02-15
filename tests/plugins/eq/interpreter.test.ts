@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { composeInterpreters, ilo } from "../../../src/core";
+import { composeInterpreters, mvfm } from "../../../src/core";
 import { coreInterpreter } from "../../../src/interpreters/core";
 import { boolean } from "../../../src/plugins/boolean";
 import { booleanInterpreter } from "../../../src/plugins/boolean/interpreter";
@@ -36,7 +36,7 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
 }
 
 describe("eq interpretation: numbers", () => {
-  const app = ilo(num, eq);
+  const app = mvfm(num, eq);
 
   it("equal numbers -> true", async () => {
     const prog = app(($) => $.eq(42, 42));
@@ -56,7 +56,7 @@ describe("eq interpretation: numbers", () => {
 });
 
 describe("eq interpretation: strings", () => {
-  const app = ilo(str, eq);
+  const app = mvfm(str, eq);
 
   it("equal strings -> true", async () => {
     const prog = app(($) => $.eq("hello", "hello"));
@@ -76,7 +76,7 @@ describe("eq interpretation: strings", () => {
 });
 
 describe("eq interpretation: booleans", () => {
-  const app = ilo(boolean, eq);
+  const app = mvfm(boolean, eq);
 
   it("equal booleans -> true", async () => {
     const prog = app(($) => $.eq(true, true));
@@ -90,7 +90,7 @@ describe("eq interpretation: booleans", () => {
 });
 
 describe("eq + cond interpretation: end-to-end", () => {
-  const app = ilo(num, str, eq);
+  const app = mvfm(num, str, eq);
 
   it("cond(eq(input.x, 1)).t('one').f('other') with x=1", async () => {
     const prog = app({ x: "number" }, ($) => $.cond($.eq($.input.x, 1)).t("one").f("other"));
@@ -108,7 +108,7 @@ describe("eq + cond interpretation: end-to-end", () => {
 });
 
 describe("eq interpretation: neq", () => {
-  const app = ilo(num, eq);
+  const app = mvfm(num, eq);
 
   it("neq(1, 2) returns true", async () => {
     const prog = app(($) => $.neq(1, 2));

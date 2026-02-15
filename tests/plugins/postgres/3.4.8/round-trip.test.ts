@@ -3,7 +3,7 @@ import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testconta
 import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { InterpreterFragment, StepContext } from "../../../../src/core";
-import { ilo, runAST } from "../../../../src/core";
+import { mvfm, runAST } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { eq } from "../../../../src/plugins/eq";
 import { eqInterpreter } from "../../../../src/plugins/eq/interpreter";
@@ -40,7 +40,7 @@ const nonPgFragments = [
 const allFragments = [postgresInterpreter, ...nonPgFragments];
 
 // The connection string here is only used during AST construction (not at runtime).
-const app = ilo(num, str, semiring, eq, ord, pgPlugin("postgres://test"));
+const app = mvfm(num, str, semiring, eq, ord, pgPlugin("postgres://test"));
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
@@ -62,7 +62,7 @@ beforeAll(async () => {
 
   // Start HTTP server that wraps serverHandler
   httpServer = http.createServer(async (req, res) => {
-    if (req.method !== "POST" || req.url !== "/ilo/execute") {
+    if (req.method !== "POST" || req.url !== "/mvfm/execute") {
       res.writeHead(404);
       res.end();
       return;

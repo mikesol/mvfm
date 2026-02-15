@@ -17,7 +17,7 @@ Additionally, `$.input` is `Expr<Record<string, unknown>>` — completely untype
 The `define` function gains a type parameter `I` for the input schema, defaulting to `never`:
 
 ```ts
-const app = ilo(num, str)
+const app = mvfm(num, str)
 
 // I = never (default) — $.input is untouchable
 const prog1 = app(($) => $.add(1, 2))
@@ -40,7 +40,7 @@ Remove the `[key: string]: any` index signature from `Expr<T>`. Replace with map
 
 ```ts
 type Expr<T> = {
-  readonly [ILO]: true;
+  readonly [MVFM]: true;
   readonly __node: ASTNode;
 } & (
   T extends Record<string, unknown>

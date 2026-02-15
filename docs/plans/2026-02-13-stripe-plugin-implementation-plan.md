@@ -54,7 +54,7 @@ Create: `tests/plugins/stripe/2025-04-30.basil/index.test.ts`
 
 ```typescript
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 import { stripe } from "../../../../src/plugins/stripe/2025-04-30.basil";
@@ -65,7 +65,7 @@ function strip(ast: unknown): unknown {
   );
 }
 
-const app = ilo(num, str, stripe({ apiKey: "sk_test_fake" }));
+const app = mvfm(num, str, stripe({ apiKey: "sk_test_fake" }));
 
 // ============================================================
 // Payment Intents
@@ -252,7 +252,7 @@ Create: `src/plugins/stripe/2025-04-30.basil/index.ts`
 
 ```typescript
 // ============================================================
-// ILO PLUGIN: stripe (Stripe API 2025-04-30.basil)
+// MVFM PLUGIN: stripe (Stripe API 2025-04-30.basil)
 // ============================================================
 //
 // Based on source-level analysis of stripe-node
@@ -270,7 +270,7 @@ Create: `src/plugins/stripe/2025-04-30.basil/index.ts`
 //   const customer = await stripe.customers.create({ email: '...' })
 //   const charge = await stripe.charges.create({ amount: 1000, currency: 'usd', source: '...' })
 //
-// Ilo:
+// Mvfm:
 //   const pi = $.stripe.paymentIntents.create({ amount: 2000, currency: 'usd' })
 //   const customer = $.stripe.customers.create({ email: '...' })
 //   const charge = $.stripe.charges.create({ amount: 1000, currency: 'usd', source: '...' })
@@ -297,7 +297,7 @@ export interface StripeMethods {
        * Create a PaymentIntent.
        *
        * Real: `stripe.paymentIntents.create({ amount, currency, ... })`
-       * Ilo: `$.stripe.paymentIntents.create({ amount, currency, ... })`
+       * Mvfm: `$.stripe.paymentIntents.create({ amount, currency, ... })`
        */
       create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
 
@@ -305,7 +305,7 @@ export interface StripeMethods {
        * Retrieve a PaymentIntent by ID.
        *
        * Real: `stripe.paymentIntents.retrieve('pi_...')`
-       * Ilo: `$.stripe.paymentIntents.retrieve('pi_...')`
+       * Mvfm: `$.stripe.paymentIntents.retrieve('pi_...')`
        */
       retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
 
@@ -313,7 +313,7 @@ export interface StripeMethods {
        * Confirm a PaymentIntent.
        *
        * Real: `stripe.paymentIntents.confirm('pi_...', { payment_method: '...' })`
-       * Ilo: `$.stripe.paymentIntents.confirm('pi_...', { payment_method: '...' })`
+       * Mvfm: `$.stripe.paymentIntents.confirm('pi_...', { payment_method: '...' })`
        */
       confirm(id: Expr<string> | string, params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
     };
@@ -324,7 +324,7 @@ export interface StripeMethods {
        * Create a Customer.
        *
        * Real: `stripe.customers.create({ email, name, ... })`
-       * Ilo: `$.stripe.customers.create({ email, name, ... })`
+       * Mvfm: `$.stripe.customers.create({ email, name, ... })`
        */
       create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
 
@@ -332,7 +332,7 @@ export interface StripeMethods {
        * Retrieve a Customer by ID.
        *
        * Real: `stripe.customers.retrieve('cus_...')`
-       * Ilo: `$.stripe.customers.retrieve('cus_...')`
+       * Mvfm: `$.stripe.customers.retrieve('cus_...')`
        */
       retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
 
@@ -340,7 +340,7 @@ export interface StripeMethods {
        * Update a Customer.
        *
        * Real: `stripe.customers.update('cus_...', { name: '...' })`
-       * Ilo: `$.stripe.customers.update('cus_...', { name: '...' })`
+       * Mvfm: `$.stripe.customers.update('cus_...', { name: '...' })`
        */
       update(id: Expr<string> | string, params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
 
@@ -348,7 +348,7 @@ export interface StripeMethods {
        * List Customers.
        *
        * Real: `stripe.customers.list({ limit: 10 })`
-       * Ilo: `$.stripe.customers.list({ limit: 10 })`
+       * Mvfm: `$.stripe.customers.list({ limit: 10 })`
        *
        * Returns `{object: 'list', data: Customer[], has_more: boolean}`.
        */
@@ -361,7 +361,7 @@ export interface StripeMethods {
        * Create a Charge.
        *
        * Real: `stripe.charges.create({ amount, currency, source, ... })`
-       * Ilo: `$.stripe.charges.create({ amount, currency, source, ... })`
+       * Mvfm: `$.stripe.charges.create({ amount, currency, source, ... })`
        */
       create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
 
@@ -369,7 +369,7 @@ export interface StripeMethods {
        * Retrieve a Charge by ID.
        *
        * Real: `stripe.charges.retrieve('ch_...')`
-       * Ilo: `$.stripe.charges.retrieve('ch_...')`
+       * Mvfm: `$.stripe.charges.retrieve('ch_...')`
        */
       retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
 
@@ -377,7 +377,7 @@ export interface StripeMethods {
        * List Charges.
        *
        * Real: `stripe.charges.list({ limit: 5 })`
-       * Ilo: `$.stripe.charges.list({ limit: 5 })`
+       * Mvfm: `$.stripe.charges.list({ limit: 5 })`
        *
        * Returns `{object: 'list', data: Charge[], has_more: boolean}`.
        */
@@ -532,7 +532,7 @@ export function stripe(config: StripeConfig): PluginDefinition<StripeMethods> {
 //
 // 1. Basic CRUD operations:
 //    Real:  const pi = await stripe.paymentIntents.create({ amount: 2000, currency: 'usd' })
-//    Ilo: const pi = $.stripe.paymentIntents.create({ amount: 2000, currency: 'usd' })
+//    Mvfm: const pi = $.stripe.paymentIntents.create({ amount: 2000, currency: 'usd' })
 //    Nearly identical. No await, $ prefix.
 //
 // 2. Chaining results via proxy:
@@ -556,17 +556,17 @@ export function stripe(config: StripeConfig): PluginDefinition<StripeMethods> {
 //
 // 5. List pagination:
 //    Real: for await (const charge of stripe.charges.list()) { ... }
-//    Ilo: $.stripe.charges.list({ limit: 100 })
+//    Mvfm: $.stripe.charges.list({ limit: 100 })
 //    Returns one page. No auto-pagination (that requires async iteration
 //    which can't be expressed as a finite AST). Users must manually
 //    paginate with starting_after parameter.
 //
 // 6. Response types:
 //    Real SDK returns fully-typed Stripe.PaymentIntent, Stripe.Customer, etc.
-//    Ilo returns Record<string, unknown> — the proxy gives you property
+//    Mvfm returns Record<string, unknown> — the proxy gives you property
 //    access but without the SDK's detailed type narrowing. This is because
 //    Stripe's response types have hundreds of fields and deep nesting;
-//    modeling all of them as Ilo types would be enormous and fragile.
+//    modeling all of them as Mvfm types would be enormous and fragile.
 //
 // ❌ DOESN'T WORK:
 //
@@ -586,7 +586,7 @@ export function stripe(config: StripeConfig): PluginDefinition<StripeMethods> {
 //
 // 11. Expand parameters:
 //     Real: stripe.paymentIntents.retrieve('pi_...', { expand: ['customer'] })
-//     Ilo: Users can pass expand in params, but the response type won't
+//     Mvfm: Users can pass expand in params, but the response type won't
 //     reflect the expanded fields (still Record<string, unknown>).
 //
 // ============================================================
@@ -594,7 +594,7 @@ export function stripe(config: StripeConfig): PluginDefinition<StripeMethods> {
 // For the 90% case of "create, retrieve, update, list" — this is
 // nearly identical to the real Stripe SDK. Proxy chains capture
 // dependencies between operations. Error handling and parallel
-// execution work via existing ilo plugins.
+// execution work via existing mvfm plugins.
 //
 // The main gap is pagination: Stripe's auto-pagination uses async
 // iteration, which fundamentally can't be modeled as a finite AST.
@@ -635,7 +635,7 @@ This test verifies the interpreter yields the correct `stripe/api_call` effects.
 
 ```typescript
 import { describe, expect, it } from "vitest";
-import { foldAST, ilo } from "../../../../src/core";
+import { foldAST, mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { numInterpreter } from "../../../../src/plugins/num/interpreter";
@@ -644,7 +644,7 @@ import { strInterpreter } from "../../../../src/plugins/str/interpreter";
 import { stripe } from "../../../../src/plugins/stripe/2025-04-30.basil";
 import { stripeInterpreter } from "../../../../src/plugins/stripe/2025-04-30.basil/interpreter";
 
-const app = ilo(num, str, stripe({ apiKey: "sk_test_fake" }));
+const app = mvfm(num, str, stripe({ apiKey: "sk_test_fake" }));
 
 const fragments = [stripeInterpreter, coreInterpreter, numInterpreter, strInterpreter];
 
@@ -1141,7 +1141,7 @@ export interface ClientHandlerState {
  * Creates a client-side {@link StepHandler} that sends stripe effects
  * as JSON to a remote server endpoint for execution.
  *
- * Each effect is sent as a POST request to `{baseUrl}/ilo/execute` with
+ * Each effect is sent as a POST request to `{baseUrl}/mvfm/execute` with
  * the contract hash, step index, path, and effect payload. The server
  * is expected to return `{ result: unknown }` in the response body.
  *
@@ -1162,7 +1162,7 @@ export function clientHandler(options: ClientHandlerOptions): StepHandler<Client
     context: StepContext,
     state: ClientHandlerState,
   ): Promise<{ value: unknown; state: ClientHandlerState }> => {
-    const response = await fetchFn(`${baseUrl}/ilo/execute`, {
+    const response = await fetchFn(`${baseUrl}/mvfm/execute`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1218,7 +1218,7 @@ These use the `stripe/stripe-mock` Docker container via testcontainers' `Generic
 import { GenericContainer, type StartedTestContainer } from "testcontainers";
 import Stripe from "stripe";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { error } from "../../../../src/plugins/error";
 import { errorInterpreter } from "../../../../src/plugins/error/interpreter";
@@ -1257,7 +1257,7 @@ const allFragments = [
 ];
 
 // apiKey is unused by stripe-mock but the SDK requires it
-const app = ilo(
+const app = mvfm(
   num,
   str,
   stripePlugin({ apiKey: "sk_test_fake" }),

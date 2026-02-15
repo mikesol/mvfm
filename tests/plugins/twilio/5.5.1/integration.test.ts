@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ilo } from "../../../../src/core";
+import { mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { numInterpreter } from "../../../../src/plugins/num/interpreter";
@@ -23,7 +23,7 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 
 const allFragments = [twilioInterpreter, coreInterpreter, numInterpreter, strInterpreter];
 
-const app = ilo(num, str, twilioPlugin({ accountSid: "AC_test_123", authToken: "auth_test_456" }));
+const app = mvfm(num, str, twilioPlugin({ accountSid: "AC_test_123", authToken: "auth_test_456" }));
 
 /**
  * Mock Twilio client that returns canned responses based on method/path.

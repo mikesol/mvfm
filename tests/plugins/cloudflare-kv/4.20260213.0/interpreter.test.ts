@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { foldAST, ilo } from "../../../../src/core";
+import { foldAST, mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { cloudflareKv } from "../../../../src/plugins/cloudflare-kv/4.20260213.0";
 import { cloudflareKvInterpreter } from "../../../../src/plugins/cloudflare-kv/4.20260213.0/interpreter";
 import { num } from "../../../../src/plugins/num";
 import { str } from "../../../../src/plugins/str";
 
-const app = ilo(num, str, cloudflareKv({ namespaceId: "MY_KV" }));
+const app = mvfm(num, str, cloudflareKv({ namespaceId: "MY_KV" }));
 const fragments = [cloudflareKvInterpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {

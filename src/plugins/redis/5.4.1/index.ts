@@ -1,5 +1,5 @@
 // ============================================================
-// ILO PLUGIN: redis (ioredis compatible API)
+// MVFM PLUGIN: redis (ioredis compatible API)
 // ============================================================
 //
 // Implementation status: PARTIAL (Pass 1 of 60/30/10 split)

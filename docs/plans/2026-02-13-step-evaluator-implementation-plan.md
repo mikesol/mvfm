@@ -44,7 +44,7 @@ describe("step types", () => {
 
 **Step 2: Run test to verify it fails**
 
-Run: `cd /home/mikesol/Documents/GitHub/ilo/ilo && .venv/bin/python -c "print('skip')" && npx vitest run tests/step-evaluator.test.ts`
+Run: `cd /home/mikesol/Documents/GitHub/mvfm/mvfm && .venv/bin/python -c "print('skip')" && npx vitest run tests/step-evaluator.test.ts`
 Expected: FAIL — `StepEffect` and `StepContext` don't exist yet.
 
 **Step 3: Add types to core.ts**
@@ -257,7 +257,7 @@ export type { LegacyInterpreterFragment, GeneratorInterpreterFragment } from "./
 Add to the value exports (near `composeInterpreters`):
 
 ```typescript
-export { adaptLegacy, composeInterpreters, ilo } from "./core";
+export { adaptLegacy, composeInterpreters, mvfm } from "./core";
 ```
 
 **Step 5: Run test to verify it passes**
@@ -552,7 +552,7 @@ export class Stepper<S = void> {
 Add `Stepper` to the value exports:
 
 ```typescript
-export { adaptLegacy, composeInterpreters, ilo, Stepper } from "./core";
+export { adaptLegacy, composeInterpreters, mvfm, Stepper } from "./core";
 ```
 
 **Step 5: Run test to verify it passes**
@@ -792,7 +792,7 @@ export function foldAST(
 **Step 4: Export from index.ts**
 
 ```typescript
-export { adaptLegacy, composeInterpreters, foldAST, ilo, runAST, Stepper } from "./core";
+export { adaptLegacy, composeInterpreters, foldAST, mvfm, runAST, Stepper } from "./core";
 ```
 
 **Step 5: Run test to verify it passes**
@@ -1244,7 +1244,7 @@ describe("clientHandler", () => {
 
     expect(result.value).toEqual([{ ok: 1 }]);
     expect(result.state.stepIndex).toBe(1);
-    expect(requests[0].url).toBe("http://localhost:3000/ilo/execute");
+    expect(requests[0].url).toBe("http://localhost:3000/mvfm/execute");
     expect(requests[0].body.contractHash).toBe("abc123");
     expect(requests[0].body.effect.type).toBe("query");
   });
@@ -1396,7 +1396,7 @@ export function clientHandler(options: {
         : options.headers ?? {};
 
     const res = await (options.fetch ?? globalThis.fetch)(
-      `${options.baseUrl}/ilo/execute`,
+      `${options.baseUrl}/mvfm/execute`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json", ...resolvedHeaders },
@@ -1410,7 +1410,7 @@ export function clientHandler(options: {
     );
 
     if (!res.ok) {
-      throw new Error(`ilo proxy: ${res.status} ${await res.text()}`);
+      throw new Error(`mvfm proxy: ${res.status} ${await res.text()}`);
     }
 
     const data = await res.json();
@@ -1564,7 +1564,7 @@ import * as http from "node:http";
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { runAST, ilo } from "../../../../src/core";
+import { runAST, mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { numInterpreter } from "../../../../src/plugins/num/interpreter";
@@ -1589,7 +1589,7 @@ let serverPort: number;
 const nonPgFragments = [coreInterpreter, numInterpreter, strInterpreter, eqInterpreter, ordInterpreter];
 const allFragments = [postgresInterpreter, ...nonPgFragments];
 
-const app = ilo(num, str, semiring, eq, ord, pgPlugin("postgres://test"));
+const app = mvfm(num, str, semiring, eq, ord, pgPlugin("postgres://test"));
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
@@ -1611,7 +1611,7 @@ beforeAll(async () => {
 
   // Start HTTP server that wraps serverHandler
   httpServer = http.createServer(async (req, res) => {
-    if (req.method !== "POST" || req.url !== "/ilo/execute") {
+    if (req.method !== "POST" || req.url !== "/mvfm/execute") {
       res.writeHead(404);
       res.end();
       return;

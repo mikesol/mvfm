@@ -1,5 +1,5 @@
 // ============================================================
-// ILO PLUGIN: error — structured error handling
+// MVFM PLUGIN: error — structured error handling
 // ============================================================
 //
 // This plugin provides error handling as first-class AST nodes.
@@ -9,7 +9,7 @@
 // DESIGN:
 //
 // In real JS, errors are implicit. Any function can throw.
-// In Ilo, errors are explicit. A program that might fail
+// In Mvfm, errors are explicit. A program that might fail
 // says so in its AST. This is the Either monad, but surfaced
 // as simple combinators.
 //

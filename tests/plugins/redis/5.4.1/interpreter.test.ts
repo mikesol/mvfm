@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { foldAST, ilo } from "../../../../src/core";
+import { foldAST, mvfm } from "../../../../src/core";
 import { coreInterpreter } from "../../../../src/interpreters/core";
 import { num } from "../../../../src/plugins/num";
 import { redis } from "../../../../src/plugins/redis/5.4.1";
 import { redisInterpreter } from "../../../../src/plugins/redis/5.4.1/interpreter";
 import { str } from "../../../../src/plugins/str";
 
-const app = ilo(num, str, redis({ host: "127.0.0.1", port: 6379 }));
+const app = mvfm(num, str, redis({ host: "127.0.0.1", port: 6379 }));
 const fragments = [redisInterpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {
