@@ -1,4 +1,4 @@
-import type { ASTNode, PluginContext, StepEffect } from "@mvfm/core";
+import type { PluginContext, TypedNode } from "@mvfm/core";
 import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
@@ -32,7 +32,7 @@ export class ZodLiteralBuilder<T extends LiteralValue> extends ZodSchemaBuilder<
   protected _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | ASTNode;
+    error?: string | TypedNode;
     extra?: Record<string, unknown>;
   }): ZodLiteralBuilder<T> {
     return new ZodLiteralBuilder<T>(
@@ -78,7 +78,7 @@ export function literalNamespace(ctx: PluginContext): ZodLiteralNamespace {
 /** Interpreter handlers for literal schema nodes. */
 export const literalInterpreter: SchemaInterpreterMap = {
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/literal": function* (node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
+  "zod/literal": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     const value = node.value;
     if (Array.isArray(value)) {
       return z.literal(value as [string, ...string[]]);

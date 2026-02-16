@@ -21,7 +21,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { postgres as pgPlugin } from "../../src/3.4.8";
 import { wrapPostgresJs } from "../../src/3.4.8/client-postgres-js";
 import { serverEvaluate } from "../../src/3.4.8/handler.server";
-import { postgresInterpreter } from "../../src/3.4.8/interpreter";
+import { createPostgresInterpreter } from "../../src/3.4.8/interpreter";
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
@@ -37,19 +37,6 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 let container: StartedPostgreSqlContainer;
 let sql: ReturnType<typeof postgres>;
 
-// All fragments are now generator-based.
-const nonPgFragments = [
-  errorInterpreter,
-  fiberInterpreter,
-  coreInterpreter,
-  numInterpreter,
-  ordInterpreter,
-  eqInterpreter,
-  strInterpreter,
-];
-
-const allFragments = [postgresInterpreter, ...nonPgFragments];
-
 // The connection string here is only used during AST construction (not at runtime).
 // At runtime, the real connection comes from testcontainers via wrapPostgresJs.
 const app = mvfm(num, str, semiring, eq, ord, pgPlugin("postgres://test"), fiber, error);
@@ -57,7 +44,17 @@ const app = mvfm(num, str, semiring, eq, ord, pgPlugin("postgres://test"), fiber
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
   const client = wrapPostgresJs(sql);
-  const evaluate = serverEvaluate(client, allFragments);
+  const baseInterpreter = {
+    ...createPostgresInterpreter(client),
+    ...errorInterpreter,
+    ...fiberInterpreter,
+    ...coreInterpreter,
+    ...numInterpreter,
+    ...ordInterpreter,
+    ...eqInterpreter,
+    ...strInterpreter,
+  };
+  const evaluate = serverEvaluate(client, baseInterpreter);
   return await evaluate(ast.result);
 }
 

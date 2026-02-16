@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 import { consolePlugin } from "../../src/22.0.0";
 import { wrapConsole } from "../../src/22.0.0/client-console";
 import { serverEvaluate } from "../../src/22.0.0/handler.server";
-import { consoleInterpreter } from "../../src/22.0.0/interpreter";
 
 type Call = { method: string; args: unknown[] };
 
@@ -50,11 +49,9 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 }
 
 const app = mvfm(num, str, consolePlugin());
-const fragments = [consoleInterpreter, coreInterpreter];
-
 async function run(prog: { ast: any }, target: unknown, input: Record<string, unknown> = {}) {
   const root = injectInput(prog.ast.result, input);
-  const evaluate = serverEvaluate(wrapConsole(target as any), fragments);
+  const evaluate = serverEvaluate(wrapConsole(target as any), coreInterpreter);
   return await evaluate(root);
 }
 

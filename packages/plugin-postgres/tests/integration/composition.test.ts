@@ -53,7 +53,7 @@ describe("composition: postgres + error", () => {
     const prog = app(($) => {
       return $.sql.begin((sql) => {
         const from = sql`select * from accounts where id = ${$.input.fromId}`;
-        return $.do(
+        return $.discard(
           $.guard($.gt(from[0].balance, $.input.amount), { code: "INSUFFICIENT" }),
           sql`update accounts set balance = balance - ${$.input.amount} where id = ${$.input.fromId}`,
           { success: true },
@@ -84,7 +84,7 @@ describe("composition: postgres + fiber + error (full stack)", () => {
   it("guard → par_map → try → retry → catch nests correctly", () => {
     const prog = app(($) => {
       const users = $.sql`select * from users where active = true`;
-      return $.do(
+      return $.discard(
         $.guard($.gt(users.length, 0), { code: 404, message: "no users" }),
         $.par(users, { concurrency: 5 }, (user) =>
           $.try(
@@ -97,7 +97,7 @@ describe("composition: postgres + fiber + error (full stack)", () => {
       );
     });
     const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/do");
+    expect(ast.result.kind).toBe("core/discard");
     expect(ast.result.steps[0].kind).toBe("error/guard");
     expect(ast.result.result.kind).toBe("fiber/par_map");
     expect(ast.result.result.body.kind).toBe("error/try");
@@ -111,7 +111,7 @@ describe("composition: postgres + fiber + error (full stack)", () => {
         $.sql.begin((sql) => {
           const from = sql`select * from accounts where id = ${$.input.fromId} for update`;
           const to = sql`select * from accounts where id = ${$.input.toId} for update`;
-          return $.do(
+          return $.discard(
             $.guard($.gt(from[0].balance, $.input.amount), { code: "INSUFFICIENT_FUNDS" }),
             sql`update accounts set balance = balance - ${$.input.amount} where id = ${$.input.fromId}`,
             sql`update accounts set balance = balance + ${$.input.amount} where id = ${$.input.toId}`,
@@ -127,7 +127,7 @@ describe("composition: postgres + fiber + error (full stack)", () => {
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("error/try");
     expect(ast.result.expr.kind).toBe("postgres/begin");
-    expect(ast.result.expr.body.kind).toBe("core/do");
+    expect(ast.result.expr.body.kind).toBe("core/discard");
     expect(ast.result.expr.body.steps[0].kind).toBe("error/guard");
     expect(ast.result.catch.body.kind).toBe("core/record");
   });

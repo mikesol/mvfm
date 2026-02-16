@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { composeInterpreters, mvfm } from "../../../src/core";
+import { mvfm } from "../../../src/core";
+import { foldAST } from "../../../src/fold";
 import { coreInterpreter } from "../../../src/interpreters/core";
 import { eq } from "../../../src/plugins/eq";
 import { eqInterpreter } from "../../../src/plugins/eq/interpreter";
@@ -22,19 +23,19 @@ function injectInput(node: any, input: Record<string, unknown>): any {
   return result;
 }
 
-const interp = composeInterpreters([
-  errorInterpreter,
-  coreInterpreter,
-  numInterpreter,
-  ordInterpreter,
-  eqInterpreter,
-]);
+const combined = {
+  ...errorInterpreter,
+  ...coreInterpreter,
+  ...numInterpreter,
+  ...ordInterpreter,
+  ...eqInterpreter,
+};
 
 const app = mvfm(num, semiring, eq, ord, error);
 
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
-  return await interp(ast.result);
+  return await foldAST(combined, ast.result);
 }
 
 describe("error interpreter: try/catch", () => {
@@ -99,17 +100,19 @@ describe("error interpreter: attempt", () => {
 
 describe("error interpreter: guard", () => {
   it("passes when condition is true", async () => {
-    const prog = app(($) => $.do($.guard($.gt(10, 5), "should not throw"), "passed"));
+    const prog = app(($) => $.discard($.guard($.gt(10, 5), "should not throw"), "passed"));
     expect(await run(prog)).toBe("passed");
   });
 
   it("throws when condition is false", async () => {
-    const prog = app(($) => $.do($.guard($.gt(5, 10), "guard failed"), "should not reach"));
+    const prog = app(($) => $.discard($.guard($.gt(5, 10), "guard failed"), "should not reach"));
     await expect(run(prog)).rejects.toBe("guard failed");
   });
 
   it("guard with object error", async () => {
-    const prog = app(($) => $.do($.guard($.gt(5, 10), { code: 403, message: "forbidden" }), "ok"));
+    const prog = app(($) =>
+      $.discard($.guard($.gt(5, 10), { code: 403, message: "forbidden" }), "ok"),
+    );
     await expect(run(prog)).rejects.toEqual({ code: 403, message: "forbidden" });
   });
 });
@@ -172,10 +175,9 @@ describe("error interpreter: try/match", () => {
 
 describe("error interpreter: try/finally", () => {
   it("runs finally on success", async () => {
-    // We verify the value passes through correctly even with a finally clause.
     const prog = app(($) =>
       $.try($.add(40, 2))
-        .finally($.add(1, 1)) // cleanup expression (value discarded)
+        .finally($.add(1, 1))
         .catch((_err) => "fallback"),
     );
     expect(await run(prog)).toBe(42);
@@ -194,7 +196,7 @@ describe("error interpreter: try/finally", () => {
 describe("error interpreter: composition", () => {
   it("try/catch with guard inside", async () => {
     const prog = app(($) =>
-      $.try($.do($.guard($.gt(5, 10), "guard_fail"), "ok")).catch((err) => err),
+      $.try($.discard($.guard($.gt(5, 10), "guard_fail"), "ok")).catch((err) => err),
     );
     expect(await run(prog)).toBe("guard_fail");
   });

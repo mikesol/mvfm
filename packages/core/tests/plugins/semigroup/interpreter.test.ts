@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { composeInterpreters, mvfm } from "../../../src/core";
+import { mvfm } from "../../../src/core";
+import { foldAST } from "../../../src/fold";
 import { coreInterpreter } from "../../../src/interpreters/core";
 import { semigroup } from "../../../src/plugins/semigroup";
 import { str } from "../../../src/plugins/str";
@@ -16,10 +17,11 @@ function injectInput(node: any, input: Record<string, unknown>): any {
   return result;
 }
 
+const combined = { ...coreInterpreter, ...strInterpreter };
+
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
-  const interp = composeInterpreters([coreInterpreter, strInterpreter]);
-  return await interp(ast.result);
+  return await foldAST(combined, ast.result);
 }
 
 const app = mvfm(str, semigroup);

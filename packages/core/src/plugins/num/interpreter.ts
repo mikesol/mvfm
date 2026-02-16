@@ -1,82 +1,90 @@
-import type { ASTNode, InterpreterFragment, StepEffect } from "../../core";
+import type { Interpreter, TypedNode } from "../../fold";
+import { eval_ } from "../../fold";
 
-/** Interpreter fragment for `num/` node kinds. */
-export const numInterpreter: InterpreterFragment = {
-  pluginName: "num",
-  canHandle: (node) => node.kind.startsWith("num/"),
-  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
-    switch (node.kind) {
-      case "num/add":
-        return (
-          ((yield { type: "recurse", child: node.left as ASTNode }) as number) +
-          ((yield { type: "recurse", child: node.right as ASTNode }) as number)
-        );
-      case "num/sub":
-        return (
-          ((yield { type: "recurse", child: node.left as ASTNode }) as number) -
-          ((yield { type: "recurse", child: node.right as ASTNode }) as number)
-        );
-      case "num/mul":
-        return (
-          ((yield { type: "recurse", child: node.left as ASTNode }) as number) *
-          ((yield { type: "recurse", child: node.right as ASTNode }) as number)
-        );
-      case "num/div":
-        return (
-          ((yield { type: "recurse", child: node.left as ASTNode }) as number) /
-          ((yield { type: "recurse", child: node.right as ASTNode }) as number)
-        );
-      case "num/mod":
-        return (
-          ((yield { type: "recurse", child: node.left as ASTNode }) as number) %
-          ((yield { type: "recurse", child: node.right as ASTNode }) as number)
-        );
-      case "num/compare": {
-        const l = (yield { type: "recurse", child: node.left as ASTNode }) as number;
-        const r = (yield { type: "recurse", child: node.right as ASTNode }) as number;
-        return l < r ? -1 : l === r ? 0 : 1;
-      }
-      case "num/neg":
-        return -((yield { type: "recurse", child: node.operand as ASTNode }) as number);
-      case "num/abs":
-        return Math.abs((yield { type: "recurse", child: node.operand as ASTNode }) as number);
-      case "num/floor":
-        return Math.floor((yield { type: "recurse", child: node.operand as ASTNode }) as number);
-      case "num/ceil":
-        return Math.ceil((yield { type: "recurse", child: node.operand as ASTNode }) as number);
-      case "num/round":
-        return Math.round((yield { type: "recurse", child: node.operand as ASTNode }) as number);
-      case "num/min": {
-        const values: number[] = [];
-        for (const v of node.values as ASTNode[]) {
-          values.push((yield { type: "recurse", child: v }) as number);
-        }
-        return Math.min(...values);
-      }
-      case "num/max": {
-        const values: number[] = [];
-        for (const v of node.values as ASTNode[]) {
-          values.push((yield { type: "recurse", child: v }) as number);
-        }
-        return Math.max(...values);
-      }
-      case "num/eq":
-        return (
-          (yield { type: "recurse", child: node.left as ASTNode }) ===
-          (yield { type: "recurse", child: node.right as ASTNode })
-        );
-      case "num/zero":
-        return 0;
-      case "num/one":
-        return 1;
-      case "num/show":
-        return String(yield { type: "recurse", child: node.operand as ASTNode });
-      case "num/top":
-        return Infinity;
-      case "num/bottom":
-        return -Infinity;
-      default:
-        throw new Error(`Num interpreter: unknown node kind "${node.kind}"`);
-    }
+// ---- Typed node interfaces ----------------------------------
+
+interface NumBinOp extends TypedNode<number> {
+  left: TypedNode<number>;
+  right: TypedNode<number>;
+}
+
+interface NumUnaryOp extends TypedNode<number> {
+  operand: TypedNode<number>;
+}
+
+interface NumVariadic extends TypedNode<number> {
+  values: TypedNode<number>[];
+}
+
+// ---- Interpreter map ----------------------------------------
+
+/** Interpreter handlers for `num/` node kinds. */
+export const numInterpreter: Interpreter = {
+  "num/add": async function* (node: NumBinOp) {
+    return (yield* eval_(node.left)) + (yield* eval_(node.right));
+  },
+  "num/sub": async function* (node: NumBinOp) {
+    return (yield* eval_(node.left)) - (yield* eval_(node.right));
+  },
+  "num/mul": async function* (node: NumBinOp) {
+    return (yield* eval_(node.left)) * (yield* eval_(node.right));
+  },
+  "num/div": async function* (node: NumBinOp) {
+    return (yield* eval_(node.left)) / (yield* eval_(node.right));
+  },
+  "num/mod": async function* (node: NumBinOp) {
+    return (yield* eval_(node.left)) % (yield* eval_(node.right));
+  },
+  "num/compare": async function* (node: NumBinOp) {
+    const l = yield* eval_(node.left);
+    const r = yield* eval_(node.right);
+    return l < r ? -1 : l === r ? 0 : 1;
+  },
+  "num/neg": async function* (node: NumUnaryOp) {
+    return -(yield* eval_(node.operand));
+  },
+  "num/abs": async function* (node: NumUnaryOp) {
+    return Math.abs(yield* eval_(node.operand));
+  },
+  "num/floor": async function* (node: NumUnaryOp) {
+    return Math.floor(yield* eval_(node.operand));
+  },
+  "num/ceil": async function* (node: NumUnaryOp) {
+    return Math.ceil(yield* eval_(node.operand));
+  },
+  "num/round": async function* (node: NumUnaryOp) {
+    return Math.round(yield* eval_(node.operand));
+  },
+  "num/min": async function* (node: NumVariadic) {
+    const values: number[] = [];
+    for (const v of node.values) values.push(yield* eval_(v));
+    return Math.min(...values);
+  },
+  "num/max": async function* (node: NumVariadic) {
+    const values: number[] = [];
+    for (const v of node.values) values.push(yield* eval_(v));
+    return Math.max(...values);
+  },
+  "num/eq": async function* (node: NumBinOp) {
+    return (yield* eval_(node.left)) === (yield* eval_(node.right));
+  },
+  // biome-ignore lint/correctness/useYield: leaf handler
+  "num/zero": async function* () {
+    return 0;
+  },
+  // biome-ignore lint/correctness/useYield: leaf handler
+  "num/one": async function* () {
+    return 1;
+  },
+  "num/show": async function* (node: NumUnaryOp) {
+    return String(yield* eval_(node.operand));
+  },
+  // biome-ignore lint/correctness/useYield: leaf handler
+  "num/top": async function* () {
+    return Infinity;
+  },
+  // biome-ignore lint/correctness/useYield: leaf handler
+  "num/bottom": async function* () {
+    return -Infinity;
   },
 };

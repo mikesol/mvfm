@@ -127,7 +127,7 @@ describe("typeclass type safety — negative tests", () => {
       const r2 = $.eq("a", "b");
       expectTypeOf(r1).toEqualTypeOf<Expr<boolean>>();
       expectTypeOf(r2).toEqualTypeOf<Expr<boolean>>();
-      return $.do(r1, r2);
+      return $.discard(r1, r2);
     });
     expect(prog.ast).toBeDefined();
     // Verify boolean eq is rejected at the type level (and throws at runtime)
@@ -148,7 +148,7 @@ describe("typeclass type safety — negative tests", () => {
       expectTypeOf(r1).toEqualTypeOf<Expr<boolean>>();
       expectTypeOf(r2).toEqualTypeOf<Expr<boolean>>();
       expectTypeOf(r3).toEqualTypeOf<Expr<boolean>>();
-      return $.do(r1, r2, r3);
+      return $.discard(r1, r2, r3);
     });
     expect(prog.ast).toBeDefined();
   });
@@ -177,7 +177,7 @@ describe("typeclass type safety — negative tests", () => {
       expectTypeOf(r3).toEqualTypeOf<Expr<boolean>>();
       expectTypeOf(r4).toEqualTypeOf<Expr<boolean>>();
       expectTypeOf(r5).toEqualTypeOf<Expr<number>>();
-      return $.do(r1, r2, r3, r4, r5);
+      return $.discard(r1, r2, r3, r4, r5);
     });
     expect(prog.ast).toBeDefined();
     // Verify string ord is rejected at the type level (and throws at runtime)
@@ -226,7 +226,7 @@ describe("typeclass type safety — negative tests", () => {
       expectTypeOf(r1).toEqualTypeOf<Expr<string>>();
       expectTypeOf(r2).toEqualTypeOf<Expr<string>>();
       expectTypeOf(r3).toEqualTypeOf<Expr<string>>();
-      return $.do(r1, r2, r3);
+      return $.discard(r1, r2, r3);
     });
     expect(prog.ast).toBeDefined();
   });
@@ -249,7 +249,7 @@ describe("typeclass type safety — negative tests", () => {
       const r2 = $.mul(1, 2);
       expectTypeOf(r1).toEqualTypeOf<Expr<number>>();
       expectTypeOf(r2).toEqualTypeOf<Expr<number>>();
-      return $.do(r1, r2);
+      return $.discard(r1, r2);
     });
     expect(prog.ast).toBeDefined();
   });
@@ -297,7 +297,7 @@ describe("typeclass type safety — negative tests", () => {
       expectTypeOf(r1).toEqualTypeOf<Expr<boolean>>();
       expectTypeOf(r2).toEqualTypeOf<Expr<boolean>>();
       expectTypeOf(r3).toEqualTypeOf<Expr<boolean>>();
-      return $.do(r1, r2, r3);
+      return $.discard(r1, r2, r3);
     });
     expect(prog.ast).toBeDefined();
   });

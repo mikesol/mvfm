@@ -1,4 +1,4 @@
-import type { ASTNode, PluginContext, StepEffect } from "@mvfm/core";
+import type { PluginContext, TypedNode } from "@mvfm/core";
 import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
@@ -34,7 +34,7 @@ export class ZodUnionBuilder<T> extends ZodSchemaBuilder<T> {
   protected _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | ASTNode;
+    error?: string | TypedNode;
     extra?: Record<string, unknown>;
   }): ZodUnionBuilder<T> {
     return new ZodUnionBuilder<T>(
@@ -108,13 +108,13 @@ export function unionNamespace(
  * interpreter's buildSchemaGen. This is passed in at registration time
  * to avoid circular imports.
  */
-type SchemaBuildFn = (node: ASTNode) => Generator<StepEffect, z.ZodType, unknown>;
+type SchemaBuildFn = (node: any) => AsyncGenerator<TypedNode, z.ZodType, unknown>;
 
 /** Create union interpreter handlers with access to the shared schema builder. */
 export function createUnionInterpreter(buildSchema: SchemaBuildFn): SchemaInterpreterMap {
   return {
-    "zod/union": function* (node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
-      const optionNodes = (node.options as ASTNode[]) ?? [];
+    "zod/union": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+      const optionNodes = (node.options as any[]) ?? [];
       const errorFn = toZodError(node.error as ErrorConfig | undefined);
       const errOpt = errorFn ? { error: errorFn } : {};
       const builtOptions: z.ZodType[] = [];
@@ -124,8 +124,8 @@ export function createUnionInterpreter(buildSchema: SchemaBuildFn): SchemaInterp
       return z.union(builtOptions as [z.ZodType, z.ZodType, ...z.ZodType[]], errOpt);
     },
 
-    "zod/xor": function* (node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
-      const optionNodes = (node.options as ASTNode[]) ?? [];
+    "zod/xor": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+      const optionNodes = (node.options as any[]) ?? [];
       const errorFn = toZodError(node.error as ErrorConfig | undefined);
       const errOpt = errorFn ? { error: errorFn } : {};
       const builtOptions: z.ZodType[] = [];

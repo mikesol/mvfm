@@ -1,4 +1,5 @@
-import type { ASTNode, InterpreterFragment, StepEffect } from "@mvfm/core";
+import type { Interpreter, TypedNode } from "@mvfm/core";
+import { eval_ } from "@mvfm/core";
 
 /**
  * Cloudflare KV client interface consumed by the handler.
@@ -27,81 +28,49 @@ export interface CloudflareKvClient {
   }>;
 }
 
+interface KvNode extends TypedNode<unknown> {
+  kind: string;
+  key?: TypedNode<string>;
+  value?: TypedNode<string>;
+  options?: TypedNode;
+  config: { namespaceId: string };
+}
+
 /**
- * Generator-based interpreter fragment for cloudflare-kv plugin nodes.
+ * Creates an interpreter for `cloudflare-kv/*` node kinds.
  *
- * Yields `cloudflare-kv/api_call` effects for all 5 operations.
- * Each effect contains the operation name, parameters, and namespace ID.
+ * @param client - The {@link CloudflareKvClient} to execute against.
+ * @returns An Interpreter handling all cloudflare-kv node kinds.
  */
-export const cloudflareKvInterpreter: InterpreterFragment = {
-  pluginName: "cloudflare-kv",
-  canHandle: (node) => node.kind.startsWith("cloudflare-kv/"),
-  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
-    const config = node.config as { namespaceId: string };
+export function createCloudflareKvInterpreter(client: CloudflareKvClient): Interpreter {
+  return {
+    "cloudflare-kv/get": async function* (node: KvNode) {
+      const key = yield* eval_(node.key!);
+      return await client.get(key);
+    },
 
-    switch (node.kind) {
-      case "cloudflare-kv/get": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        return yield {
-          type: "cloudflare-kv/api_call",
-          operation: "get",
-          key,
-          namespaceId: config.namespaceId,
-        };
-      }
+    "cloudflare-kv/get_json": async function* (node: KvNode) {
+      const key = yield* eval_(node.key!);
+      return await client.getJson(key);
+    },
 
-      case "cloudflare-kv/get_json": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        return yield {
-          type: "cloudflare-kv/api_call",
-          operation: "get_json",
-          key,
-          namespaceId: config.namespaceId,
-        };
-      }
+    "cloudflare-kv/put": async function* (node: KvNode) {
+      const key = yield* eval_(node.key!);
+      const value = yield* eval_(node.value!);
+      const options = node.options != null ? yield* eval_(node.options) : undefined;
+      await client.put(key, value, options as any);
+      return undefined;
+    },
 
-      case "cloudflare-kv/put": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const value = yield { type: "recurse", child: node.value as ASTNode };
-        const options =
-          node.options != null
-            ? yield { type: "recurse", child: node.options as ASTNode }
-            : undefined;
-        return yield {
-          type: "cloudflare-kv/api_call",
-          operation: "put",
-          key,
-          value,
-          ...(options !== undefined ? { options } : {}),
-          namespaceId: config.namespaceId,
-        };
-      }
+    "cloudflare-kv/delete": async function* (node: KvNode) {
+      const key = yield* eval_(node.key!);
+      await client.delete(key);
+      return undefined;
+    },
 
-      case "cloudflare-kv/delete": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        return yield {
-          type: "cloudflare-kv/api_call",
-          operation: "delete",
-          key,
-          namespaceId: config.namespaceId,
-        };
-      }
-
-      case "cloudflare-kv/list": {
-        const options =
-          node.options != null
-            ? yield { type: "recurse", child: node.options as ASTNode }
-            : undefined;
-        return yield {
-          type: "cloudflare-kv/api_call",
-          operation: "list",
-          ...(options !== undefined ? { options } : {}),
-          namespaceId: config.namespaceId,
-        };
-      }
-
-      default:
-        throw new Error(`Cloudflare KV interpreter: unknown node kind "${node.kind}"`);
-    }
-  },
-};
+    "cloudflare-kv/list": async function* (node: KvNode) {
+      const options = node.options != null ? yield* eval_(node.options) : undefined;
+      return await client.list(options as any);
+    },
+  };
+}

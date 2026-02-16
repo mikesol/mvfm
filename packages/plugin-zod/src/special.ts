@@ -1,4 +1,4 @@
-import type { ASTNode, Expr, PluginContext, StepEffect } from "@mvfm/core";
+import type { Expr, PluginContext, TypedNode } from "@mvfm/core";
 import { z } from "zod";
 import { ZodSchemaBuilder, ZodWrappedBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
@@ -28,7 +28,7 @@ export class ZodSimpleBuilder<T> extends ZodSchemaBuilder<T> {
   protected _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | ASTNode;
+    error?: string | TypedNode;
     extra?: Record<string, unknown>;
   }): ZodSimpleBuilder<T> {
     return new ZodSimpleBuilder<T>(
@@ -67,7 +67,7 @@ export function buildCustom<T>(
   fn: (val: Expr<unknown>) => Expr<boolean>,
   errorOrOpts?: string | { error?: string },
 ): ZodSimpleBuilder<T> {
-  const paramNode: ASTNode = { kind: "core/lambda_param", name: "custom_val" };
+  const paramNode = { kind: "core/lambda_param", name: "custom_val" } as TypedNode;
   const paramProxy = ctx.expr<unknown>(paramNode);
   const result = fn(paramProxy);
   const bodyNode = ctx.isExpr(result) ? result.__node : paramNode;
@@ -136,19 +136,19 @@ export function specialNamespace(
 /** Interpreter handlers for special schema nodes. */
 export const specialInterpreter: SchemaInterpreterMap = {
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/any": function* (_node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
+  "zod/any": async function* (_node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     return z.any();
   },
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/unknown": function* (_node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
+  "zod/unknown": async function* (_node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     return z.unknown();
   },
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/never": function* (_node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
+  "zod/never": async function* (_node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     return z.never();
   },
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/custom": function* (_node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
+  "zod/custom": async function* (_node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     // Custom predicate is an AST lambda — evaluated post-validation via refinements
     // For the Zod schema, use z.any() as base and let refinements handle the predicate
     return z.any();

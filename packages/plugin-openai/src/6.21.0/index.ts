@@ -278,8 +278,8 @@ export function openai(config: OpenAIConfig): PluginDefinition<OpenAIMethods> {
 //           await openai.embeddings.create(...)
 //    Mvfm:   const c = $.openai.chat.completions.create(...)
 //           const e = $.openai.embeddings.create(...)
-//           return $.do(c, e)
-//    Must use $.do() for sequencing.
+//           return $.discard(c, e)
+//    Must use $.discard() for sequencing.
 //
 // DOESN'T WORK / NOT MODELED:
 //

@@ -4,11 +4,6 @@
 
 ```ts
 
-// Warning: (ae-forgotten-export) The symbol "StepHandler" needs to be exported by the entry point index.d.ts
-//
-// @public
-export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
-
 // @public
 export interface ClientHandlerOptions {
     baseUrl: string;
@@ -17,10 +12,13 @@ export interface ClientHandlerOptions {
     headers?: Record<string, string>;
 }
 
+// Warning: (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface ClientHandlerState {
-    stepIndex: number;
-}
+export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter;
+
+// @public
+export function createRedisInterpreter(client: RedisClient): Interpreter;
 
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
@@ -42,11 +40,6 @@ export interface RedisConfig {
     port?: number;
     username?: string;
 }
-
-// Warning: (ae-forgotten-export) The symbol "InterpreterFragment" needs to be exported by the entry point index.d.ts
-//
-// @public
-export const redisInterpreter: InterpreterFragment;
 
 // @public
 export interface RedisMethods {
@@ -91,13 +84,13 @@ export interface RedisMethods {
     };
 }
 
-// Warning: (ae-forgotten-export) The symbol "ASTNode" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "TypedNode" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function serverEvaluate(client: RedisClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+export function serverEvaluate(client: RedisClient, baseInterpreter: Interpreter): (root: TypedNode) => Promise<unknown>;
 
 // @public
-export function serverHandler(client: RedisClient): StepHandler<void>;
+export function serverInterpreter(client: RedisClient): Interpreter;
 
 // @public
 export function wrapIoredis(redis: {

@@ -1,10 +1,9 @@
 import { coreInterpreter, foldAST, mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { pino } from "../../src/10.3.1";
-import { pinoInterpreter } from "../../src/10.3.1/interpreter";
+import { createPinoInterpreter, type PinoClient } from "../../src/10.3.1/interpreter";
 
 const app = mvfm(num, str, pino({ level: "info" }));
-const fragments = [pinoInterpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
@@ -20,13 +19,13 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const captured: any[] = [];
   const ast = injectInput(prog.ast, input);
-  const recurse = foldAST(fragments, {
-    "pino/log": async (effect) => {
-      captured.push(effect);
-      return undefined;
+  const mockClient: PinoClient = {
+    async log(level, bindings, mergeObject, msg) {
+      captured.push({ level, bindings, mergeObject, msg });
     },
-  });
-  const result = await recurse(ast.result);
+  };
+  const combined = { ...createPinoInterpreter(mockClient), ...coreInterpreter };
+  const result = await foldAST(combined, ast.result);
   return { result, captured };
 }
 
@@ -35,11 +34,10 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
 // ============================================================
 
 describe("pino interpreter: info with message", () => {
-  it("yields pino/log effect with level info", async () => {
+  it("calls client.log with level info", async () => {
     const prog = app(($) => $.pino.info("hello world"));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("pino/log");
     expect(captured[0].level).toBe("info");
     expect(captured[0].msg).toBe("hello world");
     expect(captured[0].mergeObject).toBeUndefined();
@@ -48,11 +46,10 @@ describe("pino interpreter: info with message", () => {
 });
 
 describe("pino interpreter: info with merge object and message", () => {
-  it("yields pino/log with mergeObject", async () => {
+  it("calls client.log with mergeObject", async () => {
     const prog = app(($) => $.pino.info({ userId: 123 }, "user action"));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("pino/log");
     expect(captured[0].level).toBe("info");
     expect(captured[0].msg).toBe("user action");
     expect(captured[0].mergeObject).toEqual({ userId: 123 });
@@ -64,11 +61,10 @@ describe("pino interpreter: info with merge object and message", () => {
 // ============================================================
 
 describe("pino interpreter: object-only logging", () => {
-  it("yields pino/log with mergeObject and no msg", async () => {
+  it("calls client.log with mergeObject and no msg", async () => {
     const prog = app(($) => $.pino.info({ userId: 123 }));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("pino/log");
     expect(captured[0].mergeObject).toEqual({ userId: 123 });
     expect(captured[0].msg).toBeUndefined();
   });
@@ -81,11 +77,10 @@ describe("pino interpreter: object-only logging", () => {
 describe("pino interpreter: all six levels yield correct effect", () => {
   const levels = ["trace", "debug", "info", "warn", "error", "fatal"] as const;
   for (const level of levels) {
-    it(`${level} yields pino/log with level="${level}"`, async () => {
+    it(`${level} calls client.log with level="${level}"`, async () => {
       const prog = app(($) => ($.pino as any)[level]("test"));
       const { captured } = await run(prog);
       expect(captured).toHaveLength(1);
-      expect(captured[0].type).toBe("pino/log");
       expect(captured[0].level).toBe(level);
       expect(captured[0].msg).toBe("test");
     });
@@ -97,7 +92,7 @@ describe("pino interpreter: all six levels yield correct effect", () => {
 // ============================================================
 
 describe("pino interpreter: child logger bindings", () => {
-  it("single child merges bindings into effect", async () => {
+  it("single child merges bindings into call", async () => {
     const prog = app(($) => $.pino.child({ requestId: "abc" }).info("handling"));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);

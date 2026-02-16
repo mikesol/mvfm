@@ -4,7 +4,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { resend as resendPlugin } from "../../src/6.9.2";
 import { serverEvaluate } from "../../src/6.9.2/handler.server";
 import type { ResendClient } from "../../src/6.9.2/interpreter";
-import { resendInterpreter } from "../../src/6.9.2/interpreter";
+import { createResendInterpreter } from "../../src/6.9.2/interpreter";
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
@@ -20,7 +20,6 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 let server: http.Server;
 let port: number;
 
-const allFragments = [resendInterpreter, coreInterpreter, numInterpreter, strInterpreter];
 const app = mvfm(num, str, resendPlugin({ apiKey: "re_test_fake" }));
 
 function createMockClient(): ResendClient {
@@ -39,7 +38,13 @@ function createMockClient(): ResendClient {
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
   const client = createMockClient();
-  const evaluate = serverEvaluate(client, allFragments);
+  const baseInterpreter = {
+    ...createResendInterpreter(client),
+    ...coreInterpreter,
+    ...numInterpreter,
+    ...strInterpreter,
+  };
+  const evaluate = serverEvaluate(client, baseInterpreter);
   return await evaluate(ast.result);
 }
 

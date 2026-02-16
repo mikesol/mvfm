@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { twilio as twilioPlugin } from "../../src/5.5.1";
 import { serverEvaluate } from "../../src/5.5.1/handler.server";
 import type { TwilioClient } from "../../src/5.5.1/interpreter";
-import { twilioInterpreter } from "../../src/5.5.1/interpreter";
+import { createTwilioInterpreter } from "../../src/5.5.1/interpreter";
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
@@ -15,8 +15,6 @@ function injectInput(node: any, input: Record<string, unknown>): any {
   if (result.kind === "core/input") result.__inputData = input;
   return result;
 }
-
-const allFragments = [twilioInterpreter, coreInterpreter, numInterpreter, strInterpreter];
 
 const app = mvfm(num, str, twilioPlugin({ accountSid: "AC_test_123", authToken: "auth_test_456" }));
 
@@ -77,7 +75,13 @@ function createMockClient(): TwilioClient {
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
   const client = createMockClient();
-  const evaluate = serverEvaluate(client, allFragments);
+  const baseInterpreter = {
+    ...createTwilioInterpreter(client),
+    ...coreInterpreter,
+    ...numInterpreter,
+    ...strInterpreter,
+  };
+  const evaluate = serverEvaluate(client, baseInterpreter);
   return await evaluate(ast.result);
 }
 

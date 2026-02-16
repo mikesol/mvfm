@@ -335,11 +335,11 @@ describe("slack: files.delete", () => {
 });
 
 // ============================================================
-// Integration: $.do(), orphan detection, cross-operation deps
+// Integration: $.discard(), orphan detection, cross-operation deps
 // ============================================================
 
-describe("slack: integration with $.do()", () => {
-  it("side-effecting operations wrapped in $.do() are reachable", () => {
+describe("slack: integration with $.discard()", () => {
+  it("side-effecting operations wrapped in $.discard() are reachable", () => {
     expect(() => {
       app(($) => {
         const msg = $.slack.chat.postMessage({ channel: "#general", text: "Hello" });
@@ -348,7 +348,7 @@ describe("slack: integration with $.do()", () => {
           timestamp: (msg as any).ts,
           name: "thumbsup",
         });
-        return $.do(msg, reaction);
+        return $.discard(msg, reaction);
       });
     }).not.toThrow();
   });
@@ -373,9 +373,9 @@ describe("slack: cross-operation dependencies", () => {
         text: "Hello",
         user: (user as any).user.id,
       });
-      return $.do(user, msg);
+      return $.discard(user, msg);
     });
     const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/do");
+    expect(ast.result.kind).toBe("core/discard");
   });
 });

@@ -4,12 +4,13 @@ import type {
   QueueStatus,
   Result,
 } from "@fal-ai/client";
-import type { ASTNode, InterpreterFragment, StepEffect } from "@mvfm/core";
+import type { Interpreter, TypedNode } from "@mvfm/core";
+import { eval_ } from "@mvfm/core";
 
 /**
  * Fal client interface consumed by the fal handler.
  *
- * Abstracts over the actual `\@fal-ai/client` so handlers can be
+ * Abstracts over the actual `@fal-ai/client` so handlers can be
  * tested with mock clients.
  */
 export interface FalClient {
@@ -42,103 +43,55 @@ export interface FalClient {
   ): Promise<void>;
 }
 
+interface FalNode extends TypedNode<unknown> {
+  kind: string;
+  endpointId: TypedNode<string>;
+  options?: TypedNode;
+}
+
 /**
- * Generator-based interpreter fragment for fal plugin nodes.
+ * Creates an interpreter for `fal/*` node kinds.
  *
- * Yields `fal/api_call` effects for direct and queue operations,
- * and `fal/subscribe` effects for the composite subscribe flow.
- * Each effect contains the endpointId, method, and optional input/requestId.
+ * @param client - The {@link FalClient} to execute against.
+ * @returns An Interpreter handling all fal node kinds.
  */
-export const falInterpreter: InterpreterFragment = {
-  pluginName: "fal",
-  canHandle: (node) => node.kind.startsWith("fal/"),
-  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
-    switch (node.kind) {
-      case "fal/run": {
-        const endpointId = yield { type: "recurse", child: node.endpointId as ASTNode };
-        const options =
-          node.options != null
-            ? yield { type: "recurse", child: node.options as ASTNode }
-            : undefined;
-        return yield {
-          type: "fal/api_call",
-          endpointId,
-          method: "run",
-          ...(options !== undefined ? { options } : {}),
-        };
-      }
+export function createFalInterpreter(client: FalClient): Interpreter {
+  return {
+    "fal/run": async function* (node: FalNode) {
+      const endpointId = yield* eval_(node.endpointId);
+      const options = node.options != null ? yield* eval_(node.options) : undefined;
+      return await client.run(endpointId, options as any);
+    },
 
-      case "fal/subscribe": {
-        const endpointId = yield { type: "recurse", child: node.endpointId as ASTNode };
-        const options =
-          node.options != null
-            ? yield { type: "recurse", child: node.options as ASTNode }
-            : undefined;
-        return yield {
-          type: "fal/subscribe",
-          endpointId,
-          ...(options !== undefined ? { options } : {}),
-        };
-      }
+    "fal/subscribe": async function* (node: FalNode) {
+      const endpointId = yield* eval_(node.endpointId);
+      const options = node.options != null ? yield* eval_(node.options) : undefined;
+      return await client.subscribe(endpointId, options as any);
+    },
 
-      case "fal/queue_submit": {
-        const endpointId = yield { type: "recurse", child: node.endpointId as ASTNode };
-        const options =
-          node.options != null
-            ? yield { type: "recurse", child: node.options as ASTNode }
-            : undefined;
-        return yield {
-          type: "fal/api_call",
-          endpointId,
-          method: "queue_submit",
-          ...(options !== undefined ? { options } : {}),
-        };
-      }
+    "fal/queue_submit": async function* (node: FalNode) {
+      const endpointId = yield* eval_(node.endpointId);
+      const options = node.options != null ? yield* eval_(node.options) : undefined;
+      return await client.queueSubmit(endpointId, options as any);
+    },
 
-      case "fal/queue_status": {
-        const endpointId = yield { type: "recurse", child: node.endpointId as ASTNode };
-        const options =
-          node.options != null
-            ? yield { type: "recurse", child: node.options as ASTNode }
-            : undefined;
-        return yield {
-          type: "fal/api_call",
-          endpointId,
-          method: "queue_status",
-          ...(options !== undefined ? { options } : {}),
-        };
-      }
+    "fal/queue_status": async function* (node: FalNode) {
+      const endpointId = yield* eval_(node.endpointId);
+      const options = node.options != null ? yield* eval_(node.options) : undefined;
+      return await client.queueStatus(endpointId, options as any);
+    },
 
-      case "fal/queue_result": {
-        const endpointId = yield { type: "recurse", child: node.endpointId as ASTNode };
-        const options =
-          node.options != null
-            ? yield { type: "recurse", child: node.options as ASTNode }
-            : undefined;
-        return yield {
-          type: "fal/api_call",
-          endpointId,
-          method: "queue_result",
-          ...(options !== undefined ? { options } : {}),
-        };
-      }
+    "fal/queue_result": async function* (node: FalNode) {
+      const endpointId = yield* eval_(node.endpointId);
+      const options = node.options != null ? yield* eval_(node.options) : undefined;
+      return await client.queueResult(endpointId, options as any);
+    },
 
-      case "fal/queue_cancel": {
-        const endpointId = yield { type: "recurse", child: node.endpointId as ASTNode };
-        const options =
-          node.options != null
-            ? yield { type: "recurse", child: node.options as ASTNode }
-            : undefined;
-        return yield {
-          type: "fal/api_call",
-          endpointId,
-          method: "queue_cancel",
-          ...(options !== undefined ? { options } : {}),
-        };
-      }
-
-      default:
-        throw new Error(`Fal interpreter: unknown node kind "${node.kind}"`);
-    }
-  },
-};
+    "fal/queue_cancel": async function* (node: FalNode) {
+      const endpointId = yield* eval_(node.endpointId);
+      const options = node.options != null ? yield* eval_(node.options) : undefined;
+      await client.queueCancel(endpointId, options as any);
+      return undefined;
+    },
+  };
+}

@@ -1,4 +1,4 @@
-import type { ASTNode, PluginContext } from "@mvfm/core";
+import type { PluginContext, TypedNode } from "@mvfm/core";
 import { ZodSchemaBuilder } from "./base";
 import type {
   CheckDescriptor,
@@ -31,7 +31,7 @@ export class ZodTupleBuilder<T extends unknown[]> extends ZodSchemaBuilder<T> {
   protected _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | ASTNode;
+    error?: string | TypedNode;
     extra?: Record<string, unknown>;
   }): ZodTupleBuilder<T> {
     return new ZodTupleBuilder<T>(

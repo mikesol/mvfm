@@ -16,11 +16,6 @@ import type { LegacyCreateContactOptions } from 'resend';
 import type { ListContactsResponseSuccess } from 'resend';
 import type { RemoveContactsResponseSuccess } from 'resend';
 
-// Warning: (ae-forgotten-export) The symbol "StepHandler" needs to be exported by the entry point index.d.ts
-//
-// @public
-export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
-
 // @public
 export interface ClientHandlerOptions {
     baseUrl: string;
@@ -29,10 +24,13 @@ export interface ClientHandlerOptions {
     headers?: Record<string, string>;
 }
 
+// Warning: (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface ClientHandlerState {
-    stepIndex: number;
-}
+export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter;
+
+// @public
+export function createResendInterpreter(client: ResendClient): Interpreter;
 
 // Warning: (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
 //
@@ -54,11 +52,6 @@ export interface ResendConfig {
     apiKey: string;
 }
 
-// Warning: (ae-forgotten-export) The symbol "InterpreterFragment" needs to be exported by the entry point index.d.ts
-//
-// @public
-export const resendInterpreter: InterpreterFragment;
-
 // @public
 export interface ResendMethods {
     resend: {
@@ -78,13 +71,13 @@ export interface ResendMethods {
     };
 }
 
-// Warning: (ae-forgotten-export) The symbol "ASTNode" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "TypedNode" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function serverEvaluate(client: ResendClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+export function serverEvaluate(client: ResendClient, baseInterpreter: Interpreter): (root: TypedNode) => Promise<unknown>;
 
 // @public
-export function serverHandler(client: ResendClient): StepHandler<void>;
+export function serverInterpreter(client: ResendClient): Interpreter;
 
 // Warning: (ae-forgotten-export) The symbol "ResendSdk" needs to be exported by the entry point index.d.ts
 //

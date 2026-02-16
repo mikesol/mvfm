@@ -1,6 +1,6 @@
-import { composeInterpreters, coreInterpreter, mvfm, str, strInterpreter } from "@mvfm/core";
+import { coreInterpreter, foldAST, mvfm, str, strInterpreter } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
-import { zod, zodInterpreter } from "../src/index";
+import { createZodInterpreter, zod } from "../src/index";
 
 /** Inject input data into core/input nodes throughout the AST. */
 function injectInput(node: any, input: Record<string, unknown>): any {
@@ -17,8 +17,8 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 /** Build AST from DSL, inject input, compose interpreters, evaluate. */
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
-  const interp = composeInterpreters([coreInterpreter, strInterpreter, zodInterpreter]);
-  return await interp(ast.result);
+  const interp = { ...coreInterpreter, ...strInterpreter, ...createZodInterpreter() };
+  return await foldAST(interp, ast.result);
 }
 
 const app = mvfm(zod);

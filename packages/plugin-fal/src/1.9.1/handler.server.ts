@@ -1,92 +1,28 @@
-import type { ASTNode, InterpreterFragment, StepHandler } from "@mvfm/core";
-import { runAST } from "@mvfm/core";
-import type { FalClient } from "./interpreter";
+import type { Interpreter, TypedNode } from "@mvfm/core";
+import { foldAST } from "@mvfm/core";
+import { createFalInterpreter, type FalClient } from "./interpreter";
 
 /**
- * Creates a server-side StepHandler that executes fal effects
- * against a real fal client.
- *
- * Handles `fal/api_call` and `fal/subscribe` effects by delegating
- * to the appropriate client method. Throws on unhandled effect types.
+ * Creates a server-side interpreter for `fal/*` node kinds.
  *
  * @param client - The {@link FalClient} to execute against.
- * @returns A StepHandler for void state.
+ * @returns An Interpreter for fal node kinds.
  */
-export function serverHandler(client: FalClient): StepHandler<void> {
-  return async (effect, _context, state) => {
-    if (effect.type === "fal/api_call") {
-      const { endpointId, method, options } = effect as {
-        type: "fal/api_call";
-        endpointId: string;
-        method: string;
-        options?: unknown;
-      };
-      let value: unknown;
-      switch (method) {
-        case "run":
-          value = await client.run(endpointId, options as Parameters<FalClient["run"]>[1]);
-          break;
-        case "queue_submit":
-          value = await client.queueSubmit(
-            endpointId,
-            options as Parameters<FalClient["queueSubmit"]>[1],
-          );
-          break;
-        case "queue_status":
-          value = await client.queueStatus(
-            endpointId,
-            options as Parameters<FalClient["queueStatus"]>[1],
-          );
-          break;
-        case "queue_result":
-          value = await client.queueResult(
-            endpointId,
-            options as Parameters<FalClient["queueResult"]>[1],
-          );
-          break;
-        case "queue_cancel":
-          value = await client.queueCancel(
-            endpointId,
-            options as Parameters<FalClient["queueCancel"]>[1],
-          );
-          break;
-        default:
-          throw new Error(`serverHandler: unknown fal method "${method}"`);
-      }
-      return { value, state };
-    }
-
-    if (effect.type === "fal/subscribe") {
-      const { endpointId, options } = effect as {
-        type: "fal/subscribe";
-        endpointId: string;
-        options?: unknown;
-      };
-      const value = await client.subscribe(
-        endpointId,
-        options as Parameters<FalClient["subscribe"]>[1],
-      );
-      return { value, state };
-    }
-
-    throw new Error(`serverHandler: unhandled effect type "${effect.type}"`);
-  };
+export function serverInterpreter(client: FalClient): Interpreter {
+  return createFalInterpreter(client);
 }
 
 /**
- * Creates a unified evaluation function that evaluates an AST against
- * a fal client using the provided interpreter fragments.
+ * Creates a unified evaluator using the fal server interpreter.
  *
  * @param client - The {@link FalClient} to execute against.
- * @param fragments - Generator interpreter fragments for evaluating sub-expressions.
- * @returns An async function that evaluates an AST node to its result.
+ * @param baseInterpreter - Base interpreter for evaluating sub-expressions.
+ * @returns An async AST evaluator function.
  */
 export function serverEvaluate(
   client: FalClient,
-  fragments: InterpreterFragment[],
-): (root: ASTNode) => Promise<unknown> {
-  return async (root: ASTNode): Promise<unknown> => {
-    const { value } = await runAST(root, fragments, serverHandler(client), undefined);
-    return value;
-  };
+  baseInterpreter: Interpreter,
+): (root: TypedNode) => Promise<unknown> {
+  const interp = { ...baseInterpreter, ...createFalInterpreter(client) };
+  return (root: TypedNode) => foldAST(interp, root);
 }

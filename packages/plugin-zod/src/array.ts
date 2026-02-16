@@ -1,4 +1,4 @@
-import type { ASTNode, PluginContext, StepEffect } from "@mvfm/core";
+import type { PluginContext, TypedNode } from "@mvfm/core";
 import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
@@ -27,7 +27,7 @@ export class ZodArrayBuilder<T> extends ZodSchemaBuilder<T[]> {
   protected _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | ASTNode;
+    error?: string | TypedNode;
     extra?: Record<string, unknown>;
   }): ZodArrayBuilder<T> {
     return new ZodArrayBuilder<T>(
@@ -42,7 +42,7 @@ export class ZodArrayBuilder<T> extends ZodSchemaBuilder<T[]> {
   /** Require at least `value` elements. Produces `min_length` check descriptor. */
   min(
     value: number,
-    opts?: { error?: string; abort?: boolean; when?: ASTNode },
+    opts?: { error?: string; abort?: boolean; when?: TypedNode },
   ): ZodArrayBuilder<T> {
     return this._addCheck("min_length", { value }, opts) as ZodArrayBuilder<T>;
   }
@@ -50,7 +50,7 @@ export class ZodArrayBuilder<T> extends ZodSchemaBuilder<T[]> {
   /** Require at most `value` elements. Produces `max_length` check descriptor. */
   max(
     value: number,
-    opts?: { error?: string; abort?: boolean; when?: ASTNode },
+    opts?: { error?: string; abort?: boolean; when?: TypedNode },
   ): ZodArrayBuilder<T> {
     return this._addCheck("max_length", { value }, opts) as ZodArrayBuilder<T>;
   }
@@ -58,7 +58,7 @@ export class ZodArrayBuilder<T> extends ZodSchemaBuilder<T[]> {
   /** Require exactly `value` elements. Produces `length` check descriptor. */
   length(
     value: number,
-    opts?: { error?: string; abort?: boolean; when?: ASTNode },
+    opts?: { error?: string; abort?: boolean; when?: TypedNode },
   ): ZodArrayBuilder<T> {
     return this._addCheck("length", { value }, opts) as ZodArrayBuilder<T>;
   }
@@ -125,13 +125,13 @@ function applyArrayChecks(schema: z.ZodArray, checks: CheckDescriptor[]): z.ZodA
  * interpreter's buildSchemaGen. This is passed in at registration time
  * to avoid circular imports.
  */
-type SchemaBuildFn = (node: ASTNode) => Generator<StepEffect, z.ZodType, unknown>;
+type SchemaBuildFn = (node: any) => AsyncGenerator<TypedNode, z.ZodType, unknown>;
 
 /** Create array interpreter handlers with access to the shared schema builder. */
 export function createArrayInterpreter(buildSchema: SchemaBuildFn): SchemaInterpreterMap {
   return {
-    "zod/array": function* (node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
-      const elementNode = node.element as ASTNode;
+    "zod/array": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+      const elementNode = node.element as any;
       const elementSchema = yield* buildSchema(elementNode);
       const checks = (node.checks as CheckDescriptor[]) ?? [];
       const errorFn = toZodError(node.error as ErrorConfig | undefined);

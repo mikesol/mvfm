@@ -1,4 +1,4 @@
-import type { ASTNode, PluginContext, StepEffect } from "@mvfm/core";
+import type { PluginContext, TypedNode } from "@mvfm/core";
 import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
@@ -29,7 +29,7 @@ export class ZodPrimitiveBuilder<T> extends ZodSchemaBuilder<T> {
   protected _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | ASTNode;
+    error?: string | TypedNode;
     extra?: Record<string, unknown>;
   }): ZodPrimitiveBuilder<T> {
     return new ZodPrimitiveBuilder<T>(
@@ -101,24 +101,24 @@ export function primitivesNamespace(
 /** Interpreter handlers for primitive schema nodes. */
 export const primitivesInterpreter: SchemaInterpreterMap = {
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/boolean": function* (node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
+  "zod/boolean": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     const errorFn = toZodError(node.error as ErrorConfig | undefined);
     return errorFn ? z.boolean({ error: errorFn }) : z.boolean();
   },
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/null": function* (_node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
+  "zod/null": async function* (_node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     return z.null();
   },
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/undefined": function* (_node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
+  "zod/undefined": async function* (_node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     return z.undefined();
   },
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/void": function* (_node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
+  "zod/void": async function* (_node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     return z.void();
   },
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/symbol": function* (_node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
+  "zod/symbol": async function* (_node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     return z.symbol();
   },
 };

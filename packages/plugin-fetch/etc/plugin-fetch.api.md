@@ -4,11 +4,6 @@
 
 ```ts
 
-// Warning: (ae-forgotten-export) The symbol "StepHandler" needs to be exported by the entry point index.d.ts
-//
-// @public
-export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
-
 // @public
 export interface ClientHandlerOptions {
     baseUrl: string;
@@ -17,10 +12,13 @@ export interface ClientHandlerOptions {
     headers?: Record<string, string>;
 }
 
+// Warning: (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface ClientHandlerState {
-    stepIndex: number;
-}
+export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter;
+
+// @public
+export function createFetchInterpreter(client: FetchClient): Interpreter;
 
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
@@ -38,11 +36,6 @@ export interface FetchConfig {
     baseUrl?: string;
     defaultHeaders?: Record<string, string>;
 }
-
-// Warning: (ae-forgotten-export) The symbol "InterpreterFragment" needs to be exported by the entry point index.d.ts
-//
-// @public
-export const fetchInterpreter: InterpreterFragment;
 
 // @public
 export interface FetchMethods {
@@ -81,13 +74,13 @@ export interface FetchRequestInit {
     referrerPolicy?: string;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ASTNode" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "TypedNode" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function serverEvaluate(client: FetchClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+export function serverEvaluate(client: FetchClient, baseInterpreter: Interpreter): (root: TypedNode) => Promise<unknown>;
 
 // @public
-export function serverHandler(client: FetchClient): StepHandler<void>;
+export function serverInterpreter(client: FetchClient): Interpreter;
 
 // @public
 export function wrapFetch(fetchFn?: typeof globalThis.fetch): FetchClient;

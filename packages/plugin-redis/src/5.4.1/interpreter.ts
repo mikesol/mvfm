@@ -1,4 +1,5 @@
-import type { ASTNode, InterpreterFragment, StepEffect } from "@mvfm/core";
+import type { Interpreter, TypedNode } from "@mvfm/core";
+import { eval_ } from "@mvfm/core";
 
 /**
  * Redis client interface consumed by the redis handler.
@@ -23,288 +24,282 @@ function flattenRecord(obj: Record<string, unknown>): unknown[] {
   return result;
 }
 
+interface RedisKeyNode extends TypedNode<unknown> {
+  kind: string;
+  key: TypedNode<string>;
+}
+
+interface RedisKeyValueNode extends TypedNode<unknown> {
+  kind: string;
+  key: TypedNode<string>;
+  value: TypedNode;
+}
+
+interface RedisKeysNode extends TypedNode<unknown> {
+  kind: string;
+  keys: TypedNode<string>[];
+}
+
 /**
- * Generator-based interpreter fragment for redis plugin nodes.
+ * Creates an interpreter for `redis/*` node kinds.
  *
- * Yields `redis/command` effects for all 35 operations. Each effect
- * contains the Redis command name and a flat args array matching
- * the Redis protocol.
+ * @param client - The {@link RedisClient} to execute against.
+ * @returns An Interpreter handling all 35 redis node kinds.
  */
-export const redisInterpreter: InterpreterFragment = {
-  pluginName: "redis",
-  canHandle: (node) => node.kind.startsWith("redis/"),
-  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
-    switch (node.kind) {
-      // ---- String commands ----
+export function createRedisInterpreter(client: RedisClient): Interpreter {
+  return {
+    // ---- String commands ----
 
-      case "redis/get": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        return yield { type: "redis/command", command: "GET", args: [key] };
+    "redis/get": async function* (node: RedisKeyNode) {
+      const key = yield* eval_(node.key);
+      return await client.command("GET", key);
+    },
+
+    "redis/set": async function* (node: any) {
+      const key = yield* eval_(node.key);
+      const value = yield* eval_(node.value);
+      const extra: unknown[] = [];
+      for (const a of node.args || []) {
+        extra.push(yield* eval_(a));
       }
+      return await client.command("SET", key, value, ...extra);
+    },
 
-      case "redis/set": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const value = yield { type: "recurse", child: node.value as ASTNode };
-        const extra: unknown[] = [];
-        for (const a of (node.args as ASTNode[]) || []) {
-          extra.push(yield { type: "recurse", child: a });
-        }
-        return yield { type: "redis/command", command: "SET", args: [key, value, ...extra] };
+    "redis/incr": async function* (node: RedisKeyNode) {
+      const key = yield* eval_(node.key);
+      return await client.command("INCR", key);
+    },
+
+    "redis/incrby": async function* (node: any) {
+      const key = yield* eval_(node.key);
+      const increment = yield* eval_(node.increment);
+      return await client.command("INCRBY", key, increment);
+    },
+
+    "redis/decr": async function* (node: RedisKeyNode) {
+      const key = yield* eval_(node.key);
+      return await client.command("DECR", key);
+    },
+
+    "redis/decrby": async function* (node: any) {
+      const key = yield* eval_(node.key);
+      const decrement = yield* eval_(node.decrement);
+      return await client.command("DECRBY", key, decrement);
+    },
+
+    "redis/mget": async function* (node: RedisKeysNode) {
+      const keys: unknown[] = [];
+      for (const k of node.keys) {
+        keys.push(yield* eval_(k));
       }
+      return await client.command("MGET", ...keys);
+    },
 
-      case "redis/incr": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        return yield { type: "redis/command", command: "INCR", args: [key] };
+    "redis/mset": async function* (node: any) {
+      const mapping = (yield* eval_(node.mapping)) as Record<string, unknown>;
+      return await client.command("MSET", ...flattenRecord(mapping));
+    },
+
+    "redis/append": async function* (node: RedisKeyValueNode) {
+      const key = yield* eval_(node.key);
+      const value = yield* eval_(node.value);
+      return await client.command("APPEND", key, value);
+    },
+
+    "redis/getrange": async function* (node: any) {
+      const key = yield* eval_(node.key);
+      const start = yield* eval_(node.start);
+      const end = yield* eval_(node.end);
+      return await client.command("GETRANGE", key, start, end);
+    },
+
+    "redis/setrange": async function* (node: any) {
+      const key = yield* eval_(node.key);
+      const offset = yield* eval_(node.offset);
+      const value = yield* eval_(node.value);
+      return await client.command("SETRANGE", key, offset, value);
+    },
+
+    // ---- Key commands ----
+
+    "redis/del": async function* (node: RedisKeysNode) {
+      const keys: unknown[] = [];
+      for (const k of node.keys) {
+        keys.push(yield* eval_(k));
       }
+      return await client.command("DEL", ...keys);
+    },
 
-      case "redis/incrby": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const increment = yield { type: "recurse", child: node.increment as ASTNode };
-        return yield { type: "redis/command", command: "INCRBY", args: [key, increment] };
+    "redis/exists": async function* (node: RedisKeysNode) {
+      const keys: unknown[] = [];
+      for (const k of node.keys) {
+        keys.push(yield* eval_(k));
       }
+      return await client.command("EXISTS", ...keys);
+    },
 
-      case "redis/decr": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        return yield { type: "redis/command", command: "DECR", args: [key] };
+    "redis/expire": async function* (node: any) {
+      const key = yield* eval_(node.key);
+      const seconds = yield* eval_(node.seconds);
+      return await client.command("EXPIRE", key, seconds);
+    },
+
+    "redis/pexpire": async function* (node: any) {
+      const key = yield* eval_(node.key);
+      const ms = yield* eval_(node.milliseconds);
+      return await client.command("PEXPIRE", key, ms);
+    },
+
+    "redis/ttl": async function* (node: RedisKeyNode) {
+      const key = yield* eval_(node.key);
+      return await client.command("TTL", key);
+    },
+
+    "redis/pttl": async function* (node: RedisKeyNode) {
+      const key = yield* eval_(node.key);
+      return await client.command("PTTL", key);
+    },
+
+    // ---- Hash commands ----
+
+    "redis/hget": async function* (node: any) {
+      const key = yield* eval_(node.key);
+      const field = yield* eval_(node.field);
+      return await client.command("HGET", key, field);
+    },
+
+    "redis/hset": async function* (node: any) {
+      const key = yield* eval_(node.key);
+      const mapping = (yield* eval_(node.mapping)) as Record<string, unknown>;
+      return await client.command("HSET", key, ...flattenRecord(mapping));
+    },
+
+    "redis/hmget": async function* (node: any) {
+      const key = yield* eval_(node.key);
+      const fields: unknown[] = [];
+      for (const f of node.fields) {
+        fields.push(yield* eval_(f));
       }
+      return await client.command("HMGET", key, ...fields);
+    },
 
-      case "redis/decrby": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const decrement = yield { type: "recurse", child: node.decrement as ASTNode };
-        return yield { type: "redis/command", command: "DECRBY", args: [key, decrement] };
+    "redis/hgetall": async function* (node: RedisKeyNode) {
+      const key = yield* eval_(node.key);
+      return await client.command("HGETALL", key);
+    },
+
+    "redis/hdel": async function* (node: any) {
+      const key = yield* eval_(node.key);
+      const fields: unknown[] = [];
+      for (const f of node.fields) {
+        fields.push(yield* eval_(f));
       }
+      return await client.command("HDEL", key, ...fields);
+    },
 
-      case "redis/mget": {
-        const keys: unknown[] = [];
-        for (const k of node.keys as ASTNode[]) {
-          keys.push(yield { type: "recurse", child: k });
-        }
-        return yield { type: "redis/command", command: "MGET", args: keys };
+    "redis/hexists": async function* (node: any) {
+      const key = yield* eval_(node.key);
+      const field = yield* eval_(node.field);
+      return await client.command("HEXISTS", key, field);
+    },
+
+    "redis/hlen": async function* (node: RedisKeyNode) {
+      const key = yield* eval_(node.key);
+      return await client.command("HLEN", key);
+    },
+
+    "redis/hkeys": async function* (node: RedisKeyNode) {
+      const key = yield* eval_(node.key);
+      return await client.command("HKEYS", key);
+    },
+
+    "redis/hvals": async function* (node: RedisKeyNode) {
+      const key = yield* eval_(node.key);
+      return await client.command("HVALS", key);
+    },
+
+    "redis/hincrby": async function* (node: any) {
+      const key = yield* eval_(node.key);
+      const field = yield* eval_(node.field);
+      const increment = yield* eval_(node.increment);
+      return await client.command("HINCRBY", key, field, increment);
+    },
+
+    // ---- List commands ----
+
+    "redis/lpush": async function* (node: any) {
+      const key = yield* eval_(node.key);
+      const elements: unknown[] = [];
+      for (const e of node.elements) {
+        elements.push(yield* eval_(e));
       }
+      return await client.command("LPUSH", key, ...elements);
+    },
 
-      case "redis/mset": {
-        const mapping = (yield { type: "recurse", child: node.mapping as ASTNode }) as Record<
-          string,
-          unknown
-        >;
-        return yield { type: "redis/command", command: "MSET", args: flattenRecord(mapping) };
+    "redis/rpush": async function* (node: any) {
+      const key = yield* eval_(node.key);
+      const elements: unknown[] = [];
+      for (const e of node.elements) {
+        elements.push(yield* eval_(e));
       }
+      return await client.command("RPUSH", key, ...elements);
+    },
 
-      case "redis/append": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const value = yield { type: "recurse", child: node.value as ASTNode };
-        return yield { type: "redis/command", command: "APPEND", args: [key, value] };
+    "redis/lpop": async function* (node: any) {
+      const key = yield* eval_(node.key);
+      const args: unknown[] = [key];
+      if (node.count != null) {
+        args.push(yield* eval_(node.count));
       }
+      return await client.command("LPOP", ...args);
+    },
 
-      case "redis/getrange": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const start = yield { type: "recurse", child: node.start as ASTNode };
-        const end = yield { type: "recurse", child: node.end as ASTNode };
-        return yield { type: "redis/command", command: "GETRANGE", args: [key, start, end] };
+    "redis/rpop": async function* (node: any) {
+      const key = yield* eval_(node.key);
+      const args: unknown[] = [key];
+      if (node.count != null) {
+        args.push(yield* eval_(node.count));
       }
+      return await client.command("RPOP", ...args);
+    },
 
-      case "redis/setrange": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const offset = yield { type: "recurse", child: node.offset as ASTNode };
-        const value = yield { type: "recurse", child: node.value as ASTNode };
-        return yield { type: "redis/command", command: "SETRANGE", args: [key, offset, value] };
-      }
+    "redis/llen": async function* (node: RedisKeyNode) {
+      const key = yield* eval_(node.key);
+      return await client.command("LLEN", key);
+    },
 
-      // ---- Key commands ----
+    "redis/lrange": async function* (node: any) {
+      const key = yield* eval_(node.key);
+      const start = yield* eval_(node.start);
+      const stop = yield* eval_(node.stop);
+      return await client.command("LRANGE", key, start, stop);
+    },
 
-      case "redis/del": {
-        const keys: unknown[] = [];
-        for (const k of node.keys as ASTNode[]) {
-          keys.push(yield { type: "recurse", child: k });
-        }
-        return yield { type: "redis/command", command: "DEL", args: keys };
-      }
+    "redis/lindex": async function* (node: any) {
+      const key = yield* eval_(node.key);
+      const index = yield* eval_(node.index);
+      return await client.command("LINDEX", key, index);
+    },
 
-      case "redis/exists": {
-        const keys: unknown[] = [];
-        for (const k of node.keys as ASTNode[]) {
-          keys.push(yield { type: "recurse", child: k });
-        }
-        return yield { type: "redis/command", command: "EXISTS", args: keys };
-      }
+    "redis/lset": async function* (node: any) {
+      const key = yield* eval_(node.key);
+      const index = yield* eval_(node.index);
+      const element = yield* eval_(node.element);
+      return await client.command("LSET", key, index, element);
+    },
 
-      case "redis/expire": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const seconds = yield { type: "recurse", child: node.seconds as ASTNode };
-        return yield { type: "redis/command", command: "EXPIRE", args: [key, seconds] };
-      }
+    "redis/lrem": async function* (node: any) {
+      const key = yield* eval_(node.key);
+      const count = yield* eval_(node.count);
+      const element = yield* eval_(node.element);
+      return await client.command("LREM", key, count, element);
+    },
 
-      case "redis/pexpire": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const ms = yield { type: "recurse", child: node.milliseconds as ASTNode };
-        return yield { type: "redis/command", command: "PEXPIRE", args: [key, ms] };
-      }
-
-      case "redis/ttl": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        return yield { type: "redis/command", command: "TTL", args: [key] };
-      }
-
-      case "redis/pttl": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        return yield { type: "redis/command", command: "PTTL", args: [key] };
-      }
-
-      // ---- Hash commands ----
-
-      case "redis/hget": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const field = yield { type: "recurse", child: node.field as ASTNode };
-        return yield { type: "redis/command", command: "HGET", args: [key, field] };
-      }
-
-      case "redis/hset": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const mapping = (yield { type: "recurse", child: node.mapping as ASTNode }) as Record<
-          string,
-          unknown
-        >;
-        return yield {
-          type: "redis/command",
-          command: "HSET",
-          args: [key, ...flattenRecord(mapping)],
-        };
-      }
-
-      case "redis/hmget": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const fields: unknown[] = [];
-        for (const f of node.fields as ASTNode[]) {
-          fields.push(yield { type: "recurse", child: f });
-        }
-        return yield { type: "redis/command", command: "HMGET", args: [key, ...fields] };
-      }
-
-      case "redis/hgetall": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        return yield { type: "redis/command", command: "HGETALL", args: [key] };
-      }
-
-      case "redis/hdel": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const fields: unknown[] = [];
-        for (const f of node.fields as ASTNode[]) {
-          fields.push(yield { type: "recurse", child: f });
-        }
-        return yield { type: "redis/command", command: "HDEL", args: [key, ...fields] };
-      }
-
-      case "redis/hexists": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const field = yield { type: "recurse", child: node.field as ASTNode };
-        return yield { type: "redis/command", command: "HEXISTS", args: [key, field] };
-      }
-
-      case "redis/hlen": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        return yield { type: "redis/command", command: "HLEN", args: [key] };
-      }
-
-      case "redis/hkeys": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        return yield { type: "redis/command", command: "HKEYS", args: [key] };
-      }
-
-      case "redis/hvals": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        return yield { type: "redis/command", command: "HVALS", args: [key] };
-      }
-
-      case "redis/hincrby": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const field = yield { type: "recurse", child: node.field as ASTNode };
-        const increment = yield { type: "recurse", child: node.increment as ASTNode };
-        return yield { type: "redis/command", command: "HINCRBY", args: [key, field, increment] };
-      }
-
-      // ---- List commands ----
-
-      case "redis/lpush": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const elements: unknown[] = [];
-        for (const e of node.elements as ASTNode[]) {
-          elements.push(yield { type: "recurse", child: e });
-        }
-        return yield { type: "redis/command", command: "LPUSH", args: [key, ...elements] };
-      }
-
-      case "redis/rpush": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const elements: unknown[] = [];
-        for (const e of node.elements as ASTNode[]) {
-          elements.push(yield { type: "recurse", child: e });
-        }
-        return yield { type: "redis/command", command: "RPUSH", args: [key, ...elements] };
-      }
-
-      case "redis/lpop": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const args: unknown[] = [key];
-        if (node.count != null) {
-          args.push(yield { type: "recurse", child: node.count as ASTNode });
-        }
-        return yield { type: "redis/command", command: "LPOP", args };
-      }
-
-      case "redis/rpop": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const args: unknown[] = [key];
-        if (node.count != null) {
-          args.push(yield { type: "recurse", child: node.count as ASTNode });
-        }
-        return yield { type: "redis/command", command: "RPOP", args };
-      }
-
-      case "redis/llen": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        return yield { type: "redis/command", command: "LLEN", args: [key] };
-      }
-
-      case "redis/lrange": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const start = yield { type: "recurse", child: node.start as ASTNode };
-        const stop = yield { type: "recurse", child: node.stop as ASTNode };
-        return yield { type: "redis/command", command: "LRANGE", args: [key, start, stop] };
-      }
-
-      case "redis/lindex": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const index = yield { type: "recurse", child: node.index as ASTNode };
-        return yield { type: "redis/command", command: "LINDEX", args: [key, index] };
-      }
-
-      case "redis/lset": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const index = yield { type: "recurse", child: node.index as ASTNode };
-        const element = yield { type: "recurse", child: node.element as ASTNode };
-        return yield { type: "redis/command", command: "LSET", args: [key, index, element] };
-      }
-
-      case "redis/lrem": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const count = yield { type: "recurse", child: node.count as ASTNode };
-        const element = yield { type: "recurse", child: node.element as ASTNode };
-        return yield { type: "redis/command", command: "LREM", args: [key, count, element] };
-      }
-
-      case "redis/linsert": {
-        const key = yield { type: "recurse", child: node.key as ASTNode };
-        const pivot = yield { type: "recurse", child: node.pivot as ASTNode };
-        const element = yield { type: "recurse", child: node.element as ASTNode };
-        return yield {
-          type: "redis/command",
-          command: "LINSERT",
-          args: [key, node.position as string, pivot, element],
-        };
-      }
-
-      default:
-        throw new Error(`Redis interpreter: unknown node kind "${node.kind}"`);
-    }
-  },
-};
+    "redis/linsert": async function* (node: any) {
+      const key = yield* eval_(node.key);
+      const pivot = yield* eval_(node.pivot);
+      const element = yield* eval_(node.element);
+      return await client.command("LINSERT", key, node.position, pivot, element);
+    },
+  };
+}

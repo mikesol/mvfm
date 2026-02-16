@@ -1,4 +1,5 @@
-import type { ASTNode, InterpreterFragment, StepEffect } from "@mvfm/core";
+import type { Interpreter, TypedNode } from "@mvfm/core";
+import { eval_ } from "@mvfm/core";
 
 /**
  * Anthropic client interface consumed by the anthropic handler.
@@ -11,118 +12,63 @@ export interface AnthropicClient {
   request(method: string, path: string, params?: Record<string, unknown>): Promise<unknown>;
 }
 
+interface AnthropicNode extends TypedNode<unknown> {
+  kind: string;
+  id?: TypedNode<string>;
+  params?: TypedNode<Record<string, unknown>>;
+}
+
 /**
- * Generator-based interpreter fragment for anthropic plugin nodes.
+ * Creates an interpreter for `anthropic/*` node kinds.
  *
- * Yields `anthropic/api_call` effects for all 9 operations. Each effect
- * contains the HTTP method, API path, and optional params matching the
- * Anthropic REST API conventions (as defined by \@anthropic-ai/sdk).
+ * @param client - The {@link AnthropicClient} to execute against.
+ * @returns An Interpreter handling all anthropic node kinds.
  */
-export const anthropicInterpreter: InterpreterFragment = {
-  pluginName: "anthropic",
-  canHandle: (node) => node.kind.startsWith("anthropic/"),
-  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
-    switch (node.kind) {
-      // ---- Messages ----
+export function createAnthropicInterpreter(client: AnthropicClient): Interpreter {
+  return {
+    "anthropic/create_message": async function* (node: AnthropicNode) {
+      const params = yield* eval_(node.params!);
+      return await client.request("POST", "/v1/messages", params);
+    },
 
-      case "anthropic/create_message": {
-        const params = yield { type: "recurse", child: node.params as ASTNode };
-        return yield {
-          type: "anthropic/api_call",
-          method: "POST",
-          path: "/v1/messages",
-          params,
-        };
-      }
+    "anthropic/count_tokens": async function* (node: AnthropicNode) {
+      const params = yield* eval_(node.params!);
+      return await client.request("POST", "/v1/messages/count_tokens", params);
+    },
 
-      case "anthropic/count_tokens": {
-        const params = yield { type: "recurse", child: node.params as ASTNode };
-        return yield {
-          type: "anthropic/api_call",
-          method: "POST",
-          path: "/v1/messages/count_tokens",
-          params,
-        };
-      }
+    "anthropic/create_message_batch": async function* (node: AnthropicNode) {
+      const params = yield* eval_(node.params!);
+      return await client.request("POST", "/v1/messages/batches", params);
+    },
 
-      // ---- Message Batches ----
+    "anthropic/retrieve_message_batch": async function* (node: AnthropicNode) {
+      const id = yield* eval_(node.id!);
+      return await client.request("GET", `/v1/messages/batches/${id}`);
+    },
 
-      case "anthropic/create_message_batch": {
-        const params = yield { type: "recurse", child: node.params as ASTNode };
-        return yield {
-          type: "anthropic/api_call",
-          method: "POST",
-          path: "/v1/messages/batches",
-          params,
-        };
-      }
+    "anthropic/list_message_batches": async function* (node: AnthropicNode) {
+      const params = node.params != null ? yield* eval_(node.params) : undefined;
+      return await client.request("GET", "/v1/messages/batches", params);
+    },
 
-      case "anthropic/retrieve_message_batch": {
-        const id = yield { type: "recurse", child: node.id as ASTNode };
-        return yield {
-          type: "anthropic/api_call",
-          method: "GET",
-          path: `/v1/messages/batches/${id}`,
-        };
-      }
+    "anthropic/delete_message_batch": async function* (node: AnthropicNode) {
+      const id = yield* eval_(node.id!);
+      return await client.request("DELETE", `/v1/messages/batches/${id}`);
+    },
 
-      case "anthropic/list_message_batches": {
-        const params =
-          node.params != null
-            ? yield { type: "recurse", child: node.params as ASTNode }
-            : undefined;
-        return yield {
-          type: "anthropic/api_call",
-          method: "GET",
-          path: "/v1/messages/batches",
-          ...(params !== undefined ? { params } : {}),
-        };
-      }
+    "anthropic/cancel_message_batch": async function* (node: AnthropicNode) {
+      const id = yield* eval_(node.id!);
+      return await client.request("POST", `/v1/messages/batches/${id}/cancel`);
+    },
 
-      case "anthropic/delete_message_batch": {
-        const id = yield { type: "recurse", child: node.id as ASTNode };
-        return yield {
-          type: "anthropic/api_call",
-          method: "DELETE",
-          path: `/v1/messages/batches/${id}`,
-        };
-      }
+    "anthropic/retrieve_model": async function* (node: AnthropicNode) {
+      const id = yield* eval_(node.id!);
+      return await client.request("GET", `/v1/models/${id}`);
+    },
 
-      case "anthropic/cancel_message_batch": {
-        const id = yield { type: "recurse", child: node.id as ASTNode };
-        return yield {
-          type: "anthropic/api_call",
-          method: "POST",
-          path: `/v1/messages/batches/${id}/cancel`,
-        };
-      }
-
-      // ---- Models ----
-
-      case "anthropic/retrieve_model": {
-        const id = yield { type: "recurse", child: node.id as ASTNode };
-        return yield {
-          type: "anthropic/api_call",
-          method: "GET",
-          path: `/v1/models/${id}`,
-        };
-      }
-
-      case "anthropic/list_models": {
-        const params =
-          node.params != null
-            ? yield { type: "recurse", child: node.params as ASTNode }
-            : undefined;
-        return yield {
-          type: "anthropic/api_call",
-          method: "GET",
-          path: "/v1/models",
-          ...(params !== undefined ? { params } : {}),
-        };
-      }
-
-      default:
-        throw new Error(`Anthropic interpreter: unknown node kind "${node.kind}"`);
-    }
-  },
-};
+    "anthropic/list_models": async function* (node: AnthropicNode) {
+      const params = node.params != null ? yield* eval_(node.params) : undefined;
+      return await client.request("GET", "/v1/models", params);
+    },
+  };
+}

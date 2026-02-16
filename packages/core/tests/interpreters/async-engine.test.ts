@@ -1,46 +1,35 @@
 import { describe, expect, it } from "vitest";
-import type { ASTNode, InterpreterFragment, StepEffect } from "../../src/core";
-import { composeInterpreters } from "../../src/core";
+import type { Interpreter, TypedNode } from "../../src/fold";
+import { eval_, foldAST } from "../../src/fold";
 
-describe("async engine: composeInterpreters", () => {
-  it("returns a function that returns a Promise", async () => {
-    const fragment: InterpreterFragment = {
-      pluginName: "test",
-      canHandle: (node) => node.kind === "test/literal",
-      // biome-ignore lint/correctness/useYield: leaf node returns directly without yielding
-      *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
+describe("async engine: foldAST", () => {
+  it("returns a Promise", async () => {
+    const interpreter: Interpreter = {
+      // biome-ignore lint/correctness/useYield: leaf handler
+      "test/literal": async function* (node: any) {
         return node.value;
       },
     };
-    const interp = composeInterpreters([fragment]);
-    const result = interp({ kind: "test/literal", value: 42 });
-    // Must be a Promise
+    const result = foldAST(interpreter, { kind: "test/literal", value: 42 } as TypedNode);
     expect(result).toBeInstanceOf(Promise);
     expect(await result).toBe(42);
   });
 
-  it("recurse passes Promises between fragments", async () => {
-    const inner: InterpreterFragment = {
-      pluginName: "inner",
-      canHandle: (node) => node.kind === "inner/value",
-      // biome-ignore lint/correctness/useYield: leaf node returns directly without yielding
-      *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
+  it("recurse passes values between handlers", async () => {
+    const interpreter: Interpreter = {
+      // biome-ignore lint/correctness/useYield: leaf handler
+      "inner/value": async function* (node: any) {
         return node.value;
       },
-    };
-    const outer: InterpreterFragment = {
-      pluginName: "outer",
-      canHandle: (node) => node.kind === "outer/double",
-      *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
-        const val = (yield { type: "recurse", child: node.inner as ASTNode }) as number;
+      "outer/double": async function* (node: any) {
+        const val = (yield* eval_(node.inner)) as number;
         return val * 2;
       },
     };
-    const interp = composeInterpreters([outer, inner]);
-    const result = await interp({
+    const result = await foldAST(interpreter, {
       kind: "outer/double",
       inner: { kind: "inner/value", value: 21 },
-    });
+    } as TypedNode);
     expect(result).toBe(42);
   });
 });

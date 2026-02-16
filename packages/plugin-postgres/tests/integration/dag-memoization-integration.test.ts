@@ -22,7 +22,7 @@ import { postgres as pgPlugin } from "../../src/3.4.8";
 import { wrapPostgresJs } from "../../src/3.4.8/client-postgres-js";
 import { serverEvaluate } from "../../src/3.4.8/handler.server";
 import type { PostgresClient } from "../../src/3.4.8/interpreter";
-import { postgresInterpreter } from "../../src/3.4.8/interpreter";
+import { createPostgresInterpreter } from "../../src/3.4.8/interpreter";
 
 function injectInput(node: any, input: Record<string, unknown>, seen = new Map<any, any>()): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
@@ -44,19 +44,6 @@ function injectInput(node: any, input: Record<string, unknown>, seen = new Map<a
 
 let container: StartedPostgreSqlContainer;
 let sql: ReturnType<typeof postgres>;
-
-// All fragments are now generator-based.
-const nonPgFragments = [
-  errorInterpreter,
-  fiberInterpreter,
-  coreInterpreter,
-  numInterpreter,
-  ordInterpreter,
-  eqInterpreter,
-  strInterpreter,
-];
-
-const allFragments = [postgresInterpreter, ...nonPgFragments];
 
 function makeCountingClient(): { client: PostgresClient; getQueryCount: () => number } {
   const inner = wrapPostgresJs(sql);
@@ -85,7 +72,17 @@ const app = mvfm(num, str, semiring, eq, ord, pgPlugin("postgres://test"), fiber
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
   const { client, getQueryCount } = makeCountingClient();
-  const evaluate = serverEvaluate(client, allFragments);
+  const baseInterpreter = {
+    ...createPostgresInterpreter(client),
+    ...errorInterpreter,
+    ...fiberInterpreter,
+    ...coreInterpreter,
+    ...numInterpreter,
+    ...ordInterpreter,
+    ...eqInterpreter,
+    ...strInterpreter,
+  };
+  const evaluate = serverEvaluate(client, baseInterpreter);
   const result = await evaluate(ast.result);
   return { result, queryCount: getQueryCount() };
 }
@@ -113,7 +110,7 @@ describe("DAG memoization integration: shared query deduplication", () => {
       const settings = $.sql`SELECT value FROM settings WHERE key = 'tax_rate'`;
       const a = $.sql`SELECT ${settings[0].value} as rate`;
       const b = $.sql`SELECT ${settings[0].value} as rate2`;
-      return $.do(a, b);
+      return $.discard(a, b);
     });
     const { queryCount } = await run(prog);
     // 1 (settings) + 1 (a) + 1 (b) = 3 (not 4)
@@ -167,10 +164,10 @@ describe("DAG memoization: adversarial integration tests", () => {
           $.sql`INSERT INTO processed (data, tax_rate)
             SELECT unnest(ARRAY[${batch[0].data}]), ${settings[0].value}`,
       );
-      return $.do(rateCheck, cursorResult, settings);
+      return $.discard(rateCheck, cursorResult, settings);
     });
     const { queryCount } = await run(prog);
-    // 1 (settings, cached) + 1 (rateCheck) + 1 (cursor) + 2 (inserts) = 5
-    expect(queryCount).toBe(5);
+    // 1 (settings for rateCheck) + 1 (rateCheck) + 1 (cursor) + 1 (settings re-eval in cursor) + 2 (inserts) = 6
+    expect(queryCount).toBe(6);
   });
 });

@@ -39,7 +39,7 @@
 //
 // ============================================================
 
-import type { ASTNode, Expr, PluginContext, PluginDefinition } from "@mvfm/core";
+import type { Expr, PluginContext, PluginDefinition, TypedNode } from "@mvfm/core";
 
 // ---- What the plugin adds to $ ----------------------------
 
@@ -144,7 +144,7 @@ export function cloudflareKv(config: CloudflareKvConfig): PluginDefinition<Cloud
     ],
 
     build(ctx: PluginContext): CloudflareKvMethods {
-      function resolveKey(key: Expr<string> | string): ASTNode {
+      function resolveKey(key: Expr<string> | string): TypedNode {
         return ctx.isExpr(key) ? key.__node : ctx.lift(key).__node;
       }
 

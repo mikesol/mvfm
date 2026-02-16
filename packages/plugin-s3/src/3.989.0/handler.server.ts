@@ -1,48 +1,28 @@
-import type { ASTNode, InterpreterFragment, StepHandler } from "@mvfm/core";
-import { runAST } from "@mvfm/core";
-import type { S3Client } from "./interpreter";
+import type { Interpreter, TypedNode } from "@mvfm/core";
+import { foldAST } from "@mvfm/core";
+import { createS3Interpreter, type S3Client } from "./interpreter";
 
 /**
- * Creates a server-side StepHandler that executes S3 effects
- * against a real S3 client.
- *
- * Handles `s3/command` effects by delegating to
- * `client.execute(command, input)`. Throws on unhandled effect types.
+ * Creates a server-side interpreter for `s3/*` node kinds.
  *
  * @param client - The {@link S3Client} to execute against.
- * @returns A StepHandler for void state.
+ * @returns An Interpreter for s3 node kinds.
  */
-export function serverHandler(client: S3Client): StepHandler<void> {
-  return async (effect, _context, state) => {
-    if (effect.type === "s3/command") {
-      const { command, input } = effect as {
-        type: "s3/command";
-        command: string;
-        input: Record<string, unknown>;
-      };
-      const value = await client.execute(command, input);
-      return { value, state };
-    }
-    throw new Error(`serverHandler: unhandled effect type "${effect.type}"`);
-  };
+export function serverInterpreter(client: S3Client): Interpreter {
+  return createS3Interpreter(client);
 }
 
 /**
- * Creates a unified evaluation function that evaluates an AST against
- * an S3 client using the provided interpreter fragments.
- *
- * Convenience wrapper composing fragments + {@link serverHandler} via `runAST`.
+ * Creates a unified evaluator using the s3 server interpreter.
  *
  * @param client - The {@link S3Client} to execute against.
- * @param fragments - Generator interpreter fragments for evaluating sub-expressions.
- * @returns An async function that evaluates an AST node to its result.
+ * @param baseInterpreter - Base interpreter for evaluating sub-expressions.
+ * @returns An async AST evaluator function.
  */
 export function serverEvaluate(
   client: S3Client,
-  fragments: InterpreterFragment[],
-): (root: ASTNode) => Promise<unknown> {
-  return async (root: ASTNode): Promise<unknown> => {
-    const { value } = await runAST(root, fragments, serverHandler(client), undefined);
-    return value;
-  };
+  baseInterpreter: Interpreter,
+): (root: TypedNode) => Promise<unknown> {
+  const interp = { ...baseInterpreter, ...createS3Interpreter(client) };
+  return (root: TypedNode) => foldAST(interp, root);
 }

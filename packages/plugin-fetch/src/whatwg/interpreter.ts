@@ -1,4 +1,5 @@
-import type { ASTNode, InterpreterFragment, StepEffect } from "@mvfm/core";
+import type { Interpreter, TypedNode } from "@mvfm/core";
+import { eval_ } from "@mvfm/core";
 
 /**
  * Fetch client interface consumed by the fetch handler.
@@ -11,69 +12,69 @@ export interface FetchClient {
   request(url: string, init?: RequestInit): Promise<Response>;
 }
 
+interface FetchRequestNode extends TypedNode<unknown> {
+  kind: "fetch/request";
+  url: TypedNode<string>;
+  init: TypedNode | null;
+  config: { baseUrl?: string; defaultHeaders?: Record<string, string> };
+}
+
+interface FetchResponseNode extends TypedNode<unknown> {
+  kind: string;
+  response: TypedNode<Response>;
+}
+
 /**
- * Generator-based interpreter fragment for fetch plugin nodes.
+ * Creates an interpreter for `fetch/*` node kinds.
  *
- * Yields two effect types:
- * - `fetch/http_request`: for fetch/request nodes (the actual HTTP call)
- * - `fetch/read_body`: for fetch/json, fetch/text, fetch/status, fetch/headers
- *   (reading response body or metadata)
+ * @param client - The {@link FetchClient} to execute against.
+ * @returns An Interpreter handling all fetch node kinds.
  */
-export const fetchInterpreter: InterpreterFragment = {
-  pluginName: "fetch",
-  canHandle: (node) => node.kind.startsWith("fetch/"),
-  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
-    switch (node.kind) {
-      case "fetch/request": {
-        const url = yield { type: "recurse", child: node.url as ASTNode };
-        const init =
-          node.init != null ? yield { type: "recurse", child: node.init as ASTNode } : undefined;
-        return yield {
-          type: "fetch/http_request",
-          url,
-          ...(init !== undefined ? { init } : {}),
-          config: node.config,
+export function createFetchInterpreter(client: FetchClient): Interpreter {
+  return {
+    "fetch/request": async function* (node: FetchRequestNode) {
+      const url = yield* eval_(node.url);
+      const init = node.init != null ? yield* eval_(node.init) : undefined;
+
+      let resolvedUrl = url;
+      const config = node.config;
+      if (config?.baseUrl && !url.startsWith("http://") && !url.startsWith("https://")) {
+        resolvedUrl = `${config.baseUrl.replace(/\/$/, "")}/${url.replace(/^\//, "")}`;
+      }
+
+      const mergedInit: RequestInit = { ...(init as RequestInit | undefined) };
+      if (config?.defaultHeaders) {
+        mergedInit.headers = {
+          ...config.defaultHeaders,
+          ...(mergedInit.headers as Record<string, string> | undefined),
         };
       }
 
-      case "fetch/json": {
-        const response = yield { type: "recurse", child: node.response as ASTNode };
-        return yield {
-          type: "fetch/read_body",
-          response,
-          mode: "json",
-        };
-      }
+      return await client.request(resolvedUrl, mergedInit);
+    },
 
-      case "fetch/text": {
-        const response = yield { type: "recurse", child: node.response as ASTNode };
-        return yield {
-          type: "fetch/read_body",
-          response,
-          mode: "text",
-        };
-      }
+    "fetch/json": async function* (node: FetchResponseNode) {
+      const response = yield* eval_(node.response);
+      return await response.json();
+    },
 
-      case "fetch/status": {
-        const response = yield { type: "recurse", child: node.response as ASTNode };
-        return yield {
-          type: "fetch/read_body",
-          response,
-          mode: "status",
-        };
-      }
+    "fetch/text": async function* (node: FetchResponseNode) {
+      const response = yield* eval_(node.response);
+      return await response.text();
+    },
 
-      case "fetch/headers": {
-        const response = yield { type: "recurse", child: node.response as ASTNode };
-        return yield {
-          type: "fetch/read_body",
-          response,
-          mode: "headers",
-        };
-      }
+    "fetch/status": async function* (node: FetchResponseNode) {
+      const response = yield* eval_(node.response);
+      return response.status;
+    },
 
-      default:
-        throw new Error(`Fetch interpreter: unknown node kind "${node.kind}"`);
-    }
-  },
-};
+    "fetch/headers": async function* (node: FetchResponseNode) {
+      const response = yield* eval_(node.response);
+      const headers: Record<string, string> = {};
+      response.headers.forEach((v, k) => {
+        headers[k] = v;
+      });
+      return headers;
+    },
+  };
+}

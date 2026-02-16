@@ -1,4 +1,4 @@
-import type { ASTNode, Expr, PluginContext } from "@mvfm/core";
+import type { Expr, PluginContext, TypedNode } from "@mvfm/core";
 import type {
   CheckDescriptor,
   ErrorConfig,
@@ -120,7 +120,7 @@ export abstract class ZodSchemaBuilder<T> {
   protected _addCheck(
     kind: string,
     params: Record<string, unknown> = {},
-    opts?: { error?: string; abort?: boolean; when?: ASTNode },
+    opts?: { error?: string; abort?: boolean; when?: TypedNode },
   ): this {
     const check: CheckDescriptor = { kind, ...params };
     if (opts?.error !== undefined) check.error = opts.error;
@@ -151,12 +151,12 @@ export abstract class ZodSchemaBuilder<T> {
     opKind: string,
     input: Expr<unknown> | unknown,
     opts?: { error?: ErrorConfig },
-  ): ASTNode {
-    const node: ASTNode & { parseError?: ErrorConfig } = {
+  ): TypedNode {
+    const node = {
       kind: opKind,
       schema: this._buildSchemaNode(),
       input: this._ctx.lift(input).__node,
-    };
+    } as TypedNode & { parseError?: ErrorConfig };
     if (opts?.error !== undefined) {
       node.parseError = opts.error;
     }
@@ -203,16 +203,16 @@ export abstract class ZodSchemaBuilder<T> {
   private _buildRefinement(
     kind: RefinementDescriptor["kind"],
     fn: (val: Expr<T>) => Expr<unknown> | undefined,
-    opts?: { error?: string; abort?: boolean; path?: string[]; when?: ASTNode },
+    opts?: { error?: string; abort?: boolean; path?: string[]; when?: TypedNode },
   ): RefinementDescriptor {
-    const paramNode: ASTNode = { kind: "core/lambda_param", name: "refine_val" };
+    const paramNode = { kind: "core/lambda_param", name: "refine_val" } as TypedNode;
     const paramProxy = this._ctx.expr<T>(paramNode);
     const result = fn(paramProxy);
     const bodyNode = result && this._ctx.isExpr(result) ? result.__node : paramNode;
 
     const refinement: RefinementDescriptor = {
       kind,
-      fn: { kind: "core/lambda", param: paramNode, body: bodyNode },
+      fn: { kind: "core/lambda", param: paramNode, body: bodyNode } as TypedNode,
     };
     if (opts?.error !== undefined) refinement.error = opts.error;
     if (opts?.abort !== undefined) refinement.abort = opts.abort;
@@ -232,7 +232,7 @@ export abstract class ZodSchemaBuilder<T> {
    */
   refine(
     predicate: (val: Expr<T>) => Expr<boolean>,
-    opts?: { error?: string; abort?: boolean; path?: string[]; when?: ASTNode },
+    opts?: { error?: string; abort?: boolean; path?: string[]; when?: TypedNode },
   ): this {
     const refinement = this._buildRefinement("refine", predicate, opts);
     return this._clone({
@@ -247,7 +247,7 @@ export abstract class ZodSchemaBuilder<T> {
    */
   superRefine(
     fn: (val: Expr<T>) => Expr<unknown> | undefined,
-    opts?: { error?: string; abort?: boolean; when?: ASTNode },
+    opts?: { error?: string; abort?: boolean; when?: TypedNode },
   ): this {
     const refinement = this._buildRefinement("super_refine", fn, opts);
     return this._clone({
@@ -261,7 +261,7 @@ export abstract class ZodSchemaBuilder<T> {
    */
   check(
     fn: (val: Expr<T>) => Expr<boolean>,
-    opts?: { error?: string; abort?: boolean; path?: string[]; when?: ASTNode },
+    opts?: { error?: string; abort?: boolean; path?: string[]; when?: TypedNode },
   ): this {
     const refinement = this._buildRefinement("check", fn, opts);
     return this._clone({
@@ -273,7 +273,7 @@ export abstract class ZodSchemaBuilder<T> {
    * Mutating refinement — the callback transforms the value.
    * Returns a new builder with the overwrite refinement added.
    */
-  overwrite(fn: (val: Expr<T>) => Expr<T>, opts?: { error?: string; when?: ASTNode }): this {
+  overwrite(fn: (val: Expr<T>) => Expr<T>, opts?: { error?: string; when?: TypedNode }): this {
     const refinement = this._buildRefinement("overwrite", fn, opts);
     return this._clone({
       refinements: [...this._refinements, refinement],
@@ -348,7 +348,7 @@ export abstract class ZodSchemaBuilder<T> {
    * Produces a `zod/transform` wrapper node with an embedded lambda.
    */
   transform<U>(fn: (val: Expr<T>) => Expr<U>): ZodWrappedBuilder<U> {
-    const paramNode: ASTNode = { kind: "core/lambda_param", name: "transform_val" };
+    const paramNode = { kind: "core/lambda_param", name: "transform_val" } as TypedNode;
     const paramProxy = this._ctx.expr<T>(paramNode);
     const result = fn(paramProxy);
     const bodyNode = this._ctx.isExpr(result) ? result.__node : paramNode;

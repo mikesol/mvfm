@@ -1,4 +1,4 @@
-import type { ASTNode, PluginContext, StepEffect } from "@mvfm/core";
+import type { PluginContext, TypedNode } from "@mvfm/core";
 import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
@@ -27,7 +27,7 @@ export class ZodStringBuilder extends ZodSchemaBuilder<string> {
   protected _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | ASTNode;
+    error?: string | TypedNode;
     extra?: Record<string, unknown>;
   }): ZodStringBuilder {
     return new ZodStringBuilder(
@@ -44,7 +44,7 @@ export class ZodStringBuilder extends ZodSchemaBuilder<string> {
   /** Minimum length. Produces `min_length` check descriptor. */
   min(
     length: number,
-    opts?: { error?: string; abort?: boolean; when?: ASTNode },
+    opts?: { error?: string; abort?: boolean; when?: TypedNode },
   ): ZodStringBuilder {
     return this._addCheck("min_length", { value: length }, opts);
   }
@@ -52,7 +52,7 @@ export class ZodStringBuilder extends ZodSchemaBuilder<string> {
   /** Maximum length. Produces `max_length` check descriptor. */
   max(
     length: number,
-    opts?: { error?: string; abort?: boolean; when?: ASTNode },
+    opts?: { error?: string; abort?: boolean; when?: TypedNode },
   ): ZodStringBuilder {
     return this._addCheck("max_length", { value: length }, opts);
   }
@@ -60,7 +60,7 @@ export class ZodStringBuilder extends ZodSchemaBuilder<string> {
   /** Exact length. Produces `length` check descriptor. */
   length(
     len: number,
-    opts?: { error?: string; abort?: boolean; when?: ASTNode },
+    opts?: { error?: string; abort?: boolean; when?: TypedNode },
   ): ZodStringBuilder {
     return this._addCheck("length", { value: len }, opts);
   }
@@ -70,7 +70,7 @@ export class ZodStringBuilder extends ZodSchemaBuilder<string> {
   /** Regex match. Produces `regex` check descriptor. */
   regex(
     pattern: RegExp,
-    opts?: { error?: string; abort?: boolean; when?: ASTNode },
+    opts?: { error?: string; abort?: boolean; when?: TypedNode },
   ): ZodStringBuilder {
     return this._addCheck("regex", { pattern: pattern.source, flags: pattern.flags }, opts);
   }
@@ -80,7 +80,7 @@ export class ZodStringBuilder extends ZodSchemaBuilder<string> {
   /** Must start with prefix. Produces `starts_with` check descriptor. */
   startsWith(
     prefix: string,
-    opts?: { error?: string; abort?: boolean; when?: ASTNode },
+    opts?: { error?: string; abort?: boolean; when?: TypedNode },
   ): ZodStringBuilder {
     return this._addCheck("starts_with", { value: prefix }, opts);
   }
@@ -88,7 +88,7 @@ export class ZodStringBuilder extends ZodSchemaBuilder<string> {
   /** Must end with suffix. Produces `ends_with` check descriptor. */
   endsWith(
     suffix: string,
-    opts?: { error?: string; abort?: boolean; when?: ASTNode },
+    opts?: { error?: string; abort?: boolean; when?: TypedNode },
   ): ZodStringBuilder {
     return this._addCheck("ends_with", { value: suffix }, opts);
   }
@@ -96,7 +96,7 @@ export class ZodStringBuilder extends ZodSchemaBuilder<string> {
   /** Must contain substring. Produces `includes` check descriptor. */
   includes(
     substring: string,
-    opts?: { error?: string; abort?: boolean; when?: ASTNode },
+    opts?: { error?: string; abort?: boolean; when?: TypedNode },
   ): ZodStringBuilder {
     return this._addCheck("includes", { value: substring }, opts);
   }
@@ -104,36 +104,36 @@ export class ZodStringBuilder extends ZodSchemaBuilder<string> {
   // ---- Case checks ----
 
   /** Must be all uppercase. Produces `uppercase` check descriptor. */
-  uppercase(opts?: { error?: string; abort?: boolean; when?: ASTNode }): ZodStringBuilder {
+  uppercase(opts?: { error?: string; abort?: boolean; when?: TypedNode }): ZodStringBuilder {
     return this._addCheck("uppercase", {}, opts);
   }
 
   /** Must be all lowercase. Produces `lowercase` check descriptor. */
-  lowercase(opts?: { error?: string; abort?: boolean; when?: ASTNode }): ZodStringBuilder {
+  lowercase(opts?: { error?: string; abort?: boolean; when?: TypedNode }): ZodStringBuilder {
     return this._addCheck("lowercase", {}, opts);
   }
 
   // ---- Transforms ----
 
   /** Trim whitespace. Produces `trim` check descriptor. */
-  trim(opts?: { error?: string; abort?: boolean; when?: ASTNode }): ZodStringBuilder {
+  trim(opts?: { error?: string; abort?: boolean; when?: TypedNode }): ZodStringBuilder {
     return this._addCheck("trim", {}, opts);
   }
 
   /** Convert to lowercase. Produces `to_lower_case` check descriptor. */
-  toLowerCase(opts?: { error?: string; abort?: boolean; when?: ASTNode }): ZodStringBuilder {
+  toLowerCase(opts?: { error?: string; abort?: boolean; when?: TypedNode }): ZodStringBuilder {
     return this._addCheck("to_lower_case", {}, opts);
   }
 
   /** Convert to uppercase. Produces `to_upper_case` check descriptor. */
-  toUpperCase(opts?: { error?: string; abort?: boolean; when?: ASTNode }): ZodStringBuilder {
+  toUpperCase(opts?: { error?: string; abort?: boolean; when?: TypedNode }): ZodStringBuilder {
     return this._addCheck("to_upper_case", {}, opts);
   }
 
   /** Unicode normalize. Produces `normalize` check descriptor. */
   normalize(
     form?: "NFC" | "NFD" | "NFKC" | "NFKD",
-    opts?: { error?: string; abort?: boolean; when?: ASTNode },
+    opts?: { error?: string; abort?: boolean; when?: TypedNode },
   ): ZodStringBuilder {
     return this._addCheck("normalize", { form: form ?? "NFC" }, opts);
   }
@@ -223,7 +223,7 @@ function applyStringChecks(schema: z.ZodString, checks: CheckDescriptor[]): z.Zo
 
 /** Interpreter handlers for string schema nodes. */
 export const stringInterpreter: SchemaInterpreterMap = {
-  "zod/string": function* (node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
+  "zod/string": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     const checks = (node.checks as CheckDescriptor[]) ?? [];
     const errorFn = toZodError(node.error as ErrorConfig | undefined);
     const format = node.format as Record<string, unknown> | undefined;

@@ -1,15 +1,14 @@
-import type { ASTNode, InterpreterFragment, StepEffect } from "../../core";
+import type { Interpreter, TypedNode } from "../../fold";
+import { eval_ } from "../../fold";
 
-/** Interpreter fragment for `eq/` node kinds. */
-export const eqInterpreter: InterpreterFragment = {
-  pluginName: "eq",
-  canHandle: (node) => node.kind.startsWith("eq/"),
-  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
-    switch (node.kind) {
-      case "eq/neq":
-        return !(yield { type: "recurse", child: node.inner as ASTNode });
-      default:
-        throw new Error(`Eq interpreter: unknown node kind "${node.kind}"`);
-    }
+interface EqNeq extends TypedNode<boolean> {
+  kind: "eq/neq";
+  inner: TypedNode<boolean>;
+}
+
+/** Interpreter handlers for `eq/` node kinds. */
+export const eqInterpreter: Interpreter = {
+  "eq/neq": async function* (node: EqNeq) {
+    return !(yield* eval_(node.inner));
   },
 };

@@ -189,69 +189,9 @@
       "preserveMemberOrder": false,
       "members": [
         {
-          "kind": "Function",
-          "canonicalReference": "@mvfm/plugin-slack!clientHandler:function(1)",
-          "docComment": "/**\n * Creates a client-side StepHandler that sends effects as JSON to a remote server endpoint for execution.\n *\n * Each effect is sent as a POST request to `{baseUrl}/mvfm/execute` with the contract hash, step index, path, and effect payload. The server is expected to return `{ result: unknown }` in the response body.\n *\n * @param options - Configuration for the client handler.\n *\n * @returns A StepHandler that tracks step indices.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export declare function clientHandler(options: "
-            },
-            {
-              "kind": "Reference",
-              "text": "ClientHandlerOptions",
-              "canonicalReference": "@mvfm/plugin-slack!ClientHandlerOptions:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "): "
-            },
-            {
-              "kind": "Reference",
-              "text": "StepHandler",
-              "canonicalReference": "@mvfm/plugin-slack!~StepHandler:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "ClientHandlerState",
-              "canonicalReference": "@mvfm/plugin-slack!ClientHandlerState:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ">"
-            },
-            {
-              "kind": "Content",
-              "text": ";"
-            }
-          ],
-          "fileUrlPath": "dist/7.14.0/handler.client.d.ts",
-          "returnTypeTokenRange": {
-            "startIndex": 3,
-            "endIndex": 7
-          },
-          "releaseTag": "Public",
-          "overloadIndex": 1,
-          "parameters": [
-            {
-              "parameterName": "options",
-              "parameterTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isOptional": false
-            }
-          ],
-          "name": "clientHandler"
-        },
-        {
           "kind": "Interface",
           "canonicalReference": "@mvfm/plugin-slack!ClientHandlerOptions:interface",
-          "docComment": "/**\n * Options for configuring the client-side handler.\n */\n",
+          "docComment": "/**\n * Options for the client-side interpreter.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -266,7 +206,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "@mvfm/plugin-slack!ClientHandlerOptions#baseUrl:member",
-              "docComment": "/**\n * Base URL of the server endpoint (e.g., \"https://api.example.com\").\n */\n",
+              "docComment": "/**\n * Base URL for remote execution endpoint.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -293,7 +233,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "@mvfm/plugin-slack!ClientHandlerOptions#contractHash:member",
-              "docComment": "/**\n * Contract hash from the program, used for verification.\n */\n",
+              "docComment": "/**\n * Contract hash from compiled program metadata.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -320,7 +260,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "@mvfm/plugin-slack!ClientHandlerOptions#fetch:member",
-              "docComment": "/**\n * Custom fetch implementation (defaults to global fetch).\n */\n",
+              "docComment": "/**\n * Optional fetch override.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -352,7 +292,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "@mvfm/plugin-slack!ClientHandlerOptions#headers:member",
-              "docComment": "/**\n * Additional headers to include in requests.\n */\n",
+              "docComment": "/**\n * Optional extra request headers.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -385,54 +325,119 @@
           "extendsTokenRanges": []
         },
         {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/plugin-slack!ClientHandlerState:interface",
-          "docComment": "/**\n * State tracked by the client handler across steps.\n */\n",
+          "kind": "Function",
+          "canonicalReference": "@mvfm/plugin-slack!clientInterpreter:function(1)",
+          "docComment": "/**\n * Creates a client-side interpreter that proxies all operations to a server.\n *\n * Each handler resolves its TypedNode children via `eval_()`, then sends the resolved data to `{baseUrl}/mvfm/execute` as a JSON POST.\n *\n * @param options - Handler options.\n *\n * @param nodeKinds - Node kinds to create handlers for.\n *\n * @returns An Interpreter that proxies all operations to the server.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export interface ClientHandlerState "
+              "text": "export declare function clientInterpreter(options: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ClientHandlerOptions",
+              "canonicalReference": "@mvfm/plugin-slack!ClientHandlerOptions:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", nodeKinds: "
+            },
+            {
+              "kind": "Content",
+              "text": "string[]"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/plugin-slack!~Interpreter:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
             }
           ],
           "fileUrlPath": "dist/7.14.0/handler.client.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 5,
+            "endIndex": 6
+          },
           "releaseTag": "Public",
-          "name": "ClientHandlerState",
-          "preserveMemberOrder": false,
-          "members": [
+          "overloadIndex": 1,
+          "parameters": [
             {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-slack!ClientHandlerState#stepIndex:member",
-              "docComment": "/**\n * The current step index, incremented after each effect.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "stepIndex: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "number"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "stepIndex",
-              "propertyTypeTokenRange": {
+              "parameterName": "options",
+              "parameterTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
-              }
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "nodeKinds",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": false
             }
           ],
-          "extendsTokenRanges": []
+          "name": "clientInterpreter"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@mvfm/plugin-slack!createSlackInterpreter:function(1)",
+          "docComment": "/**\n * Creates an interpreter for `slack/*` node kinds.\n *\n * All 25 methods follow the same uniform pattern: look up the API method, resolve params, and call `client.apiCall()`.\n *\n * @param client - The {@link SlackClient} to execute against.\n *\n * @returns An Interpreter handling all slack node kinds.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function createSlackInterpreter(client: "
+            },
+            {
+              "kind": "Reference",
+              "text": "SlackClient",
+              "canonicalReference": "@mvfm/plugin-slack!SlackClient:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/plugin-slack!~Interpreter:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/7.14.0/interpreter.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "client",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "createSlackInterpreter"
         },
         {
           "kind": "Function",
           "canonicalReference": "@mvfm/plugin-slack!serverEvaluate:function(1)",
-          "docComment": "/**\n * Creates a unified evaluation function that evaluates an AST against a Slack client using the provided interpreter fragments.\n *\n * Convenience wrapper composing fragments + {@link serverHandler} via `runAST`.\n *\n * @param client - The {@link SlackClient} to execute against.\n *\n * @param fragments - Generator interpreter fragments for evaluating sub-expressions.\n *\n * @returns An async function that evaluates an AST node to its result.\n */\n",
+          "docComment": "/**\n * Creates a unified evaluator using the slack server interpreter.\n *\n * @param client - The {@link SlackClient} to execute against.\n *\n * @param baseInterpreter - Base interpreter for evaluating sub-expressions.\n *\n * @returns An async AST evaluator function.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -445,16 +450,12 @@
             },
             {
               "kind": "Content",
-              "text": ", fragments: "
+              "text": ", baseInterpreter: "
             },
             {
               "kind": "Reference",
-              "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/plugin-slack!~InterpreterFragment:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "[]"
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/plugin-slack!~Interpreter:type"
             },
             {
               "kind": "Content",
@@ -466,8 +467,8 @@
             },
             {
               "kind": "Reference",
-              "text": "ASTNode",
-              "canonicalReference": "@mvfm/plugin-slack!~ASTNode:interface"
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/plugin-slack!~TypedNode:interface"
             },
             {
               "kind": "Content",
@@ -489,8 +490,8 @@
           ],
           "fileUrlPath": "dist/7.14.0/handler.server.d.ts",
           "returnTypeTokenRange": {
-            "startIndex": 6,
-            "endIndex": 11
+            "startIndex": 5,
+            "endIndex": 10
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
@@ -504,10 +505,10 @@
               "isOptional": false
             },
             {
-              "parameterName": "fragments",
+              "parameterName": "baseInterpreter",
               "parameterTypeTokenRange": {
                 "startIndex": 3,
-                "endIndex": 5
+                "endIndex": 4
               },
               "isOptional": false
             }
@@ -516,12 +517,12 @@
         },
         {
           "kind": "Function",
-          "canonicalReference": "@mvfm/plugin-slack!serverHandler:function(1)",
-          "docComment": "/**\n * Creates a server-side StepHandler that executes Slack effects against a real Slack client.\n *\n * Handles `slack/api_call` effects by delegating to `client.apiCall(method, params)`. Throws on unhandled effect types.\n *\n * @param client - The {@link SlackClient} to execute against.\n *\n * @returns A StepHandler for void state.\n */\n",
+          "canonicalReference": "@mvfm/plugin-slack!serverInterpreter:function(1)",
+          "docComment": "/**\n * Creates a server-side interpreter for `slack/*` node kinds.\n *\n * @param client - The {@link SlackClient} to execute against.\n *\n * @returns An Interpreter for slack node kinds.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare function serverHandler(client: "
+              "text": "export declare function serverInterpreter(client: "
             },
             {
               "kind": "Reference",
@@ -534,12 +535,8 @@
             },
             {
               "kind": "Reference",
-              "text": "StepHandler",
-              "canonicalReference": "@mvfm/plugin-slack!~StepHandler:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<void>"
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/plugin-slack!~Interpreter:type"
             },
             {
               "kind": "Content",
@@ -549,7 +546,7 @@
           "fileUrlPath": "dist/7.14.0/handler.server.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 3,
-            "endIndex": 5
+            "endIndex": 4
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
@@ -563,7 +560,7 @@
               "isOptional": false
             }
           ],
-          "name": "serverHandler"
+          "name": "serverInterpreter"
         },
         {
           "kind": "Function",
@@ -758,30 +755,6 @@
             }
           ],
           "extendsTokenRanges": []
-        },
-        {
-          "kind": "Variable",
-          "canonicalReference": "@mvfm/plugin-slack!slackInterpreter:var",
-          "docComment": "/**\n * Generator-based interpreter fragment for slack plugin nodes.\n *\n * Yields `slack/api_call` effects for all 25 operations across 5 resource groups (chat, conversations, users, reactions, files). Each effect contains the Slack API method string and optional params, matching the `WebClient.apiCall()` calling convention.\n *\n * All 25 methods follow the same uniform pattern: look up the API method from `NODE_TO_METHOD`, recurse into params if non-null, and yield a single `slack/api_call` effect.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "slackInterpreter: "
-            },
-            {
-              "kind": "Reference",
-              "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/plugin-slack!~InterpreterFragment:interface"
-            }
-          ],
-          "fileUrlPath": "dist/7.14.0/interpreter.d.ts",
-          "isReadonly": true,
-          "releaseTag": "Public",
-          "name": "slackInterpreter",
-          "variableTypeTokenRange": {
-            "startIndex": 1,
-            "endIndex": 2
-          }
         },
         {
           "kind": "Interface",

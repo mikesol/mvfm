@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { composeInterpreters, mvfm } from "../../../src/core";
+import { mvfm } from "../../../src/core";
+import { foldAST } from "../../../src/fold";
 import { coreInterpreter } from "../../../src/interpreters/core";
 import { error } from "../../../src/plugins/error";
 import { errorInterpreter } from "../../../src/plugins/error/interpreter";
@@ -21,18 +22,18 @@ function injectInput(node: any, input: Record<string, unknown>): any {
   return result;
 }
 
-const interp = composeInterpreters([
-  errorInterpreter,
-  fiberInterpreter,
-  coreInterpreter,
-  numInterpreter,
-]);
+const combined = {
+  ...errorInterpreter,
+  ...fiberInterpreter,
+  ...coreInterpreter,
+  ...numInterpreter,
+};
 
 const app = mvfm(num, semiring, fiber, error);
 
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
-  return await interp(ast.result);
+  return await foldAST(combined, ast.result);
 }
 
 describe("fiber interpreter: par (tuple form)", () => {
@@ -63,7 +64,6 @@ describe("fiber interpreter: par_map", () => {
   });
 
   it("respects concurrency limit by processing in batches", async () => {
-    // 5 items with concurrency 2 → 3 batches (2, 2, 1)
     const prog = app({ items: array("number") }, ($) =>
       $.par($.input.items, { concurrency: 2 }, (item) => $.mul(item, 2)),
     );
@@ -105,7 +105,6 @@ describe("fiber interpreter: race", () => {
   });
 
   it("returns a sync value", async () => {
-    // With all sync values, Promise.race returns the first resolved
     const prog = app(($) => $.race($.add(40, 2)));
     expect(await run(prog)).toBe(42);
   });

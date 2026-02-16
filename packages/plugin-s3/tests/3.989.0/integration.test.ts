@@ -13,7 +13,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { s3 as s3Plugin } from "../../src/3.989.0";
 import { wrapAwsSdk } from "../../src/3.989.0/client-aws-sdk";
 import { serverEvaluate } from "../../src/3.989.0/handler.server";
-import { s3Interpreter } from "../../src/3.989.0/interpreter";
+import { createS3Interpreter } from "../../src/3.989.0/interpreter";
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
@@ -31,8 +31,6 @@ let awsClient: AwsS3Client | undefined;
 
 const BUCKET = "test-bucket";
 
-const allFragments = [s3Interpreter, coreInterpreter, numInterpreter, strInterpreter];
-
 const commands: Record<string, new (input: any) => any> = {
   PutObject: PutObjectCommand,
   GetObject: GetObjectCommand,
@@ -49,7 +47,13 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   }
   const ast = injectInput(prog.ast, input);
   const client = wrapAwsSdk(awsClient, commands);
-  const evaluate = serverEvaluate(client, allFragments);
+  const baseInterpreter = {
+    ...createS3Interpreter(client),
+    ...coreInterpreter,
+    ...numInterpreter,
+    ...strInterpreter,
+  };
+  const evaluate = serverEvaluate(client, baseInterpreter);
   return await evaluate(ast.result);
 }
 

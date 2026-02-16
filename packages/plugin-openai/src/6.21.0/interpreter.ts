@@ -1,4 +1,5 @@
-import type { ASTNode, InterpreterFragment, StepEffect } from "@mvfm/core";
+import type { Interpreter, TypedNode } from "@mvfm/core";
+import { eval_ } from "@mvfm/core";
 
 /**
  * OpenAI client interface consumed by the openai handler.
@@ -11,110 +12,59 @@ export interface OpenAIClient {
   request(method: string, path: string, body?: Record<string, unknown>): Promise<unknown>;
 }
 
+interface OpenAINode extends TypedNode<unknown> {
+  kind: string;
+  id?: TypedNode<string>;
+  params?: TypedNode<Record<string, unknown>>;
+}
+
 /**
- * Generator-based interpreter fragment for openai plugin nodes.
+ * Creates an interpreter for `openai/*` node kinds.
  *
- * Yields `openai/api_call` effects for all 8 operations. Each effect
- * contains the HTTP method, API path, and optional body matching the
- * OpenAI REST API conventions.
+ * @param client - The {@link OpenAIClient} to execute against.
+ * @returns An Interpreter handling all openai node kinds.
  */
-export const openaiInterpreter: InterpreterFragment = {
-  pluginName: "openai",
-  canHandle: (node) => node.kind.startsWith("openai/"),
-  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
-    switch (node.kind) {
-      // ---- Chat Completions ----
+export function createOpenAIInterpreter(client: OpenAIClient): Interpreter {
+  return {
+    "openai/create_chat_completion": async function* (node: OpenAINode) {
+      const body = yield* eval_(node.params!);
+      return await client.request("POST", "/chat/completions", body);
+    },
 
-      case "openai/create_chat_completion": {
-        const body = yield { type: "recurse", child: node.params as ASTNode };
-        return yield {
-          type: "openai/api_call",
-          method: "POST",
-          path: "/chat/completions",
-          body,
-        };
-      }
+    "openai/retrieve_chat_completion": async function* (node: OpenAINode) {
+      const id = yield* eval_(node.id!);
+      return await client.request("GET", `/chat/completions/${id}`);
+    },
 
-      case "openai/retrieve_chat_completion": {
-        const id = yield { type: "recurse", child: node.id as ASTNode };
-        return yield {
-          type: "openai/api_call",
-          method: "GET",
-          path: `/chat/completions/${id}`,
-        };
-      }
+    "openai/list_chat_completions": async function* (node: OpenAINode) {
+      const body = node.params != null ? yield* eval_(node.params) : undefined;
+      return await client.request("GET", "/chat/completions", body);
+    },
 
-      case "openai/list_chat_completions": {
-        const body =
-          node.params != null
-            ? yield { type: "recurse", child: node.params as ASTNode }
-            : undefined;
-        return yield {
-          type: "openai/api_call",
-          method: "GET",
-          path: "/chat/completions",
-          ...(body !== undefined ? { body } : {}),
-        };
-      }
+    "openai/update_chat_completion": async function* (node: OpenAINode) {
+      const id = yield* eval_(node.id!);
+      const body = yield* eval_(node.params!);
+      return await client.request("POST", `/chat/completions/${id}`, body);
+    },
 
-      case "openai/update_chat_completion": {
-        const id = yield { type: "recurse", child: node.id as ASTNode };
-        const body = yield { type: "recurse", child: node.params as ASTNode };
-        return yield {
-          type: "openai/api_call",
-          method: "POST",
-          path: `/chat/completions/${id}`,
-          body,
-        };
-      }
+    "openai/delete_chat_completion": async function* (node: OpenAINode) {
+      const id = yield* eval_(node.id!);
+      return await client.request("DELETE", `/chat/completions/${id}`);
+    },
 
-      case "openai/delete_chat_completion": {
-        const id = yield { type: "recurse", child: node.id as ASTNode };
-        return yield {
-          type: "openai/api_call",
-          method: "DELETE",
-          path: `/chat/completions/${id}`,
-        };
-      }
+    "openai/create_embedding": async function* (node: OpenAINode) {
+      const body = yield* eval_(node.params!);
+      return await client.request("POST", "/embeddings", body);
+    },
 
-      // ---- Embeddings ----
+    "openai/create_moderation": async function* (node: OpenAINode) {
+      const body = yield* eval_(node.params!);
+      return await client.request("POST", "/moderations", body);
+    },
 
-      case "openai/create_embedding": {
-        const body = yield { type: "recurse", child: node.params as ASTNode };
-        return yield {
-          type: "openai/api_call",
-          method: "POST",
-          path: "/embeddings",
-          body,
-        };
-      }
-
-      // ---- Moderations ----
-
-      case "openai/create_moderation": {
-        const body = yield { type: "recurse", child: node.params as ASTNode };
-        return yield {
-          type: "openai/api_call",
-          method: "POST",
-          path: "/moderations",
-          body,
-        };
-      }
-
-      // ---- Legacy Completions ----
-
-      case "openai/create_completion": {
-        const body = yield { type: "recurse", child: node.params as ASTNode };
-        return yield {
-          type: "openai/api_call",
-          method: "POST",
-          path: "/completions",
-          body,
-        };
-      }
-
-      default:
-        throw new Error(`OpenAI interpreter: unknown node kind "${node.kind}"`);
-    }
-  },
-};
+    "openai/create_completion": async function* (node: OpenAINode) {
+      const body = yield* eval_(node.params!);
+      return await client.request("POST", "/completions", body);
+    },
+  };
+}

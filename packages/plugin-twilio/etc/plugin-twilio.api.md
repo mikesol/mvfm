@@ -4,11 +4,6 @@
 
 ```ts
 
-// Warning: (ae-forgotten-export) The symbol "StepHandler" needs to be exported by the entry point index.d.ts
-//
-// @public
-export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
-
 // @public
 export interface ClientHandlerOptions {
     baseUrl: string;
@@ -17,19 +12,21 @@ export interface ClientHandlerOptions {
     headers?: Record<string, string>;
 }
 
-// @public
-export interface ClientHandlerState {
-    stepIndex: number;
-}
-
-// Warning: (ae-forgotten-export) The symbol "InterpreterFragment" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "ASTNode" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function serverEvaluate(client: TwilioClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter;
 
 // @public
-export function serverHandler(client: TwilioClient): StepHandler<void>;
+export function createTwilioInterpreter(client: TwilioClient): Interpreter;
+
+// Warning: (ae-forgotten-export) The symbol "TypedNode" needs to be exported by the entry point index.d.ts
+//
+// @public
+export function serverEvaluate(client: TwilioClient, baseInterpreter: Interpreter): (root: TypedNode) => Promise<unknown>;
+
+// @public
+export function serverInterpreter(client: TwilioClient): Interpreter;
 
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
@@ -59,9 +56,6 @@ export interface TwilioConfig {
     accountSid: string;
     authToken: string;
 }
-
-// @public
-export const twilioInterpreter: InterpreterFragment;
 
 // @public
 export interface TwilioMessageContext {

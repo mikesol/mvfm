@@ -1,48 +1,28 @@
-import type { ASTNode, InterpreterFragment, StepHandler } from "@mvfm/core";
-import { runAST } from "@mvfm/core";
-import type { PinoClient } from "./interpreter";
+import type { Interpreter, TypedNode } from "@mvfm/core";
+import { foldAST } from "@mvfm/core";
+import { createPinoInterpreter, type PinoClient } from "./interpreter";
 
 /**
- * Creates a server-side StepHandler that executes pino effects
- * against a real pino client.
- *
- * Handles `pino/log` effects by delegating to
- * `client.log(level, bindings, mergeObject, msg)`.
+ * Creates a server-side interpreter for `pino/*` node kinds.
  *
  * @param client - The {@link PinoClient} to execute against.
- * @returns A StepHandler for void state.
+ * @returns An Interpreter for pino node kinds.
  */
-export function serverHandler(client: PinoClient): StepHandler<void> {
-  return async (effect, _context, state) => {
-    if (effect.type === "pino/log") {
-      const { level, bindings, mergeObject, msg } = effect as {
-        type: "pino/log";
-        level: string;
-        bindings: Record<string, unknown>[];
-        mergeObject?: Record<string, unknown>;
-        msg?: string;
-      };
-      await client.log(level, bindings, mergeObject, msg);
-      return { value: undefined, state };
-    }
-    throw new Error(`serverHandler: unhandled effect type "${effect.type}"`);
-  };
+export function serverInterpreter(client: PinoClient): Interpreter {
+  return createPinoInterpreter(client);
 }
 
 /**
- * Creates a unified evaluation function that evaluates an AST against
- * a pino client using the provided interpreter fragments.
+ * Creates a unified evaluator using the pino server interpreter.
  *
  * @param client - The {@link PinoClient} to execute against.
- * @param fragments - Generator interpreter fragments for evaluating sub-expressions.
- * @returns An async function that evaluates an AST node to its result.
+ * @param baseInterpreter - Base interpreter for evaluating sub-expressions.
+ * @returns An async AST evaluator function.
  */
 export function serverEvaluate(
   client: PinoClient,
-  fragments: InterpreterFragment[],
-): (root: ASTNode) => Promise<unknown> {
-  return async (root: ASTNode): Promise<unknown> => {
-    const { value } = await runAST(root, fragments, serverHandler(client), undefined);
-    return value;
-  };
+  baseInterpreter: Interpreter,
+): (root: TypedNode) => Promise<unknown> {
+  const interp = { ...baseInterpreter, ...createPinoInterpreter(client) };
+  return (root: TypedNode) => foldAST(interp, root);
 }

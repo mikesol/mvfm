@@ -1,4 +1,4 @@
-import type { ASTNode, PluginContext, StepEffect } from "@mvfm/core";
+import type { PluginContext, TypedNode } from "@mvfm/core";
 import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
@@ -45,7 +45,7 @@ export class ZodObjectBuilder<T extends Record<string, unknown>> extends ZodSche
   protected _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | ASTNode;
+    error?: string | TypedNode;
     extra?: Record<string, unknown>;
   }): ZodObjectBuilder<T> {
     return new ZodObjectBuilder<T>(
@@ -204,13 +204,13 @@ export function objectNamespace(
  * interpreter's buildSchemaGen. This is passed in at registration time
  * to avoid circular imports.
  */
-type SchemaBuildFn = (node: ASTNode) => Generator<StepEffect, z.ZodType, unknown>;
+type SchemaBuildFn = (node: any) => AsyncGenerator<TypedNode, z.ZodType, unknown>;
 
 /** Create object interpreter handlers with access to the shared schema builder. */
 export function createObjectInterpreter(buildSchema: SchemaBuildFn): SchemaInterpreterMap {
   return {
-    "zod/object": function* (node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
-      const shape = (node.shape as Record<string, ASTNode>) ?? {};
+    "zod/object": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+      const shape = (node.shape as Record<string, any>) ?? {};
       const mode = (node.mode as string) ?? "strip";
       const errorFn = toZodError(node.error as ErrorConfig | undefined);
       const errOpt = errorFn ? { error: errorFn } : {};
@@ -236,7 +236,7 @@ export function createObjectInterpreter(buildSchema: SchemaBuildFn): SchemaInter
 
       // Apply catchall if present
       if (node.catchall) {
-        const catchallSchema = yield* buildSchema(node.catchall as ASTNode);
+        const catchallSchema = yield* buildSchema(node.catchall as any);
         obj = (obj as z.ZodObject).catchall(catchallSchema);
       }
 

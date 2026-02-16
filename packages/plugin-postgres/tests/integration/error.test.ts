@@ -99,7 +99,7 @@ describe("error: $.attempt()", () => {
 describe("error: $.guard()", () => {
   it("produces error/guard node", () => {
     const prog = app(($) => {
-      return $.do(
+      return $.discard(
         $.guard($.gt($.input.balance, $.input.amount), {
           code: 400,
           message: "insufficient funds",

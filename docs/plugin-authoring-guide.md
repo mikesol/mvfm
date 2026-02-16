@@ -134,7 +134,7 @@ Mvfm-native plugins are unversioned. They live directly under `src/plugins/<name
 ```
 src/plugins/<name>/
   index.ts           # PluginDefinition + types
-  interpreter.ts     # InterpreterFragment
+  interpreter.ts     # Interpreter (async generator-based)
 ```
 
 Tests mirror the source layout under `tests/`:
@@ -176,9 +176,9 @@ External-service plugins are versioned. The upstream package version is the dire
 ```
 src/plugins/<name>/<version>/
   index.ts            # PluginDefinition + types
-  interpreter.ts      # Generator-based interpreter fragment (const, not factory)
-  handler.server.ts   # Server-side StepHandler (wraps native SDK)
-  handler.client.ts   # Client-side StepHandler (proxies over HTTP)
+  interpreter.ts      # Factory function returning Interpreter (async generators, wraps SDK client)
+  handler.server.ts   # Server-side evaluator (composes interpreter + foldAST)
+  handler.client.ts   # Client-side interpreter (proxies over HTTP)
   client-<sdk>.ts     # SDK adapter (wraps real SDK into internal interface)
 ```
 
@@ -226,9 +226,9 @@ tests/plugins/stripe/2025-04-30.basil/
 | File | Purpose |
 |------|---------|
 | `index.ts` | Exports the `PluginDefinition`, all AST node types, and the public builder API. This is the only file other plugins import from. |
-| `interpreter.ts` | Exports the `InterpreterFragment` — a const (not a factory function) that maps node kinds to generator functions. Each generator yields effects or returns values. |
-| `handler.server.ts` | Server-side `StepHandler` that calls the real SDK. Runs in a trusted environment with credentials. |
-| `handler.client.ts` | Client-side `StepHandler` that serializes effects and proxies them over HTTP to the server handler. |
+| `interpreter.ts` | Exports a factory function `createXxxInterpreter(client: XxxClient): Interpreter` that returns an `Interpreter` — a `Record<string, (node) => AsyncGenerator>` mapping node kinds to async generator functions. Each generator yields child `TypedNode`s for recursive evaluation and performs IO directly via the client. |
+| `handler.server.ts` | Server-side evaluator. Exports `serverEvaluate(client, baseInterpreter)` which composes the plugin's interpreter with a base interpreter and calls `foldAST`. |
+| `handler.client.ts` | Client-side interpreter that serializes operations and proxies them over HTTP to the server handler. |
 | `client-<sdk>.ts` | Thin adapter that wraps the real SDK (e.g., `postgres` or `stripe`) into an internal interface the handler consumes. Isolates SDK-specific types from mvfm's handler logic. |
 
 ### Versioning rules
@@ -546,52 +546,65 @@ const appC = mvfm(dbStack);      // arbitrarily nested groups
 
 ---
 
-## Step 3: Interpreter Fragment
+## Step 3: Interpreter
 
-The interpreter fragment is where a plugin defines runtime behavior. Step 2 builds AST nodes; Step 3 evaluates them. This is the most important part of a plugin — get it wrong and the program silently produces incorrect results.
+The interpreter is where a plugin defines runtime behavior. Step 2 builds AST nodes; Step 3 evaluates them. This is the most important part of a plugin — get it wrong and the program silently produces incorrect results.
 
-### The InterpreterFragment interface
+### The Interpreter type
 
-From `src/core.ts`:
+From `src/fold.ts`:
 
 ```ts
-export interface InterpreterFragment {
-  pluginName: string;
-  canHandle: (node: ASTNode) => boolean;
-  visit: (node: ASTNode) => Generator<StepEffect, unknown, unknown>;
-  isVolatile?: (node: ASTNode) => boolean;
+export interface TypedNode<T = unknown> {
+  readonly kind: string;
+  readonly __T?: T;
 }
+
+export type Interpreter = Record<
+  string,
+  (node: any) => AsyncGenerator<TypedNode, unknown, unknown>
+>;
 ```
 
-Four fields:
+An `Interpreter` is a plain object mapping node kind strings to async generator functions. Each key is a `kind` string (e.g., `"stripe/create_payment_intent"`), and each value is an async generator that evaluates nodes of that kind.
 
-- **`pluginName`** — Must match the plugin's `name` from the `PluginDefinition`. Used for diagnostics and tracing.
+### The `eval_<T>()` helper
 
-- **`canHandle(node)`** — Returns `true` if this fragment knows how to evaluate the given node. The standard pattern is `node.kind.startsWith("pluginName/")`. The evaluator calls `canHandle` on each fragment in order until one matches. If none match, evaluation throws.
-
-- **`visit(node)`** — A **sync generator** (not async, not a regular function) that evaluates the node. It yields effects and receives resolved values back. The generator's return value is the result of evaluating the node.
-
-- **`isVolatile(node)`** — Optional. Returns `true` if the node must never be cached. Used for nodes whose value changes between evaluations (lambda parameters, cursor batch data). See the volatility section below.
-
-### The generator contract
-
-`visit()` is a sync generator function (`*visit`, not `async *visit`). It communicates with the evaluator by yielding `StepEffect` objects and receiving resolved values:
-
-**To recurse into a child node:**
+The `eval_<T>()` helper is the **only** place you cast child node results. It yields the child node to the evaluator and returns the typed result:
 
 ```ts
-const result = yield { type: "recurse", child: childNode };
+import { eval_ } from "@mvfm/core";
+
+// Inside an async generator:
+const id = yield* eval_<string>(node.id);
+const params = yield* eval_<Record<string, unknown>>(node.params);
 ```
 
-The evaluator pauses the generator, evaluates `childNode` (which may itself yield effects), and feeds the result back as the return value of `yield`. This is how the interpreter traverses the AST without explicit recursion.
+This replaces the old `yield { type: "recurse", child }` pattern. The `yield*` delegates to `eval_`, which yields the child `TypedNode` to `foldAST`. The evaluator resolves the child and feeds the result back.
 
-**To perform IO:**
+### The async generator contract
+
+Each interpreter handler is an `async function*` (async generator). It communicates with the evaluator by yielding `TypedNode` objects (child nodes to resolve) and performing IO directly:
+
+**To recurse into a child node (typed):**
 
 ```ts
-const response = yield { type: "stripe/api_call", method: "POST", path: "/v1/customers", params };
+const result = yield* eval_<string>(childNode);
 ```
 
-Yield an effect with a plugin-specific `type` string. The evaluator delegates this to the registered `StepHandler` for that effect type. The handler executes the real IO (API call, database query, etc.) and returns the result, which the generator receives back from `yield`.
+**To recurse into a child node (untyped):**
+
+```ts
+const result = yield childNode;
+```
+
+**To perform IO — call the client directly:**
+
+```ts
+const response = await client.request("POST", "/v1/customers", params);
+```
+
+IO is performed directly in the async generator via `await` on the injected client. There is no separate `StepHandler` or `StepEffect` — the generator has direct access to the SDK client.
 
 **To return a final value:**
 
@@ -599,124 +612,77 @@ Yield an effect with a plugin-specific `type` string. The evaluator delegates th
 return someValue;
 ```
 
-When the generator returns (via `return`), evaluation of this node is complete. The returned value is cached (unless the node is volatile) and fed to the parent generator that yielded the `recurse` effect.
+When the generator returns (via `return`), evaluation of this node is complete. The returned value is cached by `foldAST` (unless the node is volatile) and fed to the parent generator.
 
-### The StepEffect type
+### Mvfm-native vs external-service interpreters
 
-From `src/core.ts`:
+**Mvfm-native plugins** (num, str, eq, ord, etc.) export a `const` interpreter:
 
 ```ts
-export type StepEffect =
-  | { type: "recurse"; child: ASTNode }
-  | { type: string; [key: string]: unknown };
+export const numInterpreter: Interpreter = {
+  "num/add": async function* (node) {
+    const a = yield* eval_<number>(node.left);
+    const b = yield* eval_<number>(node.right);
+    return a + b;
+  },
+  // ...
+};
 ```
 
-Every effect has a `type` string. The `"recurse"` type is built-in — the evaluator handles it automatically by descending into the child node. All other type strings are plugin-defined IO effects that get routed to a `StepHandler`.
-
-### Example: stripe interpreter (uniform effect)
-
-The stripe interpreter is the simplest pattern. Every node yields `recurse` effects to resolve its parameters, then yields exactly one `stripe/api_call` effect. From `src/plugins/stripe/2025-04-30.basil/interpreter.ts`:
+**External-service plugins** (postgres, stripe, openai, etc.) export a factory function that takes a client:
 
 ```ts
-export const stripeInterpreter: InterpreterFragment = {
-  pluginName: "stripe",
-  canHandle: (node) => node.kind.startsWith("stripe/"),
-  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
-    switch (node.kind) {
-      case "stripe/create_payment_intent": {
-        const params = yield { type: "recurse", child: node.params as ASTNode };
-        return yield {
-          type: "stripe/api_call",
-          method: "POST",
-          path: "/v1/payment_intents",
-          params,
-        };
-      }
+export interface StripeClient {
+  request(method: string, path: string, body?: Record<string, unknown>): Promise<unknown>;
+}
 
-      case "stripe/retrieve_payment_intent": {
-        const id = yield { type: "recurse", child: node.id as ASTNode };
-        return yield {
-          type: "stripe/api_call",
-          method: "GET",
-          path: `/v1/payment_intents/${id}`,
-        };
-      }
+export function createStripeInterpreter(client: StripeClient): Interpreter {
+  return {
+    "stripe/create_payment_intent": async function* (node) {
+      const params = yield* eval_<Record<string, unknown>>(node.params);
+      return await client.request("POST", "/v1/payment_intents", params);
+    },
 
-      case "stripe/confirm_payment_intent": {
-        const id = yield { type: "recurse", child: node.id as ASTNode };
-        const params =
-          node.params != null
-            ? yield { type: "recurse", child: node.params as ASTNode }
-            : undefined;
-        return yield {
-          type: "stripe/api_call",
-          method: "POST",
-          path: `/v1/payment_intents/${id}/confirm`,
-          ...(params !== undefined ? { params } : {}),
-        };
-      }
+    "stripe/retrieve_payment_intent": async function* (node) {
+      const id = yield* eval_<string>(node.id);
+      return await client.request("GET", `/v1/payment_intents/${id}`);
+    },
 
-      // ... remaining cases follow the same pattern
-
-      default:
-        throw new Error(`Stripe interpreter: unknown node kind "${node.kind}"`);
-    }
-  },
-};
+    // ... remaining cases follow the same pattern
+  };
+}
 ```
 
 Key things to notice:
 
-1. **It is a `const`, not a factory function.** The interpreter has no configuration — it translates AST structure into effects. Configuration lives on the AST nodes (baked in during `build()`), not in the interpreter.
-2. **Every case recurses first, then yields IO.** The pattern is always: resolve child nodes via `recurse`, then yield one `stripe/api_call` effect with the resolved values.
-3. **One effect type for everything.** All stripe operations use `stripe/api_call` with varying `method` and `path`. The handler doesn't need to know which stripe operation it is — it just makes the HTTP request.
-4. **Optional parameters are guarded.** `confirm_payment_intent` checks `node.params != null` before recursing. If the param wasn't provided at build time, it doesn't recurse.
+1. **External-service interpreters are factory functions**, not consts. They take a `client` parameter (the SDK adapter interface). This makes testing possible — pass a mock client.
+2. **IO is performed directly via `await client.xxx()`.** No separate handler or effect — the async generator can do async work directly.
+3. **Child nodes are resolved via `yield* eval_<T>()`.** This is the only place casts appear.
+4. **Each node kind is a separate key.** No `switch` statement, no `canHandle` — the evaluator dispatches by exact kind match.
 
 ### Helper generators with `yield*`
 
-When SQL construction requires inline resolution of sub-expressions, use a helper generator and delegate to it with `yield*`. From `src/plugins/postgres/3.4.8/interpreter.ts`:
+When SQL construction requires inline resolution of sub-expressions, use a helper async generator and delegate to it with `yield*`. From `src/plugins/postgres/3.4.8/interpreter.ts`:
 
 ```ts
-function* buildSQL(node: ASTNode): Generator<StepEffect, BuiltQuery, unknown> {
+async function* buildSQL(node: PostgresQueryNode): AsyncGenerator<TypedNode, BuiltQuery, unknown> {
   const strings = node.strings as string[];
-  const paramNodes = node.params as ASTNode[];
+  const paramNodes = node.params as TypedNode[];
   let sql = "";
   const params: unknown[] = [];
 
   for (let i = 0; i < strings.length; i++) {
     sql += strings[i];
     if (i < paramNodes.length) {
-      const param = paramNodes[i];
+      const param = paramNodes[i] as any;
       if (param.kind === "postgres/identifier") {
-        const name = (yield { type: "recurse", child: param.name as ASTNode }) as string;
+        const name = yield* eval_<string>(param.name);
         sql += escapeIdentifier(name);
       } else if (param.kind === "postgres/insert_helper") {
-        const data = (yield { type: "recurse", child: param.data as ASTNode }) as
-          | Record<string, unknown>
-          | Record<string, unknown>[];
-        const columns =
-          (param.columns as string[] | null) ?? Object.keys(Array.isArray(data) ? data[0] : data);
-        const rows = Array.isArray(data) ? data : [data];
-        sql +=
-          "(" +
-          columns.map(escapeIdentifier).join(",") +
-          ") values " +
-          rows
-            .map(
-              (row) =>
-                "(" +
-                columns
-                  .map((col) => {
-                    params.push(row[col]);
-                    return `$${params.length}`;
-                  })
-                  .join(",") +
-                ")",
-            )
-            .join(",");
+        const data = yield* eval_<Record<string, unknown> | Record<string, unknown>[]>(param.data);
+        // ... build parameterized INSERT
       } else {
-        // Regular parameter -- recurse to get the value
-        params.push(yield { type: "recurse", child: param });
+        params.push(yield* eval_(param));
         sql += `$${params.length}`;
       }
     }
@@ -729,95 +695,79 @@ function* buildSQL(node: ASTNode): Generator<StepEffect, BuiltQuery, unknown> {
 The postgres interpreter calls this helper with `yield*`:
 
 ```ts
-export const postgresInterpreter: InterpreterFragment = {
-  pluginName: "postgres",
-  canHandle: (node) => node.kind.startsWith("postgres/"),
-  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
-    switch (node.kind) {
-      case "postgres/query": {
-        const { sql, params } = yield* buildSQL(node);
-        return yield { type: "query", sql, params };
-      }
+export function createPostgresInterpreter(client: PostgresClient): Interpreter {
+  return {
+    "postgres/query": async function* (node: PostgresQueryNode) {
+      const { sql, params } = yield* buildSQL(node);
+      return await client.query(sql, params);
+    },
 
-      case "postgres/cursor": {
-        const queryNode = node.query as ASTNode;
-        const { sql, params } = yield* buildSQL(queryNode);
-        const batchSize = (yield { type: "recurse", child: node.batchSize as ASTNode }) as number;
-        return yield {
-          type: "cursor",
-          sql,
-          params,
-          batchSize,
-          body: node.body as ASTNode,
-        };
-      }
+    "postgres/cursor": async function* (node: PostgresCursorNode) {
+      // Cursor handling is done in handler.server.ts
+      throw new Error("postgres/cursor requires serverEvaluate");
+    },
 
-      // ...
-    }
-  },
-  isVolatile: (node) => node.kind === "postgres/cursor_batch",
-};
+    // ...
+  };
+}
 ```
 
-`yield*` delegates to the helper generator. Every `yield` inside `buildSQL` passes through to the evaluator as if the `visit` generator had yielded it directly. The helper's return value becomes the result of the `yield*` expression.
+`yield*` delegates to the helper async generator. Every `yield` inside `buildSQL` passes through to the evaluator as if the handler had yielded it directly. The helper's return value becomes the result of the `yield*` expression.
 
-This pattern keeps `visit()` clean when a single node kind requires complex multi-step resolution (like building parameterized SQL from template strings with interleaved sub-expressions).
+This pattern keeps handlers clean when a single node kind requires complex multi-step resolution (like building parameterized SQL from template strings with interleaved sub-expressions).
 
-### `isVolatile` — nodes that must not be cached
+### Volatile nodes and taint tracking
 
-The evaluator caches results by AST node identity (WeakMap). Most nodes produce the same value every time — a `core/literal` always returns its value, a `num/add` always returns the sum of its children. But some nodes must produce a different value on each evaluation:
+`foldAST` caches results by AST node identity (WeakMap). Most nodes produce the same value every time — a `core/literal` always returns its value, a `num/add` always returns the sum of its children. But some nodes must produce a different value on each evaluation:
 
 - **`core/lambda_param`** — A lambda parameter's value changes each time the lambda is invoked (e.g., in `map`, `filter`, `reduce`).
 - **`postgres/cursor_batch`** — A cursor injects different row batches into this node on each iteration.
 
-The evaluator checks `isVolatile` before caching. If a node is volatile, its result is never cached, and any ancestor node that depends on it is also excluded from caching (taint propagation).
+`foldAST` uses a `VOLATILE_KINDS` set (defined in `fold.ts`) to identify volatile node kinds. If a node is volatile, its result is never cached. Additionally, **taint propagation** ensures that any ancestor node that depends on a volatile node is also excluded from caching.
 
-From the postgres interpreter:
-
-```ts
-isVolatile: (node) => node.kind === "postgres/cursor_batch",
-```
-
-From the core interpreter (`src/interpreters/core.ts`):
+To register a volatile node kind for your plugin, add it to the `VOLATILE_KINDS` set in `fold.ts`:
 
 ```ts
-isVolatile: (node) => node.kind === "core/lambda_param",
+export const VOLATILE_KINDS = new Set(["core/lambda_param", "postgres/cursor_batch"]);
 ```
 
-The default volatile check in `src/core.ts` also covers these two kinds as a safety net. Plugin-specific `isVolatile` is additive — if any fragment's `isVolatile` returns `true`, the node is volatile.
-
-**Rule:** If your plugin introduces a node kind whose value can change between evaluations of the same AST (because external data is injected into it), mark it volatile. If you are unsure, it is not volatile — most nodes are deterministic.
+**Rule:** If your plugin introduces a node kind whose value can change between evaluations of the same AST (because external data is injected into it), add it to `VOLATILE_KINDS`. If you are unsure, it is not volatile — most nodes are deterministic.
 
 ### Core nodes are always sync
 
-The core interpreter (`src/interpreters/core.ts`) handles `core/do`, `core/record`, `core/tuple`, `core/cond`, `core/prop_access`, `core/program`, `core/literal`, and `core/input`. These nodes yield only `recurse` effects — they never yield IO effects. They are pure structure: sequencing (`do`), branching (`cond`), field access (`prop_access`), and aggregation (`record`, `tuple`).
+The core interpreter (`coreInterpreter`) handles `core/discard`, `core/record`, `core/tuple`, `core/cond`, `core/prop_access`, `core/program`, `core/literal`, and `core/input`. These are pure structure nodes: sequencing (`discard`), branching (`cond`), field access (`prop_access`), and aggregation (`record`, `tuple`).
 
 This matters for plugin authors because it means:
 
 1. You do not need to handle core node kinds in your interpreter. The `coreInterpreter` handles all of them.
-2. When your plugin needs sequencing or branching, rely on the user composing with `$.do()` and `$.cond()` at the DSL level. Your interpreter only needs to handle your own `plugin/kind` nodes.
-3. The evaluator composes all fragments (core + plugins) and dispatches by `canHandle`. Your fragment only sees nodes it claims.
+2. When your plugin needs sequencing or branching, rely on the user composing with `$.discard()` and `$.cond()` at the DSL level. Your interpreter only needs to handle your own `plugin/kind` nodes.
+3. Interpreters compose via object spread: `{ ...coreInterpreter, ...pluginInterpreter }`. Each handler only sees nodes matching its kind key.
 
-### Decision: uniform vs multi-effect
+### Decision: simple vs scoped interpreters
 
-When designing your interpreter, you must decide whether to use one effect type or many. This is a design decision about the service, not the plugin.
+When designing your interpreter, you must decide whether the plugin is purely request-response or has scoped/stateful operations.
 
-**Uniform effect (1 effect type):** Use this for request-response services where every operation has the same shape — send a request, get a response. Stripe is the canonical example:
+**Simple (request-response):** Use this for services where every operation is "call the client, get a response." Stripe is the canonical example:
 
-- Every operation yields `stripe/api_call` with `method`, `path`, and optional `params`.
-- The handler makes one HTTP request and returns the response.
-- No nesting, no state, no scoping.
+```ts
+export function createStripeInterpreter(client: StripeClient): Interpreter {
+  return {
+    "stripe/create_payment_intent": async function* (node) {
+      const params = yield* eval_<Record<string, unknown>>(node.params);
+      return await client.request("POST", "/v1/payment_intents", params);
+    },
+    // ... all operations follow the same pattern
+  };
+}
+```
 
-**Multi-effect (N effect types):** Use this for stateful protocols where operations have different lifecycles or nesting semantics. Postgres is the canonical example:
+Every handler resolves child nodes via `yield*`, then calls `client.request()` directly.
 
-- `query` — execute SQL, return rows.
-- `begin` — open a transaction scope, evaluate a body within it, commit or rollback.
-- `savepoint` — open a nested savepoint within a transaction.
-- `cursor` — stream a query in batches, evaluate a body per batch.
+**Scoped (transactions, cursors, sessions):** Use this for services where some operations create execution scopes. Postgres is the canonical example — transactions create a new connection context, cursors iterate with injected batch data.
 
-The postgres handler must understand each effect type differently: `query` is fire-and-forget, but `begin` creates a scope with a new client (the transaction connection), `savepoint` nests within `begin`, and `cursor` loops with injected data. These are fundamentally different operations, not variations of the same request.
+For scoped operations, the interpreter's factory function produces stub handlers that throw, and the real evaluation logic lives in `handler.server.ts` which has access to `foldAST` and can create fresh evaluators for scoped bodies.
 
-**How to decide:** If every operation in your service is "send a request, get a response" with no scoping or statefulness, use uniform. If some operations create scopes that other operations must execute within (transactions, sessions, subscriptions), use multi-effect. The decision is about the underlying protocol, not about how many API endpoints there are — stripe has dozens of endpoints but one effect type.
+**How to decide:** If every operation is "resolve params, call client, return result," use the simple pattern. If some operations need to evaluate sub-ASTs in a different context (new connection, different cache, injected data), use the scoped pattern with `handler.server.ts`.
 
 ### Plugin sequencing: transactions and callbacks
 
@@ -853,7 +803,7 @@ Key points:
 
 1. **The interpreter yields the body AST, not its result.** The `begin` case in the interpreter yields `{ type: "begin", body: node.body }` — it passes the unevaluated AST subtree to the handler. The handler decides when and how to evaluate it.
 2. **The handler creates a fresh evaluator.** `serverEvaluateInternal(tx, fragments)` creates a new evaluation function with a fresh cache, bound to the transaction client `tx`. Queries inside the transaction execute on the transaction connection, not the top-level connection.
-3. **Do not rely on `core/do` for sequencing within scopes.** The handler explicitly loops over `queries` in pipeline mode. The sequencing is the handler's responsibility because it must happen within the transaction callback provided by the database driver.
+3. **Do not rely on `core/discard` for sequencing within scopes.** The handler explicitly loops over `queries` in pipeline mode. The sequencing is the handler's responsibility because it must happen within the transaction callback provided by the database driver.
 
 This pattern generalizes: any time your service has a callback-based scope (database transactions, HTTP sessions, streaming contexts), your interpreter yields the scope effect with the body AST, and your handler evaluates the body within the callback.
 
@@ -863,139 +813,56 @@ This pattern generalizes: any time your service has a callback-based scope (data
 
 External-service plugins provide three files beyond the plugin definition and interpreter: `handler.server.ts`, `handler.client.ts`, and `client-<sdk>.ts`. This separation enables portability — the same AST and the same interpreter produce the same effects, but different handlers execute those effects in different environments. The server handler calls the real SDK with credentials. The client handler serializes effects as JSON and proxies them over HTTP to a server endpoint. The SDK adapter isolates the real SDK's types and quirks behind a clean internal interface.
 
-### Server handler
+### Server handler (`handler.server.ts`)
 
-The server handler is a function that takes a client (the SDK adapter) and returns a `StepHandler`. It receives effects yielded by the interpreter and executes them against the real service.
-
-**Simple pattern (uniform effect):** When every operation in your service yields a single effect type, the server handler is a single function that pattern-matches on the effect type. From `src/plugins/stripe/2025-04-30.basil/handler.server.ts`:
+For **simple (request-response) plugins**, there is no separate server handler — the interpreter performs IO directly via the client. The `handler.server.ts` just exports `serverEvaluate`:
 
 ```ts
-import type { ASTNode, InterpreterFragment, StepHandler } from "../../../core";
-import { runAST } from "../../../core";
-import type { StripeClient } from "./interpreter";
+import { type Interpreter, foldAST } from "@mvfm/core";
+import { type StripeClient, createStripeInterpreter } from "./interpreter";
 
-export function serverHandler(client: StripeClient): StepHandler<void> {
-  return async (effect, _context, state) => {
-    if (effect.type === "stripe/api_call") {
-      const { method, path, params } = effect as {
-        type: "stripe/api_call";
-        method: string;
-        path: string;
-        params?: Record<string, unknown>;
-      };
-      const value = await client.request(method, path, params);
-      return { value, state };
-    }
-    throw new Error(`serverHandler: unhandled effect type "${effect.type}"`);
-  };
+export function serverEvaluate(
+  client: StripeClient,
+  baseInterpreter: Interpreter,
+): (root: TypedNode) => Promise<unknown> {
+  const interpreter = { ...createStripeInterpreter(client), ...baseInterpreter };
+  return (root) => foldAST(interpreter, root);
 }
 ```
 
-Key things to notice:
+For **scoped plugins** (postgres), `handler.server.ts` contains the complex evaluation logic — creating fresh evaluators for transaction/cursor scopes, managing cache isolation, and injecting batch data. The interpreter's factory function produces stubs for scoped kinds that throw, directing callers to use `serverEvaluate` instead.
 
-1. The handler takes `StripeClient` (the SDK adapter interface), not the real Stripe SDK. This is what makes testing possible — pass a mock client and the handler works the same way.
-2. The state type is `void` — stripe operations are stateless request-response. Each call is independent.
-3. The handler throws on unrecognized effect types. This is mandatory — silent swallowing of unknown effects causes subtle bugs.
-4. The handler returns `{ value, state }`. The `value` is fed back to the interpreter generator as the result of `yield`. The `state` is threaded to the next handler call.
-
-**Complex pattern (multi-effect):** When your service has stateful scoping (transactions, cursors, sessions), the server handler must understand multiple effect types with different lifecycles. The postgres handler in `src/plugins/postgres/3.4.8/handler.server.ts` demonstrates this. Instead of a single `StepHandler`, it builds an internal effect handler that switches on effect type:
+Example from `src/plugins/postgres/3.4.8/handler.server.ts`:
 
 ```ts
-function buildEffectHandler(
+export function serverEvaluate(
   client: PostgresClient,
-  fragments: InterpreterFragment[],
-  evaluate: (node: ASTNode) => Promise<unknown>,
-): (effect: StepEffect, currentNode: ASTNode) => Promise<unknown> {
-  return async (effect: StepEffect, _currentNode: ASTNode): Promise<unknown> => {
-    switch (effect.type) {
-      case "query": {
-        const { sql, params } = effect as { type: "query"; sql: string; params: unknown[] };
-        return client.query(sql, params);
-      }
-
-      case "begin": {
-        const { mode, body, queries } = effect as {
-          type: "begin";
-          mode: string;
-          body?: ASTNode;
-          queries?: ASTNode[];
-        };
-
-        return client.begin(async (tx) => {
-          // Transactions get a fresh evaluator with a new cache and new client
-          const txEval = serverEvaluateInternal(tx, fragments);
-          if (mode === "pipeline") {
-            const results: unknown[] = [];
-            for (const q of queries!) {
-              results.push(await txEval(q));
-            }
-            return results;
-          }
-          return await txEval(body!);
-        });
-      }
-
-      case "savepoint": {
-        // Same pattern as begin — fresh evaluator inside the savepoint callback
-        const { mode, body, queries } = effect as {
-          type: "savepoint";
-          mode: string;
-          body?: ASTNode;
-          queries?: ASTNode[];
-        };
-
-        return client.savepoint(async (tx) => {
-          const txEval = serverEvaluateInternal(tx, fragments);
-          if (mode === "pipeline") {
-            const results: unknown[] = [];
-            for (const q of queries!) {
-              results.push(await txEval(q));
-            }
-            return results;
-          }
-          return await txEval(body!);
-        });
-      }
-
-      case "cursor": {
-        const { sql, params, batchSize, body } = effect as {
-          type: "cursor";
-          sql: string;
-          params: unknown[];
-          batchSize: number;
-          body: ASTNode;
-        };
-
-        const batchNode = findCursorBatch(body);
-
-        await client.cursor(sql, params, batchSize, async (rows) => {
-          if (batchNode) {
-            batchNode.__batchData = rows;
-          }
-          await evaluate(body);
-          return undefined;
-        });
-
-        return undefined;
-      }
-
-      default:
-        throw new Error(`serverHandler: unhandled effect type "${effect.type}"`);
-    }
+  baseInterpreter: Interpreter,
+): (root: TypedNode) => Promise<unknown> {
+  const postgresInterpreter = createPostgresInterpreter(client);
+  // Override scoped handlers with full implementations that have access to foldAST
+  const fullInterpreter: Interpreter = {
+    ...postgresInterpreter,
+    ...baseInterpreter,
+    "postgres/begin": async function* (node) {
+      // Create fresh evaluator inside transaction callback
+      return yield* eval_(node); // simplified — real impl uses client.begin()
+    },
+    // ... cursor, savepoint overrides
   };
+  return (root) => foldAST(fullInterpreter, root);
 }
 ```
 
-The critical difference from the simple pattern: **scoped effects (`begin`, `savepoint`, `cursor`) create fresh evaluators for nested scopes.** The `serverEvaluateInternal` function builds a new evaluator bound to the transaction client (`tx`), with its own cache. This ensures that queries inside a transaction run on the transaction connection, not the top-level connection. The cursor case is different — it reuses the outer evaluator's shared cache so that results cached outside the cursor body are not re-evaluated on each iteration.
-
-Multi-effect handlers also need `buildEvaluate` — a custom evaluation loop that drives generators and delegates effects to the handler. The postgres handler builds this internally because it needs control over caching and taint propagation across scope boundaries. See `src/plugins/postgres/3.4.8/handler.server.ts` for the full implementation.
+The critical difference from the simple pattern: **scoped operations (`begin`, `savepoint`, `cursor`) create fresh evaluators for nested scopes.** The server handler builds a new evaluator bound to the transaction client, with its own cache via `createFoldState()`. This ensures that queries inside a transaction run on the transaction connection, not the top-level connection.
 
 ### Client handler
 
-The client handler enables browser-side execution. Instead of calling the real SDK, it serializes each effect as JSON and sends it to a server endpoint via HTTP. The server endpoint runs the server handler against the real SDK and returns the result. From `src/plugins/stripe/2025-04-30.basil/handler.client.ts`:
+The client handler enables browser-side execution. Instead of calling the real SDK, it implements the `Interpreter` interface but serializes each operation as JSON and sends it to a server endpoint via HTTP. The server endpoint runs the real interpreter and returns the result. From `src/plugins/stripe/2025-04-30.basil/handler.client.ts`:
 
 ```ts
-import type { StepContext, StepEffect, StepHandler } from "../../../core";
+import type { Interpreter, TypedNode } from "@mvfm/core";
+import { foldAST } from "@mvfm/core";
 
 export interface ClientHandlerOptions {
   /** Base URL of the server endpoint (e.g., "https://api.example.com"). */
@@ -1008,56 +875,34 @@ export interface ClientHandlerOptions {
   headers?: Record<string, string>;
 }
 
-export interface ClientHandlerState {
-  /** The current step index, incremented after each effect. */
-  stepIndex: number;
-}
-
-export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState> {
+export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter {
   const { baseUrl, contractHash, headers = {} } = options;
   const fetchFn = options.fetch ?? globalThis.fetch;
 
-  return async (
-    effect: StepEffect,
-    context: StepContext,
-    state: ClientHandlerState,
-  ): Promise<{ value: unknown; state: ClientHandlerState }> => {
-    const response = await fetchFn(`${baseUrl}/mvfm/execute`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...headers,
-      },
-      body: JSON.stringify({
-        contractHash,
-        stepIndex: state.stepIndex,
-        path: context.path,
-        effect,
-      }),
-    });
-
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`Client handler: server returned ${response.status}: ${text}`);
-    }
-
-    const data = (await response.json()) as { result: unknown };
-
-    return {
-      value: data.result,
-      state: { stepIndex: state.stepIndex + 1 },
+  // Builds an Interpreter that proxies node kinds over HTTP
+  const interpreter: Interpreter = {};
+  for (const kind of nodeKinds) {
+    interpreter[kind] = async function* (node: TypedNode) {
+      const response = await fetchFn(`${baseUrl}/mvfm/execute`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...headers },
+        body: JSON.stringify({ contractHash, node }),
+      });
+      if (!response.ok) {
+        throw new Error(`Client: server returned ${response.status}`);
+      }
+      return (await response.json() as { result: unknown }).result;
     };
-  };
+  }
+  return interpreter;
 }
 ```
 
 Key things to notice:
 
-1. **`contractHash`** is sent with every request. The server verifies that the contract hash matches the expected program. This is the 0-trust verification mechanism — the client cannot send arbitrary effects. The server knows exactly which AST produced the effects (identified by hash) and can reject anything that doesn't match. A program's contract hash is derived from its AST, so any modification to the program changes the hash.
-2. **`stepIndex`** is a monotonically increasing counter. It tells the server which effect in the program's execution sequence this request corresponds to. Combined with the contract hash, this makes replay attacks detectable — the server knows the exact sequence of effects a valid program will produce.
-3. **`context.path`** is the path of node kinds from root to the current node. It gives the server additional structural information for verification.
-4. **State is minimal.** The client tracks only `stepIndex`. The server is stateless across requests — each request contains enough information (hash + index + path + effect) for independent verification.
-5. **The client handler is plugin-agnostic.** It serializes whatever effects it receives. Both the stripe and postgres client handlers share the same structure because the protocol is the same — only the effects differ.
+1. **`contractHash`** is sent with every request. The server verifies that the contract hash matches the expected program. This prevents arbitrary effect execution.
+2. **The client interpreter is plugin-agnostic.** It creates async generator stubs for each node kind that serialize the node and proxy it. Both the stripe and postgres client handlers share the same structure — only the `nodeKinds` differ.
+3. **`nodeKinds` drives the interpreter keys.** The client interpreter needs to know which node kinds to handle, passed from the plugin definition.
 
 ### SDK adapter
 
@@ -1072,7 +917,7 @@ export interface StripeClient {
 }
 ```
 
-This is the interface consumed by `serverHandler`. It knows nothing about the Stripe SDK — it is a generic HTTP-like interface with `method`, `path`, and `params`.
+This is the interface consumed by `createStripeInterpreter`. It knows nothing about the Stripe SDK — it is a generic HTTP-like interface with `method`, `path`, and `params`.
 
 **Wrap the real SDK** in `client-<sdk>.ts`. From `src/plugins/stripe/2025-04-30.basil/client-stripe-sdk.ts`:
 
@@ -1118,94 +963,72 @@ Key things to notice:
 
 ### `serverEvaluate` wrapper
 
-Every external-service plugin must export a `serverEvaluate` function. This is the top-level entry point for server-side evaluation — it composes the interpreter fragments and server handler into a single async function that takes an AST node and returns the result.
+Every external-service plugin must export a `serverEvaluate` function. This is the top-level entry point for server-side evaluation — it composes the plugin's interpreter with a base interpreter and uses `foldAST` to evaluate.
 
 **Simple version (stripe):** From `src/plugins/stripe/2025-04-30.basil/handler.server.ts`:
 
 ```ts
 export function serverEvaluate(
   client: StripeClient,
-  fragments: InterpreterFragment[],
-): (root: ASTNode) => Promise<unknown> {
-  return async (root: ASTNode): Promise<unknown> => {
-    const { value } = await runAST(root, fragments, serverHandler(client), undefined);
-    return value;
-  };
+  baseInterpreter: Interpreter,
+): (root: TypedNode) => Promise<unknown> {
+  const interpreter = { ...createStripeInterpreter(client), ...baseInterpreter };
+  return (root) => foldAST(interpreter, root);
 }
 ```
 
-For uniform-effect plugins, `serverEvaluate` is a thin wrapper around `runAST`. It creates the handler and passes it through. The initial state is `undefined` (matching the `void` state type of the handler).
+For simple plugins, `serverEvaluate` spreads the plugin interpreter with the base interpreter and calls `foldAST`.
 
-**Complex version (postgres):** From `src/plugins/postgres/3.4.8/handler.server.ts`:
+**Complex version (postgres):** For scoped plugins, `serverEvaluate` overrides the scoped node handlers with full implementations that have access to `foldAST` and can create fresh evaluators for transaction/cursor scopes.
 
-```ts
-export function serverEvaluate(
-  client: PostgresClient,
-  fragments: InterpreterFragment[],
-): (root: ASTNode) => Promise<unknown> {
-  return serverEvaluateInternal(client, fragments);
-}
-```
-
-For multi-effect plugins, `serverEvaluate` delegates to an internal function (`serverEvaluateInternal`) that builds a custom evaluation loop with its own cache management. The postgres version cannot use `runAST` directly because it needs control over cache sharing across transaction and cursor scopes.
-
-**The contract:** `serverEvaluate` always has the same signature — it takes a client and interpreter fragments, and returns `(root: ASTNode) => Promise<unknown>`. Callers do not need to know whether the plugin uses the simple or complex pattern. Usage looks the same:
+**The contract:** `serverEvaluate` always has the same signature — it takes a client and a base `Interpreter`, and returns `(root: TypedNode) => Promise<unknown>`. Callers do not need to know whether the plugin uses the simple or complex pattern. Usage looks the same:
 
 ```ts
-import { stripeInterpreter } from "mvfm/plugins/stripe/2025-04-30.basil/interpreter";
-import { serverEvaluate } from "mvfm/plugins/stripe/2025-04-30.basil/handler.server";
-import { wrapStripeSdk } from "mvfm/plugins/stripe/2025-04-30.basil/client-stripe-sdk";
+import { coreInterpreter, numInterpreter, strInterpreter } from "@mvfm/core";
+import { serverEvaluate } from "@mvfm/plugin-stripe/2025-04-30.basil/handler.server";
+import { wrapStripeSdk } from "@mvfm/plugin-stripe/2025-04-30.basil/client-stripe-sdk";
 import Stripe from "stripe";
 
 const sdk = new Stripe("sk_test_...");
 const client = wrapStripeSdk(sdk);
-const evaluate = serverEvaluate(client, [coreInterpreter, stripeInterpreter]);
+const evaluate = serverEvaluate(client, { ...coreInterpreter, ...numInterpreter, ...strInterpreter });
 
-const result = await evaluate(program.ast);
+const result = await evaluate(program.ast.result);
 ```
 
-### Handler composition
+### Interpreter composition
 
-Composition IS the customization mechanism. There is no separate hook interface, no middleware chain, no event emitter. If you need to customize how effects are handled — add logging, add retries, transform parameters, gate access — you compose handlers.
+Composition IS the customization mechanism. Interpreters compose via object spread — no framework, no registration, no lifecycle hooks.
 
-A handler is a function. To add behavior, wrap it:
+To compose interpreters from multiple plugins:
 
 ```ts
-function withLogging(inner: StepHandler<void>): StepHandler<void> {
-  return async (effect, context, state) => {
-    console.log(`Effect: ${effect.type}`, effect);
-    const result = await inner(effect, context, state);
-    console.log(`Result:`, result.value);
-    return result;
-  };
-}
-
-// Use it:
-const handler = withLogging(serverHandler(client));
+const interpreter = {
+  ...createStripeInterpreter(stripeClient),
+  ...createPostgresInterpreter(pgClient),
+  ...coreInterpreter,
+  ...numInterpreter,
+  ...strInterpreter,
+};
+const result = await foldAST(interpreter, ast.result);
 ```
 
-To compose handlers from multiple plugins:
+**Spread order matters for scoped plugins.** If a scoped plugin's `serverEvaluate` overrides some node kinds from the base interpreter (e.g., postgres overrides `"postgres/begin"` with a full implementation), the override must come first in the spread order, or the base interpreter's stub will take precedence.
+
+To add cross-cutting behavior (logging, retries), wrap the interpreter:
 
 ```ts
-function composedHandler(
-  stripeClient: StripeClient,
-  postgresClient: PostgresClient,
-  fragments: InterpreterFragment[],
-): StepHandler<void> {
-  const stripeH = serverHandler(stripeClient);
-  const postgresH = postgresServerHandler(postgresClient, fragments);
-
-  return async (effect, context, state) => {
-    if (effect.type === "stripe/api_call") {
-      return stripeH(effect, context, state);
-    }
-    // Delegate everything else to postgres
-    return postgresH(effect, context, state);
-  };
+function withLogging(inner: Interpreter): Interpreter {
+  const wrapped: Interpreter = {};
+  for (const [kind, handler] of Object.entries(inner)) {
+    wrapped[kind] = async function* (node) {
+      console.log(`Evaluating: ${kind}`);
+      return yield* handler(node);
+    };
+  }
+  return wrapped;
 }
 ```
-
-This is deliberate. Handler composition is simple function composition — no framework, no registration, no lifecycle hooks. The `StepHandler` type is the only abstraction. If you can write a function that matches `(effect, context, state) => Promise<{ value, state }>`, you can customize handling.
 
 ---
 
@@ -1462,7 +1285,7 @@ describe("stripe: paymentIntents.confirm", () => {
   });
 });
 
-describe("stripe: integration with $.do()", () => {
+describe("stripe: integration with $.discard()", () => {
   it("orphaned operations are rejected", () => {
     expect(() => {
       app(($) => {
@@ -1480,7 +1303,7 @@ Key things to notice:
 1. **The `strip` helper** removes `__id` (non-deterministic internal IDs) and `config` (opaque configuration) so assertions focus on structure.
 2. **Tests assert on node `kind` strings** — confirming the correct plugin/operation mapping.
 3. **Tests assert on child node types** — `core/literal` for raw values, `core/prop_access` for input references, `core/record` for object parameters.
-4. **The orphan test** verifies mvfm's reachability analysis catches side-effecting nodes that are not connected to the return value via `$.do()`.
+4. **The orphan test** verifies mvfm's reachability analysis catches side-effecting nodes that are not connected to the return value via `$.discard()`.
 
 ### Tier 2: Interpretation (`interpreter.test.ts`)
 
@@ -1493,21 +1316,17 @@ Interpretation tests verify that the interpreter fragment yields correct effects
 - Optional parameters are absent in the effect when omitted at build time
 - The handler's return value becomes the program's result
 
-**Pattern:** Create a program, then run it through `foldAST` with a mock handler that captures yielded effects. Assert on the captured effects and the final result.
+**Pattern:** Create a program, build a mock client that captures calls, compose the interpreter with `coreInterpreter`, and run through `foldAST`. Assert on the captured calls and the final result.
 
 From `tests/plugins/stripe/2025-04-30.basil/interpreter.test.ts`:
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { foldAST, mvfm } from "../../../../src/core";
-import { coreInterpreter } from "../../../../src/interpreters/core";
-import { num } from "../../../../src/plugins/num";
-import { str } from "../../../../src/plugins/str";
-import { stripe } from "../../../../src/plugins/stripe/2025-04-30.basil";
-import { stripeInterpreter } from "../../../../src/plugins/stripe/2025-04-30.basil/interpreter";
+import { coreInterpreter, foldAST, mvfm, num, str } from "@mvfm/core";
+import { stripe } from "../../src/2025-04-30.basil";
+import { type StripeClient, createStripeInterpreter } from "../../src/2025-04-30.basil/interpreter";
 
 const app = mvfm(num, str, stripe({ apiKey: "sk_test_123" }));
-const fragments = [stripeInterpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
@@ -1523,42 +1342,30 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const captured: any[] = [];
   const ast = injectInput(prog.ast, input);
-  const recurse = foldAST(fragments, {
-    "stripe/api_call": async (effect) => {
-      captured.push(effect);
+  const mockClient: StripeClient = {
+    async request(method, path, body) {
+      captured.push({ method, path, body });
       return { id: "mock_id", object: "mock" };
     },
-  });
-  const result = await recurse(ast.result);
+  };
+  const combined = { ...createStripeInterpreter(mockClient), ...coreInterpreter };
+  const result = await foldAST(combined, ast.result);
   return { result, captured };
 }
 
 describe("stripe interpreter: create_payment_intent", () => {
-  it("yields POST /v1/payment_intents with correct params", async () => {
+  it("calls POST /v1/payment_intents with correct params", async () => {
     const prog = app(($) => $.stripe.paymentIntents.create({ amount: 2000, currency: "usd" }));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("stripe/api_call");
     expect(captured[0].method).toBe("POST");
     expect(captured[0].path).toBe("/v1/payment_intents");
-    expect(captured[0].params).toEqual({ amount: 2000, currency: "usd" });
-  });
-});
-
-describe("stripe interpreter: retrieve_payment_intent", () => {
-  it("yields GET /v1/payment_intents/{id}", async () => {
-    const prog = app(($) => $.stripe.paymentIntents.retrieve("pi_123"));
-    const { captured } = await run(prog);
-    expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("stripe/api_call");
-    expect(captured[0].method).toBe("GET");
-    expect(captured[0].path).toBe("/v1/payment_intents/pi_123");
-    expect(captured[0].params).toBeUndefined();
+    expect(captured[0].body).toEqual({ amount: 2000, currency: "usd" });
   });
 });
 
 describe("stripe interpreter: input resolution", () => {
-  it("resolves input params through recurse", async () => {
+  it("resolves input params via eval_", async () => {
     const prog = app({ amount: "number", currency: "string" }, ($) =>
       $.stripe.paymentIntents.create({
         amount: $.input.amount,
@@ -1567,25 +1374,18 @@ describe("stripe interpreter: input resolution", () => {
     );
     const { captured } = await run(prog, { amount: 3000, currency: "eur" });
     expect(captured).toHaveLength(1);
-    expect(captured[0].params).toEqual({ amount: 3000, currency: "eur" });
-  });
-});
-
-describe("stripe interpreter: return value", () => {
-  it("returns the handler response as the result", async () => {
-    const prog = app(($) => $.stripe.customers.retrieve("cus_123"));
-    const { result } = await run(prog);
-    expect(result).toEqual({ id: "mock_id", object: "mock" });
+    expect(captured[0].body).toEqual({ amount: 3000, currency: "eur" });
   });
 });
 ```
 
 Key things to notice:
 
-1. **`foldAST` composes fragments and handlers.** It takes interpreter fragments and a handler map, and returns a `RecurseFn` that evaluates AST nodes. The handler map keys are effect type strings — `"stripe/api_call"` routes to the mock handler.
-2. **The mock handler captures effects.** Instead of making real API calls, it pushes each effect into a `captured` array and returns a canned response. This lets you assert on exactly what the interpreter yielded.
-3. **`injectInput` simulates runtime input.** At runtime, the evaluator injects input data into `core/input` nodes. In tests, this helper does the same thing by walking the AST and attaching `__inputData`.
-4. **Tests verify effect shape, not AST shape.** Tier 1 tests check the AST. Tier 2 tests check what the interpreter produces from that AST — the method, path, params, and effect type.
+1. **Mock client captures calls.** Instead of making real API calls, the mock client pushes each call into a `captured` array and returns a canned response. This lets you assert on exactly what the interpreter called.
+2. **Interpreter composition via spread.** `{ ...createStripeInterpreter(mockClient), ...coreInterpreter }` creates a combined interpreter.
+3. **`foldAST` evaluates the AST.** It takes the combined interpreter and the root node, returning the final result.
+4. **`injectInput` simulates runtime input.** In tests, this helper walks the AST and attaches `__inputData` to `core/input` nodes.
+5. **Tests verify client calls, not AST shape.** Tier 1 tests check the AST. Tier 2 tests check what the interpreter sends to the client.
 
 ### Tier 3: Integration (`integration.test.ts`)
 
@@ -1609,21 +1409,15 @@ From `tests/plugins/stripe/2025-04-30.basil/integration.test.ts`:
 import Stripe from "stripe";
 import { GenericContainer, type StartedTestContainer } from "testcontainers";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { mvfm } from "../../../../src/core";
-import { coreInterpreter } from "../../../../src/interpreters/core";
-import { num } from "../../../../src/plugins/num";
-import { numInterpreter } from "../../../../src/plugins/num/interpreter";
-import { str } from "../../../../src/plugins/str";
-import { strInterpreter } from "../../../../src/plugins/str/interpreter";
-import { stripe as stripePlugin } from "../../../../src/plugins/stripe/2025-04-30.basil";
-import { wrapStripeSdk } from "../../../../src/plugins/stripe/2025-04-30.basil/client-stripe-sdk";
-import { serverEvaluate } from "../../../../src/plugins/stripe/2025-04-30.basil/handler.server";
-import { stripeInterpreter } from "../../../../src/plugins/stripe/2025-04-30.basil/interpreter";
+import { coreInterpreter, mvfm, num, numInterpreter, str, strInterpreter } from "@mvfm/core";
+import { stripe as stripePlugin } from "../../src/2025-04-30.basil";
+import { wrapStripeSdk } from "../../src/2025-04-30.basil/client-stripe-sdk";
+import { serverEvaluate } from "../../src/2025-04-30.basil/handler.server";
 
 let container: StartedTestContainer;
 let sdk: Stripe;
 
-const allFragments = [stripeInterpreter, coreInterpreter, numInterpreter, strInterpreter];
+const baseInterpreter = { ...coreInterpreter, ...numInterpreter, ...strInterpreter };
 const app = mvfm(num, str, stripePlugin({ apiKey: "sk_test_fake" }));
 
 function injectInput(node: any, input: Record<string, unknown>): any {
@@ -1633,7 +1427,7 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
   const client = wrapStripeSdk(sdk);
-  const evaluate = serverEvaluate(client, allFragments);
+  const evaluate = serverEvaluate(client, baseInterpreter);
   return await evaluate(ast.result);
 }
 
@@ -1693,8 +1487,8 @@ Key things to notice:
 
 1. **Container setup.** The `beforeAll` hook starts a `stripe/stripe-mock` container using testcontainers. The container provides a real Stripe API surface that returns realistic responses without requiring credentials. For postgres, the equivalent is a real PostgreSQL container.
 2. **Real SDK client.** The test constructs a real `Stripe` SDK instance pointed at the container, wraps it with `wrapStripeSdk`, and passes it to `serverEvaluate`. This tests the full adapter chain — no mocks.
-3. **All interpreter fragments are included.** Unlike Tier 2 (which only needs the plugin's fragment and `coreInterpreter`), integration tests include fragments for all plugins in the program (`numInterpreter`, `strInterpreter`, etc.) because the full evaluation pipeline is exercised.
-4. **Assertions are on service responses, not effects.** Tier 2 asserts on what the interpreter yields. Tier 3 asserts on what the real service returns — `result.object`, `result.id`, response shapes.
+3. **Base interpreter includes all needed interpreters.** Unlike Tier 2 (which only needs the plugin's interpreter and `coreInterpreter`), integration tests include all interpreters the program needs (`numInterpreter`, `strInterpreter`, etc.) via object spread into `baseInterpreter`.
+4. **Assertions are on service responses, not client calls.** Tier 2 asserts on what the interpreter sends to the client. Tier 3 asserts on what the real service returns — `result.object`, `result.id`, response shapes.
 5. **Timeout on `beforeAll`.** Container startup can be slow. The `60000` ms timeout (60 seconds) prevents CI from failing on cold pulls.
 
 ### Which tiers you need
@@ -1704,7 +1498,7 @@ Key things to notice:
 | Mvfm-native (num, str, eq, ...) | Required | Required | Not needed |
 | External-service (stripe, postgres, ...) | Required | Required | Required |
 
-Mvfm-native plugins do not talk to external services, so there is nothing to integration-test. Their Tier 2 tests are sufficient because the interpreter evaluates to final values without yielding IO effects (or yields only `recurse` effects handled by the core interpreter).
+Mvfm-native plugins do not talk to external services, so there is nothing to integration-test. Their Tier 2 tests are sufficient because the interpreter evaluates to final values without performing IO.
 
 ### Container choices for integration tests
 
@@ -1935,7 +1729,7 @@ From the end of `src/plugins/postgres/3.4.8/index.ts`:
 //    Can't destructure proxies. [0] index access works though.
 //
 // 7. Transactions (callback mode with dependencies):
-//    Mvfm requires $.do() to sequence side effects. No destructuring.
+//    Mvfm requires $.discard() to sequence side effects. No destructuring.
 //
 // DOESN'T WORK / HARD:
 //
@@ -1944,9 +1738,9 @@ From the end of `src/plugins/postgres/3.4.8/index.ts`:
 //
 // 9. Async/await ordering:
 //    The fundamental mismatch: real postgres.js uses await for
-//    sequencing. Mvfm uses proxy chains + $.do(). For pure data
+//    sequencing. Mvfm uses proxy chains + $.discard(). For pure data
 //    dependencies this is seamless. For "do A then B" without
-//    data dependency, you need $.do() or array pipeline syntax.
+//    data dependency, you need $.discard() or array pipeline syntax.
 //
 // SUMMARY:
 // For the 80% case of "query, transform, return" -- nearly
@@ -2017,39 +1811,23 @@ This is enforced project-wide. Autogenerated API docs depend on it.
 
 #### Real example: TSDoc from the codebase
 
-From `src/plugins/stripe/2025-04-30.basil/handler.server.ts` -- the `serverHandler` function:
-
-```ts
-/**
- * Creates a server-side {@link StepHandler} that executes Stripe effects
- * against a real Stripe client.
- *
- * Handles `stripe/api_call` effects by delegating to
- * `client.request(method, path, params)`. Throws on unhandled effect types.
- *
- * @param client - The {@link StripeClient} to execute against.
- * @returns A {@link StepHandler} for void state.
- */
-export function serverHandler(client: StripeClient): StepHandler<void> {
-```
-
 From `src/plugins/stripe/2025-04-30.basil/handler.server.ts` -- the `serverEvaluate` function:
 
 ```ts
 /**
  * Creates a unified evaluation function that evaluates an AST against
- * a Stripe client using the provided interpreter fragments.
+ * a Stripe client using the provided interpreter and `foldAST`.
  *
- * Convenience wrapper composing fragments + {@link serverHandler} via `runAST`.
+ * Composes the Stripe interpreter with a base interpreter via object spread.
  *
  * @param client - The {@link StripeClient} to execute against.
- * @param fragments - Generator interpreter fragments for evaluating sub-expressions.
- * @returns An async function that evaluates an AST node to its result.
+ * @param baseInterpreter - Base interpreter for core/prelude node kinds.
+ * @returns An async function that evaluates a TypedNode to its result.
  */
 export function serverEvaluate(
   client: StripeClient,
-  fragments: InterpreterFragment[],
-): (root: ASTNode) => Promise<unknown> {
+  baseInterpreter: Interpreter,
+): (root: TypedNode) => Promise<unknown> {
 ```
 
 From `src/plugins/postgres/3.4.8/index.ts` -- the `PostgresMethods` interface:
@@ -2130,9 +1908,9 @@ For pure request-response services (like Stripe), every operation is modelable a
 
 If your plugin requires configuration (API keys, connection strings, options), store the config directly on each AST node. The stripe plugin stores `config` on every `stripe/*` node. This makes the AST portable -- an interpreter can evaluate the program without having access to the original plugin closure.
 
-**6. Interpreter fragments compose via `composeInterpreters` -- first match wins.**
+**6. Interpreters compose via object spread -- exact kind match.**
 
-The evaluator calls `canHandle` on each fragment in order until one matches. If your fragment claims a node kind that another fragment also claims, the first fragment in the array wins. Plugin interpreters should only claim nodes under their own namespace (`node.kind.startsWith("pluginName/")`).
+Interpreters compose by spreading: `{ ...pluginInterpreter, ...coreInterpreter }`. Each key is an exact node kind string. If two interpreters define the same kind, the last spread wins. Plugin interpreters should only define handlers for nodes under their own namespace (`pluginName/kind`).
 
 **7. Factory functions for configured plugins, const for unconfigured.**
 

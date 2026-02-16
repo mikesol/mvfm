@@ -1,42 +1,28 @@
-import type { ASTNode, InterpreterFragment, StepHandler } from "@mvfm/core";
-import { runAST } from "@mvfm/core";
-import type { ConsoleMethodName } from "./index";
-import type { ConsoleClient } from "./interpreter";
+import type { Interpreter, TypedNode } from "@mvfm/core";
+import { foldAST } from "@mvfm/core";
+import { type ConsoleClient, createConsoleInterpreter } from "./interpreter";
 
 /**
- * Creates a server-side StepHandler for `console/*` effects.
+ * Creates a server-side interpreter for `console/*` node kinds.
  *
  * @param client - Console effect execution client.
- * @returns A StepHandler for void state.
+ * @returns An Interpreter for console node kinds.
  */
-export function serverHandler(client: ConsoleClient): StepHandler<void> {
-  return async (effect, _context, state) => {
-    if (effect.type.startsWith("console/")) {
-      const { method, args } = effect as {
-        type: string;
-        method: ConsoleMethodName;
-        args: unknown[];
-      };
-      await client.call(method, args);
-      return { value: undefined, state };
-    }
-    throw new Error(`serverHandler: unhandled effect type "${effect.type}"`);
-  };
+export function serverInterpreter(client: ConsoleClient): Interpreter {
+  return createConsoleInterpreter(client);
 }
 
 /**
- * Creates a unified evaluator using the console server handler.
+ * Creates a unified evaluator using the console server interpreter.
  *
  * @param client - Console effect execution client.
- * @param fragments - Interpreter fragments for evaluation.
+ * @param baseInterpreter - Base interpreter for evaluating sub-expressions.
  * @returns An async AST evaluator function.
  */
 export function serverEvaluate(
   client: ConsoleClient,
-  fragments: InterpreterFragment[],
-): (root: ASTNode) => Promise<unknown> {
-  return async (root: ASTNode): Promise<unknown> => {
-    const { value } = await runAST(root, fragments, serverHandler(client), undefined);
-    return value;
-  };
+  baseInterpreter: Interpreter,
+): (root: TypedNode) => Promise<unknown> {
+  const interp = { ...baseInterpreter, ...createConsoleInterpreter(client) };
+  return (root: TypedNode) => foldAST(interp, root);
 }

@@ -1,4 +1,4 @@
-import type { ASTNode, PluginContext, StepEffect } from "@mvfm/core";
+import type { PluginContext, TypedNode } from "@mvfm/core";
 import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
@@ -26,7 +26,7 @@ export class ZodNumberBuilder extends ZodSchemaBuilder<number> {
   protected _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | ASTNode;
+    error?: string | TypedNode;
     extra?: Record<string, unknown>;
   }): ZodNumberBuilder {
     return new ZodNumberBuilder(
@@ -42,54 +42,72 @@ export class ZodNumberBuilder extends ZodSchemaBuilder<number> {
   // ---- Comparison checks ----
 
   /** Greater than. Produces `gt` check descriptor. */
-  gt(value: number, opts?: { error?: string; abort?: boolean; when?: ASTNode }): ZodNumberBuilder {
+  gt(
+    value: number,
+    opts?: { error?: string; abort?: boolean; when?: TypedNode },
+  ): ZodNumberBuilder {
     return this._addCheck("gt", { value }, opts);
   }
 
   /** Greater than or equal (alias: min). Produces `gte` check descriptor. */
-  gte(value: number, opts?: { error?: string; abort?: boolean; when?: ASTNode }): ZodNumberBuilder {
+  gte(
+    value: number,
+    opts?: { error?: string; abort?: boolean; when?: TypedNode },
+  ): ZodNumberBuilder {
     return this._addCheck("gte", { value }, opts);
   }
 
   /** Alias for gte(). */
-  min(value: number, opts?: { error?: string; abort?: boolean; when?: ASTNode }): ZodNumberBuilder {
+  min(
+    value: number,
+    opts?: { error?: string; abort?: boolean; when?: TypedNode },
+  ): ZodNumberBuilder {
     return this.gte(value, opts);
   }
 
   /** Less than. Produces `lt` check descriptor. */
-  lt(value: number, opts?: { error?: string; abort?: boolean; when?: ASTNode }): ZodNumberBuilder {
+  lt(
+    value: number,
+    opts?: { error?: string; abort?: boolean; when?: TypedNode },
+  ): ZodNumberBuilder {
     return this._addCheck("lt", { value }, opts);
   }
 
   /** Less than or equal (alias: max). Produces `lte` check descriptor. */
-  lte(value: number, opts?: { error?: string; abort?: boolean; when?: ASTNode }): ZodNumberBuilder {
+  lte(
+    value: number,
+    opts?: { error?: string; abort?: boolean; when?: TypedNode },
+  ): ZodNumberBuilder {
     return this._addCheck("lte", { value }, opts);
   }
 
   /** Alias for lte(). */
-  max(value: number, opts?: { error?: string; abort?: boolean; when?: ASTNode }): ZodNumberBuilder {
+  max(
+    value: number,
+    opts?: { error?: string; abort?: boolean; when?: TypedNode },
+  ): ZodNumberBuilder {
     return this.lte(value, opts);
   }
 
   // ---- Sign checks ----
 
   /** Must be > 0. Produces `positive` check descriptor. */
-  positive(opts?: { error?: string; abort?: boolean; when?: ASTNode }): ZodNumberBuilder {
+  positive(opts?: { error?: string; abort?: boolean; when?: TypedNode }): ZodNumberBuilder {
     return this._addCheck("positive", {}, opts);
   }
 
   /** Must be >= 0. Produces `nonnegative` check descriptor. */
-  nonnegative(opts?: { error?: string; abort?: boolean; when?: ASTNode }): ZodNumberBuilder {
+  nonnegative(opts?: { error?: string; abort?: boolean; when?: TypedNode }): ZodNumberBuilder {
     return this._addCheck("nonnegative", {}, opts);
   }
 
   /** Must be < 0. Produces `negative` check descriptor. */
-  negative(opts?: { error?: string; abort?: boolean; when?: ASTNode }): ZodNumberBuilder {
+  negative(opts?: { error?: string; abort?: boolean; when?: TypedNode }): ZodNumberBuilder {
     return this._addCheck("negative", {}, opts);
   }
 
   /** Must be <= 0. Produces `nonpositive` check descriptor. */
-  nonpositive(opts?: { error?: string; abort?: boolean; when?: ASTNode }): ZodNumberBuilder {
+  nonpositive(opts?: { error?: string; abort?: boolean; when?: TypedNode }): ZodNumberBuilder {
     return this._addCheck("nonpositive", {}, opts);
   }
 
@@ -98,7 +116,7 @@ export class ZodNumberBuilder extends ZodSchemaBuilder<number> {
   /** Must be a multiple of step. Produces `multiple_of` check descriptor. */
   multipleOf(
     step: number,
-    opts?: { error?: string; abort?: boolean; when?: ASTNode },
+    opts?: { error?: string; abort?: boolean; when?: TypedNode },
   ): ZodNumberBuilder {
     return this._addCheck("multiple_of", { value: step }, opts);
   }
@@ -106,7 +124,7 @@ export class ZodNumberBuilder extends ZodSchemaBuilder<number> {
   /** Alias for multipleOf(). */
   step(
     value: number,
-    opts?: { error?: string; abort?: boolean; when?: ASTNode },
+    opts?: { error?: string; abort?: boolean; when?: TypedNode },
   ): ZodNumberBuilder {
     return this.multipleOf(value, opts);
   }
@@ -114,17 +132,17 @@ export class ZodNumberBuilder extends ZodSchemaBuilder<number> {
   // ---- Integer/finite/safe checks ----
 
   /** Must be an integer. Produces `int` check descriptor. */
-  int(opts?: { error?: string; abort?: boolean; when?: ASTNode }): ZodNumberBuilder {
+  int(opts?: { error?: string; abort?: boolean; when?: TypedNode }): ZodNumberBuilder {
     return this._addCheck("int", {}, opts);
   }
 
   /** Must be finite. Produces `finite` check descriptor. */
-  finite(opts?: { error?: string; abort?: boolean; when?: ASTNode }): ZodNumberBuilder {
+  finite(opts?: { error?: string; abort?: boolean; when?: TypedNode }): ZodNumberBuilder {
     return this._addCheck("finite", {}, opts);
   }
 
   /** Must be a safe integer. Produces `safe` check descriptor. */
-  safe(opts?: { error?: string; abort?: boolean; when?: ASTNode }): ZodNumberBuilder {
+  safe(opts?: { error?: string; abort?: boolean; when?: TypedNode }): ZodNumberBuilder {
     return this._addCheck("safe", {}, opts);
   }
 }
@@ -278,7 +296,7 @@ function variantChecks(variant: string | undefined): CheckDescriptor[] {
 /** Interpreter handlers for number schema nodes. */
 export const numberInterpreter: SchemaInterpreterMap = {
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/number": function* (node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
+  "zod/number": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     const variant = node.variant as string | undefined;
     const explicitChecks = (node.checks as CheckDescriptor[]) ?? [];
     const vChecks = variantChecks(variant);
@@ -289,7 +307,7 @@ export const numberInterpreter: SchemaInterpreterMap = {
     return applyNumberChecks(base as z.ZodNumber, allChecks);
   },
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/nan": function* (node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
+  "zod/nan": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     const errorFn = toZodError(node.error as ErrorConfig | undefined);
     return errorFn ? z.nan({ error: errorFn }) : z.nan();
   },

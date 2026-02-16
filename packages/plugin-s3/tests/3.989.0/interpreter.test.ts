@@ -1,10 +1,9 @@
 import { coreInterpreter, foldAST, mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { s3 } from "../../src/3.989.0";
-import { s3Interpreter } from "../../src/3.989.0/interpreter";
+import { createS3Interpreter, type S3Client } from "../../src/3.989.0/interpreter";
 
 const app = mvfm(num, str, s3({ region: "us-east-1" }));
-const fragments = [s3Interpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
@@ -18,31 +17,32 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 }
 
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
-  const captured: any[] = [];
+  const captured: Array<{ command: string; input: Record<string, unknown> }> = [];
   const ast = injectInput(prog.ast, input);
-  const recurse = foldAST(fragments, {
-    "s3/command": async (effect) => {
-      captured.push(effect);
+  const mockClient: S3Client = {
+    async execute(command: string, input: Record<string, unknown>) {
+      captured.push({ command, input });
       // Return a mock response matching the command type
-      if (effect.command === "GetObject") {
+      if (command === "GetObject") {
         return { Body: "file content", ContentType: "text/plain", ETag: '"abc123"' };
       }
-      if (effect.command === "PutObject") {
+      if (command === "PutObject") {
         return { ETag: '"abc123"', VersionId: "v1" };
       }
-      if (effect.command === "HeadObject") {
+      if (command === "HeadObject") {
         return { ContentLength: 1024, ContentType: "text/plain", ETag: '"abc123"' };
       }
-      if (effect.command === "ListObjectsV2") {
+      if (command === "ListObjectsV2") {
         return { Contents: [{ Key: "file.txt", Size: 1024 }], IsTruncated: false };
       }
-      if (effect.command === "DeleteObject") {
+      if (command === "DeleteObject") {
         return { DeleteMarker: false };
       }
       return {};
     },
-  });
-  const result = await recurse(ast.result);
+  };
+  const combined = { ...createS3Interpreter(mockClient), ...coreInterpreter };
+  const result = await foldAST(combined, ast.result);
   return { result, captured };
 }
 
@@ -57,7 +57,6 @@ describe("s3 interpreter: putObject", () => {
     );
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("s3/command");
     expect(captured[0].command).toBe("PutObject");
     expect(captured[0].input).toEqual({
       Bucket: "my-bucket",
@@ -76,7 +75,6 @@ describe("s3 interpreter: getObject", () => {
     const prog = app(($) => $.s3.getObject({ Bucket: "my-bucket", Key: "file.txt" }));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("s3/command");
     expect(captured[0].command).toBe("GetObject");
     expect(captured[0].input).toEqual({
       Bucket: "my-bucket",
@@ -94,7 +92,6 @@ describe("s3 interpreter: deleteObject", () => {
     const prog = app(($) => $.s3.deleteObject({ Bucket: "my-bucket", Key: "file.txt" }));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("s3/command");
     expect(captured[0].command).toBe("DeleteObject");
     expect(captured[0].input).toEqual({
       Bucket: "my-bucket",
@@ -112,7 +109,6 @@ describe("s3 interpreter: headObject", () => {
     const prog = app(($) => $.s3.headObject({ Bucket: "my-bucket", Key: "file.txt" }));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("s3/command");
     expect(captured[0].command).toBe("HeadObject");
     expect(captured[0].input).toEqual({
       Bucket: "my-bucket",
@@ -130,7 +126,6 @@ describe("s3 interpreter: listObjectsV2", () => {
     const prog = app(($) => $.s3.listObjectsV2({ Bucket: "my-bucket", Prefix: "uploads/" }));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("s3/command");
     expect(captured[0].command).toBe("ListObjectsV2");
     expect(captured[0].input).toEqual({
       Bucket: "my-bucket",

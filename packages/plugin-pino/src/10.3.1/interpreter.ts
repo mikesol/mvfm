@@ -1,4 +1,5 @@
-import type { ASTNode, InterpreterFragment, StepEffect } from "@mvfm/core";
+import type { Interpreter, TypedNode } from "@mvfm/core";
+import { eval_ } from "@mvfm/core";
 
 /**
  * Pino client interface consumed by the pino handler.
@@ -16,43 +17,33 @@ export interface PinoClient {
   ): Promise<void>;
 }
 
+interface PinoNode extends TypedNode<void> {
+  kind: string;
+  level: string;
+  msg?: TypedNode<string>;
+  mergeObject?: TypedNode<Record<string, unknown>>;
+  bindings: TypedNode<Record<string, unknown>>[];
+}
+
+const LEVELS = ["trace", "debug", "info", "warn", "error", "fatal"] as const;
+
 /**
- * Generator-based interpreter fragment for pino plugin nodes.
+ * Creates an interpreter for `pino/*` node kinds.
  *
- * Yields `pino/log` effects for all 6 log levels. Each effect
- * contains the level, resolved bindings chain, optional merge
- * object, and optional message string.
+ * @param client - The {@link PinoClient} to execute against.
+ * @returns An Interpreter handling all pino node kinds.
  */
-export const pinoInterpreter: InterpreterFragment = {
-  pluginName: "pino",
-  canHandle: (node) => node.kind.startsWith("pino/"),
-  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
-    // All 6 levels follow the same pattern
-    const msg =
-      node.msg != null
-        ? ((yield { type: "recurse", child: node.msg as ASTNode }) as string)
-        : undefined;
-
-    const mergeObject =
-      node.mergeObject != null
-        ? ((yield {
-            type: "recurse",
-            child: node.mergeObject as ASTNode,
-          }) as Record<string, unknown>)
-        : undefined;
-
-    const bindingNodes = node.bindings as ASTNode[];
+export function createPinoInterpreter(client: PinoClient): Interpreter {
+  const handler = async function* (node: PinoNode) {
+    const msg = node.msg != null ? yield* eval_(node.msg) : undefined;
+    const mergeObject = node.mergeObject != null ? yield* eval_(node.mergeObject) : undefined;
     const bindings: Record<string, unknown>[] = [];
-    for (const b of bindingNodes) {
-      bindings.push((yield { type: "recurse", child: b }) as Record<string, unknown>);
+    for (const b of node.bindings) {
+      bindings.push(yield* eval_(b));
     }
+    await client.log(node.level, bindings, mergeObject, msg);
+    return undefined;
+  };
 
-    return yield {
-      type: "pino/log",
-      level: node.level as string,
-      ...(msg !== undefined ? { msg } : {}),
-      ...(mergeObject !== undefined ? { mergeObject } : {}),
-      bindings,
-    };
-  },
-};
+  return Object.fromEntries(LEVELS.map((l) => [`pino/${l}`, handler]));
+}

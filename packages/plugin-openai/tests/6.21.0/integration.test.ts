@@ -15,7 +15,6 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { openai as openaiPlugin } from "../../src/6.21.0";
 import { serverEvaluate } from "../../src/6.21.0/handler.server";
 import type { OpenAIClient } from "../../src/6.21.0/interpreter";
-import { openaiInterpreter } from "../../src/6.21.0/interpreter";
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
@@ -163,21 +162,20 @@ function createMockClient(): OpenAIClient {
   };
 }
 
-const allFragments = [
-  openaiInterpreter,
-  errorInterpreter,
-  fiberInterpreter,
-  coreInterpreter,
-  numInterpreter,
-  strInterpreter,
-];
+const baseInterpreter = {
+  ...coreInterpreter,
+  ...numInterpreter,
+  ...strInterpreter,
+  ...errorInterpreter,
+  ...fiberInterpreter,
+};
 
 const app = mvfm(num, str, openaiPlugin({ apiKey: "sk-test-fake" }), fiber, error);
 
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
   const client = createMockClient();
-  const evaluate = serverEvaluate(client, allFragments);
+  const evaluate = serverEvaluate(client, baseInterpreter);
   return await evaluate(ast.result);
 }
 

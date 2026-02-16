@@ -1,81 +1,97 @@
-import type { ASTNode, InterpreterFragment, StepEffect } from "../../core";
-import { injectLambdaParam } from "../../core";
+import type { Interpreter, TypedNode } from "../../fold";
+import { eval_ } from "../../fold";
+import { injectLambdaParam } from "../../utils";
 
-/** Interpreter fragment for `error/` node kinds. */
-export const errorInterpreter: InterpreterFragment = {
-  pluginName: "error",
-  canHandle: (node) => node.kind.startsWith("error/"),
-  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
-    switch (node.kind) {
-      case "error/try": {
-        try {
-          const value = yield { type: "recurse", child: node.expr as ASTNode };
-          return value;
-        } catch (e) {
-          if (node.catch) {
-            const catchInfo = node.catch as { param: ASTNode; body: ASTNode };
-            injectLambdaParam(catchInfo.body, (catchInfo.param as any).name, e);
-            return yield { type: "recurse", child: catchInfo.body };
-          }
-          if (node.match) {
-            const matchInfo = node.match as {
-              param: ASTNode;
-              branches: Record<string, ASTNode>;
-            };
-            const errObj = e as any;
-            const key = typeof errObj === "string" ? errObj : (errObj?.code ?? errObj?.type ?? "_");
-            const branch = matchInfo.branches[key] ?? matchInfo.branches._ ?? null;
-            if (!branch) throw e;
-            injectLambdaParam(branch, (matchInfo.param as any).name, e);
-            return yield { type: "recurse", child: branch };
-          }
-          throw e;
-        } finally {
-          if (node.finally) {
-            yield { type: "recurse", child: node.finally as ASTNode };
-          }
-        }
+// ---- Typed node interfaces ----------------------------------
+
+interface ErrorTry extends TypedNode<unknown> {
+  kind: "error/try";
+  expr: TypedNode;
+  catch?: { param: any; body: TypedNode };
+  match?: { param: any; branches: Record<string, TypedNode> };
+  finally?: TypedNode;
+}
+
+interface ErrorFail extends TypedNode<never> {
+  kind: "error/fail";
+  error: TypedNode;
+}
+
+interface ErrorAttempt extends TypedNode<{ ok: unknown; err: unknown }> {
+  kind: "error/attempt";
+  expr: TypedNode;
+}
+
+interface ErrorGuard extends TypedNode<void> {
+  kind: "error/guard";
+  condition: TypedNode<boolean>;
+  error: TypedNode;
+}
+
+interface ErrorSettle extends TypedNode<{ fulfilled: unknown[]; rejected: unknown[] }> {
+  kind: "error/settle";
+  exprs: TypedNode[];
+}
+
+// ---- Interpreter map ----------------------------------------
+
+/** Interpreter handlers for `error/` node kinds. */
+export const errorInterpreter: Interpreter = {
+  "error/try": async function* (node: ErrorTry) {
+    try {
+      return yield* eval_(node.expr);
+    } catch (e) {
+      if (node.catch) {
+        injectLambdaParam(node.catch.body, node.catch.param.name, e);
+        return yield* eval_(node.catch.body);
       }
-
-      case "error/fail": {
-        const error = yield { type: "recurse", child: node.error as ASTNode };
-        throw error;
+      if (node.match) {
+        const errObj = e as any;
+        const key = typeof errObj === "string" ? errObj : (errObj?.code ?? errObj?.type ?? "_");
+        const branch = node.match.branches[key] ?? node.match.branches._ ?? null;
+        if (!branch) throw e;
+        injectLambdaParam(branch, node.match.param.name, e);
+        return yield* eval_(branch);
       }
-
-      case "error/attempt": {
-        try {
-          const ok = yield { type: "recurse", child: node.expr as ASTNode };
-          return { ok, err: null };
-        } catch (e) {
-          return { ok: null, err: e };
-        }
+      throw e;
+    } finally {
+      if (node.finally) {
+        yield* eval_(node.finally);
       }
-
-      case "error/guard": {
-        const condition = yield { type: "recurse", child: node.condition as ASTNode };
-        if (!condition) {
-          throw yield { type: "recurse", child: node.error as ASTNode };
-        }
-        return undefined;
-      }
-
-      case "error/settle": {
-        const exprs = node.exprs as ASTNode[];
-        const fulfilled: unknown[] = [];
-        const rejected: unknown[] = [];
-        for (const expr of exprs) {
-          try {
-            const value = yield { type: "recurse", child: expr };
-            fulfilled.push(value);
-          } catch (e) {
-            rejected.push(e);
-          }
-        }
-        return { fulfilled, rejected };
-      }
-
-      default:
-        throw new Error(`Error interpreter: unknown node kind "${node.kind}"`);
     }
+  },
+
+  "error/fail": async function* (node: ErrorFail) {
+    throw yield* eval_(node.error);
+  },
+
+  "error/attempt": async function* (node: ErrorAttempt) {
+    try {
+      const ok = yield* eval_(node.expr);
+      return { ok, err: null };
+    } catch (e) {
+      return { ok: null, err: e };
+    }
+  },
+
+  "error/guard": async function* (node: ErrorGuard) {
+    const condition = yield* eval_(node.condition);
+    if (!condition) {
+      throw yield* eval_(node.error);
+    }
+    return undefined;
+  },
+
+  "error/settle": async function* (node: ErrorSettle) {
+    const fulfilled: unknown[] = [];
+    const rejected: unknown[] = [];
+    for (const expr of node.exprs) {
+      try {
+        fulfilled.push(yield* eval_(expr));
+      } catch (e) {
+        rejected.push(e);
+      }
+    }
+    return { fulfilled, rejected };
   },
 };

@@ -1,4 +1,5 @@
-import type { ASTNode, InterpreterFragment, StepEffect } from "@mvfm/core";
+import type { Interpreter, TypedNode } from "@mvfm/core";
+import { eval_ } from "@mvfm/core";
 
 /**
  * S3 client interface consumed by the s3 handler.
@@ -20,27 +21,24 @@ const COMMAND_MAP: Record<string, string> = {
   "s3/list_objects_v2": "ListObjectsV2",
 };
 
-/**
- * Generator-based interpreter fragment for s3 plugin nodes.
- *
- * Yields `s3/command` effects for all 5 operations. Each effect
- * contains the command name and resolved input, matching the
- * AWS SDK command pattern.
- */
-export const s3Interpreter: InterpreterFragment = {
-  pluginName: "s3",
-  canHandle: (node) => node.kind.startsWith("s3/"),
-  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
-    const command = COMMAND_MAP[node.kind];
-    if (!command) {
-      throw new Error(`S3 interpreter: unknown node kind "${node.kind}"`);
-    }
+interface S3Node extends TypedNode<unknown> {
+  kind: string;
+  input: TypedNode<Record<string, unknown>>;
+}
 
-    const input = yield { type: "recurse", child: node.input as ASTNode };
-    return yield {
-      type: "s3/command",
-      command,
-      input,
-    };
-  },
-};
+/**
+ * Creates an interpreter for `s3/*` node kinds.
+ *
+ * @param client - The {@link S3Client} to execute against.
+ * @returns An Interpreter handling all s3 node kinds.
+ */
+export function createS3Interpreter(client: S3Client): Interpreter {
+  const handler = async function* (node: S3Node) {
+    const command = COMMAND_MAP[node.kind];
+    if (!command) throw new Error(`S3 interpreter: unknown node kind "${node.kind}"`);
+    const input = yield* eval_(node.input);
+    return await client.execute(command, input);
+  };
+
+  return Object.fromEntries(Object.keys(COMMAND_MAP).map((kind) => [kind, handler]));
+}

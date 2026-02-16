@@ -1,4 +1,4 @@
-import type { ASTNode, PluginContext, StepEffect } from "@mvfm/core";
+import type { PluginContext, TypedNode } from "@mvfm/core";
 import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
@@ -27,7 +27,7 @@ export class ZodMapBuilder<K, V> extends ZodSchemaBuilder<Map<K, V>> {
   protected _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | ASTNode;
+    error?: string | TypedNode;
     extra?: Record<string, unknown>;
   }): ZodMapBuilder<K, V> {
     return new ZodMapBuilder<K, V>(
@@ -62,7 +62,7 @@ export class ZodSetBuilder<T> extends ZodSchemaBuilder<Set<T>> {
   protected _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | ASTNode;
+    error?: string | TypedNode;
     extra?: Record<string, unknown>;
   }): ZodSetBuilder<T> {
     return new ZodSetBuilder<T>(
@@ -146,21 +146,21 @@ export function mapSetNamespace(
  * interpreter's buildSchemaGen. This is passed in at registration time
  * to avoid circular imports.
  */
-type SchemaBuildFn = (node: ASTNode) => Generator<StepEffect, z.ZodType, unknown>;
+type SchemaBuildFn = (node: any) => AsyncGenerator<TypedNode, z.ZodType, unknown>;
 
 /** Create map/set interpreter handlers with access to the shared schema builder. */
 export function createMapSetInterpreter(buildSchema: SchemaBuildFn): SchemaInterpreterMap {
   return {
-    "zod/map": function* (node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
-      const keySchema = yield* buildSchema(node.key as ASTNode);
-      const valueSchema = yield* buildSchema(node.value as ASTNode);
+    "zod/map": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+      const keySchema = yield* buildSchema(node.key as any);
+      const valueSchema = yield* buildSchema(node.value as any);
       const errorFn = toZodError(node.error as ErrorConfig | undefined);
       const errOpt = errorFn ? { error: errorFn } : {};
       return z.map(keySchema as z.ZodString, valueSchema, errOpt);
     },
 
-    "zod/set": function* (node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
-      const valueSchema = yield* buildSchema(node.value as ASTNode);
+    "zod/set": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+      const valueSchema = yield* buildSchema(node.value as any);
       const checks = (node.checks as CheckDescriptor[]) ?? [];
       const errorFn = toZodError(node.error as ErrorConfig | undefined);
       const errOpt = errorFn ? { error: errorFn } : {};

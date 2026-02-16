@@ -1,4 +1,4 @@
-import type { ASTNode, PluginContext, StepEffect } from "@mvfm/core";
+import type { PluginContext, TypedNode } from "@mvfm/core";
 import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
@@ -31,7 +31,7 @@ export class ZodRecordBuilder<K extends string, V> extends ZodSchemaBuilder<Reco
   protected _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | ASTNode;
+    error?: string | TypedNode;
     extra?: Record<string, unknown>;
   }): ZodRecordBuilder<K, V> {
     return new ZodRecordBuilder<K, V>(
@@ -124,14 +124,14 @@ export function recordNamespace(
  * interpreter's buildSchemaGen. This is passed in at registration time
  * to avoid circular imports.
  */
-type SchemaBuildFn = (node: ASTNode) => Generator<StepEffect, z.ZodType, unknown>;
+type SchemaBuildFn = (node: any) => AsyncGenerator<TypedNode, z.ZodType, unknown>;
 
 /** Create record interpreter handlers with access to the shared schema builder. */
 export function createRecordInterpreter(buildSchema: SchemaBuildFn): SchemaInterpreterMap {
   return {
-    "zod/record": function* (node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
-      const keySchema = yield* buildSchema(node.key as ASTNode);
-      const valueSchema = yield* buildSchema(node.value as ASTNode);
+    "zod/record": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+      const keySchema = yield* buildSchema(node.key as any);
+      const valueSchema = yield* buildSchema(node.value as any);
       const mode = (node.mode as string) ?? "strict";
       const errorFn = toZodError(node.error as ErrorConfig | undefined);
       const errOpt = errorFn ? { error: errorFn } : {};

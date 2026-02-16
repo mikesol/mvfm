@@ -169,9 +169,9 @@ describe("cloudflare-kv: cross-operation dependencies", () => {
     const prog = app(($) => {
       const cached = $.kv.get("source-key");
       const stored = $.kv.put("dest-key", cached);
-      return $.do(cached, stored);
+      return $.discard(cached, stored);
     });
     const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/do");
+    expect(ast.result.kind).toBe("core/discard");
   });
 });

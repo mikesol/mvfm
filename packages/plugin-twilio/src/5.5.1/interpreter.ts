@@ -1,4 +1,5 @@
-import type { ASTNode, InterpreterFragment, StepEffect } from "@mvfm/core";
+import type { Interpreter, TypedNode } from "@mvfm/core";
+import { eval_ } from "@mvfm/core";
 
 /**
  * Twilio client interface consumed by the twilio handler.
@@ -11,91 +12,55 @@ export interface TwilioClient {
   request(method: string, path: string, params?: Record<string, unknown>): Promise<unknown>;
 }
 
+interface TwilioNode extends TypedNode<unknown> {
+  kind: string;
+  sid?: TypedNode<string>;
+  params?: TypedNode<Record<string, unknown>>;
+  config: { accountSid: string; authToken: string };
+}
+
 /**
- * Generator-based interpreter fragment for twilio plugin nodes.
+ * Creates an interpreter for `twilio/*` node kinds.
  *
- * Yields `twilio/api_call` effects for all 6 operations. Each effect
- * contains the HTTP method, API path, and optional params matching the
- * Twilio REST API v2010 conventions.
+ * @param client - The {@link TwilioClient} to execute against.
+ * @returns An Interpreter handling all twilio node kinds.
  */
-export const twilioInterpreter: InterpreterFragment = {
-  pluginName: "twilio",
-  canHandle: (node) => node.kind.startsWith("twilio/"),
-  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
-    const config = node.config as { accountSid: string; authToken: string };
-    const base = `/2010-04-01/Accounts/${config.accountSid}`;
+export function createTwilioInterpreter(client: TwilioClient): Interpreter {
+  return {
+    "twilio/create_message": async function* (node: TwilioNode) {
+      const base = `/2010-04-01/Accounts/${node.config.accountSid}`;
+      const params = yield* eval_(node.params!);
+      return await client.request("POST", `${base}/Messages.json`, params);
+    },
 
-    switch (node.kind) {
-      // ---- Messages ----
+    "twilio/fetch_message": async function* (node: TwilioNode) {
+      const base = `/2010-04-01/Accounts/${node.config.accountSid}`;
+      const sid = yield* eval_(node.sid!);
+      return await client.request("GET", `${base}/Messages/${sid}.json`);
+    },
 
-      case "twilio/create_message": {
-        const params = yield { type: "recurse", child: node.params as ASTNode };
-        return yield {
-          type: "twilio/api_call",
-          method: "POST",
-          path: `${base}/Messages.json`,
-          params,
-        };
-      }
+    "twilio/list_messages": async function* (node: TwilioNode) {
+      const base = `/2010-04-01/Accounts/${node.config.accountSid}`;
+      const params = node.params != null ? yield* eval_(node.params) : undefined;
+      return await client.request("GET", `${base}/Messages.json`, params);
+    },
 
-      case "twilio/fetch_message": {
-        const sid = yield { type: "recurse", child: node.sid as ASTNode };
-        return yield {
-          type: "twilio/api_call",
-          method: "GET",
-          path: `${base}/Messages/${sid}.json`,
-        };
-      }
+    "twilio/create_call": async function* (node: TwilioNode) {
+      const base = `/2010-04-01/Accounts/${node.config.accountSid}`;
+      const params = yield* eval_(node.params!);
+      return await client.request("POST", `${base}/Calls.json`, params);
+    },
 
-      case "twilio/list_messages": {
-        const params =
-          node.params != null
-            ? yield { type: "recurse", child: node.params as ASTNode }
-            : undefined;
-        return yield {
-          type: "twilio/api_call",
-          method: "GET",
-          path: `${base}/Messages.json`,
-          ...(params !== undefined ? { params } : {}),
-        };
-      }
+    "twilio/fetch_call": async function* (node: TwilioNode) {
+      const base = `/2010-04-01/Accounts/${node.config.accountSid}`;
+      const sid = yield* eval_(node.sid!);
+      return await client.request("GET", `${base}/Calls/${sid}.json`);
+    },
 
-      // ---- Calls ----
-
-      case "twilio/create_call": {
-        const params = yield { type: "recurse", child: node.params as ASTNode };
-        return yield {
-          type: "twilio/api_call",
-          method: "POST",
-          path: `${base}/Calls.json`,
-          params,
-        };
-      }
-
-      case "twilio/fetch_call": {
-        const sid = yield { type: "recurse", child: node.sid as ASTNode };
-        return yield {
-          type: "twilio/api_call",
-          method: "GET",
-          path: `${base}/Calls/${sid}.json`,
-        };
-      }
-
-      case "twilio/list_calls": {
-        const params =
-          node.params != null
-            ? yield { type: "recurse", child: node.params as ASTNode }
-            : undefined;
-        return yield {
-          type: "twilio/api_call",
-          method: "GET",
-          path: `${base}/Calls.json`,
-          ...(params !== undefined ? { params } : {}),
-        };
-      }
-
-      default:
-        throw new Error(`Twilio interpreter: unknown node kind "${node.kind}"`);
-    }
-  },
-};
+    "twilio/list_calls": async function* (node: TwilioNode) {
+      const base = `/2010-04-01/Accounts/${node.config.accountSid}`;
+      const params = node.params != null ? yield* eval_(node.params) : undefined;
+      return await client.request("GET", `${base}/Calls.json`, params);
+    },
+  };
+}

@@ -1,4 +1,4 @@
-import type { ASTNode, PluginContext, StepEffect } from "@mvfm/core";
+import type { PluginContext, TypedNode } from "@mvfm/core";
 import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
@@ -31,7 +31,7 @@ export class ZodIntersectionBuilder<T> extends ZodSchemaBuilder<T> {
   protected _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | ASTNode;
+    error?: string | TypedNode;
     extra?: Record<string, unknown>;
   }): ZodIntersectionBuilder<T> {
     return new ZodIntersectionBuilder<T>(
@@ -84,14 +84,14 @@ export function intersectionNamespace(
  * interpreter's buildSchemaGen. This is passed in at registration time
  * to avoid circular imports.
  */
-type SchemaBuildFn = (node: ASTNode) => Generator<StepEffect, z.ZodType, unknown>;
+type SchemaBuildFn = (node: any) => AsyncGenerator<TypedNode, z.ZodType, unknown>;
 
 /** Create intersection interpreter handlers with access to the shared schema builder. */
 export function createIntersectionInterpreter(buildSchema: SchemaBuildFn): SchemaInterpreterMap {
   return {
-    "zod/intersection": function* (node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
-      const leftSchema = yield* buildSchema(node.left as ASTNode);
-      const rightSchema = yield* buildSchema(node.right as ASTNode);
+    "zod/intersection": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+      const leftSchema = yield* buildSchema(node.left as any);
+      const rightSchema = yield* buildSchema(node.right as any);
       return z.intersection(leftSchema, rightSchema);
     },
   };

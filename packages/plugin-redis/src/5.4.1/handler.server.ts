@@ -1,46 +1,28 @@
-import type { ASTNode, InterpreterFragment, StepHandler } from "@mvfm/core";
-import { runAST } from "@mvfm/core";
-import type { RedisClient } from "./interpreter";
+import type { Interpreter, TypedNode } from "@mvfm/core";
+import { foldAST } from "@mvfm/core";
+import { createRedisInterpreter, type RedisClient } from "./interpreter";
 
 /**
- * Creates a server-side StepHandler that executes Redis effects
- * against a real Redis client.
- *
- * Handles `redis/command` effects by delegating to
- * `client.command(command, ...args)`. Throws on unhandled effect types.
+ * Creates a server-side interpreter for `redis/*` node kinds.
  *
  * @param client - The {@link RedisClient} to execute against.
- * @returns A StepHandler for void state.
+ * @returns An Interpreter for redis node kinds.
  */
-export function serverHandler(client: RedisClient): StepHandler<void> {
-  return async (effect, _context, state) => {
-    if (effect.type === "redis/command") {
-      const { command, args } = effect as {
-        type: "redis/command";
-        command: string;
-        args: unknown[];
-      };
-      const value = await client.command(command, ...args);
-      return { value, state };
-    }
-    throw new Error(`serverHandler: unhandled effect type "${effect.type}"`);
-  };
+export function serverInterpreter(client: RedisClient): Interpreter {
+  return createRedisInterpreter(client);
 }
 
 /**
- * Creates a unified evaluation function that evaluates an AST against
- * a Redis client using the provided interpreter fragments.
+ * Creates a unified evaluator using the redis server interpreter.
  *
  * @param client - The {@link RedisClient} to execute against.
- * @param fragments - Generator interpreter fragments for evaluating sub-expressions.
- * @returns An async function that evaluates an AST node to its result.
+ * @param baseInterpreter - Base interpreter for evaluating sub-expressions.
+ * @returns An async AST evaluator function.
  */
 export function serverEvaluate(
   client: RedisClient,
-  fragments: InterpreterFragment[],
-): (root: ASTNode) => Promise<unknown> {
-  return async (root: ASTNode): Promise<unknown> => {
-    const { value } = await runAST(root, fragments, serverHandler(client), undefined);
-    return value;
-  };
+  baseInterpreter: Interpreter,
+): (root: TypedNode) => Promise<unknown> {
+  const interp = { ...baseInterpreter, ...createRedisInterpreter(client) };
+  return (root: TypedNode) => foldAST(interp, root);
 }

@@ -433,10 +433,10 @@ describe("redis: cross-operation dependencies", () => {
     const prog = app(($) => {
       const val = $.redis.get("source");
       const result = $.redis.set("dest", val);
-      return $.do(val, result);
+      return $.discard(val, result);
     });
     const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/do");
+    expect(ast.result.kind).toBe("core/discard");
   });
 });
 

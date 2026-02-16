@@ -42,7 +42,7 @@ export { ZodSchemaBuilder, ZodWrappedBuilder } from "./base";
 export { ZodBigIntBuilder } from "./bigint";
 export { ZodDateBuilder } from "./date";
 export { ZodEnumBuilder, ZodNativeEnumBuilder } from "./enum";
-export { zodInterpreter } from "./interpreter";
+export { createZodInterpreter } from "./interpreter";
 export type { SchemaInterpreterMap } from "./interpreter-utils";
 export { ZodIntersectionBuilder } from "./intersection";
 export { ZodLiteralBuilder } from "./literal";

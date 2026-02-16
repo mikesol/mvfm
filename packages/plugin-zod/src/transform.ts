@@ -1,4 +1,4 @@
-import type { ASTNode, Expr, PluginContext } from "@mvfm/core";
+import type { Expr, PluginContext, TypedNode } from "@mvfm/core";
 import { ZodSchemaBuilder, ZodWrappedBuilder } from "./base";
 import type { CheckDescriptor, ErrorConfig, RefinementDescriptor, WrapperASTNode } from "./types";
 
@@ -24,7 +24,7 @@ export class ZodTransformBuilder<T> extends ZodSchemaBuilder<T> {
   protected _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | ASTNode;
+    error?: string | TypedNode;
     extra?: Record<string, unknown>;
   }): ZodTransformBuilder<T> {
     return new ZodTransformBuilder<T>(
@@ -44,7 +44,7 @@ export function buildStandaloneTransform<T>(
   ctx: PluginContext,
   fn: (val: Expr<unknown>) => Expr<T>,
 ): ZodTransformBuilder<T> {
-  const paramNode: ASTNode = { kind: "core/lambda_param", name: "transform_val" };
+  const paramNode = { kind: "core/lambda_param", name: "transform_val" } as TypedNode;
   const paramProxy = ctx.expr<unknown>(paramNode);
   const result = fn(paramProxy);
   const bodyNode = ctx.isExpr(result) ? result.__node : paramNode;
@@ -61,7 +61,7 @@ export function buildPreprocess<T>(
   fn: (val: Expr<unknown>) => Expr<unknown>,
   schema: ZodSchemaBuilder<T>,
 ): ZodWrappedBuilder<T> {
-  const paramNode: ASTNode = { kind: "core/lambda_param", name: "preprocess_val" };
+  const paramNode = { kind: "core/lambda_param", name: "preprocess_val" } as TypedNode;
   const paramProxy = ctx.expr<unknown>(paramNode);
   const result = fn(paramProxy);
   const bodyNode = ctx.isExpr(result) ? result.__node : paramNode;

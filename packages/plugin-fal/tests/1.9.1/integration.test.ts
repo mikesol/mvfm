@@ -2,7 +2,6 @@ import { coreInterpreter, mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { fal as falPlugin } from "../../src/1.9.1";
 import { serverEvaluate } from "../../src/1.9.1/handler.server";
-import { falInterpreter } from "../../src/1.9.1/interpreter";
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
@@ -61,8 +60,6 @@ function createClient() {
   return { client, calls };
 }
 
-const fragments = [falInterpreter, coreInterpreter];
-
 describe("fal integration: options passthrough", () => {
   it("passes run options through server handler", async () => {
     const app = mvfm(num, str, falPlugin({ credentials: "key_test_123" }));
@@ -76,7 +73,7 @@ describe("fal integration: options passthrough", () => {
 
     const ast = injectInput(prog.ast, {});
     const { client, calls } = createClient();
-    const evaluate = serverEvaluate(client, fragments);
+    const evaluate = serverEvaluate(client, coreInterpreter);
     const result = await evaluate(ast.result);
 
     expect(result).toEqual({ data: { ok: true }, requestId: "req_run" });
@@ -101,7 +98,7 @@ describe("fal integration: options passthrough", () => {
 
     const ast = injectInput(prog.ast, {});
     const { client, calls } = createClient();
-    const evaluate = serverEvaluate(client, fragments);
+    const evaluate = serverEvaluate(client, coreInterpreter);
     const result = await evaluate(ast.result);
 
     expect(result).toEqual({ data: { ok: true }, requestId: "req_sub" });
@@ -129,7 +126,7 @@ describe("fal integration: options passthrough", () => {
     const cancelProg = app(($) => $.fal.queue.cancel("fal-ai/flux/dev", { requestId: "req_123" }));
 
     const { client, calls } = createClient();
-    const evaluate = serverEvaluate(client, fragments);
+    const evaluate = serverEvaluate(client, coreInterpreter);
 
     await evaluate(injectInput(submitProg.ast, {}).result);
     await evaluate(injectInput(statusProg.ast, {}).result);
