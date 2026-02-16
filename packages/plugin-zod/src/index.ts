@@ -15,6 +15,8 @@ import type { ZodPrimitivesNamespace } from "./primitives";
 import { primitivesNamespace, primitivesNodeKinds } from "./primitives";
 import type { ZodStringNamespace } from "./string";
 import { stringNamespace, stringNodeKinds } from "./string";
+import type { ZodStringFormatsNamespace } from "./string-formats";
+import { stringFormatsNamespace, stringFormatsNodeKinds } from "./string-formats";
 
 // Re-export types, builders, and interpreter for consumers
 export { ZodSchemaBuilder, ZodWrappedBuilder } from "./base";
@@ -27,6 +29,8 @@ export { ZodLiteralBuilder } from "./literal";
 export { ZodNumberBuilder } from "./number";
 export { ZodPrimitiveBuilder } from "./primitives";
 export { ZodStringBuilder } from "./string";
+export type { ZodIsoNamespace, ZodStringFormatsNamespace } from "./string-formats";
+export { buildStringFormat } from "./string-formats";
 export type {
   CheckDescriptor,
   ErrorConfig,
@@ -53,7 +57,8 @@ export interface ZodNamespace
     ZodEnumNamespace,
     ZodLiteralNamespace,
     ZodNumberNamespace,
-    ZodPrimitivesNamespace {
+    ZodPrimitivesNamespace,
+    ZodStringFormatsNamespace {
   /** Coercion constructors -- convert input before validating. */
   coerce: ZodCoerceNamespace;
   // ^^^ Each new schema type adds ONE extends clause here
@@ -103,6 +108,7 @@ export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
     ...numberNodeKinds,
     ...primitivesNodeKinds,
     ...coerceNodeKinds,
+    ...stringFormatsNodeKinds,
     // ^^^ Each new schema type adds ONE spread here
   ],
 
@@ -117,6 +123,7 @@ export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
         ...numberNamespace(ctx, parseError),
         ...primitivesNamespace(ctx, parseError),
         ...coerceNamespace(ctx, parseError),
+        ...stringFormatsNamespace(ctx, parseError),
         // ^^^ Each new schema type adds ONE spread here
       } as ZodNamespace,
     };

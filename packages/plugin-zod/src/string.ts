@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
 import { checkErrorOpt, toZodError } from "./interpreter-utils";
+import { buildStringFormat } from "./string-formats";
 import type { CheckDescriptor, ErrorConfig, RefinementDescriptor } from "./types";
 
 /**
@@ -222,12 +223,16 @@ function applyStringChecks(schema: z.ZodString, checks: CheckDescriptor[]): z.Zo
 
 /** Interpreter handlers for string schema nodes. */
 export const stringInterpreter: SchemaInterpreterMap = {
-  // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
   "zod/string": function* (node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
     const checks = (node.checks as CheckDescriptor[]) ?? [];
     const errorFn = toZodError(node.error as ErrorConfig | undefined);
-    const ctor = node.coerce === true ? z.coerce.string : z.string;
-    const base = errorFn ? ctor({ error: errorFn }) : ctor();
+    const format = node.format as Record<string, unknown> | undefined;
+    const base = format
+      ? buildStringFormat(format, errorFn)
+      : (() => {
+          const ctor = node.coerce === true ? z.coerce.string : z.string;
+          return errorFn ? ctor({ error: errorFn }) : ctor();
+        })();
     return applyStringChecks(base as z.ZodString, checks);
   },
 };
