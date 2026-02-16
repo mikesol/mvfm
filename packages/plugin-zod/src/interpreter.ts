@@ -1,6 +1,7 @@
 import type { ASTNode, InterpreterFragment, StepEffect } from "@mvfm/core";
 import { injectLambdaParam } from "@mvfm/core";
 import type { z } from "zod";
+import { createArrayInterpreter } from "./array";
 import { bigintInterpreter } from "./bigint";
 import { dateInterpreter } from "./date";
 import { enumInterpreter } from "./enum";
@@ -16,6 +17,7 @@ import type { ErrorConfig, RefinementDescriptor } from "./types";
 // ---- Schema handler dispatch ----
 // Each schema module exports an interpreter map.
 // New schema types add ONE import + ONE spread here.
+// Leaf handlers don't need buildSchemaGen; recursive handlers do.
 
 const leafHandlers: SchemaInterpreterMap = {
   ...stringInterpreter,
@@ -27,7 +29,7 @@ const leafHandlers: SchemaInterpreterMap = {
   ...primitivesInterpreter,
 };
 
-// Object interpreter needs buildSchemaGen for recursive field building.
+// Recursive handlers (array, object) need buildSchemaGen for inner schemas.
 // Initialized lazily on first use to break the definition-order cycle.
 let schemaHandlers: SchemaInterpreterMap | undefined;
 
@@ -37,6 +39,7 @@ function getHandlers(): SchemaInterpreterMap {
     schemaHandlers = {
       ...leafHandlers,
       ...createObjectInterpreter(buildSchemaGen),
+      ...createArrayInterpreter(buildSchemaGen),
     };
   }
   return schemaHandlers;

@@ -1,4 +1,6 @@
 import type { PluginDefinition } from "@mvfm/core";
+import type { ZodArrayNamespace } from "./array";
+import { arrayNamespace, arrayNodeKinds } from "./array";
 import type { ZodBigIntNamespace } from "./bigint";
 import { bigintNamespace, bigintNodeKinds } from "./bigint";
 import type { ZodCoerceNamespace } from "./coerce";
@@ -21,6 +23,7 @@ import type { ZodStringFormatsNamespace } from "./string-formats";
 import { stringFormatsNamespace, stringFormatsNodeKinds } from "./string-formats";
 
 // Re-export types, builders, and interpreter for consumers
+export { ZodArrayBuilder } from "./array";
 export { ZodSchemaBuilder, ZodWrappedBuilder } from "./base";
 export { ZodBigIntBuilder } from "./bigint";
 export { ZodDateBuilder } from "./date";
@@ -55,7 +58,8 @@ export type {
  * or `.safeParse()` to produce a validation AST node.
  */
 export interface ZodNamespace
-  extends ZodStringNamespace,
+  extends ZodArrayNamespace,
+    ZodStringNamespace,
     ZodBigIntNamespace,
     ZodDateNamespace,
     ZodEnumNamespace,
@@ -105,6 +109,7 @@ export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
 
   nodeKinds: [
     ...COMMON_NODE_KINDS,
+    ...arrayNodeKinds,
     ...stringNodeKinds,
     ...bigintNodeKinds,
     ...dateNodeKinds,
@@ -121,6 +126,7 @@ export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
   build(ctx) {
     return {
       zod: {
+        ...arrayNamespace(ctx, parseError),
         ...stringNamespace(ctx, parseError),
         ...bigintNamespace(ctx, parseError),
         ...dateNamespace(ctx, parseError),
