@@ -8,6 +8,8 @@ export type {
   FoldYield,
   Handler,
   Interpreter,
+  IsAny,
+  NodeTypeMap,
   RecurseScopedEffect,
   ScopedBinding,
   TypedNode,
@@ -21,6 +23,7 @@ export {
   foldAST,
   recurseScoped,
   typedFoldAST,
+  typedInterpreter,
   VOLATILE_KINDS,
 } from "./fold";
 export { coreInterpreter } from "./interpreters/core";
