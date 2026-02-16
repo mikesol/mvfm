@@ -3,7 +3,16 @@ import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
 import { checkErrorOpt, toZodError } from "./interpreter-utils";
-import type { CheckDescriptor, ErrorConfig, RefinementDescriptor } from "./types";
+import type {
+  CheckDescriptor,
+  ErrorConfig,
+  RefinementDescriptor,
+  ZodSchemaNodeBase,
+} from "./types";
+
+interface ZodDateNode extends ZodSchemaNodeBase {
+  kind: "zod/date";
+}
 
 /**
  * Builder for Zod date schemas.
@@ -101,7 +110,7 @@ function applyDateChecks(schema: z.ZodDate, checks: CheckDescriptor[]): z.ZodDat
 /** Interpreter handlers for date schema nodes. */
 export const dateInterpreter: SchemaInterpreterMap = {
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/date": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/date": async function* (node: ZodDateNode): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     const checks = (node.checks as CheckDescriptor[]) ?? [];
     const errorFn = toZodError(node.error as ErrorConfig | undefined);
     const base = errorFn ? z.date({ error: errorFn }) : z.date();

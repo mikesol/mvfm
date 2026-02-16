@@ -4,7 +4,18 @@ import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
 import { checkErrorOpt, toZodError } from "./interpreter-utils";
 import { buildStringFormat } from "./string-formats";
-import type { CheckDescriptor, ErrorConfig, RefinementDescriptor } from "./types";
+import type {
+  CheckDescriptor,
+  ErrorConfig,
+  RefinementDescriptor,
+  ZodSchemaNodeBase,
+} from "./types";
+
+interface ZodStringNode extends ZodSchemaNodeBase {
+  kind: "zod/string";
+  coerce?: boolean;
+  format?: Record<string, unknown>;
+}
 
 /**
  * Builder for Zod string schemas.
@@ -223,7 +234,9 @@ function applyStringChecks(schema: z.ZodString, checks: CheckDescriptor[]): z.Zo
 
 /** Interpreter handlers for string schema nodes. */
 export const stringInterpreter: SchemaInterpreterMap = {
-  "zod/string": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/string": async function* (
+    node: ZodStringNode,
+  ): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     const checks = (node.checks as CheckDescriptor[]) ?? [];
     const errorFn = toZodError(node.error as ErrorConfig | undefined);
     const format = node.format as Record<string, unknown> | undefined;

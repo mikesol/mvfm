@@ -2,10 +2,20 @@ import type { PluginContext, TypedNode } from "@mvfm/core";
 import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
-import type { CheckDescriptor, ErrorConfig, RefinementDescriptor } from "./types";
+import type {
+  CheckDescriptor,
+  ErrorConfig,
+  RefinementDescriptor,
+  ZodSchemaNodeBase,
+} from "./types";
 
 /** Primitive types allowed as literal values. */
 type LiteralValue = string | number | bigint | boolean;
+
+interface ZodLiteralNode extends ZodSchemaNodeBase {
+  kind: "zod/literal";
+  value: LiteralValue | [string, ...string[]];
+}
 
 /**
  * Builder for Zod literal schemas.
@@ -78,7 +88,9 @@ export function literalNamespace(ctx: PluginContext): ZodLiteralNamespace {
 /** Interpreter handlers for literal schema nodes. */
 export const literalInterpreter: SchemaInterpreterMap = {
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/literal": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/literal": async function* (
+    node: ZodLiteralNode,
+  ): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     const value = node.value;
     if (Array.isArray(value)) {
       return z.literal(value as [string, ...string[]]);

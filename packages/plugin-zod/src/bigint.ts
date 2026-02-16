@@ -3,7 +3,16 @@ import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
 import { checkErrorOpt, toZodError } from "./interpreter-utils";
-import type { CheckDescriptor, ErrorConfig, RefinementDescriptor } from "./types";
+import type {
+  CheckDescriptor,
+  ErrorConfig,
+  RefinementDescriptor,
+  ZodSchemaNodeBase,
+} from "./types";
+
+interface ZodBigIntNode extends ZodSchemaNodeBase {
+  kind: "zod/bigint";
+}
 
 /**
  * Builder for Zod bigint schemas.
@@ -197,7 +206,9 @@ function applyBigIntChecks(schema: z.ZodBigInt, checks: CheckDescriptor[]): z.Zo
 /** Interpreter handlers for bigint schema nodes. */
 export const bigintInterpreter: SchemaInterpreterMap = {
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/bigint": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/bigint": async function* (
+    node: ZodBigIntNode,
+  ): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     const checks = (node.checks as CheckDescriptor[]) ?? [];
     const errorFn = toZodError(node.error as ErrorConfig | undefined);
     const base = errorFn ? z.bigint({ error: errorFn }) : z.bigint();

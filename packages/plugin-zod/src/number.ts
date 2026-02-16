@@ -3,7 +3,22 @@ import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
 import { checkErrorOpt, toZodError } from "./interpreter-utils";
-import type { CheckDescriptor, ErrorConfig, RefinementDescriptor } from "./types";
+import type {
+  CheckDescriptor,
+  ErrorConfig,
+  RefinementDescriptor,
+  ZodSchemaNodeBase,
+} from "./types";
+
+interface ZodNumberNode extends ZodSchemaNodeBase {
+  kind: "zod/number";
+  variant?: string;
+  coerce?: boolean;
+}
+
+interface ZodNanNode extends ZodSchemaNodeBase {
+  kind: "zod/nan";
+}
 
 /**
  * Builder for Zod number schemas.
@@ -296,7 +311,9 @@ function variantChecks(variant: string | undefined): CheckDescriptor[] {
 /** Interpreter handlers for number schema nodes. */
 export const numberInterpreter: SchemaInterpreterMap = {
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/number": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/number": async function* (
+    node: ZodNumberNode,
+  ): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     const variant = node.variant as string | undefined;
     const explicitChecks = (node.checks as CheckDescriptor[]) ?? [];
     const vChecks = variantChecks(variant);
@@ -307,7 +324,7 @@ export const numberInterpreter: SchemaInterpreterMap = {
     return applyNumberChecks(base as z.ZodNumber, allChecks);
   },
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/nan": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/nan": async function* (node: ZodNanNode): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     const errorFn = toZodError(node.error as ErrorConfig | undefined);
     return errorFn ? z.nan({ error: errorFn }) : z.nan();
   },

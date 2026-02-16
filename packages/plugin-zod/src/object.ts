@@ -4,11 +4,13 @@ import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
 import { toZodError } from "./interpreter-utils";
 import type {
+  AnyZodSchemaNode,
   CheckDescriptor,
   ErrorConfig,
   RefinementDescriptor,
   SchemaASTNode,
   WrapperASTNode,
+  ZodSchemaNodeBase,
 } from "./types";
 
 /** A shape mapping field names to schema builders. */
@@ -204,14 +206,23 @@ export function objectNamespace(
  * interpreter's buildSchemaGen. This is passed in at registration time
  * to avoid circular imports.
  */
-type SchemaBuildFn = (node: any) => AsyncGenerator<TypedNode, z.ZodType, unknown>;
+type SchemaBuildFn = (node: AnyZodSchemaNode) => AsyncGenerator<TypedNode, z.ZodType, unknown>;
+
+interface ZodObjectNode extends ZodSchemaNodeBase {
+  kind: "zod/object";
+  shape?: Record<string, AnyZodSchemaNode>;
+  mode?: "strip" | "strict" | "loose";
+  catchall?: AnyZodSchemaNode;
+}
 
 /** Create object interpreter handlers with access to the shared schema builder. */
 export function createObjectInterpreter(buildSchema: SchemaBuildFn): SchemaInterpreterMap {
   return {
-    "zod/object": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
-      const shape = (node.shape as Record<string, any>) ?? {};
-      const mode = (node.mode as string) ?? "strip";
+    "zod/object": async function* (
+      node: ZodObjectNode,
+    ): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+      const shape = node.shape ?? {};
+      const mode = node.mode ?? "strip";
       const errorFn = toZodError(node.error as ErrorConfig | undefined);
       const errOpt = errorFn ? { error: errorFn } : {};
 
@@ -236,7 +247,7 @@ export function createObjectInterpreter(buildSchema: SchemaBuildFn): SchemaInter
 
       // Apply catchall if present
       if (node.catchall) {
-        const catchallSchema = yield* buildSchema(node.catchall as any);
+        const catchallSchema = yield* buildSchema(node.catchall);
         obj = (obj as z.ZodObject).catchall(catchallSchema);
       }
 
