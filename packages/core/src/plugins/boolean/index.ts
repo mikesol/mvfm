@@ -1,4 +1,5 @@
 import type { PluginDefinition } from "../../core";
+import { booleanInterpreter } from "./interpreter";
 
 /** Boolean type plugin. Provides no direct methods — exposes trait implementations for eq, show, bounded, and heytingAlgebra. */
 export type BooleanMethods = {};
@@ -21,6 +22,7 @@ export const boolean: PluginDefinition<
     "boolean/top",
     "boolean/bottom",
   ],
+  defaultInterpreter: booleanInterpreter,
   traits: {
     eq: { type: "boolean", nodeKinds: { eq: "boolean/eq" } },
     show: { type: "boolean", nodeKinds: { show: "boolean/show" } },

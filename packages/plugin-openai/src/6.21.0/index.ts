@@ -54,6 +54,7 @@
 // ============================================================
 
 import type { Expr, PluginContext, PluginDefinition } from "@mvfm/core";
+import { openaiInterpreter } from "./interpreter";
 
 // ---- What the plugin adds to $ ----------------------------
 
@@ -151,6 +152,7 @@ export function openai(config: OpenAIConfig): PluginDefinition<OpenAIMethods> {
       "openai/create_moderation",
       "openai/create_completion",
     ],
+    defaultInterpreter: openaiInterpreter,
 
     build(ctx: PluginContext): OpenAIMethods {
       function resolveId(id: Expr<string> | string) {

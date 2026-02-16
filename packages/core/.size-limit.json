@@ -3,12 +3,12 @@
     "name": "Minimal pure-logic (num + eq)",
     "path": "dist/index.js",
     "import": "{ num, eq }",
-    "limit": "1 kB"
+    "limit": "1.1 kB"
   },
   {
     "name": "Medium prelude (num + str + eq + boolean + control)",
     "path": "dist/index.js",
     "import": "{ num, str, eq, boolean, control }",
-    "limit": "1.75 kB"
+    "limit": "2 kB"
   }
 ]

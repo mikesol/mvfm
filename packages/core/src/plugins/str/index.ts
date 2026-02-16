@@ -1,4 +1,5 @@
 import type { Expr, PluginContext, PluginDefinition } from "../../core";
+import { strInterpreter } from "./interpreter";
 
 /**
  * String manipulation operations.
@@ -72,6 +73,7 @@ export const str: PluginDefinition<
     "str/append",
     "str/mempty",
   ],
+  defaultInterpreter: strInterpreter,
   traits: {
     eq: { type: "string", nodeKinds: { eq: "str/eq" } },
     show: { type: "string", nodeKinds: { show: "str/show" } },

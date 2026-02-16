@@ -57,6 +57,7 @@
 // ============================================================
 
 import type { Expr, PluginContext, PluginDefinition } from "@mvfm/core";
+import { slackInterpreter } from "./interpreter";
 
 // ---- What the plugin adds to $ ----------------------------
 
@@ -241,6 +242,7 @@ export function slack(config: SlackConfig): PluginDefinition<SlackMethods> {
       "slack/files_info",
       "slack/files_delete",
     ],
+    defaultInterpreter: slackInterpreter,
 
     build(ctx: PluginContext): SlackMethods {
       // Helper: resolve a params object to an AST node.

@@ -1,6 +1,7 @@
 // Public API
 
 export { injectInput, injectLambdaParam, mvfm } from "./core";
+export { defaults } from "./defaults";
 
 export type {
   CompleteInterpreter,
@@ -13,7 +14,6 @@ export type {
   TypedNode,
   TypedProgram,
 } from "./fold";
-
 export {
   createFoldState,
   eval_,

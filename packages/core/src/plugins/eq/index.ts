@@ -1,5 +1,6 @@
 import type { Expr, PluginContext, PluginDefinition, TypeclassSlot } from "../../core";
 import { inferType } from "../../trait-utils";
+import { eqInterpreter } from "./interpreter";
 
 /**
  * Eq typeclass template — generates eq/neq methods for a specific type T.
@@ -28,6 +29,7 @@ declare module "../../core" {
 export const eq: PluginDefinition<TypeclassSlot<"eq">> = {
   name: "eq",
   nodeKinds: ["eq/neq"],
+  defaultInterpreter: eqInterpreter,
   build(ctx: PluginContext): any {
     const impls = ctx.plugins.filter((p) => p.traits?.eq).map((p) => p.traits!.eq!);
 

@@ -18,6 +18,7 @@ declare module "../../core" {
 export const bounded: PluginDefinition<TypeclassSlot<"bounded">> = {
   name: "bounded",
   nodeKinds: [],
+  defaultInterpreter: {},
   build(_ctx: PluginContext): any {
     return {};
   },

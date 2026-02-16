@@ -144,6 +144,8 @@ export interface PluginDefinition<T = any, Traits extends Record<string, unknown
   name: string;
   nodeKinds: string[];
   build: (ctx: PluginContext) => T;
+  /** Default interpreter handlers for this plugin's node kinds. */
+  defaultInterpreter?: Record<string, (node: any) => AsyncGenerator<any, unknown, unknown>>;
   traits?: {
     eq?: TraitImpl;
     ord?: TraitImpl;

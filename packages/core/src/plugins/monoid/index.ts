@@ -17,6 +17,7 @@ declare module "../../core" {
 export const monoid: PluginDefinition<TypeclassSlot<"monoid">> = {
   name: "monoid",
   nodeKinds: [],
+  defaultInterpreter: {},
   build(_ctx: PluginContext): any {
     return {};
   },

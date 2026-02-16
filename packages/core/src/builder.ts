@@ -42,6 +42,7 @@ function flattenPluginInputs(inputs: readonly PluginInput[]): PluginDefinition<a
  */
 export function mvfm<const P extends readonly PluginInput[]>(...plugins: P) {
   type FlatP = FlattenPluginInputs<P>;
+  const resolvedPlugins = flattenPluginInputs(plugins);
 
   function define<S extends SchemaShape>(
     schema: S,
@@ -56,8 +57,6 @@ export function mvfm<const P extends readonly PluginInput[]>(...plugins: P) {
 
     const statements: any[] = [];
     const registry = new Map<number, any>();
-
-    const resolvedPlugins = flattenPluginInputs(plugins);
 
     const ctx: PluginContext = {
       expr: <T>(node: any) => {
@@ -243,5 +242,7 @@ export function mvfm<const P extends readonly PluginInput[]>(...plugins: P) {
     };
   }
 
-  return define;
+  return Object.assign(define, {
+    plugins: resolvedPlugins as any as FlattenPluginInputs<P>,
+  });
 }

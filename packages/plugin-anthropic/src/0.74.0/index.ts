@@ -65,6 +65,7 @@ import type {
   ModelListParams,
 } from "@anthropic-ai/sdk/resources/models";
 import type { Expr, PluginContext, PluginDefinition } from "@mvfm/core";
+import { anthropicInterpreter } from "./interpreter";
 
 // ---- What the plugin adds to $ ----------------------------
 
@@ -150,6 +151,7 @@ export function anthropic(config: AnthropicConfig): PluginDefinition<AnthropicMe
       "anthropic/retrieve_model",
       "anthropic/list_models",
     ],
+    defaultInterpreter: anthropicInterpreter,
 
     build(ctx: PluginContext): AnthropicMethods {
       // Helper: resolve an id argument to an AST node.

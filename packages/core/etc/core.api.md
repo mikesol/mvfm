@@ -66,6 +66,13 @@ export const coreInterpreter: Interpreter;
 // @public
 export function createFoldState(): FoldState;
 
+// Warning: (ae-forgotten-export) The symbol "DefaultsArgs" needs to be exported by the entry point index.d.ts
+//
+// @public
+export function defaults<const P extends readonly PluginInput[]>(app: {
+    readonly plugins: P;
+}, ...args: DefaultsArgs<P>): Interpreter;
+
 // Warning: (ae-incompatible-release-tags) The symbol "eq" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
 //
 // @public
@@ -209,6 +216,8 @@ export interface MonoidFor<_T> {
 export function mvfm<const P extends readonly PluginInput[]>(...plugins: P): {
     <S extends SchemaShape>(schema: S, fn: ($: CoreDollar<InferSchema<S>> & MergePlugins<FlattenPluginInputs<P>>) => Expr<any> | any): Program;
     <I = never>(fn: ($: CoreDollar<I> & MergePlugins<FlattenPluginInputs<P>>) => Expr<any> | any): Program;
+} & {
+    plugins: FlattenPluginInputs<P>;
 };
 
 // @public
@@ -285,6 +294,7 @@ export interface PluginContext {
 export interface PluginDefinition<T = any, Traits extends Record<string, unknown> = {}> {
     // (undocumented)
     build: (ctx: PluginContext) => T;
+    defaultInterpreter?: Record<string, (node: any) => AsyncGenerator<any, unknown, unknown>>;
     // (undocumented)
     name: string;
     // (undocumented)

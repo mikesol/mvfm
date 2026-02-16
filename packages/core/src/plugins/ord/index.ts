@@ -1,5 +1,6 @@
 import type { Expr, PluginContext, PluginDefinition, TypeclassSlot } from "../../core";
 import { inferType } from "../../trait-utils";
+import { ordInterpreter } from "./interpreter";
 
 /**
  * Ord typeclass template — generates comparison methods for a specific type T.
@@ -34,6 +35,7 @@ declare module "../../core" {
 export const ord: PluginDefinition<TypeclassSlot<"ord">> = {
   name: "ord",
   nodeKinds: ["ord/gt", "ord/gte", "ord/lt", "ord/lte"],
+  defaultInterpreter: ordInterpreter,
   build(ctx: PluginContext): any {
     const impls = ctx.plugins.filter((p) => p.traits?.ord).map((p) => p.traits!.ord!);
 

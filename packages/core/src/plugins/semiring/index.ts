@@ -23,6 +23,7 @@ declare module "../../core" {
 export const semiring: PluginDefinition<TypeclassSlot<"semiring">> = {
   name: "semiring",
   nodeKinds: [],
+  defaultInterpreter: {},
   build(ctx: PluginContext): any {
     const impls = ctx.plugins.filter((p) => p.traits?.semiring).map((p) => p.traits!.semiring!);
 
