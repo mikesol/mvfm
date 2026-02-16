@@ -1,7 +1,7 @@
 // Public API
 
 export { injectLambdaParam, mvfm } from "./core";
-
+export { defaults } from "./defaults";
 export type {
   CompleteInterpreter,
   FoldState,
@@ -13,7 +13,6 @@ export type {
   TypedNode,
   TypedProgram,
 } from "./fold";
-
 export {
   checkCompleteness,
   createFoldState,

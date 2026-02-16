@@ -242,5 +242,7 @@ export function mvfm<const P extends readonly PluginInput[]>(...plugins: P) {
     };
   }
 
-  return Object.assign(define, { plugins: resolvedPlugins });
+  return Object.assign(define, {
+    plugins: resolvedPlugins as any as FlattenPluginInputs<P>,
+  });
 }
