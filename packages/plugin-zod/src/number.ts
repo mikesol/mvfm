@@ -284,8 +284,9 @@ export const numberInterpreter: SchemaInterpreterMap = {
     const vChecks = variantChecks(variant);
     const allChecks = [...vChecks, ...explicitChecks];
     const errorFn = toZodError(node.error as ErrorConfig | undefined);
-    const base = errorFn ? z.number({ error: errorFn }) : z.number();
-    return applyNumberChecks(base, allChecks);
+    const ctor = node.coerce === true ? z.coerce.number : z.number;
+    const base = errorFn ? ctor({ error: errorFn }) : ctor();
+    return applyNumberChecks(base as z.ZodNumber, allChecks);
   },
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
   "zod/nan": function* (node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {

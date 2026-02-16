@@ -226,7 +226,8 @@ export const stringInterpreter: SchemaInterpreterMap = {
   "zod/string": function* (node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
     const checks = (node.checks as CheckDescriptor[]) ?? [];
     const errorFn = toZodError(node.error as ErrorConfig | undefined);
-    const base = errorFn ? z.string({ error: errorFn }) : z.string();
-    return applyStringChecks(base, checks);
+    const ctor = node.coerce === true ? z.coerce.string : z.string;
+    const base = errorFn ? ctor({ error: errorFn }) : ctor();
+    return applyStringChecks(base as z.ZodString, checks);
   },
 };

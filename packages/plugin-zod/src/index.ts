@@ -1,6 +1,8 @@
 import type { PluginDefinition } from "@mvfm/core";
 import type { ZodBigIntNamespace } from "./bigint";
 import { bigintNamespace, bigintNodeKinds } from "./bigint";
+import type { ZodCoerceNamespace } from "./coerce";
+import { coerceNamespace, coerceNodeKinds } from "./coerce";
 import type { ZodDateNamespace } from "./date";
 import { dateNamespace, dateNodeKinds } from "./date";
 import type { ZodEnumNamespace } from "./enum";
@@ -52,6 +54,8 @@ export interface ZodNamespace
     ZodLiteralNamespace,
     ZodNumberNamespace,
     ZodPrimitivesNamespace {
+  /** Coercion constructors -- convert input before validating. */
+  coerce: ZodCoerceNamespace;
   // ^^^ Each new schema type adds ONE extends clause here
 }
 
@@ -98,6 +102,7 @@ export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
     ...literalNodeKinds,
     ...numberNodeKinds,
     ...primitivesNodeKinds,
+    ...coerceNodeKinds,
     // ^^^ Each new schema type adds ONE spread here
   ],
 
@@ -111,6 +116,7 @@ export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
         ...literalNamespace(ctx),
         ...numberNamespace(ctx, parseError),
         ...primitivesNamespace(ctx, parseError),
+        ...coerceNamespace(ctx, parseError),
         // ^^^ Each new schema type adds ONE spread here
       } as ZodNamespace,
     };
