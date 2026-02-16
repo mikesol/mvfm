@@ -1,14 +1,19 @@
 import type { Interpreter, TypedNode } from "../../fold";
-import { eval_, foldAST, recurseScoped } from "../../fold";
+import { eval_, foldAST, recurseScoped, typedInterpreter } from "../../fold";
 import { injectLambdaParam } from "../../utils";
 
 // ---- Typed node interfaces ----------------------------------
+
+interface FiberParam {
+  __id: number;
+  name: string;
+}
 
 interface FiberParMap extends TypedNode<unknown[]> {
   kind: "fiber/par_map";
   collection: TypedNode<unknown[]>;
   concurrency: number;
-  param: any;
+  param: FiberParam;
   body: TypedNode;
 }
 
@@ -31,10 +36,21 @@ interface FiberRetry extends TypedNode<unknown> {
   delay: number;
 }
 
+declare module "@mvfm/core" {
+  interface NodeTypeMap {
+    "fiber/par_map": FiberParMap;
+    "fiber/race": FiberRace;
+    "fiber/timeout": FiberTimeout;
+    "fiber/retry": FiberRetry;
+  }
+}
+
+type FiberKinds = "fiber/par_map" | "fiber/race" | "fiber/timeout" | "fiber/retry";
+
 // ---- Sequential interpreter (default) -----------------------
 
 /** Sequential interpreter handlers for `fiber/` node kinds. */
-export const fiberInterpreter: Interpreter = {
+export const fiberInterpreter: Interpreter = typedInterpreter<FiberKinds>()({
   "fiber/par_map": async function* (node: FiberParMap) {
     const collection = yield* eval_(node.collection);
     const results: unknown[] = [];
@@ -68,7 +84,7 @@ export const fiberInterpreter: Interpreter = {
     }
     throw lastError;
   },
-};
+});
 
 // ---- Parallel interpreter factory ---------------------------
 
@@ -83,7 +99,7 @@ export const fiberInterpreter: Interpreter = {
  * ```
  */
 export function createParallelFiberInterpreter(interpreter: Interpreter): Interpreter {
-  return {
+  return typedInterpreter<FiberKinds>()({
     "fiber/par_map": async function* (node: FiberParMap) {
       const collection = yield* eval_(node.collection);
       const results: unknown[] = [];
@@ -135,5 +151,5 @@ export function createParallelFiberInterpreter(interpreter: Interpreter): Interp
       }
       throw lastError;
     },
-  };
+  });
 }

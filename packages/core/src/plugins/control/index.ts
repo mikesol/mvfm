@@ -1,4 +1,5 @@
 import type { Expr, PluginContext, PluginDefinition } from "../../core";
+import { controlInterpreter } from "./interpreter";
 
 /**
  * Control flow operations for iteration.
@@ -30,6 +31,7 @@ export interface ControlMethods {
 export const control: PluginDefinition<ControlMethods> = {
   name: "control",
   nodeKinds: ["control/each", "control/while"],
+  defaultInterpreter: controlInterpreter,
   build(ctx: PluginContext): ControlMethods {
     return {
       each<T>(collection: Expr<T[]>, body: (item: Expr<T>) => void) {

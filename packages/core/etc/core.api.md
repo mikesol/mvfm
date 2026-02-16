@@ -53,6 +53,9 @@ export type CompleteInterpreter<K extends string> = {
 export const control: PluginDefinition<ControlMethods>;
 
 // @public
+export const controlInterpreter: Interpreter;
+
+// @public
 export interface ControlMethods {
     each<T>(collection: Expr<T[]>, body: (item: Expr<T>) => void): void;
     while(condition: Expr<boolean>): {

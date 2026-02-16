@@ -1,13 +1,17 @@
 import type { Interpreter, TypedNode } from "../../fold";
-import { eval_, recurseScoped } from "../../fold";
+import { eval_, recurseScoped, typedInterpreter } from "../../fold";
 
 // ---- Typed node interfaces ----------------------------------
+
+interface ErrorParam {
+  __id: number;
+}
 
 interface ErrorTry extends TypedNode<unknown> {
   kind: "error/try";
   expr: TypedNode;
-  catch?: { param: any; body: TypedNode };
-  match?: { param: any; branches: Record<string, TypedNode> };
+  catch?: { param: ErrorParam; body: TypedNode };
+  match?: { param: ErrorParam; branches: Record<string, TypedNode> };
   finally?: TypedNode;
 }
 
@@ -16,7 +20,7 @@ interface ErrorFail extends TypedNode<never> {
   error: TypedNode;
 }
 
-interface ErrorAttempt extends TypedNode<{ ok: unknown; err: unknown }> {
+interface ErrorAttempt extends TypedNode<{ ok: unknown | null; err: unknown | null }> {
   kind: "error/attempt";
   expr: TypedNode;
 }
@@ -32,10 +36,22 @@ interface ErrorSettle extends TypedNode<{ fulfilled: unknown[]; rejected: unknow
   exprs: TypedNode[];
 }
 
+declare module "@mvfm/core" {
+  interface NodeTypeMap {
+    "error/try": ErrorTry;
+    "error/fail": ErrorFail;
+    "error/attempt": ErrorAttempt;
+    "error/guard": ErrorGuard;
+    "error/settle": ErrorSettle;
+  }
+}
+
 // ---- Interpreter map ----------------------------------------
 
 /** Interpreter handlers for `error/` node kinds. */
-export const errorInterpreter: Interpreter = {
+export const errorInterpreter: Interpreter = typedInterpreter<
+  "error/try" | "error/fail" | "error/attempt" | "error/guard" | "error/settle"
+>()({
   "error/try": async function* (node: ErrorTry) {
     try {
       return yield* eval_(node.expr);
@@ -91,4 +107,4 @@ export const errorInterpreter: Interpreter = {
     }
     return { fulfilled, rejected };
   },
-};
+});

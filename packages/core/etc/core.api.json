@@ -718,6 +718,30 @@
           }
         },
         {
+          "kind": "Variable",
+          "canonicalReference": "@mvfm/core!controlInterpreter:var",
+          "docComment": "/**\n * Interpreter handlers for `control/` node kinds.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "controlInterpreter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
+            }
+          ],
+          "fileUrlPath": "dist/plugins/control/interpreter.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "controlInterpreter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
           "kind": "Interface",
           "canonicalReference": "@mvfm/core!ControlMethods:interface",
           "docComment": "/**\n * Control flow operations for iteration.\n */\n",
@@ -6996,7 +7020,7 @@
             },
             {
               "kind": "Content",
-              "text": "readonly [import(\"./types\")."
+              "text": "readonly [import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7005,7 +7029,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\".\")."
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7014,7 +7038,7 @@
             },
             {
               "kind": "Content",
-              "text": ", {\n    eq: number;\n    ord: number;\n    semiring: number;\n    show: number;\n    bounded: number;\n}>, import(\"./types\")."
+              "text": ", {\n    eq: number;\n    ord: number;\n    semiring: number;\n    show: number;\n    bounded: number;\n}>, import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7023,7 +7047,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\".\")."
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7032,7 +7056,7 @@
             },
             {
               "kind": "Content",
-              "text": ", {\n    eq: string;\n    show: string;\n    semigroup: string;\n    monoid: string;\n}>, import(\"./types\")."
+              "text": ", {\n    eq: string;\n    show: string;\n    semigroup: string;\n    monoid: string;\n}>, import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7041,7 +7065,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./types\")."
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7050,7 +7074,7 @@
             },
             {
               "kind": "Content",
-              "text": "<\"semiring\">, {}>, import(\"./types\")."
+              "text": "<\"semiring\">, {}>, import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7059,7 +7083,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./types\")."
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7068,7 +7092,7 @@
             },
             {
               "kind": "Content",
-              "text": "<\"eq\">, {}>, import(\"./types\")."
+              "text": "<\"eq\">, {}>, import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7077,7 +7101,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./types\")."
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7086,7 +7110,7 @@
             },
             {
               "kind": "Content",
-              "text": "<\"ord\">, {}>, import(\"./types\")."
+              "text": "<\"ord\">, {}>, import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7095,7 +7119,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./types\")."
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7104,7 +7128,7 @@
             },
             {
               "kind": "Content",
-              "text": "<\"show\">, {}>, import(\"./types\")."
+              "text": "<\"show\">, {}>, import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7113,7 +7137,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\".\")."
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7122,7 +7146,7 @@
             },
             {
               "kind": "Content",
-              "text": ", {\n    eq: boolean;\n    show: boolean;\n    heytingAlgebra: boolean;\n    bounded: boolean;\n}>, import(\"./types\")."
+              "text": ", {\n    eq: boolean;\n    show: boolean;\n    heytingAlgebra: boolean;\n    bounded: boolean;\n}>, import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7131,7 +7155,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./types\")."
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7140,7 +7164,7 @@
             },
             {
               "kind": "Content",
-              "text": "<\"bounded\">, {}>, import(\"./types\")."
+              "text": "<\"bounded\">, {}>, import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7149,7 +7173,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./types\")."
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7158,7 +7182,7 @@
             },
             {
               "kind": "Content",
-              "text": "<\"heytingAlgebra\">, {}>, import(\"./types\")."
+              "text": "<\"heytingAlgebra\">, {}>, import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7167,7 +7191,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./types\")."
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7176,7 +7200,7 @@
             },
             {
               "kind": "Content",
-              "text": "<\"semigroup\">, {}>, import(\"./types\")."
+              "text": "<\"semigroup\">, {}>, import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7185,7 +7209,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./types\")."
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",

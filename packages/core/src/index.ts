@@ -44,6 +44,7 @@ export type { BoundedFor } from "./plugins/bounded";
 export { bounded } from "./plugins/bounded";
 export type { ControlMethods } from "./plugins/control";
 export { control } from "./plugins/control";
+export { controlInterpreter } from "./plugins/control/interpreter";
 export type { EqFor } from "./plugins/eq";
 export { eq } from "./plugins/eq";
 export { eqInterpreter } from "./plugins/eq/interpreter";
