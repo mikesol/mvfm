@@ -7,6 +7,9 @@
 
 import { typedInterpreter } from "../fold";
 import type { CoreInput, CoreLiteral } from "../interpreters/core";
+import type { EqNeq } from "../plugins/eq/interpreter";
+import type { OrdCmp } from "../plugins/ord/interpreter";
+import type { StrUpperNode } from "../plugins/str/interpreter";
 
 // --- Positive: correct handler compiles ---
 
@@ -117,5 +120,44 @@ const _controlBadAny = typedInterpreter<"control/while">()({
   // biome-ignore lint/correctness/useYield: type test
   "control/while": async function* (node: any) {
     return node.body.length;
+  },
+});
+
+// --- str/eq/ord registrations ---
+
+const _strCorrect = typedInterpreter<"str/upper">()({
+  // biome-ignore lint/correctness/useYield: type test
+  "str/upper": async function* (_node: StrUpperNode) {
+    return "";
+  },
+});
+
+const _eqCorrect = typedInterpreter<"eq/neq">()({
+  // biome-ignore lint/correctness/useYield: type test
+  "eq/neq": async function* (_node: EqNeq) {
+    return false;
+  },
+});
+
+const _ordCorrect = typedInterpreter<"ord/gt">()({
+  // biome-ignore lint/correctness/useYield: type test
+  "ord/gt": async function* (_node: OrdCmp) {
+    return false;
+  },
+});
+
+const _strWrongType = typedInterpreter<"str/upper">()({
+  // @ts-expect-error EqNeq should not satisfy handler for str/upper
+  // biome-ignore lint/correctness/useYield: type test
+  "str/upper": async function* (node: EqNeq) {
+    return node.inner;
+  },
+});
+
+const _eqWrongType = typedInterpreter<"eq/neq">()({
+  // @ts-expect-error OrdCmp should not satisfy handler for eq/neq
+  // biome-ignore lint/correctness/useYield: type test
+  "eq/neq": async function* (node: OrdCmp) {
+    return node.operand;
   },
 });

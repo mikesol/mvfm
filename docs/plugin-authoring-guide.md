@@ -258,6 +258,7 @@ export interface PluginDefinition<T = any> {
   name: string;           // unique namespace prefix
   nodeKinds: string[];    // every AST node kind this plugin emits
   build: (ctx: PluginContext) => T;  // returns what goes on $
+  defaultInterpreter?: Record<string, (node: any) => AsyncGenerator<any, unknown, unknown>>;
   traits?: {              // optional typeclass implementations
     eq?: TraitImpl;
     ord?: TraitImpl;
@@ -271,13 +272,15 @@ export interface PluginDefinition<T = any> {
 }
 ```
 
-Three required fields:
+Three required fields plus one optional runtime field:
 
 - **`name`** — A unique string that becomes the namespace prefix for this plugin's AST node kinds. For `num`, the prefix is `"num"`. For `stripe`, the prefix is `"stripe"`. Every node kind emitted by the plugin must start with `name/`.
 
 - **`nodeKinds`** — An exhaustive list of every AST node `kind` string this plugin can emit. The interpreter uses this for dispatch; the build system uses it for validation. If a node kind is missing from this list, it is a bug.
 
 - **`build(ctx)`** — A function that receives a `PluginContext` and returns an object of type `T`. That object is spread onto `$`. If your plugin adds `{ sub, div, mod }`, then the program closure sees `$.sub()`, `$.div()`, `$.mod()`.
+
+- **`defaultInterpreter`** (optional) — A map of node kind to interpreter handler that works as the plugin's default runtime behavior. Include this when there is an obvious default interpreter and users should get useful behavior without extra runtime wiring (for example mvfm-native plugins like `num`, `str`, `eq`, `ord`). Omit this when the interpreter requires runtime configuration or external clients (for example `postgres` connection/session config, `redis` client config, API keys).
 
 The optional **`traits`** field registers typeclass implementations. This is how the `eq`, `ord`, `semiring`, etc. plugins discover that `num` provides equality for numbers or that `str` provides a semigroup for strings. See Step 5 (when written) for details.
 
@@ -398,6 +401,7 @@ Key things to notice:
 3. Every method parameter accepts `Expr<T> | T` and uses `ctx.lift()` or `ctx.isExpr()` to normalize.
 4. `config` is stored directly on each AST node — the AST is self-contained.
 5. `build()` only constructs and returns an object of methods. No side effects.
+6. `defaultInterpreter` is intentionally omitted here because Stripe requires runtime config (API keys/client setup) to interpret effects safely.
 
 ### Code example: num plugin (unconfigured, const)
 
@@ -498,6 +502,7 @@ Mvfm plugins come in two shapes:
 export const num: PluginDefinition<NumMethods> = {
   name: "num",
   nodeKinds: [...],
+  defaultInterpreter: numInterpreter,
   build(ctx) { ... },
 };
 ```
@@ -510,6 +515,7 @@ export function stripe(config: StripeConfig): PluginDefinition<StripeMethods> {
   return {
     name: "stripe",
     nodeKinds: [...],
+    // no defaultInterpreter: requires runtime config/client setup
     build(ctx) { ... },
   };
 }

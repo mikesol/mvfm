@@ -1,14 +1,20 @@
-import type { Interpreter, TypedNode } from "../../fold";
-import { eval_ } from "../../fold";
+import type { TypedNode } from "../../fold";
+import { eval_, typedInterpreter } from "../../fold";
 
-interface EqNeq extends TypedNode<boolean> {
+export interface EqNeq extends TypedNode<boolean> {
   kind: "eq/neq";
   inner: TypedNode<boolean>;
 }
 
+declare module "@mvfm/core" {
+  interface NodeTypeMap {
+    "eq/neq": EqNeq;
+  }
+}
+
 /** Interpreter handlers for `eq/` node kinds. */
-export const eqInterpreter: Interpreter = {
+export const eqInterpreter = typedInterpreter<"eq/neq">()({
   "eq/neq": async function* (node: EqNeq) {
     return !(yield* eval_(node.inner));
   },
-};
+});
