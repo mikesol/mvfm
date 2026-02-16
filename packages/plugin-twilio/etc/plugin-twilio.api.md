@@ -58,6 +58,9 @@ export interface TwilioConfig {
 }
 
 // @public
+export const twilioInterpreter: Interpreter;
+
+// @public
 export interface TwilioMessageContext {
     fetch(): Expr<Record<string, unknown>>;
 }

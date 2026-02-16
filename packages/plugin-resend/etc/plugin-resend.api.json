@@ -684,6 +684,30 @@
           "extendsTokenRanges": []
         },
         {
+          "kind": "Variable",
+          "canonicalReference": "@mvfm/plugin-resend!resendInterpreter:var",
+          "docComment": "/**\n * Default Resend interpreter that uses `RESEND_API_KEY`.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "resendInterpreter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/plugin-resend!~Interpreter:type"
+            }
+          ],
+          "fileUrlPath": "dist/6.9.2/interpreter.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "resendInterpreter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
           "kind": "Interface",
           "canonicalReference": "@mvfm/plugin-resend!ResendMethods:interface",
           "docComment": "/**\n * Resend operations added to the DSL context by the resend plugin.\n *\n * Mirrors the resend-node SDK resource API: emails, batch, and contacts. Each resource exposes methods that produce namespaced AST nodes.\n */\n",

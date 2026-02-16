@@ -1,9 +1,26 @@
 import { coreInterpreter, foldAST, mvfm, num, str } from "@mvfm/core";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { falInterpreter } from "../../src";
 import { fal } from "../../src/1.9.1";
 import { createFalInterpreter, type FalClient } from "../../src/1.9.1/interpreter";
 
 const app = mvfm(num, str, fal({ credentials: "key_test_123" }));
+
+describe("fal interpreter: default export", () => {
+  it("throws when FAL_KEY is missing", async () => {
+    vi.stubEnv("FAL_KEY", "");
+    const prog = app(($) => $.fal.run("fal-ai/flux/dev", { input: { prompt: "a cat" } }));
+    const combined = { ...falInterpreter, ...coreInterpreter };
+    await expect(foldAST(combined, prog.ast.result)).rejects.toThrow(/FAL_KEY/);
+    vi.unstubAllEnvs();
+  });
+
+  it("exports a default ready-to-use interpreter when FAL_KEY is set", () => {
+    vi.stubEnv("FAL_KEY", "key_test_default");
+    expect(typeof falInterpreter["fal/run"]).toBe("function");
+    vi.unstubAllEnvs();
+  });
+});
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;

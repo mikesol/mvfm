@@ -1,5 +1,6 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
 import { eval_ } from "@mvfm/core";
+import { wrapFetch } from "./client-fetch";
 
 /**
  * Fetch client interface consumed by the fetch handler.
@@ -78,3 +79,8 @@ export function createFetchInterpreter(client: FetchClient): Interpreter {
     },
   };
 }
+
+/**
+ * Default fetch interpreter that uses `globalThis.fetch`.
+ */
+export const fetchInterpreter: Interpreter = createFetchInterpreter(wrapFetch(globalThis.fetch));

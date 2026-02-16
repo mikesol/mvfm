@@ -1,5 +1,6 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
 import { eval_ } from "@mvfm/core";
+import { wrapAnthropicSdk } from "./client-anthropic-sdk";
 
 /**
  * Anthropic client interface consumed by the anthropic handler.
@@ -72,3 +73,75 @@ export function createAnthropicInterpreter(client: AnthropicClient): Interpreter
     },
   };
 }
+
+function requiredEnv(name: "ANTHROPIC_API_KEY"): string {
+  const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process
+    ?.env;
+  const value = env?.[name];
+  if (!value) {
+    throw new Error(
+      `@mvfm/plugin-anthropic: missing ${name}. Set ${name} or use createAnthropicInterpreter(...)`,
+    );
+  }
+  return value;
+}
+
+const dynamicImport = new Function("m", "return import(m)") as (moduleName: string) => Promise<any>;
+
+function lazyInterpreter(factory: () => Interpreter): Interpreter {
+  let cached: Interpreter | undefined;
+  const get = () => (cached ??= factory());
+  return new Proxy({} as Interpreter, {
+    get(_target, property) {
+      return get()[property as keyof Interpreter];
+    },
+    has(_target, property) {
+      return property in get();
+    },
+    ownKeys() {
+      return Reflect.ownKeys(get());
+    },
+    getOwnPropertyDescriptor(_target, property) {
+      const descriptor = Object.getOwnPropertyDescriptor(get(), property);
+      return descriptor
+        ? descriptor
+        : { configurable: true, enumerable: true, writable: false, value: undefined };
+    },
+  });
+}
+
+/**
+ * Default Anthropic interpreter that uses `ANTHROPIC_API_KEY`.
+ */
+export const anthropicInterpreter: Interpreter = lazyInterpreter(() =>
+  createAnthropicInterpreter(
+    (() => {
+      let clientPromise: Promise<AnthropicClient> | undefined;
+      const getClient = async (): Promise<AnthropicClient> => {
+        if (!clientPromise) {
+          const apiKey = requiredEnv("ANTHROPIC_API_KEY");
+          clientPromise = dynamicImport("@anthropic-ai/sdk").then((moduleValue) => {
+            const Anthropic = moduleValue.default;
+            return wrapAnthropicSdk(
+              new Anthropic({
+                apiKey,
+              }),
+            );
+          });
+        }
+        return clientPromise;
+      };
+
+      return {
+        async request(
+          method: string,
+          path: string,
+          params?: Record<string, unknown>,
+        ): Promise<unknown> {
+          const client = await getClient();
+          return client.request(method, path, params);
+        },
+      } satisfies AnthropicClient;
+    })(),
+  ),
+);

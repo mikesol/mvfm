@@ -800,6 +800,30 @@
           "extendsTokenRanges": []
         },
         {
+          "kind": "Variable",
+          "canonicalReference": "@mvfm/plugin-stripe!stripeInterpreter:var",
+          "docComment": "/**\n * Default Stripe interpreter that uses `STRIPE_API_KEY`.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "stripeInterpreter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/plugin-stripe!~Interpreter:type"
+            }
+          ],
+          "fileUrlPath": "dist/2025-04-30.basil/interpreter.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "stripeInterpreter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
           "kind": "Interface",
           "canonicalReference": "@mvfm/plugin-stripe!StripeMethods:interface",
           "docComment": "/**\n * Stripe operations added to the DSL context by the stripe plugin.\n *\n * Mirrors the stripe-node SDK resource API: payment intents, customers, and charges. Each resource exposes CRUD-style methods that produce namespaced AST nodes.\n */\n",

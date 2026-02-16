@@ -82,6 +82,9 @@ export interface ConsoleInstance {
 }
 
 // @public
+export const consoleInterpreter: Interpreter;
+
+// @public
 export type ConsoleMethodName = "assert" | "clear" | "count" | "countReset" | "debug" | "dir" | "dirxml" | "error" | "group" | "groupCollapsed" | "groupEnd" | "info" | "log" | "table" | "time" | "timeEnd" | "timeLog" | "trace" | "warn";
 
 // @public

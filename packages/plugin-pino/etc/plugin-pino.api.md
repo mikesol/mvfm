@@ -67,6 +67,9 @@ export interface PinoInstance {
 }
 
 // @public
+export const pinoInterpreter: Interpreter;
+
+// @public
 export interface PinoLogger {
     child(bindings: Expr<Record<string, unknown>> | Record<string, unknown>): PinoLogger;
     debug(msg: Expr<string> | string): Expr<void>;

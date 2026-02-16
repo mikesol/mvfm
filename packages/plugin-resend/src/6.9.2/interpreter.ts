@@ -1,5 +1,6 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
 import { eval_ } from "@mvfm/core";
+import { wrapResendSdk } from "./client-resend-sdk";
 
 /**
  * Resend client interface consumed by the resend handler.
@@ -63,3 +64,67 @@ export function createResendInterpreter(client: ResendClient): Interpreter {
     },
   };
 }
+
+function requiredEnv(name: "RESEND_API_KEY"): string {
+  const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process
+    ?.env;
+  const value = env?.[name];
+  if (!value) {
+    throw new Error(
+      `@mvfm/plugin-resend: missing ${name}. Set ${name} or use createResendInterpreter(...)`,
+    );
+  }
+  return value;
+}
+
+const dynamicImport = new Function("m", "return import(m)") as (moduleName: string) => Promise<any>;
+
+function lazyInterpreter(factory: () => Interpreter): Interpreter {
+  let cached: Interpreter | undefined;
+  const get = () => (cached ??= factory());
+  return new Proxy({} as Interpreter, {
+    get(_target, property) {
+      return get()[property as keyof Interpreter];
+    },
+    has(_target, property) {
+      return property in get();
+    },
+    ownKeys() {
+      return Reflect.ownKeys(get());
+    },
+    getOwnPropertyDescriptor(_target, property) {
+      const descriptor = Object.getOwnPropertyDescriptor(get(), property);
+      return descriptor
+        ? descriptor
+        : { configurable: true, enumerable: true, writable: false, value: undefined };
+    },
+  });
+}
+
+/**
+ * Default Resend interpreter that uses `RESEND_API_KEY`.
+ */
+export const resendInterpreter: Interpreter = lazyInterpreter(() =>
+  createResendInterpreter(
+    (() => {
+      let clientPromise: Promise<ResendClient> | undefined;
+      const getClient = async (): Promise<ResendClient> => {
+        if (!clientPromise) {
+          const apiKey = requiredEnv("RESEND_API_KEY");
+          clientPromise = dynamicImport("resend").then((moduleValue) => {
+            const Resend = moduleValue.Resend;
+            return wrapResendSdk(new Resend(apiKey) as any);
+          });
+        }
+        return clientPromise;
+      };
+
+      return {
+        async request(method: string, path: string, params?: unknown): Promise<unknown> {
+          const client = await getClient();
+          return client.request(method, path, params);
+        },
+      } satisfies ResendClient;
+    })(),
+  ),
+);

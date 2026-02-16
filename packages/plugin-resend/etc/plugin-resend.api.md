@@ -53,6 +53,9 @@ export interface ResendConfig {
 }
 
 // @public
+export const resendInterpreter: Interpreter;
+
+// @public
 export interface ResendMethods {
     resend: {
         emails: {

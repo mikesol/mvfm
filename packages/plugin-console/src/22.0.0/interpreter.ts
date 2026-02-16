@@ -1,5 +1,6 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
 import { eval_ } from "@mvfm/core";
+import { type ConsoleInstance, wrapConsole } from "./client-console";
 import type { ConsoleMethodName } from "./index";
 
 /**
@@ -62,3 +63,10 @@ export function createConsoleInterpreter(client: ConsoleClient): Interpreter {
 
   return Object.fromEntries(METHODS.map((m) => [`console/${m}`, handler]));
 }
+
+/**
+ * Default console interpreter that uses `globalThis.console`.
+ */
+export const consoleInterpreter: Interpreter = createConsoleInterpreter(
+  wrapConsole(globalThis.console as unknown as ConsoleInstance),
+);

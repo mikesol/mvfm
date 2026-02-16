@@ -45,6 +45,9 @@ export interface FalConfig {
     credentials: string;
 }
 
+// @public
+export const falInterpreter: Interpreter;
+
 // @public (undocumented)
 export interface FalMethods {
     fal: {

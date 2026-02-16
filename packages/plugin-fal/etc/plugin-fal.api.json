@@ -1065,6 +1065,30 @@
           "extendsTokenRanges": []
         },
         {
+          "kind": "Variable",
+          "canonicalReference": "@mvfm/plugin-fal!falInterpreter:var",
+          "docComment": "/**\n * Default Fal interpreter that uses `FAL_KEY`.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "falInterpreter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/plugin-fal!~Interpreter:type"
+            }
+          ],
+          "fileUrlPath": "dist/1.9.1/interpreter.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "falInterpreter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
           "kind": "Interface",
           "canonicalReference": "@mvfm/plugin-fal!FalMethods:interface",
           "docComment": "",

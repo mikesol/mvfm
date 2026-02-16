@@ -2172,6 +2172,30 @@
           "extendsTokenRanges": []
         },
         {
+          "kind": "Variable",
+          "canonicalReference": "@mvfm/plugin-console!consoleInterpreter:var",
+          "docComment": "/**\n * Default console interpreter that uses `globalThis.console`.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "consoleInterpreter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/plugin-console!~Interpreter:type"
+            }
+          ],
+          "fileUrlPath": "dist/22.0.0/interpreter.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "consoleInterpreter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
           "kind": "TypeAlias",
           "canonicalReference": "@mvfm/plugin-console!ConsoleMethodName:type",
           "docComment": "/**\n * Full set of Node.js console methods covered by this plugin.\n */\n",

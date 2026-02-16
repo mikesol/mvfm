@@ -1,5 +1,6 @@
 import { coreInterpreter, foldAST, mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
+import { consoleInterpreter } from "../../src";
 import type { ConsoleMethodName } from "../../src/22.0.0";
 import { consolePlugin } from "../../src/22.0.0";
 import { type ConsoleClient, createConsoleInterpreter } from "../../src/22.0.0/interpreter";
@@ -29,6 +30,10 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
 }
 
 describe("console interpreter", () => {
+  it("exports a default ready-to-use interpreter", () => {
+    expect(typeof consoleInterpreter["console/log"]).toBe("function");
+  });
+
   it("calls console/log with resolved arguments", async () => {
     const prog = app(($) => $.console.log("hello", $.input.n));
     const { captured } = await run(prog, { n: 42 });

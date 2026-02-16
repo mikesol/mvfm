@@ -47,6 +47,9 @@ export interface StripeConfig {
 }
 
 // @public
+export const stripeInterpreter: Interpreter;
+
+// @public
 export interface StripeMethods {
     stripe: {
         paymentIntents: {

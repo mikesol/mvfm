@@ -38,6 +38,9 @@ export interface FetchConfig {
 }
 
 // @public
+export const fetchInterpreter: Interpreter;
+
+// @public
 export interface FetchMethods {
     // Warning: (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
     fetch: ((url: Expr<string> | string, init?: Expr<FetchRequestInit> | FetchRequestInit) => Expr<unknown>) & {

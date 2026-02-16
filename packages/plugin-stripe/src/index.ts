@@ -5,4 +5,4 @@ export type { ClientHandlerOptions } from "./2025-04-30.basil/handler.client";
 export { clientInterpreter } from "./2025-04-30.basil/handler.client";
 export { serverEvaluate, serverInterpreter } from "./2025-04-30.basil/handler.server";
 export type { StripeClient } from "./2025-04-30.basil/interpreter";
-export { createStripeInterpreter } from "./2025-04-30.basil/interpreter";
+export { createStripeInterpreter, stripeInterpreter } from "./2025-04-30.basil/interpreter";

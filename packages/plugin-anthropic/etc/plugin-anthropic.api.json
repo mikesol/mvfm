@@ -426,6 +426,30 @@
           "extendsTokenRanges": []
         },
         {
+          "kind": "Variable",
+          "canonicalReference": "@mvfm/plugin-anthropic!anthropicInterpreter:var",
+          "docComment": "/**\n * Default Anthropic interpreter that uses `ANTHROPIC_API_KEY`.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "anthropicInterpreter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/plugin-anthropic!~Interpreter:type"
+            }
+          ],
+          "fileUrlPath": "dist/0.74.0/interpreter.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "anthropicInterpreter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
           "kind": "Interface",
           "canonicalReference": "@mvfm/plugin-anthropic!AnthropicMethods:interface",
           "docComment": "/**\n * Anthropic operations added to the DSL context by the anthropic plugin.\n *\n * Mirrors the \\@anthropic-ai/sdk resource API: messages (create, countTokens), message batches (create, retrieve, list, delete, cancel), and models (retrieve, list). Each resource exposes methods that produce namespaced AST nodes.\n */\n",

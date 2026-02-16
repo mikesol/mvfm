@@ -699,6 +699,30 @@
           "extendsTokenRanges": []
         },
         {
+          "kind": "Variable",
+          "canonicalReference": "@mvfm/plugin-openai!openaiInterpreter:var",
+          "docComment": "/**\n * Default OpenAI interpreter that uses `OPENAI_API_KEY`.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "openaiInterpreter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/plugin-openai!~Interpreter:type"
+            }
+          ],
+          "fileUrlPath": "dist/6.21.0/interpreter.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "openaiInterpreter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
           "kind": "Interface",
           "canonicalReference": "@mvfm/plugin-openai!OpenAIMethods:interface",
           "docComment": "/**\n * OpenAI operations added to the DSL context by the openai plugin.\n *\n * Mirrors the openai-node SDK resource API: chat completions, embeddings, moderations, and legacy completions. Each resource exposes methods that produce namespaced AST nodes.\n */\n",

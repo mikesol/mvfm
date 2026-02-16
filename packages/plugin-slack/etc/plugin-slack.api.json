@@ -757,6 +757,30 @@
           "extendsTokenRanges": []
         },
         {
+          "kind": "Variable",
+          "canonicalReference": "@mvfm/plugin-slack!slackInterpreter:var",
+          "docComment": "/**\n * Default Slack interpreter that uses `SLACK_BOT_TOKEN`.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "slackInterpreter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/plugin-slack!~Interpreter:type"
+            }
+          ],
+          "fileUrlPath": "dist/7.14.0/interpreter.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "slackInterpreter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
           "kind": "Interface",
           "canonicalReference": "@mvfm/plugin-slack!SlackMethods:interface",
           "docComment": "/**\n * Slack operations added to the DSL context by the slack plugin.\n *\n * Mirrors the `@slack/web-api` SDK resource API: chat, conversations, users, reactions, and files. Each resource group exposes methods that produce namespaced AST nodes.\n */\n",

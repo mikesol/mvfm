@@ -1,5 +1,6 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
 import { eval_ } from "@mvfm/core";
+import { wrapTwilioSdk } from "./client-twilio-sdk";
 
 /**
  * Twilio client interface consumed by the twilio handler.
@@ -64,3 +65,72 @@ export function createTwilioInterpreter(client: TwilioClient): Interpreter {
     },
   };
 }
+
+function requiredEnv(name: "TWILIO_ACCOUNT_SID" | "TWILIO_AUTH_TOKEN"): string {
+  const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process
+    ?.env;
+  const value = env?.[name];
+  if (!value) {
+    throw new Error(
+      `@mvfm/plugin-twilio: missing ${name}. Set ${name} or use createTwilioInterpreter(...)`,
+    );
+  }
+  return value;
+}
+
+function createDefaultTwilioClient(): unknown {
+  const accountSid = requiredEnv("TWILIO_ACCOUNT_SID");
+  const authToken = requiredEnv("TWILIO_AUTH_TOKEN");
+  return {
+    async request(opts: {
+      method: string;
+      uri: string;
+      data?: Record<string, unknown>;
+    }): Promise<{ body: unknown }> {
+      const encodedAuth = btoa(`${accountSid}:${authToken}`);
+      const response = await fetch(opts.uri, {
+        method: opts.method,
+        headers: {
+          Authorization: `Basic ${encodedAuth}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body:
+          opts.data == null
+            ? undefined
+            : new URLSearchParams(
+                Object.entries(opts.data).map(([key, value]) => [key, String(value)]),
+              ).toString(),
+      });
+      return { body: await response.json() };
+    },
+  };
+}
+
+function lazyInterpreter(factory: () => Interpreter): Interpreter {
+  let cached: Interpreter | undefined;
+  const get = () => (cached ??= factory());
+  return new Proxy({} as Interpreter, {
+    get(_target, property) {
+      return get()[property as keyof Interpreter];
+    },
+    has(_target, property) {
+      return property in get();
+    },
+    ownKeys() {
+      return Reflect.ownKeys(get());
+    },
+    getOwnPropertyDescriptor(_target, property) {
+      const descriptor = Object.getOwnPropertyDescriptor(get(), property);
+      return descriptor
+        ? descriptor
+        : { configurable: true, enumerable: true, writable: false, value: undefined };
+    },
+  });
+}
+
+/**
+ * Default Twilio interpreter that uses `TWILIO_ACCOUNT_SID` and `TWILIO_AUTH_TOKEN`.
+ */
+export const twilioInterpreter: Interpreter = lazyInterpreter(() =>
+  createTwilioInterpreter(wrapTwilioSdk(createDefaultTwilioClient() as any)),
+);

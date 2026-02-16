@@ -40,6 +40,9 @@ export interface OpenAIConfig {
 }
 
 // @public
+export const openaiInterpreter: Interpreter;
+
+// @public
 export interface OpenAIMethods {
     openai: {
         chat: {

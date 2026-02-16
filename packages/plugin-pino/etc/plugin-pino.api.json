@@ -1433,6 +1433,30 @@
           "extendsTokenRanges": []
         },
         {
+          "kind": "Variable",
+          "canonicalReference": "@mvfm/plugin-pino!pinoInterpreter:var",
+          "docComment": "/**\n * Default pino interpreter that uses a default `pino()` logger.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "pinoInterpreter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/plugin-pino!~Interpreter:type"
+            }
+          ],
+          "fileUrlPath": "dist/10.3.1/interpreter.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "pinoInterpreter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
           "kind": "Interface",
           "canonicalReference": "@mvfm/plugin-pino!PinoLogger:interface",
           "docComment": "/**\n * A pino logger interface exposed on the DSL context.\n *\n * Provides six log level methods and `child()` for creating loggers with accumulated bindings. Each method returns `Expr<void>` for composition via `$.begin()`.\n */\n",

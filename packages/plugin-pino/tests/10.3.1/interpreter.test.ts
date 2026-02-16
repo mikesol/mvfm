@@ -1,5 +1,6 @@
 import { coreInterpreter, foldAST, mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
+import { pinoInterpreter } from "../../src";
 import { pino } from "../../src/10.3.1";
 import { createPinoInterpreter, type PinoClient } from "../../src/10.3.1/interpreter";
 
@@ -34,6 +35,10 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
 // ============================================================
 
 describe("pino interpreter: info with message", () => {
+  it("exports a default ready-to-use interpreter", () => {
+    expect(typeof pinoInterpreter["pino/info"]).toBe("function");
+  });
+
   it("calls client.log with level info", async () => {
     const prog = app(($) => $.pino.info("hello world"));
     const { captured } = await run(prog);

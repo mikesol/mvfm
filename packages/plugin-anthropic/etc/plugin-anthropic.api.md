@@ -34,6 +34,11 @@ export interface AnthropicConfig {
     baseURL?: string;
 }
 
+// Warning: (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
+//
+// @public
+export const anthropicInterpreter: Interpreter;
+
 // @public
 export interface AnthropicMethods {
     anthropic: {
@@ -63,8 +68,6 @@ export interface ClientHandlerOptions {
     headers?: Record<string, string>;
 }
 
-// Warning: (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
-//
 // @public
 export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter;
 

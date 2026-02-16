@@ -6,4 +6,4 @@ export type { ClientHandlerOptions } from "./10.3.1/handler.client";
 export { clientInterpreter } from "./10.3.1/handler.client";
 export { serverEvaluate, serverInterpreter } from "./10.3.1/handler.server";
 export type { PinoClient } from "./10.3.1/interpreter";
-export { createPinoInterpreter } from "./10.3.1/interpreter";
+export { createPinoInterpreter, pinoInterpreter } from "./10.3.1/interpreter";

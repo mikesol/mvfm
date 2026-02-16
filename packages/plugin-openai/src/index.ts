@@ -5,4 +5,4 @@ export type { ClientHandlerOptions } from "./6.21.0/handler.client";
 export { clientInterpreter } from "./6.21.0/handler.client";
 export { serverEvaluate, serverInterpreter } from "./6.21.0/handler.server";
 export type { OpenAIClient } from "./6.21.0/interpreter";
-export { createOpenAIInterpreter } from "./6.21.0/interpreter";
+export { createOpenAIInterpreter, openaiInterpreter } from "./6.21.0/interpreter";

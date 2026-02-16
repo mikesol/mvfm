@@ -46,6 +46,9 @@ export interface SlackConfig {
 }
 
 // @public
+export const slackInterpreter: Interpreter;
+
+// @public
 export interface SlackMethods {
     slack: {
         chat: {

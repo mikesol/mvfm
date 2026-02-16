@@ -1,5 +1,6 @@
 import { coreInterpreter, foldAST, mvfm, num, str } from "@mvfm/core";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { openaiInterpreter } from "../../src";
 import { openai } from "../../src/6.21.0";
 import { createOpenAIInterpreter, type OpenAIClient } from "../../src/6.21.0/interpreter";
 
@@ -35,6 +36,25 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
 // ============================================================
 
 describe("openai interpreter: create_chat_completion", () => {
+  it("throws when OPENAI_API_KEY is missing", async () => {
+    vi.stubEnv("OPENAI_API_KEY", "");
+    const prog = app(($) =>
+      $.openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [{ role: "user", content: "Hello" }],
+      }),
+    );
+    const combined = { ...openaiInterpreter, ...coreInterpreter };
+    await expect(foldAST(combined, prog.ast.result)).rejects.toThrow(/OPENAI_API_KEY/);
+    vi.unstubAllEnvs();
+  });
+
+  it("exports a default ready-to-use interpreter", () => {
+    vi.stubEnv("OPENAI_API_KEY", "sk-test-default");
+    expect(typeof openaiInterpreter["openai/create_chat_completion"]).toBe("function");
+    vi.unstubAllEnvs();
+  });
+
   it("calls POST /chat/completions with correct body", async () => {
     const prog = app(($) =>
       $.openai.chat.completions.create({

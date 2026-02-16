@@ -666,6 +666,30 @@
           "extendsTokenRanges": []
         },
         {
+          "kind": "Variable",
+          "canonicalReference": "@mvfm/plugin-fetch!fetchInterpreter:var",
+          "docComment": "/**\n * Default fetch interpreter that uses `globalThis.fetch`.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "fetchInterpreter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/plugin-fetch!~Interpreter:type"
+            }
+          ],
+          "fileUrlPath": "dist/whatwg/interpreter.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "fetchInterpreter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
           "kind": "Interface",
           "canonicalReference": "@mvfm/plugin-fetch!FetchMethods:interface",
           "docComment": "/**\n * Fetch operations added to the DSL context by the fetch plugin.\n *\n * `$.fetch(url, init?)` makes an HTTP request (mirrors `globalThis.fetch`). `$.fetch.json(response)`, `$.fetch.text(response)`, etc. read the response.\n */\n",

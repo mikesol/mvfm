@@ -6,6 +6,7 @@ import type {
 } from "@fal-ai/client";
 import type { Interpreter, TypedNode } from "@mvfm/core";
 import { eval_ } from "@mvfm/core";
+import { wrapFalSdk } from "./client-fal-sdk";
 
 /**
  * Fal client interface consumed by the fal handler.
@@ -95,3 +96,102 @@ export function createFalInterpreter(client: FalClient): Interpreter {
     },
   };
 }
+
+function requiredEnv(name: "FAL_KEY"): string {
+  const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process
+    ?.env;
+  const value = env?.[name];
+  if (!value) {
+    throw new Error(
+      `@mvfm/plugin-fal: missing ${name}. Set ${name} or use createFalInterpreter(...)`,
+    );
+  }
+  return value;
+}
+
+const dynamicImport = new Function("m", "return import(m)") as (moduleName: string) => Promise<any>;
+
+function lazyInterpreter(factory: () => Interpreter): Interpreter {
+  let cached: Interpreter | undefined;
+  const get = () => (cached ??= factory());
+  return new Proxy({} as Interpreter, {
+    get(_target, property) {
+      return get()[property as keyof Interpreter];
+    },
+    has(_target, property) {
+      return property in get();
+    },
+    ownKeys() {
+      return Reflect.ownKeys(get());
+    },
+    getOwnPropertyDescriptor(_target, property) {
+      const descriptor = Object.getOwnPropertyDescriptor(get(), property);
+      return descriptor
+        ? descriptor
+        : { configurable: true, enumerable: true, writable: false, value: undefined };
+    },
+  });
+}
+
+/**
+ * Default Fal interpreter that uses `FAL_KEY`.
+ */
+export const falInterpreter: Interpreter = lazyInterpreter(() => {
+  let clientPromise: Promise<FalClient> | undefined;
+  const getClient = async (): Promise<FalClient> => {
+    if (!clientPromise) {
+      const credentials = requiredEnv("FAL_KEY");
+      clientPromise = dynamicImport("@fal-ai/client").then((moduleValue) => {
+        const falClient = moduleValue.fal;
+        falClient.config({ credentials });
+        return wrapFalSdk(falClient);
+      });
+    }
+    return clientPromise;
+  };
+
+  return createFalInterpreter({
+    async run(
+      endpointId: string,
+      options?: Parameters<FalSdkClient["run"]>[1],
+    ): Promise<Result<unknown>> {
+      const client = await getClient();
+      return client.run(endpointId, options);
+    },
+    async subscribe(
+      endpointId: string,
+      options?: Parameters<FalSdkClient["subscribe"]>[1],
+    ): Promise<Result<unknown>> {
+      const client = await getClient();
+      return client.subscribe(endpointId, options);
+    },
+    async queueSubmit(
+      endpointId: string,
+      options: Parameters<FalSdkQueueClient["submit"]>[1],
+    ): Promise<unknown> {
+      const client = await getClient();
+      return client.queueSubmit(endpointId, options);
+    },
+    async queueStatus(
+      endpointId: string,
+      options: Parameters<FalSdkQueueClient["status"]>[1],
+    ): Promise<QueueStatus> {
+      const client = await getClient();
+      return client.queueStatus(endpointId, options);
+    },
+    async queueResult(
+      endpointId: string,
+      options: Parameters<FalSdkQueueClient["result"]>[1],
+    ): Promise<unknown> {
+      const client = await getClient();
+      return client.queueResult(endpointId, options);
+    },
+    async queueCancel(
+      endpointId: string,
+      options: Parameters<FalSdkQueueClient["cancel"]>[1],
+    ): Promise<void> {
+      const client = await getClient();
+      await client.queueCancel(endpointId, options);
+    },
+  });
+});

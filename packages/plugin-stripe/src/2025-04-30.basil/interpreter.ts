@@ -1,5 +1,6 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
 import { eval_ } from "@mvfm/core";
+import { wrapStripeSdk } from "./client-stripe-sdk";
 
 /**
  * Stripe client interface consumed by the stripe handler.
@@ -79,3 +80,71 @@ export function createStripeInterpreter(client: StripeClient): Interpreter {
     },
   };
 }
+
+function requiredEnv(name: "STRIPE_API_KEY"): string {
+  const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process
+    ?.env;
+  const value = env?.[name];
+  if (!value) {
+    throw new Error(
+      `@mvfm/plugin-stripe: missing ${name}. Set ${name} or use createStripeInterpreter(...)`,
+    );
+  }
+  return value;
+}
+
+const dynamicImport = new Function("m", "return import(m)") as (moduleName: string) => Promise<any>;
+
+function lazyInterpreter(factory: () => Interpreter): Interpreter {
+  let cached: Interpreter | undefined;
+  const get = () => (cached ??= factory());
+  return new Proxy({} as Interpreter, {
+    get(_target, property) {
+      return get()[property as keyof Interpreter];
+    },
+    has(_target, property) {
+      return property in get();
+    },
+    ownKeys() {
+      return Reflect.ownKeys(get());
+    },
+    getOwnPropertyDescriptor(_target, property) {
+      const descriptor = Object.getOwnPropertyDescriptor(get(), property);
+      return descriptor
+        ? descriptor
+        : { configurable: true, enumerable: true, writable: false, value: undefined };
+    },
+  });
+}
+
+/**
+ * Default Stripe interpreter that uses `STRIPE_API_KEY`.
+ */
+export const stripeInterpreter: Interpreter = lazyInterpreter(() =>
+  createStripeInterpreter(
+    (() => {
+      let clientPromise: Promise<StripeClient> | undefined;
+      const getClient = async (): Promise<StripeClient> => {
+        if (!clientPromise) {
+          const apiKey = requiredEnv("STRIPE_API_KEY");
+          clientPromise = dynamicImport("stripe").then((moduleValue) => {
+            const Stripe = moduleValue.default;
+            return wrapStripeSdk(new Stripe(apiKey));
+          });
+        }
+        return clientPromise;
+      };
+
+      return {
+        async request(
+          method: string,
+          path: string,
+          params?: Record<string, unknown>,
+        ): Promise<unknown> {
+          const client = await getClient();
+          return client.request(method, path, params);
+        },
+      } satisfies StripeClient;
+    })(),
+  ),
+);

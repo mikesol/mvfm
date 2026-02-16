@@ -1,5 +1,6 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
 import { eval_ } from "@mvfm/core";
+import { wrapPino } from "./client-pino";
 
 /**
  * Pino client interface consumed by the pino handler.
@@ -47,3 +48,59 @@ export function createPinoInterpreter(client: PinoClient): Interpreter {
 
   return Object.fromEntries(LEVELS.map((l) => [`pino/${l}`, handler]));
 }
+
+const dynamicImport = new Function("m", "return import(m)") as (moduleName: string) => Promise<any>;
+
+function lazyInterpreter(factory: () => Interpreter): Interpreter {
+  let cached: Interpreter | undefined;
+  const get = () => (cached ??= factory());
+  return new Proxy({} as Interpreter, {
+    get(_target, property) {
+      return get()[property as keyof Interpreter];
+    },
+    has(_target, property) {
+      return property in get();
+    },
+    ownKeys() {
+      return Reflect.ownKeys(get());
+    },
+    getOwnPropertyDescriptor(_target, property) {
+      const descriptor = Object.getOwnPropertyDescriptor(get(), property);
+      return descriptor
+        ? descriptor
+        : { configurable: true, enumerable: true, writable: false, value: undefined };
+    },
+  });
+}
+
+/**
+ * Default pino interpreter that uses a default `pino()` logger.
+ */
+export const pinoInterpreter: Interpreter = lazyInterpreter(() =>
+  createPinoInterpreter(
+    (() => {
+      let clientPromise: Promise<PinoClient> | undefined;
+      const getClient = async (): Promise<PinoClient> => {
+        if (!clientPromise) {
+          clientPromise = dynamicImport("pino").then((moduleValue) => {
+            const pino = moduleValue.default as () => unknown;
+            return wrapPino(pino() as any);
+          });
+        }
+        return clientPromise;
+      };
+
+      return {
+        async log(
+          level: string,
+          bindings: Record<string, unknown>[],
+          mergeObject?: Record<string, unknown>,
+          msg?: string,
+        ): Promise<void> {
+          const client = await getClient();
+          return client.log(level, bindings, mergeObject, msg);
+        },
+      } satisfies PinoClient;
+    })(),
+  ),
+);

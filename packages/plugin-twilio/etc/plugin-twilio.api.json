@@ -1091,6 +1091,30 @@
           "extendsTokenRanges": []
         },
         {
+          "kind": "Variable",
+          "canonicalReference": "@mvfm/plugin-twilio!twilioInterpreter:var",
+          "docComment": "/**\n * Default Twilio interpreter that uses `TWILIO_ACCOUNT_SID` and `TWILIO_AUTH_TOKEN`.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "twilioInterpreter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/plugin-twilio!~Interpreter:type"
+            }
+          ],
+          "fileUrlPath": "dist/5.5.1/interpreter.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "twilioInterpreter",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
           "kind": "Interface",
           "canonicalReference": "@mvfm/plugin-twilio!TwilioMessageContext:interface",
           "docComment": "/**\n * Context returned by `$.twilio.messages(sid)` — mirrors twilio-node's MessageContext.\n */\n",

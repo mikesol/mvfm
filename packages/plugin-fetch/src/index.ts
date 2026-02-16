@@ -5,4 +5,4 @@ export type { ClientHandlerOptions } from "./whatwg/handler.client";
 export { clientInterpreter } from "./whatwg/handler.client";
 export { serverEvaluate, serverInterpreter } from "./whatwg/handler.server";
 export type { FetchClient } from "./whatwg/interpreter";
-export { createFetchInterpreter } from "./whatwg/interpreter";
+export { createFetchInterpreter, fetchInterpreter } from "./whatwg/interpreter";

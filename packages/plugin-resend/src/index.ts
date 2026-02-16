@@ -5,4 +5,4 @@ export type { ClientHandlerOptions } from "./6.9.2/handler.client";
 export { clientInterpreter } from "./6.9.2/handler.client";
 export { serverEvaluate, serverInterpreter } from "./6.9.2/handler.server";
 export type { ResendClient } from "./6.9.2/interpreter";
-export { createResendInterpreter } from "./6.9.2/interpreter";
+export { createResendInterpreter, resendInterpreter } from "./6.9.2/interpreter";

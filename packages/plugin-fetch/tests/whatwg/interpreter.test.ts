@@ -1,5 +1,6 @@
 import { coreInterpreter, foldAST, mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
+import { fetchInterpreter } from "../../src";
 import { fetch } from "../../src/whatwg";
 import { createFetchInterpreter, type FetchClient } from "../../src/whatwg/interpreter";
 
@@ -48,6 +49,10 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
 // ============================================================
 
 describe("fetch interpreter: request with literal URL", () => {
+  it("exports a default ready-to-use interpreter", () => {
+    expect(typeof fetchInterpreter["fetch/request"]).toBe("function");
+  });
+
   it("calls client.request with correct URL", async () => {
     const prog = app(($) => $.fetch("https://api.example.com/data"));
     const { captured } = await run(prog);

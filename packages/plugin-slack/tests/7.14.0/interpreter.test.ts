@@ -1,9 +1,26 @@
 import { coreInterpreter, foldAST, mvfm, num, str } from "@mvfm/core";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { slackInterpreter } from "../../src";
 import { slack } from "../../src/7.14.0";
 import { createSlackInterpreter, type SlackClient } from "../../src/7.14.0/interpreter";
 
 const app = mvfm(num, str, slack({ token: "xoxb-test-token" }));
+
+describe("slack interpreter: default export", () => {
+  it("throws when SLACK_BOT_TOKEN is missing", async () => {
+    vi.stubEnv("SLACK_BOT_TOKEN", "");
+    const prog = app(($) => $.slack.chat.postMessage({ channel: "#general", text: "Hello" }));
+    const combined = { ...slackInterpreter, ...coreInterpreter };
+    await expect(foldAST(combined, prog.ast.result)).rejects.toThrow(/SLACK_BOT_TOKEN/);
+    vi.unstubAllEnvs();
+  });
+
+  it("exports a default ready-to-use interpreter when SLACK_BOT_TOKEN is set", () => {
+    vi.stubEnv("SLACK_BOT_TOKEN", "xoxb-test-default");
+    expect(typeof slackInterpreter["slack/chat_postMessage"]).toBe("function");
+    vi.unstubAllEnvs();
+  });
+});
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;

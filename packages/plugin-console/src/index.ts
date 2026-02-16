@@ -6,4 +6,4 @@ export type { ClientHandlerOptions } from "./22.0.0/handler.client";
 export { clientInterpreter } from "./22.0.0/handler.client";
 export { serverEvaluate, serverInterpreter } from "./22.0.0/handler.server";
 export type { ConsoleClient } from "./22.0.0/interpreter";
-export { createConsoleInterpreter } from "./22.0.0/interpreter";
+export { consoleInterpreter, createConsoleInterpreter } from "./22.0.0/interpreter";
