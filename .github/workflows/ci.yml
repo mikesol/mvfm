@@ -39,6 +39,12 @@ jobs:
           MVFM_S3_ENDPOINT: http://localhost:4566
         run: pnpm run test
 
+      - name: Check docs coverage
+        run: pnpm run check:docs
+
+      - name: Test docs examples
+        run: pnpm --filter @mvfm/docs run test
+
   size:
     runs-on: ubuntu-latest
     steps:
