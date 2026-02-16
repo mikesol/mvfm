@@ -94,7 +94,7 @@ export function wrapSlackWebClient(client: WebClient): SlackClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/7.14.0/index.d.ts:15:13 - (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/types.d.ts:14:13 - (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

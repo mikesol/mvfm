@@ -1,51 +1,8 @@
 import { describe, expect, it } from "vitest";
-import type { Interpreter, TypedNode } from "../../src/fold";
-import { createFoldState, eval_, foldAST } from "../../src/fold";
+import type { TypedNode } from "../../src/fold";
+import { createFoldState, foldAST } from "../../src/fold";
 import { coreInterpreter } from "../../src/interpreters/core";
-import { errorInterpreter } from "../../src/plugins/error/interpreter";
-import { fiberInterpreter } from "../../src/plugins/fiber/interpreter";
-
-function createTrackingInterpreter(): {
-  interpreter: Interpreter;
-  visitCount: Map<string, number>;
-} {
-  const visitCount = new Map<string, number>();
-  return {
-    visitCount,
-    interpreter: {
-      // biome-ignore lint/correctness/useYield: leaf handler
-      "track/value": async function* (node: any) {
-        const id = node.id as string;
-        visitCount.set(id, (visitCount.get(id) ?? 0) + 1);
-        return node.value;
-      },
-      "track/add": async function* (node: any) {
-        const id = node.id as string;
-        visitCount.set(id, (visitCount.get(id) ?? 0) + 1);
-        const left = (yield* eval_(node.left)) as number;
-        const right = (yield* eval_(node.right)) as number;
-        return left + right;
-      },
-      "track/pair": async function* (node: any) {
-        const id = node.id as string;
-        visitCount.set(id, (visitCount.get(id) ?? 0) + 1);
-        const a = yield* eval_(node.a);
-        const b = yield* eval_(node.b);
-        return [a, b];
-      },
-      "track/parallel": async function* (node: any) {
-        const id = node.id as string;
-        visitCount.set(id, (visitCount.get(id) ?? 0) + 1);
-        const elements = node.elements as TypedNode[];
-        const results: unknown[] = [];
-        for (const e of elements) {
-          results.push(yield* eval_(e));
-        }
-        return results;
-      },
-    },
-  };
-}
+import { createTrackingInterpreter } from "./dag-memoization.shared";
 
 describe("DAG memoization", () => {
   it("shared node evaluated once when used by two consumers in sequence", async () => {
@@ -311,64 +268,5 @@ describe("DAG memoization: adversarial cases", () => {
     const result = await foldAST(interpreter, root, state);
     expect(result).toEqual([3, 4]);
     expect(visitCount.get("deep")).toBe(1);
-  });
-});
-
-describe("DAG memoization: retry with fresh cache", () => {
-  it("retry re-executes on each attempt (not cached)", async () => {
-    let callCount = 0;
-    const sideEffectInterpreter: Interpreter = {
-      // biome-ignore lint/correctness/useYield: test handler throws/returns without yielding
-      "fx/call": async function* () {
-        callCount++;
-        if (callCount < 3) throw new Error("not yet");
-        return "success";
-      },
-    };
-
-    const combined = {
-      ...sideEffectInterpreter,
-      ...fiberInterpreter,
-      ...errorInterpreter,
-      ...coreInterpreter,
-    };
-
-    const result = await foldAST(combined, {
-      kind: "fiber/retry",
-      expr: { kind: "fx/call" },
-      attempts: 5,
-      delay: 0,
-    } as TypedNode);
-
-    expect(result).toBe("success");
-    expect(callCount).toBe(3);
-  });
-
-  it("retry exhausts attempts when all fail", async () => {
-    let callCount = 0;
-    const alwaysFailsInterpreter: Interpreter = {
-      // biome-ignore lint/correctness/useYield: test handler throws without yielding
-      "fx/call": async function* () {
-        callCount++;
-        throw new Error("always fails");
-      },
-    };
-
-    const combined = {
-      ...alwaysFailsInterpreter,
-      ...fiberInterpreter,
-      ...errorInterpreter,
-      ...coreInterpreter,
-    };
-
-    await expect(
-      foldAST(combined, {
-        kind: "fiber/retry",
-        expr: { kind: "fx/call" },
-        attempts: 3,
-        delay: 0,
-      } as TypedNode),
-    ).rejects.toThrow("always fails");
-    expect(callCount).toBe(3);
   });
 });

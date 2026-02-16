@@ -721,7 +721,7 @@
               "text": "export interface SlackConfig "
             }
           ],
-          "fileUrlPath": "dist/7.14.0/index.d.ts",
+          "fileUrlPath": "dist/7.14.0/types.d.ts",
           "releaseTag": "Public",
           "name": "SlackConfig",
           "preserveMemberOrder": false,
@@ -790,7 +790,7 @@
               "text": "export interface SlackMethods "
             }
           ],
-          "fileUrlPath": "dist/7.14.0/index.d.ts",
+          "fileUrlPath": "dist/7.14.0/types.d.ts",
           "releaseTag": "Public",
           "name": "SlackMethods",
           "preserveMemberOrder": false,

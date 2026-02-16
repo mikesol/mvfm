@@ -23,6 +23,15 @@
       },
       "performance": {
         "noAccumulatingSpread": "off"
+      },
+      "nursery": {
+        "noExcessiveLinesPerFile": {
+          "level": "error",
+          "options": {
+            "maxLines": 300,
+            "skipBlankLines": false
+          }
+        }
       }
     }
   },
@@ -34,6 +43,6 @@
     }
   },
   "files": {
-    "includes": ["packages/*/src/**", "packages/*/tests/**"]
+    "includes": ["packages/*/src/**/*.ts", "packages/*/tests/**/*.ts"]
   }
 }

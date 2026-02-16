@@ -390,7 +390,7 @@
         {
           "kind": "Function",
           "canonicalReference": "@mvfm/plugin-redis!createRedisInterpreter:function(1)",
-          "docComment": "/**\n * Creates an interpreter for `redis/*` node kinds.\n *\n * @param client - The {@link RedisClient} to execute against.\n *\n * @returns An Interpreter handling all 35 redis node kinds.\n */\n",
+          "docComment": "/**\n * Creates an interpreter for `redis/*` node kinds.\n *\n * @param client - The {@link RedisClient} to execute against.\n *\n * @returns An Interpreter handling all redis node kinds.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -425,7 +425,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -452,7 +452,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -479,7 +479,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -506,7 +506,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -533,7 +533,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -560,7 +560,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -587,7 +587,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -614,7 +614,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -641,7 +641,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -668,7 +668,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -695,7 +695,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -722,7 +722,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -749,7 +749,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -776,7 +776,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -803,7 +803,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -830,7 +830,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -857,7 +857,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -884,7 +884,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -911,7 +911,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -938,7 +938,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -965,7 +965,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1001,7 +1001,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1028,7 +1028,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1055,7 +1055,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1082,7 +1082,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1109,7 +1109,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1136,7 +1136,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1163,7 +1163,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1190,7 +1190,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1217,7 +1217,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1244,7 +1244,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1271,7 +1271,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1298,7 +1298,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1325,7 +1325,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1352,7 +1352,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1379,7 +1379,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1406,7 +1406,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1599,7 +1599,7 @@
               "text": "export interface RedisConfig "
             }
           ],
-          "fileUrlPath": "dist/5.4.1/index.d.ts",
+          "fileUrlPath": "dist/5.4.1/types.d.ts",
           "releaseTag": "Public",
           "name": "RedisConfig",
           "preserveMemberOrder": false,
@@ -1806,7 +1806,7 @@
               "text": "export interface RedisMethods "
             }
           ],
-          "fileUrlPath": "dist/5.4.1/index.d.ts",
+          "fileUrlPath": "dist/5.4.1/types.d.ts",
           "releaseTag": "Public",
           "name": "RedisMethods",
           "preserveMemberOrder": false,
