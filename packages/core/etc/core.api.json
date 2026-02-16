@@ -2568,9 +2568,35 @@
               "text": "eqInterpreter: "
             },
             {
+              "kind": "Content",
+              "text": "{\n    \"eq/neq\": (node: "
+            },
+            {
               "kind": "Reference",
-              "text": "Interpreter",
-              "canonicalReference": "@mvfm/core!Interpreter:type"
+              "text": "EqNeq",
+              "canonicalReference": "@mvfm/core!~EqNeq:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>, boolean, unknown>;\n}"
             }
           ],
           "fileUrlPath": "dist/plugins/eq/interpreter.d.ts",
@@ -2579,7 +2605,7 @@
           "name": "eqInterpreter",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 2
+            "endIndex": 8
           }
         },
         {
@@ -6243,9 +6269,116 @@
               "text": "ordInterpreter: "
             },
             {
+              "kind": "Content",
+              "text": "{\n    \"ord/gt\": (node: "
+            },
+            {
               "kind": "Reference",
-              "text": "Interpreter",
-              "canonicalReference": "@mvfm/core!Interpreter:type"
+              "text": "OrdCmp",
+              "canonicalReference": "@mvfm/core!~OrdCmp:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>, boolean, unknown>;\n    \"ord/gte\": (node: "
+            },
+            {
+              "kind": "Reference",
+              "text": "OrdCmp",
+              "canonicalReference": "@mvfm/core!~OrdCmp:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>, boolean, unknown>;\n    \"ord/lt\": (node: "
+            },
+            {
+              "kind": "Reference",
+              "text": "OrdCmp",
+              "canonicalReference": "@mvfm/core!~OrdCmp:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>, boolean, unknown>;\n    \"ord/lte\": (node: "
+            },
+            {
+              "kind": "Reference",
+              "text": "OrdCmp",
+              "canonicalReference": "@mvfm/core!~OrdCmp:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>, boolean, unknown>;\n}"
             }
           ],
           "fileUrlPath": "dist/plugins/ord/interpreter.d.ts",
@@ -6254,7 +6387,7 @@
           "name": "ordInterpreter",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 2
+            "endIndex": 26
           }
         },
         {
@@ -6996,7 +7129,7 @@
             },
             {
               "kind": "Content",
-              "text": "readonly [import(\"./types\")."
+              "text": "readonly [import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7005,7 +7138,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\".\")."
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7014,7 +7147,7 @@
             },
             {
               "kind": "Content",
-              "text": ", {\n    eq: number;\n    ord: number;\n    semiring: number;\n    show: number;\n    bounded: number;\n}>, import(\"./types\")."
+              "text": ", {\n    eq: number;\n    ord: number;\n    semiring: number;\n    show: number;\n    bounded: number;\n}>, import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7023,7 +7156,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\".\")."
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7032,7 +7165,7 @@
             },
             {
               "kind": "Content",
-              "text": ", {\n    eq: string;\n    show: string;\n    semigroup: string;\n    monoid: string;\n}>, import(\"./types\")."
+              "text": ", {\n    eq: string;\n    show: string;\n    semigroup: string;\n    monoid: string;\n}>, import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7041,7 +7174,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./types\")."
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7050,7 +7183,7 @@
             },
             {
               "kind": "Content",
-              "text": "<\"semiring\">, {}>, import(\"./types\")."
+              "text": "<\"semiring\">, {}>, import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7059,7 +7192,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./types\")."
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7068,7 +7201,7 @@
             },
             {
               "kind": "Content",
-              "text": "<\"eq\">, {}>, import(\"./types\")."
+              "text": "<\"eq\">, {}>, import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7077,7 +7210,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./types\")."
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7086,7 +7219,7 @@
             },
             {
               "kind": "Content",
-              "text": "<\"ord\">, {}>, import(\"./types\")."
+              "text": "<\"ord\">, {}>, import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7095,7 +7228,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./types\")."
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7104,7 +7237,7 @@
             },
             {
               "kind": "Content",
-              "text": "<\"show\">, {}>, import(\"./types\")."
+              "text": "<\"show\">, {}>, import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7113,7 +7246,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\".\")."
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7122,7 +7255,7 @@
             },
             {
               "kind": "Content",
-              "text": ", {\n    eq: boolean;\n    show: boolean;\n    heytingAlgebra: boolean;\n    bounded: boolean;\n}>, import(\"./types\")."
+              "text": ", {\n    eq: boolean;\n    show: boolean;\n    heytingAlgebra: boolean;\n    bounded: boolean;\n}>, import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7131,7 +7264,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./types\")."
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7140,7 +7273,7 @@
             },
             {
               "kind": "Content",
-              "text": "<\"bounded\">, {}>, import(\"./types\")."
+              "text": "<\"bounded\">, {}>, import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7149,7 +7282,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./types\")."
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7158,7 +7291,7 @@
             },
             {
               "kind": "Content",
-              "text": "<\"heytingAlgebra\">, {}>, import(\"./types\")."
+              "text": "<\"heytingAlgebra\">, {}>, import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7167,7 +7300,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./types\")."
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7176,7 +7309,7 @@
             },
             {
               "kind": "Content",
-              "text": "<\"semigroup\">, {}>, import(\"./types\")."
+              "text": "<\"semigroup\">, {}>, import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -7185,7 +7318,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./types\")."
+              "text": "<import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -8451,9 +8584,458 @@
               "text": "strInterpreter: "
             },
             {
+              "kind": "Content",
+              "text": "{\n    \"str/template\": (node: "
+            },
+            {
               "kind": "Reference",
-              "text": "Interpreter",
-              "canonicalReference": "@mvfm/core!Interpreter:type"
+              "text": "StrTemplateNode",
+              "canonicalReference": "@mvfm/core!~StrTemplateNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>, string, unknown>;\n    \"str/concat\": (node: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StrConcatNode",
+              "canonicalReference": "@mvfm/core!~StrConcatNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>, string, unknown>;\n    \"str/upper\": (node: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StrUpperNode",
+              "canonicalReference": "@mvfm/core!~StrUpperNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>, string, unknown>;\n    \"str/lower\": (node: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StrLowerNode",
+              "canonicalReference": "@mvfm/core!~StrLowerNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>, string, unknown>;\n    \"str/trim\": (node: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StrTrimNode",
+              "canonicalReference": "@mvfm/core!~StrTrimNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>, string, unknown>;\n    \"str/slice\": (node: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StrSliceNode",
+              "canonicalReference": "@mvfm/core!~StrSliceNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>, string, unknown>;\n    \"str/includes\": (node: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StrIncludesNode",
+              "canonicalReference": "@mvfm/core!~StrIncludesNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>, boolean, unknown>;\n    \"str/startsWith\": (node: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StrStartsWithNode",
+              "canonicalReference": "@mvfm/core!~StrStartsWithNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>, boolean, unknown>;\n    \"str/endsWith\": (node: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StrEndsWithNode",
+              "canonicalReference": "@mvfm/core!~StrEndsWithNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>, boolean, unknown>;\n    \"str/split\": (node: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StrSplitNode",
+              "canonicalReference": "@mvfm/core!~StrSplitNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>, string[], unknown>;\n    \"str/join\": (node: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StrJoinNode",
+              "canonicalReference": "@mvfm/core!~StrJoinNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>, string, unknown>;\n    \"str/replace\": (node: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StrReplaceNode",
+              "canonicalReference": "@mvfm/core!~StrReplaceNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>, string, unknown>;\n    \"str/len\": (node: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StrLenNode",
+              "canonicalReference": "@mvfm/core!~StrLenNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>, number, unknown>;\n    \"str/eq\": (node: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StrEqNode",
+              "canonicalReference": "@mvfm/core!~StrEqNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>, boolean, unknown>;\n    \"str/show\": (node: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StrShowNode",
+              "canonicalReference": "@mvfm/core!~StrShowNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>, string, unknown>;\n    \"str/append\": (node: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StrAppendNode",
+              "canonicalReference": "@mvfm/core!~StrAppendNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>, string, unknown>;\n    \"str/mempty\": (_node: "
+            },
+            {
+              "kind": "Reference",
+              "text": "StrMemptyNode",
+              "canonicalReference": "@mvfm/core!~StrMemptyNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<never, string, unknown>;\n}"
             }
           ],
           "fileUrlPath": "dist/plugins/str/interpreter.d.ts",
@@ -8462,7 +9044,7 @@
           "name": "strInterpreter",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 2
+            "endIndex": 102
           }
         },
         {
