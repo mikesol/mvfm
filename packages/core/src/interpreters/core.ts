@@ -1,61 +1,96 @@
-import type { Interpreter, TypedNode } from "../fold";
-import { eval_ } from "../fold";
+import type { TypedNode } from "../fold";
+import { eval_, typedInterpreter } from "../fold";
 
 // ---- Typed node interfaces ----------------------------------
 
-interface CoreLiteral<T = unknown> extends TypedNode<T> {
+/** A literal value node. */
+export interface CoreLiteral<T = unknown> extends TypedNode<T> {
   kind: "core/literal";
   value: T;
 }
 
-interface CoreInput extends TypedNode<unknown> {
+/** An input data node. */
+export interface CoreInput extends TypedNode<unknown> {
   kind: "core/input";
   __inputData?: unknown;
 }
 
-interface CorePropAccess<T = unknown> extends TypedNode<T> {
+/** A property access node. */
+export interface CorePropAccess<T = unknown> extends TypedNode<T> {
   kind: "core/prop_access";
   object: TypedNode<Record<string, unknown>>;
   property: string;
 }
 
-interface CoreRecord extends TypedNode<Record<string, unknown>> {
+/** A record construction node. */
+export interface CoreRecord extends TypedNode<Record<string, unknown>> {
   kind: "core/record";
   fields: Record<string, TypedNode>;
 }
 
-interface CoreCond<T = unknown> extends TypedNode<T> {
+/** A conditional node. */
+export interface CoreCond<T = unknown> extends TypedNode<T> {
   kind: "core/cond";
   predicate: TypedNode<boolean>;
   then: TypedNode<T>;
   else: TypedNode<T>;
 }
 
-interface CoreBegin<T = unknown> extends TypedNode<T> {
+/** A begin (sequencing) node. */
+export interface CoreBegin<T = unknown> extends TypedNode<T> {
   kind: "core/begin";
   steps: TypedNode[];
   result: TypedNode<T>;
 }
 
-interface CoreProgram extends TypedNode<unknown> {
+/** A program root node. */
+export interface CoreProgram extends TypedNode<unknown> {
   kind: "core/program";
   result: TypedNode;
 }
 
-interface CoreTuple extends TypedNode<unknown[]> {
+/** A tuple construction node. */
+export interface CoreTuple extends TypedNode<unknown[]> {
   kind: "core/tuple";
   elements: TypedNode[];
 }
 
-interface CoreLambdaParam<T = unknown> extends TypedNode<T> {
+/** A lambda parameter node. */
+export interface CoreLambdaParam<T = unknown> extends TypedNode<T> {
   kind: "core/lambda_param";
   __value?: T;
+}
+
+// ---- NodeTypeMap augmentation --------------------------------
+
+declare module "../fold" {
+  interface NodeTypeMap {
+    "core/literal": CoreLiteral;
+    "core/input": CoreInput;
+    "core/prop_access": CorePropAccess;
+    "core/record": CoreRecord;
+    "core/cond": CoreCond;
+    "core/begin": CoreBegin;
+    "core/program": CoreProgram;
+    "core/tuple": CoreTuple;
+    "core/lambda_param": CoreLambdaParam;
+  }
 }
 
 // ---- Interpreter map ----------------------------------------
 
 /** Interpreter handlers for core node kinds. */
-export const coreInterpreter: Interpreter = {
+export const coreInterpreter = typedInterpreter<
+  | "core/literal"
+  | "core/input"
+  | "core/prop_access"
+  | "core/record"
+  | "core/cond"
+  | "core/begin"
+  | "core/program"
+  | "core/tuple"
+  | "core/lambda_param"
+>()({
   // biome-ignore lint/correctness/useYield: leaf handler returns directly
   "core/literal": async function* (node: CoreLiteral) {
     return node.value;
@@ -110,4 +145,4 @@ export const coreInterpreter: Interpreter = {
   "core/lambda_param": async function* (node: CoreLambdaParam) {
     return node.__value;
   },
-};
+});

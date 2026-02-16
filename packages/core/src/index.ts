@@ -27,6 +27,17 @@ export {
   VOLATILE_KINDS,
 } from "./fold";
 export { coreInterpreter } from "./interpreters/core";
+export type {
+  CoreBegin,
+  CoreCond,
+  CoreInput,
+  CoreLambdaParam,
+  CoreLiteral,
+  CoreProgram,
+  CorePropAccess,
+  CoreRecord,
+  CoreTuple,
+} from "./interpreters/core";
 export type { BooleanMethods } from "./plugins/boolean";
 export { boolean } from "./plugins/boolean";
 export { booleanInterpreter } from "./plugins/boolean/interpreter";
