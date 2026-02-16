@@ -1,4 +1,5 @@
 import type { Expr, PluginContext, PluginDefinition } from "../../core";
+import { numInterpreter } from "./interpreter";
 
 /**
  * Numeric operations beyond what the semiring typeclass provides.
@@ -62,6 +63,7 @@ export const num: PluginDefinition<
     "num/top",
     "num/bottom",
   ],
+  defaultInterpreter: numInterpreter,
   traits: {
     eq: { type: "number", nodeKinds: { eq: "num/eq" } },
     ord: { type: "number", nodeKinds: { compare: "num/compare" } },

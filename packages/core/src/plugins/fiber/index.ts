@@ -29,6 +29,7 @@
 // ============================================================
 
 import type { Expr, PluginContext, PluginDefinition } from "../../core";
+import { fiberInterpreter } from "./interpreter";
 
 // ---- What the plugin adds to $ ----------------------------
 
@@ -143,6 +144,7 @@ interface ParFn {
 export const fiber: PluginDefinition<FiberMethods> = {
   name: "fiber",
   nodeKinds: ["fiber/par_map", "fiber/race", "fiber/timeout", "fiber/retry"],
+  defaultInterpreter: fiberInterpreter,
 
   build(ctx: PluginContext): FiberMethods {
     const parFn: ParFn = ((...args: any[]) => {

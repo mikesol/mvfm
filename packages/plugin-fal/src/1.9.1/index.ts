@@ -52,6 +52,7 @@
 
 import type { FalClient as FalSdkClient, QueueClient as FalSdkQueueClient } from "@fal-ai/client";
 import type { Expr, PluginContext, PluginDefinition } from "@mvfm/core";
+import { falInterpreter } from "./interpreter";
 
 // ---- What the plugin adds to $ ----------------------------
 
@@ -172,6 +173,7 @@ export function fal(config: FalConfig): PluginDefinition<FalMethods> {
       "fal/queue_result",
       "fal/queue_cancel",
     ],
+    defaultInterpreter: falInterpreter,
 
     build(ctx: PluginContext): FalMethods {
       function resolveEndpointId(endpointId: Expr<string> | string) {

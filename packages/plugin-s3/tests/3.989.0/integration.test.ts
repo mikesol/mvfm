@@ -7,24 +7,22 @@ import {
   ListObjectsV2Command,
   PutObjectCommand,
 } from "@aws-sdk/client-s3";
-import { coreInterpreter, mvfm, num, numInterpreter, str, strInterpreter } from "@mvfm/core";
+import type { Program } from "@mvfm/core";
+import {
+  coreInterpreter,
+  injectInput,
+  mvfm,
+  num,
+  numInterpreter,
+  str,
+  strInterpreter,
+} from "@mvfm/core";
 import { GenericContainer, type StartedTestContainer } from "testcontainers";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { s3 as s3Plugin } from "../../src/3.989.0";
 import { wrapAwsSdk } from "../../src/3.989.0/client-aws-sdk";
 import { serverEvaluate } from "../../src/3.989.0/handler.server";
 import { createS3Interpreter } from "../../src/3.989.0/interpreter";
-
-function injectInput(node: any, input: Record<string, unknown>): any {
-  if (node === null || node === undefined || typeof node !== "object") return node;
-  if (Array.isArray(node)) return node.map((n) => injectInput(n, input));
-  const result: any = {};
-  for (const [k, v] of Object.entries(node)) {
-    result[k] = injectInput(v, input);
-  }
-  if (result.kind === "core/input") result.__inputData = input;
-  return result;
-}
 
 let container: StartedTestContainer | undefined;
 let awsClient: AwsS3Client | undefined;
@@ -41,11 +39,11 @@ const commands: Record<string, new (input: any) => any> = {
 
 const app = mvfm(num, str, s3Plugin({ region: "us-east-1" }));
 
-async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
+async function run(prog: Program, input: Record<string, unknown> = {}) {
   if (!awsClient) {
     throw new Error("S3 test client was not initialized");
   }
-  const ast = injectInput(prog.ast, input);
+  const injected = injectInput(prog, input);
   const client = wrapAwsSdk(awsClient, commands);
   const baseInterpreter = {
     ...createS3Interpreter(client),
@@ -54,7 +52,7 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
     ...strInterpreter,
   };
   const evaluate = serverEvaluate(client, baseInterpreter);
-  return await evaluate(ast.result);
+  return await evaluate(injected.ast.result);
 }
 
 beforeAll(async () => {

@@ -32,6 +32,7 @@
 // ============================================================
 
 import type { Expr, PluginContext, PluginDefinition } from "../../core";
+import { errorInterpreter } from "./interpreter";
 
 // ---- What the plugin adds to $ ----------------------------
 
@@ -198,6 +199,7 @@ interface TryBuilder<T> {
 export const error: PluginDefinition<ErrorMethods> = {
   name: "error",
   nodeKinds: ["error/try", "error/fail", "error/attempt", "error/guard", "error/settle"],
+  defaultInterpreter: errorInterpreter,
 
   build(ctx: PluginContext): ErrorMethods {
     function buildTryBuilder<T>(exprNode: any, finallyNode: any = null): TryBuilder<T> {

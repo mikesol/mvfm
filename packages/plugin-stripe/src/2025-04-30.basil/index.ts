@@ -58,6 +58,7 @@
 // ============================================================
 
 import type { Expr, PluginContext, PluginDefinition } from "@mvfm/core";
+import { stripeInterpreter } from "./interpreter";
 
 // ---- What the plugin adds to $ ----------------------------
 
@@ -157,6 +158,7 @@ export function stripe(config: StripeConfig): PluginDefinition<StripeMethods> {
       "stripe/retrieve_charge",
       "stripe/list_charges",
     ],
+    defaultInterpreter: stripeInterpreter,
 
     build(ctx: PluginContext): StripeMethods {
       // Helper: resolve an id argument to an AST node.

@@ -53,6 +53,7 @@
 // ============================================================
 
 import type { Expr, PluginContext, PluginDefinition } from "@mvfm/core";
+import { twilioInterpreter } from "./interpreter";
 
 // ---- What the plugin adds to $ ----------------------------
 
@@ -156,6 +157,7 @@ export function twilio(config: TwilioConfig): PluginDefinition<TwilioMethods> {
       "twilio/fetch_call",
       "twilio/list_calls",
     ],
+    defaultInterpreter: twilioInterpreter,
 
     build(ctx: PluginContext): TwilioMethods {
       function resolveSid(sid: Expr<string> | string) {

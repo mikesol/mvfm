@@ -1,4 +1,5 @@
-import { coreInterpreter, foldAST, mvfm, num, str } from "@mvfm/core";
+import type { Program } from "@mvfm/core";
+import { coreInterpreter, foldAST, injectInput, mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it, vi } from "vitest";
 import { twilioInterpreter } from "../../src";
 import { twilio } from "../../src/5.5.1";
@@ -37,20 +38,9 @@ describe("twilio interpreter: default export", () => {
   });
 });
 
-function injectInput(node: any, input: Record<string, unknown>): any {
-  if (node === null || node === undefined || typeof node !== "object") return node;
-  if (Array.isArray(node)) return node.map((n) => injectInput(n, input));
-  const result: any = {};
-  for (const [k, v] of Object.entries(node)) {
-    result[k] = injectInput(v, input);
-  }
-  if (result.kind === "core/input") result.__inputData = input;
-  return result;
-}
-
-async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
+async function run(prog: Program, input: Record<string, unknown> = {}) {
   const captured: Array<{ method: string; path: string; params?: Record<string, unknown> }> = [];
-  const ast = injectInput(prog.ast, input);
+  const injected = injectInput(prog, input);
   const mockClient: TwilioClient = {
     async request(method: string, path: string, params?: Record<string, unknown>) {
       captured.push({ method, path, params });
@@ -58,7 +48,7 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
     },
   };
   const combined = { ...createTwilioInterpreter(mockClient), ...coreInterpreter };
-  const result = await foldAST(combined, ast.result);
+  const result = await foldAST(combined, injected);
   return { result, captured };
 }
 

@@ -21,6 +21,7 @@ declare module "../../core" {
 export const semigroup: PluginDefinition<TypeclassSlot<"semigroup">> = {
   name: "semigroup",
   nodeKinds: [],
+  defaultInterpreter: {},
   build(ctx: PluginContext): any {
     const impls = ctx.plugins.filter((p) => p.traits?.semigroup).map((p) => p.traits!.semigroup!);
 

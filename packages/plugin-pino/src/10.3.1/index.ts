@@ -45,6 +45,7 @@
 // ============================================================
 
 import type { Expr, PluginContext, PluginDefinition, TypedNode } from "@mvfm/core";
+import { pinoInterpreter } from "./interpreter";
 
 // ---- What the plugin adds to $ ----------------------------
 
@@ -134,6 +135,7 @@ export function pino(config: PinoConfig = {}): PluginDefinition<PinoMethods> {
   return {
     name: "pino",
     nodeKinds: ["pino/trace", "pino/debug", "pino/info", "pino/warn", "pino/error", "pino/fatal"],
+    defaultInterpreter: pinoInterpreter,
 
     build(ctx: PluginContext): PinoMethods {
       function buildLogger(parentBindings: TypedNode[]): PinoLogger {

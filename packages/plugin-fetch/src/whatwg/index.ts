@@ -62,6 +62,7 @@
 // ============================================================
 
 import type { Expr, PluginContext, PluginDefinition } from "@mvfm/core";
+import { fetchInterpreter } from "./interpreter";
 
 // ---- What the plugin adds to $ ----------------------------
 
@@ -142,6 +143,7 @@ export function fetch(config?: FetchConfig): PluginDefinition<FetchMethods> {
   return {
     name: "fetch",
     nodeKinds: ["fetch/request", "fetch/json", "fetch/text", "fetch/status", "fetch/headers"],
+    defaultInterpreter: fetchInterpreter,
 
     build(ctx: PluginContext): FetchMethods {
       function resolveUrl(url: Expr<string> | string) {

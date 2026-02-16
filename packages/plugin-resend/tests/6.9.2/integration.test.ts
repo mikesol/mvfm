@@ -1,21 +1,19 @@
 import http from "node:http";
-import { coreInterpreter, mvfm, num, numInterpreter, str, strInterpreter } from "@mvfm/core";
+import type { Program } from "@mvfm/core";
+import {
+  coreInterpreter,
+  injectInput,
+  mvfm,
+  num,
+  numInterpreter,
+  str,
+  strInterpreter,
+} from "@mvfm/core";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { resend as resendPlugin } from "../../src/6.9.2";
 import { serverEvaluate } from "../../src/6.9.2/handler.server";
 import type { ResendClient } from "../../src/6.9.2/interpreter";
 import { createResendInterpreter } from "../../src/6.9.2/interpreter";
-
-function injectInput(node: any, input: Record<string, unknown>): any {
-  if (node === null || node === undefined || typeof node !== "object") return node;
-  if (Array.isArray(node)) return node.map((n) => injectInput(n, input));
-  const result: any = {};
-  for (const [k, v] of Object.entries(node)) {
-    result[k] = injectInput(v, input);
-  }
-  if (result.kind === "core/input") result.__inputData = input;
-  return result;
-}
 
 let server: http.Server;
 let port: number;
@@ -35,8 +33,8 @@ function createMockClient(): ResendClient {
   };
 }
 
-async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
-  const ast = injectInput(prog.ast, input);
+async function run(prog: Program, input: Record<string, unknown> = {}) {
+  const injected = injectInput(prog, input);
   const client = createMockClient();
   const baseInterpreter = {
     ...createResendInterpreter(client),
@@ -45,7 +43,7 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
     ...strInterpreter,
   };
   const evaluate = serverEvaluate(client, baseInterpreter);
-  return await evaluate(ast.result);
+  return await evaluate(injected.ast.result);
 }
 
 beforeAll(async () => {

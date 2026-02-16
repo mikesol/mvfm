@@ -26,6 +26,7 @@
 // ============================================================
 
 import type { Expr, PluginContext, PluginDefinition } from "@mvfm/core";
+import { consoleInterpreter } from "./interpreter";
 
 /**
  * Full set of Node.js console methods covered by this plugin.
@@ -151,6 +152,7 @@ export function console(config: ConsoleConfig = {}): PluginDefinition<ConsoleMet
   return {
     name: "console",
     nodeKinds,
+    defaultInterpreter: consoleInterpreter,
     build(ctx: PluginContext): ConsoleMethods {
       function call(method: ConsoleMethodName, args: ConsoleArg[]): Expr<void> {
         return ctx.expr<void>({
