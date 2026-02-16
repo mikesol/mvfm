@@ -1,5 +1,5 @@
-import { coreInterpreter, foldAST, injectInput, mvfm, num, str } from "@mvfm/core";
 import type { Program } from "@mvfm/core";
+import { coreInterpreter, foldAST, injectInput, mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it, vi } from "vitest";
 import { slackInterpreter } from "../../src";
 import { slack } from "../../src/7.14.0";

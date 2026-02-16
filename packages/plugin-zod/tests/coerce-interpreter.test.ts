@@ -1,4 +1,11 @@
-import { coreInterpreter, foldAST, injectInput, mvfm, strInterpreter, type Program } from "@mvfm/core";
+import {
+  coreInterpreter,
+  foldAST,
+  injectInput,
+  mvfm,
+  type Program,
+  strInterpreter,
+} from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { createZodInterpreter, zod } from "../src/index";
 

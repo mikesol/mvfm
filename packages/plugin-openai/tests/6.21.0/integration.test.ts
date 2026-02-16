@@ -1,18 +1,18 @@
 import * as http from "node:http";
+import type { Program } from "@mvfm/core";
 import {
   coreInterpreter,
   error,
   errorInterpreter,
   fiber,
   fiberInterpreter,
+  injectInput,
   mvfm,
   num,
   numInterpreter,
   str,
   strInterpreter,
-  injectInput,
 } from "@mvfm/core";
-import type { Program } from "@mvfm/core";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { openai as openaiPlugin } from "../../src/6.21.0";
 import { serverEvaluate } from "../../src/6.21.0/handler.server";

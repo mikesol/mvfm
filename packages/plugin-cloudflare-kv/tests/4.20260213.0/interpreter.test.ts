@@ -1,5 +1,5 @@
-import { coreInterpreter, foldAST, injectInput, mvfm, num, str } from "@mvfm/core";
 import type { Program } from "@mvfm/core";
+import { coreInterpreter, foldAST, injectInput, mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { cloudflareKv } from "../../src/4.20260213.0";
 import {

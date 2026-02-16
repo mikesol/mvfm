@@ -1,3 +1,4 @@
+import type { Program } from "@mvfm/core";
 import {
   coreInterpreter,
   eq,
@@ -6,6 +7,7 @@ import {
   errorInterpreter,
   fiber,
   fiberInterpreter,
+  injectInput,
   mvfm,
   num,
   numInterpreter,
@@ -14,9 +16,7 @@ import {
   semiring,
   str,
   strInterpreter,
-  injectInput,
 } from "@mvfm/core";
-import type { Program } from "@mvfm/core";
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";

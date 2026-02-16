@@ -498,7 +498,7 @@
               "text": ";"
             }
           ],
-          "fileUrlPath": "dist/fold.d.ts",
+          "fileUrlPath": "dist/validation.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 5,
             "endIndex": 6
@@ -561,7 +561,7 @@
               "text": ";"
             }
           ],
-          "fileUrlPath": "dist/fold.d.ts",
+          "fileUrlPath": "dist/validation.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 5,
             "endIndex": 6

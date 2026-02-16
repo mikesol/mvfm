@@ -1,5 +1,13 @@
-import { coreInterpreter, injectInput, mvfm, num, numInterpreter, str, strInterpreter } from "@mvfm/core";
 import type { Program } from "@mvfm/core";
+import {
+  coreInterpreter,
+  injectInput,
+  mvfm,
+  num,
+  numInterpreter,
+  str,
+  strInterpreter,
+} from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { twilio as twilioPlugin } from "../../src/5.5.1";
 import { serverEvaluate } from "../../src/5.5.1/handler.server";

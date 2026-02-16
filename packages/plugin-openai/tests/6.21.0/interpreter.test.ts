@@ -1,5 +1,5 @@
-import { coreInterpreter, foldAST, injectInput, mvfm, num, str } from "@mvfm/core";
 import type { Program } from "@mvfm/core";
+import { coreInterpreter, foldAST, injectInput, mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it, vi } from "vitest";
 import { openaiInterpreter } from "../../src";
 import { openai } from "../../src/6.21.0";

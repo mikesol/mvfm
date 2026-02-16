@@ -1,5 +1,13 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
-import { coreInterpreter, injectInput, mvfm, num, numInterpreter, str, strInterpreter } from "@mvfm/core";
+import {
+  coreInterpreter,
+  injectInput,
+  mvfm,
+  num,
+  numInterpreter,
+  str,
+  strInterpreter,
+} from "@mvfm/core";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { fetch as fetchPlugin } from "../../src/whatwg";
 import { wrapFetch } from "../../src/whatwg/client-fetch";

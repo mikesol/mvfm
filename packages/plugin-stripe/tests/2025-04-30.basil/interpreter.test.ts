@@ -1,5 +1,5 @@
-import { coreInterpreter, foldAST, injectInput, mvfm, num, str } from "@mvfm/core";
 import type { Program } from "@mvfm/core";
+import { coreInterpreter, foldAST, injectInput, mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it, vi } from "vitest";
 import { stripeInterpreter } from "../../src";
 import { stripe } from "../../src/2025-04-30.basil";

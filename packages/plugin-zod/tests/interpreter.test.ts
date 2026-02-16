@@ -3,9 +3,9 @@ import {
   foldAST,
   injectInput,
   mvfm,
+  type Program,
   str,
   strInterpreter,
-  type Program,
 } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { createZodInterpreter, zod } from "../src/index";

@@ -1,17 +1,17 @@
+import type { Program } from "@mvfm/core";
 import {
   coreInterpreter,
   error,
   errorInterpreter,
   fiber,
   fiberInterpreter,
+  injectInput,
   mvfm,
   num,
   numInterpreter,
   str,
   strInterpreter,
-  injectInput,
 } from "@mvfm/core";
-import type { Program } from "@mvfm/core";
 import Stripe from "stripe";
 import { GenericContainer, type StartedTestContainer } from "testcontainers";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";

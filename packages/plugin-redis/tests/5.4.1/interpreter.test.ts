@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { coreInterpreter, foldAST, injectInput, mvfm, num, str } from "@mvfm/core";
 import type { Program } from "@mvfm/core";
+import { coreInterpreter, foldAST, injectInput, mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { redis } from "../../src/5.4.1";
 import { createRedisInterpreter, type RedisClient } from "../../src/5.4.1/interpreter";

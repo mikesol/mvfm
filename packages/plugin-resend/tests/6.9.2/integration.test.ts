@@ -1,6 +1,14 @@
 import http from "node:http";
-import { coreInterpreter, injectInput, mvfm, num, numInterpreter, str, strInterpreter } from "@mvfm/core";
 import type { Program } from "@mvfm/core";
+import {
+  coreInterpreter,
+  injectInput,
+  mvfm,
+  num,
+  numInterpreter,
+  str,
+  strInterpreter,
+} from "@mvfm/core";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { resend as resendPlugin } from "../../src/6.9.2";
 import { serverEvaluate } from "../../src/6.9.2/handler.server";

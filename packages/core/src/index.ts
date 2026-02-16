@@ -15,7 +15,6 @@ export type {
 } from "./fold";
 
 export {
-  checkCompleteness,
   createFoldState,
   eval_,
   foldAST,
@@ -84,3 +83,4 @@ export type {
   TypeclassMapping,
   TypeclassSlot,
 } from "./types";
+export { checkCompleteness } from "./validation";

@@ -1,17 +1,17 @@
+import type { Program } from "@mvfm/core";
 import {
   coreInterpreter,
   error,
   errorInterpreter,
   fiber,
   fiberInterpreter,
+  injectInput,
   mvfm,
   num,
   numInterpreter,
   str,
   strInterpreter,
-  injectInput,
 } from "@mvfm/core";
-import type { Program } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { slack as slackPlugin } from "../../src/7.14.0";
 import { serverEvaluate } from "../../src/7.14.0/handler.server";

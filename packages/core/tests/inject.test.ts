@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { mvfm } from "../src/core";
-import { checkCompleteness, foldAST } from "../src/fold";
+import { foldAST } from "../src/fold";
 import { injectInput } from "../src/inject";
 import { coreInterpreter } from "../src/interpreters/core";
 import { num } from "../src/plugins/num";
 import { numInterpreter } from "../src/plugins/num/interpreter";
 import { semiring } from "../src/plugins/semiring";
+import { checkCompleteness } from "../src/validation";
 
 const app = mvfm();
 const mathApp = mvfm(num, semiring);
@@ -43,7 +44,7 @@ describe("injectInput", () => {
   });
 
   it("preserves non-input nodes unchanged", () => {
-    const prog = app(($) => 42);
+    const prog = app((_$) => 42);
     const injected = injectInput(prog, { x: 1 });
 
     // Strip __id for stable comparison

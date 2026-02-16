@@ -1,6 +1,6 @@
 import { Writable } from "node:stream";
-import { coreInterpreter, injectInput, mvfm, num, str } from "@mvfm/core";
 import type { Program } from "@mvfm/core";
+import { coreInterpreter, injectInput, mvfm, num, str } from "@mvfm/core";
 import pinoLib from "pino";
 import { describe, expect, it } from "vitest";
 import { pino } from "../../src/10.3.1";
