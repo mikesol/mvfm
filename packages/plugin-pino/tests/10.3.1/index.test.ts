@@ -119,15 +119,15 @@ describe("pino: object-only logging (single raw object arg)", () => {
 });
 
 // ============================================================
-// Integration with $.do()
+// Integration with $.discard()
 // ============================================================
 
-describe("pino: integration with $.do()", () => {
-  it("log calls composed with $.do() are reachable", () => {
+describe("pino: integration with $.discard()", () => {
+  it("log calls composed with $.discard() are reachable", () => {
     expect(() => {
       app(($) => {
         const logLine = $.pino.info({ action: "login" }, "user logged in");
-        return $.do(logLine, $.input.result);
+        return $.discard(logLine, $.input.result);
       });
     }).not.toThrow();
   });

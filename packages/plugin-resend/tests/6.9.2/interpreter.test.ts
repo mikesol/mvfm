@@ -1,10 +1,9 @@
 import { coreInterpreter, foldAST, mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { resend } from "../../src/6.9.2";
-import { resendInterpreter } from "../../src/6.9.2/interpreter";
+import { createResendInterpreter, type ResendClient } from "../../src/6.9.2/interpreter";
 
 const app = mvfm(num, str, resend({ apiKey: "re_test_123" }));
-const fragments = [resendInterpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
@@ -18,15 +17,16 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 }
 
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
-  const captured: any[] = [];
+  const captured: Array<{ method: string; path: string; params?: unknown }> = [];
   const ast = injectInput(prog.ast, input);
-  const recurse = foldAST(fragments, {
-    "resend/api_call": async (effect) => {
-      captured.push(effect);
+  const mockClient: ResendClient = {
+    async request(method: string, path: string, params?: unknown) {
+      captured.push({ method, path, params });
       return { id: "mock_id" };
     },
-  });
-  const result = await recurse(ast.result);
+  };
+  const combined = { ...createResendInterpreter(mockClient), ...coreInterpreter };
+  const result = await foldAST(combined, ast.result);
   return { result, captured };
 }
 
@@ -41,7 +41,6 @@ describe("resend interpreter: send_email", () => {
     );
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("resend/api_call");
     expect(captured[0].method).toBe("POST");
     expect(captured[0].path).toBe("/emails");
     expect(captured[0].params).toEqual({
@@ -58,7 +57,6 @@ describe("resend interpreter: get_email", () => {
     const prog = app(($) => $.resend.emails.get("email_123"));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("resend/api_call");
     expect(captured[0].method).toBe("GET");
     expect(captured[0].path).toBe("/emails/email_123");
     expect(captured[0].params).toBeUndefined();
@@ -79,7 +77,6 @@ describe("resend interpreter: send_batch", () => {
     );
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("resend/api_call");
     expect(captured[0].method).toBe("POST");
     expect(captured[0].path).toBe("/emails/batch");
     expect(captured[0].params).toEqual([
@@ -100,7 +97,6 @@ describe("resend interpreter: create_contact", () => {
     );
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("resend/api_call");
     expect(captured[0].method).toBe("POST");
     expect(captured[0].path).toBe("/contacts");
     expect(captured[0].params).toEqual({ email: "user@example.com", firstName: "Jane" });
@@ -112,7 +108,6 @@ describe("resend interpreter: get_contact", () => {
     const prog = app(($) => $.resend.contacts.get("contact_123"));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("resend/api_call");
     expect(captured[0].method).toBe("GET");
     expect(captured[0].path).toBe("/contacts/contact_123");
     expect(captured[0].params).toBeUndefined();
@@ -124,7 +119,6 @@ describe("resend interpreter: list_contacts", () => {
     const prog = app(($) => $.resend.contacts.list());
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("resend/api_call");
     expect(captured[0].method).toBe("GET");
     expect(captured[0].path).toBe("/contacts");
     expect(captured[0].params).toBeUndefined();
@@ -136,7 +130,6 @@ describe("resend interpreter: remove_contact", () => {
     const prog = app(($) => $.resend.contacts.remove("contact_456"));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("resend/api_call");
     expect(captured[0].method).toBe("DELETE");
     expect(captured[0].path).toBe("/contacts/contact_456");
     expect(captured[0].params).toBeUndefined();

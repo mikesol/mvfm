@@ -5,7 +5,6 @@ import { describe, expect, it } from "vitest";
 import { pino } from "../../src/10.3.1";
 import { wrapPino } from "../../src/10.3.1/client-pino";
 import { serverEvaluate } from "../../src/10.3.1/handler.server";
-import { pinoInterpreter } from "../../src/10.3.1/interpreter";
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
@@ -18,7 +17,7 @@ function injectInput(node: any, input: Record<string, unknown>): any {
   return result;
 }
 
-const allFragments = [pinoInterpreter, coreInterpreter];
+const baseInterpreter = coreInterpreter;
 const app = mvfm(num, str, pino({ level: "trace" }));
 
 function createCapturingLogger() {
@@ -36,7 +35,7 @@ function createCapturingLogger() {
 async function run(prog: { ast: any }, logger: any, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
   const client = wrapPino(logger);
-  const evaluate = serverEvaluate(client, allFragments);
+  const evaluate = serverEvaluate(client, baseInterpreter);
   return await evaluate(ast.result);
 }
 

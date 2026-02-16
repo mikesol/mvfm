@@ -190,53 +190,6 @@
       "members": [
         {
           "kind": "Function",
-          "canonicalReference": "@mvfm/core!adaptLegacy:function(1)",
-          "docComment": "/**\n * Wraps a {@link LegacyInterpreterFragment} as an {@link InterpreterFragment}.\n *\n * The adapted fragment yields a single `__legacy` effect, which the evaluator intercepts and executes using the original callback-based `visit` method.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export declare function adaptLegacy(fragment: "
-            },
-            {
-              "kind": "Reference",
-              "text": "LegacyInterpreterFragment",
-              "canonicalReference": "@mvfm/core!LegacyInterpreterFragment:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "): "
-            },
-            {
-              "kind": "Reference",
-              "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ";"
-            }
-          ],
-          "fileUrlPath": "dist/core.d.ts",
-          "returnTypeTokenRange": {
-            "startIndex": 3,
-            "endIndex": 4
-          },
-          "releaseTag": "Public",
-          "overloadIndex": 1,
-          "parameters": [
-            {
-              "parameterName": "fragment",
-              "parameterTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isOptional": false
-            }
-          ],
-          "name": "adaptLegacy"
-        },
-        {
-          "kind": "Function",
           "canonicalReference": "@mvfm/core!array:function(1)",
           "docComment": "/**\n * Creates an array schema type.\n *\n * @param of - The element schema type.\n *\n * @returns An {@link ArraySchema} descriptor.\n *\n * @example\n * ```ts\n * const schema = { tags: array(\"string\") };\n * ```\n *\n */\n",
           "excerptTokens": [
@@ -356,122 +309,6 @@
           "extendsTokenRanges": []
         },
         {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/core!ASTNode:interface",
-          "docComment": "/**\n * Every AST node has a `kind` discriminant (namespaced to the plugin that created it) and arbitrary fields. Plugins define their own node shapes.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export interface ASTNode "
-            }
-          ],
-          "fileUrlPath": "dist/core.d.ts",
-          "releaseTag": "Public",
-          "name": "ASTNode",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/core!ASTNode#__id:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "__id?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "number"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "__id",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "IndexSignature",
-              "canonicalReference": "@mvfm/core!ASTNode:index(1)",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "[key: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": "]: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "unknown"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "returnTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 4
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "key",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  },
-                  "isOptional": false
-                }
-              ]
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/core!ASTNode#kind:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "kind: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "kind",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            }
-          ],
-          "extendsTokenRanges": []
-        },
-        {
           "kind": "Variable",
           "canonicalReference": "@mvfm/core!boolean:var",
           "docComment": "/**\n * Boolean type plugin. Namespace: `boolean/`. Registers boolean trait implementations for use by typeclass plugins.\n */\n",
@@ -511,7 +348,7 @@
         {
           "kind": "Variable",
           "canonicalReference": "@mvfm/core!booleanInterpreter:var",
-          "docComment": "/**\n * Interpreter fragment for `boolean/` node kinds.\n */\n",
+          "docComment": "/**\n * Interpreter handlers for `boolean/` node kinds.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -519,8 +356,8 @@
             },
             {
               "kind": "Reference",
-              "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
             }
           ],
           "fileUrlPath": "dist/plugins/boolean/interpreter.d.ts",
@@ -627,54 +464,131 @@
         },
         {
           "kind": "Function",
-          "canonicalReference": "@mvfm/core!composeInterpreters:function(1)",
-          "docComment": "/**\n * Compose interpreter fragments into a full interpreter. Uses WeakMap memoization so shared AST nodes (DAG references) are only evaluated once. Volatile nodes (lambda_param, cursor_batch) are tracked as \"tainted\" and their ancestors are not cached.\n *\n * Delegates to {@link foldAST} with no effect handlers — all effects are expected to be `recurse` (or `__legacy` from adapted fragments). For IO effects, use {@link foldAST} directly with handlers.\n */\n",
+          "canonicalReference": "@mvfm/core!checkCompleteness:function(1)",
+          "docComment": "/**\n * Walk an AST to verify all node kinds have handlers. Throws before evaluation if any are missing.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare function composeInterpreters(fragments: "
+              "text": "export declare function checkCompleteness(interpreter: "
             },
             {
               "kind": "Reference",
-              "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
             },
             {
               "kind": "Content",
-              "text": "[]"
+              "text": ", root: "
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
             },
             {
               "kind": "Content",
               "text": "): "
             },
             {
-              "kind": "Reference",
-              "text": "RecurseFn",
-              "canonicalReference": "@mvfm/core!RecurseFn:interface"
+              "kind": "Content",
+              "text": "void"
             },
             {
               "kind": "Content",
               "text": ";"
             }
           ],
-          "fileUrlPath": "dist/core.d.ts",
+          "fileUrlPath": "dist/fold.d.ts",
           "returnTypeTokenRange": {
-            "startIndex": 4,
-            "endIndex": 5
+            "startIndex": 5,
+            "endIndex": 6
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "fragments",
+              "parameterName": "interpreter",
               "parameterTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 3
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "root",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
               },
               "isOptional": false
             }
           ],
-          "name": "composeInterpreters"
+          "name": "checkCompleteness"
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@mvfm/core!CompleteInterpreter:type",
+          "docComment": "/**\n * Complete interpreter type: must have a handler for every kind `K`.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type CompleteInterpreter<K extends "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": "> = "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    [key in K]: (node: any) => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", unknown, unknown>;\n}"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/fold.d.ts",
+          "releaseTag": "Public",
+          "name": "CompleteInterpreter",
+          "typeParameters": [
+            {
+              "typeParameterName": "K",
+              "constraintTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "typeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 8
+          }
         },
         {
           "kind": "Variable",
@@ -872,7 +786,7 @@
         {
           "kind": "Variable",
           "canonicalReference": "@mvfm/core!coreInterpreter:var",
-          "docComment": "/**\n * Interpreter fragment for core node kinds (literal, input, prop_access, cond, do, program, tuple, record).\n */\n",
+          "docComment": "/**\n * Interpreter handlers for core node kinds.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -880,8 +794,8 @@
             },
             {
               "kind": "Reference",
-              "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
             }
           ],
           "fileUrlPath": "dist/interpreters/core.d.ts",
@@ -892,6 +806,35 @@
             "startIndex": 1,
             "endIndex": 2
           }
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@mvfm/core!createFoldState:function(1)",
+          "docComment": "/**\n * Create a fresh FoldState.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function createFoldState(): "
+            },
+            {
+              "kind": "Reference",
+              "text": "FoldState",
+              "canonicalReference": "@mvfm/core!FoldState:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/fold.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [],
+          "name": "createFoldState"
         },
         {
           "kind": "Variable",
@@ -1116,7 +1059,7 @@
         {
           "kind": "Variable",
           "canonicalReference": "@mvfm/core!eqInterpreter:var",
-          "docComment": "/**\n * Interpreter fragment for `eq/` node kinds.\n */\n",
+          "docComment": "/**\n * Interpreter handlers for `eq/` node kinds.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -1124,8 +1067,8 @@
             },
             {
               "kind": "Reference",
-              "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
             }
           ],
           "fileUrlPath": "dist/plugins/eq/interpreter.d.ts",
@@ -1177,7 +1120,7 @@
         {
           "kind": "Variable",
           "canonicalReference": "@mvfm/core!errorInterpreter:var",
-          "docComment": "/**\n * Interpreter fragment for `error/` node kinds.\n */\n",
+          "docComment": "/**\n * Interpreter handlers for `error/` node kinds.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -1185,8 +1128,8 @@
             },
             {
               "kind": "Reference",
-              "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
             }
           ],
           "fileUrlPath": "dist/plugins/error/interpreter.d.ts",
@@ -1339,7 +1282,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "@mvfm/core!ErrorMethods#guard:member(1)",
-              "docComment": "/**\n * Validate a condition, failing if it's false. Like an assertion in the program.\n * ```\n * $.guard($.gt(user.age, 18), { code: 403, message: 'must be 18+' })\n * ```\n *\n * If the condition is true, continues. If false, fails with the given error. Useful in `$.do()` chains:\n * ```\n * return $.do(\n *   $.guard($.gt(balance, amount), 'insufficient funds'),\n *   $.sql`update accounts set balance = balance - ${amount}`,\n *   { success: true }\n * )\n * ```\n *\n */\n",
+              "docComment": "/**\n * Validate a condition, failing if it's false. Like an assertion in the program.\n * ```\n * $.guard($.gt(user.age, 18), { code: 403, message: 'must be 18+' })\n * ```\n *\n * If the condition is true, continues. If false, fails with the given error. Useful in `$.discard()` chains:\n * ```\n * return $.discard(\n *   $.guard($.gt(balance, amount), 'insufficient funds'),\n *   $.sql`update accounts set balance = balance - ${amount}`,\n *   { success: true }\n * )\n * ```\n *\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -1628,6 +1571,83 @@
           "extendsTokenRanges": []
         },
         {
+          "kind": "Function",
+          "canonicalReference": "@mvfm/core!eval_:function(1)",
+          "docComment": "/**\n * Evaluate a child node by yielding it to the trampoline. Returns the typed result. This is the only user-facing cast — TypeScript generators have a single `Next` type for all yields.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function eval_<T>(node: "
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<T>"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", T, unknown>"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/fold.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 4,
+            "endIndex": 8
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "node",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "isOptional": false
+            }
+          ],
+          "typeParameters": [
+            {
+              "typeParameterName": "T",
+              "constraintTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "name": "eval_"
+        },
+        {
           "kind": "TypeAlias",
           "canonicalReference": "@mvfm/core!Expr:type",
           "docComment": "/**\n * Expr<T> is the phantom-typed wrapper around every value in the DSL. At runtime it's a Proxy. At the type level it carries T so your IDE gives you completions and errors.\n *\n * The brand symbol lets plugins detect \"is this already a Mvfm value or a raw JS primitive?\"\n */\n",
@@ -1659,7 +1679,7 @@
               "text": ";"
             }
           ],
-          "fileUrlPath": "dist/core.d.ts",
+          "fileUrlPath": "dist/types.d.ts",
           "releaseTag": "Public",
           "name": "Expr",
           "typeParameters": [
@@ -1720,7 +1740,7 @@
         {
           "kind": "Variable",
           "canonicalReference": "@mvfm/core!fiberInterpreter:var",
-          "docComment": "/**\n * Interpreter fragment for `fiber/` node kinds.\n */\n",
+          "docComment": "/**\n * Sequential interpreter handlers for `fiber/` node kinds.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -1728,8 +1748,8 @@
             },
             {
               "kind": "Reference",
-              "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
             }
           ],
           "fileUrlPath": "dist/plugins/fiber/interpreter.d.ts",
@@ -1913,7 +1933,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "@mvfm/core!FiberMethods#seq:member(1)",
-              "docComment": "/**\n * Run expressions sequentially, return last result. This is `$.do()` with fiber awareness -- each step is guaranteed to complete before the next starts.\n *\n * Alias for `$.do()` but makes the intent clearer in a concurrent context.\n * ```\n * $.seq(\n *   $.sql`insert into users ...`,\n *   $.sql`insert into accounts ...`,\n *   $.sql`select * from users where ...`  // returned\n * )\n * ```\n *\n */\n",
+              "docComment": "/**\n * Run expressions sequentially, return last result. This is `$.discard()` with fiber awareness -- each step is guaranteed to complete before the next starts.\n *\n * Alias for `$.discard()` but makes the intent clearer in a concurrent context.\n * ```\n * $.seq(\n *   $.sql`insert into users ...`,\n *   $.sql`insert into accounts ...`,\n *   $.sql`select * from users where ...`  // returned\n * )\n * ```\n *\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -2076,42 +2096,38 @@
         {
           "kind": "Function",
           "canonicalReference": "@mvfm/core!foldAST:function(1)",
-          "docComment": "/**\n * Build a {@link RecurseFn} from generator-based fragments and a map of effect handlers.\n *\n * `foldAST` is the generator-based replacement for {@link composeInterpreters}. It returns a `RecurseFn` with the same API (callable + `.fresh()`), so it can be used as a drop-in replacement in existing interpreter pipelines.\n *\n * @param fragments - Interpreter fragments.\n *\n * @param handlers - Map from effect type string to async handler function. Each handler receives the effect and returns a value.\n *\n * @returns A {@link RecurseFn} that evaluates AST nodes.\n */\n",
+          "docComment": "/**\n * Stack-safe async fold with WeakMap memoization and taint tracking.\n *\n * - Async generators live on the heap; the call stack is O(1). - Shared nodes (DAG references) evaluate once via WeakMap cache. - Volatile nodes and their dependents re-evaluate each time. - Error propagation via `gen.throw()` — handlers can try/catch. - Accepts optional `FoldState` for cache sharing across calls.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare function foldAST(fragments: "
+              "text": "export declare function foldAST(interpreter: "
             },
             {
               "kind": "Reference",
-              "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
             },
             {
               "kind": "Content",
-              "text": "[]"
-            },
-            {
-              "kind": "Content",
-              "text": ", handlers: "
+              "text": ", root: "
             },
             {
               "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
             },
             {
               "kind": "Content",
-              "text": "<string, (effect: "
+              "text": ", state?: "
             },
             {
               "kind": "Reference",
-              "text": "StepEffect",
-              "canonicalReference": "@mvfm/core!StepEffect:type"
+              "text": "FoldState",
+              "canonicalReference": "@mvfm/core!FoldState:interface"
             },
             {
               "kind": "Content",
-              "text": ") => "
+              "text": "): "
             },
             {
               "kind": "Reference",
@@ -2120,74 +2136,225 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown>>"
-            },
-            {
-              "kind": "Content",
-              "text": "): "
-            },
-            {
-              "kind": "Reference",
-              "text": "RecurseFn",
-              "canonicalReference": "@mvfm/core!RecurseFn:interface"
+              "text": "<unknown>"
             },
             {
               "kind": "Content",
               "text": ";"
             }
           ],
-          "fileUrlPath": "dist/core.d.ts",
+          "fileUrlPath": "dist/fold.d.ts",
           "returnTypeTokenRange": {
-            "startIndex": 11,
-            "endIndex": 12
+            "startIndex": 7,
+            "endIndex": 9
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "fragments",
+              "parameterName": "interpreter",
               "parameterTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 3
+                "endIndex": 2
               },
               "isOptional": false
             },
             {
-              "parameterName": "handlers",
+              "parameterName": "root",
               "parameterTypeTokenRange": {
-                "startIndex": 4,
-                "endIndex": 10
+                "startIndex": 3,
+                "endIndex": 4
               },
               "isOptional": false
+            },
+            {
+              "parameterName": "state",
+              "parameterTypeTokenRange": {
+                "startIndex": 5,
+                "endIndex": 6
+              },
+              "isOptional": true
             }
           ],
           "name": "foldAST"
         },
         {
-          "kind": "TypeAlias",
-          "canonicalReference": "@mvfm/core!GeneratorInterpreterFragment:type",
-          "docComment": "/**\n * Type alias for backward compatibility.\n *\n * `GeneratorInterpreterFragment` is now identical to {@link InterpreterFragment}. New code should use `InterpreterFragment` directly.\n *\n * @deprecated\n *\n * Use {@link InterpreterFragment} instead.\n */\n",
+          "kind": "Interface",
+          "canonicalReference": "@mvfm/core!FoldState:interface",
+          "docComment": "/**\n * Externalized fold state for cache sharing across evaluations.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export type GeneratorInterpreterFragment = "
+              "text": "export interface FoldState "
+            }
+          ],
+          "fileUrlPath": "dist/fold.d.ts",
+          "releaseTag": "Public",
+          "name": "FoldState",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@mvfm/core!FoldState#cache:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "cache: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "WeakMap",
+                  "canonicalReference": "!WeakMap:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "TypedNode",
+                  "canonicalReference": "@mvfm/core!TypedNode:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", unknown>"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "cache",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@mvfm/core!FoldState#tainted:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "tainted: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "WeakSet",
+                  "canonicalReference": "!WeakSet:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "TypedNode",
+                  "canonicalReference": "@mvfm/core!TypedNode:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "tainted",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 5
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@mvfm/core!Handler:type",
+          "docComment": "/**\n * Handler type: an async generator for a specific typed node. The return type is inferred from the node's phantom type.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type Handler<N extends "
             },
             {
               "kind": "Reference",
-              "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<any>"
+            },
+            {
+              "kind": "Content",
+              "text": "> = "
+            },
+            {
+              "kind": "Content",
+              "text": "N extends "
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<infer T> ? (node: N) => "
+            },
+            {
+              "kind": "Reference",
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", T, unknown> : never"
             },
             {
               "kind": "Content",
               "text": ";"
             }
           ],
-          "fileUrlPath": "dist/core.d.ts",
+          "fileUrlPath": "dist/fold.d.ts",
           "releaseTag": "Public",
-          "name": "GeneratorInterpreterFragment",
+          "name": "Handler",
+          "typeParameters": [
+            {
+              "typeParameterName": "N",
+              "constraintTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
           "typeTokenRange": {
-            "startIndex": 1,
-            "endIndex": 2
+            "startIndex": 4,
+            "endIndex": 11
           }
         },
         {
@@ -2568,9 +2735,8 @@
               "text": "export declare function inferType(node: "
             },
             {
-              "kind": "Reference",
-              "text": "ASTNode",
-              "canonicalReference": "@mvfm/core!ASTNode:interface"
+              "kind": "Content",
+              "text": "any"
             },
             {
               "kind": "Content",
@@ -2688,7 +2854,7 @@
               "text": ";"
             }
           ],
-          "fileUrlPath": "dist/core.d.ts",
+          "fileUrlPath": "dist/utils.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 7,
             "endIndex": 8
@@ -2726,24 +2892,11 @@
         {
           "kind": "TypeAlias",
           "canonicalReference": "@mvfm/core!Interpreter:type",
-          "docComment": "/**\n * An interpreter is a function that takes a {@link Program} and returns a runner with an async `run` method.\n */\n",
+          "docComment": "/**\n * An interpreter is a plain record mapping node kind strings to async generator handler functions. Composition is spread: `{ ...num$, ...str$, ...console$ }`.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
               "text": "export type Interpreter = "
-            },
-            {
-              "kind": "Content",
-              "text": "(program: "
-            },
-            {
-              "kind": "Reference",
-              "text": "Program",
-              "canonicalReference": "@mvfm/core!Program:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ") => {\n    run: (input: "
             },
             {
               "kind": "Reference",
@@ -2752,344 +2905,38 @@
             },
             {
               "kind": "Content",
-              "text": "<string, unknown>) => "
+              "text": "<string, (node: any) => "
             },
             {
               "kind": "Reference",
-              "text": "Promise",
-              "canonicalReference": "!Promise:interface"
+              "text": "AsyncGenerator",
+              "canonicalReference": "!AsyncGenerator:interface"
             },
             {
               "kind": "Content",
-              "text": "<unknown>;\n}"
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", unknown, unknown>>"
             },
             {
               "kind": "Content",
               "text": ";"
             }
           ],
-          "fileUrlPath": "dist/core.d.ts",
+          "fileUrlPath": "dist/fold.d.ts",
           "releaseTag": "Public",
           "name": "Interpreter",
           "typeTokenRange": {
             "startIndex": 1,
-            "endIndex": 8
+            "endIndex": 7
           }
-        },
-        {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/core!InterpreterFragment:interface",
-          "docComment": "/**\n * A generator-based interpreter fragment that yields effects instead of directly calling a recurse callback.\n *\n * Generator fragments enable the step evaluator to pause, inspect, and resume evaluation — the foundation for middleware, debugging, and IO interception.\n *\n * Each plugin can ship its own interpreter fragment, and they compose via {@link composeInterpreters} or {@link foldAST}.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export interface InterpreterFragment "
-            }
-          ],
-          "fileUrlPath": "dist/core.d.ts",
-          "releaseTag": "Public",
-          "name": "InterpreterFragment",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/core!InterpreterFragment#canHandle:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "canHandle: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(node: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ASTNode",
-                  "canonicalReference": "@mvfm/core!ASTNode:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => boolean"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "canHandle",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 4
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/core!InterpreterFragment#isVolatile:member",
-              "docComment": "/**\n * Returns true if the node should never be cached (e.g., lambda params).\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "isVolatile?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(node: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ASTNode",
-                  "canonicalReference": "@mvfm/core!ASTNode:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => boolean"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "isVolatile",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 4
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/core!InterpreterFragment#pluginName:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "pluginName: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "pluginName",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/core!InterpreterFragment#visit:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "visit: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(node: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ASTNode",
-                  "canonicalReference": "@mvfm/core!ASTNode:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Generator",
-                  "canonicalReference": "!Generator:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "StepEffect",
-                  "canonicalReference": "@mvfm/core!StepEffect:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", unknown, unknown>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "visit",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 8
-              }
-            }
-          ],
-          "extendsTokenRanges": []
-        },
-        {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/core!LegacyInterpreterFragment:interface",
-          "docComment": "/**\n * A legacy interpreter fragment using callback-based recursion.\n *\n * This type exists only for backward compatibility with {@link adaptLegacy}. New code should use {@link InterpreterFragment} (generator-based).\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export interface LegacyInterpreterFragment "
-            }
-          ],
-          "fileUrlPath": "dist/core.d.ts",
-          "releaseTag": "Public",
-          "name": "LegacyInterpreterFragment",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/core!LegacyInterpreterFragment#canHandle:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "canHandle: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(node: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ASTNode",
-                  "canonicalReference": "@mvfm/core!ASTNode:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => boolean"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "canHandle",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 4
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/core!LegacyInterpreterFragment#pluginName:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "pluginName: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "pluginName",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/core!LegacyInterpreterFragment#visit:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "visit: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(node: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ASTNode",
-                  "canonicalReference": "@mvfm/core!ASTNode:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", recurse: (node: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ASTNode",
-                  "canonicalReference": "@mvfm/core!ASTNode:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Promise",
-                  "canonicalReference": "!Promise:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<unknown>) => "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Promise",
-                  "canonicalReference": "!Promise:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<unknown>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "visit",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 10
-              }
-            }
-          ],
-          "extendsTokenRanges": []
         },
         {
           "kind": "Variable",
@@ -3161,7 +3008,7 @@
         {
           "kind": "Function",
           "canonicalReference": "@mvfm/core!mvfm:function(1)",
-          "docComment": "",
+          "docComment": "/**\n * Create a mvfm program builder with the given plugins.\n *\n * Usage: `const serverless = mvfm(num, str, db('postgres://...'))` `const myProgram = serverless(($) => { ... })`\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -3309,7 +3156,7 @@
               "text": ";"
             }
           ],
-          "fileUrlPath": "dist/core.d.ts",
+          "fileUrlPath": "dist/builder.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 7,
             "endIndex": 32
@@ -3501,7 +3348,7 @@
         {
           "kind": "Variable",
           "canonicalReference": "@mvfm/core!numInterpreter:var",
-          "docComment": "/**\n * Interpreter fragment for `num/` node kinds.\n */\n",
+          "docComment": "/**\n * Interpreter handlers for `num/` node kinds.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -3509,8 +3356,8 @@
             },
             {
               "kind": "Reference",
-              "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
             }
           ],
           "fileUrlPath": "dist/plugins/num/interpreter.d.ts",
@@ -4612,7 +4459,7 @@
         {
           "kind": "Variable",
           "canonicalReference": "@mvfm/core!ordInterpreter:var",
-          "docComment": "/**\n * Interpreter fragment for `ord/` node kinds.\n */\n",
+          "docComment": "/**\n * Interpreter handlers for `ord/` node kinds.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -4620,8 +4467,8 @@
             },
             {
               "kind": "Reference",
-              "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
             }
           ],
           "fileUrlPath": "dist/plugins/ord/interpreter.d.ts",
@@ -4694,7 +4541,7 @@
               "text": ";"
             }
           ],
-          "fileUrlPath": "dist/core.d.ts",
+          "fileUrlPath": "dist/types.d.ts",
           "releaseTag": "Public",
           "name": "Plugin_2",
           "typeParameters": [
@@ -4736,7 +4583,7 @@
               "text": "export interface PluginContext "
             }
           ],
-          "fileUrlPath": "dist/core.d.ts",
+          "fileUrlPath": "dist/types.d.ts",
           "releaseTag": "Public",
           "name": "PluginContext",
           "preserveMemberOrder": false,
@@ -4757,16 +4604,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<number, "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ASTNode",
-                  "canonicalReference": "@mvfm/core!ASTNode:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">"
+                  "text": "<number, any>"
                 },
                 {
                   "kind": "Content",
@@ -4779,7 +4617,7 @@
               "name": "_registry",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 5
+                "endIndex": 3
               }
             },
             {
@@ -4793,16 +4631,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "(node: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ASTNode",
-                  "canonicalReference": "@mvfm/core!ASTNode:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => void"
+                  "text": "(node: any) => void"
                 },
                 {
                   "kind": "Content",
@@ -4815,7 +4644,7 @@
               "name": "emit",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 4
+                "endIndex": 2
               }
             },
             {
@@ -4829,16 +4658,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<T>(node: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ASTNode",
-                  "canonicalReference": "@mvfm/core!ASTNode:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => "
+                  "text": "<T>(node: any) => "
                 },
                 {
                   "kind": "Reference",
@@ -4860,7 +4680,7 @@
               "name": "expr",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 6
+                "endIndex": 4
               }
             },
             {
@@ -5027,13 +4847,8 @@
                   "text": "statements: "
                 },
                 {
-                  "kind": "Reference",
-                  "text": "ASTNode",
-                  "canonicalReference": "@mvfm/core!ASTNode:interface"
-                },
-                {
                   "kind": "Content",
-                  "text": "[]"
+                  "text": "any[]"
                 },
                 {
                   "kind": "Content",
@@ -5046,7 +4861,7 @@
               "name": "statements",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 3
+                "endIndex": 2
               }
             }
           ],
@@ -5055,7 +4870,7 @@
         {
           "kind": "Interface",
           "canonicalReference": "@mvfm/core!PluginDefinition:interface",
-          "docComment": "/**\n * Defines a plugin's contract: its name, the AST node kinds it emits, and a build function that returns the methods it contributes to `$`.\n *\n * @example\n * ```ts\n * const myPlugin: PluginDefinition<MyMethods> = {\n *   name: \"my\",\n *   nodeKinds: [\"my/op\"],\n *   build(ctx) { return { op: (a) => ctx.expr({ kind: \"my/op\", a: ctx.lift(a).__node }) }; }\n * };\n * ```\n *\n */\n",
+          "docComment": "/**\n * Defines a plugin's contract: its name, the AST node kinds it emits, and a build function that returns the methods it contributes to `$`.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -5091,7 +4906,7 @@
               "text": "> "
             }
           ],
-          "fileUrlPath": "dist/core.d.ts",
+          "fileUrlPath": "dist/types.d.ts",
           "releaseTag": "Public",
           "typeParameters": [
             {
@@ -5344,7 +5159,7 @@
               "text": ";"
             }
           ],
-          "fileUrlPath": "dist/core.d.ts",
+          "fileUrlPath": "dist/types.d.ts",
           "releaseTag": "Public",
           "name": "PluginInput",
           "typeTokenRange": {
@@ -5363,7 +5178,7 @@
             },
             {
               "kind": "Content",
-              "text": "readonly [import(\"./core\")."
+              "text": "readonly [import(\"./types\")."
             },
             {
               "kind": "Reference",
@@ -5381,7 +5196,7 @@
             },
             {
               "kind": "Content",
-              "text": ", {\n    eq: number;\n    ord: number;\n    semiring: number;\n    show: number;\n    bounded: number;\n}>, import(\"./core\")."
+              "text": ", {\n    eq: number;\n    ord: number;\n    semiring: number;\n    show: number;\n    bounded: number;\n}>, import(\"./types\")."
             },
             {
               "kind": "Reference",
@@ -5399,7 +5214,7 @@
             },
             {
               "kind": "Content",
-              "text": ", {\n    eq: string;\n    show: string;\n    semigroup: string;\n    monoid: string;\n}>, import(\"./core\")."
+              "text": ", {\n    eq: string;\n    show: string;\n    semigroup: string;\n    monoid: string;\n}>, import(\"./types\")."
             },
             {
               "kind": "Reference",
@@ -5408,7 +5223,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./core\")."
+              "text": "<import(\"./types\")."
             },
             {
               "kind": "Reference",
@@ -5417,7 +5232,7 @@
             },
             {
               "kind": "Content",
-              "text": "<\"semiring\">, {}>, import(\"./core\")."
+              "text": "<\"semiring\">, {}>, import(\"./types\")."
             },
             {
               "kind": "Reference",
@@ -5426,7 +5241,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./core\")."
+              "text": "<import(\"./types\")."
             },
             {
               "kind": "Reference",
@@ -5435,7 +5250,7 @@
             },
             {
               "kind": "Content",
-              "text": "<\"eq\">, {}>, import(\"./core\")."
+              "text": "<\"eq\">, {}>, import(\"./types\")."
             },
             {
               "kind": "Reference",
@@ -5444,7 +5259,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./core\")."
+              "text": "<import(\"./types\")."
             },
             {
               "kind": "Reference",
@@ -5453,7 +5268,7 @@
             },
             {
               "kind": "Content",
-              "text": "<\"ord\">, {}>, import(\"./core\")."
+              "text": "<\"ord\">, {}>, import(\"./types\")."
             },
             {
               "kind": "Reference",
@@ -5462,7 +5277,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./core\")."
+              "text": "<import(\"./types\")."
             },
             {
               "kind": "Reference",
@@ -5471,7 +5286,7 @@
             },
             {
               "kind": "Content",
-              "text": "<\"show\">, {}>, import(\"./core\")."
+              "text": "<\"show\">, {}>, import(\"./types\")."
             },
             {
               "kind": "Reference",
@@ -5489,7 +5304,7 @@
             },
             {
               "kind": "Content",
-              "text": ", {\n    eq: boolean;\n    show: boolean;\n    heytingAlgebra: boolean;\n    bounded: boolean;\n}>, import(\"./core\")."
+              "text": ", {\n    eq: boolean;\n    show: boolean;\n    heytingAlgebra: boolean;\n    bounded: boolean;\n}>, import(\"./types\")."
             },
             {
               "kind": "Reference",
@@ -5498,7 +5313,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./core\")."
+              "text": "<import(\"./types\")."
             },
             {
               "kind": "Reference",
@@ -5507,7 +5322,7 @@
             },
             {
               "kind": "Content",
-              "text": "<\"bounded\">, {}>, import(\"./core\")."
+              "text": "<\"bounded\">, {}>, import(\"./types\")."
             },
             {
               "kind": "Reference",
@@ -5516,7 +5331,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./core\")."
+              "text": "<import(\"./types\")."
             },
             {
               "kind": "Reference",
@@ -5525,7 +5340,7 @@
             },
             {
               "kind": "Content",
-              "text": "<\"heytingAlgebra\">, {}>, import(\"./core\")."
+              "text": "<\"heytingAlgebra\">, {}>, import(\"./types\")."
             },
             {
               "kind": "Reference",
@@ -5534,7 +5349,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./core\")."
+              "text": "<import(\"./types\")."
             },
             {
               "kind": "Reference",
@@ -5543,7 +5358,7 @@
             },
             {
               "kind": "Content",
-              "text": "<\"semigroup\">, {}>, import(\"./core\")."
+              "text": "<\"semigroup\">, {}>, import(\"./types\")."
             },
             {
               "kind": "Reference",
@@ -5552,7 +5367,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./core\")."
+              "text": "<import(\"./types\")."
             },
             {
               "kind": "Reference",
@@ -5583,7 +5398,7 @@
               "text": "export interface Program "
             }
           ],
-          "fileUrlPath": "dist/core.d.ts",
+          "fileUrlPath": "dist/types.d.ts",
           "releaseTag": "Public",
           "name": "Program",
           "preserveMemberOrder": false,
@@ -5598,9 +5413,8 @@
                   "text": "ast: "
                 },
                 {
-                  "kind": "Reference",
-                  "text": "ASTNode",
-                  "canonicalReference": "@mvfm/core!ASTNode:interface"
+                  "kind": "Content",
+                  "text": "any"
                 },
                 {
                   "kind": "Content",
@@ -5706,102 +5520,6 @@
           "extendsTokenRanges": []
         },
         {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/core!RecurseFn:interface",
-          "docComment": "/**\n * A callable interpreter function returned by {@link composeInterpreters}.\n *\n * Evaluates an AST node using the composed interpreter fragments, with WeakMap-based memoization so shared (DAG) references are only evaluated once.\n *\n * Call `fresh()` to obtain a new instance with an empty cache — used by retry logic so each attempt re-executes from scratch.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export interface RecurseFn "
-            }
-          ],
-          "fileUrlPath": "dist/core.d.ts",
-          "releaseTag": "Public",
-          "name": "RecurseFn",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "CallSignature",
-              "canonicalReference": "@mvfm/core!RecurseFn:call(1)",
-              "docComment": "/**\n * Evaluate an AST node, returning its result. Memoized by object identity.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "(node: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ASTNode",
-                  "canonicalReference": "@mvfm/core!ASTNode:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Promise",
-                  "canonicalReference": "!Promise:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<unknown>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "returnTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 5
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "node",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  },
-                  "isOptional": false
-                }
-              ]
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/core!RecurseFn#fresh:member(1)",
-              "docComment": "/**\n * Create a new RecurseFn with a fresh (empty) memoization cache.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "fresh(): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "RecurseFn",
-                  "canonicalReference": "@mvfm/core!RecurseFn:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [],
-              "name": "fresh"
-            }
-          ],
-          "extendsTokenRanges": []
-        },
-        {
           "kind": "Function",
           "canonicalReference": "@mvfm/core!resolveSchemaType:function(1)",
           "docComment": "/**\n * Resolves the schema type of a property access chain rooted at `core/input`.\n *\n * Walks backwards through nested `core/prop_access` nodes to reconstruct the access path, then looks it up in the schema.\n *\n * @param node - A `core/prop_access` AST node.\n *\n * @param schema - The program's input schema.\n *\n * @returns The schema type string or `null` if the path doesn't resolve.\n */\n",
@@ -5811,9 +5529,8 @@
               "text": "export declare function resolveSchemaType(node: "
             },
             {
-              "kind": "Reference",
-              "text": "ASTNode",
-              "canonicalReference": "@mvfm/core!ASTNode:interface"
+              "kind": "Content",
+              "text": "any"
             },
             {
               "kind": "Content",
@@ -5867,128 +5584,6 @@
             }
           ],
           "name": "resolveSchemaType"
-        },
-        {
-          "kind": "Function",
-          "canonicalReference": "@mvfm/core!runAST:function(1)",
-          "docComment": "/**\n * Evaluate an AST using generator-based fragments with a custom effect handler.\n *\n * `runAST` auto-handles `recurse` effects by descending into child nodes. All other effects (IO, custom) are delegated to the provided StepHandler. The `\"__legacy\"` effect is handled internally for backward compatibility with {@link LegacyInterpreterFragment}s.\n *\n * @param root - The root AST node to evaluate.\n *\n * @param fragments - Interpreter fragments.\n *\n * @param handler - Handler for non-recurse effects.\n *\n * @param initialState - Initial user state.\n *\n * @typeParam S - User-defined state threaded through the evaluation.\n *\n * @returns The final value and state after evaluation.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export declare function runAST<S>(root: "
-            },
-            {
-              "kind": "Reference",
-              "text": "ASTNode",
-              "canonicalReference": "@mvfm/core!ASTNode:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ", fragments: "
-            },
-            {
-              "kind": "Reference",
-              "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "[]"
-            },
-            {
-              "kind": "Content",
-              "text": ", handler: "
-            },
-            {
-              "kind": "Reference",
-              "text": "StepHandler",
-              "canonicalReference": "@mvfm/core!StepHandler:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<S>"
-            },
-            {
-              "kind": "Content",
-              "text": ", initialState: "
-            },
-            {
-              "kind": "Content",
-              "text": "S"
-            },
-            {
-              "kind": "Content",
-              "text": "): "
-            },
-            {
-              "kind": "Reference",
-              "text": "Promise",
-              "canonicalReference": "!Promise:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<{\n    value: unknown;\n    state: S;\n}>"
-            },
-            {
-              "kind": "Content",
-              "text": ";"
-            }
-          ],
-          "fileUrlPath": "dist/core.d.ts",
-          "returnTypeTokenRange": {
-            "startIndex": 11,
-            "endIndex": 13
-          },
-          "releaseTag": "Public",
-          "overloadIndex": 1,
-          "parameters": [
-            {
-              "parameterName": "root",
-              "parameterTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isOptional": false
-            },
-            {
-              "parameterName": "fragments",
-              "parameterTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 5
-              },
-              "isOptional": false
-            },
-            {
-              "parameterName": "handler",
-              "parameterTypeTokenRange": {
-                "startIndex": 6,
-                "endIndex": 8
-              },
-              "isOptional": false
-            },
-            {
-              "parameterName": "initialState",
-              "parameterTypeTokenRange": {
-                "startIndex": 9,
-                "endIndex": 10
-              },
-              "isOptional": false
-            }
-          ],
-          "typeParameters": [
-            {
-              "typeParameterName": "S",
-              "constraintTokenRange": {
-                "startIndex": 0,
-                "endIndex": 0
-              },
-              "defaultTypeTokenRange": {
-                "startIndex": 0,
-                "endIndex": 0
-              }
-            }
-          ],
-          "name": "runAST"
         },
         {
           "kind": "TypeAlias",
@@ -6639,524 +6234,6 @@
           }
         },
         {
-          "kind": "TypeAlias",
-          "canonicalReference": "@mvfm/core!Step:type",
-          "docComment": "/**\n * A single step in the evaluation of an AST node.\n *\n * When `done` is `true`, the node has been fully evaluated and `value` contains the result. When `done` is `false`, the evaluator has yielded an effect that must be resolved before evaluation can continue.\n *\n * @typeParam S - User-defined state threaded through the evaluation.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export type Step<S> = "
-            },
-            {
-              "kind": "Content",
-              "text": "{\n    done: true;\n    value: unknown;\n    state: S;\n} | {\n    done: false;\n    node: "
-            },
-            {
-              "kind": "Reference",
-              "text": "ASTNode",
-              "canonicalReference": "@mvfm/core!ASTNode:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ";\n    effect: "
-            },
-            {
-              "kind": "Reference",
-              "text": "StepEffect",
-              "canonicalReference": "@mvfm/core!StepEffect:type"
-            },
-            {
-              "kind": "Content",
-              "text": ";\n    context: "
-            },
-            {
-              "kind": "Reference",
-              "text": "StepContext",
-              "canonicalReference": "@mvfm/core!StepContext:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ";\n    state: S;\n}"
-            },
-            {
-              "kind": "Content",
-              "text": ";"
-            }
-          ],
-          "fileUrlPath": "dist/core.d.ts",
-          "releaseTag": "Public",
-          "name": "Step",
-          "typeParameters": [
-            {
-              "typeParameterName": "S",
-              "constraintTokenRange": {
-                "startIndex": 0,
-                "endIndex": 0
-              },
-              "defaultTypeTokenRange": {
-                "startIndex": 0,
-                "endIndex": 0
-              }
-            }
-          ],
-          "typeTokenRange": {
-            "startIndex": 1,
-            "endIndex": 8
-          }
-        },
-        {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/core!StepContext:interface",
-          "docComment": "/**\n * Contextual information about the current position in the AST during step-by-step evaluation.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export interface StepContext "
-            }
-          ],
-          "fileUrlPath": "dist/core.d.ts",
-          "releaseTag": "Public",
-          "name": "StepContext",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/core!StepContext#depth:member",
-              "docComment": "/**\n * How many levels deep from the root this evaluation is.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "depth: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "number"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "depth",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/core!StepContext#parentNode:member",
-              "docComment": "/**\n * The parent AST node, if any.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "parentNode?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ASTNode",
-                  "canonicalReference": "@mvfm/core!ASTNode:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "parentNode",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/core!StepContext#path:member",
-              "docComment": "/**\n * Path of node kinds from root to the current node.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "path: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string[]"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "path",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            }
-          ],
-          "extendsTokenRanges": []
-        },
-        {
-          "kind": "TypeAlias",
-          "canonicalReference": "@mvfm/core!StepEffect:type",
-          "docComment": "/**\n * Describes a side effect produced during AST evaluation.\n *\n * A `\"recurse\"` effect signals the evaluator to descend into a child node. Any other `type` string represents an IO or custom effect to be handled externally (e.g., `\"query\"`, `\"http\"`, `\"log\"`).\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export type StepEffect = "
-            },
-            {
-              "kind": "Content",
-              "text": "{\n    type: \"recurse\";\n    child: "
-            },
-            {
-              "kind": "Reference",
-              "text": "ASTNode",
-              "canonicalReference": "@mvfm/core!ASTNode:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ";\n} | {\n    type: string;\n    [key: string]: unknown;\n}"
-            },
-            {
-              "kind": "Content",
-              "text": ";"
-            }
-          ],
-          "fileUrlPath": "dist/core.d.ts",
-          "releaseTag": "Public",
-          "name": "StepEffect",
-          "typeTokenRange": {
-            "startIndex": 1,
-            "endIndex": 4
-          }
-        },
-        {
-          "kind": "TypeAlias",
-          "canonicalReference": "@mvfm/core!StepHandler:type",
-          "docComment": "/**\n * Handles an effect produced during AST evaluation, returning the resolved value and updated state.\n *\n * @typeParam S - User-defined state threaded through the evaluation.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export type StepHandler<S> = "
-            },
-            {
-              "kind": "Content",
-              "text": "(effect: "
-            },
-            {
-              "kind": "Reference",
-              "text": "StepEffect",
-              "canonicalReference": "@mvfm/core!StepEffect:type"
-            },
-            {
-              "kind": "Content",
-              "text": ", context: "
-            },
-            {
-              "kind": "Reference",
-              "text": "StepContext",
-              "canonicalReference": "@mvfm/core!StepContext:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ", state: S) => "
-            },
-            {
-              "kind": "Reference",
-              "text": "Promise",
-              "canonicalReference": "!Promise:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<{\n    value: unknown;\n    state: S;\n}>"
-            },
-            {
-              "kind": "Content",
-              "text": ";"
-            }
-          ],
-          "fileUrlPath": "dist/core.d.ts",
-          "releaseTag": "Public",
-          "name": "StepHandler",
-          "typeParameters": [
-            {
-              "typeParameterName": "S",
-              "constraintTokenRange": {
-                "startIndex": 0,
-                "endIndex": 0
-              },
-              "defaultTypeTokenRange": {
-                "startIndex": 0,
-                "endIndex": 0
-              }
-            }
-          ],
-          "typeTokenRange": {
-            "startIndex": 1,
-            "endIndex": 8
-          }
-        },
-        {
-          "kind": "Class",
-          "canonicalReference": "@mvfm/core!Stepper:class",
-          "docComment": "/**\n * A trampoline-based AST evaluator that advances one step at a time.\n *\n * The Stepper maintains an explicit stack of generator frames on the heap, enabling step-by-step evaluation with full control over scheduling, caching, and effect interception.\n *\n * Use {@link runAST} or {@link foldAST} for higher-level evaluation; the Stepper is exposed for advanced use cases (debuggers, profilers).\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export declare class Stepper "
-            }
-          ],
-          "fileUrlPath": "dist/core.d.ts",
-          "releaseTag": "Public",
-          "isAbstract": false,
-          "name": "Stepper",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "Constructor",
-              "canonicalReference": "@mvfm/core!Stepper:constructor(1)",
-              "docComment": "/**\n * Constructs a new instance of the `Stepper` class\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "constructor(fragments: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "InterpreterFragment",
-                  "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "[]"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", root: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ASTNode",
-                  "canonicalReference": "@mvfm/core!ASTNode:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ");"
-                }
-              ],
-              "releaseTag": "Public",
-              "isProtected": false,
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "fragments",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 3
-                  },
-                  "isOptional": false
-                },
-                {
-                  "parameterName": "root",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 4,
-                    "endIndex": 5
-                  },
-                  "isOptional": false
-                }
-              ]
-            },
-            {
-              "kind": "Method",
-              "canonicalReference": "@mvfm/core!Stepper#descend:member(1)",
-              "docComment": "/**\n * Push a child node onto the evaluation stack (descend into it).\n *\n * If the child has a cached result and is not tainted, returns the cached value immediately via a done step.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "descend(child: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ASTNode",
-                  "canonicalReference": "@mvfm/core!ASTNode:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", parentNode: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ASTNode",
-                  "canonicalReference": "@mvfm/core!ASTNode:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": " | undefined"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Step",
-                  "canonicalReference": "@mvfm/core!Step:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<undefined> | null"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isStatic": false,
-              "returnTypeTokenRange": {
-                "startIndex": 6,
-                "endIndex": 8
-              },
-              "releaseTag": "Public",
-              "isProtected": false,
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "child",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  },
-                  "isOptional": false
-                },
-                {
-                  "parameterName": "parentNode",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 3,
-                    "endIndex": 5
-                  },
-                  "isOptional": false
-                }
-              ],
-              "isOptional": false,
-              "isAbstract": false,
-              "name": "descend"
-            },
-            {
-              "kind": "Method",
-              "canonicalReference": "@mvfm/core!Stepper#fresh:member(1)",
-              "docComment": "/**\n * Create a new Stepper for the given root with an empty cache.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "fresh(root: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ASTNode",
-                  "canonicalReference": "@mvfm/core!ASTNode:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Stepper",
-                  "canonicalReference": "@mvfm/core!Stepper:class"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isStatic": false,
-              "returnTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 4
-              },
-              "releaseTag": "Public",
-              "isProtected": false,
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "root",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  },
-                  "isOptional": false
-                }
-              ],
-              "isOptional": false,
-              "isAbstract": false,
-              "name": "fresh"
-            },
-            {
-              "kind": "Method",
-              "canonicalReference": "@mvfm/core!Stepper#tick:member(1)",
-              "docComment": "/**\n * Advance the evaluation by one step.\n *\n * @param lastResult - The resolved value of the previous effect (if any).\n *\n * @returns A {@link Step} describing what happened, or `null` if evaluation is complete.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "tick(lastResult?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "unknown"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Step",
-                  "canonicalReference": "@mvfm/core!Step:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<undefined> | null"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isStatic": false,
-              "returnTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 5
-              },
-              "releaseTag": "Public",
-              "isProtected": false,
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "lastResult",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  },
-                  "isOptional": true
-                }
-              ],
-              "isOptional": false,
-              "isAbstract": false,
-              "name": "tick"
-            }
-          ],
-          "implementsTokenRanges": []
-        },
-        {
           "kind": "Interface",
           "canonicalReference": "@mvfm/core!StMethods:interface",
           "docComment": "/**\n * Mutable state operations for local variables within a program.\n */\n",
@@ -7304,7 +6381,7 @@
         {
           "kind": "Variable",
           "canonicalReference": "@mvfm/core!strInterpreter:var",
-          "docComment": "/**\n * Interpreter fragment for `str/` node kinds.\n */\n",
+          "docComment": "/**\n * Interpreter handlers for `str/` node kinds.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -7312,8 +6389,8 @@
             },
             {
               "kind": "Reference",
-              "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/core!InterpreterFragment:interface"
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
             }
           ],
           "fileUrlPath": "dist/plugins/str/interpreter.d.ts",
@@ -8282,7 +7359,7 @@
               "text": "export interface TraitImpl "
             }
           ],
-          "fileUrlPath": "dist/core.d.ts",
+          "fileUrlPath": "dist/types.d.ts",
           "releaseTag": "Public",
           "name": "TraitImpl",
           "preserveMemberOrder": false,
@@ -8348,6 +7425,335 @@
             }
           ],
           "extendsTokenRanges": []
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@mvfm/core!typedFoldAST:function(1)",
+          "docComment": "/**\n * Type-safe fold that enforces interpreter completeness at compile time. Program goes first so `K` is inferred before the interpreter is checked.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function typedFoldAST<K extends "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ">(program: "
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedProgram",
+              "canonicalReference": "@mvfm/core!TypedProgram:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<K>"
+            },
+            {
+              "kind": "Content",
+              "text": ", interpreter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "CompleteInterpreter",
+              "canonicalReference": "@mvfm/core!CompleteInterpreter:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<K>"
+            },
+            {
+              "kind": "Content",
+              "text": ", state?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "FoldState",
+              "canonicalReference": "@mvfm/core!FoldState:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/fold.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 11,
+            "endIndex": 13
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "program",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 5
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "interpreter",
+              "parameterTypeTokenRange": {
+                "startIndex": 6,
+                "endIndex": 8
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "state",
+              "parameterTypeTokenRange": {
+                "startIndex": 9,
+                "endIndex": 10
+              },
+              "isOptional": true
+            }
+          ],
+          "typeParameters": [
+            {
+              "typeParameterName": "K",
+              "constraintTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "name": "typedFoldAST"
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@mvfm/core!TypedNode:interface",
+          "docComment": "/**\n * Base type for AST nodes in the interpreter. Carries a phantom type parameter `T` tracking the runtime value type. No index signature — handlers receive specific typed node interfaces, not untyped bags.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface TypedNode<T = "
+            },
+            {
+              "kind": "Content",
+              "text": "unknown"
+            },
+            {
+              "kind": "Content",
+              "text": "> "
+            }
+          ],
+          "fileUrlPath": "dist/fold.d.ts",
+          "releaseTag": "Public",
+          "typeParameters": [
+            {
+              "typeParameterName": "T",
+              "constraintTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "name": "TypedNode",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@mvfm/core!TypedNode#__T:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly __T?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "T"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "__T",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@mvfm/core!TypedNode#kind:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly kind: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "kind",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@mvfm/core!TypedProgram:interface",
+          "docComment": "/**\n * A program with phantom type `K` tracking all node kinds used. `typedFoldAST` infers `K` and requires a complete interpreter.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface TypedProgram<K extends "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": "> "
+            }
+          ],
+          "fileUrlPath": "dist/fold.d.ts",
+          "releaseTag": "Public",
+          "typeParameters": [
+            {
+              "typeParameterName": "K",
+              "constraintTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "name": "TypedProgram",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@mvfm/core!TypedProgram#__kinds:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "readonly __kinds?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "K"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": true,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "__kinds",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@mvfm/core!TypedProgram#root:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "root: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "TypedNode",
+                  "canonicalReference": "@mvfm/core!TypedNode:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "root",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@mvfm/core!VOLATILE_KINDS:var",
+          "docComment": "/**\n * Node kinds that are inherently volatile (never cached, always re-evaluated).\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "VOLATILE_KINDS: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Set",
+              "canonicalReference": "!Set:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<string>"
+            }
+          ],
+          "fileUrlPath": "dist/fold.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "VOLATILE_KINDS",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
         }
       ]
     }

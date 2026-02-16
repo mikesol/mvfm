@@ -1,4 +1,4 @@
-import type { ASTNode, Expr, PluginContext, PluginDefinition } from "../../core";
+import type { Expr, PluginContext, PluginDefinition } from "../../core";
 
 /**
  * Control flow operations for iteration.
@@ -33,7 +33,7 @@ export const control: PluginDefinition<ControlMethods> = {
   build(ctx: PluginContext): ControlMethods {
     return {
       each<T>(collection: Expr<T[]>, body: (item: Expr<T>) => void) {
-        const paramNode: ASTNode = { kind: "core/lambda_param", name: "item" };
+        const paramNode: any = { kind: "core/lambda_param", name: "item" };
         const paramProxy = ctx.expr<T>(paramNode) as Expr<T>;
         const prevLen = ctx.statements.length;
         body(paramProxy);

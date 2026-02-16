@@ -1,10 +1,9 @@
 import { coreInterpreter, foldAST, mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { twilio } from "../../src/5.5.1";
-import { twilioInterpreter } from "../../src/5.5.1/interpreter";
+import { createTwilioInterpreter, type TwilioClient } from "../../src/5.5.1/interpreter";
 
 const app = mvfm(num, str, twilio({ accountSid: "AC_test_123", authToken: "auth_test_456" }));
-const fragments = [twilioInterpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
@@ -18,15 +17,16 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 }
 
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
-  const captured: any[] = [];
+  const captured: Array<{ method: string; path: string; params?: Record<string, unknown> }> = [];
   const ast = injectInput(prog.ast, input);
-  const recurse = foldAST(fragments, {
-    "twilio/api_call": async (effect) => {
-      captured.push(effect);
+  const mockClient: TwilioClient = {
+    async request(method: string, path: string, params?: Record<string, unknown>) {
+      captured.push({ method, path, params });
       return { sid: "mock_sid", status: "mock" };
     },
-  });
-  const result = await recurse(ast.result);
+  };
+  const combined = { ...createTwilioInterpreter(mockClient), ...coreInterpreter };
+  const result = await foldAST(combined, ast.result);
   return { result, captured };
 }
 
@@ -41,7 +41,6 @@ describe("twilio interpreter: create_message", () => {
     );
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("twilio/api_call");
     expect(captured[0].method).toBe("POST");
     expect(captured[0].path).toBe("/2010-04-01/Accounts/AC_test_123/Messages.json");
     expect(captured[0].params).toEqual({
@@ -57,7 +56,6 @@ describe("twilio interpreter: fetch_message", () => {
     const prog = app(($) => $.twilio.messages("SM800f449d").fetch());
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("twilio/api_call");
     expect(captured[0].method).toBe("GET");
     expect(captured[0].path).toBe("/2010-04-01/Accounts/AC_test_123/Messages/SM800f449d.json");
     expect(captured[0].params).toBeUndefined();
@@ -69,7 +67,6 @@ describe("twilio interpreter: list_messages", () => {
     const prog = app(($) => $.twilio.messages.list({ limit: 10 }));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("twilio/api_call");
     expect(captured[0].method).toBe("GET");
     expect(captured[0].path).toBe("/2010-04-01/Accounts/AC_test_123/Messages.json");
     expect(captured[0].params).toEqual({ limit: 10 });
@@ -100,7 +97,6 @@ describe("twilio interpreter: create_call", () => {
     );
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("twilio/api_call");
     expect(captured[0].method).toBe("POST");
     expect(captured[0].path).toBe("/2010-04-01/Accounts/AC_test_123/Calls.json");
     expect(captured[0].params).toEqual({
@@ -116,7 +112,6 @@ describe("twilio interpreter: fetch_call", () => {
     const prog = app(($) => $.twilio.calls("CA42ed11f9").fetch());
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("twilio/api_call");
     expect(captured[0].method).toBe("GET");
     expect(captured[0].path).toBe("/2010-04-01/Accounts/AC_test_123/Calls/CA42ed11f9.json");
     expect(captured[0].params).toBeUndefined();
@@ -128,7 +123,6 @@ describe("twilio interpreter: list_calls", () => {
     const prog = app(($) => $.twilio.calls.list({ limit: 20 }));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("twilio/api_call");
     expect(captured[0].method).toBe("GET");
     expect(captured[0].path).toBe("/2010-04-01/Accounts/AC_test_123/Calls.json");
     expect(captured[0].params).toEqual({ limit: 20 });

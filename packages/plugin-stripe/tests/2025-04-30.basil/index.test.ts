@@ -199,8 +199,8 @@ describe("stripe: charges.list", () => {
   });
 });
 
-describe("stripe: integration with $.do()", () => {
-  it("side-effecting operations wrapped in $.do() are reachable", () => {
+describe("stripe: integration with $.discard()", () => {
+  it("side-effecting operations wrapped in $.discard() are reachable", () => {
     expect(() => {
       app(($) => {
         const customer = $.stripe.customers.create({ email: "test@example.com" });
@@ -209,7 +209,7 @@ describe("stripe: integration with $.do()", () => {
           currency: "usd",
           customer: customer.id,
         });
-        return $.do(customer, charge);
+        return $.discard(customer, charge);
       });
     }).not.toThrow();
   });
@@ -234,10 +234,10 @@ describe("stripe: cross-operation dependencies", () => {
         currency: "usd",
         customer: customer.id,
       });
-      return $.do(customer, paymentIntent);
+      return $.discard(customer, paymentIntent);
     });
     const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/do");
+    expect(ast.result.kind).toBe("core/discard");
     // The payment intent params should reference the customer via prop_access
     const piParams = ast.result.result.params;
     expect(piParams.fields.customer.kind).toBe("core/prop_access");

@@ -5,9 +5,6 @@
 ```ts
 
 // @public
-export function adaptLegacy(fragment: LegacyInterpreterFragment): InterpreterFragment;
-
-// @public
 export function array(of: SchemaType): ArraySchema;
 
 // @public
@@ -19,16 +16,6 @@ export interface ArraySchema {
 }
 
 // @public
-export interface ASTNode {
-    // (undocumented)
-    __id?: number;
-    // (undocumented)
-    [key: string]: unknown;
-    // (undocumented)
-    kind: string;
-}
-
-// @public
 export const boolean: PluginDefinition<BooleanMethods, {
     eq: boolean;
     show: boolean;
@@ -37,7 +24,7 @@ export const boolean: PluginDefinition<BooleanMethods, {
 }>;
 
 // @public
-export const booleanInterpreter: InterpreterFragment;
+export const booleanInterpreter: Interpreter;
 
 // @public
 export type BooleanMethods = {};
@@ -52,7 +39,12 @@ export interface BoundedFor<_T> {
 }
 
 // @public
-export function composeInterpreters(fragments: InterpreterFragment[]): RecurseFn;
+export function checkCompleteness(interpreter: Interpreter, root: TypedNode): void;
+
+// @public
+export type CompleteInterpreter<K extends string> = {
+    [key in K]: (node: any) => AsyncGenerator<TypedNode, unknown, unknown>;
+};
 
 // @public
 export const control: PluginDefinition<ControlMethods>;
@@ -66,7 +58,10 @@ export interface ControlMethods {
 }
 
 // @public
-export const coreInterpreter: InterpreterFragment;
+export const coreInterpreter: Interpreter;
+
+// @public
+export function createFoldState(): FoldState;
 
 // Warning: (ae-incompatible-release-tags) The symbol "eq" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
 //
@@ -80,13 +75,13 @@ export interface EqFor<T> {
 }
 
 // @public
-export const eqInterpreter: InterpreterFragment;
+export const eqInterpreter: Interpreter;
 
 // @public
 export const error: PluginDefinition<ErrorMethods>;
 
 // @public
-export const errorInterpreter: InterpreterFragment;
+export const errorInterpreter: Interpreter;
 
 // @public
 export interface ErrorMethods {
@@ -105,6 +100,9 @@ export interface ErrorMethods {
     try<T>(expr: Expr<T>): TryBuilder<T>;
 }
 
+// @public
+export function eval_<T>(node: TypedNode<T>): AsyncGenerator<TypedNode, T, unknown>;
+
 // Warning: (ae-forgotten-export) The symbol "ExprBase" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "ExprFields" needs to be exported by the entry point index.d.ts
 //
@@ -115,7 +113,7 @@ export type Expr<T> = ExprBase<T> & ExprFields<T>;
 export const fiber: PluginDefinition<FiberMethods>;
 
 // @public
-export const fiberInterpreter: InterpreterFragment;
+export const fiberInterpreter: Interpreter;
 
 // @public
 export interface FiberMethods {
@@ -131,10 +129,18 @@ export interface FiberMethods {
 }
 
 // @public
-export function foldAST(fragments: InterpreterFragment[], handlers: Record<string, (effect: StepEffect) => Promise<unknown>>): RecurseFn;
+export function foldAST(interpreter: Interpreter, root: TypedNode, state?: FoldState): Promise<unknown>;
 
-// @public @deprecated
-export type GeneratorInterpreterFragment = InterpreterFragment;
+// @public
+export interface FoldState {
+    // (undocumented)
+    cache: WeakMap<TypedNode, unknown>;
+    // (undocumented)
+    tainted: WeakSet<TypedNode>;
+}
+
+// @public
+export type Handler<N extends TypedNode<any>> = N extends TypedNode<infer T> ? (node: N) => AsyncGenerator<TypedNode, T, unknown> : never;
 
 // Warning: (ae-incompatible-release-tags) The symbol "heytingAlgebra" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
 //
@@ -162,36 +168,13 @@ export type InferSchema<S> = S extends SchemaTag ? TagToType<S> : S extends {
 } : never;
 
 // @public
-export function inferType(node: ASTNode, impls: TraitImpl[], schema?: Record<string, unknown>): string | null;
+export function inferType(node: any, impls: TraitImpl[], schema?: Record<string, unknown>): string | null;
 
 // @public
 export function injectLambdaParam(node: any, name: string, value: unknown): void;
 
 // @public
-export type Interpreter = (program: Program) => {
-    run: (input: Record<string, unknown>) => Promise<unknown>;
-};
-
-// @public
-export interface InterpreterFragment {
-    // (undocumented)
-    canHandle: (node: ASTNode) => boolean;
-    isVolatile?: (node: ASTNode) => boolean;
-    // (undocumented)
-    pluginName: string;
-    // (undocumented)
-    visit: (node: ASTNode) => Generator<StepEffect, unknown, unknown>;
-}
-
-// @public
-export interface LegacyInterpreterFragment {
-    // (undocumented)
-    canHandle: (node: ASTNode) => boolean;
-    // (undocumented)
-    pluginName: string;
-    // (undocumented)
-    visit: (node: ASTNode, recurse: (node: ASTNode) => Promise<unknown>) => Promise<unknown>;
-}
+export type Interpreter = Record<string, (node: any) => AsyncGenerator<TypedNode, unknown, unknown>>;
 
 // Warning: (ae-internal-missing-underscore) The name "MissingTraitError" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -210,7 +193,7 @@ export const monoid: PluginDefinition<TypeclassSlot<"monoid">>;
 export interface MonoidFor<_T> {
 }
 
-// @public (undocumented)
+// @public
 export function mvfm<const P extends readonly PluginInput[]>(...plugins: P): {
     <S extends SchemaShape>(schema: S, fn: ($: CoreDollar<InferSchema<S>> & MergePlugins<FlattenPluginInputs<P>>) => Expr<any> | any): Program;
     <I = never>(fn: ($: CoreDollar<I> & MergePlugins<FlattenPluginInputs<P>>) => Expr<any> | any): Program;
@@ -237,7 +220,7 @@ export const num: PluginDefinition<NumMethods, {
 }>;
 
 // @public
-export const numInterpreter: InterpreterFragment;
+export const numInterpreter: Interpreter;
 
 // @public
 export interface NumMethods {
@@ -268,7 +251,7 @@ export interface OrdFor<T> {
 }
 
 // @public
-export const ordInterpreter: InterpreterFragment;
+export const ordInterpreter: Interpreter;
 
 // @public
 type Plugin_2<T = any, Traits extends Record<string, unknown> = {}> = PluginDefinition<T, Traits> | (() => PluginDefinition<T, Traits>);
@@ -276,14 +259,14 @@ export { Plugin_2 as Plugin }
 
 // @public
 export interface PluginContext {
-    emit: (node: ASTNode) => void;
-    expr: <T>(node: ASTNode) => Expr<T>;
+    emit: (node: any) => void;
+    expr: <T>(node: any) => Expr<T>;
     inputSchema?: Record<string, unknown>;
     isExpr: (value: unknown) => value is Expr<unknown>;
     lift: <T>(value: T | Expr<T>) => Expr<T>;
     plugins: PluginDefinition[];
-    _registry: Map<number, ASTNode>;
-    statements: ASTNode[];
+    _registry: Map<number, any>;
+    statements: any[];
 }
 
 // @public
@@ -334,7 +317,7 @@ bounded: boolean;
 // @public
 export interface Program {
     // (undocumented)
-    ast: ASTNode;
+    ast: any;
     // (undocumented)
     hash: string;
     // (undocumented)
@@ -344,19 +327,7 @@ export interface Program {
 }
 
 // @public
-export interface RecurseFn {
-    (node: ASTNode): Promise<unknown>;
-    fresh(): RecurseFn;
-}
-
-// @public
-export function resolveSchemaType(node: ASTNode, schema?: Record<string, unknown>): string | null;
-
-// @public
-export function runAST<S>(root: ASTNode, fragments: InterpreterFragment[], handler: StepHandler<S>, initialState: S): Promise<{
-    value: unknown;
-    state: S;
-}>;
+export function resolveSchemaType(node: any, schema?: Record<string, unknown>): string | null;
 
 // @public
 export type SchemaShape = Record<string, SchemaType>;
@@ -404,49 +375,6 @@ export interface ShowFor<T> {
 export const st: PluginDefinition<StMethods>;
 
 // @public
-export type Step<S> = {
-    done: true;
-    value: unknown;
-    state: S;
-} | {
-    done: false;
-    node: ASTNode;
-    effect: StepEffect;
-    context: StepContext;
-    state: S;
-};
-
-// @public
-export interface StepContext {
-    depth: number;
-    parentNode?: ASTNode;
-    path: string[];
-}
-
-// @public
-export type StepEffect = {
-    type: "recurse";
-    child: ASTNode;
-} | {
-    type: string;
-    [key: string]: unknown;
-};
-
-// @public
-export type StepHandler<S> = (effect: StepEffect, context: StepContext, state: S) => Promise<{
-    value: unknown;
-    state: S;
-}>;
-
-// @public
-export class Stepper {
-    constructor(fragments: InterpreterFragment[], root: ASTNode);
-    descend(child: ASTNode, parentNode: ASTNode | undefined): Step<undefined> | null;
-    fresh(root: ASTNode): Stepper;
-    tick(lastResult?: unknown): Step<undefined> | null;
-}
-
-// @public
 export interface StMethods {
     let<T>(initial: Expr<T> | T): {
         get: () => Expr<T>;
@@ -464,7 +392,7 @@ export const str: PluginDefinition<StrMethods, {
 }>;
 
 // @public
-export const strInterpreter: InterpreterFragment;
+export const strInterpreter: Interpreter;
 
 // @public
 export interface StrMethods {
@@ -505,11 +433,33 @@ export interface TypeclassSlot<Name extends string> {
     readonly __typeclassSlot: Name;
 }
 
+// @public
+export function typedFoldAST<K extends string>(program: TypedProgram<K>, interpreter: CompleteInterpreter<K>, state?: FoldState): Promise<unknown>;
+
+// @public
+export interface TypedNode<T = unknown> {
+    // (undocumented)
+    readonly __T?: T;
+    // (undocumented)
+    readonly kind: string;
+}
+
+// @public
+export interface TypedProgram<K extends string> {
+    // (undocumented)
+    readonly __kinds?: K;
+    // (undocumented)
+    root: TypedNode;
+}
+
+// @public
+export const VOLATILE_KINDS: Set<string>;
+
 // Warnings were encountered during analysis:
 //
-// dist/core.d.ts:424:5 - (ae-forgotten-export) The symbol "CoreDollar" needs to be exported by the entry point index.d.ts
-// dist/core.d.ts:424:5 - (ae-forgotten-export) The symbol "MergePlugins" needs to be exported by the entry point index.d.ts
-// dist/core.d.ts:424:5 - (ae-forgotten-export) The symbol "FlattenPluginInputs" needs to be exported by the entry point index.d.ts
+// dist/builder.d.ts:11:5 - (ae-forgotten-export) The symbol "CoreDollar" needs to be exported by the entry point index.d.ts
+// dist/builder.d.ts:11:5 - (ae-forgotten-export) The symbol "MergePlugins" needs to be exported by the entry point index.d.ts
+// dist/builder.d.ts:11:5 - (ae-forgotten-export) The symbol "FlattenPluginInputs" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

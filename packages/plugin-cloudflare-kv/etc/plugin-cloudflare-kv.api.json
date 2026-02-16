@@ -189,69 +189,9 @@
       "preserveMemberOrder": false,
       "members": [
         {
-          "kind": "Function",
-          "canonicalReference": "@mvfm/plugin-cloudflare-kv!clientHandler:function(1)",
-          "docComment": "/**\n * Creates a client-side StepHandler that sends Cloudflare KV effects as JSON to a remote server endpoint for execution.\n *\n * Each effect is sent as a POST request to `{baseUrl}/mvfm/execute` with the contract hash, step index, path, and effect payload.\n *\n * @param options - Configuration for the client handler.\n *\n * @returns A StepHandler that tracks step indices.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export declare function clientHandler(options: "
-            },
-            {
-              "kind": "Reference",
-              "text": "ClientHandlerOptions",
-              "canonicalReference": "@mvfm/plugin-cloudflare-kv!ClientHandlerOptions:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "): "
-            },
-            {
-              "kind": "Reference",
-              "text": "StepHandler",
-              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~StepHandler:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "ClientHandlerState",
-              "canonicalReference": "@mvfm/plugin-cloudflare-kv!ClientHandlerState:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ">"
-            },
-            {
-              "kind": "Content",
-              "text": ";"
-            }
-          ],
-          "fileUrlPath": "dist/4.20260213.0/handler.client.d.ts",
-          "returnTypeTokenRange": {
-            "startIndex": 3,
-            "endIndex": 7
-          },
-          "releaseTag": "Public",
-          "overloadIndex": 1,
-          "parameters": [
-            {
-              "parameterName": "options",
-              "parameterTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isOptional": false
-            }
-          ],
-          "name": "clientHandler"
-        },
-        {
           "kind": "Interface",
           "canonicalReference": "@mvfm/plugin-cloudflare-kv!ClientHandlerOptions:interface",
-          "docComment": "/**\n * Options for configuring the client-side handler.\n */\n",
+          "docComment": "/**\n * Options for the client-side interpreter.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -266,7 +206,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "@mvfm/plugin-cloudflare-kv!ClientHandlerOptions#baseUrl:member",
-              "docComment": "/**\n * Base URL of the server endpoint (e.g., \"https://api.example.com\").\n */\n",
+              "docComment": "/**\n * Base URL for remote execution endpoint.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -293,7 +233,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "@mvfm/plugin-cloudflare-kv!ClientHandlerOptions#contractHash:member",
-              "docComment": "/**\n * Contract hash from the program, used for verification.\n */\n",
+              "docComment": "/**\n * Contract hash from compiled program metadata.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -320,7 +260,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "@mvfm/plugin-cloudflare-kv!ClientHandlerOptions#fetch:member",
-              "docComment": "/**\n * Custom fetch implementation (defaults to global fetch).\n */\n",
+              "docComment": "/**\n * Optional fetch override.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -352,7 +292,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "@mvfm/plugin-cloudflare-kv!ClientHandlerOptions#headers:member",
-              "docComment": "/**\n * Additional headers to include in requests.\n */\n",
+              "docComment": "/**\n * Optional extra request headers.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -385,49 +325,67 @@
           "extendsTokenRanges": []
         },
         {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/plugin-cloudflare-kv!ClientHandlerState:interface",
-          "docComment": "/**\n * State tracked by the client handler across steps.\n */\n",
+          "kind": "Function",
+          "canonicalReference": "@mvfm/plugin-cloudflare-kv!clientInterpreter:function(1)",
+          "docComment": "/**\n * Creates a client-side interpreter that proxies all operations to a server.\n *\n * Each handler resolves its TypedNode children via `eval_()`, then sends the resolved data to `{baseUrl}/mvfm/execute` as a JSON POST.\n *\n * @param options - Handler options.\n *\n * @param nodeKinds - Node kinds to create handlers for.\n *\n * @returns An Interpreter that proxies all operations to the server.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export interface ClientHandlerState "
+              "text": "export declare function clientInterpreter(options: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ClientHandlerOptions",
+              "canonicalReference": "@mvfm/plugin-cloudflare-kv!ClientHandlerOptions:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", nodeKinds: "
+            },
+            {
+              "kind": "Content",
+              "text": "string[]"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~Interpreter:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
             }
           ],
           "fileUrlPath": "dist/4.20260213.0/handler.client.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 5,
+            "endIndex": 6
+          },
           "releaseTag": "Public",
-          "name": "ClientHandlerState",
-          "preserveMemberOrder": false,
-          "members": [
+          "overloadIndex": 1,
+          "parameters": [
             {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-cloudflare-kv!ClientHandlerState#stepIndex:member",
-              "docComment": "/**\n * The current step index, incremented after each effect.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "stepIndex: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "number"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "stepIndex",
-              "propertyTypeTokenRange": {
+              "parameterName": "options",
+              "parameterTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
-              }
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "nodeKinds",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": false
             }
           ],
-          "extendsTokenRanges": []
+          "name": "clientInterpreter"
         },
         {
           "kind": "Function",
@@ -865,30 +823,6 @@
           "extendsTokenRanges": []
         },
         {
-          "kind": "Variable",
-          "canonicalReference": "@mvfm/plugin-cloudflare-kv!cloudflareKvInterpreter:var",
-          "docComment": "/**\n * Generator-based interpreter fragment for cloudflare-kv plugin nodes.\n *\n * Yields `cloudflare-kv/api_call` effects for all 5 operations. Each effect contains the operation name, parameters, and namespace ID.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "cloudflareKvInterpreter: "
-            },
-            {
-              "kind": "Reference",
-              "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~InterpreterFragment:interface"
-            }
-          ],
-          "fileUrlPath": "dist/4.20260213.0/interpreter.d.ts",
-          "isReadonly": true,
-          "releaseTag": "Public",
-          "name": "cloudflareKvInterpreter",
-          "variableTypeTokenRange": {
-            "startIndex": 1,
-            "endIndex": 2
-          }
-        },
-        {
           "kind": "Interface",
           "canonicalReference": "@mvfm/plugin-cloudflare-kv!CloudflareKvMethods:interface",
           "docComment": "/**\n * Cloudflare KV operations added to the DSL context.\n *\n * Mirrors the KVNamespace API: get, put, delete, list. Each method produces a namespaced AST node.\n */\n",
@@ -1058,6 +992,53 @@
             }
           ],
           "extendsTokenRanges": []
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@mvfm/plugin-cloudflare-kv!createCloudflareKvInterpreter:function(1)",
+          "docComment": "/**\n * Creates an interpreter for `cloudflare-kv/*` node kinds.\n *\n * @param client - The {@link CloudflareKvClient} to execute against.\n *\n * @returns An Interpreter handling all cloudflare-kv node kinds.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function createCloudflareKvInterpreter(client: "
+            },
+            {
+              "kind": "Reference",
+              "text": "CloudflareKvClient",
+              "canonicalReference": "@mvfm/plugin-cloudflare-kv!CloudflareKvClient:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~Interpreter:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/4.20260213.0/interpreter.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "client",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "createCloudflareKvInterpreter"
         },
         {
           "kind": "Interface",
@@ -2006,7 +1987,7 @@
         {
           "kind": "Function",
           "canonicalReference": "@mvfm/plugin-cloudflare-kv!serverEvaluate:function(1)",
-          "docComment": "/**\n * Creates a unified evaluation function that evaluates an AST against a Cloudflare KV client using the provided interpreter fragments.\n *\n * @param client - The {@link CloudflareKvClient} to execute against.\n *\n * @param fragments - Generator interpreter fragments for evaluating sub-expressions.\n *\n * @returns An async function that evaluates an AST node to its result.\n */\n",
+          "docComment": "/**\n * Creates a unified evaluator using the cloudflare-kv server interpreter.\n *\n * @param client - The {@link CloudflareKvClient} to execute against.\n *\n * @param baseInterpreter - Base interpreter for evaluating sub-expressions.\n *\n * @returns An async AST evaluator function.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -2019,16 +2000,12 @@
             },
             {
               "kind": "Content",
-              "text": ", fragments: "
+              "text": ", baseInterpreter: "
             },
             {
               "kind": "Reference",
-              "text": "InterpreterFragment",
-              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~InterpreterFragment:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "[]"
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~Interpreter:type"
             },
             {
               "kind": "Content",
@@ -2040,8 +2017,8 @@
             },
             {
               "kind": "Reference",
-              "text": "ASTNode",
-              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~ASTNode:interface"
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~TypedNode:interface"
             },
             {
               "kind": "Content",
@@ -2063,8 +2040,8 @@
           ],
           "fileUrlPath": "dist/4.20260213.0/handler.server.d.ts",
           "returnTypeTokenRange": {
-            "startIndex": 6,
-            "endIndex": 11
+            "startIndex": 5,
+            "endIndex": 10
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
@@ -2078,10 +2055,10 @@
               "isOptional": false
             },
             {
-              "parameterName": "fragments",
+              "parameterName": "baseInterpreter",
               "parameterTypeTokenRange": {
                 "startIndex": 3,
-                "endIndex": 5
+                "endIndex": 4
               },
               "isOptional": false
             }
@@ -2090,12 +2067,12 @@
         },
         {
           "kind": "Function",
-          "canonicalReference": "@mvfm/plugin-cloudflare-kv!serverHandler:function(1)",
-          "docComment": "/**\n * Creates a server-side StepHandler that executes Cloudflare KV effects against a real KV client.\n *\n * Handles `cloudflare-kv/api_call` effects by delegating to the appropriate client method based on the operation field.\n *\n * @param client - The {@link CloudflareKvClient} to execute against.\n *\n * @returns A StepHandler for void state.\n */\n",
+          "canonicalReference": "@mvfm/plugin-cloudflare-kv!serverInterpreter:function(1)",
+          "docComment": "/**\n * Creates a server-side interpreter for `cloudflare-kv/*` node kinds.\n *\n * @param client - The {@link CloudflareKvClient} to execute against.\n *\n * @returns An Interpreter for cloudflare-kv node kinds.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare function serverHandler(client: "
+              "text": "export declare function serverInterpreter(client: "
             },
             {
               "kind": "Reference",
@@ -2108,12 +2085,8 @@
             },
             {
               "kind": "Reference",
-              "text": "StepHandler",
-              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~StepHandler:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<void>"
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~Interpreter:type"
             },
             {
               "kind": "Content",
@@ -2123,7 +2096,7 @@
           "fileUrlPath": "dist/4.20260213.0/handler.server.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 3,
-            "endIndex": 5
+            "endIndex": 4
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
@@ -2137,7 +2110,7 @@
               "isOptional": false
             }
           ],
-          "name": "serverHandler"
+          "name": "serverInterpreter"
         },
         {
           "kind": "Function",

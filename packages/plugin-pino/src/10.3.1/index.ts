@@ -44,7 +44,7 @@
 //
 // ============================================================
 
-import type { ASTNode, Expr, PluginContext, PluginDefinition } from "@mvfm/core";
+import type { Expr, PluginContext, PluginDefinition, TypedNode } from "@mvfm/core";
 
 // ---- What the plugin adds to $ ----------------------------
 
@@ -53,7 +53,7 @@ import type { ASTNode, Expr, PluginContext, PluginDefinition } from "@mvfm/core"
  *
  * Provides six log level methods and `child()` for creating
  * loggers with accumulated bindings. Each method returns
- * `Expr<void>` for composition via `$.do()`.
+ * `Expr<void>` for composition via `$.discard()`.
  */
 export interface PinoLogger {
   /** Log at trace level. */
@@ -136,11 +136,11 @@ export function pino(config: PinoConfig = {}): PluginDefinition<PinoMethods> {
     nodeKinds: ["pino/trace", "pino/debug", "pino/info", "pino/warn", "pino/error", "pino/fatal"],
 
     build(ctx: PluginContext): PinoMethods {
-      function buildLogger(parentBindings: ASTNode[]): PinoLogger {
+      function buildLogger(parentBindings: TypedNode[]): PinoLogger {
         function logMethod(level: string) {
           return (...args: any[]): Expr<void> => {
-            let mergeObject: ASTNode | null = null;
-            let msg: ASTNode | null = null;
+            let mergeObject: TypedNode | null = null;
+            let msg: TypedNode | null = null;
 
             if (args.length === 2) {
               // Two args: (mergeObject, msg)

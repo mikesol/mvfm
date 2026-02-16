@@ -1,6 +1,6 @@
-import { composeInterpreters, coreInterpreter, mvfm, str, strInterpreter } from "@mvfm/core";
+import { coreInterpreter, foldAST, mvfm, str, strInterpreter } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
-import { zod, zodInterpreter } from "../src/index";
+import { createZodInterpreter, zod } from "../src/index";
 
 /** Inject input data into core/input nodes throughout the AST. */
 function injectInput(node: any, input: Record<string, unknown>): any {
@@ -17,8 +17,8 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 /** Build AST from DSL, inject input, compose interpreters, evaluate. */
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
-  const interp = composeInterpreters([coreInterpreter, strInterpreter, zodInterpreter]);
-  return await interp(ast.result);
+  const interp = { ...coreInterpreter, ...strInterpreter, ...createZodInterpreter() };
+  return await foldAST(interp, ast.result);
 }
 
 const app = mvfm(zod);
@@ -700,6 +700,425 @@ describe("zodInterpreter: primitives (#141)", () => {
     const undef = (await run(prog, { value: undefined })) as any;
     expect(undef.success).toBe(true);
     const valid = (await run(prog, { value: true })) as any;
+    expect(valid.success).toBe(true);
+  });
+});
+describe("zodInterpreter: tuple schemas (#148)", () => {
+  it("tuple of strings accepts valid input", async () => {
+    const prog = app(($) => $.zod.tuple([$.zod.string(), $.zod.string()]).parse($.input.value));
+    expect(await run(prog, { value: ["a", "b"] })).toEqual(["a", "b"]);
+  });
+
+  it("tuple rejects non-array input", async () => {
+    const prog = app(($) => $.zod.tuple([$.zod.string()]).safeParse($.input.value));
+    const result = (await run(prog, { value: "not a tuple" })) as any;
+    expect(result.success).toBe(false);
+  });
+
+  it("tuple rejects wrong number of elements", async () => {
+    const prog = app(($) => $.zod.tuple([$.zod.string(), $.zod.string()]).safeParse($.input.value));
+    const result = (await run(prog, { value: ["only one"] })) as any;
+    expect(result.success).toBe(false);
+  });
+
+  it("tuple rejects wrong element types", async () => {
+    const prog = app(($) => $.zod.tuple([$.zod.string()]).safeParse($.input.value));
+    const result = (await run(prog, { value: [42] })) as any;
+    expect(result.success).toBe(false);
+  });
+
+  it("tuple with rest element accepts extra elements", async () => {
+    const prog = app(($) => $.zod.tuple([$.zod.string()], $.zod.string()).parse($.input.value));
+    expect(await run(prog, { value: ["a", "b", "c"] })).toEqual(["a", "b", "c"]);
+  });
+
+  it("tuple with rest element validates rest type", async () => {
+    const prog = app(($) => $.zod.tuple([$.zod.string()], $.zod.string()).safeParse($.input.value));
+    const result = (await run(prog, { value: ["a", 42] })) as any;
+    expect(result.success).toBe(false);
+  });
+
+  it("empty tuple accepts empty array", async () => {
+    const prog = app(($) => $.zod.tuple([]).parse($.input.value));
+    expect(await run(prog, { value: [] })).toEqual([]);
+  });
+
+  it("schema-level error appears in output", async () => {
+    const prog = app(($) =>
+      $.zod.tuple([$.zod.string()], undefined, "Must be tuple!").safeParse($.input.value),
+    );
+    const result = (await run(prog, { value: 42 })) as any;
+    expect(result.success).toBe(false);
+    expect(result.error.message).toContain("Must be tuple!");
+  });
+
+  it("optional tuple works", async () => {
+    const prog = app(($) => $.zod.tuple([$.zod.string()]).optional().safeParse($.input.value));
+    const undef = (await run(prog, { value: undefined })) as any;
+    const valid = (await run(prog, { value: ["a"] })) as any;
+    expect(undef.success).toBe(true);
+    expect(valid.success).toBe(true);
+    expect(valid.data).toEqual(["a"]);
+  });
+});
+
+describe("zodInterpreter: union/xor schemas (#149)", () => {
+  it("union accepts value matching first option", async () => {
+    const prog = app(($) =>
+      $.zod.union([$.zod.string().min(1), $.zod.string().min(5)]).parse($.input.value),
+    );
+    expect(await run(prog, { value: "hi" })).toBe("hi");
+  });
+
+  it("union rejects non-matching input", async () => {
+    const prog = app(($) => $.zod.union([$.zod.string(), $.zod.string()]).safeParse($.input.value));
+    const result = (await run(prog, { value: 42 })) as any;
+    expect(result.success).toBe(false);
+  });
+
+  it("union with schema-level error", async () => {
+    const prog = app(($) =>
+      $.zod.union([$.zod.string(), $.zod.string()], "Must match!").safeParse($.input.value),
+    );
+    const result = (await run(prog, { value: 42 })) as any;
+    expect(result.success).toBe(false);
+    expect(result.error.message).toContain("Must match!");
+  });
+
+  it("union with optional wrapper", async () => {
+    const prog = app(($) =>
+      $.zod.union([$.zod.string(), $.zod.string()]).optional().safeParse($.input.value),
+    );
+    const undef = (await run(prog, { value: undefined })) as any;
+    const valid = (await run(prog, { value: "hi" })) as any;
+    expect(undef.success).toBe(true);
+    expect(valid.success).toBe(true);
+  });
+
+  it("xor accepts value matching exactly one option", async () => {
+    const prog = app(($) =>
+      $.zod.xor([$.zod.string().min(5), $.zod.string().max(3)]).parse($.input.value),
+    );
+    // "hello!" matches min(5) but not max(3) → exactly one match → passes
+    expect(await run(prog, { value: "hello!" })).toBe("hello!");
+  });
+
+  it("xor rejects non-matching input", async () => {
+    const prog = app(($) => $.zod.xor([$.zod.string(), $.zod.string()]).safeParse($.input.value));
+    const result = (await run(prog, { value: 42 })) as any;
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("zodInterpreter: intersection schemas (#151)", () => {
+  it("intersection validates against both schemas", async () => {
+    const prog = app(($) =>
+      $.zod.intersection($.zod.string(), $.zod.string().min(3)).parse($.input.value),
+    );
+    expect(await run(prog, { value: "hello" })).toBe("hello");
+  });
+
+  it("intersection rejects if left schema fails", async () => {
+    const prog = app(($) =>
+      $.zod.intersection($.zod.string(), $.zod.string()).safeParse($.input.value),
+    );
+    const result = (await run(prog, { value: 42 })) as any;
+    expect(result.success).toBe(false);
+  });
+
+  it("intersection rejects if right schema fails", async () => {
+    const prog = app(($) =>
+      $.zod.intersection($.zod.string(), $.zod.string().min(10)).safeParse($.input.value),
+    );
+    const result = (await run(prog, { value: "hi" })) as any;
+    expect(result.success).toBe(false);
+  });
+
+  it("optional intersection works", async () => {
+    const prog = app(($) =>
+      $.zod.intersection($.zod.string(), $.zod.string()).optional().safeParse($.input.value),
+    );
+    const undef = (await run(prog, { value: undefined })) as any;
+    const valid = (await run(prog, { value: "hi" })) as any;
+    expect(undef.success).toBe(true);
+    expect(valid.success).toBe(true);
+  });
+});
+
+describe("zodInterpreter: record schemas (#152)", () => {
+  it("record accepts valid Record<string, string>", async () => {
+    const prog = app(($) => $.zod.record($.zod.string(), $.zod.string()).parse($.input.value));
+    expect(await run(prog, { value: { a: "hello", b: "world" } })).toEqual({
+      a: "hello",
+      b: "world",
+    });
+  });
+
+  it("record accepts empty object", async () => {
+    const prog = app(($) => $.zod.record($.zod.string(), $.zod.string()).parse($.input.value));
+    expect(await run(prog, { value: {} })).toEqual({});
+  });
+
+  it("record rejects non-object input", async () => {
+    const prog = app(($) => $.zod.record($.zod.string(), $.zod.string()).safeParse($.input.value));
+    const result = (await run(prog, { value: "not an object" })) as any;
+    expect(result.success).toBe(false);
+  });
+
+  it("record rejects invalid value types", async () => {
+    const prog = app(($) => $.zod.record($.zod.string(), $.zod.string()).safeParse($.input.value));
+    const result = (await run(prog, { value: { a: 42 } })) as any;
+    expect(result.success).toBe(false);
+  });
+
+  it("partialRecord accepts valid input", async () => {
+    const prog = app(($) =>
+      $.zod.partialRecord($.zod.string(), $.zod.string()).parse($.input.value),
+    );
+    expect(await run(prog, { value: { x: "hi" } })).toEqual({ x: "hi" });
+  });
+
+  it("looseRecord accepts valid input", async () => {
+    const prog = app(($) => $.zod.looseRecord($.zod.string(), $.zod.string()).parse($.input.value));
+    expect(await run(prog, { value: { x: "hi" } })).toEqual({ x: "hi" });
+  });
+
+  it("optional record works", async () => {
+    const prog = app(($) =>
+      $.zod.record($.zod.string(), $.zod.string()).optional().safeParse($.input.value),
+    );
+    const undef = (await run(prog, { value: undefined })) as any;
+    const valid = (await run(prog, { value: { a: "b" } })) as any;
+    expect(undef.success).toBe(true);
+    expect(valid.success).toBe(true);
+  });
+});
+describe("zodInterpreter: map/set schemas (#153)", () => {
+  it("map accepts valid Map input", async () => {
+    const prog = app(($) => $.zod.map($.zod.string(), $.zod.string()).parse($.input.value));
+    const m = new Map([["a", "hello"]]);
+    const result = await run(prog, { value: m });
+    expect(result).toBeInstanceOf(Map);
+    expect((result as Map<string, string>).get("a")).toBe("hello");
+  });
+
+  it("map rejects non-Map input", async () => {
+    const prog = app(($) => $.zod.map($.zod.string(), $.zod.string()).safeParse($.input.value));
+    const result = (await run(prog, { value: "not a map" })) as any;
+    expect(result.success).toBe(false);
+  });
+
+  it("set accepts valid Set input", async () => {
+    const prog = app(($) => $.zod.set($.zod.string()).parse($.input.value));
+    const s = new Set(["a", "b"]);
+    const result = await run(prog, { value: s });
+    expect(result).toBeInstanceOf(Set);
+    expect((result as Set<string>).has("a")).toBe(true);
+  });
+
+  it("set rejects non-Set input", async () => {
+    const prog = app(($) => $.zod.set($.zod.string()).safeParse($.input.value));
+    const result = (await run(prog, { value: "not a set" })) as any;
+    expect(result.success).toBe(false);
+  });
+
+  it("set min() rejects too-small sets", async () => {
+    const prog = app(($) => $.zod.set($.zod.string()).min(3).safeParse($.input.value));
+    const result = (await run(prog, { value: new Set(["a"]) })) as any;
+    expect(result.success).toBe(false);
+  });
+
+  it("set min() accepts large enough sets", async () => {
+    const prog = app(($) => $.zod.set($.zod.string()).min(2).safeParse($.input.value));
+    const result = (await run(prog, { value: new Set(["a", "b"]) })) as any;
+    expect(result.success).toBe(true);
+  });
+
+  it("set max() rejects too-large sets", async () => {
+    const prog = app(($) => $.zod.set($.zod.string()).max(2).safeParse($.input.value));
+    const result = (await run(prog, { value: new Set(["a", "b", "c"]) })) as any;
+    expect(result.success).toBe(false);
+  });
+
+  it("set size() rejects wrong-sized sets", async () => {
+    const prog = app(($) => $.zod.set($.zod.string()).size(2).safeParse($.input.value));
+    const small = (await run(prog, { value: new Set(["a"]) })) as any;
+    const exact = (await run(prog, { value: new Set(["a", "b"]) })) as any;
+    expect(small.success).toBe(false);
+    expect(exact.success).toBe(true);
+  });
+
+  it("optional set works", async () => {
+    const prog = app(($) => $.zod.set($.zod.string()).optional().safeParse($.input.value));
+    const undef = (await run(prog, { value: undefined })) as any;
+    expect(undef.success).toBe(true);
+  });
+});
+
+describe("zodInterpreter: transform/pipe/preprocess (#155)", () => {
+  it(".transform(fn) applies transform after validation", async () => {
+    const prog = appWithStr(($) =>
+      $.zod
+        .string()
+        .transform((val) => $.upper(val))
+        .parse($.input.value),
+    );
+    expect(await run(prog, { value: "hello" })).toBe("HELLO");
+  });
+
+  it(".transform(fn) rejects invalid input before transform runs", async () => {
+    const prog = appWithStr(($) =>
+      $.zod
+        .string()
+        .transform((val) => $.upper(val))
+        .parse($.input.value),
+    );
+    await expect(run(prog, { value: 42 })).rejects.toThrow();
+  });
+
+  it(".transform(fn) with safeParse returns transformed data", async () => {
+    const prog = appWithStr(($) =>
+      $.zod
+        .string()
+        .transform((val) => $.trim(val))
+        .safeParse($.input.value),
+    );
+    const result = (await run(prog, { value: "  hello  " })) as any;
+    expect(result.success).toBe(true);
+    expect(result.data).toBe("hello");
+  });
+
+  it(".transform(fn) with safeParse returns failure for invalid input", async () => {
+    const prog = appWithStr(($) =>
+      $.zod
+        .string()
+        .transform((val) => $.upper(val))
+        .safeParse($.input.value),
+    );
+    const result = (await run(prog, { value: 123 })) as any;
+    expect(result.success).toBe(false);
+  });
+
+  it("chained transforms execute in order", async () => {
+    const prog = appWithStr(($) =>
+      $.zod
+        .string()
+        .transform((val) => $.trim(val))
+        .transform((val) => $.upper(val))
+        .parse($.input.value),
+    );
+    expect(await run(prog, { value: "  hello  " })).toBe("HELLO");
+  });
+
+  it(".transform(fn) with checks validates before transforming", async () => {
+    const prog = appWithStr(($) =>
+      $.zod
+        .string()
+        .min(3)
+        .transform((val) => $.upper(val))
+        .safeParse($.input.value),
+    );
+    const short = (await run(prog, { value: "hi" })) as any;
+    expect(short.success).toBe(false);
+    const valid = (await run(prog, { value: "hello" })) as any;
+    expect(valid.success).toBe(true);
+    expect(valid.data).toBe("HELLO");
+  });
+
+  it(".pipe(target) validates through both schemas", async () => {
+    const prog = app(($) => $.zod.string().pipe($.zod.string().min(3)).safeParse($.input.value));
+    const short = (await run(prog, { value: "hi" })) as any;
+    expect(short.success).toBe(false);
+    const valid = (await run(prog, { value: "hello" })) as any;
+    expect(valid.success).toBe(true);
+  });
+
+  it("$.zod.transform(fn) standalone transform with parse", async () => {
+    const prog = appWithStr(($) => $.zod.transform((val) => $.upper(val)).parse($.input.value));
+    expect(await run(prog, { value: "hello" })).toBe("HELLO");
+  });
+
+  it("$.zod.transform(fn) standalone accepts any input type", async () => {
+    const prog = app(($) => $.zod.transform((val) => val).parse($.input.value));
+    expect(await run(prog, { value: 42 })).toBe(42);
+    expect(await run(prog, { value: "hello" })).toBe("hello");
+  });
+
+  it("$.zod.preprocess(fn, schema) preprocesses before validation", async () => {
+    const prog = appWithStr(($) =>
+      $.zod.preprocess((val) => $.trim(val), $.zod.string().min(3)).safeParse($.input.value),
+    );
+    // "  hi  " → trimmed to "hi" → min(3) fails
+    const short = (await run(prog, { value: "  hi  " })) as any;
+    expect(short.success).toBe(false);
+    // "  hello  " → trimmed to "hello" → min(3) passes
+    const valid = (await run(prog, { value: "  hello  " })) as any;
+    expect(valid.success).toBe(true);
+    expect(valid.data).toBe("hello");
+  });
+
+  it("$.zod.preprocess(fn, schema) with parse", async () => {
+    const prog = appWithStr(($) =>
+      $.zod.preprocess((val) => $.upper(val), $.zod.string()).parse($.input.value),
+    );
+    expect(await run(prog, { value: "hello" })).toBe("HELLO");
+  });
+});
+
+describe("zodInterpreter: special types (#157)", () => {
+  it("any() accepts any value", async () => {
+    const prog = app(($) => $.zod.any().parse($.input.value));
+    expect(await run(prog, { value: "hello" })).toBe("hello");
+    expect(await run(prog, { value: 42 })).toBe(42);
+    expect(await run(prog, { value: null })).toBeNull();
+    expect(await run(prog, { value: undefined })).toBeUndefined();
+  });
+
+  it("unknown() accepts any value", async () => {
+    const prog = app(($) => $.zod.unknown().parse($.input.value));
+    expect(await run(prog, { value: "hello" })).toBe("hello");
+    expect(await run(prog, { value: 42 })).toBe(42);
+  });
+
+  it("never() rejects all values", async () => {
+    const prog = app(($) => $.zod.never().safeParse($.input.value));
+    const str = (await run(prog, { value: "hello" })) as any;
+    expect(str.success).toBe(false);
+    const num = (await run(prog, { value: 42 })) as any;
+    expect(num.success).toBe(false);
+  });
+
+  it("nan() accepts NaN", async () => {
+    const prog = app(($) => $.zod.nan().safeParse($.input.value));
+    const valid = (await run(prog, { value: Number.NaN })) as any;
+    expect(valid.success).toBe(true);
+    const invalid = (await run(prog, { value: 42 })) as any;
+    expect(invalid.success).toBe(false);
+  });
+
+  it("custom(fn) validates with the predicate", async () => {
+    const prog = appWithStr(($) =>
+      $.zod.custom((val) => $.startsWith(val, "hello")).parse($.input.value),
+    );
+    expect(await run(prog, { value: "hello world" })).toBe("hello world");
+  });
+
+  it("custom(fn) rejects when predicate returns false", async () => {
+    const prog = appWithStr(($) =>
+      $.zod
+        .custom((val) => $.startsWith(val, "hello"), "Must start with hello")
+        .safeParse($.input.value),
+    );
+    const result = (await run(prog, { value: "goodbye" })) as any;
+    expect(result.success).toBe(false);
+    expect(result.error.message).toBe("Must start with hello");
+  });
+
+  it("any() with optional wrapper", async () => {
+    const prog = app(($) => $.zod.any().optional().safeParse($.input.value));
+    const undef = (await run(prog, { value: undefined })) as any;
+    expect(undef.success).toBe(true);
+    const valid = (await run(prog, { value: "hi" })) as any;
     expect(valid.success).toBe(true);
   });
 });

@@ -1,4 +1,4 @@
-import type { ASTNode } from "@mvfm/core";
+import type { TypedNode } from "@mvfm/core";
 
 // ============================================================
 // Zod Plugin AST Types
@@ -9,7 +9,7 @@ import type { ASTNode } from "@mvfm/core";
  * and parse operations. Can be a simple string message or an error map
  * AST node (a DSL expression producing a string from the validation issue).
  */
-export type ErrorConfig = string | ASTNode;
+export type ErrorConfig = string | TypedNode;
 
 /**
  * A check descriptor stored inside a schema node's `checks` array.
@@ -25,7 +25,7 @@ export interface CheckDescriptor {
   /** If true, validation stops after this check fails */
   abort?: boolean;
   /** Conditional execution predicate (AST node returning boolean) */
-  when?: ASTNode;
+  when?: TypedNode;
   /** Check-specific parameters (value, pattern, etc.) */
   [key: string]: unknown;
 }
@@ -40,7 +40,7 @@ export interface RefinementDescriptor {
   /** Refinement type */
   kind: "refine" | "super_refine" | "check" | "overwrite";
   /** Predicate or transform AST expression */
-  fn: ASTNode;
+  fn: TypedNode;
   /** Optional custom error */
   error?: ErrorConfig;
   /** If true, validation stops after this refinement fails */
@@ -48,7 +48,7 @@ export interface RefinementDescriptor {
   /** Error path override */
   path?: string[];
   /** Conditional execution predicate */
-  when?: ASTNode;
+  when?: TypedNode;
 }
 
 /**
@@ -57,7 +57,7 @@ export interface RefinementDescriptor {
  * Every Zod schema (string, number, object, etc.) produces one of these.
  * The `kind` is namespaced to the plugin (e.g. `"zod/string"`, `"zod/number"`).
  */
-export interface SchemaASTNode extends ASTNode {
+export interface SchemaASTNode extends TypedNode {
   /** Schema kind (e.g. `"zod/string"`, `"zod/number"`, `"zod/object"`) */
   kind: string;
   /** Accumulated check descriptors */
@@ -71,23 +71,25 @@ export interface SchemaASTNode extends ASTNode {
 /**
  * A wrapper AST node that wraps an inner schema (e.g. optional, nullable).
  */
-export interface WrapperASTNode extends ASTNode {
+export interface WrapperASTNode extends TypedNode {
   /** Wrapper kind (e.g. `"zod/optional"`, `"zod/nullable"`) */
   kind: string;
   /** The inner schema being wrapped */
   inner: SchemaASTNode | WrapperASTNode;
+  /** Wrappers may carry additional kind-specific properties (fn, target, value, etc.) */
+  [key: string]: unknown;
 }
 
 /**
  * A validation operation AST node (parse, safeParse).
  */
-export interface ValidationASTNode extends ASTNode {
+export interface ValidationASTNode extends TypedNode {
   /** Operation kind (`"zod/parse"` or `"zod/safe_parse"`) */
   kind: "zod/parse" | "zod/safe_parse" | "zod/parse_async" | "zod/safe_parse_async";
   /** The schema to validate against */
   schema: SchemaASTNode | WrapperASTNode;
   /** The input expression to validate */
-  input: ASTNode;
+  input: TypedNode;
   /** Optional per-parse error config */
   parseError?: ErrorConfig;
 }

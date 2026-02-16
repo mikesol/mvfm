@@ -1,4 +1,4 @@
-import type { ASTNode, StepEffect } from "@mvfm/core";
+import type { TypedNode } from "@mvfm/core";
 import type { z } from "zod";
 import type { CheckDescriptor, ErrorConfig } from "./types";
 
@@ -8,7 +8,7 @@ import type { CheckDescriptor, ErrorConfig } from "./types";
  */
 export type SchemaInterpreterMap = Record<
   string,
-  (node: ASTNode) => Generator<StepEffect, z.ZodType, unknown>
+  (node: any) => AsyncGenerator<TypedNode, z.ZodType, unknown>
 >;
 
 /**

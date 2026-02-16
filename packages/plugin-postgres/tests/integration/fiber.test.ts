@@ -60,7 +60,7 @@ describe("fiber: $.seq()", () => {
       );
     });
     const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/do");
+    expect(ast.result.kind).toBe("core/discard");
     expect(ast.result.steps).toHaveLength(2);
     expect(ast.result.result.kind).toBe("postgres/query");
   });

@@ -1,4 +1,5 @@
-import type { ASTNode, InterpreterFragment, StepEffect } from "@mvfm/core";
+import type { Interpreter, TypedNode } from "@mvfm/core";
+import { eval_ } from "@mvfm/core";
 
 /**
  * Abstract Slack client interface consumed by the slack handler.
@@ -46,32 +47,27 @@ const NODE_TO_METHOD: Record<string, string> = {
   "slack/files_delete": "files.delete",
 };
 
+interface SlackNode extends TypedNode<unknown> {
+  kind: string;
+  params?: TypedNode<Record<string, unknown>>;
+}
+
 /**
- * Generator-based interpreter fragment for slack plugin nodes.
+ * Creates an interpreter for `slack/*` node kinds.
  *
- * Yields `slack/api_call` effects for all 25 operations across 5 resource
- * groups (chat, conversations, users, reactions, files). Each effect contains
- * the Slack API method string and optional params, matching the
- * `WebClient.apiCall()` calling convention.
+ * All 25 methods follow the same uniform pattern: look up the API method,
+ * resolve params, and call `client.apiCall()`.
  *
- * All 25 methods follow the same uniform pattern: look up the API method
- * from `NODE_TO_METHOD`, recurse into params if non-null, and yield a
- * single `slack/api_call` effect.
+ * @param client - The {@link SlackClient} to execute against.
+ * @returns An Interpreter handling all slack node kinds.
  */
-export const slackInterpreter: InterpreterFragment = {
-  pluginName: "slack",
-  canHandle: (node) => node.kind.startsWith("slack/"),
-  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
+export function createSlackInterpreter(client: SlackClient): Interpreter {
+  const handler = async function* (node: SlackNode) {
     const method = NODE_TO_METHOD[node.kind];
     if (!method) throw new Error(`Slack interpreter: unknown node kind "${node.kind}"`);
+    const params = node.params != null ? yield* eval_(node.params) : undefined;
+    return await client.apiCall(method, params);
+  };
 
-    const params =
-      node.params != null ? yield { type: "recurse", child: node.params as ASTNode } : undefined;
-
-    return yield {
-      type: "slack/api_call",
-      method,
-      ...(params !== undefined ? { params } : {}),
-    };
-  },
-};
+  return Object.fromEntries(Object.keys(NODE_TO_METHOD).map((kind) => [kind, handler]));
+}

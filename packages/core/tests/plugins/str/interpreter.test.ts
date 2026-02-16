@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { composeInterpreters, mvfm } from "../../../src/core";
+import { mvfm } from "../../../src/core";
+import { foldAST } from "../../../src/fold";
 import { coreInterpreter } from "../../../src/interpreters/core";
 import { str } from "../../../src/plugins/str";
 import { strInterpreter } from "../../../src/plugins/str/interpreter";
@@ -15,10 +16,11 @@ function injectInput(node: any, input: Record<string, unknown>): any {
   return result;
 }
 
+const combined = { ...coreInterpreter, ...strInterpreter };
+
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
-  const interp = composeInterpreters([coreInterpreter, strInterpreter]);
-  return await interp(ast.result);
+  return await foldAST(combined, ast.result);
 }
 
 const app = mvfm(str);
@@ -53,8 +55,7 @@ describe("str interpreter: show", () => {
       kind: "str/show",
       operand: { kind: "core/literal", value: "hello", __id: "t" },
     };
-    const interp = composeInterpreters([coreInterpreter, strInterpreter]);
-    expect(await interp(ast)).toBe("hello");
+    expect(await foldAST(combined, ast)).toBe("hello");
   });
 });
 
@@ -65,15 +66,12 @@ describe("str interpreter: semigroup", () => {
       left: { kind: "core/literal", value: "foo", __id: "t1" },
       right: { kind: "core/literal", value: "bar", __id: "t2" },
     };
-    const interp = composeInterpreters([coreInterpreter, strInterpreter]);
-    expect(await interp(ast)).toBe("foobar");
+    expect(await foldAST(combined, ast)).toBe("foobar");
   });
 });
 
 describe("str interpreter: monoid", () => {
   it("str/mempty returns empty string", async () => {
-    const ast = { kind: "str/mempty" };
-    const interp = composeInterpreters([coreInterpreter, strInterpreter]);
-    expect(await interp(ast)).toBe("");
+    expect(await foldAST(combined, { kind: "str/mempty" })).toBe("");
   });
 });

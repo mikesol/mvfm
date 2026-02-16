@@ -16,11 +16,6 @@ import type { PutObjectCommandInput } from '@aws-sdk/client-s3';
 import type { PutObjectCommandOutput } from '@aws-sdk/client-s3';
 import type { S3Client as S3Client_2 } from '@aws-sdk/client-s3';
 
-// Warning: (ae-forgotten-export) The symbol "StepHandler" needs to be exported by the entry point index.d.ts
-//
-// @public
-export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
-
 // @public
 export interface ClientHandlerOptions {
     baseUrl: string;
@@ -29,10 +24,13 @@ export interface ClientHandlerOptions {
     headers?: Record<string, string>;
 }
 
+// Warning: (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface ClientHandlerState {
-    stepIndex: number;
-}
+export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter;
+
+// @public
+export function createS3Interpreter(client: S3Client): Interpreter;
 
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
@@ -56,11 +54,6 @@ export interface S3Config {
     region: string;
 }
 
-// Warning: (ae-forgotten-export) The symbol "InterpreterFragment" needs to be exported by the entry point index.d.ts
-//
-// @public
-export const s3Interpreter: InterpreterFragment;
-
 // @public
 export interface S3Methods {
     s3: {
@@ -72,13 +65,13 @@ export interface S3Methods {
     };
 }
 
-// Warning: (ae-forgotten-export) The symbol "ASTNode" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "TypedNode" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function serverEvaluate(client: S3Client, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+export function serverEvaluate(client: S3Client, baseInterpreter: Interpreter): (root: TypedNode) => Promise<unknown>;
 
 // @public
-export function serverHandler(client: S3Client): StepHandler<void>;
+export function serverInterpreter(client: S3Client): Interpreter;
 
 // Warning: (ae-forgotten-export) The symbol "CommandConstructor" needs to be exported by the entry point index.d.ts
 //

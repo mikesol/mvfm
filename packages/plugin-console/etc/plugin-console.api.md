@@ -4,11 +4,6 @@
 
 ```ts
 
-// Warning: (ae-forgotten-export) The symbol "StepHandler" needs to be exported by the entry point index.d.ts
-//
-// @public
-export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
-
 // @public
 export interface ClientHandlerOptions {
     baseUrl: string;
@@ -17,10 +12,10 @@ export interface ClientHandlerOptions {
     headers?: Record<string, string>;
 }
 
+// Warning: (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface ClientHandlerState {
-    stepIndex: number;
-}
+export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter;
 
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
@@ -86,11 +81,6 @@ export interface ConsoleInstance {
     warn: (...args: unknown[]) => void;
 }
 
-// Warning: (ae-forgotten-export) The symbol "InterpreterFragment" needs to be exported by the entry point index.d.ts
-//
-// @public
-export const consoleInterpreter: InterpreterFragment;
-
 // @public
 export type ConsoleMethodName = "assert" | "clear" | "count" | "countReset" | "debug" | "dir" | "dirxml" | "error" | "group" | "groupCollapsed" | "groupEnd" | "info" | "log" | "table" | "time" | "timeEnd" | "timeLog" | "trace" | "warn";
 
@@ -102,13 +92,16 @@ export interface ConsoleMethods {
 // @public
 export const consolePlugin: typeof console_2;
 
-// Warning: (ae-forgotten-export) The symbol "ASTNode" needs to be exported by the entry point index.d.ts
+// @public
+export function createConsoleInterpreter(client: ConsoleClient): Interpreter;
+
+// Warning: (ae-forgotten-export) The symbol "TypedNode" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function serverEvaluate(client: ConsoleClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+export function serverEvaluate(client: ConsoleClient, baseInterpreter: Interpreter): (root: TypedNode) => Promise<unknown>;
 
 // @public
-export function serverHandler(client: ConsoleClient): StepHandler<void>;
+export function serverInterpreter(client: ConsoleClient): Interpreter;
 
 // @public
 export function wrapConsole(instance: ConsoleInstance): ConsoleClient;

@@ -4,11 +4,6 @@
 
 ```ts
 
-// Warning: (ae-forgotten-export) The symbol "StepHandler" needs to be exported by the entry point index.d.ts
-//
-// @public
-export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
-
 // @public
 export interface ClientHandlerOptions {
     baseUrl: string;
@@ -17,10 +12,10 @@ export interface ClientHandlerOptions {
     headers?: Record<string, string>;
 }
 
+// Warning: (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface ClientHandlerState {
-    stepIndex: number;
-}
+export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter;
 
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
@@ -56,11 +51,6 @@ export interface CloudflareKvConfig {
     namespaceId: string;
 }
 
-// Warning: (ae-forgotten-export) The symbol "InterpreterFragment" needs to be exported by the entry point index.d.ts
-//
-// @public
-export const cloudflareKvInterpreter: InterpreterFragment;
-
 // @public
 export interface CloudflareKvMethods {
     kv: {
@@ -70,6 +60,9 @@ export interface CloudflareKvMethods {
         list(options?: Expr<KvListOptions> | KvListOptions): Expr<KvListResult>;
     };
 }
+
+// @public
+export function createCloudflareKvInterpreter(client: CloudflareKvClient): Interpreter;
 
 // @public
 export interface KvGet {
@@ -133,13 +126,13 @@ export interface KvPutOptions {
     metadata?: unknown;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ASTNode" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "TypedNode" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function serverEvaluate(client: CloudflareKvClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+export function serverEvaluate(client: CloudflareKvClient, baseInterpreter: Interpreter): (root: TypedNode) => Promise<unknown>;
 
 // @public
-export function serverHandler(client: CloudflareKvClient): StepHandler<void>;
+export function serverInterpreter(client: CloudflareKvClient): Interpreter;
 
 // @public
 export function wrapKVNamespace(kv: KVNamespaceLike): CloudflareKvClient;

@@ -1,10 +1,9 @@
 import { coreInterpreter, foldAST, mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { anthropic } from "../../src/0.74.0";
-import { anthropicInterpreter } from "../../src/0.74.0/interpreter";
+import { type AnthropicClient, createAnthropicInterpreter } from "../../src/0.74.0/interpreter";
 
 const app = mvfm(num, str, anthropic({ apiKey: "sk-ant-test-123" }));
-const fragments = [anthropicInterpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
@@ -20,13 +19,14 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const captured: any[] = [];
   const ast = injectInput(prog.ast, input);
-  const recurse = foldAST(fragments, {
-    "anthropic/api_call": async (effect) => {
-      captured.push(effect);
+  const mockClient: AnthropicClient = {
+    async request(method, path, params) {
+      captured.push({ method, path, params });
       return { id: "mock_id", type: "message", model: "claude-sonnet-4-5-20250929" };
     },
-  });
-  const result = await recurse(ast.result);
+  };
+  const combined = { ...createAnthropicInterpreter(mockClient), ...coreInterpreter };
+  const result = await foldAST(combined, ast.result);
   return { result, captured };
 }
 
@@ -35,7 +35,7 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
 // ============================================================
 
 describe("anthropic interpreter: create_message", () => {
-  it("yields POST /v1/messages with correct params", async () => {
+  it("calls POST /v1/messages with correct params", async () => {
     const prog = app(($) =>
       $.anthropic.messages.create({
         model: "claude-sonnet-4-20250514",
@@ -44,7 +44,6 @@ describe("anthropic interpreter: create_message", () => {
     );
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("anthropic/api_call");
     expect(captured[0].method).toBe("POST");
     expect(captured[0].path).toBe("/v1/messages");
     expect(captured[0].params).toEqual({
@@ -55,7 +54,7 @@ describe("anthropic interpreter: create_message", () => {
 });
 
 describe("anthropic interpreter: count_tokens", () => {
-  it("yields POST /v1/messages/count_tokens with correct params", async () => {
+  it("calls POST /v1/messages/count_tokens with correct params", async () => {
     const prog = app(($) =>
       $.anthropic.messages.countTokens({
         model: "claude-sonnet-4-20250514",
@@ -64,7 +63,6 @@ describe("anthropic interpreter: count_tokens", () => {
     );
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("anthropic/api_call");
     expect(captured[0].method).toBe("POST");
     expect(captured[0].path).toBe("/v1/messages/count_tokens");
     expect(captured[0].params).toEqual({
@@ -79,7 +77,7 @@ describe("anthropic interpreter: count_tokens", () => {
 // ============================================================
 
 describe("anthropic interpreter: create_message_batch", () => {
-  it("yields POST /v1/messages/batches with correct params", async () => {
+  it("calls POST /v1/messages/batches with correct params", async () => {
     const prog = app(($) =>
       $.anthropic.messages.batches.create({
         batch_name: "test-batch",
@@ -88,7 +86,6 @@ describe("anthropic interpreter: create_message_batch", () => {
     );
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("anthropic/api_call");
     expect(captured[0].method).toBe("POST");
     expect(captured[0].path).toBe("/v1/messages/batches");
     expect(captured[0].params).toEqual({
@@ -99,11 +96,10 @@ describe("anthropic interpreter: create_message_batch", () => {
 });
 
 describe("anthropic interpreter: retrieve_message_batch", () => {
-  it("yields GET /v1/messages/batches/{id}", async () => {
+  it("calls GET /v1/messages/batches/{id}", async () => {
     const prog = app(($) => $.anthropic.messages.batches.retrieve("msgbatch_123"));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("anthropic/api_call");
     expect(captured[0].method).toBe("GET");
     expect(captured[0].path).toBe("/v1/messages/batches/msgbatch_123");
     expect(captured[0].params).toBeUndefined();
@@ -111,17 +107,16 @@ describe("anthropic interpreter: retrieve_message_batch", () => {
 });
 
 describe("anthropic interpreter: list_message_batches", () => {
-  it("yields GET /v1/messages/batches with params", async () => {
+  it("calls GET /v1/messages/batches with params", async () => {
     const prog = app(($) => $.anthropic.messages.batches.list({ limit: 10 }));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("anthropic/api_call");
     expect(captured[0].method).toBe("GET");
     expect(captured[0].path).toBe("/v1/messages/batches");
     expect(captured[0].params).toEqual({ limit: 10 });
   });
 
-  it("yields GET /v1/messages/batches with undefined params when omitted", async () => {
+  it("calls GET /v1/messages/batches with undefined params when omitted", async () => {
     const prog = app(($) => $.anthropic.messages.batches.list());
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
@@ -132,11 +127,10 @@ describe("anthropic interpreter: list_message_batches", () => {
 });
 
 describe("anthropic interpreter: delete_message_batch", () => {
-  it("yields DELETE /v1/messages/batches/{id}", async () => {
+  it("calls DELETE /v1/messages/batches/{id}", async () => {
     const prog = app(($) => $.anthropic.messages.batches.delete("msgbatch_123"));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("anthropic/api_call");
     expect(captured[0].method).toBe("DELETE");
     expect(captured[0].path).toBe("/v1/messages/batches/msgbatch_123");
     expect(captured[0].params).toBeUndefined();
@@ -144,11 +138,10 @@ describe("anthropic interpreter: delete_message_batch", () => {
 });
 
 describe("anthropic interpreter: cancel_message_batch", () => {
-  it("yields POST /v1/messages/batches/{id}/cancel", async () => {
+  it("calls POST /v1/messages/batches/{id}/cancel", async () => {
     const prog = app(($) => $.anthropic.messages.batches.cancel("msgbatch_123"));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("anthropic/api_call");
     expect(captured[0].method).toBe("POST");
     expect(captured[0].path).toBe("/v1/messages/batches/msgbatch_123/cancel");
     expect(captured[0].params).toBeUndefined();
@@ -160,11 +153,10 @@ describe("anthropic interpreter: cancel_message_batch", () => {
 // ============================================================
 
 describe("anthropic interpreter: retrieve_model", () => {
-  it("yields GET /v1/models/{id}", async () => {
+  it("calls GET /v1/models/{id}", async () => {
     const prog = app(($) => $.anthropic.models.retrieve("claude-sonnet-4-20250514"));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("anthropic/api_call");
     expect(captured[0].method).toBe("GET");
     expect(captured[0].path).toBe("/v1/models/claude-sonnet-4-20250514");
     expect(captured[0].params).toBeUndefined();
@@ -172,17 +164,16 @@ describe("anthropic interpreter: retrieve_model", () => {
 });
 
 describe("anthropic interpreter: list_models", () => {
-  it("yields GET /v1/models with params", async () => {
+  it("calls GET /v1/models with params", async () => {
     const prog = app(($) => $.anthropic.models.list({ limit: 5 }));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("anthropic/api_call");
     expect(captured[0].method).toBe("GET");
     expect(captured[0].path).toBe("/v1/models");
     expect(captured[0].params).toEqual({ limit: 5 });
   });
 
-  it("yields GET /v1/models with undefined params when omitted", async () => {
+  it("calls GET /v1/models with undefined params when omitted", async () => {
     const prog = app(($) => $.anthropic.models.list());
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
@@ -197,7 +188,7 @@ describe("anthropic interpreter: list_models", () => {
 // ============================================================
 
 describe("anthropic interpreter: input resolution", () => {
-  it("resolves input params through recurse", async () => {
+  it("resolves input params through evaluation", async () => {
     const prog = app({ model: "string", maxTokens: "number" }, ($) =>
       $.anthropic.messages.create({
         model: $.input.model,
@@ -230,7 +221,7 @@ describe("anthropic interpreter: input resolution", () => {
 // ============================================================
 
 describe("anthropic interpreter: return value", () => {
-  it("returns the handler response as the result", async () => {
+  it("returns the client response as the result", async () => {
     const prog = app(($) => $.anthropic.models.retrieve("claude-sonnet-4-20250514"));
     const { result } = await run(prog);
     expect(result).toEqual({ id: "mock_id", type: "message", model: "claude-sonnet-4-5-20250929" });

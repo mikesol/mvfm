@@ -1,22 +1,22 @@
-import type { ASTNode, InterpreterFragment, StepEffect } from "../../core";
+import type { Interpreter, TypedNode } from "../../fold";
+import { eval_ } from "../../fold";
 
-/** Interpreter fragment for `ord/` node kinds. */
-export const ordInterpreter: InterpreterFragment = {
-  pluginName: "ord",
-  canHandle: (node) => node.kind.startsWith("ord/"),
-  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
-    const cmp = (yield { type: "recurse", child: node.operand as ASTNode }) as number;
-    switch (node.kind) {
-      case "ord/gt":
-        return cmp > 0;
-      case "ord/gte":
-        return cmp >= 0;
-      case "ord/lt":
-        return cmp < 0;
-      case "ord/lte":
-        return cmp <= 0;
-      default:
-        throw new Error(`Ord interpreter: unknown node kind "${node.kind}"`);
-    }
+interface OrdCmp extends TypedNode<boolean> {
+  operand: TypedNode<number>;
+}
+
+/** Interpreter handlers for `ord/` node kinds. */
+export const ordInterpreter: Interpreter = {
+  "ord/gt": async function* (node: OrdCmp) {
+    return (yield* eval_(node.operand)) > 0;
+  },
+  "ord/gte": async function* (node: OrdCmp) {
+    return (yield* eval_(node.operand)) >= 0;
+  },
+  "ord/lt": async function* (node: OrdCmp) {
+    return (yield* eval_(node.operand)) < 0;
+  },
+  "ord/lte": async function* (node: OrdCmp) {
+    return (yield* eval_(node.operand)) <= 0;
   },
 };

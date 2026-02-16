@@ -1,4 +1,5 @@
-import type { ASTNode, InterpreterFragment, StepEffect } from "@mvfm/core";
+import type { Interpreter, TypedNode } from "@mvfm/core";
+import { eval_ } from "@mvfm/core";
 
 /**
  * Resend client interface consumed by the resend handler.
@@ -11,91 +12,54 @@ export interface ResendClient {
   request(method: string, path: string, params?: unknown): Promise<unknown>;
 }
 
+interface ResendNode extends TypedNode<unknown> {
+  kind: string;
+  id?: TypedNode<string>;
+  params?: TypedNode<Record<string, unknown>>;
+  emails?: TypedNode<unknown[]>;
+}
+
 /**
- * Generator-based interpreter fragment for resend plugin nodes.
+ * Creates an interpreter for `resend/*` node kinds.
  *
- * Yields `resend/api_call` effects for all 7 operations. Each effect
- * contains the HTTP method, API path, and optional params matching the
- * Resend REST API conventions (as defined by resend-node v6.9.2).
+ * @param client - The {@link ResendClient} to execute against.
+ * @returns An Interpreter handling all resend node kinds.
  */
-export const resendInterpreter: InterpreterFragment = {
-  pluginName: "resend",
-  canHandle: (node) => node.kind.startsWith("resend/"),
-  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
-    switch (node.kind) {
-      // ---- Emails ----
+export function createResendInterpreter(client: ResendClient): Interpreter {
+  return {
+    "resend/send_email": async function* (node: ResendNode) {
+      const params = yield* eval_(node.params!);
+      return await client.request("POST", "/emails", params);
+    },
 
-      case "resend/send_email": {
-        const params = yield { type: "recurse", child: node.params as ASTNode };
-        return yield {
-          type: "resend/api_call",
-          method: "POST",
-          path: "/emails",
-          params,
-        };
-      }
+    "resend/get_email": async function* (node: ResendNode) {
+      const id = yield* eval_(node.id!);
+      return await client.request("GET", `/emails/${id}`);
+    },
 
-      case "resend/get_email": {
-        const id = yield { type: "recurse", child: node.id as ASTNode };
-        return yield {
-          type: "resend/api_call",
-          method: "GET",
-          path: `/emails/${id}`,
-        };
-      }
+    "resend/send_batch": async function* (node: ResendNode) {
+      const emails = yield* eval_(node.emails!);
+      return await client.request("POST", "/emails/batch", emails);
+    },
 
-      // ---- Batch ----
+    "resend/create_contact": async function* (node: ResendNode) {
+      const params = yield* eval_(node.params!);
+      return await client.request("POST", "/contacts", params);
+    },
 
-      case "resend/send_batch": {
-        const emails = yield { type: "recurse", child: node.emails as ASTNode };
-        return yield {
-          type: "resend/api_call",
-          method: "POST",
-          path: "/emails/batch",
-          params: emails,
-        };
-      }
+    "resend/get_contact": async function* (node: ResendNode) {
+      const id = yield* eval_(node.id!);
+      return await client.request("GET", `/contacts/${id}`);
+    },
 
-      // ---- Contacts ----
+    // biome-ignore lint/correctness/useYield: no child nodes to evaluate
+    "resend/list_contacts": async function* () {
+      return await client.request("GET", "/contacts");
+    },
 
-      case "resend/create_contact": {
-        const params = yield { type: "recurse", child: node.params as ASTNode };
-        return yield {
-          type: "resend/api_call",
-          method: "POST",
-          path: "/contacts",
-          params,
-        };
-      }
-
-      case "resend/get_contact": {
-        const id = yield { type: "recurse", child: node.id as ASTNode };
-        return yield {
-          type: "resend/api_call",
-          method: "GET",
-          path: `/contacts/${id}`,
-        };
-      }
-
-      case "resend/list_contacts": {
-        return yield {
-          type: "resend/api_call",
-          method: "GET",
-          path: "/contacts",
-        };
-      }
-
-      case "resend/remove_contact": {
-        const id = yield { type: "recurse", child: node.id as ASTNode };
-        return yield {
-          type: "resend/api_call",
-          method: "DELETE",
-          path: `/contacts/${id}`,
-        };
-      }
-
-      default:
-        throw new Error(`Resend interpreter: unknown node kind "${node.kind}"`);
-    }
-  },
-};
+    "resend/remove_contact": async function* (node: ResendNode) {
+      const id = yield* eval_(node.id!);
+      return await client.request("DELETE", `/contacts/${id}`);
+    },
+  };
+}

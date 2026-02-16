@@ -6,10 +6,11 @@
 
 import type { default as postgres_2 } from 'postgres';
 
-// Warning: (ae-forgotten-export) The symbol "StepHandler" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "TypedNode" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "BuiltQuery" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
+export function buildSQL(node: PostgresQueryNode): AsyncGenerator<TypedNode, BuiltQuery, unknown>;
 
 // @public
 export interface ClientHandlerOptions {
@@ -19,21 +20,36 @@ export interface ClientHandlerOptions {
     headers?: Record<string, string>;
 }
 
+// Warning: (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
+//
 // @public
-export interface ClientHandlerState {
-    stepIndex: number;
-}
+export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter;
+
+// @public
+export function createPostgresInterpreter(client: PostgresClient): Interpreter;
+
+// @public
+export function createPostgresServerInterpreter(client: PostgresClient, baseInterpreter: Interpreter): Interpreter;
 
 // @public
 export function escapeIdentifier(name: string): string;
-
-// @public
-export function findCursorBatch(node: any): any | null;
 
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
 // @public
 export function postgres(config?: PostgresConfig | string): PluginDefinition<PostgresMethods>;
+
+// @public
+export interface PostgresBeginNode extends TypedNode<unknown> {
+    // (undocumented)
+    body?: TypedNode;
+    // (undocumented)
+    kind: "postgres/begin";
+    // (undocumented)
+    mode: string;
+    // (undocumented)
+    queries?: TypedNode[];
+}
 
 // @public
 export interface PostgresClient {
@@ -74,10 +90,41 @@ export interface PostgresConfig {
     username?: string;
 }
 
-// Warning: (ae-forgotten-export) The symbol "InterpreterFragment" needs to be exported by the entry point index.d.ts
-//
 // @public
-export const postgresInterpreter: InterpreterFragment;
+export interface PostgresCursorBatchNode extends TypedNode<unknown[]> {
+    // (undocumented)
+    kind: "postgres/cursor_batch";
+}
+
+// @public
+export interface PostgresCursorNode extends TypedNode<unknown> {
+    // (undocumented)
+    batchSize: TypedNode<number>;
+    // (undocumented)
+    body: TypedNode;
+    // (undocumented)
+    kind: "postgres/cursor";
+    // (undocumented)
+    query: PostgresQueryNode;
+}
+
+// @public
+export interface PostgresIdentifierNode extends TypedNode<string> {
+    // (undocumented)
+    kind: "postgres/identifier";
+    // (undocumented)
+    name: TypedNode<string>;
+}
+
+// @public
+export interface PostgresInsertHelperNode extends TypedNode<string> {
+    // (undocumented)
+    columns?: string[];
+    // (undocumented)
+    data: TypedNode<Record<string, unknown> | Record<string, unknown>[]>;
+    // (undocumented)
+    kind: "postgres/insert_helper";
+}
 
 // @public
 export interface PostgresMethods {
@@ -85,13 +132,46 @@ export interface PostgresMethods {
     sql: PostgresSql;
 }
 
-// Warning: (ae-forgotten-export) The symbol "ASTNode" needs to be exported by the entry point index.d.ts
-//
 // @public
-export function serverEvaluate(client: PostgresClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+export type PostgresParamNode = PostgresIdentifierNode | PostgresInsertHelperNode | PostgresSetHelperNode | TypedNode;
 
 // @public
-export function serverHandler(client: PostgresClient, fragments: InterpreterFragment[]): StepHandler<void>;
+export interface PostgresQueryNode extends TypedNode<unknown[]> {
+    // (undocumented)
+    kind: "postgres/query";
+    // (undocumented)
+    params: PostgresParamNode[];
+    // (undocumented)
+    strings: string[];
+}
+
+// @public
+export interface PostgresSavepointNode extends TypedNode<unknown> {
+    // (undocumented)
+    body?: TypedNode;
+    // (undocumented)
+    kind: "postgres/savepoint";
+    // (undocumented)
+    mode: string;
+    // (undocumented)
+    queries?: TypedNode[];
+}
+
+// @public
+export interface PostgresSetHelperNode extends TypedNode<string> {
+    // (undocumented)
+    columns?: string[];
+    // (undocumented)
+    data: TypedNode<Record<string, unknown>>;
+    // (undocumented)
+    kind: "postgres/set_helper";
+}
+
+// @public
+export function serverEvaluate(client: PostgresClient, baseInterpreter: Interpreter): (root: TypedNode) => Promise<unknown>;
+
+// @public
+export function serverInterpreter(client: PostgresClient, baseInterpreter: Interpreter): Interpreter;
 
 // Warning: (ae-forgotten-export) The symbol "Sql" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "TransactionSql" needs to be exported by the entry point index.d.ts

@@ -6,11 +6,6 @@
 
 import type { WebClient } from '@slack/web-api';
 
-// Warning: (ae-forgotten-export) The symbol "StepHandler" needs to be exported by the entry point index.d.ts
-//
-// @public
-export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
-
 // @public
 export interface ClientHandlerOptions {
     baseUrl: string;
@@ -19,19 +14,21 @@ export interface ClientHandlerOptions {
     headers?: Record<string, string>;
 }
 
-// @public
-export interface ClientHandlerState {
-    stepIndex: number;
-}
-
-// Warning: (ae-forgotten-export) The symbol "InterpreterFragment" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "ASTNode" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function serverEvaluate(client: SlackClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter;
 
 // @public
-export function serverHandler(client: SlackClient): StepHandler<void>;
+export function createSlackInterpreter(client: SlackClient): Interpreter;
+
+// Warning: (ae-forgotten-export) The symbol "TypedNode" needs to be exported by the entry point index.d.ts
+//
+// @public
+export function serverEvaluate(client: SlackClient, baseInterpreter: Interpreter): (root: TypedNode) => Promise<unknown>;
+
+// @public
+export function serverInterpreter(client: SlackClient): Interpreter;
 
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
@@ -47,9 +44,6 @@ export interface SlackClient {
 export interface SlackConfig {
     token: string;
 }
-
-// @public
-export const slackInterpreter: InterpreterFragment;
 
 // @public
 export interface SlackMethods {

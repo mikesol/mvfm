@@ -1,49 +1,28 @@
-import type { ASTNode, InterpreterFragment, StepHandler } from "@mvfm/core";
-import { runAST } from "@mvfm/core";
-import type { ResendClient } from "./interpreter";
+import type { Interpreter, TypedNode } from "@mvfm/core";
+import { foldAST } from "@mvfm/core";
+import { createResendInterpreter, type ResendClient } from "./interpreter";
 
 /**
- * Creates a server-side StepHandler that executes Resend effects
- * against a real Resend client.
- *
- * Handles `resend/api_call` effects by delegating to
- * `client.request(method, path, params)`. Throws on unhandled effect types.
+ * Creates a server-side interpreter for `resend/*` node kinds.
  *
  * @param client - The {@link ResendClient} to execute against.
- * @returns A StepHandler for void state.
+ * @returns An Interpreter for resend node kinds.
  */
-export function serverHandler(client: ResendClient): StepHandler<void> {
-  return async (effect, _context, state) => {
-    if (effect.type === "resend/api_call") {
-      const { method, path, params } = effect as {
-        type: "resend/api_call";
-        method: string;
-        path: string;
-        params?: unknown;
-      };
-      const value = await client.request(method, path, params);
-      return { value, state };
-    }
-    throw new Error(`serverHandler: unhandled effect type "${effect.type}"`);
-  };
+export function serverInterpreter(client: ResendClient): Interpreter {
+  return createResendInterpreter(client);
 }
 
 /**
- * Creates a unified evaluation function that evaluates an AST against
- * a Resend client using the provided interpreter fragments.
- *
- * Convenience wrapper composing fragments + {@link serverHandler} via `runAST`.
+ * Creates a unified evaluator using the resend server interpreter.
  *
  * @param client - The {@link ResendClient} to execute against.
- * @param fragments - Generator interpreter fragments for evaluating sub-expressions.
- * @returns An async function that evaluates an AST node to its result.
+ * @param baseInterpreter - Base interpreter for evaluating sub-expressions.
+ * @returns An async AST evaluator function.
  */
 export function serverEvaluate(
   client: ResendClient,
-  fragments: InterpreterFragment[],
-): (root: ASTNode) => Promise<unknown> {
-  return async (root: ASTNode): Promise<unknown> => {
-    const { value } = await runAST(root, fragments, serverHandler(client), undefined);
-    return value;
-  };
+  baseInterpreter: Interpreter,
+): (root: TypedNode) => Promise<unknown> {
+  const interp = { ...baseInterpreter, ...createResendInterpreter(client) };
+  return (root: TypedNode) => foldAST(interp, root);
 }

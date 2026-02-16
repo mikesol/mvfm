@@ -172,8 +172,8 @@ describe("resend: contacts.remove", () => {
   });
 });
 
-describe("resend: integration with $.do()", () => {
-  it("side-effecting operations wrapped in $.do() are reachable", () => {
+describe("resend: integration with $.discard()", () => {
+  it("side-effecting operations wrapped in $.discard() are reachable", () => {
     expect(() => {
       app(($) => {
         const email = $.resend.emails.send({
@@ -185,7 +185,7 @@ describe("resend: integration with $.do()", () => {
         const contact = $.resend.contacts.create({
           email: "user@example.com",
         });
-        return $.do(email, contact);
+        return $.discard(email, contact);
       });
     }).not.toThrow();
   });
@@ -213,10 +213,10 @@ describe("resend: cross-operation dependencies", () => {
         html: "<p>Hello</p>",
       });
       const retrieved = $.resend.emails.get(sent.id);
-      return $.do(sent, retrieved);
+      return $.discard(sent, retrieved);
     });
     const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/do");
+    expect(ast.result.kind).toBe("core/discard");
     // The get email id should reference the send result via prop_access
     const getNode = ast.result.result;
     expect(getNode.kind).toBe("resend/get_email");

@@ -1,4 +1,4 @@
-import type { ASTNode, TraitImpl } from "./core";
+import type { TraitImpl } from "./core";
 
 /**
  * Infers the runtime type of an AST node by checking it against registered
@@ -10,7 +10,7 @@ import type { ASTNode, TraitImpl } from "./core";
  * @returns The type string (e.g. `"number"`, `"string"`) or `null` if unresolvable.
  */
 export function inferType(
-  node: ASTNode,
+  node: any,
   impls: TraitImpl[],
   schema?: Record<string, unknown>,
 ): string | null {
@@ -40,13 +40,13 @@ export function inferType(
  * @param schema - The program's input schema.
  * @returns The schema type string or `null` if the path doesn't resolve.
  */
-export function resolveSchemaType(node: ASTNode, schema?: Record<string, unknown>): string | null {
+export function resolveSchemaType(node: any, schema?: Record<string, unknown>): string | null {
   if (!schema) return null;
   const path: string[] = [];
   let current = node;
   while (current.kind === "core/prop_access") {
     path.unshift(current.property as string);
-    current = current.object as ASTNode;
+    current = current.object;
   }
   if (current.kind !== "core/input") return null;
   let schemaNode: unknown = schema;

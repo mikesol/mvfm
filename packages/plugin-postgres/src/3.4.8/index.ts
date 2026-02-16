@@ -26,7 +26,7 @@
 //
 // ============================================================
 
-import type { ASTNode, Expr, PluginContext, PluginDefinition } from "@mvfm/core";
+import type { Expr, PluginContext, PluginDefinition, TypedNode } from "@mvfm/core";
 
 // ---- What the plugin adds to $ ----------------------------
 
@@ -116,7 +116,7 @@ interface PostgresSql {
    *   const result = $.sql.begin(sql => {
    *     const user = sql`insert into users (name) values ('Murray') returning *`
    *     const account = sql`insert into accounts (user_id) values (${user[0].user_id}) returning *`
-   *     return $.do(user, account)   // <-- must use $.do for sequencing!
+   *     return $.discard(user, account)   // <-- must use $.discard for sequencing!
    *   })
    *
    * ============================================================
@@ -147,7 +147,7 @@ interface PostgresSql {
    * In the transaction, both inserts are side effects.
    * Neither is "just" a return value. In real postgres.js,
    * await enforces ordering. In Mvfm, the callback just
-   * builds a tree, so you need $.do() or return an array
+   * builds a tree, so you need $.discard() or return an array
    * to capture all the effects.
    *
    * This is where the pipelining syntax is nice:
@@ -163,7 +163,7 @@ interface PostgresSql {
    *   ])
    *
    * And we interpret the array as "execute these in order,
-   * within a transaction." No $.do() needed — the array IS
+   * within a transaction." No $.discard() needed — the array IS
    * the sequencing primitive.
    *
    * Problem 3: ERROR HANDLING / ROLLBACK
@@ -325,7 +325,7 @@ export function postgres(config?: PostgresConfig | string): PluginDefinition<Pos
         // .cursor() — callback-style cursor for large result sets
         // Available at all scope levels (top, transaction, savepoint)
         sqlFn.cursor = (query: any, batchSize: any, fn: Function) => {
-          const batchNode: ASTNode = { kind: "postgres/cursor_batch" };
+          const batchNode: TypedNode = { kind: "postgres/cursor_batch" };
           const batchProxy = ctx.expr(batchNode);
           const bodyResult = fn(batchProxy);
           const bodyNode = ctx.isExpr(bodyResult) ? bodyResult.__node : ctx.lift(bodyResult).__node;
@@ -448,10 +448,10 @@ export function postgres(config?: PostgresConfig | string): PluginDefinition<Pos
 //      const result = $.sql.begin(sql => {
 //        const user = sql`insert ... returning *`
 //        const account = sql`insert ... values (${user[0].user_id})`
-//        return $.do(user, account, { user: user[0], account: account[0] })
+//        return $.discard(user, account, { user: user[0], account: account[0] })
 //      })
 //    The dependency graph is captured via proxy, but you need
-//    $.do() to sequence the side effects. And no destructuring.
+//    $.discard() to sequence the side effects. And no destructuring.
 //
 // ❌ DOESN'T WORK / HARD:
 //
@@ -469,7 +469,7 @@ export function postgres(config?: PostgresConfig | string): PluginDefinition<Pos
 //        // Can't do native if() on a proxy!
 //        // Must use $.cond():
 //        return $.cond($.eq(user[0].role, 'admin'))
-//          .t($.do(
+//          .t($.discard(
 //            sql`insert into audit_log ...`,
 //            user
 //          ))
@@ -503,7 +503,7 @@ export function postgres(config?: PostgresConfig | string): PluginDefinition<Pos
 //    sequential execution. In Mvfm, everything runs synchronously
 //    during AST construction. For pure data dependencies (query B
 //    uses result of query A), the proxy chain captures this. But
-//    for "do A then do B" without data dependency, you need $.do()
+//    for "do A then do B" without data dependency, you need $.discard()
 //    or the array pipeline syntax. This is the fundamental
 //    mismatch between an imperative async API and a declarative
 //    AST builder.

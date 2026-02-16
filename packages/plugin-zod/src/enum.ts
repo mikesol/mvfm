@@ -1,4 +1,4 @@
-import type { ASTNode, PluginContext, StepEffect } from "@mvfm/core";
+import type { PluginContext, TypedNode } from "@mvfm/core";
 import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
@@ -27,7 +27,7 @@ export class ZodEnumBuilder<T extends string> extends ZodSchemaBuilder<T> {
   protected _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | ASTNode;
+    error?: string | TypedNode;
     extra?: Record<string, unknown>;
   }): ZodEnumBuilder<T> {
     return new ZodEnumBuilder<T>(
@@ -80,7 +80,7 @@ export class ZodNativeEnumBuilder<T> extends ZodSchemaBuilder<T> {
   protected _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | ASTNode;
+    error?: string | TypedNode;
     extra?: Record<string, unknown>;
   }): ZodNativeEnumBuilder<T> {
     return new ZodNativeEnumBuilder<T>(
@@ -143,7 +143,7 @@ export function enumNamespace(
 /** Interpreter handlers for enum schema nodes. */
 export const enumInterpreter: SchemaInterpreterMap = {
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/enum": function* (node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
+  "zod/enum": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     const values = node.values as [string, ...string[]];
     const errorFn = toZodError(node.error as ErrorConfig | undefined);
     const errOpt = errorFn ? { error: errorFn } : {};
@@ -151,7 +151,7 @@ export const enumInterpreter: SchemaInterpreterMap = {
   },
 
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/native_enum": function* (node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
+  "zod/native_enum": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     const entries = node.entries as Record<string, string | number>;
     const errorFn = toZodError(node.error as ErrorConfig | undefined);
     const errOpt = errorFn ? { error: errorFn } : {};

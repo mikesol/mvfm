@@ -1,10 +1,23 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { coreInterpreter, foldAST, mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { redis } from "../../src/5.4.1";
-import { redisInterpreter } from "../../src/5.4.1/interpreter";
+import { createRedisInterpreter, type RedisClient } from "../../src/5.4.1/interpreter";
 
 const app = mvfm(num, str, redis({ host: "127.0.0.1", port: 6379 }));
-const fragments = [redisInterpreter, coreInterpreter];
+
+describe("redis interpreter: typing hygiene", () => {
+  it("contains no untyped node:any handler parameters", () => {
+    const source = readFileSync(join(process.cwd(), "src/5.4.1/interpreter.ts"), "utf8");
+    expect(source).not.toMatch(/node:\s*any/);
+  });
+
+  it("contains no broad kind:string node interface fields", () => {
+    const source = readFileSync(join(process.cwd(), "src/5.4.1/interpreter.ts"), "utf8");
+    expect(source).not.toMatch(/kind:\s*string/);
+  });
+});
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
@@ -18,15 +31,16 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 }
 
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
-  const captured: any[] = [];
+  const captured: Array<{ command: string; args: unknown[] }> = [];
   const ast = injectInput(prog.ast, input);
-  const recurse = foldAST(fragments, {
-    "redis/command": async (effect) => {
-      captured.push(effect);
+  const mockClient: RedisClient = {
+    async command(command: string, ...args: unknown[]) {
+      captured.push({ command, args });
       return "mock_result";
     },
-  });
-  const result = await recurse(ast.result);
+  };
+  const combined = { ...createRedisInterpreter(mockClient), ...coreInterpreter };
+  const result = await foldAST(combined, ast.result);
   return { result, captured };
 }
 
@@ -39,7 +53,6 @@ describe("redis interpreter: get", () => {
     const prog = app(($) => $.redis.get("mykey"));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("redis/command");
     expect(captured[0].command).toBe("GET");
     expect(captured[0].args).toEqual(["mykey"]);
   });

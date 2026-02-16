@@ -1,9 +1,17 @@
 import { mvfm } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import {
+  ZodIntersectionBuilder,
+  ZodMapBuilder,
   ZodNumberBuilder,
   ZodPrimitiveBuilder,
+  ZodRecordBuilder,
+  ZodSetBuilder,
+  ZodSimpleBuilder,
   ZodStringBuilder,
+  ZodTransformBuilder,
+  ZodTupleBuilder,
+  ZodUnionBuilder,
   ZodWrappedBuilder,
   zod,
 } from "../src/index";
@@ -745,5 +753,479 @@ describe("primitive types (#104)", () => {
     const ast = strip(prog.ast) as any;
     expect(ast.result.schema.kind).toBe("zod/optional");
     expect(ast.result.schema.inner.kind).toBe("zod/boolean");
+  });
+});
+describe("tuple schemas (#111)", () => {
+  it("$.zod.tuple() returns a ZodTupleBuilder", () => {
+    const app = mvfm(zod);
+    app(($) => {
+      const builder = $.zod.tuple([$.zod.string()]);
+      expect(builder).toBeInstanceOf(ZodTupleBuilder);
+      return builder.parse($.input);
+    });
+  });
+
+  it("$.zod.tuple() produces zod/tuple AST with items", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.tuple([$.zod.string(), $.zod.string()]).parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/tuple");
+    expect(ast.result.schema.items).toHaveLength(2);
+    expect(ast.result.schema.items[0].kind).toBe("zod/string");
+    expect(ast.result.schema.items[1].kind).toBe("zod/string");
+  });
+
+  it("$.zod.tuple() with rest element", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.tuple([$.zod.string()], $.zod.string()).parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/tuple");
+    expect(ast.result.schema.items).toHaveLength(1);
+    expect(ast.result.schema.rest).toBeDefined();
+    expect(ast.result.schema.rest.kind).toBe("zod/string");
+  });
+
+  it("$.zod.tuple() without rest omits rest field", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.tuple([$.zod.string()]).parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.rest).toBeUndefined();
+  });
+
+  it("$.zod.tuple() accepts error param", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.tuple([$.zod.string()], undefined, "Must be tuple!").parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.error).toBe("Must be tuple!");
+  });
+
+  it("wrappers work on tuple schemas", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.tuple([$.zod.string()]).optional().parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/optional");
+    expect(ast.result.schema.inner.kind).toBe("zod/tuple");
+  });
+});
+
+describe("union/xor schemas (#112)", () => {
+  it("$.zod.union() returns a ZodUnionBuilder", () => {
+    const app = mvfm(zod);
+    app(($) => {
+      const builder = $.zod.union([$.zod.string(), $.zod.string()]);
+      expect(builder).toBeInstanceOf(ZodUnionBuilder);
+      return builder.parse($.input);
+    });
+  });
+
+  it("$.zod.union() produces zod/union AST with options", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.union([$.zod.string(), $.zod.string()]).parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/union");
+    expect(ast.result.schema.options).toHaveLength(2);
+    expect(ast.result.schema.options[0].kind).toBe("zod/string");
+    expect(ast.result.schema.options[1].kind).toBe("zod/string");
+  });
+
+  it("$.zod.union() accepts error param", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.union([$.zod.string(), $.zod.string()], "Bad union!").parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.error).toBe("Bad union!");
+  });
+
+  it("$.zod.xor() produces zod/xor AST", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.xor([$.zod.string(), $.zod.string()]).parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/xor");
+    expect(ast.result.schema.options).toHaveLength(2);
+  });
+
+  it("wrappers work on union schemas", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.union([$.zod.string(), $.zod.string()]).optional().parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/optional");
+    expect(ast.result.schema.inner.kind).toBe("zod/union");
+  });
+});
+
+describe("intersection schemas (#114)", () => {
+  it("$.zod.intersection() returns a ZodIntersectionBuilder", () => {
+    const app = mvfm(zod);
+    app(($) => {
+      const builder = $.zod.intersection($.zod.string(), $.zod.string());
+      expect(builder).toBeInstanceOf(ZodIntersectionBuilder);
+      return builder.parse($.input);
+    });
+  });
+
+  it("$.zod.intersection() produces zod/intersection AST with left and right", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.intersection($.zod.string(), $.zod.string().min(3)).parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/intersection");
+    expect(ast.result.schema.left).toBeDefined();
+    expect(ast.result.schema.left.kind).toBe("zod/string");
+    expect(ast.result.schema.right).toBeDefined();
+    expect(ast.result.schema.right.kind).toBe("zod/string");
+    expect(ast.result.schema.right.checks).toHaveLength(1);
+  });
+
+  it("$.zod.intersection() accepts error param", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod
+        .intersection($.zod.string(), $.zod.string(), "Intersection fail!")
+        .parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.error).toBe("Intersection fail!");
+  });
+
+  it("wrappers work on intersection schemas", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.intersection($.zod.string(), $.zod.string()).optional().parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/optional");
+    expect(ast.result.schema.inner.kind).toBe("zod/intersection");
+  });
+});
+
+describe("record schemas (#115)", () => {
+  it("$.zod.record() returns a ZodRecordBuilder", () => {
+    const app = mvfm(zod);
+    app(($) => {
+      const builder = $.zod.record($.zod.string(), $.zod.string());
+      expect(builder).toBeInstanceOf(ZodRecordBuilder);
+      return builder.parse($.input);
+    });
+  });
+
+  it("$.zod.record() produces zod/record AST with key and value schemas", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.record($.zod.string(), $.zod.string()).parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/record");
+    expect(ast.result.schema.key.kind).toBe("zod/string");
+    expect(ast.result.schema.value.kind).toBe("zod/string");
+    expect(ast.result.schema.mode).toBe("strict");
+  });
+
+  it("$.zod.partialRecord() sets mode to partial", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.partialRecord($.zod.string(), $.zod.string()).parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.mode).toBe("partial");
+  });
+
+  it("$.zod.looseRecord() sets mode to loose", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.looseRecord($.zod.string(), $.zod.string()).parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.mode).toBe("loose");
+  });
+
+  it("$.zod.record() accepts error param", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.record($.zod.string(), $.zod.string(), "Bad record!").parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.error).toBe("Bad record!");
+  });
+
+  it("wrappers work on record schemas", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.record($.zod.string(), $.zod.string()).optional().parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/optional");
+    expect(ast.result.schema.inner.kind).toBe("zod/record");
+  });
+});
+describe("map/set schemas (#116)", () => {
+  it("$.zod.map() returns a ZodMapBuilder", () => {
+    const app = mvfm(zod);
+    app(($) => {
+      const builder = $.zod.map($.zod.string(), $.zod.string());
+      expect(builder).toBeInstanceOf(ZodMapBuilder);
+      return builder.parse($.input);
+    });
+  });
+
+  it("$.zod.map() produces zod/map AST with key and value schemas", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.map($.zod.string(), $.zod.string()).parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/map");
+    expect(ast.result.schema.key.kind).toBe("zod/string");
+    expect(ast.result.schema.value.kind).toBe("zod/string");
+  });
+
+  it("$.zod.set() returns a ZodSetBuilder", () => {
+    const app = mvfm(zod);
+    app(($) => {
+      const builder = $.zod.set($.zod.string());
+      expect(builder).toBeInstanceOf(ZodSetBuilder);
+      return builder.parse($.input);
+    });
+  });
+
+  it("$.zod.set() produces zod/set AST with value schema", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.set($.zod.string()).parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/set");
+    expect(ast.result.schema.value.kind).toBe("zod/string");
+  });
+
+  it("set size checks chain correctly", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.set($.zod.string()).min(2).max(5).parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.checks).toHaveLength(2);
+    expect(ast.result.schema.checks[0]).toMatchObject({ kind: "min_size", value: 2 });
+    expect(ast.result.schema.checks[1]).toMatchObject({ kind: "max_size", value: 5 });
+  });
+
+  it("set size() adds exact size check", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.set($.zod.string()).size(3).parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.checks[0]).toMatchObject({ kind: "size", value: 3 });
+  });
+
+  it("wrappers work on map/set schemas", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.set($.zod.string()).optional().parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/optional");
+    expect(ast.result.schema.inner.kind).toBe("zod/set");
+  });
+});
+
+describe("transform/pipe/preprocess methods (#118)", () => {
+  it(".transform(fn) produces zod/transform wrapper with lambda", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod
+        .string()
+        .transform((val) => val)
+        .parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/transform");
+    expect(ast.result.schema.inner.kind).toBe("zod/string");
+    expect(ast.result.schema.fn.kind).toBe("core/lambda");
+    expect(ast.result.schema.fn.param.kind).toBe("core/lambda_param");
+    expect(ast.result.schema.fn.param.name).toBe("transform_val");
+  });
+
+  it(".transform(fn) returns ZodWrappedBuilder", () => {
+    const app = mvfm(zod);
+    app(($) => {
+      const wrapped = $.zod.string().transform((val) => val);
+      expect(wrapped).toBeInstanceOf(ZodWrappedBuilder);
+      return wrapped.parse($.input);
+    });
+  });
+
+  it(".pipe(target) produces zod/pipe wrapper with target schema", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.string().pipe($.zod.string()).parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/pipe");
+    expect(ast.result.schema.inner.kind).toBe("zod/string");
+    expect(ast.result.schema.target.kind).toBe("zod/string");
+  });
+
+  it("$.zod.transform(fn) produces standalone transform AST", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.transform((val) => val).parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/transform");
+    expect(ast.result.schema.fn.kind).toBe("core/lambda");
+    expect(ast.result.schema.fn.param.name).toBe("transform_val");
+    // Standalone transform has no inner
+    expect(ast.result.schema.inner).toBeUndefined();
+  });
+
+  it("$.zod.transform(fn) returns ZodTransformBuilder", () => {
+    const app = mvfm(zod);
+    app(($) => {
+      const builder = $.zod.transform((val) => val);
+      expect(builder).toBeInstanceOf(ZodTransformBuilder);
+      return builder.parse($.input);
+    });
+  });
+
+  it("$.zod.preprocess(fn, schema) produces zod/preprocess wrapper", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod.preprocess((val) => val, $.zod.string()).parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/preprocess");
+    expect(ast.result.schema.inner.kind).toBe("zod/string");
+    expect(ast.result.schema.fn.kind).toBe("core/lambda");
+    expect(ast.result.schema.fn.param.name).toBe("preprocess_val");
+  });
+
+  it("chained transforms nest correctly", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod
+        .string()
+        .transform((val) => val)
+        .transform((val) => val)
+        .parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    // Outer transform wraps inner transform wraps string
+    expect(ast.result.schema.kind).toBe("zod/transform");
+    expect(ast.result.schema.inner.kind).toBe("zod/transform");
+    expect(ast.result.schema.inner.inner.kind).toBe("zod/string");
+  });
+
+  it(".transform(fn) preserves inner schema checks", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => {
+      return $.zod
+        .string()
+        .min(3)
+        .transform((val) => val)
+        .parse($.input);
+    });
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/transform");
+    expect(ast.result.schema.inner.kind).toBe("zod/string");
+    expect(ast.result.schema.inner.checks).toHaveLength(1);
+    expect(ast.result.schema.inner.checks[0].kind).toBe("min_length");
+  });
+});
+
+describe("special types (#120)", () => {
+  it("$.zod.any() produces zod/any AST node", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => $.zod.any().parse($.input));
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/any");
+  });
+
+  it("$.zod.any() returns ZodSimpleBuilder", () => {
+    const app = mvfm(zod);
+    app(($) => {
+      expect($.zod.any()).toBeInstanceOf(ZodSimpleBuilder);
+      return $.zod.any().parse($.input);
+    });
+  });
+
+  it("$.zod.unknown() produces zod/unknown AST node", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => $.zod.unknown().parse($.input));
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/unknown");
+  });
+
+  it("$.zod.never() produces zod/never AST node", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => $.zod.never().parse($.input));
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/never");
+  });
+
+  it("$.zod.nan() produces zod/nan AST node", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => $.zod.nan().parse($.input));
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/nan");
+  });
+
+  it("$.zod.promise(inner) produces zod/promise wrapper node", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => $.zod.promise($.zod.string()).parse($.input));
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/promise");
+    expect(ast.result.schema.inner.kind).toBe("zod/string");
+  });
+
+  it("$.zod.promise() returns ZodWrappedBuilder", () => {
+    const app = mvfm(zod);
+    app(($) => {
+      const wrapped = $.zod.promise($.zod.string());
+      expect(wrapped).toBeInstanceOf(ZodWrappedBuilder);
+      return wrapped.parse($.input);
+    });
+  });
+
+  it("$.zod.custom(fn) produces zod/custom AST node with predicate", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => $.zod.custom((val) => val).parse($.input));
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/custom");
+    expect(ast.result.schema.predicate.kind).toBe("core/lambda");
+    expect(ast.result.schema.predicate.param.name).toBe("custom_val");
+  });
+
+  it("$.zod.custom(fn) accepts error config", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => $.zod.custom((val) => val, "Must pass!").parse($.input));
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/custom");
+    expect(ast.result.schema.error).toBe("Must pass!");
+  });
+
+  it("special types support wrappers", () => {
+    const app = mvfm(zod);
+    const prog = app(($) => $.zod.any().optional().parse($.input));
+    const ast = strip(prog.ast) as any;
+    expect(ast.result.schema.kind).toBe("zod/optional");
+    expect(ast.result.schema.inner.kind).toBe("zod/any");
   });
 });

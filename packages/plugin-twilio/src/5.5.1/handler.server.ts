@@ -1,49 +1,28 @@
-import type { ASTNode, InterpreterFragment, StepHandler } from "@mvfm/core";
-import { runAST } from "@mvfm/core";
-import type { TwilioClient } from "./interpreter";
+import type { Interpreter, TypedNode } from "@mvfm/core";
+import { foldAST } from "@mvfm/core";
+import { createTwilioInterpreter, type TwilioClient } from "./interpreter";
 
 /**
- * Creates a server-side StepHandler that executes Twilio effects
- * against a real Twilio client.
- *
- * Handles `twilio/api_call` effects by delegating to
- * `client.request(method, path, params)`. Throws on unhandled effect types.
+ * Creates a server-side interpreter for `twilio/*` node kinds.
  *
  * @param client - The {@link TwilioClient} to execute against.
- * @returns A StepHandler for void state.
+ * @returns An Interpreter for twilio node kinds.
  */
-export function serverHandler(client: TwilioClient): StepHandler<void> {
-  return async (effect, _context, state) => {
-    if (effect.type === "twilio/api_call") {
-      const { method, path, params } = effect as {
-        type: "twilio/api_call";
-        method: string;
-        path: string;
-        params?: Record<string, unknown>;
-      };
-      const value = await client.request(method, path, params);
-      return { value, state };
-    }
-    throw new Error(`serverHandler: unhandled effect type "${effect.type}"`);
-  };
+export function serverInterpreter(client: TwilioClient): Interpreter {
+  return createTwilioInterpreter(client);
 }
 
 /**
- * Creates a unified evaluation function that evaluates an AST against
- * a Twilio client using the provided interpreter fragments.
- *
- * Convenience wrapper composing fragments + {@link serverHandler} via `runAST`.
+ * Creates a unified evaluator using the twilio server interpreter.
  *
  * @param client - The {@link TwilioClient} to execute against.
- * @param fragments - Generator interpreter fragments for evaluating sub-expressions.
- * @returns An async function that evaluates an AST node to its result.
+ * @param baseInterpreter - Base interpreter for evaluating sub-expressions.
+ * @returns An async AST evaluator function.
  */
 export function serverEvaluate(
   client: TwilioClient,
-  fragments: InterpreterFragment[],
-): (root: ASTNode) => Promise<unknown> {
-  return async (root: ASTNode): Promise<unknown> => {
-    const { value } = await runAST(root, fragments, serverHandler(client), undefined);
-    return value;
-  };
+  baseInterpreter: Interpreter,
+): (root: TypedNode) => Promise<unknown> {
+  const interp = { ...baseInterpreter, ...createTwilioInterpreter(client) };
+  return (root: TypedNode) => foldAST(interp, root);
 }

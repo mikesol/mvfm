@@ -14,7 +14,7 @@ import { describe, expect, it } from "vitest";
 import { slack as slackPlugin } from "../../src/7.14.0";
 import { serverEvaluate } from "../../src/7.14.0/handler.server";
 import type { SlackClient } from "../../src/7.14.0/interpreter";
-import { slackInterpreter } from "../../src/7.14.0/interpreter";
+import { createSlackInterpreter } from "../../src/7.14.0/interpreter";
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
@@ -28,15 +28,6 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 }
 
 const callLog: Array<{ method: string; params: Record<string, unknown> }> = [];
-
-const allFragments = [
-  slackInterpreter,
-  errorInterpreter,
-  fiberInterpreter,
-  coreInterpreter,
-  numInterpreter,
-  strInterpreter,
-];
 
 const app = mvfm(num, str, slackPlugin({ token: "xoxb-test-token" }), fiber, error);
 
@@ -87,7 +78,15 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   callLog.length = 0;
   const ast = injectInput(prog.ast, input);
   const client = createMockClient();
-  const evaluate = serverEvaluate(client, allFragments);
+  const baseInterpreter = {
+    ...createSlackInterpreter(client),
+    ...errorInterpreter,
+    ...fiberInterpreter,
+    ...coreInterpreter,
+    ...numInterpreter,
+    ...strInterpreter,
+  };
+  const evaluate = serverEvaluate(client, baseInterpreter);
   return await evaluate(ast.result);
 }
 

@@ -16,7 +16,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { stripe as stripePlugin } from "../../src/2025-04-30.basil";
 import { wrapStripeSdk } from "../../src/2025-04-30.basil/client-stripe-sdk";
 import { serverEvaluate } from "../../src/2025-04-30.basil/handler.server";
-import { stripeInterpreter } from "../../src/2025-04-30.basil/interpreter";
+import { createStripeInterpreter } from "../../src/2025-04-30.basil/interpreter";
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
@@ -32,21 +32,20 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 let container: StartedTestContainer;
 let sdk: Stripe;
 
-const allFragments = [
-  stripeInterpreter,
-  errorInterpreter,
-  fiberInterpreter,
-  coreInterpreter,
-  numInterpreter,
-  strInterpreter,
-];
-
 const app = mvfm(num, str, stripePlugin({ apiKey: "sk_test_fake" }), fiber, error);
 
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
   const client = wrapStripeSdk(sdk);
-  const evaluate = serverEvaluate(client, allFragments);
+  const baseInterpreter = {
+    ...createStripeInterpreter(client),
+    ...errorInterpreter,
+    ...fiberInterpreter,
+    ...coreInterpreter,
+    ...numInterpreter,
+    ...strInterpreter,
+  };
+  const evaluate = serverEvaluate(client, baseInterpreter);
   return await evaluate(ast.result);
 }
 

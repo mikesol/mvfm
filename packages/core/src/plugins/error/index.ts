@@ -31,7 +31,7 @@
 //
 // ============================================================
 
-import type { ASTNode, Expr, PluginContext, PluginDefinition } from "../../core";
+import type { Expr, PluginContext, PluginDefinition } from "../../core";
 
 // ---- What the plugin adds to $ ----------------------------
 
@@ -109,10 +109,10 @@ export interface ErrorMethods {
    * ```
    *
    * If the condition is true, continues. If false, fails
-   * with the given error. Useful in `$.do()` chains:
+   * with the given error. Useful in `$.discard()` chains:
    *
    * ```
-   * return $.do(
+   * return $.discard(
    *   $.guard($.gt(balance, amount), 'insufficient funds'),
    *   $.sql`update accounts set balance = balance - ${amount}`,
    *   { success: true }
@@ -200,13 +200,10 @@ export const error: PluginDefinition<ErrorMethods> = {
   nodeKinds: ["error/try", "error/fail", "error/attempt", "error/guard", "error/settle"],
 
   build(ctx: PluginContext): ErrorMethods {
-    function buildTryBuilder<T>(
-      exprNode: ASTNode,
-      finallyNode: ASTNode | null = null,
-    ): TryBuilder<T> {
+    function buildTryBuilder<T>(exprNode: any, finallyNode: any = null): TryBuilder<T> {
       return {
         catch<U>(fn: (err: Expr<any>) => Expr<U> | U): Expr<T | U> {
-          const errParam: ASTNode = {
+          const errParam: any = {
             kind: "core/lambda_param",
             name: "err",
           };
@@ -228,13 +225,13 @@ export const error: PluginDefinition<ErrorMethods> = {
         },
 
         match<U>(cases: Record<string, (err: Expr<any>) => Expr<U> | U>): Expr<T | U> {
-          const errParam: ASTNode = {
+          const errParam: any = {
             kind: "core/lambda_param",
             name: "err",
           };
           const errProxy = ctx.expr<any>(errParam);
 
-          const branches: Record<string, ASTNode> = {};
+          const branches: Record<string, any> = {};
           for (const [key, fn] of Object.entries(cases)) {
             const result = fn(errProxy);
             branches[key] = ctx.isExpr(result) ? result.__node : ctx.lift(result).__node;

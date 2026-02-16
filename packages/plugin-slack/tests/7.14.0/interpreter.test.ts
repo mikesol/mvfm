@@ -1,10 +1,9 @@
 import { coreInterpreter, foldAST, mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { slack } from "../../src/7.14.0";
-import { slackInterpreter } from "../../src/7.14.0/interpreter";
+import { createSlackInterpreter, type SlackClient } from "../../src/7.14.0/interpreter";
 
 const app = mvfm(num, str, slack({ token: "xoxb-test-token" }));
-const fragments = [slackInterpreter, coreInterpreter];
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
@@ -18,15 +17,16 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 }
 
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
-  const captured: any[] = [];
+  const captured: Array<{ method: string; params?: Record<string, unknown> }> = [];
   const ast = injectInput(prog.ast, input);
-  const recurse = foldAST(fragments, {
-    "slack/api_call": async (effect) => {
-      captured.push(effect);
+  const mockClient: SlackClient = {
+    async apiCall(method: string, params?: Record<string, unknown>) {
+      captured.push({ method, params });
       return { ok: true, channel: "C123", ts: "1234567890.123456" };
     },
-  });
-  const result = await recurse(ast.result);
+  };
+  const combined = { ...createSlackInterpreter(mockClient), ...coreInterpreter };
+  const result = await foldAST(combined, ast.result);
   return { result, captured };
 }
 
@@ -37,7 +37,6 @@ describe("slack interpreter: chat_postMessage", () => {
     const prog = app(($) => $.slack.chat.postMessage({ channel: "#general", text: "Hello" }));
     const { captured } = await run(prog);
     expect(captured).toHaveLength(1);
-    expect(captured[0].type).toBe("slack/api_call");
     expect(captured[0].method).toBe("chat.postMessage");
     expect(captured[0].params).toEqual({ channel: "#general", text: "Hello" });
   });

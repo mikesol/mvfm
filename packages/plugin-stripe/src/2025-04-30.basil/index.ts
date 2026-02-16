@@ -308,9 +308,9 @@ export function stripe(config: StripeConfig): PluginDefinition<StripeMethods> {
 //           await stripe.paymentIntents.create(...)
 //    Mvfm:   const c = $.stripe.customers.create(...)
 //           const pi = $.stripe.paymentIntents.create({ customer: c.id })
-//           return $.do(c, pi)
-//    Must use $.do() for sequencing when there are data dependencies.
-//    Without data dependency, $.do() is required to avoid orphan errors.
+//           return $.discard(c, pi)
+//    Must use $.discard() for sequencing when there are data dependencies.
+//    Without data dependency, $.discard() is required to avoid orphan errors.
 //
 // DOESN'T WORK / NOT MODELED:
 //

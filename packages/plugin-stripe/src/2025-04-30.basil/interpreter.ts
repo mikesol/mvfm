@@ -1,4 +1,5 @@
-import type { ASTNode, InterpreterFragment, StepEffect } from "@mvfm/core";
+import type { Interpreter, TypedNode } from "@mvfm/core";
+import { eval_ } from "@mvfm/core";
 
 /**
  * Stripe client interface consumed by the stripe handler.
@@ -11,134 +12,70 @@ export interface StripeClient {
   request(method: string, path: string, params?: Record<string, unknown>): Promise<unknown>;
 }
 
+interface StripeNode extends TypedNode<unknown> {
+  kind: string;
+  id?: TypedNode<string>;
+  params?: TypedNode<Record<string, unknown>>;
+}
+
 /**
- * Generator-based interpreter fragment for stripe plugin nodes.
+ * Creates an interpreter for `stripe/*` node kinds.
  *
- * Yields `stripe/api_call` effects for all 10 operations. Each effect
- * contains the HTTP method, API path, and optional params matching the
- * Stripe REST API conventions (as defined by stripe-node's StripeResource).
+ * @param client - The {@link StripeClient} to execute against.
+ * @returns An Interpreter handling all stripe node kinds.
  */
-export const stripeInterpreter: InterpreterFragment = {
-  pluginName: "stripe",
-  canHandle: (node) => node.kind.startsWith("stripe/"),
-  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
-    switch (node.kind) {
-      // ---- Payment Intents ----
+export function createStripeInterpreter(client: StripeClient): Interpreter {
+  return {
+    "stripe/create_payment_intent": async function* (node: StripeNode) {
+      const params = yield* eval_(node.params!);
+      return await client.request("POST", "/v1/payment_intents", params);
+    },
 
-      case "stripe/create_payment_intent": {
-        const params = yield { type: "recurse", child: node.params as ASTNode };
-        return yield {
-          type: "stripe/api_call",
-          method: "POST",
-          path: "/v1/payment_intents",
-          params,
-        };
-      }
+    "stripe/retrieve_payment_intent": async function* (node: StripeNode) {
+      const id = yield* eval_(node.id!);
+      return await client.request("GET", `/v1/payment_intents/${id}`);
+    },
 
-      case "stripe/retrieve_payment_intent": {
-        const id = yield { type: "recurse", child: node.id as ASTNode };
-        return yield {
-          type: "stripe/api_call",
-          method: "GET",
-          path: `/v1/payment_intents/${id}`,
-        };
-      }
+    "stripe/confirm_payment_intent": async function* (node: StripeNode) {
+      const id = yield* eval_(node.id!);
+      const params = node.params != null ? yield* eval_(node.params) : undefined;
+      return await client.request("POST", `/v1/payment_intents/${id}/confirm`, params);
+    },
 
-      case "stripe/confirm_payment_intent": {
-        const id = yield { type: "recurse", child: node.id as ASTNode };
-        const params =
-          node.params != null
-            ? yield { type: "recurse", child: node.params as ASTNode }
-            : undefined;
-        return yield {
-          type: "stripe/api_call",
-          method: "POST",
-          path: `/v1/payment_intents/${id}/confirm`,
-          ...(params !== undefined ? { params } : {}),
-        };
-      }
+    "stripe/create_customer": async function* (node: StripeNode) {
+      const params = yield* eval_(node.params!);
+      return await client.request("POST", "/v1/customers", params);
+    },
 
-      // ---- Customers ----
+    "stripe/retrieve_customer": async function* (node: StripeNode) {
+      const id = yield* eval_(node.id!);
+      return await client.request("GET", `/v1/customers/${id}`);
+    },
 
-      case "stripe/create_customer": {
-        const params = yield { type: "recurse", child: node.params as ASTNode };
-        return yield {
-          type: "stripe/api_call",
-          method: "POST",
-          path: "/v1/customers",
-          params,
-        };
-      }
+    "stripe/update_customer": async function* (node: StripeNode) {
+      const id = yield* eval_(node.id!);
+      const params = yield* eval_(node.params!);
+      return await client.request("POST", `/v1/customers/${id}`, params);
+    },
 
-      case "stripe/retrieve_customer": {
-        const id = yield { type: "recurse", child: node.id as ASTNode };
-        return yield {
-          type: "stripe/api_call",
-          method: "GET",
-          path: `/v1/customers/${id}`,
-        };
-      }
+    "stripe/list_customers": async function* (node: StripeNode) {
+      const params = node.params != null ? yield* eval_(node.params) : undefined;
+      return await client.request("GET", "/v1/customers", params);
+    },
 
-      case "stripe/update_customer": {
-        const id = yield { type: "recurse", child: node.id as ASTNode };
-        const params = yield { type: "recurse", child: node.params as ASTNode };
-        return yield {
-          type: "stripe/api_call",
-          method: "POST",
-          path: `/v1/customers/${id}`,
-          params,
-        };
-      }
+    "stripe/create_charge": async function* (node: StripeNode) {
+      const params = yield* eval_(node.params!);
+      return await client.request("POST", "/v1/charges", params);
+    },
 
-      case "stripe/list_customers": {
-        const params =
-          node.params != null
-            ? yield { type: "recurse", child: node.params as ASTNode }
-            : undefined;
-        return yield {
-          type: "stripe/api_call",
-          method: "GET",
-          path: "/v1/customers",
-          ...(params !== undefined ? { params } : {}),
-        };
-      }
+    "stripe/retrieve_charge": async function* (node: StripeNode) {
+      const id = yield* eval_(node.id!);
+      return await client.request("GET", `/v1/charges/${id}`);
+    },
 
-      // ---- Charges ----
-
-      case "stripe/create_charge": {
-        const params = yield { type: "recurse", child: node.params as ASTNode };
-        return yield {
-          type: "stripe/api_call",
-          method: "POST",
-          path: "/v1/charges",
-          params,
-        };
-      }
-
-      case "stripe/retrieve_charge": {
-        const id = yield { type: "recurse", child: node.id as ASTNode };
-        return yield {
-          type: "stripe/api_call",
-          method: "GET",
-          path: `/v1/charges/${id}`,
-        };
-      }
-
-      case "stripe/list_charges": {
-        const params =
-          node.params != null
-            ? yield { type: "recurse", child: node.params as ASTNode }
-            : undefined;
-        return yield {
-          type: "stripe/api_call",
-          method: "GET",
-          path: "/v1/charges",
-          ...(params !== undefined ? { params } : {}),
-        };
-      }
-
-      default:
-        throw new Error(`Stripe interpreter: unknown node kind "${node.kind}"`);
-    }
-  },
-};
+    "stripe/list_charges": async function* (node: StripeNode) {
+      const params = node.params != null ? yield* eval_(node.params) : undefined;
+      return await client.request("GET", "/v1/charges", params);
+    },
+  };
+}

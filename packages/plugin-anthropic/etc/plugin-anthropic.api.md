@@ -34,11 +34,6 @@ export interface AnthropicConfig {
     baseURL?: string;
 }
 
-// Warning: (ae-forgotten-export) The symbol "InterpreterFragment" needs to be exported by the entry point index.d.ts
-//
-// @public
-export const anthropicInterpreter: InterpreterFragment;
-
 // @public
 export interface AnthropicMethods {
     anthropic: {
@@ -60,11 +55,6 @@ export interface AnthropicMethods {
     };
 }
 
-// Warning: (ae-forgotten-export) The symbol "StepHandler" needs to be exported by the entry point index.d.ts
-//
-// @public
-export function clientHandler(options: ClientHandlerOptions): StepHandler<ClientHandlerState>;
-
 // @public
 export interface ClientHandlerOptions {
     baseUrl: string;
@@ -73,18 +63,21 @@ export interface ClientHandlerOptions {
     headers?: Record<string, string>;
 }
 
-// @public
-export interface ClientHandlerState {
-    stepIndex: number;
-}
-
-// Warning: (ae-forgotten-export) The symbol "ASTNode" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function serverEvaluate(client: AnthropicClient, fragments: InterpreterFragment[]): (root: ASTNode) => Promise<unknown>;
+export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter;
 
 // @public
-export function serverHandler(client: AnthropicClient): StepHandler<void>;
+export function createAnthropicInterpreter(client: AnthropicClient): Interpreter;
+
+// Warning: (ae-forgotten-export) The symbol "TypedNode" needs to be exported by the entry point index.d.ts
+//
+// @public
+export function serverEvaluate(client: AnthropicClient, baseInterpreter: Interpreter): (root: TypedNode) => Promise<unknown>;
+
+// @public
+export function serverInterpreter(client: AnthropicClient): Interpreter;
 
 // @public
 export function wrapAnthropicSdk(client: Anthropic): AnthropicClient;

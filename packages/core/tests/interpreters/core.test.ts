@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { composeInterpreters, mvfm } from "../../src/core";
+import { mvfm } from "../../src/core";
+import { foldAST } from "../../src/fold";
 import { coreInterpreter } from "../../src/interpreters/core";
 
 // Helper to inject input data into core/input nodes throughout an AST
@@ -18,8 +19,7 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
-  const interp = composeInterpreters([coreInterpreter]);
-  return await interp(ast.result);
+  return await foldAST(coreInterpreter, ast.result);
 }
 
 const app = mvfm();
@@ -65,9 +65,9 @@ describe("core interpreter: records", () => {
   });
 });
 
-describe("core interpreter: do", () => {
+describe("core interpreter: discard", () => {
   it("returns last value", async () => {
-    const prog = app(($) => $.do("step1", "step2", "result"));
+    const prog = app(($) => $.discard("step1", "step2", "result"));
     expect(await run(prog)).toBe("result");
   });
 });

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { composeInterpreters, mvfm } from "../../../src/core";
+import { mvfm } from "../../../src/core";
+import { foldAST } from "../../../src/fold";
 import { coreInterpreter } from "../../../src/interpreters/core";
 import { boolean } from "../../../src/plugins/boolean";
 import { booleanInterpreter } from "../../../src/plugins/boolean/interpreter";
@@ -20,15 +21,16 @@ function injectInput(node: any, input: Record<string, unknown>): any {
   return result;
 }
 
+const combined = {
+  ...coreInterpreter,
+  ...numInterpreter,
+  ...strInterpreter,
+  ...booleanInterpreter,
+};
+
 async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
   const ast = injectInput(prog.ast, input);
-  const interp = composeInterpreters([
-    coreInterpreter,
-    numInterpreter,
-    strInterpreter,
-    booleanInterpreter,
-  ]);
-  return await interp(ast.result);
+  return await foldAST(combined, ast.result);
 }
 
 const app = mvfm(num, str, boolean, show);

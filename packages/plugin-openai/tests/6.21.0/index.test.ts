@@ -160,11 +160,11 @@ describe("openai: completions.create", () => {
 });
 
 // ============================================================
-// Integration with $.do() and cross-operation dependencies
+// Integration with $.discard() and cross-operation dependencies
 // ============================================================
 
-describe("openai: integration with $.do()", () => {
-  it("side-effecting operations wrapped in $.do() are reachable", () => {
+describe("openai: integration with $.discard()", () => {
+  it("side-effecting operations wrapped in $.discard() are reachable", () => {
     expect(() => {
       app(($) => {
         const completion = $.openai.chat.completions.create({
@@ -175,7 +175,7 @@ describe("openai: integration with $.do()", () => {
           model: "text-embedding-3-small",
           input: "Hello world",
         });
-        return $.do(completion, embedding);
+        return $.discard(completion, embedding);
       });
     }).not.toThrow();
   });
@@ -191,9 +191,9 @@ describe("openai: cross-operation dependencies", () => {
       const moderation = $.openai.moderations.create({
         input: (completion as any).choices,
       });
-      return $.do(completion, moderation);
+      return $.discard(completion, moderation);
     });
     const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/do");
+    expect(ast.result.kind).toBe("core/discard");
   });
 });

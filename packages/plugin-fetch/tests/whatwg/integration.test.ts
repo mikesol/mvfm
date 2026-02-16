@@ -4,7 +4,6 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { fetch as fetchPlugin } from "../../src/whatwg";
 import { wrapFetch } from "../../src/whatwg/client-fetch";
 import { serverEvaluate } from "../../src/whatwg/handler.server";
-import { fetchInterpreter } from "../../src/whatwg/interpreter";
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
@@ -20,7 +19,7 @@ function injectInput(node: any, input: Record<string, unknown>): any {
 let server: Server;
 let baseUrl: string;
 
-const allFragments = [fetchInterpreter, coreInterpreter, numInterpreter, strInterpreter];
+const baseInterpreter = { ...coreInterpreter, ...numInterpreter, ...strInterpreter };
 
 function handler(req: IncomingMessage, res: ServerResponse) {
   let body = "";
@@ -96,7 +95,7 @@ describe("fetch integration: GET + json", () => {
     });
     const ast = injectInput(prog.ast, {});
     const client = wrapFetch();
-    const evaluate = serverEvaluate(client, allFragments);
+    const evaluate = serverEvaluate(client, baseInterpreter);
     const result = (await evaluate(ast.result)) as any;
     expect(result.message).toBe("hello");
     expect(result.count).toBe(42);
@@ -116,7 +115,7 @@ describe("fetch integration: GET + text", () => {
     });
     const ast = injectInput(prog.ast, {});
     const client = wrapFetch();
-    const evaluate = serverEvaluate(client, allFragments);
+    const evaluate = serverEvaluate(client, baseInterpreter);
     const result = await evaluate(ast.result);
     expect(result).toBe("Hello, world!");
   });
@@ -135,7 +134,7 @@ describe("fetch integration: GET + status", () => {
     });
     const ast = injectInput(prog.ast, {});
     const client = wrapFetch();
-    const evaluate = serverEvaluate(client, allFragments);
+    const evaluate = serverEvaluate(client, baseInterpreter);
     const result = await evaluate(ast.result);
     expect(result).toBe(200);
   });
@@ -148,7 +147,7 @@ describe("fetch integration: GET + status", () => {
     });
     const ast = injectInput(prog.ast, {});
     const client = wrapFetch();
-    const evaluate = serverEvaluate(client, allFragments);
+    const evaluate = serverEvaluate(client, baseInterpreter);
     const result = await evaluate(ast.result);
     expect(result).toBe(404);
   });
@@ -167,7 +166,7 @@ describe("fetch integration: GET + headers", () => {
     });
     const ast = injectInput(prog.ast, {});
     const client = wrapFetch();
-    const evaluate = serverEvaluate(client, allFragments);
+    const evaluate = serverEvaluate(client, baseInterpreter);
     const result = (await evaluate(ast.result)) as Record<string, string>;
     expect(result["content-type"]).toBe("text/plain");
     expect(result["x-custom"]).toBe("test-value");
@@ -191,7 +190,7 @@ describe("fetch integration: POST + json", () => {
     });
     const ast = injectInput(prog.ast, {});
     const client = wrapFetch();
-    const evaluate = serverEvaluate(client, allFragments);
+    const evaluate = serverEvaluate(client, baseInterpreter);
     const result = (await evaluate(ast.result)) as any;
     expect(result.echo).toBe('{"hello":"world"}');
     expect(result.method).toBe("POST");
@@ -211,7 +210,7 @@ describe("fetch integration: baseUrl config", () => {
     });
     const ast = injectInput(prog.ast, {});
     const client = wrapFetch();
-    const evaluate = serverEvaluate(client, allFragments);
+    const evaluate = serverEvaluate(client, baseInterpreter);
     const result = (await evaluate(ast.result)) as any;
     expect(result.message).toBe("hello");
   });
@@ -230,7 +229,7 @@ describe("fetch integration: defaultHeaders config", () => {
     });
     const ast = injectInput(prog.ast, {});
     const client = wrapFetch();
-    const evaluate = serverEvaluate(client, allFragments);
+    const evaluate = serverEvaluate(client, baseInterpreter);
     const result = (await evaluate(ast.result)) as any;
     expect(result.receivedHeaders["x-default"]).toBe("from-config");
   });
@@ -254,7 +253,7 @@ describe("fetch integration: chaining", () => {
     });
     const ast = injectInput(prog.ast, {});
     const client = wrapFetch();
-    const evaluate = serverEvaluate(client, allFragments);
+    const evaluate = serverEvaluate(client, baseInterpreter);
     const result = (await evaluate(ast.result)) as any;
     expect(result.receivedHeaders["x-message"]).toBe("hello");
   });
@@ -273,7 +272,7 @@ describe("fetch integration: input resolution", () => {
     });
     const ast = injectInput(prog.ast, { url: `${baseUrl}/json` });
     const client = wrapFetch();
-    const evaluate = serverEvaluate(client, allFragments);
+    const evaluate = serverEvaluate(client, baseInterpreter);
     const result = (await evaluate(ast.result)) as any;
     expect(result.message).toBe("hello");
   });

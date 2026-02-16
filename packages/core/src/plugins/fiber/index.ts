@@ -12,7 +12,7 @@
 //
 // DESIGN PRINCIPLES:
 //
-// 1. Sequential is the default. $.do(a, b, c) runs in order.
+// 1. Sequential is the default. $.discard(a, b, c) runs in order.
 //    You opt INTO parallelism, not out of it.
 //
 // 2. Parallelism always has a concurrency limit. No unbounded
@@ -28,7 +28,7 @@
 //
 // ============================================================
 
-import type { ASTNode, Expr, PluginContext, PluginDefinition } from "../../core";
+import type { Expr, PluginContext, PluginDefinition } from "../../core";
 
 // ---- What the plugin adds to $ ----------------------------
 
@@ -62,10 +62,10 @@ export interface FiberMethods {
 
   /**
    * Run expressions sequentially, return last result.
-   * This is `$.do()` with fiber awareness -- each step is
+   * This is `$.discard()` with fiber awareness -- each step is
    * guaranteed to complete before the next starts.
    *
-   * Alias for `$.do()` but makes the intent clearer in
+   * Alias for `$.discard()` but makes the intent clearer in
    * a concurrent context.
    *
    * ```
@@ -158,7 +158,7 @@ export const fiber: PluginDefinition<FiberMethods> = {
       ) {
         const [collection, opts, fn] = args;
         // Build the lambda: invoke fn with a param proxy
-        const paramNode: ASTNode = {
+        const paramNode: any = {
           kind: "core/lambda_param",
           name: "par_item",
         };
@@ -190,7 +190,7 @@ export const fiber: PluginDefinition<FiberMethods> = {
         const steps = nodes.slice(0, -1);
         const result = nodes[nodes.length - 1];
         return ctx.expr({
-          kind: "core/do",
+          kind: "core/discard",
           steps,
           result,
         });

@@ -1,36 +1,24 @@
 // Public API
 
+export { injectLambdaParam, mvfm } from "./core";
+
 export type {
-  ASTNode,
-  Expr,
-  GeneratorInterpreterFragment,
+  CompleteInterpreter,
+  FoldState,
+  Handler,
   Interpreter,
-  InterpreterFragment,
-  LegacyInterpreterFragment,
-  MissingTraitError,
-  Plugin,
-  PluginContext,
-  PluginDefinition,
-  PluginInput,
-  Program,
-  RecurseFn,
-  Step,
-  StepContext,
-  StepEffect,
-  StepHandler,
-  TraitImpl,
-  TypeclassMapping,
-  TypeclassSlot,
-} from "./core";
+  TypedNode,
+  TypedProgram,
+} from "./fold";
+
 export {
-  adaptLegacy,
-  composeInterpreters,
+  checkCompleteness,
+  createFoldState,
+  eval_,
   foldAST,
-  injectLambdaParam,
-  mvfm,
-  runAST,
-  Stepper,
-} from "./core";
+  typedFoldAST,
+  VOLATILE_KINDS,
+} from "./fold";
 export { coreInterpreter } from "./interpreters/core";
 export type { BooleanMethods } from "./plugins/boolean";
 export { boolean } from "./plugins/boolean";
@@ -80,3 +68,15 @@ export type {
 } from "./schema";
 export { array, nullable } from "./schema";
 export { inferType, resolveSchemaType } from "./trait-utils";
+export type {
+  Expr,
+  MissingTraitError,
+  Plugin,
+  PluginContext,
+  PluginDefinition,
+  PluginInput,
+  Program,
+  TraitImpl,
+  TypeclassMapping,
+  TypeclassSlot,
+} from "./types";

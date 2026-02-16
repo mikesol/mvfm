@@ -1,4 +1,5 @@
-import type { ASTNode, InterpreterFragment, StepEffect } from "@mvfm/core";
+import type { Interpreter, TypedNode } from "@mvfm/core";
+import { eval_ } from "@mvfm/core";
 import type { ConsoleMethodName } from "./index";
 
 /**
@@ -15,25 +16,49 @@ export interface ConsoleClient {
   call(method: ConsoleMethodName, args: unknown[]): Promise<void>;
 }
 
+interface ConsoleMethodNode extends TypedNode<void> {
+  kind: string;
+  args: TypedNode[];
+}
+
+const METHODS: readonly ConsoleMethodName[] = [
+  "assert",
+  "clear",
+  "count",
+  "countReset",
+  "debug",
+  "dir",
+  "dirxml",
+  "error",
+  "group",
+  "groupCollapsed",
+  "groupEnd",
+  "info",
+  "log",
+  "table",
+  "time",
+  "timeEnd",
+  "timeLog",
+  "trace",
+  "warn",
+];
+
 /**
- * Interpreter fragment for `console/*` nodes.
+ * Creates an interpreter for `console/*` node kinds.
+ *
+ * @param client - Console effect execution client.
+ * @returns An Interpreter handling all console node kinds.
  */
-export const consoleInterpreter: InterpreterFragment = {
-  pluginName: "console",
-  canHandle: (node) => node.kind.startsWith("console/"),
-  *visit(node: ASTNode): Generator<StepEffect, unknown, unknown> {
+export function createConsoleInterpreter(client: ConsoleClient): Interpreter {
+  const handler = async function* (node: ConsoleMethodNode) {
     const method = node.kind.slice("console/".length) as ConsoleMethodName;
-    const argNodes = ((node.args as ASTNode[] | undefined) ?? []) as ASTNode[];
     const args: unknown[] = [];
-
-    for (const argNode of argNodes) {
-      args.push(yield { type: "recurse", child: argNode });
+    for (const argNode of node.args ?? []) {
+      args.push(yield* eval_(argNode));
     }
+    await client.call(method, args);
+    return undefined;
+  };
 
-    return yield {
-      type: `console/${method}`,
-      method,
-      args,
-    };
-  },
-};
+  return Object.fromEntries(METHODS.map((m) => [`console/${m}`, handler]));
+}

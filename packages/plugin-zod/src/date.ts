@@ -1,4 +1,4 @@
-import type { ASTNode, PluginContext, StepEffect } from "@mvfm/core";
+import type { PluginContext, TypedNode } from "@mvfm/core";
 import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
@@ -30,7 +30,7 @@ export class ZodDateBuilder extends ZodSchemaBuilder<Date> {
   protected _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | ASTNode;
+    error?: string | TypedNode;
     extra?: Record<string, unknown>;
   }): ZodDateBuilder {
     return new ZodDateBuilder(
@@ -43,12 +43,12 @@ export class ZodDateBuilder extends ZodSchemaBuilder<Date> {
   }
 
   /** Minimum date constraint. Produces `min` check descriptor with ISO string value. */
-  min(value: Date, opts?: { error?: string; abort?: boolean; when?: ASTNode }): ZodDateBuilder {
+  min(value: Date, opts?: { error?: string; abort?: boolean; when?: TypedNode }): ZodDateBuilder {
     return this._addCheck("min", { value: value.toISOString() }, opts);
   }
 
   /** Maximum date constraint. Produces `max` check descriptor with ISO string value. */
-  max(value: Date, opts?: { error?: string; abort?: boolean; when?: ASTNode }): ZodDateBuilder {
+  max(value: Date, opts?: { error?: string; abort?: boolean; when?: TypedNode }): ZodDateBuilder {
     return this._addCheck("max", { value: value.toISOString() }, opts);
   }
 }
@@ -101,7 +101,7 @@ function applyDateChecks(schema: z.ZodDate, checks: CheckDescriptor[]): z.ZodDat
 /** Interpreter handlers for date schema nodes. */
 export const dateInterpreter: SchemaInterpreterMap = {
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/date": function* (node: ASTNode): Generator<StepEffect, z.ZodType, unknown> {
+  "zod/date": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     const checks = (node.checks as CheckDescriptor[]) ?? [];
     const errorFn = toZodError(node.error as ErrorConfig | undefined);
     const base = errorFn ? z.date({ error: errorFn }) : z.date();
