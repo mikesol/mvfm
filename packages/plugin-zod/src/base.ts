@@ -339,6 +339,39 @@ export abstract class ZodSchemaBuilder<T> {
   brand<B extends string>(brand?: B): ZodWrappedBuilder<T & { __brand: B }> {
     return this._wrap<T & { __brand: B }>("zod/branded", brand ? { brand } : {});
   }
+
+  // ---- Transform methods (#118) ----
+
+  /**
+   * Chain a transform after this schema. The callback receives an `Expr<T>`
+   * placeholder and must return an `Expr<U>` built from DSL operations.
+   * Produces a `zod/transform` wrapper node with an embedded lambda.
+   */
+  transform<U>(fn: (val: Expr<T>) => Expr<U>): ZodWrappedBuilder<U> {
+    const paramNode: ASTNode = { kind: "core/lambda_param", name: "transform_val" };
+    const paramProxy = this._ctx.expr<T>(paramNode);
+    const result = fn(paramProxy);
+    const bodyNode = this._ctx.isExpr(result) ? result.__node : paramNode;
+    const wrapperNode: WrapperASTNode = {
+      kind: "zod/transform",
+      inner: this._buildSchemaNode(),
+      fn: { kind: "core/lambda", param: paramNode, body: bodyNode },
+    };
+    return new ZodWrappedBuilder<U>(this._ctx, wrapperNode);
+  }
+
+  /**
+   * Pipe this schema's output into another schema for further validation.
+   * Produces a `zod/pipe` wrapper node.
+   */
+  pipe<U>(target: ZodSchemaBuilder<U>): ZodWrappedBuilder<U> {
+    const wrapperNode: WrapperASTNode = {
+      kind: "zod/pipe",
+      inner: this._buildSchemaNode(),
+      target: target.__schemaNode,
+    };
+    return new ZodWrappedBuilder<U>(this._ctx, wrapperNode);
+  }
 }
 
 /**

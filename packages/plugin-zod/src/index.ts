@@ -27,6 +27,8 @@ import type { ZodStringNamespace } from "./string";
 import { stringNamespace, stringNodeKinds } from "./string";
 import type { ZodStringFormatsNamespace } from "./string-formats";
 import { stringFormatsNamespace, stringFormatsNodeKinds } from "./string-formats";
+import type { ZodTransformNamespace } from "./transform";
+import { transformNamespace, transformNodeKinds } from "./transform";
 import type { ZodTupleNamespace } from "./tuple";
 import { tupleNamespace, tupleNodeKinds } from "./tuple";
 import type { ZodUnionNamespace } from "./union";
@@ -51,6 +53,7 @@ export { ZodRecordBuilder } from "./record";
 export { ZodStringBuilder } from "./string";
 export type { ZodIsoNamespace, ZodStringFormatsNamespace } from "./string-formats";
 export { buildStringFormat } from "./string-formats";
+export { ZodTransformBuilder } from "./transform";
 export { ZodTupleBuilder } from "./tuple";
 export type {
   CheckDescriptor,
@@ -91,6 +94,7 @@ export interface ZodNamespace
     ZodPrimitivesNamespace,
     ZodRecordNamespace,
     ZodStringFormatsNamespace,
+    ZodTransformNamespace,
     ZodTupleNamespace,
     ZodUnionNamespace {
   /** Coercion constructors -- convert input before validating. */
@@ -143,6 +147,7 @@ export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
     ...coerceNodeKinds,
     ...recordNodeKinds,
     ...stringFormatsNodeKinds,
+    ...transformNodeKinds,
     ...tupleNodeKinds,
     ...unionNodeKinds,
     // ^^^ Each new schema type adds ONE spread here
@@ -165,6 +170,7 @@ export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
         ...coerceNamespace(ctx, parseError),
         ...recordNamespace(ctx, parseError),
         ...stringFormatsNamespace(ctx, parseError),
+        ...transformNamespace(ctx),
         ...tupleNamespace(ctx, parseError),
         ...unionNamespace(ctx, parseError),
         // ^^^ Each new schema type adds ONE spread here
