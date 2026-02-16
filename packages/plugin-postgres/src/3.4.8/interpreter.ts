@@ -1,5 +1,5 @@
-import type { Interpreter, TypedNode } from "@mvfm/core";
-import { eval_ } from "@mvfm/core";
+import { eval_, typedInterpreter } from "@mvfm/core";
+import type { TypedNode } from "@mvfm/core";
 
 /**
  * Database client interface consumed by the postgres handler.
@@ -94,6 +94,19 @@ export interface PostgresCursorBatchNode extends TypedNode<unknown[]> {
   kind: "postgres/cursor_batch";
 }
 
+declare module "@mvfm/core" {
+  interface NodeTypeMap {
+    "postgres/query": PostgresQueryNode;
+    "postgres/identifier": PostgresIdentifierNode;
+    "postgres/insert_helper": PostgresInsertHelperNode;
+    "postgres/set_helper": PostgresSetHelperNode;
+    "postgres/begin": PostgresBeginNode;
+    "postgres/savepoint": PostgresSavepointNode;
+    "postgres/cursor": PostgresCursorNode;
+    "postgres/cursor_batch": PostgresCursorBatchNode;
+  }
+}
+
 /**
  * Build parameterized SQL from a postgres/query AST node.
  * Resolves identifier, insert_helper, and set_helper fragments inline.
@@ -168,8 +181,12 @@ export async function* buildSQL(
  * @param client - The {@link PostgresClient} to execute against.
  * @returns An Interpreter handling postgres node kinds.
  */
-export function createPostgresInterpreter(client: PostgresClient): Interpreter {
-  return {
+export function createPostgresInterpreter(client: PostgresClient) {
+  return typedInterpreter<
+    | "postgres/query" | "postgres/identifier" | "postgres/insert_helper"
+    | "postgres/set_helper" | "postgres/begin" | "postgres/savepoint"
+    | "postgres/cursor" | "postgres/cursor_batch"
+  >()({
     "postgres/query": async function* (node: PostgresQueryNode) {
       const { sql, params } = yield* buildSQL(node);
       return await client.query(sql, params);
@@ -204,24 +221,24 @@ export function createPostgresInterpreter(client: PostgresClient): Interpreter {
     },
 
     // biome-ignore lint/correctness/useYield: stub throws before yielding
-    "postgres/identifier": async function* () {
+    "postgres/identifier": async function* (_node: PostgresIdentifierNode) {
       throw new Error(
         "postgres/identifier should be resolved during SQL construction, not visited directly",
       );
     },
 
     // biome-ignore lint/correctness/useYield: stub throws before yielding
-    "postgres/insert_helper": async function* () {
+    "postgres/insert_helper": async function* (_node: PostgresInsertHelperNode) {
       throw new Error(
         "postgres/insert_helper should be resolved during SQL construction, not visited directly",
       );
     },
 
     // biome-ignore lint/correctness/useYield: stub throws before yielding
-    "postgres/set_helper": async function* () {
+    "postgres/set_helper": async function* (_node: PostgresSetHelperNode) {
       throw new Error(
         "postgres/set_helper should be resolved during SQL construction, not visited directly",
       );
     },
-  };
+  });
 }
