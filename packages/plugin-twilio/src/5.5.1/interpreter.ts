@@ -1,4 +1,3 @@
-import { createRequire } from "node:module";
 import type { Interpreter, TypedNode } from "@mvfm/core";
 import { eval_ } from "@mvfm/core";
 import { wrapTwilioSdk } from "./client-twilio-sdk";
@@ -80,45 +79,31 @@ function requiredEnv(name: "TWILIO_ACCOUNT_SID" | "TWILIO_AUTH_TOKEN"): string {
 }
 
 function createDefaultTwilioClient(): unknown {
-  const require = createRequire(import.meta.url);
   const accountSid = requiredEnv("TWILIO_ACCOUNT_SID");
   const authToken = requiredEnv("TWILIO_AUTH_TOKEN");
-  let moduleValue: unknown;
-  try {
-    moduleValue = require("twilio");
-  } catch {
-    return {
-      async request(opts: {
-        method: string;
-        uri: string;
-        data?: Record<string, unknown>;
-      }): Promise<{ body: unknown }> {
-        const encodedAuth = btoa(`${accountSid}:${authToken}`);
-        const response = await fetch(opts.uri, {
-          method: opts.method,
-          headers: {
-            Authorization: `Basic ${encodedAuth}`,
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body:
-            opts.data == null
-              ? undefined
-              : new URLSearchParams(
-                  Object.entries(opts.data).map(([key, value]) => [key, String(value)]),
-                ).toString(),
-        });
-        return { body: await response.json() };
-      },
-    };
-  }
-  const twilioFactory =
-    typeof moduleValue === "function"
-      ? moduleValue
-      : (moduleValue as { default?: unknown }).default;
-  if (typeof twilioFactory !== "function") {
-    throw new Error("@mvfm/plugin-twilio: failed to load `twilio` client factory");
-  }
-  return twilioFactory(accountSid, authToken);
+  return {
+    async request(opts: {
+      method: string;
+      uri: string;
+      data?: Record<string, unknown>;
+    }): Promise<{ body: unknown }> {
+      const encodedAuth = btoa(`${accountSid}:${authToken}`);
+      const response = await fetch(opts.uri, {
+        method: opts.method,
+        headers: {
+          Authorization: `Basic ${encodedAuth}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body:
+          opts.data == null
+            ? undefined
+            : new URLSearchParams(
+                Object.entries(opts.data).map(([key, value]) => [key, String(value)]),
+              ).toString(),
+      });
+      return { body: await response.json() };
+    },
+  };
 }
 
 function lazyInterpreter(factory: () => Interpreter): Interpreter {
