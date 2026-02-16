@@ -175,7 +175,9 @@ export interface EqFor<T> {
 }
 
 // @public
-export const eqInterpreter: Interpreter;
+export const eqInterpreter: {
+    "eq/neq": (node: EqNeq) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
+};
 
 // @public
 export const error: PluginDefinition<ErrorMethods>;
@@ -369,7 +371,12 @@ export interface OrdFor<T> {
 }
 
 // @public
-export const ordInterpreter: Interpreter;
+export const ordInterpreter: {
+    "ord/gt": (node: OrdCmp) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
+    "ord/gte": (node: OrdCmp) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
+    "ord/lt": (node: OrdCmp) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
+    "ord/lte": (node: OrdCmp) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
+};
 
 // @public
 type Plugin_2<T = any, Traits extends Record<string, unknown> = {}> = PluginDefinition<T, Traits> | (() => PluginDefinition<T, Traits>);
@@ -532,7 +539,25 @@ export const str: PluginDefinition<StrMethods, {
 }>;
 
 // @public
-export const strInterpreter: Interpreter;
+export const strInterpreter: {
+    "str/template": (node: StrTemplateNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
+    "str/concat": (node: StrConcatNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
+    "str/upper": (node: StrUpperNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
+    "str/lower": (node: StrLowerNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
+    "str/trim": (node: StrTrimNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
+    "str/slice": (node: StrSliceNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
+    "str/includes": (node: StrIncludesNode) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
+    "str/startsWith": (node: StrStartsWithNode) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
+    "str/endsWith": (node: StrEndsWithNode) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
+    "str/split": (node: StrSplitNode) => AsyncGenerator<TypedNode<unknown>, string[], unknown>;
+    "str/join": (node: StrJoinNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
+    "str/replace": (node: StrReplaceNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
+    "str/len": (node: StrLenNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
+    "str/eq": (node: StrEqNode) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
+    "str/show": (node: StrShowNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
+    "str/append": (node: StrAppendNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
+    "str/mempty": (_node: StrMemptyNode) => AsyncGenerator<never, string, unknown>;
+};
 
 // @public
 export interface StrMethods {
@@ -607,6 +632,25 @@ export const VOLATILE_KINDS: Set<string>;
 // dist/builder.d.ts:11:5 - (ae-forgotten-export) The symbol "CoreDollar" needs to be exported by the entry point index.d.ts
 // dist/builder.d.ts:11:5 - (ae-forgotten-export) The symbol "MergePlugins" needs to be exported by the entry point index.d.ts
 // dist/builder.d.ts:11:5 - (ae-forgotten-export) The symbol "FlattenPluginInputs" needs to be exported by the entry point index.d.ts
+// dist/plugins/eq/interpreter.d.ts:13:5 - (ae-forgotten-export) The symbol "EqNeq" needs to be exported by the entry point index.d.ts
+// dist/plugins/ord/interpreter.d.ts:16:5 - (ae-forgotten-export) The symbol "OrdCmp" needs to be exported by the entry point index.d.ts
+// dist/plugins/str/interpreter.d.ts:104:5 - (ae-forgotten-export) The symbol "StrTemplateNode" needs to be exported by the entry point index.d.ts
+// dist/plugins/str/interpreter.d.ts:105:5 - (ae-forgotten-export) The symbol "StrConcatNode" needs to be exported by the entry point index.d.ts
+// dist/plugins/str/interpreter.d.ts:106:5 - (ae-forgotten-export) The symbol "StrUpperNode" needs to be exported by the entry point index.d.ts
+// dist/plugins/str/interpreter.d.ts:107:5 - (ae-forgotten-export) The symbol "StrLowerNode" needs to be exported by the entry point index.d.ts
+// dist/plugins/str/interpreter.d.ts:108:5 - (ae-forgotten-export) The symbol "StrTrimNode" needs to be exported by the entry point index.d.ts
+// dist/plugins/str/interpreter.d.ts:109:5 - (ae-forgotten-export) The symbol "StrSliceNode" needs to be exported by the entry point index.d.ts
+// dist/plugins/str/interpreter.d.ts:110:5 - (ae-forgotten-export) The symbol "StrIncludesNode" needs to be exported by the entry point index.d.ts
+// dist/plugins/str/interpreter.d.ts:111:5 - (ae-forgotten-export) The symbol "StrStartsWithNode" needs to be exported by the entry point index.d.ts
+// dist/plugins/str/interpreter.d.ts:112:5 - (ae-forgotten-export) The symbol "StrEndsWithNode" needs to be exported by the entry point index.d.ts
+// dist/plugins/str/interpreter.d.ts:113:5 - (ae-forgotten-export) The symbol "StrSplitNode" needs to be exported by the entry point index.d.ts
+// dist/plugins/str/interpreter.d.ts:114:5 - (ae-forgotten-export) The symbol "StrJoinNode" needs to be exported by the entry point index.d.ts
+// dist/plugins/str/interpreter.d.ts:115:5 - (ae-forgotten-export) The symbol "StrReplaceNode" needs to be exported by the entry point index.d.ts
+// dist/plugins/str/interpreter.d.ts:116:5 - (ae-forgotten-export) The symbol "StrLenNode" needs to be exported by the entry point index.d.ts
+// dist/plugins/str/interpreter.d.ts:117:5 - (ae-forgotten-export) The symbol "StrEqNode" needs to be exported by the entry point index.d.ts
+// dist/plugins/str/interpreter.d.ts:118:5 - (ae-forgotten-export) The symbol "StrShowNode" needs to be exported by the entry point index.d.ts
+// dist/plugins/str/interpreter.d.ts:119:5 - (ae-forgotten-export) The symbol "StrAppendNode" needs to be exported by the entry point index.d.ts
+// dist/plugins/str/interpreter.d.ts:120:5 - (ae-forgotten-export) The symbol "StrMemptyNode" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

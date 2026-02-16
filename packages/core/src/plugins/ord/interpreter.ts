@@ -1,12 +1,22 @@
-import type { Interpreter, TypedNode } from "../../fold";
-import { eval_ } from "../../fold";
+import type { TypedNode } from "../../fold";
+import { eval_, typedInterpreter } from "../../fold";
 
-interface OrdCmp extends TypedNode<boolean> {
+export interface OrdCmp extends TypedNode<boolean> {
+  kind: "ord/gt" | "ord/gte" | "ord/lt" | "ord/lte";
   operand: TypedNode<number>;
 }
 
+declare module "@mvfm/core" {
+  interface NodeTypeMap {
+    "ord/gt": OrdCmp;
+    "ord/gte": OrdCmp;
+    "ord/lt": OrdCmp;
+    "ord/lte": OrdCmp;
+  }
+}
+
 /** Interpreter handlers for `ord/` node kinds. */
-export const ordInterpreter: Interpreter = {
+export const ordInterpreter = typedInterpreter<"ord/gt" | "ord/gte" | "ord/lt" | "ord/lte">()({
   "ord/gt": async function* (node: OrdCmp) {
     return (yield* eval_(node.operand)) > 0;
   },
@@ -19,4 +29,4 @@ export const ordInterpreter: Interpreter = {
   "ord/lte": async function* (node: OrdCmp) {
     return (yield* eval_(node.operand)) <= 0;
   },
-};
+});
