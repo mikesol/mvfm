@@ -459,7 +459,7 @@ export const num: PluginDefinition<NumMethods> = {
 
 Key difference: `num` is a **const**, not a factory function. It needs no configuration, so it is directly a `PluginDefinition`. No wrapper function, no config parameter.
 
-### The six rules
+### The seven rules
 
 Every plugin must follow these rules. Violating any of them is a build error, a runtime bug, or an architectural regression.
 
@@ -486,6 +486,10 @@ If your plugin requires configuration (API keys, connection strings, options), s
 **6. Return `Expr<T>` with accurate types.**
 
 Every builder method must return `Expr<T>` where `T` accurately reflects the type of the value the expression will produce at runtime. If a method computes a number, it returns `Expr<number>`. If it computes a string, it returns `Expr<string>`. This is what gives the DSL its type safety — the TypeScript compiler checks that you do not pass an `Expr<string>` where an `Expr<number>` is expected.
+
+**7. Every node kind must have a docs example.**
+
+Add an entry to the corresponding file in `packages/docs/src/examples/<plugin-name>.ts`. CI will fail if any node kind in your plugin's `nodeKinds` array lacks an example. For plugins requiring infrastructure, provide a `mockInterpreter` that returns realistic fake data. See `packages/docs/src/examples/st.ts` for the mock interpreter pattern.
 
 ### Config pattern: configured vs. unconfigured plugins
 
