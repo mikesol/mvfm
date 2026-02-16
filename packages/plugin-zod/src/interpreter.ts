@@ -1,5 +1,5 @@
-import type { Interpreter, TypedNode } from "@mvfm/core";
-import { eval_, injectLambdaParam } from "@mvfm/core";
+import type { FoldYield, Interpreter, TypedNode } from "@mvfm/core";
+import { eval_ } from "@mvfm/core";
 import { z } from "zod";
 import { createArrayInterpreter } from "./array";
 import { bigintInterpreter } from "./bigint";
@@ -170,19 +170,23 @@ function extractRefinements(schemaNode: any): RefinementDescriptor[] {
  */
 async function* evaluateLambda(
   value: unknown,
-  lambda: { param: { name: string }; body: any },
-): AsyncGenerator<TypedNode, unknown, unknown> {
-  const bodyClone = structuredClone(lambda.body);
-  injectLambdaParam(bodyClone, lambda.param.name, value);
-  return yield* eval_(bodyClone);
+  lambda: { param: { __id: number; name?: string }; body: any },
+): AsyncGenerator<FoldYield, unknown, unknown> {
+  return yield {
+    type: "recurse_scoped",
+    child: lambda.body,
+    bindings: [{ paramId: lambda.param.__id, value }],
+  };
 }
 
 /**
  * Collect transform lambdas from the schema wrapper chain.
  * Returns lambdas in execution order (innermost first).
  */
-function collectTransformLambdas(node: any): Array<{ param: { name: string }; body: any }> {
-  const transforms: Array<{ param: { name: string }; body: any }> = [];
+function collectTransformLambdas(
+  node: any,
+): Array<{ param: { __id: number; name?: string }; body: any }> {
+  const transforms: Array<{ param: { __id: number; name?: string }; body: any }> = [];
   let current = node;
   // Walk through wrapper transforms
   while (current.kind === "zod/transform" && current.inner) {
@@ -200,7 +204,9 @@ function collectTransformLambdas(node: any): Array<{ param: { name: string }; bo
  * Extract preprocess lambda if the schema chain contains a preprocess wrapper.
  * Walks through transform wrappers to find preprocess underneath.
  */
-function extractPreprocessLambda(node: any): { param: { name: string }; body: any } | undefined {
+function extractPreprocessLambda(
+  node: any,
+): { param: { __id: number; name?: string }; body: any } | undefined {
   let current = node;
   while (current.kind === "zod/transform" && current.inner) {
     current = current.inner;
@@ -217,13 +223,15 @@ function extractPreprocessLambda(node: any): { param: { name: string }; body: an
 async function* applyRefinements(
   value: unknown,
   refinements: RefinementDescriptor[],
-): AsyncGenerator<TypedNode, unknown, unknown> {
+): AsyncGenerator<FoldYield, unknown, unknown> {
   let current = value;
   for (const ref of refinements) {
-    const lambda = ref.fn as unknown as { param: { name: string }; body: any };
-    const bodyClone = structuredClone(lambda.body);
-    injectLambdaParam(bodyClone, lambda.param.name, current);
-    const result = yield* eval_(bodyClone);
+    const lambda = ref.fn as unknown as { param: { __id: number }; body: any };
+    const result = yield {
+      type: "recurse_scoped",
+      child: lambda.body,
+      bindings: [{ paramId: lambda.param.__id, value: current }],
+    };
 
     switch (ref.kind) {
       case "refine":
@@ -246,7 +254,7 @@ async function* applyRefinements(
  * Handle a parse-like operation: build schema, evaluate input,
  * apply preprocessing, validation, transforms, and refinements.
  */
-async function* handleParse(node: any, safe: boolean): AsyncGenerator<TypedNode, unknown, unknown> {
+async function* handleParse(node: any, safe: boolean): AsyncGenerator<FoldYield, unknown, unknown> {
   const schemaNode = node.schema;
   const schema = yield* buildSchemaGen(schemaNode);
   let input = yield* eval_(node.input);

@@ -1,5 +1,5 @@
 import type { Interpreter, TypedNode } from "../../fold";
-import { eval_, foldAST } from "../../fold";
+import { eval_, foldAST, recurseScoped } from "../../fold";
 import { injectLambdaParam } from "../../utils";
 
 // ---- Typed node interfaces ----------------------------------
@@ -41,9 +41,7 @@ export const fiberInterpreter: Interpreter = {
     for (let i = 0; i < collection.length; i += node.concurrency) {
       const batch = collection.slice(i, i + node.concurrency);
       for (const item of batch) {
-        const bodyClone = structuredClone(node.body);
-        injectLambdaParam(bodyClone, node.param.name, item);
-        results.push(yield* eval_(bodyClone));
+        results.push(yield recurseScoped(node.body, [{ paramId: node.param.__id, value: item }]));
       }
     }
     return results;

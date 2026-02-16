@@ -557,8 +557,8 @@
             },
             {
               "kind": "Reference",
-              "text": "TypedNode",
-              "canonicalReference": "@mvfm/core!TypedNode:interface"
+              "text": "FoldYield",
+              "canonicalReference": "@mvfm/core!FoldYield:type"
             },
             {
               "kind": "Content",
@@ -2096,7 +2096,7 @@
         {
           "kind": "Function",
           "canonicalReference": "@mvfm/core!foldAST:function(1)",
-          "docComment": "/**\n * Stack-safe async fold with WeakMap memoization and taint tracking.\n *\n * - Async generators live on the heap; the call stack is O(1). - Shared nodes (DAG references) evaluate once via WeakMap cache. - Volatile nodes and their dependents re-evaluate each time. - Error propagation via `gen.throw()` — handlers can try/catch. - Accepts optional `FoldState` for cache sharing across calls.\n */\n",
+          "docComment": "/**\n * Stack-safe async fold with memoization and taint tracking.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -2280,6 +2280,42 @@
         },
         {
           "kind": "TypeAlias",
+          "canonicalReference": "@mvfm/core!FoldYield:type",
+          "docComment": "/**\n * Values handlers can yield to the fold trampoline.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type FoldYield = "
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " | "
+            },
+            {
+              "kind": "Reference",
+              "text": "RecurseScopedEffect",
+              "canonicalReference": "@mvfm/core!RecurseScopedEffect:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/fold.d.ts",
+          "releaseTag": "Public",
+          "name": "FoldYield",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 4
+          }
+        },
+        {
+          "kind": "TypeAlias",
           "canonicalReference": "@mvfm/core!Handler:type",
           "docComment": "/**\n * Handler type: an async generator for a specific typed node. The return type is inferred from the node's phantom type.\n */\n",
           "excerptTokens": [
@@ -2324,8 +2360,8 @@
             },
             {
               "kind": "Reference",
-              "text": "TypedNode",
-              "canonicalReference": "@mvfm/core!TypedNode:interface"
+              "text": "FoldYield",
+              "canonicalReference": "@mvfm/core!FoldYield:type"
             },
             {
               "kind": "Content",
@@ -2918,8 +2954,8 @@
             },
             {
               "kind": "Reference",
-              "text": "TypedNode",
-              "canonicalReference": "@mvfm/core!TypedNode:interface"
+              "text": "FoldYield",
+              "canonicalReference": "@mvfm/core!FoldYield:type"
             },
             {
               "kind": "Content",
@@ -5521,6 +5557,179 @@
         },
         {
           "kind": "Function",
+          "canonicalReference": "@mvfm/core!recurseScoped:function(1)",
+          "docComment": "/**\n * Build a scoped recurse effect.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function recurseScoped(child: "
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", bindings: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ScopedBinding",
+              "canonicalReference": "@mvfm/core!ScopedBinding:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "[]"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "RecurseScopedEffect",
+              "canonicalReference": "@mvfm/core!RecurseScopedEffect:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/fold.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 6,
+            "endIndex": 7
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "child",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "bindings",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 5
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "recurseScoped"
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@mvfm/core!RecurseScopedEffect:interface",
+          "docComment": "/**\n * Control effect: evaluate a child under temporary lexical bindings.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface RecurseScopedEffect "
+            }
+          ],
+          "fileUrlPath": "dist/fold.d.ts",
+          "releaseTag": "Public",
+          "name": "RecurseScopedEffect",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@mvfm/core!RecurseScopedEffect#bindings:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "bindings: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ScopedBinding",
+                  "canonicalReference": "@mvfm/core!ScopedBinding:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "[]"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "bindings",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 3
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@mvfm/core!RecurseScopedEffect#child:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "child: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "TypedNode",
+                  "canonicalReference": "@mvfm/core!TypedNode:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "child",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@mvfm/core!RecurseScopedEffect#type:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "type: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"recurse_scoped\""
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "type",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Function",
           "canonicalReference": "@mvfm/core!resolveSchemaType:function(1)",
           "docComment": "/**\n * Resolves the schema type of a property access chain rooted at `core/input`.\n *\n * Walks backwards through nested `core/prop_access` nodes to reconstruct the access path, then looks it up in the schema.\n *\n * @param node - A `core/prop_access` AST node.\n *\n * @param schema - The program's input schema.\n *\n * @returns The schema type string or `null` if the path doesn't resolve.\n */\n",
           "excerptTokens": [
@@ -5708,6 +5917,78 @@
             "startIndex": 1,
             "endIndex": 9
           }
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@mvfm/core!ScopedBinding:interface",
+          "docComment": "/**\n * Runtime binding for scoped lambda evaluation.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface ScopedBinding "
+            }
+          ],
+          "fileUrlPath": "dist/fold.d.ts",
+          "releaseTag": "Public",
+          "name": "ScopedBinding",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@mvfm/core!ScopedBinding#paramId:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "paramId: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "number"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "paramId",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@mvfm/core!ScopedBinding#value:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "value: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "unknown"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "value",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
         },
         {
           "kind": "Variable",

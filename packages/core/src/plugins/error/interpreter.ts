@@ -1,6 +1,5 @@
 import type { Interpreter, TypedNode } from "../../fold";
-import { eval_ } from "../../fold";
-import { injectLambdaParam } from "../../utils";
+import { eval_, recurseScoped } from "../../fold";
 
 // ---- Typed node interfaces ----------------------------------
 
@@ -42,16 +41,14 @@ export const errorInterpreter: Interpreter = {
       return yield* eval_(node.expr);
     } catch (e) {
       if (node.catch) {
-        injectLambdaParam(node.catch.body, node.catch.param.name, e);
-        return yield* eval_(node.catch.body);
+        return yield recurseScoped(node.catch.body, [{ paramId: node.catch.param.__id, value: e }]);
       }
       if (node.match) {
         const errObj = e as any;
         const key = typeof errObj === "string" ? errObj : (errObj?.code ?? errObj?.type ?? "_");
         const branch = node.match.branches[key] ?? node.match.branches._ ?? null;
         if (!branch) throw e;
-        injectLambdaParam(branch, node.match.param.name, e);
-        return yield* eval_(branch);
+        return yield recurseScoped(branch, [{ paramId: node.match.param.__id, value: e }]);
       }
       throw e;
     } finally {

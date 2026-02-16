@@ -5,8 +5,11 @@ export { injectLambdaParam, mvfm } from "./core";
 export type {
   CompleteInterpreter,
   FoldState,
+  FoldYield,
   Handler,
   Interpreter,
+  RecurseScopedEffect,
+  ScopedBinding,
   TypedNode,
   TypedProgram,
 } from "./fold";
@@ -16,6 +19,7 @@ export {
   createFoldState,
   eval_,
   foldAST,
+  recurseScoped,
   typedFoldAST,
   VOLATILE_KINDS,
 } from "./fold";
