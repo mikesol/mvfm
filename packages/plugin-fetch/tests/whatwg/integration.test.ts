@@ -1,20 +1,17 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
-import { coreInterpreter, mvfm, num, numInterpreter, str, strInterpreter } from "@mvfm/core";
+import {
+  coreInterpreter,
+  injectInput,
+  mvfm,
+  num,
+  numInterpreter,
+  str,
+  strInterpreter,
+} from "@mvfm/core";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { fetch as fetchPlugin } from "../../src/whatwg";
 import { wrapFetch } from "../../src/whatwg/client-fetch";
 import { serverEvaluate } from "../../src/whatwg/handler.server";
-
-function injectInput(node: any, input: Record<string, unknown>): any {
-  if (node === null || node === undefined || typeof node !== "object") return node;
-  if (Array.isArray(node)) return node.map((n) => injectInput(n, input));
-  const result: any = {};
-  for (const [k, v] of Object.entries(node)) {
-    result[k] = injectInput(v, input);
-  }
-  if (result.kind === "core/input") result.__inputData = input;
-  return result;
-}
 
 let server: Server;
 let baseUrl: string;
@@ -93,10 +90,10 @@ describe("fetch integration: GET + json", () => {
       const resp = $.fetch(`${baseUrl}/json`);
       return $.fetch.json(resp);
     });
-    const ast = injectInput(prog.ast, {});
+    const injected = injectInput(prog, {});
     const client = wrapFetch();
     const evaluate = serverEvaluate(client, baseInterpreter);
-    const result = (await evaluate(ast.result)) as any;
+    const result = (await evaluate(injected.ast.result)) as any;
     expect(result.message).toBe("hello");
     expect(result.count).toBe(42);
   });
@@ -113,10 +110,10 @@ describe("fetch integration: GET + text", () => {
       const resp = $.fetch(`${baseUrl}/text`);
       return $.fetch.text(resp);
     });
-    const ast = injectInput(prog.ast, {});
+    const injected = injectInput(prog, {});
     const client = wrapFetch();
     const evaluate = serverEvaluate(client, baseInterpreter);
-    const result = await evaluate(ast.result);
+    const result = await evaluate(injected.ast.result);
     expect(result).toBe("Hello, world!");
   });
 });
@@ -132,10 +129,10 @@ describe("fetch integration: GET + status", () => {
       const resp = $.fetch(`${baseUrl}/json`);
       return $.fetch.status(resp);
     });
-    const ast = injectInput(prog.ast, {});
+    const injected = injectInput(prog, {});
     const client = wrapFetch();
     const evaluate = serverEvaluate(client, baseInterpreter);
-    const result = await evaluate(ast.result);
+    const result = await evaluate(injected.ast.result);
     expect(result).toBe(200);
   });
 
@@ -145,10 +142,10 @@ describe("fetch integration: GET + status", () => {
       const resp = $.fetch(`${baseUrl}/status-404`);
       return $.fetch.status(resp);
     });
-    const ast = injectInput(prog.ast, {});
+    const injected = injectInput(prog, {});
     const client = wrapFetch();
     const evaluate = serverEvaluate(client, baseInterpreter);
-    const result = await evaluate(ast.result);
+    const result = await evaluate(injected.ast.result);
     expect(result).toBe(404);
   });
 });
@@ -164,10 +161,10 @@ describe("fetch integration: GET + headers", () => {
       const resp = $.fetch(`${baseUrl}/text`);
       return $.fetch.headers(resp);
     });
-    const ast = injectInput(prog.ast, {});
+    const injected = injectInput(prog, {});
     const client = wrapFetch();
     const evaluate = serverEvaluate(client, baseInterpreter);
-    const result = (await evaluate(ast.result)) as Record<string, string>;
+    const result = (await evaluate(injected.ast.result)) as Record<string, string>;
     expect(result["content-type"]).toBe("text/plain");
     expect(result["x-custom"]).toBe("test-value");
   });
@@ -188,10 +185,10 @@ describe("fetch integration: POST + json", () => {
       });
       return $.fetch.json(resp);
     });
-    const ast = injectInput(prog.ast, {});
+    const injected = injectInput(prog, {});
     const client = wrapFetch();
     const evaluate = serverEvaluate(client, baseInterpreter);
-    const result = (await evaluate(ast.result)) as any;
+    const result = (await evaluate(injected.ast.result)) as any;
     expect(result.echo).toBe('{"hello":"world"}');
     expect(result.method).toBe("POST");
   });
@@ -208,10 +205,10 @@ describe("fetch integration: baseUrl config", () => {
       const resp = $.fetch("/json");
       return $.fetch.json(resp);
     });
-    const ast = injectInput(prog.ast, {});
+    const injected = injectInput(prog, {});
     const client = wrapFetch();
     const evaluate = serverEvaluate(client, baseInterpreter);
-    const result = (await evaluate(ast.result)) as any;
+    const result = (await evaluate(injected.ast.result)) as any;
     expect(result.message).toBe("hello");
   });
 });
@@ -227,10 +224,10 @@ describe("fetch integration: defaultHeaders config", () => {
       const resp = $.fetch(`${baseUrl}/headers-echo`);
       return $.fetch.json(resp);
     });
-    const ast = injectInput(prog.ast, {});
+    const injected = injectInput(prog, {});
     const client = wrapFetch();
     const evaluate = serverEvaluate(client, baseInterpreter);
-    const result = (await evaluate(ast.result)) as any;
+    const result = (await evaluate(injected.ast.result)) as any;
     expect(result.receivedHeaders["x-default"]).toBe("from-config");
   });
 });
@@ -251,10 +248,10 @@ describe("fetch integration: chaining", () => {
       });
       return $.fetch.json(resp2);
     });
-    const ast = injectInput(prog.ast, {});
+    const injected = injectInput(prog, {});
     const client = wrapFetch();
     const evaluate = serverEvaluate(client, baseInterpreter);
-    const result = (await evaluate(ast.result)) as any;
+    const result = (await evaluate(injected.ast.result)) as any;
     expect(result.receivedHeaders["x-message"]).toBe("hello");
   });
 });
@@ -270,10 +267,10 @@ describe("fetch integration: input resolution", () => {
       const resp = $.fetch($.input.url);
       return $.fetch.json(resp);
     });
-    const ast = injectInput(prog.ast, { url: `${baseUrl}/json` });
+    const injected = injectInput(prog, { url: `${baseUrl}/json` });
     const client = wrapFetch();
     const evaluate = serverEvaluate(client, baseInterpreter);
-    const result = (await evaluate(ast.result)) as any;
+    const result = (await evaluate(injected.ast.result)) as any;
     expect(result.message).toBe("hello");
   });
 });

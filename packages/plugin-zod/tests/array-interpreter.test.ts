@@ -1,24 +1,17 @@
-import { coreInterpreter, foldAST, mvfm, strInterpreter } from "@mvfm/core";
+import {
+  coreInterpreter,
+  foldAST,
+  injectInput,
+  mvfm,
+  type Program,
+  strInterpreter,
+} from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { createZodInterpreter, zod } from "../src/index";
 
-/** Inject input data into core/input nodes throughout the AST. */
-function injectInput(node: any, input: Record<string, unknown>): any {
-  if (node === null || node === undefined || typeof node !== "object") return node;
-  if (Array.isArray(node)) return node.map((n) => injectInput(n, input));
-  const result: any = {};
-  for (const [k, v] of Object.entries(node)) {
-    result[k] = injectInput(v, input);
-  }
-  if (result.kind === "core/input") result.__inputData = input;
-  return result;
-}
-
-/** Build AST from DSL, inject input, compose interpreters, evaluate. */
-async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
-  const ast = injectInput(prog.ast, input);
+async function run(prog: Program, input: Record<string, unknown> = {}) {
   const interp = { ...coreInterpreter, ...strInterpreter, ...createZodInterpreter() };
-  return await foldAST(interp, ast.result);
+  return await foldAST(interp, injectInput(prog, input));
 }
 
 const app = mvfm(zod);

@@ -1,21 +1,11 @@
-import { coreInterpreter, foldAST, mvfm, num, str } from "@mvfm/core";
+import type { Program } from "@mvfm/core";
+import { coreInterpreter, foldAST, injectInput, mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { fetchInterpreter } from "../../src";
 import { fetch } from "../../src/whatwg";
 import { createFetchInterpreter, type FetchClient } from "../../src/whatwg/interpreter";
 
 const app = mvfm(num, str, fetch({ baseUrl: "https://api.test.com" }));
-
-function injectInput(node: any, input: Record<string, unknown>): any {
-  if (node === null || node === undefined || typeof node !== "object") return node;
-  if (Array.isArray(node)) return node.map((n) => injectInput(n, input));
-  const result: any = {};
-  for (const [k, v] of Object.entries(node)) {
-    result[k] = injectInput(v, input);
-  }
-  if (result.kind === "core/input") result.__inputData = input;
-  return result;
-}
 
 // Mock Response class for testing
 function mockResponse(body: unknown, status = 200, headers: Record<string, string> = {}) {
@@ -29,9 +19,9 @@ function mockResponse(body: unknown, status = 200, headers: Record<string, strin
   } as unknown as Response;
 }
 
-async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
+async function run(prog: Program, input: Record<string, unknown> = {}) {
   const captured: any[] = [];
-  const ast = injectInput(prog.ast, input);
+  const injected = injectInput(prog, input);
   const lastResponse = mockResponse({ message: "ok" }, 200, { "content-type": "application/json" });
   const mockClient: FetchClient = {
     async request(url, init) {
@@ -40,7 +30,7 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
     },
   };
   const combined = { ...createFetchInterpreter(mockClient), ...coreInterpreter };
-  const result = await foldAST(combined, ast.result);
+  const result = await foldAST(combined, injected);
   return { result, captured };
 }
 

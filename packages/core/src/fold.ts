@@ -2,6 +2,8 @@
 // Stack-safe async fold with memoization and taint tracking
 // ============================================================
 
+import type { Program } from "./types";
+
 /**
  * Base type for AST nodes in the interpreter. Carries a phantom type
  * parameter `T` tracking the runtime value type. No index signature —
@@ -73,41 +75,6 @@ export function createFoldState(): FoldState {
   return { cache: new WeakMap(), tainted: new WeakSet() };
 }
 
-/**
- * Walk an AST to verify all node kinds have handlers.
- * Throws before evaluation if any are missing.
- */
-export function checkCompleteness(interpreter: Interpreter, root: TypedNode): void {
-  const visited = new WeakSet<TypedNode>();
-  const missing = new Set<string>();
-  const queue: TypedNode[] = [root];
-
-  while (queue.length > 0) {
-    const node = queue.pop()!;
-    if (visited.has(node)) continue;
-    visited.add(node);
-
-    if (!interpreter[node.kind]) missing.add(node.kind);
-
-    for (const val of Object.values(node)) {
-      if (val && typeof val === "object" && "kind" in val) {
-        queue.push(val as TypedNode);
-      }
-      if (Array.isArray(val)) {
-        for (const v of val) {
-          if (v && typeof v === "object" && "kind" in v) {
-            queue.push(v as TypedNode);
-          }
-        }
-      }
-    }
-  }
-
-  if (missing.size > 0) {
-    throw new Error(`Missing interpreters for: ${[...missing].join(", ")}`);
-  }
-}
-
 type Frame = {
   gen: AsyncGenerator<FoldYield, unknown, unknown>;
   node: TypedNode;
@@ -118,9 +85,23 @@ type Frame = {
 /** Stack-safe async fold with memoization and taint tracking. */
 export async function foldAST(
   interpreter: Interpreter,
+  program: Program,
+  state?: FoldState,
+): Promise<unknown>;
+export async function foldAST(
+  interpreter: Interpreter,
   root: TypedNode,
   state?: FoldState,
+): Promise<unknown>;
+export async function foldAST(
+  interpreter: Interpreter,
+  rootOrProgram: TypedNode | Program,
+  state?: FoldState,
 ): Promise<unknown> {
+  const root =
+    "ast" in rootOrProgram && "hash" in rootOrProgram
+      ? (rootOrProgram as Program).ast.result
+      : (rootOrProgram as TypedNode);
   const { cache, tainted } = state ?? createFoldState();
   const stack: Frame[] = [];
   const scopeStack: Array<Map<number, unknown>> = [];

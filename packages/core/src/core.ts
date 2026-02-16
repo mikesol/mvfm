@@ -9,7 +9,6 @@
 export { mvfm } from "./builder";
 export {
   type CompleteInterpreter,
-  checkCompleteness,
   createFoldState,
   eval_,
   type FoldState,
@@ -21,6 +20,7 @@ export {
   typedFoldAST,
   VOLATILE_KINDS,
 } from "./fold";
+export { injectInput } from "./inject";
 export { autoLift, isExpr, makeExprProxy } from "./proxy";
 export {
   type CollectTrait,
@@ -47,3 +47,4 @@ export {
   type UnionToIntersection,
 } from "./types";
 export { injectLambdaParam, isInternalNode, nextNodeId, simpleHash } from "./utils";
+export { checkCompleteness } from "./validation";

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { mvfm } from "../../../src/core";
 import { foldAST } from "../../../src/fold";
+import { injectInput } from "../../../src/inject";
 import { coreInterpreter } from "../../../src/interpreters/core";
 import { error } from "../../../src/plugins/error";
 import { errorInterpreter } from "../../../src/plugins/error/interpreter";
@@ -10,17 +11,7 @@ import { num } from "../../../src/plugins/num";
 import { numInterpreter } from "../../../src/plugins/num/interpreter";
 import { semiring } from "../../../src/plugins/semiring";
 import { array } from "../../../src/schema";
-
-function injectInput(node: any, input: Record<string, unknown>): any {
-  if (node === null || node === undefined || typeof node !== "object") return node;
-  if (Array.isArray(node)) return node.map((n) => injectInput(n, input));
-  const result: any = {};
-  for (const [k, v] of Object.entries(node)) {
-    result[k] = injectInput(v, input);
-  }
-  if (result.kind === "core/input") result.__inputData = input;
-  return result;
-}
+import type { Program } from "../../../src/types";
 
 const combined = {
   ...errorInterpreter,
@@ -31,9 +22,8 @@ const combined = {
 
 const app = mvfm(num, semiring, fiber, error);
 
-async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
-  const ast = injectInput(prog.ast, input);
-  return await foldAST(combined, ast.result);
+async function run(prog: Program, input: Record<string, unknown> = {}) {
+  return await foldAST(combined, injectInput(prog, input));
 }
 
 describe("fiber interpreter: par (tuple form)", () => {

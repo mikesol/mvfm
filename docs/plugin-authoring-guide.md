@@ -993,7 +993,7 @@ const sdk = new Stripe("sk_test_...");
 const client = wrapStripeSdk(sdk);
 const evaluate = serverEvaluate(client, { ...coreInterpreter, ...numInterpreter, ...strInterpreter });
 
-const result = await evaluate(program.ast.result);
+const result = await evaluate(program);
 ```
 
 ### Interpreter composition
@@ -1322,26 +1322,16 @@ From `tests/plugins/stripe/2025-04-30.basil/interpreter.test.ts`:
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { coreInterpreter, foldAST, mvfm, num, str } from "@mvfm/core";
+import { coreInterpreter, foldAST, injectInput, mvfm, num, str } from "@mvfm/core";
+import type { Program } from "@mvfm/core";
 import { stripe } from "../../src/2025-04-30.basil";
 import { type StripeClient, createStripeInterpreter } from "../../src/2025-04-30.basil/interpreter";
 
 const app = mvfm(num, str, stripe({ apiKey: "sk_test_123" }));
 
-function injectInput(node: any, input: Record<string, unknown>): any {
-  if (node === null || node === undefined || typeof node !== "object") return node;
-  if (Array.isArray(node)) return node.map((n) => injectInput(n, input));
-  const result: any = {};
-  for (const [k, v] of Object.entries(node)) {
-    result[k] = injectInput(v, input);
-  }
-  if (result.kind === "core/input") result.__inputData = input;
-  return result;
-}
-
-async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
+async function run(prog: Program, input: Record<string, unknown> = {}) {
   const captured: any[] = [];
-  const ast = injectInput(prog.ast, input);
+  const injected = injectInput(prog, input);
   const mockClient: StripeClient = {
     async request(method, path, body) {
       captured.push({ method, path, body });
@@ -1349,7 +1339,7 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
     },
   };
   const combined = { ...createStripeInterpreter(mockClient), ...coreInterpreter };
-  const result = await foldAST(combined, ast.result);
+  const result = await foldAST(combined, injected);
   return { result, captured };
 }
 
@@ -1383,8 +1373,8 @@ Key things to notice:
 
 1. **Mock client captures calls.** Instead of making real API calls, the mock client pushes each call into a `captured` array and returns a canned response. This lets you assert on exactly what the interpreter called.
 2. **Interpreter composition via spread.** `{ ...createStripeInterpreter(mockClient), ...coreInterpreter }` creates a combined interpreter.
-3. **`foldAST` evaluates the AST.** It takes the combined interpreter and the root node, returning the final result.
-4. **`injectInput` simulates runtime input.** In tests, this helper walks the AST and attaches `__inputData` to `core/input` nodes.
+3. **`foldAST` evaluates the AST.** It accepts either a `Program` or a `TypedNode` directly.
+4. **`injectInput` simulates runtime input.** Exported from `@mvfm/core`, it returns a new `Program` with `__inputData` attached to `core/input` nodes.
 5. **Tests verify client calls, not AST shape.** Tier 1 tests check the AST. Tier 2 tests check what the interpreter sends to the client.
 
 ### Tier 3: Integration (`integration.test.ts`)
@@ -1409,7 +1399,8 @@ From `tests/plugins/stripe/2025-04-30.basil/integration.test.ts`:
 import Stripe from "stripe";
 import { GenericContainer, type StartedTestContainer } from "testcontainers";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { coreInterpreter, mvfm, num, numInterpreter, str, strInterpreter } from "@mvfm/core";
+import { coreInterpreter, injectInput, mvfm, num, numInterpreter, str, strInterpreter } from "@mvfm/core";
+import type { Program } from "@mvfm/core";
 import { stripe as stripePlugin } from "../../src/2025-04-30.basil";
 import { wrapStripeSdk } from "../../src/2025-04-30.basil/client-stripe-sdk";
 import { serverEvaluate } from "../../src/2025-04-30.basil/handler.server";
@@ -1420,15 +1411,11 @@ let sdk: Stripe;
 const baseInterpreter = { ...coreInterpreter, ...numInterpreter, ...strInterpreter };
 const app = mvfm(num, str, stripePlugin({ apiKey: "sk_test_fake" }));
 
-function injectInput(node: any, input: Record<string, unknown>): any {
-  // ... same helper as Tier 2
-}
-
-async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
-  const ast = injectInput(prog.ast, input);
+async function run(prog: Program, input: Record<string, unknown> = {}) {
+  const injected = injectInput(prog, input);
   const client = wrapStripeSdk(sdk);
   const evaluate = serverEvaluate(client, baseInterpreter);
-  return await evaluate(ast.result);
+  return await evaluate(injected.ast.result);
 }
 
 beforeAll(async () => {

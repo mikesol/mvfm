@@ -1,20 +1,18 @@
-import { coreInterpreter, mvfm, num, numInterpreter, str, strInterpreter } from "@mvfm/core";
+import type { Program } from "@mvfm/core";
+import {
+  coreInterpreter,
+  injectInput,
+  mvfm,
+  num,
+  numInterpreter,
+  str,
+  strInterpreter,
+} from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { twilio as twilioPlugin } from "../../src/5.5.1";
 import { serverEvaluate } from "../../src/5.5.1/handler.server";
 import type { TwilioClient } from "../../src/5.5.1/interpreter";
 import { createTwilioInterpreter } from "../../src/5.5.1/interpreter";
-
-function injectInput(node: any, input: Record<string, unknown>): any {
-  if (node === null || node === undefined || typeof node !== "object") return node;
-  if (Array.isArray(node)) return node.map((n) => injectInput(n, input));
-  const result: any = {};
-  for (const [k, v] of Object.entries(node)) {
-    result[k] = injectInput(v, input);
-  }
-  if (result.kind === "core/input") result.__inputData = input;
-  return result;
-}
 
 const app = mvfm(num, str, twilioPlugin({ accountSid: "AC_test_123", authToken: "auth_test_456" }));
 
@@ -72,8 +70,8 @@ function createMockClient(): TwilioClient {
   };
 }
 
-async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
-  const ast = injectInput(prog.ast, input);
+async function run(prog: Program, input: Record<string, unknown> = {}) {
+  const injected = injectInput(prog, input);
   const client = createMockClient();
   const baseInterpreter = {
     ...createTwilioInterpreter(client),
@@ -82,7 +80,7 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
     ...strInterpreter,
   };
   const evaluate = serverEvaluate(client, baseInterpreter);
-  return await evaluate(ast.result);
+  return await evaluate(injected.ast.result);
 }
 
 // ============================================================

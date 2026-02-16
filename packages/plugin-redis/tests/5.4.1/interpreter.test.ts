@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { coreInterpreter, foldAST, mvfm, num, str } from "@mvfm/core";
+import type { Program } from "@mvfm/core";
+import { coreInterpreter, foldAST, injectInput, mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { redis } from "../../src/5.4.1";
 import { createRedisInterpreter, type RedisClient } from "../../src/5.4.1/interpreter";
@@ -19,20 +20,9 @@ describe("redis interpreter: typing hygiene", () => {
   });
 });
 
-function injectInput(node: any, input: Record<string, unknown>): any {
-  if (node === null || node === undefined || typeof node !== "object") return node;
-  if (Array.isArray(node)) return node.map((n) => injectInput(n, input));
-  const result: any = {};
-  for (const [k, v] of Object.entries(node)) {
-    result[k] = injectInput(v, input);
-  }
-  if (result.kind === "core/input") result.__inputData = input;
-  return result;
-}
-
-async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
+async function run(prog: Program, input: Record<string, unknown> = {}) {
   const captured: Array<{ command: string; args: unknown[] }> = [];
-  const ast = injectInput(prog.ast, input);
+  const injected = injectInput(prog, input);
   const mockClient: RedisClient = {
     async command(command: string, ...args: unknown[]) {
       captured.push({ command, args });
@@ -40,7 +30,7 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
     },
   };
   const combined = { ...createRedisInterpreter(mockClient), ...coreInterpreter };
-  const result = await foldAST(combined, ast.result);
+  const result = await foldAST(combined, injected);
   return { result, captured };
 }
 

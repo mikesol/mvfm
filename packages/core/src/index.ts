@@ -1,6 +1,6 @@
 // Public API
 
-export { injectLambdaParam, mvfm } from "./core";
+export { injectInput, injectLambdaParam, mvfm } from "./core";
 
 export type {
   CompleteInterpreter,
@@ -15,7 +15,6 @@ export type {
 } from "./fold";
 
 export {
-  checkCompleteness,
   createFoldState,
   eval_,
   foldAST,
@@ -84,3 +83,4 @@ export type {
   TypeclassMapping,
   TypeclassSlot,
 } from "./types";
+export { checkCompleteness } from "./validation";

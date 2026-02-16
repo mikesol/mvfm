@@ -1,21 +1,11 @@
 import { Writable } from "node:stream";
-import { coreInterpreter, mvfm, num, str } from "@mvfm/core";
+import type { Program } from "@mvfm/core";
+import { coreInterpreter, injectInput, mvfm, num, str } from "@mvfm/core";
 import pinoLib from "pino";
 import { describe, expect, it } from "vitest";
 import { pino } from "../../src/10.3.1";
 import { wrapPino } from "../../src/10.3.1/client-pino";
 import { serverEvaluate } from "../../src/10.3.1/handler.server";
-
-function injectInput(node: any, input: Record<string, unknown>): any {
-  if (node === null || node === undefined || typeof node !== "object") return node;
-  if (Array.isArray(node)) return node.map((n) => injectInput(n, input));
-  const result: any = {};
-  for (const [k, v] of Object.entries(node)) {
-    result[k] = injectInput(v, input);
-  }
-  if (result.kind === "core/input") result.__inputData = input;
-  return result;
-}
 
 const baseInterpreter = coreInterpreter;
 const app = mvfm(num, str, pino({ level: "trace" }));
@@ -32,11 +22,11 @@ function createCapturingLogger() {
   return { logger, lines };
 }
 
-async function run(prog: { ast: any }, logger: any, input: Record<string, unknown> = {}) {
-  const ast = injectInput(prog.ast, input);
+async function run(prog: Program, logger: any, input: Record<string, unknown> = {}) {
+  const injected = injectInput(prog, input);
   const client = wrapPino(logger);
   const evaluate = serverEvaluate(client, baseInterpreter);
-  return await evaluate(ast.result);
+  return await evaluate(injected.ast.result);
 }
 
 describe("pino integration: basic logging", () => {

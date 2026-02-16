@@ -1,18 +1,7 @@
-import { coreInterpreter, mvfm, num, str } from "@mvfm/core";
+import { coreInterpreter, injectInput, mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { fal as falPlugin } from "../../src/1.9.1";
 import { serverEvaluate } from "../../src/1.9.1/handler.server";
-
-function injectInput(node: any, input: Record<string, unknown>): any {
-  if (node === null || node === undefined || typeof node !== "object") return node;
-  if (Array.isArray(node)) return node.map((n) => injectInput(n, input));
-  const result: any = {};
-  for (const [k, v] of Object.entries(node)) {
-    result[k] = injectInput(v, input);
-  }
-  if (result.kind === "core/input") result.__inputData = input;
-  return result;
-}
 
 function createClient() {
   const calls: Array<{ method: string; endpointId: string; options?: unknown }> = [];
@@ -71,10 +60,10 @@ describe("fal integration: options passthrough", () => {
       }),
     );
 
-    const ast = injectInput(prog.ast, {});
+    const injected = injectInput(prog, {});
     const { client, calls } = createClient();
     const evaluate = serverEvaluate(client, coreInterpreter);
-    const result = await evaluate(ast.result);
+    const result = await evaluate(injected.ast.result);
 
     expect(result).toEqual({ data: { ok: true }, requestId: "req_run" });
     expect(calls).toEqual([
@@ -96,10 +85,10 @@ describe("fal integration: options passthrough", () => {
       }),
     );
 
-    const ast = injectInput(prog.ast, {});
+    const injected = injectInput(prog, {});
     const { client, calls } = createClient();
     const evaluate = serverEvaluate(client, coreInterpreter);
-    const result = await evaluate(ast.result);
+    const result = await evaluate(injected.ast.result);
 
     expect(result).toEqual({ data: { ok: true }, requestId: "req_sub" });
     expect(calls[0]).toEqual({
@@ -128,10 +117,10 @@ describe("fal integration: options passthrough", () => {
     const { client, calls } = createClient();
     const evaluate = serverEvaluate(client, coreInterpreter);
 
-    await evaluate(injectInput(submitProg.ast, {}).result);
-    await evaluate(injectInput(statusProg.ast, {}).result);
-    const result = await evaluate(injectInput(resultProg.ast, {}).result);
-    const cancelResult = await evaluate(injectInput(cancelProg.ast, {}).result);
+    await evaluate(injectInput(submitProg, {}).ast.result);
+    await evaluate(injectInput(statusProg, {}).ast.result);
+    const result = await evaluate(injectInput(resultProg, {}).ast.result);
+    const cancelResult = await evaluate(injectInput(cancelProg, {}).ast.result);
 
     expect(result).toEqual({
       data: { imageUrl: "https://example.com/image.png" },
