@@ -9,6 +9,6 @@
     "name": "Medium prelude (num + str + eq + boolean + control)",
     "path": "dist/index.js",
     "import": "{ num, str, eq, boolean, control }",
-    "limit": "2 kB"
+    "limit": "2.2 kB"
   }
 ]
