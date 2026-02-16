@@ -8,10 +8,20 @@ export {
   serverEvaluate,
   serverInterpreter,
 } from "./3.4.8/handler.server";
-export type { PostgresClient } from "./3.4.8/interpreter";
+export type {
+  PostgresBeginNode,
+  PostgresClient,
+  PostgresCursorBatchNode,
+  PostgresCursorNode,
+  PostgresIdentifierNode,
+  PostgresInsertHelperNode,
+  PostgresParamNode,
+  PostgresQueryNode,
+  PostgresSavepointNode,
+  PostgresSetHelperNode,
+} from "./3.4.8/interpreter";
 export {
   buildSQL,
   createPostgresInterpreter,
   escapeIdentifier,
-  findCursorBatch,
 } from "./3.4.8/interpreter";

@@ -3,8 +3,10 @@ import { createFoldState, eval_, foldAST } from "@mvfm/core";
 import {
   buildSQL,
   createPostgresInterpreter,
-  findCursorBatch,
+  type PostgresBeginNode,
   type PostgresClient,
+  type PostgresCursorNode,
+  type PostgresSavepointNode,
 } from "./interpreter";
 
 /**
@@ -39,7 +41,7 @@ export function createPostgresServerInterpreter(
   return {
     ...base,
 
-    "postgres/begin": async function* (node: any) {
+    "postgres/begin": async function* (node: PostgresBeginNode) {
       return await client.begin(async (tx) => {
         const evaluate = makeEvaluator(tx);
         if (node.mode === "pipeline") {
@@ -53,7 +55,7 @@ export function createPostgresServerInterpreter(
       });
     },
 
-    "postgres/savepoint": async function* (node: any) {
+    "postgres/savepoint": async function* (node: PostgresSavepointNode) {
       return await client.savepoint(async (tx) => {
         const evaluate = makeEvaluator(tx);
         if (node.mode === "pipeline") {
@@ -67,19 +69,26 @@ export function createPostgresServerInterpreter(
       });
     },
 
-    "postgres/cursor": async function* (node: any) {
+    "postgres/cursor": async function* (node: PostgresCursorNode) {
       const { sql, params } = yield* buildSQL(node.query);
       const batchSize = yield* eval_<number>(node.batchSize);
-      const batchNode = findCursorBatch(node.body);
 
+      const batchCell: { current: unknown[] } = { current: [] };
       const cursorState = createFoldState();
-      const cursorEvaluator = makeEvaluator(client, cursorState);
+
+      const cursorInterp = {
+        ...baseInterpreter,
+        ...createPostgresServerInterpreter(client, baseInterpreter),
+        // biome-ignore lint/correctness/useYield: returns closure data without needing child evaluation
+        "postgres/cursor_batch": async function* () {
+          return batchCell.current;
+        },
+      };
+      const cursorEvaluate = (n: TypedNode) => foldAST(cursorInterp, n, cursorState);
 
       await client.cursor(sql, params, batchSize, async (rows) => {
-        if (batchNode) {
-          batchNode.__batchData = rows;
-        }
-        await cursorEvaluator(node.body);
+        batchCell.current = rows;
+        await cursorEvaluate(node.body);
         return undefined;
       });
 

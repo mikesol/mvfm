@@ -29,31 +29,69 @@ interface BuiltQuery {
   params: unknown[];
 }
 
-interface PostgresQueryNode extends TypedNode<unknown[]> {
-  kind: "postgres/query";
-  strings: string[];
-  params: TypedNode[];
+// --- Typed node interfaces -------------------------------------------
+
+/** A `postgres/identifier` node for dynamic SQL identifiers. */
+export interface PostgresIdentifierNode extends TypedNode<string> {
+  kind: "postgres/identifier";
+  name: TypedNode<string>;
 }
 
-interface PostgresBeginNode extends TypedNode<unknown> {
+/** A `postgres/insert_helper` node for bulk INSERT value construction. */
+export interface PostgresInsertHelperNode extends TypedNode<string> {
+  kind: "postgres/insert_helper";
+  data: TypedNode<Record<string, unknown> | Record<string, unknown>[]>;
+  columns?: string[];
+}
+
+/** A `postgres/set_helper` node for UPDATE SET clause construction. */
+export interface PostgresSetHelperNode extends TypedNode<string> {
+  kind: "postgres/set_helper";
+  data: TypedNode<Record<string, unknown>>;
+  columns?: string[];
+}
+
+/** Discriminated union of parameter node types within a `postgres/query`. */
+export type PostgresParamNode =
+  | PostgresIdentifierNode
+  | PostgresInsertHelperNode
+  | PostgresSetHelperNode
+  | TypedNode;
+
+/** A `postgres/query` node representing a parameterized SQL query. */
+export interface PostgresQueryNode extends TypedNode<unknown[]> {
+  kind: "postgres/query";
+  strings: string[];
+  params: PostgresParamNode[];
+}
+
+/** A `postgres/begin` node representing a transaction block. */
+export interface PostgresBeginNode extends TypedNode<unknown> {
   kind: "postgres/begin";
   mode: string;
   body?: TypedNode;
   queries?: TypedNode[];
 }
 
-interface PostgresSavepointNode extends TypedNode<unknown> {
+/** A `postgres/savepoint` node representing a savepoint block. */
+export interface PostgresSavepointNode extends TypedNode<unknown> {
   kind: "postgres/savepoint";
   mode: string;
   body?: TypedNode;
   queries?: TypedNode[];
 }
 
-interface PostgresCursorNode extends TypedNode<unknown> {
+/** A `postgres/cursor` node representing a streaming cursor query. */
+export interface PostgresCursorNode extends TypedNode<unknown> {
   kind: "postgres/cursor";
   query: PostgresQueryNode;
   batchSize: TypedNode<number>;
   body: TypedNode;
+}
+
+/** A `postgres/cursor_batch` node — yields the current batch inside a cursor body. */
+export interface PostgresCursorBatchNode extends TypedNode<unknown[]> {
+  kind: "postgres/cursor_batch";
 }
 
 /**
@@ -71,16 +109,17 @@ export async function* buildSQL(
   for (let i = 0; i < strings.length; i++) {
     sql += strings[i];
     if (i < paramNodes.length) {
-      const param = paramNodes[i] as any;
+      const param = paramNodes[i];
       if (param.kind === "postgres/identifier") {
-        const name = (yield* eval_<string>(param.name)) as string;
+        const id = param as PostgresIdentifierNode;
+        const name = (yield* eval_<string>(id.name)) as string;
         sql += escapeIdentifier(name);
       } else if (param.kind === "postgres/insert_helper") {
-        const data = (yield* eval_(param.data)) as
+        const ins = param as PostgresInsertHelperNode;
+        const data = (yield* eval_(ins.data)) as
           | Record<string, unknown>
           | Record<string, unknown>[];
-        const columns =
-          (param.columns as string[] | null) ?? Object.keys(Array.isArray(data) ? data[0] : data);
+        const columns = ins.columns ?? Object.keys(Array.isArray(data) ? data[0] : data);
         const rows = Array.isArray(data) ? data : [data];
         sql +=
           "(" +
@@ -100,8 +139,9 @@ export async function* buildSQL(
             )
             .join(",");
       } else if (param.kind === "postgres/set_helper") {
-        const data = (yield* eval_(param.data)) as Record<string, unknown>;
-        const columns = (param.columns as string[] | null) ?? Object.keys(data);
+        const set = param as PostgresSetHelperNode;
+        const data = (yield* eval_(set.data)) as Record<string, unknown>;
+        const columns = set.columns ?? Object.keys(data);
         sql += columns
           .map((col) => {
             params.push(data[col]);
@@ -116,31 +156,6 @@ export async function* buildSQL(
   }
 
   return { sql, params };
-}
-
-/**
- * Find the postgres/cursor_batch node within an AST subtree.
- *
- * The handler uses this to locate the batch data injection point
- * within cursor body expressions.
- */
-export function findCursorBatch(node: any): any | null {
-  if (node === null || node === undefined || typeof node !== "object") return null;
-  if (Array.isArray(node)) {
-    for (const item of node) {
-      const found = findCursorBatch(item);
-      if (found) return found;
-    }
-    return null;
-  }
-  if (node.kind === "postgres/cursor_batch") return node;
-  for (const v of Object.values(node)) {
-    if (typeof v === "object" && v !== null) {
-      const found = findCursorBatch(v);
-      if (found) return found;
-    }
-  }
-  return null;
 }
 
 /**
@@ -181,9 +196,11 @@ export function createPostgresInterpreter(client: PostgresClient): Interpreter {
       );
     },
 
-    // biome-ignore lint/correctness/useYield: returns data without needing child evaluation
-    "postgres/cursor_batch": async function* (node: any) {
-      return node.__batchData;
+    // biome-ignore lint/correctness/useYield: stub throws before yielding
+    "postgres/cursor_batch": async function* (_node: PostgresCursorBatchNode) {
+      throw new Error(
+        "postgres/cursor_batch requires the server interpreter — use createPostgresServerInterpreter",
+      );
     },
 
     // biome-ignore lint/correctness/useYield: stub throws before yielding
