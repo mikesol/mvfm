@@ -1,10 +1,40 @@
 import type { PluginDefinition } from "@mvfm/core";
-import { ZodStringBuilder } from "./string";
+import type { ZodBigIntNamespace } from "./bigint";
+import { bigintNamespace, bigintNodeKinds } from "./bigint";
+import type { ZodCoerceNamespace } from "./coerce";
+import { coerceNamespace, coerceNodeKinds } from "./coerce";
+import type { ZodDateNamespace } from "./date";
+import { dateNamespace, dateNodeKinds } from "./date";
+import type { ZodEnumNamespace } from "./enum";
+import { enumNamespace, enumNodeKinds } from "./enum";
+import type { ZodLiteralNamespace } from "./literal";
+import { literalNamespace, literalNodeKinds } from "./literal";
+import type { ZodNumberNamespace } from "./number";
+import { numberNamespace, numberNodeKinds } from "./number";
+import type { ZodObjectNamespace } from "./object";
+import { objectNamespace, objectNodeKinds } from "./object";
+import type { ZodPrimitivesNamespace } from "./primitives";
+import { primitivesNamespace, primitivesNodeKinds } from "./primitives";
+import type { ZodStringNamespace } from "./string";
+import { stringNamespace, stringNodeKinds } from "./string";
+import type { ZodStringFormatsNamespace } from "./string-formats";
+import { stringFormatsNamespace, stringFormatsNodeKinds } from "./string-formats";
 
 // Re-export types, builders, and interpreter for consumers
 export { ZodSchemaBuilder, ZodWrappedBuilder } from "./base";
+export { ZodBigIntBuilder } from "./bigint";
+export { ZodDateBuilder } from "./date";
+export { ZodEnumBuilder, ZodNativeEnumBuilder } from "./enum";
 export { zodInterpreter } from "./interpreter";
+export type { SchemaInterpreterMap } from "./interpreter-utils";
+export { ZodLiteralBuilder } from "./literal";
+export { ZodNumberBuilder } from "./number";
+export type { ShapeInput } from "./object";
+export { ZodObjectBuilder } from "./object";
+export { ZodPrimitiveBuilder } from "./primitives";
 export { ZodStringBuilder } from "./string";
+export type { ZodIsoNamespace, ZodStringFormatsNamespace } from "./string-formats";
+export { buildStringFormat } from "./string-formats";
 export type {
   CheckDescriptor,
   ErrorConfig,
@@ -23,29 +53,43 @@ export type {
  * Each factory returns a schema builder with chainable methods
  * for adding checks, refinements, and wrappers. Call `.parse()`
  * or `.safeParse()` to produce a validation AST node.
- *
- * @example
- * ```ts
- * const app = mvfm(num, str, zod);
- * const prog = app(schema, $ => {
- *   const result = $.zod.string().min(5).safeParse($.input.name);
- *   return $.cond(result.success, result.data, $.fail("invalid"));
- * });
- * ```
  */
-export interface ZodNamespace {
-  /** Create a string schema builder. */
-  string(errorOrOpts?: string | { error?: string }): ZodStringBuilder;
-
-  // ---- Stubs for future schema types ----
-  // Each issue (#102-#120) adds its factory method here.
-  // number(errorOrOpts?): ZodNumberBuilder;
-  // bigint(errorOrOpts?): ZodBigIntBuilder;
-  // boolean(errorOrOpts?): ZodBooleanBuilder;
-  // object(shape): ZodObjectBuilder;
-  // array(element): ZodArrayBuilder;
-  // ... etc.
+export interface ZodNamespace
+  extends ZodStringNamespace,
+    ZodBigIntNamespace,
+    ZodDateNamespace,
+    ZodEnumNamespace,
+    ZodLiteralNamespace,
+    ZodNumberNamespace,
+    ZodObjectNamespace,
+    ZodPrimitivesNamespace,
+    ZodStringFormatsNamespace {
+  /** Coercion constructors -- convert input before validating. */
+  coerce: ZodCoerceNamespace;
+  // ^^^ Each new schema type adds ONE extends clause here
 }
+
+/** Parse error config from the standard `errorOrOpts` param. */
+function parseError(errorOrOpts?: string | { error?: string }): string | undefined {
+  return typeof errorOrOpts === "string" ? errorOrOpts : errorOrOpts?.error;
+}
+
+/** Parsing and wrapper node kinds shared across all schema types. */
+const COMMON_NODE_KINDS: string[] = [
+  "zod/parse",
+  "zod/safe_parse",
+  "zod/parse_async",
+  "zod/safe_parse_async",
+  "zod/optional",
+  "zod/nullable",
+  "zod/nullish",
+  "zod/nonoptional",
+  "zod/default",
+  "zod/prefault",
+  "zod/catch",
+  "zod/readonly",
+  "zod/branded",
+];
 
 /**
  * Zod validation DSL plugin for mvfm.
@@ -60,35 +104,35 @@ export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
   name: "zod",
 
   nodeKinds: [
-    // Parsing operations (#96)
-    "zod/parse",
-    "zod/safe_parse",
-    "zod/parse_async",
-    "zod/safe_parse_async",
-
-    // Schema types — each issue adds its kinds here
-    "zod/string", // #100
-
-    // Wrappers (#99)
-    "zod/optional",
-    "zod/nullable",
-    "zod/nullish",
-    "zod/nonoptional",
-    "zod/default",
-    "zod/prefault",
-    "zod/catch",
-    "zod/readonly",
-    "zod/branded",
+    ...COMMON_NODE_KINDS,
+    ...stringNodeKinds,
+    ...bigintNodeKinds,
+    ...dateNodeKinds,
+    ...enumNodeKinds,
+    ...literalNodeKinds,
+    ...numberNodeKinds,
+    ...objectNodeKinds,
+    ...primitivesNodeKinds,
+    ...coerceNodeKinds,
+    ...stringFormatsNodeKinds,
+    // ^^^ Each new schema type adds ONE spread here
   ],
 
   build(ctx) {
     return {
       zod: {
-        string(errorOrOpts?: string | { error?: string }): ZodStringBuilder {
-          const error = typeof errorOrOpts === "string" ? errorOrOpts : errorOrOpts?.error;
-          return new ZodStringBuilder(ctx, [], [], error);
-        },
-      },
+        ...stringNamespace(ctx, parseError),
+        ...bigintNamespace(ctx, parseError),
+        ...dateNamespace(ctx, parseError),
+        ...enumNamespace(ctx, parseError),
+        ...literalNamespace(ctx),
+        ...numberNamespace(ctx, parseError),
+        ...objectNamespace(ctx, parseError),
+        ...primitivesNamespace(ctx, parseError),
+        ...coerceNamespace(ctx, parseError),
+        ...stringFormatsNamespace(ctx, parseError),
+        // ^^^ Each new schema type adds ONE spread here
+      } as ZodNamespace,
     };
   },
 };

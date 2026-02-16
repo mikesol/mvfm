@@ -71,6 +71,14 @@ export abstract class ZodSchemaBuilder<T> {
   // ---- Internal helpers (used by subclasses & foundation issues) ----
 
   /**
+   * Get the schema AST node for this builder.
+   * Used by composite schemas to embed inner schemas into their own AST nodes.
+   */
+  get __schemaNode(): SchemaASTNode | WrapperASTNode {
+    return this._buildSchemaNode();
+  }
+
+  /**
    * Build the final schema AST node from accumulated state.
    * Combines kind + checks + refinements + error + extra fields.
    */

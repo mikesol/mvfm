@@ -197,6 +197,14 @@ export type Plugin<T = any, Traits extends Record<string, unknown> = {}> =
   | PluginDefinition<T, Traits>
   | (() => PluginDefinition<T, Traits>);
 
+/**
+ * A plugin input accepted by {@link mvfm}.
+ *
+ * Supports either a single plugin/factory or an arbitrarily nested
+ * readonly array/tuple of plugin inputs.
+ */
+export type PluginInput = Plugin | readonly PluginInput[];
+
 // ---- Interpreter Interface -------------------------------
 
 /**
@@ -937,6 +945,15 @@ type ResolvePlugin<P, Plugins extends readonly any[]> =
         >
     : ExtractPluginType<P>;
 
+type FlattenPluginInput<P> = P extends readonly any[] ? FlattenPluginInputs<P> : [P];
+
+type FlattenPluginInputs<Plugins extends readonly any[]> = Plugins extends readonly [
+  infer Head,
+  ...infer Tail,
+]
+  ? [...FlattenPluginInput<Head>, ...FlattenPluginInputs<Tail>]
+  : [];
+
 type MergePlugins<Plugins extends readonly any[]> = UnionToIntersection<
   ResolvePlugin<Plugins[number], Plugins>
 >;
@@ -986,12 +1003,32 @@ interface CoreDollar<I = never> {
  *   `const serverless = mvfm(num, str, db('postgres://...'))`
  *   `const myProgram = serverless(($) => { ... })`
  */
-export function mvfm<P extends PluginDefinition<any, any>[]>(...plugins: P) {
+function resolvePlugin(plugin: Plugin): PluginDefinition<any, any> {
+  return typeof plugin === "function" ? plugin() : plugin;
+}
+
+function flattenPluginInputs(inputs: readonly PluginInput[]): PluginDefinition<any, any>[] {
+  const flattened: PluginDefinition<any, any>[] = [];
+  for (const input of inputs) {
+    if (Array.isArray(input)) {
+      flattened.push(...flattenPluginInputs(input));
+      continue;
+    }
+    flattened.push(resolvePlugin(input as Plugin));
+  }
+  return flattened;
+}
+
+export function mvfm<const P extends readonly PluginInput[]>(...plugins: P) {
+  type FlatP = FlattenPluginInputs<P>;
+
   function define<S extends SchemaShape>(
     schema: S,
-    fn: ($: CoreDollar<InferSchema<S>> & MergePlugins<P>) => Expr<any> | any,
+    fn: ($: CoreDollar<InferSchema<S>> & MergePlugins<FlatP>) => Expr<any> | any,
   ): Program;
-  function define<I = never>(fn: ($: CoreDollar<I> & MergePlugins<P>) => Expr<any> | any): Program;
+  function define<I = never>(
+    fn: ($: CoreDollar<I> & MergePlugins<FlatP>) => Expr<any> | any,
+  ): Program;
   function define(schemaOrFn: SchemaShape | (($: any) => any), maybeFn?: ($: any) => any): Program {
     const schema = typeof schemaOrFn === "function" ? undefined : (schemaOrFn as SchemaShape);
     const fn = typeof schemaOrFn === "function" ? schemaOrFn : maybeFn!;
@@ -1000,9 +1037,7 @@ export function mvfm<P extends PluginDefinition<any, any>[]>(...plugins: P) {
     const registry = new Map<number, ASTNode>(); // id -> node
 
     // Resolve plugins BEFORE building ctx
-    const resolvedPlugins = plugins.map((p) =>
-      typeof p === "function" && !("name" in p) ? (p as () => PluginDefinition<any, any>)() : p,
-    ) as PluginDefinition<any, any>[];
+    const resolvedPlugins = flattenPluginInputs(plugins);
 
     // Build the plugin context
     const ctx: PluginContext = {
@@ -1115,7 +1150,7 @@ export function mvfm<P extends PluginDefinition<any, any>[]>(...plugins: P) {
     );
 
     // Assemble $
-    const dollar = { ...core, ...pluginContributions } as CoreDollar<any> & MergePlugins<P>;
+    const dollar = { ...core, ...pluginContributions } as CoreDollar<any> & MergePlugins<FlatP>;
 
     // Run the closure — this builds the AST
     const result = fn(dollar);

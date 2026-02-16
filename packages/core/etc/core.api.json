@@ -3161,20 +3161,24 @@
         {
           "kind": "Function",
           "canonicalReference": "@mvfm/core!mvfm:function(1)",
-          "docComment": "/**\n * Create a mvfm program builder with the given plugins.\n *\n * Usage: `const serverless = mvfm(num, str, db('postgres://...'))` `const myProgram = serverless(($) => { ... })`\n */\n",
+          "docComment": "",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare function mvfm<P extends "
-            },
-            {
-              "kind": "Reference",
-              "text": "PluginDefinition",
-              "canonicalReference": "@mvfm/core!PluginDefinition:interface"
+              "text": "export declare function mvfm<const P extends "
             },
             {
               "kind": "Content",
-              "text": "<any, any>[]"
+              "text": "readonly "
+            },
+            {
+              "kind": "Reference",
+              "text": "PluginInput",
+              "canonicalReference": "@mvfm/core!PluginInput:type"
+            },
+            {
+              "kind": "Content",
+              "text": "[]"
             },
             {
               "kind": "Content",
@@ -3226,7 +3230,16 @@
             },
             {
               "kind": "Content",
-              "text": "<P>) => "
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FlattenPluginInputs",
+              "canonicalReference": "@mvfm/core!~FlattenPluginInputs:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<P>>) => "
             },
             {
               "kind": "Reference",
@@ -3262,7 +3275,16 @@
             },
             {
               "kind": "Content",
-              "text": "<P>) => "
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FlattenPluginInputs",
+              "canonicalReference": "@mvfm/core!~FlattenPluginInputs:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<P>>) => "
             },
             {
               "kind": "Reference",
@@ -3289,8 +3311,8 @@
           ],
           "fileUrlPath": "dist/core.d.ts",
           "returnTypeTokenRange": {
-            "startIndex": 6,
-            "endIndex": 27
+            "startIndex": 7,
+            "endIndex": 32
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
@@ -3298,8 +3320,8 @@
             {
               "parameterName": "plugins",
               "parameterTypeTokenRange": {
-                "startIndex": 4,
-                "endIndex": 5
+                "startIndex": 5,
+                "endIndex": 6
               },
               "isOptional": false
             }
@@ -3309,7 +3331,7 @@
               "typeParameterName": "P",
               "constraintTokenRange": {
                 "startIndex": 1,
-                "endIndex": 3
+                "endIndex": 4
               },
               "defaultTypeTokenRange": {
                 "startIndex": 0,
@@ -5289,6 +5311,267 @@
             }
           ],
           "extendsTokenRanges": []
+        },
+        {
+          "kind": "TypeAlias",
+          "canonicalReference": "@mvfm/core!PluginInput:type",
+          "docComment": "/**\n * A plugin input accepted by {@link mvfm}.\n *\n * Supports either a single plugin/factory or an arbitrarily nested readonly array/tuple of plugin inputs.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type PluginInput = "
+            },
+            {
+              "kind": "Reference",
+              "text": "Plugin",
+              "canonicalReference": "@mvfm/core!Plugin_2:type"
+            },
+            {
+              "kind": "Content",
+              "text": " | readonly "
+            },
+            {
+              "kind": "Reference",
+              "text": "PluginInput",
+              "canonicalReference": "@mvfm/core!PluginInput:type"
+            },
+            {
+              "kind": "Content",
+              "text": "[]"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/core.d.ts",
+          "releaseTag": "Public",
+          "name": "PluginInput",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 5
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@mvfm/core!prelude:var",
+          "docComment": "/**\n * Default core plugin group for common pure operations.\n *\n * Includes numeric/string primitives, standard typeclass dispatch, and boolean algebra plugins, while excluding effect/control plugins.\n *\n * @example\n * ```ts\n * const app = mvfm(prelude)\n * ```\n *\n * @example\n * ```ts\n * const app = mvfm(...prelude)\n * ```\n *\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "prelude: "
+            },
+            {
+              "kind": "Content",
+              "text": "readonly [import(\"./core\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "PluginDefinition",
+              "canonicalReference": "@mvfm/core!PluginDefinition:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\".\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "NumMethods",
+              "canonicalReference": "@mvfm/core!NumMethods:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", {\n    eq: number;\n    ord: number;\n    semiring: number;\n    show: number;\n    bounded: number;\n}>, import(\"./core\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "PluginDefinition",
+              "canonicalReference": "@mvfm/core!PluginDefinition:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\".\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "StrMethods",
+              "canonicalReference": "@mvfm/core!StrMethods:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", {\n    eq: string;\n    show: string;\n    semigroup: string;\n    monoid: string;\n}>, import(\"./core\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "PluginDefinition",
+              "canonicalReference": "@mvfm/core!PluginDefinition:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"./core\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TypeclassSlot",
+              "canonicalReference": "@mvfm/core!TypeclassSlot:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"semiring\">, {}>, import(\"./core\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "PluginDefinition",
+              "canonicalReference": "@mvfm/core!PluginDefinition:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"./core\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TypeclassSlot",
+              "canonicalReference": "@mvfm/core!TypeclassSlot:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"eq\">, {}>, import(\"./core\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "PluginDefinition",
+              "canonicalReference": "@mvfm/core!PluginDefinition:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"./core\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TypeclassSlot",
+              "canonicalReference": "@mvfm/core!TypeclassSlot:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"ord\">, {}>, import(\"./core\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "PluginDefinition",
+              "canonicalReference": "@mvfm/core!PluginDefinition:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"./core\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TypeclassSlot",
+              "canonicalReference": "@mvfm/core!TypeclassSlot:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"show\">, {}>, import(\"./core\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "PluginDefinition",
+              "canonicalReference": "@mvfm/core!PluginDefinition:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\".\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "BooleanMethods",
+              "canonicalReference": "@mvfm/core!BooleanMethods:type"
+            },
+            {
+              "kind": "Content",
+              "text": ", {\n    eq: boolean;\n    show: boolean;\n    heytingAlgebra: boolean;\n    bounded: boolean;\n}>, import(\"./core\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "PluginDefinition",
+              "canonicalReference": "@mvfm/core!PluginDefinition:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"./core\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TypeclassSlot",
+              "canonicalReference": "@mvfm/core!TypeclassSlot:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"bounded\">, {}>, import(\"./core\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "PluginDefinition",
+              "canonicalReference": "@mvfm/core!PluginDefinition:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"./core\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TypeclassSlot",
+              "canonicalReference": "@mvfm/core!TypeclassSlot:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"heytingAlgebra\">, {}>, import(\"./core\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "PluginDefinition",
+              "canonicalReference": "@mvfm/core!PluginDefinition:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"./core\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TypeclassSlot",
+              "canonicalReference": "@mvfm/core!TypeclassSlot:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"semigroup\">, {}>, import(\"./core\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "PluginDefinition",
+              "canonicalReference": "@mvfm/core!PluginDefinition:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"./core\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TypeclassSlot",
+              "canonicalReference": "@mvfm/core!TypeclassSlot:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<\"monoid\">, {}>]"
+            }
+          ],
+          "fileUrlPath": "dist/prelude.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "prelude",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 46
+          }
         },
         {
           "kind": "Interface",

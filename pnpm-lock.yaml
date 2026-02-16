@@ -84,6 +84,12 @@ importers:
         specifier: workspace:*
         version: link:../core
 
+  packages/plugin-console:
+    devDependencies:
+      '@mvfm/core':
+        specifier: workspace:*
+        version: link:../core
+
   packages/plugin-fal:
     devDependencies:
       '@fal-ai/client':
