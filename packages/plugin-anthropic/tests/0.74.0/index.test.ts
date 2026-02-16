@@ -183,8 +183,8 @@ describe("anthropic: models.list", () => {
   });
 });
 
-describe("anthropic: integration with $.discard()", () => {
-  it("side-effecting operations wrapped in $.discard() are reachable", () => {
+describe("anthropic: integration with $.begin()", () => {
+  it("side-effecting operations wrapped in $.begin() are reachable", () => {
     expect(() => {
       app(($) => {
         const msg = $.anthropic.messages.create({
@@ -196,7 +196,7 @@ describe("anthropic: integration with $.discard()", () => {
           model: "claude-sonnet-4-20250514",
           messages: [{ role: "user", content: "Hello" }],
         });
-        return $.discard(msg, tokens);
+        return $.begin(msg, tokens);
       });
     }).not.toThrow();
   });
@@ -218,10 +218,10 @@ describe("anthropic: cross-operation dependencies", () => {
         ],
       });
       const retrieved = $.anthropic.messages.batches.retrieve(batch.id);
-      return $.discard(batch, retrieved);
+      return $.begin(batch, retrieved);
     });
     const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/discard");
+    expect(ast.result.kind).toBe("core/begin");
     // The retrieve's id should reference the batch via prop_access
     const retrieveNode = ast.result.result;
     expect(retrieveNode.id.kind).toBe("core/prop_access");

@@ -118,11 +118,12 @@ export function mvfm<const P extends readonly PluginInput[]>(...plugins: P) {
         };
       },
 
-      discard(...exprs: (Expr<any> | any)[]) {
+      begin(first: Expr<any> | any, ...rest: (Expr<any> | any)[]) {
+        const exprs = [first, ...rest];
         const nodes = exprs.map((e) => (isExpr(e) ? e.__node : autoLift(e, ctx.expr).__node));
         const steps = nodes.slice(0, -1);
         const result = nodes[nodes.length - 1];
-        return makeExprProxy({ kind: "core/discard", steps, result }, ctx);
+        return makeExprProxy({ kind: "core/begin", steps, result }, ctx);
       },
 
       rec<T, R>(fn: (self: (arg: Expr<T> | T) => Expr<R>, param: Expr<T>) => Expr<R> | R): Expr<R> {
@@ -221,8 +222,8 @@ export function mvfm<const P extends readonly PluginInput[]>(...plugins: P) {
       throw new Error(
         `Mvfm build error: ${orphans.length} unreachable node(s) detected.\n` +
           `These expressions were created but are not part of the return tree.\n` +
-          `Wrap side effects in $.discard():\n\n` +
-          `  return $.discard(\n` +
+          `Wrap side effects in $.begin():\n\n` +
+          `  return $.begin(\n` +
           `    $.db.exec('...'),  // side effect\n` +
           `    result             // return value\n` +
           `  )\n\n` +

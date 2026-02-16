@@ -735,12 +735,12 @@ export const VOLATILE_KINDS = new Set(["core/lambda_param", "postgres/cursor_bat
 
 ### Core nodes are always sync
 
-The core interpreter (`coreInterpreter`) handles `core/discard`, `core/record`, `core/tuple`, `core/cond`, `core/prop_access`, `core/program`, `core/literal`, and `core/input`. These are pure structure nodes: sequencing (`discard`), branching (`cond`), field access (`prop_access`), and aggregation (`record`, `tuple`).
+The core interpreter (`coreInterpreter`) handles `core/begin`, `core/record`, `core/tuple`, `core/cond`, `core/prop_access`, `core/program`, `core/literal`, and `core/input`. These are pure structure nodes: sequencing (`begin`), branching (`cond`), field access (`prop_access`), and aggregation (`record`, `tuple`).
 
 This matters for plugin authors because it means:
 
 1. You do not need to handle core node kinds in your interpreter. The `coreInterpreter` handles all of them.
-2. When your plugin needs sequencing or branching, rely on the user composing with `$.discard()` and `$.cond()` at the DSL level. Your interpreter only needs to handle your own `plugin/kind` nodes.
+2. When your plugin needs sequencing or branching, rely on the user composing with `$.begin()` and `$.cond()` at the DSL level. Your interpreter only needs to handle your own `plugin/kind` nodes.
 3. Interpreters compose via object spread: `{ ...coreInterpreter, ...pluginInterpreter }`. Each handler only sees nodes matching its kind key.
 
 ### Decision: simple vs scoped interpreters
@@ -803,7 +803,7 @@ Key points:
 
 1. **The interpreter yields the body AST, not its result.** The `begin` case in the interpreter yields `{ type: "begin", body: node.body }` — it passes the unevaluated AST subtree to the handler. The handler decides when and how to evaluate it.
 2. **The handler creates a fresh evaluator.** `serverEvaluateInternal(tx, fragments)` creates a new evaluation function with a fresh cache, bound to the transaction client `tx`. Queries inside the transaction execute on the transaction connection, not the top-level connection.
-3. **Do not rely on `core/discard` for sequencing within scopes.** The handler explicitly loops over `queries` in pipeline mode. The sequencing is the handler's responsibility because it must happen within the transaction callback provided by the database driver.
+3. **Do not rely on `core/begin` for sequencing within scopes.** The handler explicitly loops over `queries` in pipeline mode. The sequencing is the handler's responsibility because it must happen within the transaction callback provided by the database driver.
 
 This pattern generalizes: any time your service has a callback-based scope (database transactions, HTTP sessions, streaming contexts), your interpreter yields the scope effect with the body AST, and your handler evaluates the body within the callback.
 
@@ -1285,7 +1285,7 @@ describe("stripe: paymentIntents.confirm", () => {
   });
 });
 
-describe("stripe: integration with $.discard()", () => {
+describe("stripe: integration with $.begin()", () => {
   it("orphaned operations are rejected", () => {
     expect(() => {
       app(($) => {
@@ -1303,7 +1303,7 @@ Key things to notice:
 1. **The `strip` helper** removes `__id` (non-deterministic internal IDs) and `config` (opaque configuration) so assertions focus on structure.
 2. **Tests assert on node `kind` strings** — confirming the correct plugin/operation mapping.
 3. **Tests assert on child node types** — `core/literal` for raw values, `core/prop_access` for input references, `core/record` for object parameters.
-4. **The orphan test** verifies mvfm's reachability analysis catches side-effecting nodes that are not connected to the return value via `$.discard()`.
+4. **The orphan test** verifies mvfm's reachability analysis catches side-effecting nodes that are not connected to the return value via `$.begin()`.
 
 ### Tier 2: Interpretation (`interpreter.test.ts`)
 
@@ -1729,7 +1729,7 @@ From the end of `src/plugins/postgres/3.4.8/index.ts`:
 //    Can't destructure proxies. [0] index access works though.
 //
 // 7. Transactions (callback mode with dependencies):
-//    Mvfm requires $.discard() to sequence side effects. No destructuring.
+//    Mvfm requires $.begin() to sequence side effects. No destructuring.
 //
 // DOESN'T WORK / HARD:
 //
@@ -1738,9 +1738,9 @@ From the end of `src/plugins/postgres/3.4.8/index.ts`:
 //
 // 9. Async/await ordering:
 //    The fundamental mismatch: real postgres.js uses await for
-//    sequencing. Mvfm uses proxy chains + $.discard(). For pure data
+//    sequencing. Mvfm uses proxy chains + $.begin(). For pure data
 //    dependencies this is seamless. For "do A then B" without
-//    data dependency, you need $.discard() or array pipeline syntax.
+//    data dependency, you need $.begin() or array pipeline syntax.
 //
 // SUMMARY:
 // For the 80% case of "query, transform, return" -- nearly

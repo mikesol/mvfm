@@ -43,7 +43,7 @@ export function checkCompleteness(interpreter: Interpreter, root: TypedNode): vo
 
 // @public
 export type CompleteInterpreter<K extends string> = {
-    [key in K]: (node: any) => AsyncGenerator<TypedNode, unknown, unknown>;
+    [key in K]: (node: any) => AsyncGenerator<FoldYield, unknown, unknown>;
 };
 
 // @public
@@ -140,7 +140,10 @@ export interface FoldState {
 }
 
 // @public
-export type Handler<N extends TypedNode<any>> = N extends TypedNode<infer T> ? (node: N) => AsyncGenerator<TypedNode, T, unknown> : never;
+export type FoldYield = TypedNode | RecurseScopedEffect;
+
+// @public
+export type Handler<N extends TypedNode<any>> = N extends TypedNode<infer T> ? (node: N) => AsyncGenerator<FoldYield, T, unknown> : never;
 
 // Warning: (ae-incompatible-release-tags) The symbol "heytingAlgebra" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
 //
@@ -174,7 +177,7 @@ export function inferType(node: any, impls: TraitImpl[], schema?: Record<string,
 export function injectLambdaParam(node: any, name: string, value: unknown): void;
 
 // @public
-export type Interpreter = Record<string, (node: any) => AsyncGenerator<TypedNode, unknown, unknown>>;
+export type Interpreter = Record<string, (node: any) => AsyncGenerator<FoldYield, unknown, unknown>>;
 
 // Warning: (ae-internal-missing-underscore) The name "MissingTraitError" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -327,6 +330,19 @@ export interface Program {
 }
 
 // @public
+export function recurseScoped(child: TypedNode, bindings: ScopedBinding[]): RecurseScopedEffect;
+
+// @public
+export interface RecurseScopedEffect {
+    // (undocumented)
+    bindings: ScopedBinding[];
+    // (undocumented)
+    child: TypedNode;
+    // (undocumented)
+    type: "recurse_scoped";
+}
+
+// @public
 export function resolveSchemaType(node: any, schema?: Record<string, unknown>): string | null;
 
 // @public
@@ -339,6 +355,14 @@ export type SchemaTag = "string" | "number" | "boolean" | "date" | "null";
 export type SchemaType = SchemaTag | ArraySchema | NullableSchema | {
     readonly [key: string]: SchemaType;
 };
+
+// @public
+export interface ScopedBinding {
+    // (undocumented)
+    paramId: number;
+    // (undocumented)
+    value: unknown;
+}
 
 // Warning: (ae-incompatible-release-tags) The symbol "semigroup" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
 //

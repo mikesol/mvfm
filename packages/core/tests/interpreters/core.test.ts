@@ -65,9 +65,9 @@ describe("core interpreter: records", () => {
   });
 });
 
-describe("core interpreter: discard", () => {
+describe("core interpreter: begin", () => {
   it("returns last value", async () => {
-    const prog = app(($) => $.discard("step1", "step2", "result"));
+    const prog = app(($) => $.begin("step1", "step2", "result"));
     expect(await run(prog)).toBe("result");
   });
 });

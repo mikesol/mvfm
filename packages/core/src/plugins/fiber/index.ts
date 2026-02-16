@@ -12,7 +12,7 @@
 //
 // DESIGN PRINCIPLES:
 //
-// 1. Sequential is the default. $.discard(a, b, c) runs in order.
+// 1. Sequential is the default. $.begin(a, b, c) runs in order.
 //    You opt INTO parallelism, not out of it.
 //
 // 2. Parallelism always has a concurrency limit. No unbounded
@@ -62,10 +62,10 @@ export interface FiberMethods {
 
   /**
    * Run expressions sequentially, return last result.
-   * This is `$.discard()` with fiber awareness -- each step is
+   * This is `$.begin()` with fiber awareness -- each step is
    * guaranteed to complete before the next starts.
    *
-   * Alias for `$.discard()` but makes the intent clearer in
+   * Alias for `$.begin()` but makes the intent clearer in
    * a concurrent context.
    *
    * ```
@@ -76,7 +76,7 @@ export interface FiberMethods {
    * )
    * ```
    */
-  seq(...exprs: (Expr<any> | any)[]): Expr<any>;
+  seq(first: Expr<any> | any, ...rest: (Expr<any> | any)[]): Expr<any>;
 
   /**
    * Run expressions concurrently, return the first to complete.
@@ -185,12 +185,13 @@ export const fiber: PluginDefinition<FiberMethods> = {
     return {
       par: parFn,
 
-      seq(...exprs: (Expr<any> | any)[]) {
+      seq(first: Expr<any> | any, ...rest: (Expr<any> | any)[]) {
+        const exprs = [first, ...rest];
         const nodes = exprs.map((e) => (ctx.isExpr(e) ? e.__node : ctx.lift(e).__node));
         const steps = nodes.slice(0, -1);
         const result = nodes[nodes.length - 1];
         return ctx.expr({
-          kind: "core/discard",
+          kind: "core/begin",
           steps,
           result,
         });

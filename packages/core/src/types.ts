@@ -265,15 +265,15 @@ export interface CoreDollar<I = never> {
   };
 
   /**
-   * Sequence side effects, discard intermediate results, return the last.
+   * Sequence expressions, return the last.
    *
-   *   return $.discard(
+   *   return $.begin(
    *     $.db.exec('UPDATE ...', []),
    *     $.kv.set('key', value),
    *     user   // ← returned
    *   )
    */
-  discard(...exprs: (Expr<any> | any)[]): Expr<any>;
+  begin(first: Expr<any> | any, ...rest: (Expr<any> | any)[]): Expr<any>;
 
   /**
    * Recursion via Y combinator. The callback receives `self`

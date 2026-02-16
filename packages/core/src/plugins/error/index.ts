@@ -109,10 +109,10 @@ export interface ErrorMethods {
    * ```
    *
    * If the condition is true, continues. If false, fails
-   * with the given error. Useful in `$.discard()` chains:
+   * with the given error. Useful in `$.begin()` chains:
    *
    * ```
-   * return $.discard(
+   * return $.begin(
    *   $.guard($.gt(balance, amount), 'insufficient funds'),
    *   $.sql`update accounts set balance = balance - ${amount}`,
    *   { success: true }

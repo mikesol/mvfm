@@ -13,17 +13,17 @@ function strip(ast: unknown): unknown {
   return JSON.parse(JSON.stringify(ast, (k, v) => (k === "__id" ? undefined : v)));
 }
 
-describe("core: $.discard()", () => {
+describe("core: $.begin()", () => {
   const app = mvfm(num, str, semiring);
 
   it("sequences side effects with last arg as return value", () => {
     const prog = app(($) => {
       const a = $.add(1, 2);
       const b = $.add(3, 4);
-      return $.discard(a, b);
+      return $.begin(a, b);
     });
     const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/discard");
+    expect(ast.result.kind).toBe("core/begin");
     expect(ast.result.steps).toHaveLength(1);
     expect(ast.result.steps[0].kind).toBe("num/add");
     expect(ast.result.result.kind).toBe("num/add");
@@ -31,12 +31,21 @@ describe("core: $.discard()", () => {
 
   it("works with a single expression (no steps)", () => {
     const prog = app(($) => {
-      return $.discard($.add(1, 2));
+      return $.begin($.add(1, 2));
     });
     const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/discard");
+    expect(ast.result.kind).toBe("core/begin");
     expect(ast.result.steps).toHaveLength(0);
     expect(ast.result.result.kind).toBe("num/add");
+  });
+
+  it("rejects zero arguments at the type level", () => {
+    expect(() =>
+      app(($) => {
+        // @ts-expect-error — $.begin() requires at least one expression
+        return $.begin();
+      }),
+    ).toThrow();
   });
 });
 
@@ -207,12 +216,12 @@ describe("core: reachability analysis", () => {
     }).not.toThrow();
   });
 
-  it("does not reject nodes inside $.discard()", () => {
+  it("does not reject nodes inside $.begin()", () => {
     expect(() => {
       app(($) => {
         const sideEffect = $.add(1, 2);
         const result = $.add(3, 4);
-        return $.discard(sideEffect, result);
+        return $.begin(sideEffect, result);
       });
     }).not.toThrow();
   });

@@ -110,7 +110,7 @@ describe("DAG memoization integration: shared query deduplication", () => {
       const settings = $.sql`SELECT value FROM settings WHERE key = 'tax_rate'`;
       const a = $.sql`SELECT ${settings[0].value} as rate`;
       const b = $.sql`SELECT ${settings[0].value} as rate2`;
-      return $.discard(a, b);
+      return $.begin(a, b);
     });
     const { queryCount } = await run(prog);
     // 1 (settings) + 1 (a) + 1 (b) = 3 (not 4)
@@ -164,7 +164,7 @@ describe("DAG memoization: adversarial integration tests", () => {
           $.sql`INSERT INTO processed (data, tax_rate)
             SELECT unnest(ARRAY[${batch[0].data}]), ${settings[0].value}`,
       );
-      return $.discard(rateCheck, cursorResult, settings);
+      return $.begin(rateCheck, cursorResult, settings);
     });
     const { queryCount } = await run(prog);
     // 1 (settings for rateCheck) + 1 (rateCheck) + 1 (cursor) + 1 (settings re-eval in cursor) + 2 (inserts) = 6

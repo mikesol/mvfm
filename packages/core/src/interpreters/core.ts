@@ -31,8 +31,8 @@ interface CoreCond<T = unknown> extends TypedNode<T> {
   else: TypedNode<T>;
 }
 
-interface CoreDiscard<T = unknown> extends TypedNode<T> {
-  kind: "core/discard";
+interface CoreBegin<T = unknown> extends TypedNode<T> {
+  kind: "core/begin";
   steps: TypedNode[];
   result: TypedNode<T>;
 }
@@ -87,7 +87,7 @@ export const coreInterpreter: Interpreter = {
     return yield* eval_(node.else);
   },
 
-  "core/discard": async function* (node: CoreDiscard) {
+  "core/begin": async function* (node: CoreBegin) {
     for (const step of node.steps) {
       yield* eval_(step);
     }

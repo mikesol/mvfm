@@ -138,18 +138,18 @@ describe("fetch: headers", () => {
 });
 
 // ============================================================
-// Integration with $.discard()
+// Integration with $.begin()
 // ============================================================
 
-describe("fetch: integration with $.discard()", () => {
-  it("chained operations wrapped in $.discard() are reachable", () => {
+describe("fetch: integration with $.begin()", () => {
+  it("chained operations wrapped in $.begin() are reachable", () => {
     expect(() => {
       app(($) => {
         const resp1 = $.fetch("https://api.example.com/users");
         const data1 = $.fetch.json(resp1);
         const resp2 = $.fetch("https://api.example.com/posts");
         const data2 = $.fetch.json(resp2);
-        return $.discard(data1, data2);
+        return $.begin(data1, data2);
       });
     }).not.toThrow();
   });

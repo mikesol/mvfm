@@ -2,8 +2,6 @@
 // Stack-safe async fold with memoization and taint tracking
 // ============================================================
 
-// --- TypedNode: phantom-typed base for all AST nodes ---------
-
 /**
  * Base type for AST nodes in the interpreter. Carries a phantom type
  * parameter `T` tracking the runtime value type. No index signature —
@@ -14,7 +12,21 @@ export interface TypedNode<T = unknown> {
   readonly __T?: T;
 }
 
-// --- eval_: the ONLY cast in the system ----------------------
+/** Runtime binding for scoped lambda evaluation. */
+export interface ScopedBinding {
+  paramId: number;
+  value: unknown;
+}
+
+/** Control effect: evaluate a child under temporary lexical bindings. */
+export interface RecurseScopedEffect {
+  type: "recurse_scoped";
+  child: TypedNode;
+  bindings: ScopedBinding[];
+}
+
+/** Values handlers can yield to the fold trampoline. */
+export type FoldYield = TypedNode | RecurseScopedEffect;
 
 /**
  * Evaluate a child node by yielding it to the trampoline.
@@ -25,7 +37,10 @@ export async function* eval_<T>(node: TypedNode<T>): AsyncGenerator<TypedNode, T
   return (yield node) as T;
 }
 
-// --- Interpreter type ----------------------------------------
+/** Build a scoped recurse effect. */
+export function recurseScoped(child: TypedNode, bindings: ScopedBinding[]): RecurseScopedEffect {
+  return { type: "recurse_scoped", child, bindings };
+}
 
 /**
  * An interpreter is a plain record mapping node kind strings to
@@ -34,7 +49,7 @@ export async function* eval_<T>(node: TypedNode<T>): AsyncGenerator<TypedNode, T
  */
 export type Interpreter = Record<
   string,
-  (node: any) => AsyncGenerator<TypedNode, unknown, unknown>
+  (node: any) => AsyncGenerator<FoldYield, unknown, unknown>
 >;
 
 /**
@@ -42,14 +57,10 @@ export type Interpreter = Record<
  * The return type is inferred from the node's phantom type.
  */
 export type Handler<N extends TypedNode<any>> =
-  N extends TypedNode<infer T> ? (node: N) => AsyncGenerator<TypedNode, T, unknown> : never;
-
-// --- Volatile registry ---------------------------------------
+  N extends TypedNode<infer T> ? (node: N) => AsyncGenerator<FoldYield, T, unknown> : never;
 
 /** Node kinds that are inherently volatile (never cached, always re-evaluated). */
 export const VOLATILE_KINDS = new Set<string>(["core/lambda_param", "postgres/cursor_batch"]);
-
-// --- FoldState: externalized cache + taint -------------------
 
 /** Externalized fold state for cache sharing across evaluations. */
 export interface FoldState {
@@ -61,8 +72,6 @@ export interface FoldState {
 export function createFoldState(): FoldState {
   return { cache: new WeakMap(), tainted: new WeakSet() };
 }
-
-// --- Completeness check --------------------------------------
 
 /**
  * Walk an AST to verify all node kinds have handlers.
@@ -99,23 +108,14 @@ export function checkCompleteness(interpreter: Interpreter, root: TypedNode): vo
   }
 }
 
-// --- foldAST: the sole evaluation primitive ------------------
-
 type Frame = {
-  gen: AsyncGenerator<TypedNode, unknown, unknown>;
+  gen: AsyncGenerator<FoldYield, unknown, unknown>;
   node: TypedNode;
   childNodes: Set<TypedNode>;
+  restoreScopeDepth: number | null;
 };
 
-/**
- * Stack-safe async fold with WeakMap memoization and taint tracking.
- *
- * - Async generators live on the heap; the call stack is O(1).
- * - Shared nodes (DAG references) evaluate once via WeakMap cache.
- * - Volatile nodes and their dependents re-evaluate each time.
- * - Error propagation via `gen.throw()` — handlers can try/catch.
- * - Accepts optional `FoldState` for cache sharing across calls.
- */
+/** Stack-safe async fold with memoization and taint tracking. */
 export async function foldAST(
   interpreter: Interpreter,
   root: TypedNode,
@@ -123,6 +123,7 @@ export async function foldAST(
 ): Promise<unknown> {
   const { cache, tainted } = state ?? createFoldState();
   const stack: Frame[] = [];
+  const scopeStack: Array<Map<number, unknown>> = [];
 
   function isVolatile(node: TypedNode): boolean {
     return VOLATILE_KINDS.has(node.kind);
@@ -132,10 +133,50 @@ export async function foldAST(
     return tainted.has(node);
   }
 
-  function push(node: TypedNode): void {
+  function resolveScopedParam(node: TypedNode): { found: true; value: unknown } | { found: false } {
+    if (node.kind !== "core/lambda_param") return { found: false };
+    const id = (node as { __id?: unknown }).__id;
+    if (typeof id !== "number") return { found: false };
+    for (let i = scopeStack.length - 1; i >= 0; i--) {
+      if (scopeStack[i].has(id)) {
+        return { found: true, value: scopeStack[i].get(id) };
+      }
+    }
+    return { found: false };
+  }
+
+  function push(node: TypedNode, restoreScopeDepth: number | null = null): void {
+    const scoped = resolveScopedParam(node);
+    if (scoped.found) {
+      stack.push({
+        // biome-ignore lint/correctness/useYield: leaf scoped param frame returns directly
+        gen: (async function* () {
+          return scoped.value;
+        })(),
+        node,
+        childNodes: new Set(),
+        restoreScopeDepth,
+      });
+      return;
+    }
+
     const h = interpreter[node.kind];
     if (!h) throw new Error(`No interpreter for: ${node.kind}`);
-    stack.push({ gen: h(node), node, childNodes: new Set() });
+    stack.push({ gen: h(node), node, childNodes: new Set(), restoreScopeDepth });
+  }
+
+  function restoreScope(depth: number | null): void {
+    if (depth === null) return;
+    scopeStack.length = depth;
+  }
+
+  function isRecurseScoped(effect: FoldYield): effect is RecurseScopedEffect {
+    return (
+      typeof effect === "object" &&
+      effect !== null &&
+      "type" in effect &&
+      (effect as { type?: unknown }).type === "recurse_scoped"
+    );
   }
 
   push(root);
@@ -144,7 +185,7 @@ export async function foldAST(
 
   while (stack.length > 0) {
     const frame = stack[stack.length - 1];
-    let result: IteratorResult<TypedNode, unknown>;
+    let result: IteratorResult<FoldYield, unknown>;
 
     try {
       result =
@@ -153,14 +194,16 @@ export async function foldAST(
           : await frame.gen.next(input);
       pendingError = undefined;
     } catch (e) {
-      stack.pop();
+      const doneFrame = stack.pop()!;
+      restoreScope(doneFrame.restoreScopeDepth);
       if (stack.length === 0) throw e;
       pendingError = e;
       continue;
     }
 
     if (result.done) {
-      stack.pop();
+      const doneFrame = stack.pop()!;
+      restoreScope(doneFrame.restoreScopeDepth);
       const value = result.value;
 
       const shouldTaint = isVolatile(frame.node) || [...frame.childNodes].some((c) => isTainted(c));
@@ -180,10 +223,32 @@ export async function foldAST(
       continue;
     }
 
+    if (isRecurseScoped(result.value)) {
+      const { child, bindings } = result.value;
+      frame.childNodes.add(child);
+      const restoreDepth = scopeStack.length;
+      scopeStack.push(new Map(bindings.map((b) => [b.paramId, b.value])));
+
+      if (!isTainted(child) && cache.has(child)) {
+        input = cache.get(child);
+        scopeStack.length = restoreDepth;
+      } else {
+        push(child, restoreDepth);
+        input = undefined;
+      }
+      continue;
+    }
+
     const child = result.value;
     frame.childNodes.add(child);
 
-    if (!isTainted(child) && cache.has(child)) {
+    const scoped = resolveScopedParam(child);
+    if (scoped.found) {
+      // Scoped params are volatile: never cache, always taint upstream.
+      tainted.add(child);
+      cache.delete(child);
+      input = scoped.value;
+    } else if (!isTainted(child) && cache.has(child)) {
       input = cache.get(child);
     } else {
       push(child);
@@ -193,8 +258,6 @@ export async function foldAST(
 
   return input;
 }
-
-// --- TypedProgram + typedFoldAST -----------------------------
 
 /**
  * A program with phantom type `K` tracking all node kinds used.
@@ -209,7 +272,7 @@ export interface TypedProgram<K extends string> {
  * Complete interpreter type: must have a handler for every kind `K`.
  */
 export type CompleteInterpreter<K extends string> = {
-  [key in K]: (node: any) => AsyncGenerator<TypedNode, unknown, unknown>;
+  [key in K]: (node: any) => AsyncGenerator<FoldYield, unknown, unknown>;
 };
 
 /**
