@@ -1,5 +1,6 @@
+import type { Expr } from "@mvfm/core";
 import { mvfm, num, str } from "@mvfm/core";
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 import { redis } from "../../src/5.4.1";
 
 function strip(ast: unknown): unknown {
@@ -9,6 +10,49 @@ function strip(ast: unknown): unknown {
 }
 
 const app = mvfm(num, str, redis({ host: "127.0.0.1", port: 6379 }));
+
+describe("redis: typing", () => {
+  it("preserves command return types", () => {
+    app(($) => {
+      const get = $.redis.get("key");
+      expectTypeOf(get).toEqualTypeOf<Expr<string | null>>();
+      return get;
+    });
+
+    app(($) => {
+      const set = $.redis.set("key", "value", "EX", 60);
+      expectTypeOf(set).toEqualTypeOf<Expr<string | null>>();
+      return set;
+    });
+
+    app(($) => {
+      const hget = $.redis.hget("hash", "field");
+      expectTypeOf(hget).toEqualTypeOf<Expr<string | null>>();
+      return hget;
+    });
+
+    app(($) => {
+      const lrange = $.redis.lrange("list", 0, 10);
+      expectTypeOf(lrange).toEqualTypeOf<Expr<string[]>>();
+      return lrange;
+    });
+  });
+
+  it("rejects invalid command argument shapes", () => {
+    app(($) => {
+      // @ts-expect-error increment must be number | Expr<number>
+      return $.redis.incrby("counter", "five");
+    });
+    app(($) => {
+      // @ts-expect-error position must be BEFORE | AFTER
+      return $.redis.linsert("list", "MIDDLE", "pivot", "value");
+    });
+    app(($) => {
+      // @ts-expect-error mapping must be Record<string, string | number>
+      return $.redis.mset("not-a-mapping");
+    });
+  });
+});
 
 // ============================================================
 // String commands

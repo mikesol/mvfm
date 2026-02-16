@@ -1,9 +1,23 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { coreInterpreter, foldAST, mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { redis } from "../../src/5.4.1";
 import { createRedisInterpreter, type RedisClient } from "../../src/5.4.1/interpreter";
 
 const app = mvfm(num, str, redis({ host: "127.0.0.1", port: 6379 }));
+
+describe("redis interpreter: typing hygiene", () => {
+  it("contains no untyped node:any handler parameters", () => {
+    const source = readFileSync(join(process.cwd(), "src/5.4.1/interpreter.ts"), "utf8");
+    expect(source).not.toMatch(/node:\s*any/);
+  });
+
+  it("contains no broad kind:string node interface fields", () => {
+    const source = readFileSync(join(process.cwd(), "src/5.4.1/interpreter.ts"), "utf8");
+    expect(source).not.toMatch(/kind:\s*string/);
+  });
+});
 
 function injectInput(node: any, input: Record<string, unknown>): any {
   if (node === null || node === undefined || typeof node !== "object") return node;
