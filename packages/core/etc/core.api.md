@@ -39,6 +39,9 @@ export interface BoundedFor<_T> {
 }
 
 // @public
+export function checkCompleteness(interpreter: Interpreter, program: Program): void;
+
+// @public (undocumented)
 export function checkCompleteness(interpreter: Interpreter, root: TypedNode): void;
 
 // @public
@@ -124,11 +127,14 @@ export interface FiberMethods {
         attempts: number;
         delay?: number;
     }): Expr<any>;
-    seq(...exprs: (Expr<any> | any)[]): Expr<any>;
+    seq(first: Expr<any> | any, ...rest: (Expr<any> | any)[]): Expr<any>;
     timeout(expr: Expr<any>, ms: number | Expr<number>, fallback: Expr<any> | any): Expr<any>;
 }
 
 // @public
+export function foldAST(interpreter: Interpreter, program: Program, state?: FoldState): Promise<unknown>;
+
+// @public (undocumented)
 export function foldAST(interpreter: Interpreter, root: TypedNode, state?: FoldState): Promise<unknown>;
 
 // @public
@@ -172,6 +178,9 @@ export type InferSchema<S> = S extends SchemaTag ? TagToType<S> : S extends {
 
 // @public
 export function inferType(node: any, impls: TraitImpl[], schema?: Record<string, unknown>): string | null;
+
+// @public
+export function injectInput(program: Program, input: Record<string, unknown>): Program;
 
 // @public
 export function injectLambdaParam(node: any, name: string, value: unknown): void;
