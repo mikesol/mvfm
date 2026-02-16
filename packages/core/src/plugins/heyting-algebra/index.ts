@@ -25,6 +25,7 @@ declare module "../../core" {
 export const heytingAlgebra: PluginDefinition<TypeclassSlot<"heytingAlgebra">> = {
   name: "heytingAlgebra",
   nodeKinds: [],
+  defaultInterpreter: {},
   build(ctx: PluginContext): any {
     const impls = ctx.plugins
       .filter((p) => p.traits?.heytingAlgebra)

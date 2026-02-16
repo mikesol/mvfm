@@ -9,6 +9,7 @@ import { fiber } from "../src/plugins/fiber";
 import { num } from "../src/plugins/num";
 import { ord } from "../src/plugins/ord";
 import { str } from "../src/plugins/str";
+import { prelude } from "../src/prelude";
 
 describe("core plugins have defaultInterpreter", () => {
   it.each([
@@ -289,5 +290,13 @@ describe("defaults() end-to-end", () => {
 
     const ast2 = injectInput(prog.ast, { x: 2 });
     expect(await foldAST(interp, ast2)).toBe("other");
+  });
+
+  it("works with prelude (typeclass plugins have empty defaultInterpreter)", async () => {
+    const app = mvfm(...prelude);
+    const interp = defaults(app);
+    const prog = app(($) => $.add(1, 2));
+    const result = await foldAST(interp, prog.ast);
+    expect(result).toBe(3);
   });
 });
