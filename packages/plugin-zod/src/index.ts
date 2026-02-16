@@ -13,6 +13,8 @@ import type { ZodIntersectionNamespace } from "./intersection";
 import { intersectionNamespace, intersectionNodeKinds } from "./intersection";
 import type { ZodLiteralNamespace } from "./literal";
 import { literalNamespace, literalNodeKinds } from "./literal";
+import type { ZodMapSetNamespace } from "./map-set";
+import { mapSetNamespace, mapSetNodeKinds } from "./map-set";
 import type { ZodNumberNamespace } from "./number";
 import { numberNamespace, numberNodeKinds } from "./number";
 import type { ZodObjectNamespace } from "./object";
@@ -40,6 +42,7 @@ export { zodInterpreter } from "./interpreter";
 export type { SchemaInterpreterMap } from "./interpreter-utils";
 export { ZodIntersectionBuilder } from "./intersection";
 export { ZodLiteralBuilder } from "./literal";
+export { ZodMapBuilder, ZodSetBuilder } from "./map-set";
 export { ZodNumberBuilder } from "./number";
 export type { ShapeInput } from "./object";
 export { ZodObjectBuilder } from "./object";
@@ -82,6 +85,7 @@ export interface ZodNamespace
     ZodEnumNamespace,
     ZodIntersectionNamespace,
     ZodLiteralNamespace,
+    ZodMapSetNamespace,
     ZodNumberNamespace,
     ZodObjectNamespace,
     ZodPrimitivesNamespace,
@@ -132,6 +136,7 @@ export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
     ...enumNodeKinds,
     ...intersectionNodeKinds,
     ...literalNodeKinds,
+    ...mapSetNodeKinds,
     ...numberNodeKinds,
     ...objectNodeKinds,
     ...primitivesNodeKinds,
@@ -153,6 +158,7 @@ export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
         ...enumNamespace(ctx, parseError),
         ...intersectionNamespace(ctx, parseError),
         ...literalNamespace(ctx),
+        ...mapSetNamespace(ctx, parseError),
         ...numberNamespace(ctx, parseError),
         ...objectNamespace(ctx, parseError),
         ...primitivesNamespace(ctx, parseError),
