@@ -289,8 +289,8 @@ export function anthropic(config: AnthropicConfig): PluginDefinition<AnthropicMe
 // 6. Sequencing side effects:
 //    Real:  const msg = await anthropic.messages.create(...)
 //    Mvfm:   const msg = $.anthropic.messages.create(...)
-//           return $.discard(msg)
-//    Must use $.discard() for sequencing when there are data dependencies.
+//           return $.begin(msg)
+//    Must use $.begin() for sequencing when there are data dependencies.
 //
 // DOESN'T WORK / NOT MODELED:
 //

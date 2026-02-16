@@ -100,18 +100,18 @@ describe("error interpreter: attempt", () => {
 
 describe("error interpreter: guard", () => {
   it("passes when condition is true", async () => {
-    const prog = app(($) => $.discard($.guard($.gt(10, 5), "should not throw"), "passed"));
+    const prog = app(($) => $.begin($.guard($.gt(10, 5), "should not throw"), "passed"));
     expect(await run(prog)).toBe("passed");
   });
 
   it("throws when condition is false", async () => {
-    const prog = app(($) => $.discard($.guard($.gt(5, 10), "guard failed"), "should not reach"));
+    const prog = app(($) => $.begin($.guard($.gt(5, 10), "guard failed"), "should not reach"));
     await expect(run(prog)).rejects.toBe("guard failed");
   });
 
   it("guard with object error", async () => {
     const prog = app(($) =>
-      $.discard($.guard($.gt(5, 10), { code: 403, message: "forbidden" }), "ok"),
+      $.begin($.guard($.gt(5, 10), { code: 403, message: "forbidden" }), "ok"),
     );
     await expect(run(prog)).rejects.toEqual({ code: 403, message: "forbidden" });
   });
@@ -196,7 +196,7 @@ describe("error interpreter: try/finally", () => {
 describe("error interpreter: composition", () => {
   it("try/catch with guard inside", async () => {
     const prog = app(($) =>
-      $.try($.discard($.guard($.gt(5, 10), "guard_fail"), "ok")).catch((err) => err),
+      $.try($.begin($.guard($.gt(5, 10), "guard_fail"), "ok")).catch((err) => err),
     );
     expect(await run(prog)).toBe("guard_fail");
   });

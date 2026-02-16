@@ -34,7 +34,7 @@ describe("core prelude", () => {
       expectTypeOf(s).toEqualTypeOf<Expr<string>>();
       expectTypeOf(joined).toEqualTypeOf<Expr<string>>();
 
-      return $.discard(n, cmp, s, joined);
+      return $.begin(n, cmp, s, joined);
     });
   });
 });

@@ -1435,7 +1435,7 @@
         {
           "kind": "Interface",
           "canonicalReference": "@mvfm/plugin-pino!PinoLogger:interface",
-          "docComment": "/**\n * A pino logger interface exposed on the DSL context.\n *\n * Provides six log level methods and `child()` for creating loggers with accumulated bindings. Each method returns `Expr<void>` for composition via `$.discard()`.\n */\n",
+          "docComment": "/**\n * A pino logger interface exposed on the DSL context.\n *\n * Provides six log level methods and `child()` for creating loggers with accumulated bindings. Each method returns `Expr<void>` for composition via `$.begin()`.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",

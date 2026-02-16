@@ -93,7 +93,7 @@ describe("async composition: query chaining", () => {
 describe("async composition: core/do with mixed async steps", () => {
   it("$.do sequences async operations", async () => {
     const prog = app(($) => {
-      return $.discard(
+      return $.begin(
         $.sql`INSERT INTO orders (product_id, quantity) VALUES (1, 5)`,
         $.sql`INSERT INTO orders (product_id, quantity) VALUES (2, 3)`,
         $.sql`SELECT count(*)::int as c FROM orders`,

@@ -1282,7 +1282,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "@mvfm/core!ErrorMethods#guard:member(1)",
-              "docComment": "/**\n * Validate a condition, failing if it's false. Like an assertion in the program.\n * ```\n * $.guard($.gt(user.age, 18), { code: 403, message: 'must be 18+' })\n * ```\n *\n * If the condition is true, continues. If false, fails with the given error. Useful in `$.discard()` chains:\n * ```\n * return $.discard(\n *   $.guard($.gt(balance, amount), 'insufficient funds'),\n *   $.sql`update accounts set balance = balance - ${amount}`,\n *   { success: true }\n * )\n * ```\n *\n */\n",
+              "docComment": "/**\n * Validate a condition, failing if it's false. Like an assertion in the program.\n * ```\n * $.guard($.gt(user.age, 18), { code: 403, message: 'must be 18+' })\n * ```\n *\n * If the condition is true, continues. If false, fails with the given error. Useful in `$.begin()` chains:\n * ```\n * return $.begin(\n *   $.guard($.gt(balance, amount), 'insufficient funds'),\n *   $.sql`update accounts set balance = balance - ${amount}`,\n *   { success: true }\n * )\n * ```\n *\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -1933,7 +1933,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "@mvfm/core!FiberMethods#seq:member(1)",
-              "docComment": "/**\n * Run expressions sequentially, return last result. This is `$.discard()` with fiber awareness -- each step is guaranteed to complete before the next starts.\n *\n * Alias for `$.discard()` but makes the intent clearer in a concurrent context.\n * ```\n * $.seq(\n *   $.sql`insert into users ...`,\n *   $.sql`insert into accounts ...`,\n *   $.sql`select * from users where ...`  // returned\n * )\n * ```\n *\n */\n",
+              "docComment": "/**\n * Run expressions sequentially, return last result. This is `$.begin()` with fiber awareness -- each step is guaranteed to complete before the next starts.\n *\n * Alias for `$.begin()` but makes the intent clearer in a concurrent context.\n * ```\n * $.seq(\n *   $.sql`insert into users ...`,\n *   $.sql`insert into accounts ...`,\n *   $.sql`select * from users where ...`  // returned\n * )\n * ```\n *\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",

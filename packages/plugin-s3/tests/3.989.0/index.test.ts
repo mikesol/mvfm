@@ -115,16 +115,16 @@ describe("s3: listObjectsV2", () => {
 });
 
 // ============================================================
-// $.discard() integration
+// $.begin() integration
 // ============================================================
 
-describe("s3: integration with $.discard()", () => {
-  it("side-effecting operations wrapped in $.discard() are reachable", () => {
+describe("s3: integration with $.begin()", () => {
+  it("side-effecting operations wrapped in $.begin() are reachable", () => {
     expect(() => {
       app(($) => {
         const put = $.s3.putObject({ Bucket: "b", Key: "k", Body: "data" });
         const head = $.s3.headObject({ Bucket: "b", Key: "k" });
-        return $.discard(put, head);
+        return $.begin(put, head);
       });
     }).not.toThrow();
   });
@@ -152,10 +152,10 @@ describe("s3: cross-operation dependencies", () => {
         Bucket: "my-bucket",
         Key: (list as any).Contents[0].Key,
       });
-      return $.discard(list, head);
+      return $.begin(list, head);
     });
     const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/discard");
+    expect(ast.result.kind).toBe("core/begin");
   });
 });
 
@@ -174,7 +174,7 @@ describe("s3: sdk typing parity", () => {
 
       expect(etag).toBeDefined();
       expect(length).toBeDefined();
-      return $.discard(put, get);
+      return $.begin(put, get);
     });
   });
 

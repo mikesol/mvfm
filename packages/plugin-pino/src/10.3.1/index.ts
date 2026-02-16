@@ -53,7 +53,7 @@ import type { Expr, PluginContext, PluginDefinition, TypedNode } from "@mvfm/cor
  *
  * Provides six log level methods and `child()` for creating
  * loggers with accumulated bindings. Each method returns
- * `Expr<void>` for composition via `$.discard()`.
+ * `Expr<void>` for composition via `$.begin()`.
  */
 export interface PinoLogger {
   /** Log at trace level. */

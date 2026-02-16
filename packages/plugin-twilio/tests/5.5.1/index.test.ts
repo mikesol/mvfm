@@ -139,11 +139,11 @@ describe("twilio: calls.list", () => {
 });
 
 // ============================================================
-// Integration: $.discard() and cross-operation dependencies
+// Integration: $.begin() and cross-operation dependencies
 // ============================================================
 
-describe("twilio: integration with $.discard()", () => {
-  it("side-effecting operations wrapped in $.discard() are reachable", () => {
+describe("twilio: integration with $.begin()", () => {
+  it("side-effecting operations wrapped in $.begin() are reachable", () => {
     expect(() => {
       app(($) => {
         const msg = $.twilio.messages.create({
@@ -156,7 +156,7 @@ describe("twilio: integration with $.discard()", () => {
           from: "+15559876543",
           url: "https://example.com/twiml",
         });
-        return $.discard(msg, call);
+        return $.begin(msg, call);
       });
     }).not.toThrow();
   });
@@ -181,9 +181,9 @@ describe("twilio: cross-operation dependencies", () => {
         body: "Hello",
       });
       const fetched = $.twilio.messages((msg as any).sid).fetch();
-      return $.discard(msg, fetched);
+      return $.begin(msg, fetched);
     });
     const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/discard");
+    expect(ast.result.kind).toBe("core/begin");
   });
 });

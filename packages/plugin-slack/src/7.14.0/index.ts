@@ -489,9 +489,9 @@ export function slack(config: SlackConfig): PluginDefinition<SlackMethods> {
 //           await client.reactions.add(...)
 //    Mvfm:   const msg = $.slack.chat.postMessage(...)
 //           const reaction = $.slack.reactions.add({ timestamp: msg.ts, ... })
-//           return $.discard(msg, reaction)
-//    Must use $.discard() for sequencing when there are data dependencies.
-//    Without data dependency, $.discard() is required to avoid orphan errors.
+//           return $.begin(msg, reaction)
+//    Must use $.begin() for sequencing when there are data dependencies.
+//    Without data dependency, $.begin() is required to avoid orphan errors.
 //
 // DOESN'T WORK / NOT MODELED:
 //

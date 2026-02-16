@@ -115,13 +115,13 @@ describe("postgres: transactions", () => {
       return $.sql.begin((sql) => {
         const user = sql`insert into users (name) values ('test') returning *`;
         const account = sql`insert into accounts (user_id) values (${user[0].id}) returning *`;
-        return $.discard(user, account, { user: user[0], account: account[0] });
+        return $.begin(user, account, { user: user[0], account: account[0] });
       });
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("postgres/begin");
     expect(ast.result.mode).toBe("callback");
-    expect(ast.result.body.kind).toBe("core/discard");
+    expect(ast.result.body.kind).toBe("core/begin");
   });
 
   it("transaction sql instance has savepoint", () => {
@@ -131,13 +131,13 @@ describe("postgres: transactions", () => {
         const sp = (sql as any).savepoint((sql2: any) => [
           sql2`update users set name = 'test' where id = ${user[0].id}`,
         ]);
-        return $.discard(sp, user[0]);
+        return $.begin(sp, user[0]);
       });
     });
     const ast = strip(prog.ast) as any;
     expect(ast.result.kind).toBe("postgres/begin");
     const doNode = ast.result.body;
-    expect(doNode.kind).toBe("core/discard");
+    expect(doNode.kind).toBe("core/begin");
     expect(doNode.steps[0].kind).toBe("postgres/savepoint");
   });
 });
@@ -172,15 +172,12 @@ describe("postgres: cursor", () => {
   });
 });
 
-describe("postgres: integration with $.discard()", () => {
-  it("side-effecting queries wrapped in $.discard() are reachable", () => {
+describe("postgres: integration with $.begin()", () => {
+  it("side-effecting queries wrapped in $.begin() are reachable", () => {
     expect(() => {
       app(($) => {
         const user = $.sql`select * from users where id = ${$.input.id}`;
-        return $.discard(
-          $.sql`update users set last_seen = now() where id = ${$.input.id}`,
-          user[0],
-        );
+        return $.begin($.sql`update users set last_seen = now() where id = ${$.input.id}`, user[0]);
       });
     }).not.toThrow();
   });
