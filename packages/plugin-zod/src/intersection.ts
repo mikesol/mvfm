@@ -3,11 +3,13 @@ import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
 import type {
+  AnyZodSchemaNode,
   CheckDescriptor,
   ErrorConfig,
   RefinementDescriptor,
   SchemaASTNode,
   WrapperASTNode,
+  ZodSchemaNodeBase,
 } from "./types";
 
 /**
@@ -84,14 +86,22 @@ export function intersectionNamespace(
  * interpreter's buildSchemaGen. This is passed in at registration time
  * to avoid circular imports.
  */
-type SchemaBuildFn = (node: any) => AsyncGenerator<TypedNode, z.ZodType, unknown>;
+type SchemaBuildFn = (node: AnyZodSchemaNode) => AsyncGenerator<TypedNode, z.ZodType, unknown>;
+
+interface ZodIntersectionNode extends ZodSchemaNodeBase {
+  kind: "zod/intersection";
+  left: AnyZodSchemaNode;
+  right: AnyZodSchemaNode;
+}
 
 /** Create intersection interpreter handlers with access to the shared schema builder. */
 export function createIntersectionInterpreter(buildSchema: SchemaBuildFn): SchemaInterpreterMap {
   return {
-    "zod/intersection": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
-      const leftSchema = yield* buildSchema(node.left as any);
-      const rightSchema = yield* buildSchema(node.right as any);
+    "zod/intersection": async function* (
+      node: ZodIntersectionNode,
+    ): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+      const leftSchema = yield* buildSchema(node.left);
+      const rightSchema = yield* buildSchema(node.right);
       return z.intersection(leftSchema, rightSchema);
     },
   };

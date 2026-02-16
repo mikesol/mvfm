@@ -3,10 +3,24 @@ import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
 import { toZodError } from "./interpreter-utils";
-import type { CheckDescriptor, ErrorConfig, RefinementDescriptor } from "./types";
+import type {
+  AnyZodSchemaNode,
+  CheckDescriptor,
+  ErrorConfig,
+  RefinementDescriptor,
+  ZodSchemaNodeBase,
+} from "./types";
+import { zodLooseRecord, zodPartialRecord } from "./zod-compat";
 
 /** Record mode: strict (exhaustive), partial (non-exhaustive), or loose (pass-through). */
 export type RecordMode = "strict" | "partial" | "loose";
+
+interface ZodRecordNode extends ZodSchemaNodeBase {
+  kind: "zod/record";
+  key: AnyZodSchemaNode;
+  value: AnyZodSchemaNode;
+  mode?: RecordMode;
+}
 
 /**
  * Builder for Zod record schemas.
@@ -124,22 +138,24 @@ export function recordNamespace(
  * interpreter's buildSchemaGen. This is passed in at registration time
  * to avoid circular imports.
  */
-type SchemaBuildFn = (node: any) => AsyncGenerator<TypedNode, z.ZodType, unknown>;
+type SchemaBuildFn = (node: AnyZodSchemaNode) => AsyncGenerator<TypedNode, z.ZodType, unknown>;
 
 /** Create record interpreter handlers with access to the shared schema builder. */
 export function createRecordInterpreter(buildSchema: SchemaBuildFn): SchemaInterpreterMap {
   return {
-    "zod/record": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
-      const keySchema = yield* buildSchema(node.key as any);
-      const valueSchema = yield* buildSchema(node.value as any);
-      const mode = (node.mode as string) ?? "strict";
+    "zod/record": async function* (
+      node: ZodRecordNode,
+    ): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+      const keySchema = yield* buildSchema(node.key);
+      const valueSchema = yield* buildSchema(node.value);
+      const mode = node.mode ?? "strict";
       const errorFn = toZodError(node.error as ErrorConfig | undefined);
       const errOpt = errorFn ? { error: errorFn } : {};
       switch (mode) {
         case "partial":
-          return (z as any).partialRecord(keySchema, valueSchema, errOpt);
+          return zodPartialRecord(keySchema, valueSchema, errOpt);
         case "loose":
-          return (z as any).looseRecord(keySchema, valueSchema, errOpt);
+          return zodLooseRecord(keySchema, valueSchema, errOpt);
         default:
           return z.record(keySchema as z.ZodString, valueSchema, errOpt);
       }

@@ -3,7 +3,22 @@ import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
 import { toZodError } from "./interpreter-utils";
-import type { CheckDescriptor, ErrorConfig, RefinementDescriptor } from "./types";
+import type {
+  CheckDescriptor,
+  ErrorConfig,
+  RefinementDescriptor,
+  ZodSchemaNodeBase,
+} from "./types";
+
+interface ZodEnumNode extends ZodSchemaNodeBase {
+  kind: "zod/enum";
+  values: [string, ...string[]];
+}
+
+interface ZodNativeEnumNode extends ZodSchemaNodeBase {
+  kind: "zod/native_enum";
+  entries: Record<string, string | number>;
+}
 
 /**
  * Builder for Zod enum schemas.
@@ -143,7 +158,7 @@ export function enumNamespace(
 /** Interpreter handlers for enum schema nodes. */
 export const enumInterpreter: SchemaInterpreterMap = {
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/enum": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/enum": async function* (node: ZodEnumNode): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     const values = node.values as [string, ...string[]];
     const errorFn = toZodError(node.error as ErrorConfig | undefined);
     const errOpt = errorFn ? { error: errorFn } : {};
@@ -151,7 +166,9 @@ export const enumInterpreter: SchemaInterpreterMap = {
   },
 
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/native_enum": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/native_enum": async function* (
+    node: ZodNativeEnumNode,
+  ): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     const entries = node.entries as Record<string, string | number>;
     const errorFn = toZodError(node.error as ErrorConfig | undefined);
     const errOpt = errorFn ? { error: errorFn } : {};

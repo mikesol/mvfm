@@ -2,7 +2,29 @@ import type { Expr, PluginContext, TypedNode } from "@mvfm/core";
 import { z } from "zod";
 import { ZodSchemaBuilder, ZodWrappedBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
-import type { CheckDescriptor, ErrorConfig, RefinementDescriptor, WrapperASTNode } from "./types";
+import type {
+  CheckDescriptor,
+  ErrorConfig,
+  RefinementDescriptor,
+  WrapperASTNode,
+  ZodSchemaNodeBase,
+} from "./types";
+
+interface ZodAnyNode extends ZodSchemaNodeBase {
+  kind: "zod/any";
+}
+
+interface ZodUnknownNode extends ZodSchemaNodeBase {
+  kind: "zod/unknown";
+}
+
+interface ZodNeverNode extends ZodSchemaNodeBase {
+  kind: "zod/never";
+}
+
+interface ZodCustomNode extends ZodSchemaNodeBase {
+  kind: "zod/custom";
+}
 
 /**
  * Builder for simple Zod schema types with no type-specific methods.
@@ -136,19 +158,25 @@ export function specialNamespace(
 /** Interpreter handlers for special schema nodes. */
 export const specialInterpreter: SchemaInterpreterMap = {
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/any": async function* (_node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/any": async function* (_node: ZodAnyNode): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     return z.any();
   },
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/unknown": async function* (_node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/unknown": async function* (
+    _node: ZodUnknownNode,
+  ): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     return z.unknown();
   },
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/never": async function* (_node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/never": async function* (
+    _node: ZodNeverNode,
+  ): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     return z.never();
   },
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/custom": async function* (_node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/custom": async function* (
+    _node: ZodCustomNode,
+  ): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     // Custom predicate is an AST lambda — evaluated post-validation via refinements
     // For the Zod schema, use z.any() as base and let refinements handle the predicate
     return z.any();

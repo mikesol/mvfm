@@ -4,12 +4,15 @@ import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
 import { toZodError } from "./interpreter-utils";
 import type {
+  AnyZodSchemaNode,
   CheckDescriptor,
   ErrorConfig,
   RefinementDescriptor,
   SchemaASTNode,
   WrapperASTNode,
+  ZodSchemaNodeBase,
 } from "./types";
+import { zodXor } from "./zod-compat";
 
 /**
  * Builder for Zod union and exclusive-or (xor) schemas.
@@ -108,13 +111,25 @@ export function unionNamespace(
  * interpreter's buildSchemaGen. This is passed in at registration time
  * to avoid circular imports.
  */
-type SchemaBuildFn = (node: any) => AsyncGenerator<TypedNode, z.ZodType, unknown>;
+type SchemaBuildFn = (node: AnyZodSchemaNode) => AsyncGenerator<TypedNode, z.ZodType, unknown>;
+
+interface ZodUnionNode extends ZodSchemaNodeBase {
+  kind: "zod/union";
+  options?: AnyZodSchemaNode[];
+}
+
+interface ZodXorNode extends ZodSchemaNodeBase {
+  kind: "zod/xor";
+  options?: AnyZodSchemaNode[];
+}
 
 /** Create union interpreter handlers with access to the shared schema builder. */
 export function createUnionInterpreter(buildSchema: SchemaBuildFn): SchemaInterpreterMap {
   return {
-    "zod/union": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
-      const optionNodes = (node.options as any[]) ?? [];
+    "zod/union": async function* (
+      node: ZodUnionNode,
+    ): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+      const optionNodes = node.options ?? [];
       const errorFn = toZodError(node.error as ErrorConfig | undefined);
       const errOpt = errorFn ? { error: errorFn } : {};
       const builtOptions: z.ZodType[] = [];
@@ -124,15 +139,15 @@ export function createUnionInterpreter(buildSchema: SchemaBuildFn): SchemaInterp
       return z.union(builtOptions as [z.ZodType, z.ZodType, ...z.ZodType[]], errOpt);
     },
 
-    "zod/xor": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
-      const optionNodes = (node.options as any[]) ?? [];
+    "zod/xor": async function* (node: ZodXorNode): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+      const optionNodes = node.options ?? [];
       const errorFn = toZodError(node.error as ErrorConfig | undefined);
       const errOpt = errorFn ? { error: errorFn } : {};
       const builtOptions: z.ZodType[] = [];
       for (const optNode of optionNodes) {
         builtOptions.push(yield* buildSchema(optNode));
       }
-      return (z as any).xor(builtOptions as [z.ZodType, z.ZodType, ...z.ZodType[]], errOpt);
+      return zodXor(builtOptions as [z.ZodType, z.ZodType, ...z.ZodType[]], errOpt);
     },
   };
 }

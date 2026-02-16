@@ -93,3 +93,33 @@ export interface ValidationASTNode extends TypedNode {
   /** Optional per-parse error config */
   parseError?: ErrorConfig;
 }
+
+/**
+ * Shared schema node base used by zod interpreter handlers.
+ */
+export interface ZodSchemaNodeBase extends TypedNode {
+  /** Schema kind (e.g. `"zod/string"`). */
+  kind: string;
+  /** Optional check descriptors carried by this node. */
+  checks?: CheckDescriptor[];
+  /** Optional refinement descriptors carried by this node. */
+  refinements?: RefinementDescriptor[];
+  /** Optional schema-level error config. */
+  error?: ErrorConfig;
+  /** Additional kind-specific payload. */
+  [key: string]: unknown;
+}
+
+/**
+ * Lambda AST shape used by preprocess/transform/refinement helpers.
+ */
+export interface ZodLambdaNode extends TypedNode {
+  kind: "core/lambda";
+  param: { __id: number; name?: string };
+  body: TypedNode;
+}
+
+/**
+ * Union of schema nodes accepted by the zod interpreter.
+ */
+export type AnyZodSchemaNode = ZodSchemaNodeBase;

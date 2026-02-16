@@ -3,7 +3,18 @@ import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
 import { checkErrorOpt, toZodError } from "./interpreter-utils";
-import type { CheckDescriptor, ErrorConfig, RefinementDescriptor } from "./types";
+import type {
+  AnyZodSchemaNode,
+  CheckDescriptor,
+  ErrorConfig,
+  RefinementDescriptor,
+  ZodSchemaNodeBase,
+} from "./types";
+
+interface ZodArrayNode extends ZodSchemaNodeBase {
+  kind: "zod/array";
+  element: AnyZodSchemaNode;
+}
 
 /**
  * Builder for Zod array schemas.
@@ -125,14 +136,15 @@ function applyArrayChecks(schema: z.ZodArray, checks: CheckDescriptor[]): z.ZodA
  * interpreter's buildSchemaGen. This is passed in at registration time
  * to avoid circular imports.
  */
-type SchemaBuildFn = (node: any) => AsyncGenerator<TypedNode, z.ZodType, unknown>;
+type SchemaBuildFn = (node: AnyZodSchemaNode) => AsyncGenerator<TypedNode, z.ZodType, unknown>;
 
 /** Create array interpreter handlers with access to the shared schema builder. */
 export function createArrayInterpreter(buildSchema: SchemaBuildFn): SchemaInterpreterMap {
   return {
-    "zod/array": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
-      const elementNode = node.element as any;
-      const elementSchema = yield* buildSchema(elementNode);
+    "zod/array": async function* (
+      node: ZodArrayNode,
+    ): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+      const elementSchema = yield* buildSchema(node.element);
       const checks = (node.checks as CheckDescriptor[]) ?? [];
       const errorFn = toZodError(node.error as ErrorConfig | undefined);
       const errOpt = errorFn ? { error: errorFn } : {};

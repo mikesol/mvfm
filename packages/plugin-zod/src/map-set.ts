@@ -3,7 +3,24 @@ import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
 import { checkErrorOpt, toZodError } from "./interpreter-utils";
-import type { CheckDescriptor, ErrorConfig, RefinementDescriptor } from "./types";
+import type {
+  AnyZodSchemaNode,
+  CheckDescriptor,
+  ErrorConfig,
+  RefinementDescriptor,
+  ZodSchemaNodeBase,
+} from "./types";
+
+interface ZodMapNode extends ZodSchemaNodeBase {
+  kind: "zod/map";
+  key: AnyZodSchemaNode;
+  value: AnyZodSchemaNode;
+}
+
+interface ZodSetNode extends ZodSchemaNodeBase {
+  kind: "zod/set";
+  value: AnyZodSchemaNode;
+}
 
 /**
  * Builder for Zod map schemas.
@@ -146,21 +163,21 @@ export function mapSetNamespace(
  * interpreter's buildSchemaGen. This is passed in at registration time
  * to avoid circular imports.
  */
-type SchemaBuildFn = (node: any) => AsyncGenerator<TypedNode, z.ZodType, unknown>;
+type SchemaBuildFn = (node: AnyZodSchemaNode) => AsyncGenerator<TypedNode, z.ZodType, unknown>;
 
 /** Create map/set interpreter handlers with access to the shared schema builder. */
 export function createMapSetInterpreter(buildSchema: SchemaBuildFn): SchemaInterpreterMap {
   return {
-    "zod/map": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
-      const keySchema = yield* buildSchema(node.key as any);
-      const valueSchema = yield* buildSchema(node.value as any);
+    "zod/map": async function* (node: ZodMapNode): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+      const keySchema = yield* buildSchema(node.key);
+      const valueSchema = yield* buildSchema(node.value);
       const errorFn = toZodError(node.error as ErrorConfig | undefined);
       const errOpt = errorFn ? { error: errorFn } : {};
       return z.map(keySchema as z.ZodString, valueSchema, errOpt);
     },
 
-    "zod/set": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
-      const valueSchema = yield* buildSchema(node.value as any);
+    "zod/set": async function* (node: ZodSetNode): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+      const valueSchema = yield* buildSchema(node.value);
       const checks = (node.checks as CheckDescriptor[]) ?? [];
       const errorFn = toZodError(node.error as ErrorConfig | undefined);
       const errOpt = errorFn ? { error: errorFn } : {};

@@ -2,10 +2,6 @@ import type { TypedNode } from "@mvfm/core";
 import type { z } from "zod";
 import type { CheckDescriptor, ErrorConfig } from "./types";
 
-/**
- * Handler function type for schema interpreter dispatch.
- * Each schema module exports a map of `{ [nodeKind]: handler }`.
- */
 export type SchemaInterpreterMap = Record<
   string,
   (node: any) => AsyncGenerator<TypedNode, z.ZodType, unknown>

@@ -3,7 +3,32 @@ import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
 import { toZodError } from "./interpreter-utils";
-import type { CheckDescriptor, ErrorConfig, RefinementDescriptor } from "./types";
+import type {
+  CheckDescriptor,
+  ErrorConfig,
+  RefinementDescriptor,
+  ZodSchemaNodeBase,
+} from "./types";
+
+interface ZodBooleanNode extends ZodSchemaNodeBase {
+  kind: "zod/boolean";
+}
+
+interface ZodNullNode extends ZodSchemaNodeBase {
+  kind: "zod/null";
+}
+
+interface ZodUndefinedNode extends ZodSchemaNodeBase {
+  kind: "zod/undefined";
+}
+
+interface ZodVoidNode extends ZodSchemaNodeBase {
+  kind: "zod/void";
+}
+
+interface ZodSymbolNode extends ZodSchemaNodeBase {
+  kind: "zod/symbol";
+}
 
 /**
  * Builder for simple Zod primitive schemas with no type-specific methods.
@@ -101,24 +126,30 @@ export function primitivesNamespace(
 /** Interpreter handlers for primitive schema nodes. */
 export const primitivesInterpreter: SchemaInterpreterMap = {
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/boolean": async function* (node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/boolean": async function* (
+    node: ZodBooleanNode,
+  ): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     const errorFn = toZodError(node.error as ErrorConfig | undefined);
     return errorFn ? z.boolean({ error: errorFn }) : z.boolean();
   },
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/null": async function* (_node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/null": async function* (_node: ZodNullNode): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     return z.null();
   },
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/undefined": async function* (_node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/undefined": async function* (
+    _node: ZodUndefinedNode,
+  ): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     return z.undefined();
   },
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/void": async function* (_node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/void": async function* (_node: ZodVoidNode): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     return z.void();
   },
   // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/symbol": async function* (_node: any): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/symbol": async function* (
+    _node: ZodSymbolNode,
+  ): AsyncGenerator<TypedNode, z.ZodType, unknown> {
     return z.symbol();
   },
 };
