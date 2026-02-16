@@ -1937,7 +1937,20 @@
               "excerptTokens": [
                 {
                   "kind": "Content",
-                  "text": "seq(...exprs: "
+                  "text": "seq(first: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Expr",
+                  "canonicalReference": "@mvfm/core!Expr:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<any> | any"
+                },
+                {
+                  "kind": "Content",
+                  "text": ", ...rest: "
                 },
                 {
                   "kind": "Content",
@@ -1972,17 +1985,25 @@
               ],
               "isOptional": false,
               "returnTypeTokenRange": {
-                "startIndex": 5,
-                "endIndex": 7
+                "startIndex": 8,
+                "endIndex": 10
               },
               "releaseTag": "Public",
               "overloadIndex": 1,
               "parameters": [
                 {
-                  "parameterName": "exprs",
+                  "parameterName": "first",
                   "parameterTypeTokenRange": {
                     "startIndex": 1,
-                    "endIndex": 4
+                    "endIndex": 3
+                  },
+                  "isOptional": false
+                },
+                {
+                  "parameterName": "rest",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 4,
+                    "endIndex": 7
                   },
                   "isOptional": false
                 }

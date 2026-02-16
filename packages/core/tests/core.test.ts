@@ -38,6 +38,15 @@ describe("core: $.begin()", () => {
     expect(ast.result.steps).toHaveLength(0);
     expect(ast.result.result.kind).toBe("num/add");
   });
+
+  it("rejects zero arguments at the type level", () => {
+    expect(() =>
+      app(($) => {
+        // @ts-expect-error — $.begin() requires at least one expression
+        return $.begin();
+      }),
+    ).toThrow();
+  });
 });
 
 describe("core: $.cond()", () => {

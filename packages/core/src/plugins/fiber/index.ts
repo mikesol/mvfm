@@ -76,7 +76,7 @@ export interface FiberMethods {
    * )
    * ```
    */
-  seq(...exprs: (Expr<any> | any)[]): Expr<any>;
+  seq(first: Expr<any> | any, ...rest: (Expr<any> | any)[]): Expr<any>;
 
   /**
    * Run expressions concurrently, return the first to complete.
@@ -185,7 +185,8 @@ export const fiber: PluginDefinition<FiberMethods> = {
     return {
       par: parFn,
 
-      seq(...exprs: (Expr<any> | any)[]) {
+      seq(first: Expr<any> | any, ...rest: (Expr<any> | any)[]) {
+        const exprs = [first, ...rest];
         const nodes = exprs.map((e) => (ctx.isExpr(e) ? e.__node : ctx.lift(e).__node));
         const steps = nodes.slice(0, -1);
         const result = nodes[nodes.length - 1];

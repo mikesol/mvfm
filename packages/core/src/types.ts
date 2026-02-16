@@ -273,7 +273,7 @@ export interface CoreDollar<I = never> {
    *     user   // ← returned
    *   )
    */
-  begin(...exprs: (Expr<any> | any)[]): Expr<any>;
+  begin(first: Expr<any> | any, ...rest: (Expr<any> | any)[]): Expr<any>;
 
   /**
    * Recursion via Y combinator. The callback receives `self`

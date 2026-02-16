@@ -118,7 +118,8 @@ export function mvfm<const P extends readonly PluginInput[]>(...plugins: P) {
         };
       },
 
-      begin(...exprs: (Expr<any> | any)[]) {
+      begin(first: Expr<any> | any, ...rest: (Expr<any> | any)[]) {
+        const exprs = [first, ...rest];
         const nodes = exprs.map((e) => (isExpr(e) ? e.__node : autoLift(e, ctx.expr).__node));
         const steps = nodes.slice(0, -1);
         const result = nodes[nodes.length - 1];
