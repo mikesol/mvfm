@@ -1,8 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { mvfm } from "../src/core";
+import { checkCompleteness, foldAST } from "../src/fold";
 import { injectInput } from "../src/inject";
+import { coreInterpreter } from "../src/interpreters/core";
+import { num } from "../src/plugins/num";
+import { numInterpreter } from "../src/plugins/num/interpreter";
+import { semiring } from "../src/plugins/semiring";
 
 const app = mvfm();
+const mathApp = mvfm(num, semiring);
+const combined = { ...coreInterpreter, ...numInterpreter };
 
 describe("injectInput", () => {
   it("returns a Program with __inputData injected into core/input nodes", () => {
@@ -53,5 +60,33 @@ describe("injectInput", () => {
     expect(injected.hash).toBe(prog.hash);
     expect(injected.plugins).toEqual(prog.plugins);
     expect(injected.inputSchema).toEqual(prog.inputSchema);
+  });
+});
+
+describe("foldAST with Program", () => {
+  it("accepts a Program directly (no input)", async () => {
+    const prog = mathApp(($) => $.add(3, 4));
+    const result = await foldAST(combined, prog);
+    expect(result).toBe(7);
+  });
+
+  it("accepts an injected Program (with input)", async () => {
+    const prog = mathApp({ x: "number", y: "number" }, ($) => $.add($.input.x, $.input.y));
+    const injected = injectInput(prog, { x: 10, y: 20 });
+    const result = await foldAST(combined, injected);
+    expect(result).toBe(30);
+  });
+});
+
+describe("checkCompleteness with Program", () => {
+  it("accepts a Program directly", () => {
+    const prog = mathApp(($) => $.add(1, 2));
+    expect(() => checkCompleteness(combined, prog)).not.toThrow();
+  });
+
+  it("throws for missing interpreters with Program", () => {
+    const prog = mathApp(($) => $.add(1, 2));
+    const incomplete = { "core/program": coreInterpreter["core/program"] };
+    expect(() => checkCompleteness(incomplete, prog)).toThrow("Missing interpreters for");
   });
 });

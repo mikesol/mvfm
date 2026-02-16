@@ -2,6 +2,8 @@
 // Stack-safe async fold with memoization and taint tracking
 // ============================================================
 
+import type { Program } from "./types";
+
 /**
  * Base type for AST nodes in the interpreter. Carries a phantom type
  * parameter `T` tracking the runtime value type. No index signature —
@@ -73,11 +75,14 @@ export function createFoldState(): FoldState {
   return { cache: new WeakMap(), tainted: new WeakSet() };
 }
 
-/**
- * Walk an AST to verify all node kinds have handlers.
- * Throws before evaluation if any are missing.
- */
-export function checkCompleteness(interpreter: Interpreter, root: TypedNode): void {
+/** Walk an AST to verify all node kinds have handlers. Throws if any are missing. */
+export function checkCompleteness(interpreter: Interpreter, program: Program): void;
+export function checkCompleteness(interpreter: Interpreter, root: TypedNode): void;
+export function checkCompleteness(interpreter: Interpreter, rootOrProgram: TypedNode | Program): void {
+  const root =
+    "ast" in rootOrProgram && "hash" in rootOrProgram
+      ? (rootOrProgram as Program).ast.result
+      : (rootOrProgram as TypedNode);
   const visited = new WeakSet<TypedNode>();
   const missing = new Set<string>();
   const queue: TypedNode[] = [root];
@@ -116,11 +121,17 @@ type Frame = {
 };
 
 /** Stack-safe async fold with memoization and taint tracking. */
+export async function foldAST(interpreter: Interpreter, program: Program, state?: FoldState): Promise<unknown>;
+export async function foldAST(interpreter: Interpreter, root: TypedNode, state?: FoldState): Promise<unknown>;
 export async function foldAST(
   interpreter: Interpreter,
-  root: TypedNode,
+  rootOrProgram: TypedNode | Program,
   state?: FoldState,
 ): Promise<unknown> {
+  const root =
+    "ast" in rootOrProgram && "hash" in rootOrProgram
+      ? (rootOrProgram as Program).ast.result
+      : (rootOrProgram as TypedNode);
   const { cache, tainted } = state ?? createFoldState();
   const stack: Frame[] = [];
   const scopeStack: Array<Map<number, unknown>> = [];
