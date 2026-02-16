@@ -210,10 +210,10 @@ export const monoid: PluginDefinition<TypeclassSlot<"monoid">>;
 export interface MonoidFor<_T> {
 }
 
-// @public
-export function mvfm<P extends PluginDefinition<any, any>[]>(...plugins: P): {
-    <S extends SchemaShape>(schema: S, fn: ($: CoreDollar<InferSchema<S>> & MergePlugins<P>) => Expr<any> | any): Program;
-    <I = never>(fn: ($: CoreDollar<I> & MergePlugins<P>) => Expr<any> | any): Program;
+// @public (undocumented)
+export function mvfm<const P extends readonly PluginInput[]>(...plugins: P): {
+    <S extends SchemaShape>(schema: S, fn: ($: CoreDollar<InferSchema<S>> & MergePlugins<FlattenPluginInputs<P>>) => Expr<any> | any): Program;
+    <I = never>(fn: ($: CoreDollar<I> & MergePlugins<FlattenPluginInputs<P>>) => Expr<any> | any): Program;
 };
 
 // @public
@@ -306,6 +306,30 @@ export interface PluginDefinition<T = any, Traits extends Record<string, unknown
         bounded?: TraitImpl;
     };
 }
+
+// @public
+export type PluginInput = Plugin_2 | readonly PluginInput[];
+
+// Warning: (ae-incompatible-release-tags) The symbol "prelude" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
+//
+// @public
+export const prelude: readonly [PluginDefinition<NumMethods, {
+eq: number;
+ord: number;
+semiring: number;
+show: number;
+bounded: number;
+}>, PluginDefinition<StrMethods, {
+eq: string;
+show: string;
+semigroup: string;
+monoid: string;
+}>, PluginDefinition<TypeclassSlot<"semiring">, {}>, PluginDefinition<TypeclassSlot<"eq">, {}>, PluginDefinition<TypeclassSlot<"ord">, {}>, PluginDefinition<TypeclassSlot<"show">, {}>, PluginDefinition<BooleanMethods, {
+eq: boolean;
+show: boolean;
+heytingAlgebra: boolean;
+bounded: boolean;
+}>, PluginDefinition<TypeclassSlot<"bounded">, {}>, PluginDefinition<TypeclassSlot<"heytingAlgebra">, {}>, PluginDefinition<TypeclassSlot<"semigroup">, {}>, PluginDefinition<TypeclassSlot<"monoid">, {}>];
 
 // @public
 export interface Program {
@@ -483,8 +507,9 @@ export interface TypeclassSlot<Name extends string> {
 
 // Warnings were encountered during analysis:
 //
-// dist/core.d.ts:419:5 - (ae-forgotten-export) The symbol "CoreDollar" needs to be exported by the entry point index.d.ts
-// dist/core.d.ts:419:5 - (ae-forgotten-export) The symbol "MergePlugins" needs to be exported by the entry point index.d.ts
+// dist/core.d.ts:424:5 - (ae-forgotten-export) The symbol "CoreDollar" needs to be exported by the entry point index.d.ts
+// dist/core.d.ts:424:5 - (ae-forgotten-export) The symbol "MergePlugins" needs to be exported by the entry point index.d.ts
+// dist/core.d.ts:424:5 - (ae-forgotten-export) The symbol "FlattenPluginInputs" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

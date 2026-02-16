@@ -532,6 +532,18 @@ const program = app(($) => {
 
 Notice the difference: `num` and `str` are passed directly (they are already `PluginDefinition` values). `stripe({ apiKey: "..." })` is called first to produce a `PluginDefinition`. Both end up as the same type by the time `mvfm()` sees them.
 
+`mvfm()` also accepts grouped plugin collections (including nested tuples/arrays). This is useful for reusable bundles:
+
+```ts
+import { mvfm, prelude } from "mvfm";
+
+const appA = mvfm(prelude);      // pass group as one argument
+const appB = mvfm(...prelude);   // spread group
+
+const dbStack = [prelude, [fiber, error], postgres("postgres://localhost/test")] as const;
+const appC = mvfm(dbStack);      // arbitrarily nested groups
+```
+
 ---
 
 ## Step 3: Interpreter Fragment

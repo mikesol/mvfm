@@ -11,6 +11,7 @@ export type {
   Plugin,
   PluginContext,
   PluginDefinition,
+  PluginInput,
   Program,
   RecurseFn,
   Step,
@@ -68,6 +69,7 @@ export { st } from "./plugins/st";
 export type { StrMethods } from "./plugins/str";
 export { str } from "./plugins/str";
 export { strInterpreter } from "./plugins/str/interpreter";
+export { prelude } from "./prelude";
 export type {
   ArraySchema,
   InferSchema,
