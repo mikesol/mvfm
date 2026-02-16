@@ -36,9 +36,16 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
 // ============================================================
 
 describe("anthropic interpreter: create_message", () => {
-  it("throws when ANTHROPIC_API_KEY is missing", () => {
+  it("throws when ANTHROPIC_API_KEY is missing", async () => {
     vi.stubEnv("ANTHROPIC_API_KEY", "");
-    expect(() => anthropicInterpreter["anthropic/create_message"]).toThrow(/ANTHROPIC_API_KEY/);
+    const prog = app(($) =>
+      $.anthropic.messages.create({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1,
+      }),
+    );
+    const combined = { ...anthropicInterpreter, ...coreInterpreter };
+    await expect(foldAST(combined, prog.ast.result)).rejects.toThrow(/ANTHROPIC_API_KEY/);
     vi.unstubAllEnvs();
   });
 

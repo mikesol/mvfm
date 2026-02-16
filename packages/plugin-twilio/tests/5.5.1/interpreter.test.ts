@@ -7,17 +7,25 @@ import { createTwilioInterpreter, type TwilioClient } from "../../src/5.5.1/inte
 const app = mvfm(num, str, twilio({ accountSid: "AC_test_123", authToken: "auth_test_456" }));
 
 describe("twilio interpreter: default export", () => {
-  it("throws when TWILIO_ACCOUNT_SID is missing", () => {
+  it("throws when TWILIO_ACCOUNT_SID is missing", async () => {
     vi.stubEnv("TWILIO_ACCOUNT_SID", "");
     vi.stubEnv("TWILIO_AUTH_TOKEN", "auth_test_default");
-    expect(() => twilioInterpreter["twilio/create_message"]).toThrow(/TWILIO_ACCOUNT_SID/);
+    const prog = app(($) =>
+      $.twilio.messages.create({ to: "+15551234567", from: "+15559876543", body: "Hello" }),
+    );
+    const combined = Object.assign(Object.create(twilioInterpreter), coreInterpreter);
+    await expect(foldAST(combined, prog.ast.result)).rejects.toThrow(/TWILIO_ACCOUNT_SID/);
     vi.unstubAllEnvs();
   });
 
-  it("throws when TWILIO_AUTH_TOKEN is missing", () => {
+  it("throws when TWILIO_AUTH_TOKEN is missing", async () => {
     vi.stubEnv("TWILIO_ACCOUNT_SID", "AC_test_default");
     vi.stubEnv("TWILIO_AUTH_TOKEN", "");
-    expect(() => twilioInterpreter["twilio/create_message"]).toThrow(/TWILIO_AUTH_TOKEN/);
+    const prog = app(($) =>
+      $.twilio.messages.create({ to: "+15551234567", from: "+15559876543", body: "Hello" }),
+    );
+    const combined = Object.assign(Object.create(twilioInterpreter), coreInterpreter);
+    await expect(foldAST(combined, prog.ast.result)).rejects.toThrow(/TWILIO_AUTH_TOKEN/);
     vi.unstubAllEnvs();
   });
 

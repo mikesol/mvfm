@@ -7,9 +7,11 @@ import { createStripeInterpreter, type StripeClient } from "../../src/2025-04-30
 const app = mvfm(num, str, stripe({ apiKey: "sk_test_123" }));
 
 describe("stripe interpreter: default export", () => {
-  it("throws when STRIPE_API_KEY is missing", () => {
+  it("throws when STRIPE_API_KEY is missing", async () => {
     vi.stubEnv("STRIPE_API_KEY", "");
-    expect(() => stripeInterpreter["stripe/create_payment_intent"]).toThrow(/STRIPE_API_KEY/);
+    const prog = app(($) => $.stripe.paymentIntents.create({ amount: 2000, currency: "usd" }));
+    const combined = { ...stripeInterpreter, ...coreInterpreter };
+    await expect(foldAST(combined, prog.ast.result)).rejects.toThrow(/STRIPE_API_KEY/);
     vi.unstubAllEnvs();
   });
 

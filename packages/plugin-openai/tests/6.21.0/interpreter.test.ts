@@ -36,9 +36,16 @@ async function run(prog: { ast: any }, input: Record<string, unknown> = {}) {
 // ============================================================
 
 describe("openai interpreter: create_chat_completion", () => {
-  it("throws when OPENAI_API_KEY is missing", () => {
+  it("throws when OPENAI_API_KEY is missing", async () => {
     vi.stubEnv("OPENAI_API_KEY", "");
-    expect(() => openaiInterpreter["openai/create_chat_completion"]).toThrow(/OPENAI_API_KEY/);
+    const prog = app(($) =>
+      $.openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [{ role: "user", content: "Hello" }],
+      }),
+    );
+    const combined = { ...openaiInterpreter, ...coreInterpreter };
+    await expect(foldAST(combined, prog.ast.result)).rejects.toThrow(/OPENAI_API_KEY/);
     vi.unstubAllEnvs();
   });
 

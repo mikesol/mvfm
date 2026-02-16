@@ -1,6 +1,5 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
 import { eval_ } from "@mvfm/core";
-import OpenAI from "openai";
 import { wrapOpenAISdk } from "./client-openai-sdk";
 
 /**
@@ -83,6 +82,8 @@ function requiredEnv(name: "OPENAI_API_KEY"): string {
   return value;
 }
 
+const dynamicImport = new Function("m", "return import(m)") as (moduleName: string) => Promise<any>;
+
 function lazyInterpreter(factory: () => Interpreter): Interpreter {
   let cached: Interpreter | undefined;
   const get = () => (cached ??= factory());
@@ -110,10 +111,33 @@ function lazyInterpreter(factory: () => Interpreter): Interpreter {
  */
 export const openaiInterpreter: Interpreter = lazyInterpreter(() =>
   createOpenAIInterpreter(
-    wrapOpenAISdk(
-      new OpenAI({
-        apiKey: requiredEnv("OPENAI_API_KEY"),
-      }),
-    ),
+    (() => {
+      let clientPromise: Promise<OpenAIClient> | undefined;
+      const getClient = async (): Promise<OpenAIClient> => {
+        if (!clientPromise) {
+          const apiKey = requiredEnv("OPENAI_API_KEY");
+          clientPromise = dynamicImport("openai").then((moduleValue) => {
+            const OpenAI = moduleValue.default;
+            return wrapOpenAISdk(
+              new OpenAI({
+                apiKey,
+              }),
+            );
+          });
+        }
+        return clientPromise;
+      };
+
+      return {
+        async request(
+          method: string,
+          path: string,
+          body?: Record<string, unknown>,
+        ): Promise<unknown> {
+          const client = await getClient();
+          return client.request(method, path, body);
+        },
+      } satisfies OpenAIClient;
+    })(),
   ),
 );

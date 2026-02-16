@@ -1,6 +1,5 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
 import { eval_ } from "@mvfm/core";
-import { Resend } from "resend";
 import { wrapResendSdk } from "./client-resend-sdk";
 
 /**
@@ -78,6 +77,8 @@ function requiredEnv(name: "RESEND_API_KEY"): string {
   return value;
 }
 
+const dynamicImport = new Function("m", "return import(m)") as (moduleName: string) => Promise<any>;
+
 function lazyInterpreter(factory: () => Interpreter): Interpreter {
   let cached: Interpreter | undefined;
   const get = () => (cached ??= factory());
@@ -104,5 +105,26 @@ function lazyInterpreter(factory: () => Interpreter): Interpreter {
  * Default Resend interpreter that uses `RESEND_API_KEY`.
  */
 export const resendInterpreter: Interpreter = lazyInterpreter(() =>
-  createResendInterpreter(wrapResendSdk(new Resend(requiredEnv("RESEND_API_KEY")) as any)),
+  createResendInterpreter(
+    (() => {
+      let clientPromise: Promise<ResendClient> | undefined;
+      const getClient = async (): Promise<ResendClient> => {
+        if (!clientPromise) {
+          const apiKey = requiredEnv("RESEND_API_KEY");
+          clientPromise = dynamicImport("resend").then((moduleValue) => {
+            const Resend = moduleValue.Resend;
+            return wrapResendSdk(new Resend(apiKey) as any);
+          });
+        }
+        return clientPromise;
+      };
+
+      return {
+        async request(method: string, path: string, params?: unknown): Promise<unknown> {
+          const client = await getClient();
+          return client.request(method, path, params);
+        },
+      } satisfies ResendClient;
+    })(),
+  ),
 );

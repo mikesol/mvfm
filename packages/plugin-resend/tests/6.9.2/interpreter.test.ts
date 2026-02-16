@@ -7,9 +7,18 @@ import { createResendInterpreter, type ResendClient } from "../../src/6.9.2/inte
 const app = mvfm(num, str, resend({ apiKey: "re_test_123" }));
 
 describe("resend interpreter: default export", () => {
-  it("throws when RESEND_API_KEY is missing", () => {
+  it("throws when RESEND_API_KEY is missing", async () => {
     vi.stubEnv("RESEND_API_KEY", "");
-    expect(() => resendInterpreter["resend/send_email"]).toThrow(/RESEND_API_KEY/);
+    const prog = app(($) =>
+      $.resend.emails.send({
+        from: "a@b.com",
+        to: "c@d.com",
+        subject: "Hi",
+        html: "<p>Hello</p>",
+      }),
+    );
+    const combined = { ...resendInterpreter, ...coreInterpreter };
+    await expect(foldAST(combined, prog.ast.result)).rejects.toThrow(/RESEND_API_KEY/);
     vi.unstubAllEnvs();
   });
 

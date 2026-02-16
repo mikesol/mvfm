@@ -7,9 +7,11 @@ import { createSlackInterpreter, type SlackClient } from "../../src/7.14.0/inter
 const app = mvfm(num, str, slack({ token: "xoxb-test-token" }));
 
 describe("slack interpreter: default export", () => {
-  it("throws when SLACK_BOT_TOKEN is missing", () => {
+  it("throws when SLACK_BOT_TOKEN is missing", async () => {
     vi.stubEnv("SLACK_BOT_TOKEN", "");
-    expect(() => slackInterpreter["slack/chat_postMessage"]).toThrow(/SLACK_BOT_TOKEN/);
+    const prog = app(($) => $.slack.chat.postMessage({ channel: "#general", text: "Hello" }));
+    const combined = { ...slackInterpreter, ...coreInterpreter };
+    await expect(foldAST(combined, prog.ast.result)).rejects.toThrow(/SLACK_BOT_TOKEN/);
     vi.unstubAllEnvs();
   });
 

@@ -7,9 +7,11 @@ import { createFalInterpreter, type FalClient } from "../../src/1.9.1/interprete
 const app = mvfm(num, str, fal({ credentials: "key_test_123" }));
 
 describe("fal interpreter: default export", () => {
-  it("throws when FAL_KEY is missing", () => {
+  it("throws when FAL_KEY is missing", async () => {
     vi.stubEnv("FAL_KEY", "");
-    expect(() => falInterpreter["fal/run"]).toThrow(/FAL_KEY/);
+    const prog = app(($) => $.fal.run("fal-ai/flux/dev", { input: { prompt: "a cat" } }));
+    const combined = { ...falInterpreter, ...coreInterpreter };
+    await expect(foldAST(combined, prog.ast.result)).rejects.toThrow(/FAL_KEY/);
     vi.unstubAllEnvs();
   });
 

@@ -1,6 +1,5 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
 import { eval_ } from "@mvfm/core";
-import Stripe from "stripe";
 import { wrapStripeSdk } from "./client-stripe-sdk";
 
 /**
@@ -94,6 +93,8 @@ function requiredEnv(name: "STRIPE_API_KEY"): string {
   return value;
 }
 
+const dynamicImport = new Function("m", "return import(m)") as (moduleName: string) => Promise<any>;
+
 function lazyInterpreter(factory: () => Interpreter): Interpreter {
   let cached: Interpreter | undefined;
   const get = () => (cached ??= factory());
@@ -120,5 +121,30 @@ function lazyInterpreter(factory: () => Interpreter): Interpreter {
  * Default Stripe interpreter that uses `STRIPE_API_KEY`.
  */
 export const stripeInterpreter: Interpreter = lazyInterpreter(() =>
-  createStripeInterpreter(wrapStripeSdk(new Stripe(requiredEnv("STRIPE_API_KEY")))),
+  createStripeInterpreter(
+    (() => {
+      let clientPromise: Promise<StripeClient> | undefined;
+      const getClient = async (): Promise<StripeClient> => {
+        if (!clientPromise) {
+          const apiKey = requiredEnv("STRIPE_API_KEY");
+          clientPromise = dynamicImport("stripe").then((moduleValue) => {
+            const Stripe = moduleValue.default;
+            return wrapStripeSdk(new Stripe(apiKey));
+          });
+        }
+        return clientPromise;
+      };
+
+      return {
+        async request(
+          method: string,
+          path: string,
+          params?: Record<string, unknown>,
+        ): Promise<unknown> {
+          const client = await getClient();
+          return client.request(method, path, params);
+        },
+      } satisfies StripeClient;
+    })(),
+  ),
 );

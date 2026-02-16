@@ -1,4 +1,3 @@
-import Anthropic from "@anthropic-ai/sdk";
 import type { Interpreter, TypedNode } from "@mvfm/core";
 import { eval_ } from "@mvfm/core";
 import { wrapAnthropicSdk } from "./client-anthropic-sdk";
@@ -87,6 +86,8 @@ function requiredEnv(name: "ANTHROPIC_API_KEY"): string {
   return value;
 }
 
+const dynamicImport = new Function("m", "return import(m)") as (moduleName: string) => Promise<any>;
+
 function lazyInterpreter(factory: () => Interpreter): Interpreter {
   let cached: Interpreter | undefined;
   const get = () => (cached ??= factory());
@@ -114,10 +115,33 @@ function lazyInterpreter(factory: () => Interpreter): Interpreter {
  */
 export const anthropicInterpreter: Interpreter = lazyInterpreter(() =>
   createAnthropicInterpreter(
-    wrapAnthropicSdk(
-      new Anthropic({
-        apiKey: requiredEnv("ANTHROPIC_API_KEY"),
-      }),
-    ),
+    (() => {
+      let clientPromise: Promise<AnthropicClient> | undefined;
+      const getClient = async (): Promise<AnthropicClient> => {
+        if (!clientPromise) {
+          const apiKey = requiredEnv("ANTHROPIC_API_KEY");
+          clientPromise = dynamicImport("@anthropic-ai/sdk").then((moduleValue) => {
+            const Anthropic = moduleValue.default;
+            return wrapAnthropicSdk(
+              new Anthropic({
+                apiKey,
+              }),
+            );
+          });
+        }
+        return clientPromise;
+      };
+
+      return {
+        async request(
+          method: string,
+          path: string,
+          params?: Record<string, unknown>,
+        ): Promise<unknown> {
+          const client = await getClient();
+          return client.request(method, path, params);
+        },
+      } satisfies AnthropicClient;
+    })(),
   ),
 );

@@ -1,6 +1,5 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
 import { eval_ } from "@mvfm/core";
-import { WebClient } from "@slack/web-api";
 import { wrapSlackWebClient } from "./client-slack-web-api";
 
 /**
@@ -86,6 +85,8 @@ function requiredEnv(name: "SLACK_BOT_TOKEN"): string {
   return value;
 }
 
+const dynamicImport = new Function("m", "return import(m)") as (moduleName: string) => Promise<any>;
+
 function lazyInterpreter(factory: () => Interpreter): Interpreter {
   let cached: Interpreter | undefined;
   const get = () => (cached ??= factory());
@@ -112,5 +113,26 @@ function lazyInterpreter(factory: () => Interpreter): Interpreter {
  * Default Slack interpreter that uses `SLACK_BOT_TOKEN`.
  */
 export const slackInterpreter: Interpreter = lazyInterpreter(() =>
-  createSlackInterpreter(wrapSlackWebClient(new WebClient(requiredEnv("SLACK_BOT_TOKEN")))),
+  createSlackInterpreter(
+    (() => {
+      let clientPromise: Promise<SlackClient> | undefined;
+      const getClient = async (): Promise<SlackClient> => {
+        if (!clientPromise) {
+          const token = requiredEnv("SLACK_BOT_TOKEN");
+          clientPromise = dynamicImport("@slack/web-api").then((moduleValue) => {
+            const WebClient = moduleValue.WebClient;
+            return wrapSlackWebClient(new WebClient(token));
+          });
+        }
+        return clientPromise;
+      };
+
+      return {
+        async apiCall(method: string, params?: Record<string, unknown>): Promise<unknown> {
+          const client = await getClient();
+          return client.apiCall(method, params);
+        },
+      } satisfies SlackClient;
+    })(),
+  ),
 );
