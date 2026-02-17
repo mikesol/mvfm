@@ -1,6 +1,7 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
-import { eval_ } from "@mvfm/core";
+import { eval_, typedInterpreter } from "@mvfm/core";
 import { wrapSlackWebClient } from "./client-slack-web-api";
+import type { SLACK_NODE_KINDS } from "./node-kinds";
 
 /**
  * Abstract Slack client interface consumed by the slack handler.
@@ -48,9 +49,68 @@ const NODE_TO_METHOD: Record<string, string> = {
   "slack/files_delete": "files.delete",
 };
 
-interface SlackNode extends TypedNode<unknown> {
-  kind: string;
-  params?: TypedNode<Record<string, unknown>>;
+type SlackKind = (typeof SLACK_NODE_KINDS)[number];
+
+interface SlackNode<K extends SlackKind = SlackKind> extends TypedNode<unknown> {
+  kind: K;
+  params?: TypedNode<Record<string, unknown>> | null;
+  config: { token: string };
+}
+
+export interface SlackChatPostMessageNode extends SlackNode<"slack/chat_postMessage"> {}
+export interface SlackChatUpdateNode extends SlackNode<"slack/chat_update"> {}
+export interface SlackChatDeleteNode extends SlackNode<"slack/chat_delete"> {}
+export interface SlackChatPostEphemeralNode extends SlackNode<"slack/chat_postEphemeral"> {}
+export interface SlackChatScheduleMessageNode extends SlackNode<"slack/chat_scheduleMessage"> {}
+export interface SlackChatGetPermalinkNode extends SlackNode<"slack/chat_getPermalink"> {}
+export interface SlackConversationsListNode extends SlackNode<"slack/conversations_list"> {}
+export interface SlackConversationsInfoNode extends SlackNode<"slack/conversations_info"> {}
+export interface SlackConversationsCreateNode extends SlackNode<"slack/conversations_create"> {}
+export interface SlackConversationsInviteNode extends SlackNode<"slack/conversations_invite"> {}
+export interface SlackConversationsHistoryNode extends SlackNode<"slack/conversations_history"> {}
+export interface SlackConversationsMembersNode extends SlackNode<"slack/conversations_members"> {}
+export interface SlackConversationsOpenNode extends SlackNode<"slack/conversations_open"> {}
+export interface SlackConversationsRepliesNode extends SlackNode<"slack/conversations_replies"> {}
+export interface SlackUsersInfoNode extends SlackNode<"slack/users_info"> {}
+export interface SlackUsersListNode extends SlackNode<"slack/users_list"> {}
+export interface SlackUsersLookupByEmailNode extends SlackNode<"slack/users_lookupByEmail"> {}
+export interface SlackUsersConversationsNode extends SlackNode<"slack/users_conversations"> {}
+export interface SlackReactionsAddNode extends SlackNode<"slack/reactions_add"> {}
+export interface SlackReactionsGetNode extends SlackNode<"slack/reactions_get"> {}
+export interface SlackReactionsListNode extends SlackNode<"slack/reactions_list"> {}
+export interface SlackReactionsRemoveNode extends SlackNode<"slack/reactions_remove"> {}
+export interface SlackFilesListNode extends SlackNode<"slack/files_list"> {}
+export interface SlackFilesInfoNode extends SlackNode<"slack/files_info"> {}
+export interface SlackFilesDeleteNode extends SlackNode<"slack/files_delete"> {}
+
+declare module "@mvfm/core" {
+  interface NodeTypeMap {
+    "slack/chat_postMessage": SlackChatPostMessageNode;
+    "slack/chat_update": SlackChatUpdateNode;
+    "slack/chat_delete": SlackChatDeleteNode;
+    "slack/chat_postEphemeral": SlackChatPostEphemeralNode;
+    "slack/chat_scheduleMessage": SlackChatScheduleMessageNode;
+    "slack/chat_getPermalink": SlackChatGetPermalinkNode;
+    "slack/conversations_list": SlackConversationsListNode;
+    "slack/conversations_info": SlackConversationsInfoNode;
+    "slack/conversations_create": SlackConversationsCreateNode;
+    "slack/conversations_invite": SlackConversationsInviteNode;
+    "slack/conversations_history": SlackConversationsHistoryNode;
+    "slack/conversations_members": SlackConversationsMembersNode;
+    "slack/conversations_open": SlackConversationsOpenNode;
+    "slack/conversations_replies": SlackConversationsRepliesNode;
+    "slack/users_info": SlackUsersInfoNode;
+    "slack/users_list": SlackUsersListNode;
+    "slack/users_lookupByEmail": SlackUsersLookupByEmailNode;
+    "slack/users_conversations": SlackUsersConversationsNode;
+    "slack/reactions_add": SlackReactionsAddNode;
+    "slack/reactions_get": SlackReactionsGetNode;
+    "slack/reactions_list": SlackReactionsListNode;
+    "slack/reactions_remove": SlackReactionsRemoveNode;
+    "slack/files_list": SlackFilesListNode;
+    "slack/files_info": SlackFilesInfoNode;
+    "slack/files_delete": SlackFilesDeleteNode;
+  }
 }
 
 /**
@@ -70,7 +130,83 @@ export function createSlackInterpreter(client: SlackClient): Interpreter {
     return await client.apiCall(method, params);
   };
 
-  return Object.fromEntries(Object.keys(NODE_TO_METHOD).map((kind) => [kind, handler]));
+  return typedInterpreter<SlackKind>()({
+    "slack/chat_postMessage": async function* (node: SlackChatPostMessageNode) {
+      return yield* handler(node);
+    },
+    "slack/chat_update": async function* (node: SlackChatUpdateNode) {
+      return yield* handler(node);
+    },
+    "slack/chat_delete": async function* (node: SlackChatDeleteNode) {
+      return yield* handler(node);
+    },
+    "slack/chat_postEphemeral": async function* (node: SlackChatPostEphemeralNode) {
+      return yield* handler(node);
+    },
+    "slack/chat_scheduleMessage": async function* (node: SlackChatScheduleMessageNode) {
+      return yield* handler(node);
+    },
+    "slack/chat_getPermalink": async function* (node: SlackChatGetPermalinkNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_list": async function* (node: SlackConversationsListNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_info": async function* (node: SlackConversationsInfoNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_create": async function* (node: SlackConversationsCreateNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_invite": async function* (node: SlackConversationsInviteNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_history": async function* (node: SlackConversationsHistoryNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_members": async function* (node: SlackConversationsMembersNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_open": async function* (node: SlackConversationsOpenNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_replies": async function* (node: SlackConversationsRepliesNode) {
+      return yield* handler(node);
+    },
+    "slack/users_info": async function* (node: SlackUsersInfoNode) {
+      return yield* handler(node);
+    },
+    "slack/users_list": async function* (node: SlackUsersListNode) {
+      return yield* handler(node);
+    },
+    "slack/users_lookupByEmail": async function* (node: SlackUsersLookupByEmailNode) {
+      return yield* handler(node);
+    },
+    "slack/users_conversations": async function* (node: SlackUsersConversationsNode) {
+      return yield* handler(node);
+    },
+    "slack/reactions_add": async function* (node: SlackReactionsAddNode) {
+      return yield* handler(node);
+    },
+    "slack/reactions_get": async function* (node: SlackReactionsGetNode) {
+      return yield* handler(node);
+    },
+    "slack/reactions_list": async function* (node: SlackReactionsListNode) {
+      return yield* handler(node);
+    },
+    "slack/reactions_remove": async function* (node: SlackReactionsRemoveNode) {
+      return yield* handler(node);
+    },
+    "slack/files_list": async function* (node: SlackFilesListNode) {
+      return yield* handler(node);
+    },
+    "slack/files_info": async function* (node: SlackFilesInfoNode) {
+      return yield* handler(node);
+    },
+    "slack/files_delete": async function* (node: SlackFilesDeleteNode) {
+      return yield* handler(node);
+    },
+  });
 }
 
 function requiredEnv(name: "SLACK_BOT_TOKEN"): string {

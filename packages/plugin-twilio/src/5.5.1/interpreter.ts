@@ -1,5 +1,5 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
-import { eval_ } from "@mvfm/core";
+import { eval_, typedInterpreter } from "@mvfm/core";
 import { wrapTwilioSdk } from "./client-twilio-sdk";
 
 /**
@@ -13,11 +13,52 @@ export interface TwilioClient {
   request(method: string, path: string, params?: Record<string, unknown>): Promise<unknown>;
 }
 
-interface TwilioNode extends TypedNode<unknown> {
-  kind: string;
-  sid?: TypedNode<string>;
-  params?: TypedNode<Record<string, unknown>>;
+type TwilioKind =
+  | "twilio/create_message"
+  | "twilio/fetch_message"
+  | "twilio/list_messages"
+  | "twilio/create_call"
+  | "twilio/fetch_call"
+  | "twilio/list_calls";
+
+interface TwilioNode<K extends TwilioKind = TwilioKind> extends TypedNode<unknown> {
+  kind: K;
   config: { accountSid: string; authToken: string };
+}
+
+export interface TwilioCreateMessageNode extends TwilioNode<"twilio/create_message"> {
+  params: TypedNode<Record<string, unknown>>;
+}
+
+export interface TwilioFetchMessageNode extends TwilioNode<"twilio/fetch_message"> {
+  sid: TypedNode<string>;
+}
+
+export interface TwilioListMessagesNode extends TwilioNode<"twilio/list_messages"> {
+  params?: TypedNode<Record<string, unknown>> | null;
+}
+
+export interface TwilioCreateCallNode extends TwilioNode<"twilio/create_call"> {
+  params: TypedNode<Record<string, unknown>>;
+}
+
+export interface TwilioFetchCallNode extends TwilioNode<"twilio/fetch_call"> {
+  sid: TypedNode<string>;
+}
+
+export interface TwilioListCallsNode extends TwilioNode<"twilio/list_calls"> {
+  params?: TypedNode<Record<string, unknown>> | null;
+}
+
+declare module "@mvfm/core" {
+  interface NodeTypeMap {
+    "twilio/create_message": TwilioCreateMessageNode;
+    "twilio/fetch_message": TwilioFetchMessageNode;
+    "twilio/list_messages": TwilioListMessagesNode;
+    "twilio/create_call": TwilioCreateCallNode;
+    "twilio/fetch_call": TwilioFetchCallNode;
+    "twilio/list_calls": TwilioListCallsNode;
+  }
 }
 
 /**
@@ -27,43 +68,43 @@ interface TwilioNode extends TypedNode<unknown> {
  * @returns An Interpreter handling all twilio node kinds.
  */
 export function createTwilioInterpreter(client: TwilioClient): Interpreter {
-  return {
-    "twilio/create_message": async function* (node: TwilioNode) {
+  return typedInterpreter<TwilioKind>()({
+    "twilio/create_message": async function* (node: TwilioCreateMessageNode) {
       const base = `/2010-04-01/Accounts/${node.config.accountSid}`;
-      const params = yield* eval_(node.params!);
+      const params = yield* eval_(node.params);
       return await client.request("POST", `${base}/Messages.json`, params);
     },
 
-    "twilio/fetch_message": async function* (node: TwilioNode) {
+    "twilio/fetch_message": async function* (node: TwilioFetchMessageNode) {
       const base = `/2010-04-01/Accounts/${node.config.accountSid}`;
-      const sid = yield* eval_(node.sid!);
+      const sid = yield* eval_(node.sid);
       return await client.request("GET", `${base}/Messages/${sid}.json`);
     },
 
-    "twilio/list_messages": async function* (node: TwilioNode) {
+    "twilio/list_messages": async function* (node: TwilioListMessagesNode) {
       const base = `/2010-04-01/Accounts/${node.config.accountSid}`;
       const params = node.params != null ? yield* eval_(node.params) : undefined;
       return await client.request("GET", `${base}/Messages.json`, params);
     },
 
-    "twilio/create_call": async function* (node: TwilioNode) {
+    "twilio/create_call": async function* (node: TwilioCreateCallNode) {
       const base = `/2010-04-01/Accounts/${node.config.accountSid}`;
-      const params = yield* eval_(node.params!);
+      const params = yield* eval_(node.params);
       return await client.request("POST", `${base}/Calls.json`, params);
     },
 
-    "twilio/fetch_call": async function* (node: TwilioNode) {
+    "twilio/fetch_call": async function* (node: TwilioFetchCallNode) {
       const base = `/2010-04-01/Accounts/${node.config.accountSid}`;
-      const sid = yield* eval_(node.sid!);
+      const sid = yield* eval_(node.sid);
       return await client.request("GET", `${base}/Calls/${sid}.json`);
     },
 
-    "twilio/list_calls": async function* (node: TwilioNode) {
+    "twilio/list_calls": async function* (node: TwilioListCallsNode) {
       const base = `/2010-04-01/Accounts/${node.config.accountSid}`;
       const params = node.params != null ? yield* eval_(node.params) : undefined;
       return await client.request("GET", `${base}/Calls.json`, params);
     },
-  };
+  });
 }
 
 function requiredEnv(name: "TWILIO_ACCOUNT_SID" | "TWILIO_AUTH_TOKEN"): string {
