@@ -18,11 +18,15 @@
     "test": "vitest run",
     "size": "size-limit"
   },
-  "files": ["dist", "etc"],
+  "files": [
+    "dist",
+    "etc"
+  ],
   "peerDependencies": {
     "@mvfm/core": "workspace:*"
   },
   "devDependencies": {
-    "@mvfm/core": "workspace:*"
+    "@mvfm/core": "workspace:*",
+    "twilio": "5.5.1"
   }
 }
