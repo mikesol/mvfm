@@ -2,8 +2,7 @@ import { mvfm, num, str } from "@mvfm/core";
 import type { Expr } from "@mvfm/core";
 import { describe, expectTypeOf, it } from "vitest";
 import { twilio } from "../../src/5.5.1";
-import type { MessageInstance } from "twilio/lib/rest/api/v2010/account/message";
-import type { CallInstance } from "twilio/lib/rest/api/v2010/account/call";
+import type { MessageInstance, CallInstance } from "../../src/5.5.1/types";
 
 const app = mvfm(num, str, twilio({ accountSid: "AC_test", authToken: "tok" }));
 
