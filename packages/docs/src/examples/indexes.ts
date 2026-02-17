@@ -2,13 +2,13 @@ import type { NamespaceIndex } from "./types";
 
 const indexes: Record<string, NamespaceIndex> = {
   core: {
-    content: `<p>MVFM is an extensible tagless-final DSL for deterministic TypeScript programs. Every program follows a three-step pattern:</p>
+    content: `<p>MVFM is an extensible <a href="https://okmij.org/ftp/tagless-final/index.html">tagless-final</a> DSL for deterministic TypeScript programs. Every program follows a three-step pattern:</p>
 <ul>
   <li><code>mvfm(plugins...)</code> creates an app with the plugins you need.</li>
   <li><code>app(schema, builder)</code> defines a program from a schema and builder function.</li>
   <li><code>foldAST(interpreter, program)</code> executes the program with a concrete interpreter.</li>
 </ul>
-<p>The <code>prelude</code> export bundles all core plugins. Use <code>defaults(app)</code> to build a standard interpreter, and <code>injectInput(prog, data)</code> to provide runtime values.</p>
+<p>MVFM stands for Minimum Viable Free Monad. The eventual goal is to reimplement TypeScript in TypeScript.</p>
 `,
     code: `const app = mvfm(prelude, console_);
 
