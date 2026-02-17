@@ -4,6 +4,7 @@ import { z } from "zod";
 import { createArrayInterpreter } from "./array";
 import { bigintInterpreter } from "./bigint";
 import { dateInterpreter } from "./date";
+import { createDiscriminatedUnionInterpreter } from "./discriminated-union";
 import { enumInterpreter } from "./enum";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
 import { toZodError } from "./interpreter-utils";
@@ -48,6 +49,7 @@ function getHandlers(): SchemaInterpreterMap {
       ...createObjectInterpreter(buildSchemaGen),
       ...createArrayInterpreter(buildSchemaGen),
       ...createUnionInterpreter(buildSchemaGen),
+      ...createDiscriminatedUnionInterpreter(buildSchemaGen),
       ...createIntersectionInterpreter(buildSchemaGen),
       ...createRecordInterpreter(buildSchemaGen),
       ...createMapSetInterpreter(buildSchemaGen),

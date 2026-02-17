@@ -110,6 +110,21 @@ await foldAST(
 );`,
     plugins: ZP,
   },
+  "zod/discriminated_union": {
+    description: "Schema for discriminated unions that use a discriminator key for efficient parsing",
+    code: `const app = mvfm(prelude, zod);
+const prog = app({ value: "string" }, ($) => {
+  return $.zod.discriminatedUnion("status", [
+    $.zod.object({ status: $.zod.literal("success"), data: $.zod.string() }),
+    $.zod.object({ status: $.zod.literal("failed"), error: $.zod.string() }),
+  ]).parse($.input.value);
+});
+await foldAST(
+  defaults(app),
+  injectInput(prog, { value: { status: "success", data: "hello" } })
+);`,
+    plugins: ZP,
+  },
   "zod/unknown": {
     description: "Schema that accepts unknown values for later narrowing",
     code: `const app = mvfm(prelude, zod);
