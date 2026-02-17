@@ -22,6 +22,7 @@ import { ord } from "../packages/core/src/plugins/ord/index.js";
 import { st } from "../packages/core/src/plugins/st/index.js";
 import { str } from "../packages/core/src/plugins/str/index.js";
 import { consolePlugin } from "../packages/plugin-console/src/22.0.0/index.js";
+import { zod as zodPlugin } from "../packages/plugin-zod/src/index.js";
 import { getAllExamples } from "../packages/docs/src/examples/index.js";
 
 // Internal node kinds excluded from coverage requirements.
@@ -51,6 +52,7 @@ const plugins: Array<{ nodeKinds: string[]; traits?: any }> = [
   error,
   fiber,
   consolePlugin(),
+  zodPlugin,
 ];
 
 // Also include core node kinds that aren't from plugins

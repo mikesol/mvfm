@@ -765,21 +765,21 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ChatCompletionCreateParamsNonStreaming",
+                  "canonicalReference": "openai!ChatCompletionCreateParamsNonStreaming:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": "> | "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ChatCompletionCreateParamsNonStreaming",
+                  "canonicalReference": "openai!ChatCompletionCreateParamsNonStreaming:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": "): "
                 },
                 {
                   "kind": "Reference",
@@ -792,12 +792,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ChatCompletion",
+                  "canonicalReference": "openai!ChatCompletion:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n                retrieve(id: "
+                  "text": ">;\n                retrieve(id: "
                 },
                 {
                   "kind": "Reference",
@@ -819,12 +819,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ChatCompletion",
+                  "canonicalReference": "openai!ChatCompletion:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n                list(params?: "
+                  "text": ">;\n                list(params?: "
                 },
                 {
                   "kind": "Reference",
@@ -837,21 +837,21 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ChatCompletionListParams",
+                  "canonicalReference": "openai!ChatCompletionListParams:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": "> | "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ChatCompletionListParams",
+                  "canonicalReference": "openai!ChatCompletionListParams:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": "): "
                 },
                 {
                   "kind": "Reference",
@@ -864,12 +864,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ChatCompletionsPage",
+                  "canonicalReference": "openai!ChatCompletionsPage:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n                update(id: "
+                  "text": ">;\n                update(id: "
                 },
                 {
                   "kind": "Reference",
@@ -891,21 +891,21 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ChatCompletionUpdateParams",
+                  "canonicalReference": "openai!ChatCompletionUpdateParams:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": "> | "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ChatCompletionUpdateParams",
+                  "canonicalReference": "openai!ChatCompletionUpdateParams:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": "): "
                 },
                 {
                   "kind": "Reference",
@@ -918,12 +918,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ChatCompletion",
+                  "canonicalReference": "openai!ChatCompletion:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n                delete(id: "
+                  "text": ">;\n                delete(id: "
                 },
                 {
                   "kind": "Reference",
@@ -945,12 +945,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ChatCompletionDeleted",
+                  "canonicalReference": "openai!ChatCompletionDeleted:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n            };\n        };\n        embeddings: {\n            create(params: "
+                  "text": ">;\n            };\n        };\n        embeddings: {\n            create(params: "
                 },
                 {
                   "kind": "Reference",
@@ -963,39 +963,21 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "EmbeddingCreateParams",
+                  "canonicalReference": "openai!EmbeddingCreateParams:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": "> | "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "EmbeddingCreateParams",
+                  "canonicalReference": "openai!EmbeddingCreateParams:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-openai!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>>;\n        };\n        moderations: {\n            create(params: "
+                  "text": "): "
                 },
                 {
                   "kind": "Reference",
@@ -1008,21 +990,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "CreateEmbeddingResponse",
+                  "canonicalReference": "openai!CreateEmbeddingResponse:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": ">;\n        };\n        moderations: {\n            create(params: "
                 },
                 {
                   "kind": "Reference",
@@ -1035,12 +1008,21 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ModerationCreateParams",
+                  "canonicalReference": "openai!ModerationCreateParams:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n        };\n        completions: {\n            create(params: "
+                  "text": "> | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ModerationCreateParams",
+                  "canonicalReference": "openai!ModerationCreateParams:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
                 },
                 {
                   "kind": "Reference",
@@ -1053,21 +1035,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ModerationCreateResponse",
+                  "canonicalReference": "openai!ModerationCreateResponse:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": ">;\n        };\n        completions: {\n            create(params: "
                 },
                 {
                   "kind": "Reference",
@@ -1080,12 +1053,39 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "CompletionCreateParamsNonStreaming",
+                  "canonicalReference": "openai!CompletionCreateParamsNonStreaming:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n        };\n    }"
+                  "text": "> | "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "CompletionCreateParamsNonStreaming",
+                  "canonicalReference": "openai!CompletionCreateParamsNonStreaming:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": "): "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Expr",
+                  "canonicalReference": "@mvfm/plugin-openai!~Expr:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "Completion",
+                  "canonicalReference": "openai!Completion:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">;\n        };\n    }"
                 },
                 {
                   "kind": "Content",

@@ -10,6 +10,9 @@ import ord from "./ord";
 import st from "./st";
 import str from "./str";
 import type { NodeExample } from "./types";
+import zodSchemas from "./zod-schemas";
+import zodSchemasMore from "./zod-schemas-more";
+import zodWrappers from "./zod-wrappers";
 
 const modules: Record<string, NodeExample>[] = [
   core,
@@ -23,6 +26,9 @@ const modules: Record<string, NodeExample>[] = [
   error,
   fiber,
   console_,
+  zodSchemas,
+  zodSchemasMore,
+  zodWrappers,
 ];
 
 export function getAllExamples(): Record<string, NodeExample> {

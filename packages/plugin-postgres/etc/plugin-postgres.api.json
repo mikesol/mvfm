@@ -426,13 +426,17 @@
             },
             {
               "kind": "Content",
+              "text": "<string>"
+            },
+            {
+              "kind": "Content",
               "text": ";"
             }
           ],
           "fileUrlPath": "dist/3.4.8/handler.client.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 5,
-            "endIndex": 6
+            "endIndex": 7
           },
           "releaseTag": "Public",
           "overloadIndex": 1,

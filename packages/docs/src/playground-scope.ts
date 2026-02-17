@@ -5,6 +5,7 @@ export async function createPlaygroundScope(
 ) {
   const core = await import("@mvfm/core");
   const pluginConsole = await import("@mvfm/plugin-console");
+  const pluginZod = await import("@mvfm/plugin-zod");
   const { console: _drop, consoleInterpreter: _defaultInterp, ...consoleRest } = pluginConsole;
   const fakeConsoleInterpreter = pluginConsole.createConsoleInterpreter(
     pluginConsole.wrapConsole(fakeConsole as any),
@@ -26,6 +27,8 @@ export async function createPlaygroundScope(
     ...core,
     console_: pluginConsole.consolePlugin(),
     ...consoleRest,
+    zod: pluginZod.zod,
+    createZodInterpreter: pluginZod.createZodInterpreter,
     consoleInterpreter: fakeConsoleInterpreter,
     defaults: (app: any, ...args: any[]) => {
       // Merge mock overrides into any user-provided overrides

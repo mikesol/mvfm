@@ -4,6 +4,18 @@
 
 ```ts
 
+import type { ChatCompletion } from 'openai/resources/chat/completions/completions';
+import type { ChatCompletionCreateParamsNonStreaming } from 'openai/resources/chat/completions/completions';
+import type { ChatCompletionDeleted } from 'openai/resources/chat/completions/completions';
+import type { ChatCompletionListParams } from 'openai/resources/chat/completions/completions';
+import type { ChatCompletionsPage } from 'openai/resources/chat/completions/completions';
+import type { ChatCompletionUpdateParams } from 'openai/resources/chat/completions/completions';
+import type { Completion } from 'openai/resources/completions';
+import type { CompletionCreateParamsNonStreaming } from 'openai/resources/completions';
+import type { CreateEmbeddingResponse } from 'openai/resources/embeddings';
+import type { EmbeddingCreateParams } from 'openai/resources/embeddings';
+import type { ModerationCreateParams } from 'openai/resources/moderations';
+import type { ModerationCreateResponse } from 'openai/resources/moderations';
 import type OpenAI from 'openai';
 
 // @public
@@ -47,21 +59,21 @@ export interface OpenAIMethods {
     openai: {
         chat: {
             completions: {
-                create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-                retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
-                list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-                update(id: Expr<string> | string, params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-                delete(id: Expr<string> | string): Expr<Record<string, unknown>>;
+                create(params: Expr<ChatCompletionCreateParamsNonStreaming> | ChatCompletionCreateParamsNonStreaming): Expr<ChatCompletion>;
+                retrieve(id: Expr<string> | string): Expr<ChatCompletion>;
+                list(params?: Expr<ChatCompletionListParams> | ChatCompletionListParams): Expr<ChatCompletionsPage>;
+                update(id: Expr<string> | string, params: Expr<ChatCompletionUpdateParams> | ChatCompletionUpdateParams): Expr<ChatCompletion>;
+                delete(id: Expr<string> | string): Expr<ChatCompletionDeleted>;
             };
         };
         embeddings: {
-            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            create(params: Expr<EmbeddingCreateParams> | EmbeddingCreateParams): Expr<CreateEmbeddingResponse>;
         };
         moderations: {
-            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            create(params: Expr<ModerationCreateParams> | ModerationCreateParams): Expr<ModerationCreateResponse>;
         };
         completions: {
-            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            create(params: Expr<CompletionCreateParamsNonStreaming> | CompletionCreateParamsNonStreaming): Expr<Completion>;
         };
     };
 }
@@ -79,7 +91,7 @@ export function wrapOpenAISdk(client: OpenAI): OpenAIClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/6.21.0/index.d.ts:15:17 - (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
+// dist/6.21.0/index.d.ts:19:17 - (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 
