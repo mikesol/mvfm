@@ -55,6 +55,20 @@
 
 import type { Expr, PluginContext } from "@mvfm/core";
 import { definePlugin } from "@mvfm/core";
+import type {
+  ChatCompletion,
+  ChatCompletionCreateParamsNonStreaming,
+  ChatCompletionDeleted,
+  ChatCompletionListParams,
+  ChatCompletionsPage,
+  ChatCompletionUpdateParams,
+} from "openai/resources/chat/completions/completions";
+import type { Completion, CompletionCreateParamsNonStreaming } from "openai/resources/completions";
+import type { CreateEmbeddingResponse, EmbeddingCreateParams } from "openai/resources/embeddings";
+import type {
+  ModerationCreateParams,
+  ModerationCreateResponse,
+} from "openai/resources/moderations";
 import { openaiInterpreter } from "./interpreter";
 
 // ---- What the plugin adds to $ ----------------------------
@@ -73,40 +87,42 @@ export interface OpenAIMethods {
       completions: {
         /** Create a chat completion (non-streaming). */
         create(
-          params: Expr<Record<string, unknown>> | Record<string, unknown>,
-        ): Expr<Record<string, unknown>>;
+          params:
+            | Expr<ChatCompletionCreateParamsNonStreaming>
+            | ChatCompletionCreateParamsNonStreaming,
+        ): Expr<ChatCompletion>;
         /** Retrieve a chat completion by ID. */
-        retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
+        retrieve(id: Expr<string> | string): Expr<ChatCompletion>;
         /** List chat completions with optional filter params. */
         list(
-          params?: Expr<Record<string, unknown>> | Record<string, unknown>,
-        ): Expr<Record<string, unknown>>;
+          params?: Expr<ChatCompletionListParams> | ChatCompletionListParams,
+        ): Expr<ChatCompletionsPage>;
         /** Update a chat completion by ID. */
         update(
           id: Expr<string> | string,
-          params: Expr<Record<string, unknown>> | Record<string, unknown>,
-        ): Expr<Record<string, unknown>>;
+          params: Expr<ChatCompletionUpdateParams> | ChatCompletionUpdateParams,
+        ): Expr<ChatCompletion>;
         /** Delete a chat completion by ID. */
-        delete(id: Expr<string> | string): Expr<Record<string, unknown>>;
+        delete(id: Expr<string> | string): Expr<ChatCompletionDeleted>;
       };
     };
     embeddings: {
       /** Create embeddings for the given input. */
       create(
-        params: Expr<Record<string, unknown>> | Record<string, unknown>,
-      ): Expr<Record<string, unknown>>;
+        params: Expr<EmbeddingCreateParams> | EmbeddingCreateParams,
+      ): Expr<CreateEmbeddingResponse>;
     };
     moderations: {
       /** Classify text for policy compliance. */
       create(
-        params: Expr<Record<string, unknown>> | Record<string, unknown>,
-      ): Expr<Record<string, unknown>>;
+        params: Expr<ModerationCreateParams> | ModerationCreateParams,
+      ): Expr<ModerationCreateResponse>;
     };
     completions: {
       /** Create a legacy completion (non-streaming). */
       create(
-        params: Expr<Record<string, unknown>> | Record<string, unknown>,
-      ): Expr<Record<string, unknown>>;
+        params: Expr<CompletionCreateParamsNonStreaming> | CompletionCreateParamsNonStreaming,
+      ): Expr<Completion>;
     };
   };
 }
@@ -160,7 +176,7 @@ export function openai(config: OpenAIConfig) {
         return ctx.isExpr(id) ? id.__node : ctx.lift(id).__node;
       }
 
-      function resolveParams(params: Expr<Record<string, unknown>> | Record<string, unknown>) {
+      function resolveParams<T>(params: Expr<T> | T) {
         return ctx.lift(params).__node;
       }
 
@@ -271,10 +287,9 @@ export function openai(config: OpenAIConfig) {
 // WORKS BUT DIFFERENT:
 //
 // 4. Return types:
-//    Real openai-node has typed response objects (ChatCompletion,
-//    Embedding, etc.). Mvfm uses Record<string, unknown>.
-//    Property access still works via proxy (completion.choices),
-//    but there's no IDE autocomplete for OpenAI-specific fields.
+//    Mvfm now uses openai-node SDK types (ChatCompletion,
+//    CreateEmbeddingResponse, etc.) for both params and returns.
+//    IDE autocomplete works for OpenAI-specific fields via Expr<T>.
 //
 // 5. Sequencing side effects:
 //    Real:  await openai.chat.completions.create(...)
