@@ -148,4 +148,31 @@ describe("lazy schema interpreter (#117)", () => {
     const result = await foldAST(defaults(app), injectInput(hydrated, input));
     expect(result).toEqual(input.value);
   });
+
+  it("validates mutual recursion after JSON round-trip", async () => {
+    const app = mvfm(zod);
+    const prog = app({ value: "object" }, ($) => {
+      const User = $.zod.object({
+        email: $.zod.string(),
+        posts: $.zod.lazy(() => $.zod.array(Post)),
+      });
+      const Post = $.zod.object({
+        title: $.zod.string(),
+        author: $.zod.lazy(() => User),
+      });
+      return User.parse($.input.value);
+    });
+
+    const serialized = JSON.stringify(prog);
+    const hydrated = JSON.parse(serialized);
+    const input = {
+      value: {
+        email: "user@example.com",
+        posts: [{ title: "Hello", author: { email: "user@example.com", posts: [] } }],
+      },
+    };
+
+    const result = await foldAST(defaults(app), injectInput(hydrated, input));
+    expect(result).toEqual(input.value);
+  });
 });
