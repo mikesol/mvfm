@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "@astrojs/react": "^4.3.1",
+    "@electric-sql/pglite": "^0.3.15",
     "@mvfm/core": "workspace:*",
     "@mvfm/plugin-console": "workspace:*",
+    "@mvfm/plugin-postgres": "workspace:*",
     "@mvfm/plugin-zod": "workspace:*",
     "astro": "^5.9.4",
     "react": "^19.1.0",
