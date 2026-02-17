@@ -4,6 +4,56 @@
 
 ```ts
 
+import type { ChatDeleteArguments } from '@slack/web-api';
+import type { ChatDeleteResponse } from '@slack/web-api';
+import type { ChatGetPermalinkArguments } from '@slack/web-api';
+import type { ChatGetPermalinkResponse } from '@slack/web-api';
+import type { ChatPostEphemeralArguments } from '@slack/web-api';
+import type { ChatPostEphemeralResponse } from '@slack/web-api';
+import type { ChatPostMessageArguments } from '@slack/web-api';
+import type { ChatPostMessageResponse } from '@slack/web-api';
+import type { ChatScheduleMessageArguments } from '@slack/web-api';
+import type { ChatScheduleMessageResponse } from '@slack/web-api';
+import type { ChatUpdateArguments } from '@slack/web-api';
+import type { ChatUpdateResponse } from '@slack/web-api';
+import type { ConversationsCreateArguments } from '@slack/web-api';
+import type { ConversationsCreateResponse } from '@slack/web-api';
+import type { ConversationsHistoryArguments } from '@slack/web-api';
+import type { ConversationsHistoryResponse } from '@slack/web-api';
+import type { ConversationsInfoArguments } from '@slack/web-api';
+import type { ConversationsInfoResponse } from '@slack/web-api';
+import type { ConversationsInviteArguments } from '@slack/web-api';
+import type { ConversationsInviteResponse } from '@slack/web-api';
+import type { ConversationsListArguments } from '@slack/web-api';
+import type { ConversationsListResponse } from '@slack/web-api';
+import type { ConversationsMembersArguments } from '@slack/web-api';
+import type { ConversationsMembersResponse } from '@slack/web-api';
+import type { ConversationsOpenArguments } from '@slack/web-api';
+import type { ConversationsOpenResponse } from '@slack/web-api';
+import type { ConversationsRepliesArguments } from '@slack/web-api';
+import type { ConversationsRepliesResponse } from '@slack/web-api';
+import type { FilesDeleteArguments } from '@slack/web-api';
+import type { FilesDeleteResponse } from '@slack/web-api';
+import type { FilesInfoArguments } from '@slack/web-api';
+import type { FilesInfoResponse } from '@slack/web-api';
+import type { FilesListArguments } from '@slack/web-api';
+import type { FilesListResponse } from '@slack/web-api';
+import type { ReactionsAddArguments } from '@slack/web-api';
+import type { ReactionsAddResponse } from '@slack/web-api';
+import type { ReactionsGetArguments } from '@slack/web-api';
+import type { ReactionsGetResponse } from '@slack/web-api';
+import type { ReactionsListArguments } from '@slack/web-api';
+import type { ReactionsListResponse } from '@slack/web-api';
+import type { ReactionsRemoveArguments } from '@slack/web-api';
+import type { ReactionsRemoveResponse } from '@slack/web-api';
+import type { UsersConversationsArguments } from '@slack/web-api';
+import type { UsersConversationsResponse } from '@slack/web-api';
+import type { UsersInfoArguments } from '@slack/web-api';
+import type { UsersInfoResponse } from '@slack/web-api';
+import type { UsersListArguments } from '@slack/web-api';
+import type { UsersListResponse } from '@slack/web-api';
+import type { UsersLookupByEmailArguments } from '@slack/web-api';
+import type { UsersLookupByEmailResponse } from '@slack/web-api';
 import type { WebClient } from '@slack/web-api';
 
 // @public
@@ -52,39 +102,39 @@ export const slackInterpreter: Interpreter;
 export interface SlackMethods {
     slack: {
         chat: {
-            postMessage(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            update(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            delete(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            postEphemeral(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            scheduleMessage(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            getPermalink(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            postMessage(params: SlackParams<ChatPostMessageArguments>): Expr<ChatPostMessageResponse>;
+            update(params: SlackParams<ChatUpdateArguments>): Expr<ChatUpdateResponse>;
+            delete(params: SlackParams<ChatDeleteArguments>): Expr<ChatDeleteResponse>;
+            postEphemeral(params: SlackParams<ChatPostEphemeralArguments>): Expr<ChatPostEphemeralResponse>;
+            scheduleMessage(params: SlackParams<ChatScheduleMessageArguments>): Expr<ChatScheduleMessageResponse>;
+            getPermalink(params: SlackParams<ChatGetPermalinkArguments>): Expr<ChatGetPermalinkResponse>;
         };
         conversations: {
-            list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            info(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            invite(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            history(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            members(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            open(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            replies(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            list(params?: SlackParams<ConversationsListArguments>): Expr<ConversationsListResponse>;
+            info(params: SlackParams<ConversationsInfoArguments>): Expr<ConversationsInfoResponse>;
+            create(params: SlackParams<ConversationsCreateArguments>): Expr<ConversationsCreateResponse>;
+            invite(params: SlackParams<ConversationsInviteArguments>): Expr<ConversationsInviteResponse>;
+            history(params: SlackParams<ConversationsHistoryArguments>): Expr<ConversationsHistoryResponse>;
+            members(params: SlackParams<ConversationsMembersArguments>): Expr<ConversationsMembersResponse>;
+            open(params: SlackParams<ConversationsOpenArguments>): Expr<ConversationsOpenResponse>;
+            replies(params: SlackParams<ConversationsRepliesArguments>): Expr<ConversationsRepliesResponse>;
         };
         users: {
-            info(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            lookupByEmail(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            conversations(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            info(params: SlackParams<UsersInfoArguments>): Expr<UsersInfoResponse>;
+            list(params?: SlackParams<UsersListArguments>): Expr<UsersListResponse>;
+            lookupByEmail(params: SlackParams<UsersLookupByEmailArguments>): Expr<UsersLookupByEmailResponse>;
+            conversations(params: SlackParams<UsersConversationsArguments>): Expr<UsersConversationsResponse>;
         };
         reactions: {
-            add(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            get(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            remove(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            add(params: SlackParams<ReactionsAddArguments>): Expr<ReactionsAddResponse>;
+            get(params: SlackParams<ReactionsGetArguments>): Expr<ReactionsGetResponse>;
+            list(params?: SlackParams<ReactionsListArguments>): Expr<ReactionsListResponse>;
+            remove(params: SlackParams<ReactionsRemoveArguments>): Expr<ReactionsRemoveResponse>;
         };
         files: {
-            list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            info(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-            delete(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+            list(params?: SlackParams<FilesListArguments>): Expr<FilesListResponse>;
+            info(params: SlackParams<FilesInfoArguments>): Expr<FilesInfoResponse>;
+            delete(params: SlackParams<FilesDeleteArguments>): Expr<FilesDeleteResponse>;
         };
     };
 }
@@ -94,7 +144,8 @@ export function wrapSlackWebClient(client: WebClient): SlackClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/7.14.0/types.d.ts:14:13 - (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/types.d.ts:20:13 - (ae-forgotten-export) The symbol "SlackParams" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/types.d.ts:20:13 - (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

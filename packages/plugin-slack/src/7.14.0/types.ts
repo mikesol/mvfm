@@ -1,60 +1,60 @@
 import type { Expr } from "@mvfm/core";
 import type {
+  ChatDeleteArguments,
+  ChatDeleteResponse,
+  ChatGetPermalinkArguments,
+  ChatGetPermalinkResponse,
+  ChatPostEphemeralArguments,
+  ChatPostEphemeralResponse,
   // Chat
   ChatPostMessageArguments,
-  ChatUpdateArguments,
-  ChatDeleteArguments,
-  ChatPostEphemeralArguments,
-  ChatScheduleMessageArguments,
-  ChatGetPermalinkArguments,
   ChatPostMessageResponse,
-  ChatUpdateResponse,
-  ChatDeleteResponse,
-  ChatPostEphemeralResponse,
+  ChatScheduleMessageArguments,
   ChatScheduleMessageResponse,
-  ChatGetPermalinkResponse,
+  ChatUpdateArguments,
+  ChatUpdateResponse,
+  ConversationsCreateArguments,
+  ConversationsCreateResponse,
+  ConversationsHistoryArguments,
+  ConversationsHistoryResponse,
+  ConversationsInfoArguments,
+  ConversationsInfoResponse,
+  ConversationsInviteArguments,
+  ConversationsInviteResponse,
   // Conversations
   ConversationsListArguments,
-  ConversationsInfoArguments,
-  ConversationsCreateArguments,
-  ConversationsInviteArguments,
-  ConversationsHistoryArguments,
-  ConversationsMembersArguments,
-  ConversationsOpenArguments,
-  ConversationsRepliesArguments,
   ConversationsListResponse,
-  ConversationsInfoResponse,
-  ConversationsCreateResponse,
-  ConversationsInviteResponse,
-  ConversationsHistoryResponse,
+  ConversationsMembersArguments,
   ConversationsMembersResponse,
+  ConversationsOpenArguments,
   ConversationsOpenResponse,
+  ConversationsRepliesArguments,
   ConversationsRepliesResponse,
-  // Users
-  UsersInfoArguments,
-  UsersListArguments,
-  UsersLookupByEmailArguments,
-  UsersConversationsArguments,
-  UsersInfoResponse,
-  UsersListResponse,
-  UsersLookupByEmailResponse,
-  UsersConversationsResponse,
-  // Reactions
-  ReactionsAddArguments,
-  ReactionsGetArguments,
-  ReactionsListArguments,
-  ReactionsRemoveArguments,
-  ReactionsAddResponse,
-  ReactionsGetResponse,
-  ReactionsListResponse,
-  ReactionsRemoveResponse,
+  FilesDeleteArguments,
+  FilesDeleteResponse,
+  FilesInfoArguments,
+  FilesInfoResponse,
   // Files
   FilesListArguments,
-  FilesInfoArguments,
-  FilesDeleteArguments,
   FilesListResponse,
-  FilesInfoResponse,
-  FilesDeleteResponse,
+  // Reactions
+  ReactionsAddArguments,
+  ReactionsAddResponse,
+  ReactionsGetArguments,
+  ReactionsGetResponse,
+  ReactionsListArguments,
+  ReactionsListResponse,
+  ReactionsRemoveArguments,
+  ReactionsRemoveResponse,
+  UsersConversationsArguments,
+  UsersConversationsResponse,
+  // Users
+  UsersInfoArguments,
+  UsersInfoResponse,
+  UsersListArguments,
+  UsersListResponse,
+  UsersLookupByEmailArguments,
+  UsersLookupByEmailResponse,
 } from "@slack/web-api";
 
 type Primitive = string | number | boolean | null | undefined;
@@ -90,9 +90,7 @@ export interface SlackMethods {
       scheduleMessage(
         params: SlackParams<ChatScheduleMessageArguments>,
       ): Expr<ChatScheduleMessageResponse>;
-      getPermalink(
-        params: SlackParams<ChatGetPermalinkArguments>,
-      ): Expr<ChatGetPermalinkResponse>;
+      getPermalink(params: SlackParams<ChatGetPermalinkArguments>): Expr<ChatGetPermalinkResponse>;
     };
     /** Conversation (channel/DM/group) operations. */
     conversations: {

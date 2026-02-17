@@ -814,8 +814,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
                 },
                 {
                   "kind": "Content",
@@ -823,39 +823,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ChatPostMessageArguments",
+                  "canonicalReference": "@slack/web-api!ChatPostMessageArguments:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>>;\n            update(params: "
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -868,21 +841,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ChatPostMessageResponse",
+                  "canonicalReference": "@slack/web-api!ChatPostMessageResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": ">;\n            update(params: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ChatUpdateArguments",
+                  "canonicalReference": "@slack/web-api!ChatUpdateArguments:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -895,12 +877,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ChatUpdateResponse",
+                  "canonicalReference": "@slack/web-api!ChatUpdateResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n            delete(params: "
+                  "text": ">;\n            delete(params: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ChatDeleteArguments",
+                  "canonicalReference": "@slack/web-api!ChatDeleteArguments:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -913,21 +913,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ChatDeleteResponse",
+                  "canonicalReference": "@slack/web-api!ChatDeleteResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": ">;\n            postEphemeral(params: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ChatPostEphemeralArguments",
+                  "canonicalReference": "@slack/web-api!ChatPostEphemeralArguments:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -940,12 +949,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ChatPostEphemeralResponse",
+                  "canonicalReference": "@slack/web-api!ChatPostEphemeralResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n            postEphemeral(params: "
+                  "text": ">;\n            scheduleMessage(params: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ChatScheduleMessageArguments",
+                  "canonicalReference": "@slack/web-api!ChatScheduleMessageArguments:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -958,21 +985,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ChatScheduleMessageResponse",
+                  "canonicalReference": "@slack/web-api!ChatScheduleMessageResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": ">;\n            getPermalink(params: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ChatGetPermalinkArguments",
+                  "canonicalReference": "@slack/web-api!ChatGetPermalinkArguments:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -985,12 +1021,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ChatGetPermalinkResponse",
+                  "canonicalReference": "@slack/web-api!ChatGetPermalinkResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n            scheduleMessage(params: "
+                  "text": ">;\n        };\n        conversations: {\n            list(params?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ConversationsListArguments",
+                  "canonicalReference": "@slack/web-api!ConversationsListArguments:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -1003,21 +1057,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ConversationsListResponse",
+                  "canonicalReference": "@slack/web-api!ConversationsListResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": ">;\n            info(params: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ConversationsInfoArguments",
+                  "canonicalReference": "@slack/web-api!ConversationsInfoArguments:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -1030,12 +1093,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ConversationsInfoResponse",
+                  "canonicalReference": "@slack/web-api!ConversationsInfoResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n            getPermalink(params: "
+                  "text": ">;\n            create(params: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ConversationsCreateArguments",
+                  "canonicalReference": "@slack/web-api!ConversationsCreateArguments:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -1048,21 +1129,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ConversationsCreateResponse",
+                  "canonicalReference": "@slack/web-api!ConversationsCreateResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": ">;\n            invite(params: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ConversationsInviteArguments",
+                  "canonicalReference": "@slack/web-api!ConversationsInviteArguments:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -1075,12 +1165,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ConversationsInviteResponse",
+                  "canonicalReference": "@slack/web-api!ConversationsInviteResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n        };\n        conversations: {\n            list(params?: "
+                  "text": ">;\n            history(params: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ConversationsHistoryArguments",
+                  "canonicalReference": "@slack/web-api!ConversationsHistoryArguments:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -1093,21 +1201,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ConversationsHistoryResponse",
+                  "canonicalReference": "@slack/web-api!ConversationsHistoryResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": ">;\n            members(params: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ConversationsMembersArguments",
+                  "canonicalReference": "@slack/web-api!ConversationsMembersArguments:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -1120,12 +1237,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ConversationsMembersResponse",
+                  "canonicalReference": "@slack/web-api!ConversationsMembersResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n            info(params: "
+                  "text": ">;\n            open(params: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ConversationsOpenArguments",
+                  "canonicalReference": "@slack/web-api!ConversationsOpenArguments:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -1138,21 +1273,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ConversationsOpenResponse",
+                  "canonicalReference": "@slack/web-api!ConversationsOpenResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": ">;\n            replies(params: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ConversationsRepliesArguments",
+                  "canonicalReference": "@slack/web-api!ConversationsRepliesArguments:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -1165,12 +1309,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ConversationsRepliesResponse",
+                  "canonicalReference": "@slack/web-api!ConversationsRepliesResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n            create(params: "
+                  "text": ">;\n        };\n        users: {\n            info(params: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "UsersInfoArguments",
+                  "canonicalReference": "@slack/web-api!UsersInfoArguments:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -1183,21 +1345,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "UsersInfoResponse",
+                  "canonicalReference": "@slack/web-api!UsersInfoResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": ">;\n            list(params?: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "UsersListArguments",
+                  "canonicalReference": "@slack/web-api!UsersListArguments:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -1210,12 +1381,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "UsersListResponse",
+                  "canonicalReference": "@slack/web-api!UsersListResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n            invite(params: "
+                  "text": ">;\n            lookupByEmail(params: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "UsersLookupByEmailArguments",
+                  "canonicalReference": "@slack/web-api!UsersLookupByEmailArguments:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -1228,21 +1417,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "UsersLookupByEmailResponse",
+                  "canonicalReference": "@slack/web-api!UsersLookupByEmailResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": ">;\n            conversations(params: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "UsersConversationsArguments",
+                  "canonicalReference": "@slack/web-api!UsersConversationsArguments:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -1255,12 +1453,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "UsersConversationsResponse",
+                  "canonicalReference": "@slack/web-api!UsersConversationsResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n            history(params: "
+                  "text": ">;\n        };\n        reactions: {\n            add(params: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReactionsAddArguments",
+                  "canonicalReference": "@slack/web-api!ReactionsAddArguments:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -1273,21 +1489,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ReactionsAddResponse",
+                  "canonicalReference": "@slack/web-api!ReactionsAddResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": ">;\n            get(params: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReactionsGetArguments",
+                  "canonicalReference": "@slack/web-api!ReactionsGetArguments:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -1300,12 +1525,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ReactionsGetResponse",
+                  "canonicalReference": "@slack/web-api!ReactionsGetResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n            members(params: "
+                  "text": ">;\n            list(params?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReactionsListArguments",
+                  "canonicalReference": "@slack/web-api!ReactionsListArguments:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -1318,21 +1561,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ReactionsListResponse",
+                  "canonicalReference": "@slack/web-api!ReactionsListResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": ">;\n            remove(params: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ReactionsRemoveArguments",
+                  "canonicalReference": "@slack/web-api!ReactionsRemoveArguments:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -1345,12 +1597,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "ReactionsRemoveResponse",
+                  "canonicalReference": "@slack/web-api!ReactionsRemoveResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n            open(params: "
+                  "text": ">;\n        };\n        files: {\n            list(params?: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "FilesListArguments",
+                  "canonicalReference": "@slack/web-api!FilesListArguments:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -1363,21 +1633,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "FilesListResponse",
+                  "canonicalReference": "@slack/web-api!FilesListResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": ">;\n            info(params: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>): "
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "FilesInfoArguments",
+                  "canonicalReference": "@slack/web-api!FilesInfoArguments:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -1390,12 +1669,30 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "FilesInfoResponse",
+                  "canonicalReference": "@slack/web-api!FilesInfoResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>;\n            replies(params: "
+                  "text": ">;\n            delete(params: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "SlackParams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": "<"
+                },
+                {
+                  "kind": "Reference",
+                  "text": "FilesDeleteArguments",
+                  "canonicalReference": "@slack/web-api!FilesDeleteArguments:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ">): "
                 },
                 {
                   "kind": "Reference",
@@ -1408,534 +1705,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "FilesDeleteResponse",
+                  "canonicalReference": "@slack/web-api!FilesDeleteResponse:type"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>>;\n        };\n        users: {\n            info(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>>;\n            list(params?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>>;\n            lookupByEmail(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>>;\n            conversations(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>>;\n        };\n        reactions: {\n            add(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>>;\n            get(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>>;\n            list(params?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>>;\n            remove(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>>;\n        };\n        files: {\n            list(params?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>>;\n            info(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>>;\n            delete(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>>;\n        };\n    }"
+                  "text": ">;\n        };\n    }"
                 },
                 {
                   "kind": "Content",
@@ -1948,7 +1723,7 @@
               "name": "slack",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 252
+                "endIndex": 202
               }
             }
           ],
