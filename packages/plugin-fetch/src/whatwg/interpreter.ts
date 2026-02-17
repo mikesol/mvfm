@@ -1,5 +1,5 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
-import { eval_ } from "@mvfm/core";
+import { eval_, typedInterpreter } from "@mvfm/core";
 import { wrapFetch } from "./client-fetch";
 
 /**
@@ -13,16 +13,48 @@ export interface FetchClient {
   request(url: string, init?: RequestInit): Promise<Response>;
 }
 
-interface FetchRequestNode extends TypedNode<unknown> {
+/** A `fetch/request` node representing an HTTP request execution. */
+export interface FetchRequestNode extends TypedNode<Response> {
   kind: "fetch/request";
   url: TypedNode<string>;
-  init: TypedNode | null;
+  init: TypedNode<unknown> | null;
   config: { baseUrl?: string; defaultHeaders?: Record<string, string> };
 }
 
-interface FetchResponseNode extends TypedNode<unknown> {
-  kind: string;
-  response: TypedNode<Response>;
+/** A `fetch/json` node representing `response.json()`. */
+export interface FetchJsonNode extends TypedNode<unknown> {
+  kind: "fetch/json";
+  response: TypedNode<unknown>;
+}
+
+/** A `fetch/text` node representing `response.text()`. */
+export interface FetchTextNode extends TypedNode<string> {
+  kind: "fetch/text";
+  response: TypedNode<unknown>;
+}
+
+/** A `fetch/status` node representing `response.status`. */
+export interface FetchStatusNode extends TypedNode<number> {
+  kind: "fetch/status";
+  response: TypedNode<unknown>;
+}
+
+/** A `fetch/headers` node representing materialized response headers. */
+export interface FetchHeadersNode extends TypedNode<Record<string, string>> {
+  kind: "fetch/headers";
+  response: TypedNode<unknown>;
+}
+
+type FetchKind = "fetch/request" | "fetch/json" | "fetch/text" | "fetch/status" | "fetch/headers";
+
+declare module "@mvfm/core" {
+  interface NodeTypeMap {
+    "fetch/request": FetchRequestNode;
+    "fetch/json": FetchJsonNode;
+    "fetch/text": FetchTextNode;
+    "fetch/status": FetchStatusNode;
+    "fetch/headers": FetchHeadersNode;
+  }
 }
 
 /**
@@ -32,7 +64,7 @@ interface FetchResponseNode extends TypedNode<unknown> {
  * @returns An Interpreter handling all fetch node kinds.
  */
 export function createFetchInterpreter(client: FetchClient): Interpreter {
-  return {
+  return typedInterpreter<FetchKind>()({
     "fetch/request": async function* (node: FetchRequestNode) {
       const url = yield* eval_(node.url);
       const init = node.init != null ? yield* eval_(node.init) : undefined;
@@ -54,30 +86,30 @@ export function createFetchInterpreter(client: FetchClient): Interpreter {
       return await client.request(resolvedUrl, mergedInit);
     },
 
-    "fetch/json": async function* (node: FetchResponseNode) {
+    "fetch/json": async function* (node: FetchJsonNode) {
       const response = yield* eval_(node.response);
-      return await response.json();
+      return await (response as Response).json();
     },
 
-    "fetch/text": async function* (node: FetchResponseNode) {
+    "fetch/text": async function* (node: FetchTextNode) {
       const response = yield* eval_(node.response);
-      return await response.text();
+      return await (response as Response).text();
     },
 
-    "fetch/status": async function* (node: FetchResponseNode) {
+    "fetch/status": async function* (node: FetchStatusNode) {
       const response = yield* eval_(node.response);
-      return response.status;
+      return (response as Response).status;
     },
 
-    "fetch/headers": async function* (node: FetchResponseNode) {
+    "fetch/headers": async function* (node: FetchHeadersNode) {
       const response = yield* eval_(node.response);
       const headers: Record<string, string> = {};
-      response.headers.forEach((v, k) => {
+      (response as Response).headers.forEach((v, k) => {
         headers[k] = v;
       });
       return headers;
     },
-  };
+  });
 }
 
 /**
