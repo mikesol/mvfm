@@ -453,6 +453,10 @@
               "text": "): "
             },
             {
+              "kind": "Content",
+              "text": "import(\"@mvfm/core\")."
+            },
+            {
               "kind": "Reference",
               "text": "PluginDefinition",
               "canonicalReference": "@mvfm/plugin-fetch!~PluginDefinition:interface"
@@ -468,7 +472,7 @@
             },
             {
               "kind": "Content",
-              "text": ">"
+              "text": ", {}, \"fetch/request\" | \"fetch/json\" | \"fetch/text\" | \"fetch/status\" | \"fetch/headers\">"
             },
             {
               "kind": "Content",
@@ -478,7 +482,7 @@
           "fileUrlPath": "dist/whatwg/index.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 3,
-            "endIndex": 7
+            "endIndex": 8
           },
           "releaseTag": "Public",
           "overloadIndex": 1,

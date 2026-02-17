@@ -4,25 +4,24 @@ export { injectInput, injectLambdaParam, mvfm } from "./core";
 export { defaults } from "./defaults";
 
 export type {
-  CompleteInterpreter,
   FoldState,
   FoldYield,
   Handler,
   Interpreter,
+  InterpreterHandlers,
   IsAny,
   NodeTypeMap,
   RecurseScopedEffect,
   ScopedBinding,
   TypedNode,
-  TypedProgram,
 } from "./fold";
 export {
   createFoldState,
+  defineInterpreter,
   eval_,
   foldAST,
+  mergeInterpreters,
   recurseScoped,
-  typedFoldAST,
-  typedInterpreter,
   VOLATILE_KINDS,
 } from "./fold";
 export type {
@@ -88,6 +87,7 @@ export { array, nullable } from "./schema";
 export { inferType, resolveSchemaType } from "./trait-utils";
 export type {
   Expr,
+  ExtractPluginKinds,
   MissingTraitError,
   Plugin,
   PluginContext,
@@ -98,4 +98,5 @@ export type {
   TypeclassMapping,
   TypeclassSlot,
 } from "./types";
+export { definePlugin } from "./types";
 export { checkCompleteness } from "./validation";

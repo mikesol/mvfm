@@ -1,4 +1,5 @@
-import type { Expr, PluginContext, PluginDefinition, TypeclassSlot } from "../../core";
+import type { Expr, PluginContext } from "../../core";
+import { definePlugin } from "../../core";
 import { inferType } from "../../trait-utils";
 
 /**
@@ -22,10 +23,9 @@ declare module "../../core" {
 }
 
 /** Heyting algebra typeclass plugin. Dispatches `and`, `or`, `not` to type-specific implementations. */
-export const heytingAlgebra: PluginDefinition<TypeclassSlot<"heytingAlgebra">> = {
+export const heytingAlgebra = definePlugin({
   name: "heytingAlgebra",
   nodeKinds: [],
-  defaultInterpreter: {},
   build(ctx: PluginContext): any {
     const impls = ctx.plugins
       .filter((p) => p.traits?.heytingAlgebra)
@@ -82,4 +82,4 @@ export const heytingAlgebra: PluginDefinition<TypeclassSlot<"heytingAlgebra">> =
       },
     };
   },
-};
+});

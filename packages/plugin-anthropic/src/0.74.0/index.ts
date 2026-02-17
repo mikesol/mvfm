@@ -64,7 +64,8 @@ import type {
   ModelInfosPage,
   ModelListParams,
 } from "@anthropic-ai/sdk/resources/models";
-import type { Expr, PluginContext, PluginDefinition } from "@mvfm/core";
+import type { Expr, PluginContext } from "@mvfm/core";
+import { definePlugin } from "@mvfm/core";
 import { anthropicInterpreter } from "./interpreter";
 
 // ---- What the plugin adds to $ ----------------------------
@@ -137,8 +138,8 @@ export interface AnthropicConfig {
  * @param config - An {@link AnthropicConfig} with apiKey and optional baseURL.
  * @returns A PluginDefinition for the anthropic plugin.
  */
-export function anthropic(config: AnthropicConfig): PluginDefinition<AnthropicMethods> {
-  return {
+export function anthropic(config: AnthropicConfig) {
+  return definePlugin({
     name: "anthropic",
     nodeKinds: [
       "anthropic/create_message",
@@ -248,7 +249,7 @@ export function anthropic(config: AnthropicConfig): PluginDefinition<AnthropicMe
         },
       };
     },
-  };
+  });
 }
 
 // ============================================================

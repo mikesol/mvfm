@@ -21,7 +21,7 @@ import type { ModelListParams } from '@anthropic-ai/sdk/resources/models';
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function anthropic(config: AnthropicConfig): PluginDefinition<AnthropicMethods>;
+export function anthropic(config: AnthropicConfig): PluginDefinition<AnthropicMethods, {}, "anthropic/create_message" | "anthropic/count_tokens" | "anthropic/create_message_batch" | "anthropic/retrieve_message_batch" | "anthropic/list_message_batches" | "anthropic/delete_message_batch" | "anthropic/cancel_message_batch" | "anthropic/retrieve_model" | "anthropic/list_models">;
 
 // @public
 export interface AnthropicClient {

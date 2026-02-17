@@ -25,7 +25,8 @@
 //
 // ============================================================
 
-import type { Expr, PluginContext, PluginDefinition } from "@mvfm/core";
+import type { Expr, PluginContext } from "@mvfm/core";
+import { definePlugin } from "@mvfm/core";
 import { consoleInterpreter } from "./interpreter";
 
 /**
@@ -146,10 +147,10 @@ function liftMany(ctx: PluginContext, args: ConsoleArg[]): unknown[] {
  * @param config - Optional plugin configuration.
  * @returns A plugin definition that contributes `$.console`.
  */
-export function console(config: ConsoleConfig = {}): PluginDefinition<ConsoleMethods> {
+export function console(config: ConsoleConfig = {}) {
   const nodeKinds = METHOD_NAMES.map((method) => `console/${method}`);
 
-  return {
+  return definePlugin({
     name: "console",
     nodeKinds,
     defaultInterpreter: consoleInterpreter,
@@ -232,7 +233,7 @@ export function console(config: ConsoleConfig = {}): PluginDefinition<ConsoleMet
 
       return { console: api };
     },
-  };
+  });
 }
 
 /**

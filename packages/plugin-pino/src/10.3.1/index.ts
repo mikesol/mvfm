@@ -44,7 +44,8 @@
 //
 // ============================================================
 
-import type { Expr, PluginContext, PluginDefinition, TypedNode } from "@mvfm/core";
+import type { Expr, PluginContext, TypedNode } from "@mvfm/core";
+import { definePlugin } from "@mvfm/core";
 import { pinoInterpreter } from "./interpreter";
 
 // ---- What the plugin adds to $ ----------------------------
@@ -131,8 +132,8 @@ const LEVELS = ["trace", "debug", "info", "warn", "error", "fatal"] as const;
  * @param config - A {@link PinoConfig} with optional level and base bindings.
  * @returns A PluginDefinition for the pino plugin.
  */
-export function pino(config: PinoConfig = {}): PluginDefinition<PinoMethods> {
-  return {
+export function pino(config: PinoConfig = {}) {
+  return definePlugin({
     name: "pino",
     nodeKinds: ["pino/trace", "pino/debug", "pino/info", "pino/warn", "pino/error", "pino/fatal"],
     defaultInterpreter: pinoInterpreter,
@@ -188,5 +189,5 @@ export function pino(config: PinoConfig = {}): PluginDefinition<PinoMethods> {
         pino: buildLogger([]),
       };
     },
-  };
+  });
 }

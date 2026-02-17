@@ -26,7 +26,8 @@
 //
 // ============================================================
 
-import type { Expr, PluginContext, PluginDefinition, TypedNode } from "@mvfm/core";
+import type { Expr, PluginContext, TypedNode } from "@mvfm/core";
+import { definePlugin } from "@mvfm/core";
 
 // ---- What the plugin adds to $ ----------------------------
 
@@ -267,11 +268,11 @@ export interface PostgresConfig {
  * @param config - A connection string or {@link PostgresConfig} object.
  * @returns A PluginDefinition for the postgres plugin.
  */
-export function postgres(config?: PostgresConfig | string): PluginDefinition<PostgresMethods> {
+export function postgres(config?: PostgresConfig | string) {
   const resolvedConfig: PostgresConfig =
     typeof config === "string" ? { connectionString: config } : (config ?? {});
 
-  return {
+  return definePlugin({
     name: "postgres",
     nodeKinds: [
       "postgres/query",
@@ -395,7 +396,7 @@ export function postgres(config?: PostgresConfig | string): PluginDefinition<Pos
         sql: makeSql("top") as PostgresSql,
       };
     },
-  };
+  });
 }
 
 // ============================================================

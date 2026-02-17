@@ -5,7 +5,7 @@ import type {
   Result,
 } from "@fal-ai/client";
 import type { Interpreter, TypedNode } from "@mvfm/core";
-import { eval_, typedInterpreter } from "@mvfm/core";
+import { defineInterpreter, eval_ } from "@mvfm/core";
 import { wrapFalSdk } from "./client-fal-sdk";
 
 /**
@@ -75,7 +75,7 @@ declare module "@mvfm/core" {
  * @returns An Interpreter handling all fal node kinds.
  */
 export function createFalInterpreter(client: FalClient): Interpreter {
-  return typedInterpreter<
+  return defineInterpreter<
     | "fal/run"
     | "fal/subscribe"
     | "fal/queue_submit"

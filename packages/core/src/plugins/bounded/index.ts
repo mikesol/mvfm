@@ -1,4 +1,5 @@
-import type { PluginContext, PluginDefinition, TypeclassSlot } from "../../core";
+import type { PluginContext } from "../../core";
+import { definePlugin } from "../../core";
 
 /**
  * Bounded typeclass template — placeholder for future top/bottom methods for type T.
@@ -15,11 +16,10 @@ declare module "../../core" {
 }
 
 /** Bounded typeclass plugin. No direct methods; dispatched through trait implementations registered by type plugins (e.g. `num`, `boolean`). */
-export const bounded: PluginDefinition<TypeclassSlot<"bounded">> = {
+export const bounded = definePlugin({
   name: "bounded",
   nodeKinds: [],
-  defaultInterpreter: {},
   build(_ctx: PluginContext): any {
     return {};
   },
-};
+});

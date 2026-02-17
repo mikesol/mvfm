@@ -1,4 +1,5 @@
-import type { Expr, PluginContext, PluginDefinition, TypeclassSlot } from "../../core";
+import type { Expr, PluginContext } from "../../core";
+import { definePlugin } from "../../core";
 import { inferType } from "../../trait-utils";
 
 /**
@@ -18,10 +19,9 @@ declare module "../../core" {
 }
 
 /** Show typeclass plugin. Dispatches to type-specific `show` implementations. */
-export const show: PluginDefinition<TypeclassSlot<"show">> = {
+export const show = definePlugin({
   name: "show",
   nodeKinds: [],
-  defaultInterpreter: {},
   build(ctx: PluginContext): any {
     const impls = ctx.plugins.filter((p) => p.traits?.show).map((p) => p.traits!.show!);
 
@@ -48,4 +48,4 @@ export const show: PluginDefinition<TypeclassSlot<"show">> = {
       },
     };
   },
-};
+});

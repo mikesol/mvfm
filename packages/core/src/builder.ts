@@ -7,6 +7,7 @@ import type { InferSchema, SchemaShape } from "./schema";
 import type {
   CoreDollar,
   Expr,
+  ExtractPluginKinds,
   FlattenPluginInputs,
   MergePlugins,
   Plugin,
@@ -17,12 +18,12 @@ import type {
 } from "./types";
 import { isInternalNode, nextNodeId, simpleHash } from "./utils";
 
-function resolvePlugin(plugin: Plugin): PluginDefinition<any, any> {
+function resolvePlugin(plugin: Plugin): PluginDefinition<any, any, string> {
   return typeof plugin === "function" ? plugin() : plugin;
 }
 
-function flattenPluginInputs(inputs: readonly PluginInput[]): PluginDefinition<any, any>[] {
-  const flattened: PluginDefinition<any, any>[] = [];
+function flattenPluginInputs(inputs: readonly PluginInput[]): PluginDefinition<any, any, string>[] {
+  const flattened: PluginDefinition<any, any, string>[] = [];
   for (const input of inputs) {
     if (Array.isArray(input)) {
       flattened.push(...flattenPluginInputs(input));
@@ -42,16 +43,20 @@ function flattenPluginInputs(inputs: readonly PluginInput[]): PluginDefinition<a
  */
 export function mvfm<const P extends readonly PluginInput[]>(...plugins: P) {
   type FlatP = FlattenPluginInputs<P>;
+  type K = ExtractPluginKinds<FlatP[number]>;
   const resolvedPlugins = flattenPluginInputs(plugins);
 
   function define<S extends SchemaShape>(
     schema: S,
     fn: ($: CoreDollar<InferSchema<S>> & MergePlugins<FlatP>) => Expr<any> | any,
-  ): Program;
+  ): Program<K>;
   function define<I = never>(
     fn: ($: CoreDollar<I> & MergePlugins<FlatP>) => Expr<any> | any,
-  ): Program;
-  function define(schemaOrFn: SchemaShape | (($: any) => any), maybeFn?: ($: any) => any): Program {
+  ): Program<K>;
+  function define(
+    schemaOrFn: SchemaShape | (($: any) => any),
+    maybeFn?: ($: any) => any,
+  ): Program<K> {
     const schema = typeof schemaOrFn === "function" ? undefined : (schemaOrFn as SchemaShape);
     const fn = typeof schemaOrFn === "function" ? schemaOrFn : maybeFn!;
 
@@ -239,7 +244,7 @@ export function mvfm<const P extends readonly PluginInput[]>(...plugins: P) {
       hash,
       plugins: resolvedPlugins.map((p) => p.name),
       inputSchema: schema ?? {},
-    };
+    } as Program<K>;
   }
 
   return Object.assign(define, {

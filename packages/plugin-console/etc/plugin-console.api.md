@@ -20,7 +20,7 @@ export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: stri
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
 // @public
-function console_2(config?: ConsoleConfig): PluginDefinition<ConsoleMethods>;
+function console_2(config?: ConsoleConfig): PluginDefinition<ConsoleMethods, {}, string>;
 export { console_2 as console }
 
 // @public

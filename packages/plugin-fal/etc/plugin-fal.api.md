@@ -28,7 +28,7 @@ export function createFalInterpreter(client: FalClient): Interpreter;
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function fal(config: FalConfig): PluginDefinition<FalMethods>;
+export function fal(config: FalConfig): PluginDefinition<FalMethods, {}, "fal/run" | "fal/subscribe" | "fal/queue_submit" | "fal/queue_status" | "fal/queue_result" | "fal/queue_cancel">;
 
 // @public
 export interface FalClient {

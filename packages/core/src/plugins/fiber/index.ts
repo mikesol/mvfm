@@ -28,7 +28,8 @@
 //
 // ============================================================
 
-import type { Expr, PluginContext, PluginDefinition } from "../../core";
+import type { Expr, PluginContext } from "../../core";
+import { definePlugin } from "../../core";
 import { fiberInterpreter } from "./interpreter";
 
 // ---- What the plugin adds to $ ----------------------------
@@ -141,7 +142,7 @@ interface ParFn {
  * Provides `par` for parallel execution, `seq` for sequential execution,
  * `race` for first-to-complete, `timeout`, and `retry` combinators.
  */
-export const fiber: PluginDefinition<FiberMethods> = {
+export const fiber = definePlugin({
   name: "fiber",
   nodeKinds: ["fiber/par_map", "fiber/race", "fiber/timeout", "fiber/retry"],
   defaultInterpreter: fiberInterpreter,
@@ -225,4 +226,4 @@ export const fiber: PluginDefinition<FiberMethods> = {
       },
     };
   },
-};
+});

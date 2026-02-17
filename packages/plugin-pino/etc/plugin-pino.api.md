@@ -23,7 +23,7 @@ export function createPinoInterpreter(client: PinoClient): Interpreter;
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function pino(config?: PinoConfig): PluginDefinition<PinoMethods>;
+export function pino(config?: PinoConfig): PluginDefinition<PinoMethods, {}, "pino/trace" | "pino/debug" | "pino/info" | "pino/warn" | "pino/error" | "pino/fatal">;
 
 // @public
 export interface PinoClient {

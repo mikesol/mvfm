@@ -1,4 +1,4 @@
-import type { PluginDefinition } from "@mvfm/core";
+import { definePlugin } from "@mvfm/core";
 import type { ZodArrayNamespace } from "./array";
 import { arrayNamespace, arrayNodeKinds } from "./array";
 import type { ZodBigIntNamespace } from "./bigint";
@@ -132,7 +132,7 @@ const COMMON_NODE_KINDS: string[] = [
  *
  * Requires `zod` v4+ as a peer dependency.
  */
-export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
+export const zod = definePlugin({
   name: "zod",
 
   nodeKinds: [
@@ -183,4 +183,4 @@ export const zod: PluginDefinition<{ zod: ZodNamespace }> = {
       } as ZodNamespace,
     };
   },
-};
+});

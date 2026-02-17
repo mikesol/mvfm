@@ -1,4 +1,5 @@
-import type { Expr, PluginContext, PluginDefinition, TypeclassSlot } from "../../core";
+import type { Expr, PluginContext } from "../../core";
+import { definePlugin } from "../../core";
 import { inferType } from "../../trait-utils";
 
 /**
@@ -18,10 +19,9 @@ declare module "../../core" {
 }
 
 /** Semigroup typeclass plugin. Dispatches `append` to type-specific implementations. */
-export const semigroup: PluginDefinition<TypeclassSlot<"semigroup">> = {
+export const semigroup = definePlugin({
   name: "semigroup",
   nodeKinds: [],
-  defaultInterpreter: {},
   build(ctx: PluginContext): any {
     const impls = ctx.plugins.filter((p) => p.traits?.semigroup).map((p) => p.traits!.semigroup!);
 
@@ -51,4 +51,4 @@ export const semigroup: PluginDefinition<TypeclassSlot<"semigroup">> = {
       },
     };
   },
-};
+});

@@ -49,7 +49,8 @@
 //
 // ============================================================
 
-import type { Expr, PluginContext, PluginDefinition } from "@mvfm/core";
+import type { Expr, PluginContext } from "@mvfm/core";
+import { definePlugin } from "@mvfm/core";
 import type {
   CreateBatchOptions,
   CreateBatchSuccessResponse,
@@ -129,8 +130,8 @@ export interface ResendConfig {
  * @param config - A {@link ResendConfig} with apiKey.
  * @returns A PluginDefinition for the resend plugin.
  */
-export function resend(config: ResendConfig): PluginDefinition<ResendMethods> {
-  return {
+export function resend(config: ResendConfig) {
+  return definePlugin({
     name: "resend",
     nodeKinds: [
       "resend/send_email",
@@ -230,7 +231,7 @@ export function resend(config: ResendConfig): PluginDefinition<ResendMethods> {
         },
       };
     },
-  };
+  });
 }
 
 // ============================================================

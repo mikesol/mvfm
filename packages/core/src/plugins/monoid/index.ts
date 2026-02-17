@@ -1,4 +1,5 @@
-import type { PluginContext, PluginDefinition, TypeclassSlot } from "../../core";
+import type { PluginContext } from "../../core";
+import { definePlugin } from "../../core";
 
 /**
  * Monoid typeclass template — extends Semigroup with an identity element for type T.
@@ -14,11 +15,10 @@ declare module "../../core" {
 }
 
 /** Monoid typeclass plugin. Enables identity element dispatch for types with registered monoid traits. */
-export const monoid: PluginDefinition<TypeclassSlot<"monoid">> = {
+export const monoid = definePlugin({
   name: "monoid",
   nodeKinds: [],
-  defaultInterpreter: {},
   build(_ctx: PluginContext): any {
     return {};
   },
-};
+});

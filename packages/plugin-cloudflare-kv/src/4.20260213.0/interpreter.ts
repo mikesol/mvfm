@@ -1,5 +1,5 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
-import { eval_, typedInterpreter } from "@mvfm/core";
+import { defineInterpreter, eval_ } from "@mvfm/core";
 
 /**
  * Cloudflare KV client interface consumed by the handler.
@@ -94,7 +94,7 @@ declare module "@mvfm/core" {
  * @returns An Interpreter handling all cloudflare-kv node kinds.
  */
 export function createCloudflareKvInterpreter(client: CloudflareKvClient): Interpreter {
-  return typedInterpreter<CloudflareKvKind>()({
+  return defineInterpreter<CloudflareKvKind>()({
     "cloudflare-kv/get": async function* (node: CloudflareKvGetNode) {
       const key = yield* eval_(node.key);
       return await client.get(key);

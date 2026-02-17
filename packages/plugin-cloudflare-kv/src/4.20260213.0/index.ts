@@ -39,7 +39,8 @@
 //
 // ============================================================
 
-import type { Expr, PluginContext, PluginDefinition, TypedNode } from "@mvfm/core";
+import type { Expr, PluginContext, TypedNode } from "@mvfm/core";
+import { definePlugin } from "@mvfm/core";
 
 // ---- What the plugin adds to $ ----------------------------
 
@@ -132,8 +133,8 @@ export interface CloudflareKvConfig {
  * @param config - A {@link CloudflareKvConfig} with namespaceId.
  * @returns A PluginDefinition for the cloudflare-kv plugin.
  */
-export function cloudflareKv(config: CloudflareKvConfig): PluginDefinition<CloudflareKvMethods> {
-  return {
+export function cloudflareKv(config: CloudflareKvConfig) {
+  return definePlugin({
     name: "cloudflare-kv",
     nodeKinds: [
       "cloudflare-kv/get",
@@ -193,7 +194,7 @@ export function cloudflareKv(config: CloudflareKvConfig): PluginDefinition<Cloud
         },
       };
     },
-  };
+  });
 }
 
 // ============================================================

@@ -1,4 +1,5 @@
-import type { Expr, PluginContext, PluginDefinition, TypeclassSlot } from "../../core";
+import type { Expr, PluginContext } from "../../core";
+import { definePlugin } from "../../core";
 import { inferType } from "../../trait-utils";
 import { ordInterpreter } from "./interpreter";
 
@@ -32,7 +33,7 @@ declare module "../../core" {
  * Dispatches comparisons to type-specific implementations. Derives
  * `gt`, `gte`, `lt`, `lte` from the base `compare` operation.
  */
-export const ord: PluginDefinition<TypeclassSlot<"ord">> = {
+export const ord = definePlugin({
   name: "ord",
   nodeKinds: ["ord/gt", "ord/gte", "ord/lt", "ord/lte"],
   defaultInterpreter: ordInterpreter,
@@ -78,4 +79,4 @@ export const ord: PluginDefinition<TypeclassSlot<"ord">> = {
       lte: derived("ord/lte"),
     };
   },
-};
+});

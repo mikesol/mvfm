@@ -2,6 +2,8 @@
 // MVFM — Core type definitions
 // ============================================================
 
+import type { Interpreter, InterpreterHandlers, IsAny } from "./fold";
+
 // ---- Branding & Expr ----------------------------------------
 
 /** @internal Brand symbol for Expr detection. */
@@ -49,11 +51,12 @@ export type Expr<T> = ExprBase<T> & ExprFields<T>;
  * A Program is what mvfm() returns — the complete AST plus
  * a hash for verification.
  */
-export interface Program {
+export interface Program<K extends string = string> {
   ast: any;
   hash: string;
   plugins: string[];
   inputSchema: Record<string, unknown>;
+  readonly __kinds?: K;
 }
 
 // ---- Plugin Interface ---------------------------------------
@@ -91,7 +94,7 @@ export interface PluginContext {
   _registry: Map<number, any>;
 
   /** All resolved plugin definitions loaded in this program */
-  plugins: PluginDefinition[];
+  plugins: PluginDefinition<any, Record<string, unknown>, string>[];
 
   /** Runtime schema passed via the schema overload, if any */
   inputSchema?: Record<string, unknown>;
@@ -139,13 +142,16 @@ export interface TypeclassMapping<T> {}
  * Defines a plugin's contract: its name, the AST node kinds it emits,
  * and a build function that returns the methods it contributes to `$`.
  */
-// biome-ignore lint/correctness/noUnusedVariables: Traits is reserved for trait-based plugin dispatch
-export interface PluginDefinition<T = any, Traits extends Record<string, unknown> = {}> {
+export interface PluginDefinition<
+  T = any,
+  Traits extends Record<string, unknown> = {},
+  K extends string = string,
+> {
   name: string;
-  nodeKinds: string[];
+  nodeKinds: readonly K[];
   build: (ctx: PluginContext) => T;
   /** Default interpreter handlers for this plugin's node kinds. */
-  defaultInterpreter?: Record<string, (node: any) => AsyncGenerator<any, unknown, unknown>>;
+  defaultInterpreter?: Interpreter<K>;
   traits?: {
     eq?: TraitImpl;
     ord?: TraitImpl;
@@ -156,6 +162,8 @@ export interface PluginDefinition<T = any, Traits extends Record<string, unknown
     monoid?: TraitImpl;
     bounded?: TraitImpl;
   };
+  /** @internal phantom carrier for declared trait types */
+  readonly __traits?: Traits;
 }
 
 /**
@@ -163,8 +171,8 @@ export interface PluginDefinition<T = any, Traits extends Record<string, unknown
  * function that returns one (for plugins requiring configuration).
  */
 export type Plugin<T = any, Traits extends Record<string, unknown> = {}> =
-  | PluginDefinition<T, Traits>
-  | (() => PluginDefinition<T, Traits>);
+  | PluginDefinition<T, Traits, string>
+  | (() => PluginDefinition<T, Traits, string>);
 
 /**
  * A plugin input accepted by {@link mvfm}.
@@ -178,19 +186,67 @@ export type PluginInput = Plugin | readonly PluginInput[];
 
 /** Extract the methods type T from a plugin or factory */
 export type ExtractPluginType<P> =
-  P extends PluginDefinition<infer T, any>
+  P extends PluginDefinition<infer T, any, any>
     ? T
-    : P extends (...args: any[]) => PluginDefinition<infer T, any>
+    : P extends (...args: any[]) => PluginDefinition<infer T, any, any>
       ? T
       : {};
 
 /** Extract the Traits record from a plugin or factory */
 export type ExtractPluginTraits<P> =
-  P extends PluginDefinition<any, infer Traits>
+  P extends PluginDefinition<any, infer Traits, any>
     ? Traits
-    : P extends (...args: any[]) => PluginDefinition<any, infer Traits>
+    : P extends (...args: any[]) => PluginDefinition<any, infer Traits, any>
       ? Traits
       : {};
+
+/** Extract node kind union from a plugin definition/factory. */
+export type ExtractPluginKinds<P> =
+  P extends PluginDefinition<any, any, infer K>
+    ? K
+    : P extends (...args: any[]) => PluginDefinition<any, any, infer K>
+      ? K
+      : never;
+
+type ExtractNodeParam<F> = F extends (node: infer N, ...args: any[]) => any ? N : unknown;
+type RejectAnyParam<H> = IsAny<ExtractNodeParam<H>> extends true ? never : H;
+type CheckedInlineHandlers<K extends string, I extends InterpreterHandlers<K>> = I & {
+  [P in K]: P extends keyof I ? RejectAnyParam<I[P]> : never;
+};
+
+/**
+ * Define a plugin with inferred node kind union and any-rejection on inline
+ * defaultInterpreter handlers.
+ */
+export function definePlugin<
+  const Kinds extends readonly string[],
+  T,
+  Traits extends Record<string, unknown> = {},
+>(def: {
+  name: string;
+  nodeKinds: Kinds;
+  build: (ctx: PluginContext) => T;
+  defaultInterpreter?: Interpreter<string>;
+  traits?: PluginDefinition<any, Traits, Kinds[number]>["traits"];
+}): PluginDefinition<T, Traits, Kinds[number]>;
+export function definePlugin<
+  const Kinds extends readonly string[],
+  T,
+  Traits extends Record<string, unknown> = {},
+  I extends InterpreterHandlers<Kinds[number]> = InterpreterHandlers<Kinds[number]>,
+>(def: {
+  name: string;
+  nodeKinds: Kinds;
+  build: (ctx: PluginContext) => T;
+  defaultInterpreter?: CheckedInlineHandlers<Kinds[number], I>;
+  traits?: PluginDefinition<any, Traits, Kinds[number]>["traits"];
+}): PluginDefinition<T, Traits, Kinds[number]> {
+  return {
+    ...def,
+    nodeKinds: [...def.nodeKinds],
+    defaultInterpreter: def.defaultInterpreter as unknown as Interpreter<Kinds[number]> | undefined,
+  };
+}
 
 /** @internal */
 export type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (

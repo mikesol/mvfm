@@ -1,5 +1,5 @@
-import type { Interpreter, TypedNode } from "../../fold";
-import { eval_, recurseScoped, typedInterpreter } from "../../fold";
+import type { TypedNode } from "../../fold";
+import { defineInterpreter, eval_, recurseScoped } from "../../fold";
 
 // ---- Typed node interfaces ----------------------------------
 
@@ -49,7 +49,7 @@ declare module "@mvfm/core" {
 // ---- Interpreter map ----------------------------------------
 
 /** Interpreter handlers for `error/` node kinds. */
-export const errorInterpreter: Interpreter = typedInterpreter<
+export const errorInterpreter = defineInterpreter<
   "error/try" | "error/fail" | "error/attempt" | "error/guard" | "error/settle"
 >()({
   "error/try": async function* (node: ErrorTry) {

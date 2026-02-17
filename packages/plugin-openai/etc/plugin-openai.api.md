@@ -25,7 +25,7 @@ export function createOpenAIInterpreter(client: OpenAIClient): Interpreter;
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function openai(config: OpenAIConfig): PluginDefinition<OpenAIMethods>;
+export function openai(config: OpenAIConfig): PluginDefinition<OpenAIMethods, {}, "openai/create_chat_completion" | "openai/retrieve_chat_completion" | "openai/list_chat_completions" | "openai/update_chat_completion" | "openai/delete_chat_completion" | "openai/create_embedding" | "openai/create_moderation" | "openai/create_completion">;
 
 // @public
 export interface OpenAIClient {

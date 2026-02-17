@@ -16,34 +16,18 @@ export interface ArraySchema {
 }
 
 // @public
-export const boolean: PluginDefinition<BooleanMethods, {
-    eq: boolean;
-    show: boolean;
-    heytingAlgebra: boolean;
-    bounded: boolean;
-}>;
+export const boolean: PluginDefinition<BooleanMethods, {}, "boolean/and" | "boolean/or" | "boolean/not" | "boolean/eq" | "boolean/ff" | "boolean/tt" | "boolean/implies" | "boolean/show" | "boolean/top" | "boolean/bottom">;
 
+// Warning: (ae-forgotten-export) The symbol "BooleanKinds" needs to be exported by the entry point index.d.ts
+//
 // @public
-export const booleanInterpreter: {
-    "boolean/and": (node: BooleanAndNode) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
-    "boolean/or": (node: BooleanOrNode) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
-    "boolean/not": (node: BooleanNotNode) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
-    "boolean/eq": (node: BooleanEqNode) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
-    "boolean/ff": (_node: BooleanFalseNode) => AsyncGenerator<never, false, unknown>;
-    "boolean/tt": (_node: BooleanTrueNode) => AsyncGenerator<never, true, unknown>;
-    "boolean/implies": (node: BooleanImpliesNode) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
-    "boolean/show": (node: BooleanShowNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
-    "boolean/top": (_node: BooleanTopNode) => AsyncGenerator<never, true, unknown>;
-    "boolean/bottom": (_node: BooleanBottomNode) => AsyncGenerator<never, false, unknown>;
-};
+export const booleanInterpreter: Interpreter<BooleanKinds>;
 
 // @public
 export type BooleanMethods = {};
 
-// Warning: (ae-incompatible-release-tags) The symbol "bounded" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
-//
 // @public
-export const bounded: PluginDefinition<TypeclassSlot<"bounded">>;
+export const bounded: PluginDefinition<any, {}, never>;
 
 // @public
 export interface BoundedFor<_T> {
@@ -56,15 +40,10 @@ export function checkCompleteness(interpreter: Interpreter, program: Program): v
 export function checkCompleteness(interpreter: Interpreter, root: TypedNode): void;
 
 // @public
-export type CompleteInterpreter<K extends string> = {
-    [key in K]: key extends keyof NodeTypeMap ? Handler<NodeTypeMap[key]> : never;
-};
+export const control: PluginDefinition<ControlMethods, {}, "control/each" | "control/while">;
 
 // @public
-export const control: PluginDefinition<ControlMethods>;
-
-// @public
-export const controlInterpreter: Interpreter;
+export const controlInterpreter: Interpreter<"control/each" | "control/while">;
 
 // @public
 export interface ControlMethods {
@@ -105,17 +84,7 @@ export interface CoreInput extends TypedNode<unknown> {
 }
 
 // @public
-export const coreInterpreter: {
-    "core/literal": (node: CoreLiteral) => AsyncGenerator<never, unknown, unknown>;
-    "core/input": (node: CoreInput) => AsyncGenerator<never, unknown, unknown>;
-    "core/prop_access": (node: CorePropAccess) => AsyncGenerator<TypedNode<unknown>, unknown, unknown>;
-    "core/record": (node: CoreRecord) => AsyncGenerator<TypedNode<unknown>, Record<string, unknown>, unknown>;
-    "core/cond": (node: CoreCond) => AsyncGenerator<TypedNode<unknown>, unknown, unknown>;
-    "core/begin": (node: CoreBegin) => AsyncGenerator<TypedNode<unknown>, unknown, unknown>;
-    "core/program": (node: CoreProgram) => AsyncGenerator<TypedNode<unknown>, unknown, unknown>;
-    "core/tuple": (node: CoreTuple) => AsyncGenerator<TypedNode<unknown>, unknown[], unknown>;
-    "core/lambda_param": (node: CoreLambdaParam) => AsyncGenerator<never, unknown, unknown>;
-};
+export const coreInterpreter: Interpreter<"core/literal" | "core/input" | "core/prop_access" | "core/record" | "core/cond" | "core/begin" | "core/program" | "core/tuple" | "core/lambda_param">;
 
 // @public
 export interface CoreLambdaParam<T = unknown> extends TypedNode<T> {
@@ -175,12 +144,24 @@ export function createFoldState(): FoldState;
 // @public
 export function defaults<const P extends readonly PluginInput[]>(app: {
     readonly plugins: P;
-}, ...args: DefaultsArgs<P>): Interpreter;
+}, ...args: DefaultsArgs<P>): Interpreter<ExtractPluginKinds<P[number]>>;
 
-// Warning: (ae-incompatible-release-tags) The symbol "eq" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
+// Warning: (ae-forgotten-export) The symbol "RejectAnyParam" needs to be exported by the entry point index.d.ts
 //
 // @public
-export const eq: PluginDefinition<TypeclassSlot<"eq">>;
+export function defineInterpreter<K extends string>(): <T extends InterpreterHandlers<K>>(handlers: string extends K ? T : T & { [P in K]: P extends keyof T ? RejectAnyParam<P, T[P]> : never; }) => Interpreter<K>;
+
+// @public
+export function definePlugin<const Kinds extends readonly string[], T, Traits extends Record<string, unknown> = {}>(def: {
+    name: string;
+    nodeKinds: Kinds;
+    build: (ctx: PluginContext) => T;
+    defaultInterpreter?: Interpreter<string>;
+    traits?: PluginDefinition<any, Traits, Kinds[number]>["traits"];
+}): PluginDefinition<T, Traits, Kinds[number]>;
+
+// @public
+export const eq: PluginDefinition<any, {}, "eq/neq">;
 
 // @public
 export interface EqFor<T> {
@@ -189,15 +170,13 @@ export interface EqFor<T> {
 }
 
 // @public
-export const eqInterpreter: {
-    "eq/neq": (node: EqNeq) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
-};
+export const eqInterpreter: Interpreter<"eq/neq">;
 
 // @public
-export const error: PluginDefinition<ErrorMethods>;
+export const error: PluginDefinition<ErrorMethods, {}, "error/try" | "error/fail" | "error/attempt" | "error/guard" | "error/settle">;
 
 // @public
-export const errorInterpreter: Interpreter;
+export const errorInterpreter: Interpreter<"error/try" | "error/fail" | "error/attempt" | "error/guard" | "error/settle">;
 
 // @public
 export interface ErrorMethods {
@@ -226,10 +205,15 @@ export function eval_<T>(node: TypedNode<T>): AsyncGenerator<TypedNode, T, unkno
 export type Expr<T> = ExprBase<T> & ExprFields<T>;
 
 // @public
-export const fiber: PluginDefinition<FiberMethods>;
+export type ExtractPluginKinds<P> = P extends PluginDefinition<any, any, infer K> ? K : P extends (...args: any[]) => PluginDefinition<any, any, infer K> ? K : never;
 
 // @public
-export const fiberInterpreter: Interpreter;
+export const fiber: PluginDefinition<FiberMethods, {}, "fiber/par_map" | "fiber/race" | "fiber/timeout" | "fiber/retry">;
+
+// Warning: (ae-forgotten-export) The symbol "FiberKinds" needs to be exported by the entry point index.d.ts
+//
+// @public
+export const fiberInterpreter: Interpreter<FiberKinds>;
 
 // @public
 export interface FiberMethods {
@@ -245,10 +229,10 @@ export interface FiberMethods {
 }
 
 // @public
-export function foldAST(interpreter: Interpreter, program: Program, state?: FoldState): Promise<unknown>;
+export function foldAST<K extends string>(interpreter: Interpreter<K>, program: Program<K>, state?: FoldState): Promise<unknown>;
 
 // @public (undocumented)
-export function foldAST(interpreter: Interpreter, root: TypedNode, state?: FoldState): Promise<unknown>;
+export function foldAST<K extends string>(interpreter: Interpreter<K>, root: TypedNode, state?: FoldState): Promise<unknown>;
 
 // @public
 export interface FoldState {
@@ -264,10 +248,8 @@ export type FoldYield = TypedNode | RecurseScopedEffect;
 // @public
 export type Handler<N extends TypedNode<any>> = N extends TypedNode<infer T> ? (node: N) => AsyncGenerator<FoldYield, T, unknown> : never;
 
-// Warning: (ae-incompatible-release-tags) The symbol "heytingAlgebra" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
-//
 // @public
-export const heytingAlgebra: PluginDefinition<TypeclassSlot<"heytingAlgebra">>;
+export const heytingAlgebra: PluginDefinition<any, {}, never>;
 
 // @public
 export interface HeytingAlgebraFor<T> {
@@ -299,10 +281,22 @@ export function injectInput(program: Program, input: Record<string, unknown>): P
 export function injectLambdaParam(node: any, name: string, value: unknown): void;
 
 // @public
-export type Interpreter = Record<string, (node: any) => AsyncGenerator<FoldYield, unknown, unknown>>;
+export type Interpreter<K extends string = string> = InterpreterHandlers<K> & {
+    readonly [interpreterBrand]: K;
+};
+
+// Warning: (ae-forgotten-export) The symbol "AnyHandlerRecord" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type InterpreterHandlers<K extends string> = string extends K ? AnyHandlerRecord : {
+    [P in K]: P extends keyof NodeTypeMap ? Handler<NodeTypeMap[P]> : never;
+};
 
 // @public
 export type IsAny<T> = 0 extends 1 & T ? true : false;
+
+// @public
+export function mergeInterpreters<A extends string, B extends string>(a: Interpreter<A>, b: Interpreter<B>): Interpreter<A | B>;
 
 // Warning: (ae-internal-missing-underscore) The name "MissingTraitError" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -312,10 +306,8 @@ export interface MissingTraitError<_TraitName extends string, Hint extends strin
     readonly __error: Hint;
 }
 
-// Warning: (ae-incompatible-release-tags) The symbol "monoid" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
-//
 // @public
-export const monoid: PluginDefinition<TypeclassSlot<"monoid">>;
+export const monoid: PluginDefinition<any, {}, never>;
 
 // @public
 export interface MonoidFor<_T> {
@@ -323,8 +315,8 @@ export interface MonoidFor<_T> {
 
 // @public
 export function mvfm<const P extends readonly PluginInput[]>(...plugins: P): {
-    <S extends SchemaShape>(schema: S, fn: ($: CoreDollar<InferSchema<S>> & MergePlugins<FlattenPluginInputs<P>>) => Expr<any> | any): Program;
-    <I = never>(fn: ($: CoreDollar<I> & MergePlugins<FlattenPluginInputs<P>>) => Expr<any> | any): Program;
+    <S extends SchemaShape>(schema: S, fn: ($: CoreDollar<InferSchema<S>> & MergePlugins<FlattenPluginInputs<P>>) => Expr<any> | any): Program<ExtractPluginKinds<FlattenPluginInputs<P>[number]>>;
+    <I = never>(fn: ($: CoreDollar<I> & MergePlugins<FlattenPluginInputs<P>>) => Expr<any> | any): Program<ExtractPluginKinds<FlattenPluginInputs<P>[number]>>;
 } & {
     plugins: FlattenPluginInputs<P>;
 };
@@ -345,36 +337,12 @@ export interface NullableSchema {
 }
 
 // @public
-export const num: PluginDefinition<NumMethods, {
-    eq: number;
-    ord: number;
-    semiring: number;
-    show: number;
-    bounded: number;
-}>;
+export const num: PluginDefinition<NumMethods, {}, "num/add" | "num/sub" | "num/mul" | "num/div" | "num/mod" | "num/compare" | "num/neg" | "num/abs" | "num/floor" | "num/ceil" | "num/round" | "num/min" | "num/max" | "num/eq" | "num/zero" | "num/one" | "num/show" | "num/top" | "num/bottom">;
 
+// Warning: (ae-forgotten-export) The symbol "NumKinds" needs to be exported by the entry point index.d.ts
+//
 // @public
-export const numInterpreter: {
-    "num/add": (node: NumAddNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "num/sub": (node: NumSubNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "num/mul": (node: NumMulNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "num/div": (node: NumDivNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "num/mod": (node: NumModNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "num/compare": (node: NumCompareNode) => AsyncGenerator<TypedNode<unknown>, 1 | 0 | -1, unknown>;
-    "num/neg": (node: NumNegNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "num/abs": (node: NumAbsNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "num/floor": (node: NumFloorNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "num/ceil": (node: NumCeilNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "num/round": (node: NumRoundNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "num/min": (node: NumMinNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "num/max": (node: NumMaxNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "num/eq": (node: NumEqNode) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
-    "num/zero": (_node: NumZeroNode) => AsyncGenerator<never, number, unknown>;
-    "num/one": (_node: NumOneNode) => AsyncGenerator<never, number, unknown>;
-    "num/show": (node: NumShowNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
-    "num/top": (_node: NumTopNode) => AsyncGenerator<never, number, unknown>;
-    "num/bottom": (_node: NumBottomNode) => AsyncGenerator<never, number, unknown>;
-};
+export const numInterpreter: Interpreter<NumKinds>;
 
 // @public
 export interface NumMethods {
@@ -390,10 +358,8 @@ export interface NumMethods {
     sub(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
 }
 
-// Warning: (ae-incompatible-release-tags) The symbol "ord" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
-//
 // @public
-export const ord: PluginDefinition<TypeclassSlot<"ord">>;
+export const ord: PluginDefinition<any, {}, "ord/gt" | "ord/gte" | "ord/lt" | "ord/lte">;
 
 // @public
 export interface OrdFor<T> {
@@ -405,15 +371,10 @@ export interface OrdFor<T> {
 }
 
 // @public
-export const ordInterpreter: {
-    "ord/gt": (node: OrdCmp) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
-    "ord/gte": (node: OrdCmp) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
-    "ord/lt": (node: OrdCmp) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
-    "ord/lte": (node: OrdCmp) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
-};
+export const ordInterpreter: Interpreter<"ord/gt" | "ord/gte" | "ord/lt" | "ord/lte">;
 
 // @public
-type Plugin_2<T = any, Traits extends Record<string, unknown> = {}> = PluginDefinition<T, Traits> | (() => PluginDefinition<T, Traits>);
+type Plugin_2<T = any, Traits extends Record<string, unknown> = {}> = PluginDefinition<T, Traits, string> | (() => PluginDefinition<T, Traits, string>);
 export { Plugin_2 as Plugin }
 
 // @public
@@ -423,20 +384,22 @@ export interface PluginContext {
     inputSchema?: Record<string, unknown>;
     isExpr: (value: unknown) => value is Expr<unknown>;
     lift: <T>(value: T | Expr<T>) => Expr<T>;
-    plugins: PluginDefinition[];
+    plugins: PluginDefinition<any, Record<string, unknown>, string>[];
     _registry: Map<number, any>;
     statements: any[];
 }
 
 // @public
-export interface PluginDefinition<T = any, Traits extends Record<string, unknown> = {}> {
+export interface PluginDefinition<T = any, Traits extends Record<string, unknown> = {}, K extends string = string> {
+    // @internal
+    readonly __traits?: Traits;
     // (undocumented)
     build: (ctx: PluginContext) => T;
-    defaultInterpreter?: Record<string, (node: any) => AsyncGenerator<any, unknown, unknown>>;
+    defaultInterpreter?: Interpreter<K>;
     // (undocumented)
     name: string;
     // (undocumented)
-    nodeKinds: string[];
+    nodeKinds: readonly K[];
     // (undocumented)
     traits?: {
         eq?: TraitImpl;
@@ -453,29 +416,13 @@ export interface PluginDefinition<T = any, Traits extends Record<string, unknown
 // @public
 export type PluginInput = Plugin_2 | readonly PluginInput[];
 
-// Warning: (ae-incompatible-release-tags) The symbol "prelude" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
-//
 // @public
-export const prelude: readonly [PluginDefinition<NumMethods, {
-eq: number;
-ord: number;
-semiring: number;
-show: number;
-bounded: number;
-}>, PluginDefinition<StrMethods, {
-eq: string;
-show: string;
-semigroup: string;
-monoid: string;
-}>, PluginDefinition<TypeclassSlot<"semiring">, {}>, PluginDefinition<TypeclassSlot<"eq">, {}>, PluginDefinition<TypeclassSlot<"ord">, {}>, PluginDefinition<TypeclassSlot<"show">, {}>, PluginDefinition<BooleanMethods, {
-eq: boolean;
-show: boolean;
-heytingAlgebra: boolean;
-bounded: boolean;
-}>, PluginDefinition<TypeclassSlot<"bounded">, {}>, PluginDefinition<TypeclassSlot<"heytingAlgebra">, {}>, PluginDefinition<TypeclassSlot<"semigroup">, {}>, PluginDefinition<TypeclassSlot<"monoid">, {}>];
+export const prelude: readonly [PluginDefinition<NumMethods, {}, "num/add" | "num/sub" | "num/mul" | "num/div" | "num/mod" | "num/compare" | "num/neg" | "num/abs" | "num/floor" | "num/ceil" | "num/round" | "num/min" | "num/max" | "num/eq" | "num/zero" | "num/one" | "num/show" | "num/top" | "num/bottom">, PluginDefinition<StrMethods, {}, "str/template" | "str/concat" | "str/upper" | "str/lower" | "str/trim" | "str/slice" | "str/includes" | "str/startsWith" | "str/endsWith" | "str/split" | "str/join" | "str/replace" | "str/len" | "str/eq" | "str/show" | "str/append" | "str/mempty">, PluginDefinition<any, {}, never>, PluginDefinition<any, {}, "eq/neq">, PluginDefinition<any, {}, "ord/gt" | "ord/gte" | "ord/lt" | "ord/lte">, PluginDefinition<any, {}, never>, PluginDefinition<BooleanMethods, {}, "boolean/and" | "boolean/or" | "boolean/not" | "boolean/eq" | "boolean/ff" | "boolean/tt" | "boolean/implies" | "boolean/show" | "boolean/top" | "boolean/bottom">, PluginDefinition<any, {}, never>, PluginDefinition<any, {}, never>, PluginDefinition<any, {}, never>, PluginDefinition<any, {}, never>];
 
 // @public
-export interface Program {
+export interface Program<K extends string = string> {
+    // (undocumented)
+    readonly __kinds?: K;
     // (undocumented)
     ast: any;
     // (undocumented)
@@ -521,20 +468,16 @@ export interface ScopedBinding {
     value: unknown;
 }
 
-// Warning: (ae-incompatible-release-tags) The symbol "semigroup" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
-//
 // @public
-export const semigroup: PluginDefinition<TypeclassSlot<"semigroup">>;
+export const semigroup: PluginDefinition<any, {}, never>;
 
 // @public
 export interface SemigroupFor<T> {
     append(a: Expr<T> | T, b: Expr<T> | T): Expr<T>;
 }
 
-// Warning: (ae-incompatible-release-tags) The symbol "semiring" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
-//
 // @public
-export const semiring: PluginDefinition<TypeclassSlot<"semiring">>;
+export const semiring: PluginDefinition<any, {}, never>;
 
 // @public
 export interface SemiringFor<T> {
@@ -542,10 +485,8 @@ export interface SemiringFor<T> {
     mul(a: Expr<T> | T, b: Expr<T> | T): Expr<T>;
 }
 
-// Warning: (ae-incompatible-release-tags) The symbol "show" is marked as @public, but its signature references "TypeclassSlot" which is marked as @internal
-//
 // @public
-export const show: PluginDefinition<TypeclassSlot<"show">>;
+export const show: PluginDefinition<any, {}, never>;
 
 // @public
 export interface ShowFor<T> {
@@ -553,7 +494,7 @@ export interface ShowFor<T> {
 }
 
 // @public
-export const st: PluginDefinition<StMethods>;
+export const st: PluginDefinition<StMethods, {}, "st/let" | "st/get" | "st/set" | "st/push">;
 
 // @public
 export interface StMethods {
@@ -565,33 +506,12 @@ export interface StMethods {
 }
 
 // @public
-export const str: PluginDefinition<StrMethods, {
-    eq: string;
-    show: string;
-    semigroup: string;
-    monoid: string;
-}>;
+export const str: PluginDefinition<StrMethods, {}, "str/template" | "str/concat" | "str/upper" | "str/lower" | "str/trim" | "str/slice" | "str/includes" | "str/startsWith" | "str/endsWith" | "str/split" | "str/join" | "str/replace" | "str/len" | "str/eq" | "str/show" | "str/append" | "str/mempty">;
 
+// Warning: (ae-forgotten-export) The symbol "StrKinds" needs to be exported by the entry point index.d.ts
+//
 // @public
-export const strInterpreter: {
-    "str/template": (node: StrTemplateNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
-    "str/concat": (node: StrConcatNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
-    "str/upper": (node: StrUpperNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
-    "str/lower": (node: StrLowerNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
-    "str/trim": (node: StrTrimNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
-    "str/slice": (node: StrSliceNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
-    "str/includes": (node: StrIncludesNode) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
-    "str/startsWith": (node: StrStartsWithNode) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
-    "str/endsWith": (node: StrEndsWithNode) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
-    "str/split": (node: StrSplitNode) => AsyncGenerator<TypedNode<unknown>, string[], unknown>;
-    "str/join": (node: StrJoinNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
-    "str/replace": (node: StrReplaceNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
-    "str/len": (node: StrLenNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "str/eq": (node: StrEqNode) => AsyncGenerator<TypedNode<unknown>, boolean, unknown>;
-    "str/show": (node: StrShowNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
-    "str/append": (node: StrAppendNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
-    "str/mempty": (_node: StrMemptyNode) => AsyncGenerator<never, string, unknown>;
-};
+export const strInterpreter: Interpreter<StrKinds>;
 
 // @public
 export interface StrMethods {
@@ -633,29 +553,11 @@ export interface TypeclassSlot<Name extends string> {
 }
 
 // @public
-export function typedFoldAST<K extends string>(program: TypedProgram<K>, interpreter: CompleteInterpreter<K>, state?: FoldState): Promise<unknown>;
-
-// Warning: (ae-forgotten-export) The symbol "RequiredShape" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "RejectAnyParam" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "ExpectedHandler" needs to be exported by the entry point index.d.ts
-//
-// @public
-export function typedInterpreter<K extends string>(): <T extends RequiredShape<K>>(handlers: T & { [P in K]: P extends keyof T ? RejectAnyParam<P, T[P]> : ExpectedHandler<P>; }) => T;
-
-// @public
 export interface TypedNode<T = unknown> {
     // (undocumented)
     readonly __T?: T;
     // (undocumented)
     readonly kind: string;
-}
-
-// @public
-export interface TypedProgram<K extends string> {
-    // (undocumented)
-    readonly __kinds?: K;
-    // (undocumented)
-    root: TypedNode;
 }
 
 // @public
@@ -666,54 +568,6 @@ export const VOLATILE_KINDS: Set<string>;
 // dist/builder.d.ts:11:5 - (ae-forgotten-export) The symbol "CoreDollar" needs to be exported by the entry point index.d.ts
 // dist/builder.d.ts:11:5 - (ae-forgotten-export) The symbol "MergePlugins" needs to be exported by the entry point index.d.ts
 // dist/builder.d.ts:11:5 - (ae-forgotten-export) The symbol "FlattenPluginInputs" needs to be exported by the entry point index.d.ts
-// dist/plugins/boolean/interpreter.d.ts:58:5 - (ae-forgotten-export) The symbol "BooleanAndNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/boolean/interpreter.d.ts:59:5 - (ae-forgotten-export) The symbol "BooleanOrNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/boolean/interpreter.d.ts:60:5 - (ae-forgotten-export) The symbol "BooleanNotNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/boolean/interpreter.d.ts:61:5 - (ae-forgotten-export) The symbol "BooleanEqNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/boolean/interpreter.d.ts:62:5 - (ae-forgotten-export) The symbol "BooleanFalseNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/boolean/interpreter.d.ts:63:5 - (ae-forgotten-export) The symbol "BooleanTrueNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/boolean/interpreter.d.ts:64:5 - (ae-forgotten-export) The symbol "BooleanImpliesNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/boolean/interpreter.d.ts:65:5 - (ae-forgotten-export) The symbol "BooleanShowNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/boolean/interpreter.d.ts:66:5 - (ae-forgotten-export) The symbol "BooleanTopNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/boolean/interpreter.d.ts:67:5 - (ae-forgotten-export) The symbol "BooleanBottomNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/eq/interpreter.d.ts:13:5 - (ae-forgotten-export) The symbol "EqNeq" needs to be exported by the entry point index.d.ts
-// dist/plugins/num/interpreter.d.ts:106:5 - (ae-forgotten-export) The symbol "NumAddNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/num/interpreter.d.ts:107:5 - (ae-forgotten-export) The symbol "NumSubNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/num/interpreter.d.ts:108:5 - (ae-forgotten-export) The symbol "NumMulNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/num/interpreter.d.ts:109:5 - (ae-forgotten-export) The symbol "NumDivNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/num/interpreter.d.ts:110:5 - (ae-forgotten-export) The symbol "NumModNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/num/interpreter.d.ts:111:5 - (ae-forgotten-export) The symbol "NumCompareNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/num/interpreter.d.ts:112:5 - (ae-forgotten-export) The symbol "NumNegNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/num/interpreter.d.ts:113:5 - (ae-forgotten-export) The symbol "NumAbsNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/num/interpreter.d.ts:114:5 - (ae-forgotten-export) The symbol "NumFloorNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/num/interpreter.d.ts:115:5 - (ae-forgotten-export) The symbol "NumCeilNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/num/interpreter.d.ts:116:5 - (ae-forgotten-export) The symbol "NumRoundNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/num/interpreter.d.ts:117:5 - (ae-forgotten-export) The symbol "NumMinNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/num/interpreter.d.ts:118:5 - (ae-forgotten-export) The symbol "NumMaxNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/num/interpreter.d.ts:119:5 - (ae-forgotten-export) The symbol "NumEqNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/num/interpreter.d.ts:120:5 - (ae-forgotten-export) The symbol "NumZeroNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/num/interpreter.d.ts:121:5 - (ae-forgotten-export) The symbol "NumOneNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/num/interpreter.d.ts:122:5 - (ae-forgotten-export) The symbol "NumShowNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/num/interpreter.d.ts:123:5 - (ae-forgotten-export) The symbol "NumTopNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/num/interpreter.d.ts:124:5 - (ae-forgotten-export) The symbol "NumBottomNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/ord/interpreter.d.ts:16:5 - (ae-forgotten-export) The symbol "OrdCmp" needs to be exported by the entry point index.d.ts
-// dist/plugins/str/interpreter.d.ts:104:5 - (ae-forgotten-export) The symbol "StrTemplateNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/str/interpreter.d.ts:105:5 - (ae-forgotten-export) The symbol "StrConcatNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/str/interpreter.d.ts:106:5 - (ae-forgotten-export) The symbol "StrUpperNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/str/interpreter.d.ts:107:5 - (ae-forgotten-export) The symbol "StrLowerNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/str/interpreter.d.ts:108:5 - (ae-forgotten-export) The symbol "StrTrimNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/str/interpreter.d.ts:109:5 - (ae-forgotten-export) The symbol "StrSliceNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/str/interpreter.d.ts:110:5 - (ae-forgotten-export) The symbol "StrIncludesNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/str/interpreter.d.ts:111:5 - (ae-forgotten-export) The symbol "StrStartsWithNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/str/interpreter.d.ts:112:5 - (ae-forgotten-export) The symbol "StrEndsWithNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/str/interpreter.d.ts:113:5 - (ae-forgotten-export) The symbol "StrSplitNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/str/interpreter.d.ts:114:5 - (ae-forgotten-export) The symbol "StrJoinNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/str/interpreter.d.ts:115:5 - (ae-forgotten-export) The symbol "StrReplaceNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/str/interpreter.d.ts:116:5 - (ae-forgotten-export) The symbol "StrLenNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/str/interpreter.d.ts:117:5 - (ae-forgotten-export) The symbol "StrEqNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/str/interpreter.d.ts:118:5 - (ae-forgotten-export) The symbol "StrShowNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/str/interpreter.d.ts:119:5 - (ae-forgotten-export) The symbol "StrAppendNode" needs to be exported by the entry point index.d.ts
-// dist/plugins/str/interpreter.d.ts:120:5 - (ae-forgotten-export) The symbol "StrMemptyNode" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

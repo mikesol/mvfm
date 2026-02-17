@@ -23,7 +23,7 @@ export function createFetchInterpreter(client: FetchClient): Interpreter;
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
 // @public
-function fetch_2(config?: FetchConfig): PluginDefinition<FetchMethods>;
+function fetch_2(config?: FetchConfig): PluginDefinition<FetchMethods, {}, "fetch/request" | "fetch/json" | "fetch/text" | "fetch/status" | "fetch/headers">;
 export { fetch_2 as fetch }
 
 // @public

@@ -123,3 +123,12 @@ export interface ZodLambdaNode extends TypedNode {
  * Union of schema nodes accepted by the zod interpreter.
  */
 export type AnyZodSchemaNode = ZodSchemaNodeBase;
+
+declare module "@mvfm/core" {
+  interface NodeTypeMap {
+    "zod/parse": ValidationASTNode;
+    "zod/safe_parse": ValidationASTNode;
+    "zod/parse_async": ValidationASTNode;
+    "zod/safe_parse_async": ValidationASTNode;
+  }
+}

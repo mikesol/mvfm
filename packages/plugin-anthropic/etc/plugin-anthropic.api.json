@@ -207,6 +207,10 @@
               "text": "): "
             },
             {
+              "kind": "Content",
+              "text": "import(\"@mvfm/core\")."
+            },
+            {
               "kind": "Reference",
               "text": "PluginDefinition",
               "canonicalReference": "@mvfm/plugin-anthropic!~PluginDefinition:interface"
@@ -222,7 +226,7 @@
             },
             {
               "kind": "Content",
-              "text": ">"
+              "text": ", {}, \"anthropic/create_message\" | \"anthropic/count_tokens\" | \"anthropic/create_message_batch\" | \"anthropic/retrieve_message_batch\" | \"anthropic/list_message_batches\" | \"anthropic/delete_message_batch\" | \"anthropic/cancel_message_batch\" | \"anthropic/retrieve_model\" | \"anthropic/list_models\">"
             },
             {
               "kind": "Content",
@@ -232,7 +236,7 @@
           "fileUrlPath": "dist/0.74.0/index.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 3,
-            "endIndex": 7
+            "endIndex": 8
           },
           "releaseTag": "Public",
           "overloadIndex": 1,

@@ -1,5 +1,5 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
-import { eval_, typedInterpreter } from "@mvfm/core";
+import { defineInterpreter, eval_ } from "@mvfm/core";
 import { wrapTwilioSdk } from "./client-twilio-sdk";
 
 /**
@@ -68,7 +68,7 @@ declare module "@mvfm/core" {
  * @returns An Interpreter handling all twilio node kinds.
  */
 export function createTwilioInterpreter(client: TwilioClient): Interpreter {
-  return typedInterpreter<TwilioKind>()({
+  return defineInterpreter<TwilioKind>()({
     "twilio/create_message": async function* (node: TwilioCreateMessageNode) {
       const base = `/2010-04-01/Accounts/${node.config.accountSid}`;
       const params = yield* eval_(node.params);

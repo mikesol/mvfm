@@ -1,5 +1,5 @@
 import type { Interpreter, TypedNode } from "../../fold";
-import { eval_, foldAST, recurseScoped, typedInterpreter } from "../../fold";
+import { defineInterpreter, eval_, foldAST, recurseScoped } from "../../fold";
 import { injectLambdaParam } from "../../utils";
 
 // ---- Typed node interfaces ----------------------------------
@@ -50,7 +50,7 @@ type FiberKinds = "fiber/par_map" | "fiber/race" | "fiber/timeout" | "fiber/retr
 // ---- Sequential interpreter (default) -----------------------
 
 /** Sequential interpreter handlers for `fiber/` node kinds. */
-export const fiberInterpreter: Interpreter = typedInterpreter<FiberKinds>()({
+export const fiberInterpreter = defineInterpreter<FiberKinds>()({
   "fiber/par_map": async function* (node: FiberParMap) {
     const collection = yield* eval_(node.collection);
     const results: unknown[] = [];
@@ -99,7 +99,7 @@ export const fiberInterpreter: Interpreter = typedInterpreter<FiberKinds>()({
  * ```
  */
 export function createParallelFiberInterpreter(interpreter: Interpreter): Interpreter {
-  return typedInterpreter<FiberKinds>()({
+  return defineInterpreter<FiberKinds>()({
     "fiber/par_map": async function* (node: FiberParMap) {
       const collection = yield* eval_(node.collection);
       const results: unknown[] = [];

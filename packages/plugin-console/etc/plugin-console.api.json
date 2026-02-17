@@ -406,6 +406,10 @@
               "text": "): "
             },
             {
+              "kind": "Content",
+              "text": "import(\"@mvfm/core\")."
+            },
+            {
               "kind": "Reference",
               "text": "PluginDefinition",
               "canonicalReference": "@mvfm/plugin-console!~PluginDefinition:interface"
@@ -421,7 +425,7 @@
             },
             {
               "kind": "Content",
-              "text": ">"
+              "text": ", {}, string>"
             },
             {
               "kind": "Content",
@@ -431,7 +435,7 @@
           "fileUrlPath": "dist/22.0.0/index.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 3,
-            "endIndex": 7
+            "endIndex": 8
           },
           "releaseTag": "Public",
           "overloadIndex": 1,

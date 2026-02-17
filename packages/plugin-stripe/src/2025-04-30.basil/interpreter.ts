@@ -1,5 +1,5 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
-import { eval_, typedInterpreter } from "@mvfm/core";
+import { defineInterpreter, eval_ } from "@mvfm/core";
 import { wrapStripeSdk } from "./client-stripe-sdk";
 
 /**
@@ -69,7 +69,7 @@ declare module "@mvfm/core" {
  * @returns An Interpreter handling all stripe node kinds.
  */
 export function createStripeInterpreter(client: StripeClient): Interpreter {
-  return typedInterpreter<
+  return defineInterpreter<
     | "stripe/create_payment_intent"
     | "stripe/retrieve_payment_intent"
     | "stripe/confirm_payment_intent"

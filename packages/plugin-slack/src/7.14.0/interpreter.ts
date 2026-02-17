@@ -1,5 +1,5 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
-import { eval_, typedInterpreter } from "@mvfm/core";
+import { defineInterpreter, eval_ } from "@mvfm/core";
 import { wrapSlackWebClient } from "./client-slack-web-api";
 import type { SLACK_NODE_KINDS } from "./node-kinds";
 
@@ -130,7 +130,7 @@ export function createSlackInterpreter(client: SlackClient): Interpreter {
     return await client.apiCall(method, params);
   };
 
-  return typedInterpreter<SlackKind>()({
+  return defineInterpreter<SlackKind>()({
     "slack/chat_postMessage": async function* (node: SlackChatPostMessageNode) {
       return yield* handler(node);
     },

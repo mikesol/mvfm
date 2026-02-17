@@ -497,6 +497,10 @@
               "text": "): "
             },
             {
+              "kind": "Content",
+              "text": "import(\"@mvfm/core\")."
+            },
+            {
               "kind": "Reference",
               "text": "PluginDefinition",
               "canonicalReference": "@mvfm/plugin-resend!~PluginDefinition:interface"
@@ -512,7 +516,7 @@
             },
             {
               "kind": "Content",
-              "text": ">"
+              "text": ", {}, \"resend/send_email\" | \"resend/get_email\" | \"resend/send_batch\" | \"resend/create_contact\" | \"resend/get_contact\" | \"resend/list_contacts\" | \"resend/remove_contact\">"
             },
             {
               "kind": "Content",
@@ -522,7 +526,7 @@
           "fileUrlPath": "dist/6.9.2/index.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 3,
-            "endIndex": 7
+            "endIndex": 8
           },
           "releaseTag": "Public",
           "overloadIndex": 1,

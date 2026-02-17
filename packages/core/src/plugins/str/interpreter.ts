@@ -1,5 +1,5 @@
 import type { TypedNode } from "../../fold";
-import { eval_, typedInterpreter } from "../../fold";
+import { defineInterpreter, eval_ } from "../../fold";
 
 // ---- Typed node interfaces ----------------------------------
 
@@ -143,7 +143,7 @@ type StrKinds =
 // ---- Interpreter map ----------------------------------------
 
 /** Interpreter handlers for `str/` node kinds. */
-export const strInterpreter = typedInterpreter<StrKinds>()({
+export const strInterpreter = defineInterpreter<StrKinds>()({
   "str/template": async function* (node: StrTemplateNode) {
     let result = node.strings[0];
     for (let i = 0; i < node.exprs.length; i++) {

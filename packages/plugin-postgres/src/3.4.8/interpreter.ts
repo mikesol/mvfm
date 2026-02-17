@@ -1,5 +1,5 @@
 import type { TypedNode } from "@mvfm/core";
-import { eval_, typedInterpreter } from "@mvfm/core";
+import { defineInterpreter, eval_ } from "@mvfm/core";
 
 /**
  * Database client interface consumed by the postgres handler.
@@ -182,7 +182,7 @@ export async function* buildSQL(
  * @returns An Interpreter handling postgres node kinds.
  */
 export function createPostgresInterpreter(client: PostgresClient) {
-  return typedInterpreter<
+  return defineInterpreter<
     | "postgres/query"
     | "postgres/identifier"
     | "postgres/insert_helper"

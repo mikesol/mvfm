@@ -476,160 +476,16 @@
             },
             {
               "kind": "Content",
-              "text": "{\n    \"postgres/query\": (node: "
+              "text": "import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
-              "text": "PostgresQueryNode",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresQueryNode:interface"
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/plugin-postgres!~Interpreter:type"
             },
             {
               "kind": "Content",
-              "text": ") => "
-            },
-            {
-              "kind": "Reference",
-              "text": "AsyncGenerator",
-              "canonicalReference": "!AsyncGenerator:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "TypedNode",
-              "canonicalReference": "@mvfm/plugin-postgres!~TypedNode:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<unknown>, unknown[], unknown>;\n    \"postgres/begin\": (_node: "
-            },
-            {
-              "kind": "Reference",
-              "text": "PostgresBeginNode",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresBeginNode:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ") => "
-            },
-            {
-              "kind": "Reference",
-              "text": "AsyncGenerator",
-              "canonicalReference": "!AsyncGenerator:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<never, never, unknown>;\n    \"postgres/savepoint\": (_node: "
-            },
-            {
-              "kind": "Reference",
-              "text": "PostgresSavepointNode",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresSavepointNode:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ") => "
-            },
-            {
-              "kind": "Reference",
-              "text": "AsyncGenerator",
-              "canonicalReference": "!AsyncGenerator:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<never, never, unknown>;\n    \"postgres/cursor\": (_node: "
-            },
-            {
-              "kind": "Reference",
-              "text": "PostgresCursorNode",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresCursorNode:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ") => "
-            },
-            {
-              "kind": "Reference",
-              "text": "AsyncGenerator",
-              "canonicalReference": "!AsyncGenerator:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<never, never, unknown>;\n    \"postgres/cursor_batch\": (_node: "
-            },
-            {
-              "kind": "Reference",
-              "text": "PostgresCursorBatchNode",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresCursorBatchNode:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ") => "
-            },
-            {
-              "kind": "Reference",
-              "text": "AsyncGenerator",
-              "canonicalReference": "!AsyncGenerator:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<never, never, unknown>;\n    \"postgres/identifier\": (_node: "
-            },
-            {
-              "kind": "Reference",
-              "text": "PostgresIdentifierNode",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresIdentifierNode:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ") => "
-            },
-            {
-              "kind": "Reference",
-              "text": "AsyncGenerator",
-              "canonicalReference": "!AsyncGenerator:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<never, never, unknown>;\n    \"postgres/insert_helper\": (_node: "
-            },
-            {
-              "kind": "Reference",
-              "text": "PostgresInsertHelperNode",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresInsertHelperNode:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ") => "
-            },
-            {
-              "kind": "Reference",
-              "text": "AsyncGenerator",
-              "canonicalReference": "!AsyncGenerator:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<never, never, unknown>;\n    \"postgres/set_helper\": (_node: "
-            },
-            {
-              "kind": "Reference",
-              "text": "PostgresSetHelperNode",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresSetHelperNode:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ") => "
-            },
-            {
-              "kind": "Reference",
-              "text": "AsyncGenerator",
-              "canonicalReference": "!AsyncGenerator:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<never, never, unknown>;\n}"
+              "text": "<\"postgres/query\" | \"postgres/identifier\" | \"postgres/insert_helper\" | \"postgres/set_helper\" | \"postgres/begin\" | \"postgres/savepoint\" | \"postgres/cursor\" | \"postgres/cursor_batch\">"
             },
             {
               "kind": "Content",
@@ -639,7 +495,7 @@
           "fileUrlPath": "dist/3.4.8/interpreter.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 3,
-            "endIndex": 38
+            "endIndex": 6
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
@@ -787,6 +643,10 @@
               "text": "): "
             },
             {
+              "kind": "Content",
+              "text": "import(\"@mvfm/core\")."
+            },
+            {
               "kind": "Reference",
               "text": "PluginDefinition",
               "canonicalReference": "@mvfm/plugin-postgres!~PluginDefinition:interface"
@@ -802,7 +662,7 @@
             },
             {
               "kind": "Content",
-              "text": ">"
+              "text": ", {}, \"postgres/query\" | \"postgres/identifier\" | \"postgres/insert_helper\" | \"postgres/set_helper\" | \"postgres/begin\" | \"postgres/savepoint\" | \"postgres/cursor\" | \"postgres/cursor_batch\">"
             },
             {
               "kind": "Content",
@@ -812,7 +672,7 @@
           "fileUrlPath": "dist/3.4.8/index.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 4,
-            "endIndex": 8
+            "endIndex": 9
           },
           "releaseTag": "Public",
           "overloadIndex": 1,

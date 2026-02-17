@@ -1,4 +1,5 @@
-import type { Expr, PluginContext, PluginDefinition } from "../../core";
+import type { Expr, PluginContext } from "../../core";
+import { definePlugin } from "../../core";
 
 /**
  * Mutable state operations for local variables within a program.
@@ -22,7 +23,7 @@ export interface StMethods {
  *
  * Provides `let` for declaring local mutable variables with get/set/push access.
  */
-export const st: PluginDefinition<StMethods> = {
+export const st = definePlugin({
   name: "st",
   nodeKinds: ["st/let", "st/get", "st/set", "st/push"],
   build(ctx: PluginContext): StMethods {
@@ -52,4 +53,4 @@ export const st: PluginDefinition<StMethods> = {
       },
     };
   },
-};
+});

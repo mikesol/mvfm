@@ -1,4 +1,5 @@
-import type { Expr, PluginContext, PluginDefinition } from "../../core";
+import type { Expr, PluginContext } from "../../core";
+import { definePlugin } from "../../core";
 import { controlInterpreter } from "./interpreter";
 
 /**
@@ -28,7 +29,7 @@ export interface ControlMethods {
  *
  * Provides `each` for collection iteration and `while` for conditional loops.
  */
-export const control: PluginDefinition<ControlMethods> = {
+export const control = definePlugin({
   name: "control",
   nodeKinds: ["control/each", "control/while"],
   defaultInterpreter: controlInterpreter,
@@ -61,4 +62,4 @@ export const control: PluginDefinition<ControlMethods> = {
       },
     };
   },
-};
+});

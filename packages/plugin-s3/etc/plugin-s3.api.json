@@ -453,6 +453,10 @@
               "text": "): "
             },
             {
+              "kind": "Content",
+              "text": "import(\"@mvfm/core\")."
+            },
+            {
               "kind": "Reference",
               "text": "PluginDefinition",
               "canonicalReference": "@mvfm/plugin-s3!~PluginDefinition:interface"
@@ -468,7 +472,7 @@
             },
             {
               "kind": "Content",
-              "text": ">"
+              "text": ", {}, \"s3/put_object\" | \"s3/get_object\" | \"s3/delete_object\" | \"s3/head_object\" | \"s3/list_objects_v2\">"
             },
             {
               "kind": "Content",
@@ -478,7 +482,7 @@
           "fileUrlPath": "dist/3.989.0/index.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 3,
-            "endIndex": 7
+            "endIndex": 8
           },
           "releaseTag": "Public",
           "overloadIndex": 1,

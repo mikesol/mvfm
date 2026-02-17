@@ -1,5 +1,5 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
-import { eval_, typedInterpreter } from "@mvfm/core";
+import { defineInterpreter, eval_ } from "@mvfm/core";
 import { wrapFetch } from "./client-fetch";
 
 /**
@@ -64,7 +64,7 @@ declare module "@mvfm/core" {
  * @returns An Interpreter handling all fetch node kinds.
  */
 export function createFetchInterpreter(client: FetchClient): Interpreter {
-  return typedInterpreter<FetchKind>()({
+  return defineInterpreter<FetchKind>()({
     "fetch/request": async function* (node: FetchRequestNode) {
       const url = yield* eval_(node.url);
       const init = node.init != null ? yield* eval_(node.init) : undefined;

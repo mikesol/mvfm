@@ -1,5 +1,5 @@
-import type { Interpreter, TypedNode } from "../../fold";
-import { eval_, recurseScoped, typedInterpreter } from "../../fold";
+import type { TypedNode } from "../../fold";
+import { defineInterpreter, eval_, recurseScoped } from "../../fold";
 
 interface ControlParam {
   __id: number;
@@ -26,26 +26,24 @@ declare module "@mvfm/core" {
 }
 
 /** Interpreter handlers for `control/` node kinds. */
-export const controlInterpreter: Interpreter = typedInterpreter<"control/each" | "control/while">()(
-  {
-    "control/each": async function* (node: ControlEachNode) {
-      const collection = yield* eval_(node.collection);
-      for (const item of collection) {
-        for (const statement of node.body) {
-          yield recurseScoped(statement, [{ paramId: node.param.__id, value: item }]);
-        }
+export const controlInterpreter = defineInterpreter<"control/each" | "control/while">()({
+  "control/each": async function* (node: ControlEachNode) {
+    const collection = yield* eval_(node.collection);
+    for (const item of collection) {
+      for (const statement of node.body) {
+        yield recurseScoped(statement, [{ paramId: node.param.__id, value: item }]);
       }
-      return undefined;
-    },
-
-    "control/while": async function* (node: ControlWhileNode) {
-      // Evaluate condition before each iteration to preserve while-loop semantics.
-      while (yield* eval_(node.condition)) {
-        for (const statement of node.body) {
-          yield* eval_(statement);
-        }
-      }
-      return undefined;
-    },
+    }
+    return undefined;
   },
-);
+
+  "control/while": async function* (node: ControlWhileNode) {
+    // Evaluate condition before each iteration to preserve while-loop semantics.
+    while (yield* eval_(node.condition)) {
+      for (const statement of node.body) {
+        yield* eval_(statement);
+      }
+    }
+    return undefined;
+  },
+});

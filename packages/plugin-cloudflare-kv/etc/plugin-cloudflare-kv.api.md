@@ -20,7 +20,7 @@ export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: stri
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function cloudflareKv(config: CloudflareKvConfig): PluginDefinition<CloudflareKvMethods>;
+export function cloudflareKv(config: CloudflareKvConfig): PluginDefinition<CloudflareKvMethods, {}, "cloudflare-kv/get" | "cloudflare-kv/get_json" | "cloudflare-kv/put" | "cloudflare-kv/delete" | "cloudflare-kv/list">;
 
 // @public
 export interface CloudflareKvClient {

@@ -1,5 +1,5 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
-import { eval_ } from "@mvfm/core";
+import { defineInterpreter, eval_ } from "@mvfm/core";
 
 /**
  * Options for the client-side interpreter.
@@ -30,7 +30,7 @@ export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: stri
   const fetchFn = options.fetch ?? globalThis.fetch;
   let stepIndex = 0;
 
-  const interp: Interpreter = {};
+  const interp: Record<string, (node: TypedNode) => AsyncGenerator<any, unknown, unknown>> = {};
   for (const kind of nodeKinds) {
     interp[kind] = async function* (node: TypedNode) {
       const resolved: Record<string, unknown> = {};
@@ -73,5 +73,5 @@ export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: stri
     };
   }
 
-  return interp;
+  return defineInterpreter<string>()(interp);
 }

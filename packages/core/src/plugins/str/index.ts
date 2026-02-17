@@ -1,4 +1,5 @@
-import type { Expr, PluginContext, PluginDefinition } from "../../core";
+import type { Expr, PluginContext } from "../../core";
+import { definePlugin } from "../../core";
 import { strInterpreter } from "./interpreter";
 
 /**
@@ -49,10 +50,7 @@ export interface StrMethods {
  * Provides template literals, concatenation, case conversion, search, and
  * splitting. Registers trait implementations for eq, show, semigroup, and monoid.
  */
-export const str: PluginDefinition<
-  StrMethods,
-  { eq: string; show: string; semigroup: string; monoid: string }
-> = {
+export const str = definePlugin({
   name: "str",
   nodeKinds: [
     "str/template",
@@ -145,4 +143,4 @@ export const str: PluginDefinition<
       len: (s) => ctx.expr<number>({ kind: "str/len", operand: ctx.lift(s).__node }),
     };
   },
-};
+});

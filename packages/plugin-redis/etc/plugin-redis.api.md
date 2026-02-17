@@ -18,50 +18,12 @@ export interface ClientHandlerOptions {
 export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter;
 
 // @public
-export function createRedisInterpreter(client: RedisClient): {
-    "redis/get": (node: RedisGetNode) => AsyncGenerator<TypedNode<unknown>, string | null, unknown>;
-    "redis/set": (node: RedisSetNode) => AsyncGenerator<TypedNode<unknown>, string | null, unknown>;
-    "redis/incr": (node: RedisIncrNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "redis/incrby": (node: RedisIncrByNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "redis/decr": (node: RedisDecrNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "redis/decrby": (node: RedisDecrByNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "redis/mget": (node: RedisMGetNode) => AsyncGenerator<TypedNode<unknown>, (string | null)[], unknown>;
-    "redis/mset": (node: RedisMSetNode) => AsyncGenerator<TypedNode<unknown>, "OK", unknown>;
-    "redis/append": (node: RedisAppendNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "redis/getrange": (node: RedisGetRangeNode) => AsyncGenerator<TypedNode<unknown>, string, unknown>;
-    "redis/setrange": (node: RedisSetRangeNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "redis/del": (node: RedisDelNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "redis/exists": (node: RedisExistsNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "redis/expire": (node: RedisExpireNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "redis/pexpire": (node: RedisPExpireNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "redis/ttl": (node: RedisTTLNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "redis/pttl": (node: RedisPTTLNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "redis/hget": (node: RedisHGetNode) => AsyncGenerator<TypedNode<unknown>, string | null, unknown>;
-    "redis/hset": (node: RedisHSetNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "redis/hmget": (node: RedisHMGetNode) => AsyncGenerator<TypedNode<unknown>, (string | null)[], unknown>;
-    "redis/hgetall": (node: RedisHGetAllNode) => AsyncGenerator<TypedNode<unknown>, Record<string, string>, unknown>;
-    "redis/hdel": (node: RedisHDelNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "redis/hexists": (node: RedisHExistsNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "redis/hlen": (node: RedisHLenNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "redis/hkeys": (node: RedisHKeysNode) => AsyncGenerator<TypedNode<unknown>, string[], unknown>;
-    "redis/hvals": (node: RedisHValsNode) => AsyncGenerator<TypedNode<unknown>, string[], unknown>;
-    "redis/hincrby": (node: RedisHIncrByNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "redis/lpush": (node: RedisLPushNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "redis/rpush": (node: RedisRPushNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "redis/lpop": (node: RedisLPopNode) => AsyncGenerator<TypedNode<unknown>, string | null, unknown>;
-    "redis/rpop": (node: RedisRPopNode) => AsyncGenerator<TypedNode<unknown>, string | null, unknown>;
-    "redis/llen": (node: RedisLLenNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "redis/lrange": (node: RedisLRangeNode) => AsyncGenerator<TypedNode<unknown>, string[], unknown>;
-    "redis/lindex": (node: RedisLIndexNode) => AsyncGenerator<TypedNode<unknown>, string | null, unknown>;
-    "redis/lset": (node: RedisLSetNode) => AsyncGenerator<TypedNode<unknown>, "OK", unknown>;
-    "redis/lrem": (node: RedisLRemNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-    "redis/linsert": (node: RedisLInsertNode) => AsyncGenerator<TypedNode<unknown>, number, unknown>;
-};
+export function createRedisInterpreter(client: RedisClient): Interpreter<"redis/get" | "redis/set" | "redis/incr" | "redis/incrby" | "redis/decr" | "redis/decrby" | "redis/mget" | "redis/mset" | "redis/append" | "redis/getrange" | "redis/setrange" | "redis/del" | "redis/exists" | "redis/expire" | "redis/pexpire" | "redis/ttl" | "redis/pttl" | "redis/hget" | "redis/hset" | "redis/hmget" | "redis/hgetall" | "redis/hdel" | "redis/hexists" | "redis/hlen" | "redis/hkeys" | "redis/hvals" | "redis/hincrby" | "redis/lpush" | "redis/rpush" | "redis/lpop" | "redis/rpop" | "redis/llen" | "redis/lrange" | "redis/lindex" | "redis/lset" | "redis/lrem" | "redis/linsert">;
 
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function redis(config?: RedisConfig | string): PluginDefinition<RedisMethods>;
+export function redis(config?: RedisConfig | string): PluginDefinition<RedisMethods, {}, "redis/get" | "redis/set" | "redis/incr" | "redis/incrby" | "redis/decr" | "redis/decrby" | "redis/mget" | "redis/mset" | "redis/append" | "redis/getrange" | "redis/setrange" | "redis/del" | "redis/exists" | "redis/expire" | "redis/pexpire" | "redis/ttl" | "redis/pttl" | "redis/hget" | "redis/hset" | "redis/hmget" | "redis/hgetall" | "redis/hdel" | "redis/hexists" | "redis/hlen" | "redis/hkeys" | "redis/hvals" | "redis/hincrby" | "redis/lpush" | "redis/rpush" | "redis/lpop" | "redis/rpop" | "redis/llen" | "redis/lrange" | "redis/lindex" | "redis/lset" | "redis/lrem" | "redis/linsert">;
 
 // @public
 export interface RedisClient {
@@ -122,6 +84,8 @@ export interface RedisMethods {
     };
 }
 
+// Warning: (ae-forgotten-export) The symbol "TypedNode" needs to be exported by the entry point index.d.ts
+//
 // @public
 export function serverEvaluate(client: RedisClient, baseInterpreter: Interpreter): (root: TypedNode) => Promise<unknown>;
 
@@ -135,44 +99,6 @@ export function wrapIoredis(redis: {
 
 // Warnings were encountered during analysis:
 //
-// dist/5.4.1/interpreter.d.ts:19:5 - (ae-forgotten-export) The symbol "RedisGetNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:19:5 - (ae-forgotten-export) The symbol "TypedNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:20:5 - (ae-forgotten-export) The symbol "RedisSetNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:21:5 - (ae-forgotten-export) The symbol "RedisIncrNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:22:5 - (ae-forgotten-export) The symbol "RedisIncrByNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:23:5 - (ae-forgotten-export) The symbol "RedisDecrNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:24:5 - (ae-forgotten-export) The symbol "RedisDecrByNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:25:5 - (ae-forgotten-export) The symbol "RedisMGetNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:26:5 - (ae-forgotten-export) The symbol "RedisMSetNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:27:5 - (ae-forgotten-export) The symbol "RedisAppendNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:28:5 - (ae-forgotten-export) The symbol "RedisGetRangeNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:29:5 - (ae-forgotten-export) The symbol "RedisSetRangeNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:30:5 - (ae-forgotten-export) The symbol "RedisDelNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:31:5 - (ae-forgotten-export) The symbol "RedisExistsNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:32:5 - (ae-forgotten-export) The symbol "RedisExpireNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:33:5 - (ae-forgotten-export) The symbol "RedisPExpireNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:34:5 - (ae-forgotten-export) The symbol "RedisTTLNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:35:5 - (ae-forgotten-export) The symbol "RedisPTTLNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:36:5 - (ae-forgotten-export) The symbol "RedisHGetNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:37:5 - (ae-forgotten-export) The symbol "RedisHSetNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:38:5 - (ae-forgotten-export) The symbol "RedisHMGetNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:39:5 - (ae-forgotten-export) The symbol "RedisHGetAllNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:40:5 - (ae-forgotten-export) The symbol "RedisHDelNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:41:5 - (ae-forgotten-export) The symbol "RedisHExistsNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:42:5 - (ae-forgotten-export) The symbol "RedisHLenNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:43:5 - (ae-forgotten-export) The symbol "RedisHKeysNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:44:5 - (ae-forgotten-export) The symbol "RedisHValsNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:45:5 - (ae-forgotten-export) The symbol "RedisHIncrByNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:46:5 - (ae-forgotten-export) The symbol "RedisLPushNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:47:5 - (ae-forgotten-export) The symbol "RedisRPushNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:48:5 - (ae-forgotten-export) The symbol "RedisLPopNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:49:5 - (ae-forgotten-export) The symbol "RedisRPopNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:50:5 - (ae-forgotten-export) The symbol "RedisLLenNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:51:5 - (ae-forgotten-export) The symbol "RedisLRangeNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:52:5 - (ae-forgotten-export) The symbol "RedisLIndexNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:53:5 - (ae-forgotten-export) The symbol "RedisLSetNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:54:5 - (ae-forgotten-export) The symbol "RedisLRemNode" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/interpreter.d.ts:55:5 - (ae-forgotten-export) The symbol "RedisLInsertNode" needs to be exported by the entry point index.d.ts
 // dist/5.4.1/types.d.ts:12:9 - (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)

@@ -581,6 +581,10 @@
               "text": "): "
             },
             {
+              "kind": "Content",
+              "text": "import(\"@mvfm/core\")."
+            },
+            {
               "kind": "Reference",
               "text": "PluginDefinition",
               "canonicalReference": "@mvfm/plugin-stripe!~PluginDefinition:interface"
@@ -596,7 +600,7 @@
             },
             {
               "kind": "Content",
-              "text": ">"
+              "text": ", {}, \"stripe/create_payment_intent\" | \"stripe/retrieve_payment_intent\" | \"stripe/confirm_payment_intent\" | \"stripe/create_customer\" | \"stripe/retrieve_customer\" | \"stripe/update_customer\" | \"stripe/list_customers\" | \"stripe/create_charge\" | \"stripe/retrieve_charge\" | \"stripe/list_charges\">"
             },
             {
               "kind": "Content",
@@ -606,7 +610,7 @@
           "fileUrlPath": "dist/2025-04-30.basil/index.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 3,
-            "endIndex": 7
+            "endIndex": 8
           },
           "releaseTag": "Public",
           "overloadIndex": 1,

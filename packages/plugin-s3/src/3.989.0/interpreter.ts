@@ -11,7 +11,7 @@ import type {
   PutObjectCommandOutput,
 } from "@aws-sdk/client-s3";
 import type { Interpreter, TypedNode } from "@mvfm/core";
-import { eval_, typedInterpreter } from "@mvfm/core";
+import { defineInterpreter, eval_ } from "@mvfm/core";
 
 /**
  * S3 client interface consumed by the s3 handler.
@@ -78,7 +78,7 @@ declare module "@mvfm/core" {
  * @returns An Interpreter handling all s3 node kinds.
  */
 export function createS3Interpreter(client: S3Client): Interpreter {
-  return typedInterpreter<S3Kind>()({
+  return defineInterpreter<S3Kind>()({
     "s3/put_object": async function* (node: S3PutObjectNode) {
       const input = yield* eval_(node.input);
       return (await client.execute(

@@ -35,7 +35,7 @@ export function createS3Interpreter(client: S3Client): Interpreter;
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function s3(config: S3Config): PluginDefinition<S3Methods>;
+export function s3(config: S3Config): PluginDefinition<S3Methods, {}, "s3/put_object" | "s3/get_object" | "s3/delete_object" | "s3/head_object" | "s3/list_objects_v2">;
 
 // @public
 export interface S3Client {

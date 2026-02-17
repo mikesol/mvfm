@@ -61,7 +61,8 @@
 //
 // ============================================================
 
-import type { Expr, PluginContext, PluginDefinition } from "@mvfm/core";
+import type { Expr, PluginContext } from "@mvfm/core";
+import { definePlugin } from "@mvfm/core";
 import { fetchInterpreter } from "./interpreter";
 
 // ---- What the plugin adds to $ ----------------------------
@@ -137,10 +138,10 @@ export interface FetchConfig {
  * @param config - Optional {@link FetchConfig} with baseUrl and defaultHeaders.
  * @returns A PluginDefinition for the fetch plugin.
  */
-export function fetch(config?: FetchConfig): PluginDefinition<FetchMethods> {
+export function fetch(config?: FetchConfig) {
   const resolvedConfig = config ?? {};
 
-  return {
+  return definePlugin({
     name: "fetch",
     nodeKinds: ["fetch/request", "fetch/json", "fetch/text", "fetch/status", "fetch/headers"],
     defaultInterpreter: fetchInterpreter,
@@ -204,7 +205,7 @@ export function fetch(config?: FetchConfig): PluginDefinition<FetchMethods> {
         fetch: fetchFn,
       };
     },
-  };
+  });
 }
 
 // ============================================================

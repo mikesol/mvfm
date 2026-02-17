@@ -57,7 +57,8 @@
 //
 // ============================================================
 
-import type { Expr, PluginContext, PluginDefinition } from "@mvfm/core";
+import type { Expr, PluginContext } from "@mvfm/core";
+import { definePlugin } from "@mvfm/core";
 import { stripeInterpreter } from "./interpreter";
 
 // ---- What the plugin adds to $ ----------------------------
@@ -143,8 +144,8 @@ export interface StripeConfig {
  * @param config - A {@link StripeConfig} with apiKey and optional apiVersion.
  * @returns A PluginDefinition for the stripe plugin.
  */
-export function stripe(config: StripeConfig): PluginDefinition<StripeMethods> {
-  return {
+export function stripe(config: StripeConfig) {
+  return definePlugin({
     name: "stripe",
     nodeKinds: [
       "stripe/create_payment_intent",
@@ -265,7 +266,7 @@ export function stripe(config: StripeConfig): PluginDefinition<StripeMethods> {
         },
       };
     },
-  };
+  });
 }
 
 // ============================================================

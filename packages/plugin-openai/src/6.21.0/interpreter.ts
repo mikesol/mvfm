@@ -1,5 +1,5 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
-import { eval_, typedInterpreter } from "@mvfm/core";
+import { defineInterpreter, eval_ } from "@mvfm/core";
 import { wrapOpenAISdk } from "./client-openai-sdk";
 
 /**
@@ -92,7 +92,7 @@ type OpenAIKind =
  * @returns An Interpreter handling all openai node kinds.
  */
 export function createOpenAIInterpreter(client: OpenAIClient): Interpreter {
-  return typedInterpreter<OpenAIKind>()({
+  return defineInterpreter<OpenAIKind>()({
     "openai/create_chat_completion": async function* (node: OpenAICreateChatCompletionNode) {
       const body = yield* eval_(node.params);
       return await client.request("POST", "/chat/completions", body);

@@ -1,13 +1,13 @@
-import { typedInterpreter } from "@mvfm/core";
+import { defineInterpreter } from "@mvfm/core";
 
-const _positive = typedInterpreter<"twilio/create_message">()({
+const _positive = defineInterpreter<"twilio/create_message">()({
   // biome-ignore lint/correctness/useYield: type-level compile test
   "twilio/create_message": async function* (node) {
     return node;
   },
 });
 
-const _negativeAny = typedInterpreter<"twilio/create_message">()({
+const _negativeAny = defineInterpreter<"twilio/create_message">()({
   // @ts-expect-error should reject node:any once kind is registered in NodeTypeMap
   // biome-ignore lint/correctness/useYield: type-level compile test
   "twilio/create_message": async function* (node: any) {

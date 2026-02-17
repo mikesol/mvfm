@@ -1,5 +1,5 @@
 import type { TypedNode } from "../../fold";
-import { eval_, typedInterpreter } from "../../fold";
+import { defineInterpreter, eval_ } from "../../fold";
 
 export interface OrdCmp extends TypedNode<boolean> {
   kind: "ord/gt" | "ord/gte" | "ord/lt" | "ord/lte";
@@ -16,7 +16,7 @@ declare module "@mvfm/core" {
 }
 
 /** Interpreter handlers for `ord/` node kinds. */
-export const ordInterpreter = typedInterpreter<"ord/gt" | "ord/gte" | "ord/lt" | "ord/lte">()({
+export const ordInterpreter = defineInterpreter<"ord/gt" | "ord/gte" | "ord/lt" | "ord/lte">()({
   "ord/gt": async function* (node: OrdCmp) {
     return (yield* eval_(node.operand)) > 0;
   },

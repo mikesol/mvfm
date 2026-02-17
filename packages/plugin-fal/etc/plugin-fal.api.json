@@ -453,6 +453,10 @@
               "text": "): "
             },
             {
+              "kind": "Content",
+              "text": "import(\"@mvfm/core\")."
+            },
+            {
               "kind": "Reference",
               "text": "PluginDefinition",
               "canonicalReference": "@mvfm/plugin-fal!~PluginDefinition:interface"
@@ -468,7 +472,7 @@
             },
             {
               "kind": "Content",
-              "text": ">"
+              "text": ", {}, \"fal/run\" | \"fal/subscribe\" | \"fal/queue_submit\" | \"fal/queue_status\" | \"fal/queue_result\" | \"fal/queue_cancel\">"
             },
             {
               "kind": "Content",
@@ -478,7 +482,7 @@
           "fileUrlPath": "dist/1.9.1/index.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 3,
-            "endIndex": 7
+            "endIndex": 8
           },
           "releaseTag": "Public",
           "overloadIndex": 1,

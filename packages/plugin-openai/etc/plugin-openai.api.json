@@ -453,6 +453,10 @@
               "text": "): "
             },
             {
+              "kind": "Content",
+              "text": "import(\"@mvfm/core\")."
+            },
+            {
               "kind": "Reference",
               "text": "PluginDefinition",
               "canonicalReference": "@mvfm/plugin-openai!~PluginDefinition:interface"
@@ -468,7 +472,7 @@
             },
             {
               "kind": "Content",
-              "text": ">"
+              "text": ", {}, \"openai/create_chat_completion\" | \"openai/retrieve_chat_completion\" | \"openai/list_chat_completions\" | \"openai/update_chat_completion\" | \"openai/delete_chat_completion\" | \"openai/create_embedding\" | \"openai/create_moderation\" | \"openai/create_completion\">"
             },
             {
               "kind": "Content",
@@ -478,7 +482,7 @@
           "fileUrlPath": "dist/6.21.0/index.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 3,
-            "endIndex": 7
+            "endIndex": 8
           },
           "releaseTag": "Public",
           "overloadIndex": 1,

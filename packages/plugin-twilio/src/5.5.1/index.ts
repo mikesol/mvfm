@@ -52,7 +52,8 @@
 //
 // ============================================================
 
-import type { Expr, PluginContext, PluginDefinition } from "@mvfm/core";
+import type { Expr, PluginContext } from "@mvfm/core";
+import { definePlugin } from "@mvfm/core";
 import { twilioInterpreter } from "./interpreter";
 
 // ---- What the plugin adds to $ ----------------------------
@@ -146,8 +147,8 @@ export interface TwilioConfig {
  * @param config - A {@link TwilioConfig} with accountSid and authToken.
  * @returns A PluginDefinition for the twilio plugin.
  */
-export function twilio(config: TwilioConfig): PluginDefinition<TwilioMethods> {
-  return {
+export function twilio(config: TwilioConfig) {
+  return definePlugin({
     name: "twilio",
     nodeKinds: [
       "twilio/create_message",
@@ -231,7 +232,7 @@ export function twilio(config: TwilioConfig): PluginDefinition<TwilioMethods> {
         twilio: { messages, calls },
       };
     },
-  };
+  });
 }
 
 // ============================================================

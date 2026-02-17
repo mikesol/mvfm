@@ -31,7 +31,8 @@
 //
 // ============================================================
 
-import type { Expr, PluginContext, PluginDefinition } from "../../core";
+import type { Expr, PluginContext } from "../../core";
+import { definePlugin } from "../../core";
 import { errorInterpreter } from "./interpreter";
 
 // ---- What the plugin adds to $ ----------------------------
@@ -196,7 +197,7 @@ interface TryBuilder<T> {
  * Makes failures explicit in the AST via try/catch, fail, attempt,
  * guard, and settle combinators.
  */
-export const error: PluginDefinition<ErrorMethods> = {
+export const error = definePlugin({
   name: "error",
   nodeKinds: ["error/try", "error/fail", "error/attempt", "error/guard", "error/settle"],
   defaultInterpreter: errorInterpreter,
@@ -306,4 +307,4 @@ export const error: PluginDefinition<ErrorMethods> = {
       },
     };
   },
-};
+});

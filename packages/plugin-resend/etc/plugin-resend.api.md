@@ -40,7 +40,7 @@ export type ExprOrValue<T> = Expr<T> | T;
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function resend(config: ResendConfig): PluginDefinition<ResendMethods>;
+export function resend(config: ResendConfig): PluginDefinition<ResendMethods, {}, "resend/send_email" | "resend/get_email" | "resend/send_batch" | "resend/create_contact" | "resend/get_contact" | "resend/list_contacts" | "resend/remove_contact">;
 
 // @public
 export interface ResendClient {

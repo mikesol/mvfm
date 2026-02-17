@@ -406,6 +406,10 @@
               "text": "): "
             },
             {
+              "kind": "Content",
+              "text": "import(\"@mvfm/core\")."
+            },
+            {
               "kind": "Reference",
               "text": "PluginDefinition",
               "canonicalReference": "@mvfm/plugin-cloudflare-kv!~PluginDefinition:interface"
@@ -421,7 +425,7 @@
             },
             {
               "kind": "Content",
-              "text": ">"
+              "text": ", {}, \"cloudflare-kv/get\" | \"cloudflare-kv/get_json\" | \"cloudflare-kv/put\" | \"cloudflare-kv/delete\" | \"cloudflare-kv/list\">"
             },
             {
               "kind": "Content",
@@ -431,7 +435,7 @@
           "fileUrlPath": "dist/4.20260213.0/index.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 3,
-            "endIndex": 7
+            "endIndex": 8
           },
           "releaseTag": "Public",
           "overloadIndex": 1,

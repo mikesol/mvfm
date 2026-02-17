@@ -1,5 +1,5 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
-import { eval_, typedInterpreter } from "@mvfm/core";
+import { defineInterpreter, eval_ } from "@mvfm/core";
 import { wrapPino } from "./client-pino";
 
 /**
@@ -82,7 +82,7 @@ export function createPinoInterpreter(client: PinoClient): Interpreter {
     return undefined;
   };
 
-  return typedInterpreter<
+  return defineInterpreter<
     "pino/trace" | "pino/debug" | "pino/info" | "pino/warn" | "pino/error" | "pino/fatal"
   >()({
     "pino/trace": handler,

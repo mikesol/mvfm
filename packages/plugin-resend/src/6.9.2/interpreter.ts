@@ -1,5 +1,5 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
-import { eval_, typedInterpreter } from "@mvfm/core";
+import { defineInterpreter, eval_ } from "@mvfm/core";
 import { wrapResendSdk } from "./client-resend-sdk";
 
 /**
@@ -72,7 +72,7 @@ declare module "@mvfm/core" {
  * @returns An Interpreter handling all resend node kinds.
  */
 export function createResendInterpreter(client: ResendClient): Interpreter {
-  return typedInterpreter<ResendKind>()({
+  return defineInterpreter<ResendKind>()({
     "resend/send_email": async function* (node: ResendSendEmailNode) {
       const params = yield* eval_(node.params);
       return await client.request("POST", "/emails", params);

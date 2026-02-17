@@ -1,5 +1,5 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
-import { eval_, typedInterpreter } from "@mvfm/core";
+import { defineInterpreter, eval_ } from "@mvfm/core";
 import { wrapAnthropicSdk } from "./client-anthropic-sdk";
 
 /**
@@ -99,7 +99,7 @@ type AnthropicKind =
  * @returns An Interpreter handling all anthropic node kinds.
  */
 export function createAnthropicInterpreter(client: AnthropicClient): Interpreter {
-  return typedInterpreter<AnthropicKind>()({
+  return defineInterpreter<AnthropicKind>()({
     "anthropic/create_message": async function* (node: AnthropicCreateMessageNode) {
       const params = yield* eval_(node.params);
       return await client.request("POST", "/v1/messages", params);

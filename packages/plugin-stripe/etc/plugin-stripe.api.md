@@ -33,7 +33,7 @@ export function serverInterpreter(client: StripeClient): Interpreter;
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function stripe(config: StripeConfig): PluginDefinition<StripeMethods>;
+export function stripe(config: StripeConfig): PluginDefinition<StripeMethods, {}, "stripe/create_payment_intent" | "stripe/retrieve_payment_intent" | "stripe/confirm_payment_intent" | "stripe/create_customer" | "stripe/retrieve_customer" | "stripe/update_customer" | "stripe/list_customers" | "stripe/create_charge" | "stripe/retrieve_charge" | "stripe/list_charges">;
 
 // @public
 export interface StripeClient {

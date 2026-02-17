@@ -53,7 +53,8 @@
 //
 // ============================================================
 
-import type { Expr, PluginContext, PluginDefinition } from "@mvfm/core";
+import type { Expr, PluginContext } from "@mvfm/core";
+import { definePlugin } from "@mvfm/core";
 import { openaiInterpreter } from "./interpreter";
 
 // ---- What the plugin adds to $ ----------------------------
@@ -139,8 +140,8 @@ export interface OpenAIConfig {
  * @param config - An {@link OpenAIConfig} with apiKey and optional org/project.
  * @returns A PluginDefinition for the openai plugin.
  */
-export function openai(config: OpenAIConfig): PluginDefinition<OpenAIMethods> {
-  return {
+export function openai(config: OpenAIConfig) {
+  return definePlugin({
     name: "openai",
     nodeKinds: [
       "openai/create_chat_completion",
@@ -242,7 +243,7 @@ export function openai(config: OpenAIConfig): PluginDefinition<OpenAIMethods> {
         },
       };
     },
-  };
+  });
 }
 
 // ============================================================

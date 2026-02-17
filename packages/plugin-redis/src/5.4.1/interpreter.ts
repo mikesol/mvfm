@@ -1,4 +1,4 @@
-import { eval_, typedInterpreter } from "@mvfm/core";
+import { defineInterpreter, eval_ } from "@mvfm/core";
 import type { REDIS_NODE_KINDS } from "./node-kinds";
 import type {
   RedisAppendNode,
@@ -66,7 +66,7 @@ type RedisKind = (typeof REDIS_NODE_KINDS)[number];
  * @returns An Interpreter handling all redis node kinds.
  */
 export function createRedisInterpreter(client: RedisClient) {
-  return typedInterpreter<RedisKind>()({
+  return defineInterpreter<RedisKind>()({
     "redis/get": async function* (node: RedisGetNode) {
       return (await client.command("GET", yield* eval_(node.key))) as string | null;
     },

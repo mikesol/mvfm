@@ -8,16 +8,16 @@
 
 export { mvfm } from "./builder";
 export {
-  type CompleteInterpreter,
   createFoldState,
+  defineInterpreter,
   eval_,
   type FoldState,
   foldAST,
   type Handler,
   type Interpreter,
+  type InterpreterHandlers,
+  mergeInterpreters,
   type TypedNode,
-  type TypedProgram,
-  typedFoldAST,
   VOLATILE_KINDS,
 } from "./fold";
 export { injectInput } from "./inject";
@@ -25,6 +25,7 @@ export { autoLift, isExpr, makeExprProxy } from "./proxy";
 export {
   type CollectTrait,
   type CoreDollar,
+  definePlugin,
   type Expr,
   type ExprBase,
   type ExprFields,

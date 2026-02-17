@@ -4,7 +4,7 @@
 
 import type { Interpreter } from "./fold";
 import { coreInterpreter } from "./interpreters/core";
-import type { PluginInput } from "./types";
+import type { ExtractPluginKinds, PluginInput } from "./types";
 
 // ---- Type-level helpers -------------------------------------
 
@@ -19,8 +19,12 @@ type HasDefault<P> = P extends { defaultInterpreter: Record<string, any> } ? tru
 type PluginsNeedingOverride<Plugins extends readonly any[]> = {
   [K in keyof Plugins]: HasDefault<Plugins[K]> extends true
     ? never
-    : Plugins[K] extends { name: infer _N extends string }
-      ? Plugins[K]
+    : Plugins[K] extends { nodeKinds: infer Kinds extends readonly string[] }
+      ? Kinds[number] extends never
+        ? never
+        : Plugins[K] extends { name: infer _N extends string }
+          ? Plugins[K]
+          : never
       : never;
 }[number];
 
@@ -49,9 +53,9 @@ type AllPluginNames<Plugins extends readonly any[]> = {
  * @internal
  */
 type OverridesMap<Plugins extends readonly any[]> = {
-  [K in OverrideKeys<Plugins>]: Interpreter;
+  [K in OverrideKeys<Plugins>]: Interpreter<string>;
 } & {
-  [K in Exclude<AllPluginNames<Plugins>, OverrideKeys<Plugins>>]?: Interpreter;
+  [K in Exclude<AllPluginNames<Plugins>, OverrideKeys<Plugins>>]?: Interpreter<string>;
 };
 
 /**
@@ -61,7 +65,7 @@ type OverridesMap<Plugins extends readonly any[]> = {
  */
 type DefaultsArgs<Plugins extends readonly any[]> =
   OverrideKeys<Plugins> extends never
-    ? [overrides?: Partial<Record<AllPluginNames<Plugins>, Interpreter>>]
+    ? [overrides?: Partial<Record<AllPluginNames<Plugins>, Interpreter<string>>>]
     : [overrides: OverridesMap<Plugins>];
 
 // ---- Runtime ------------------------------------------------
@@ -90,17 +94,24 @@ type DefaultsArgs<Plugins extends readonly any[]> =
 export function defaults<const P extends readonly PluginInput[]>(
   app: { readonly plugins: P },
   ...args: DefaultsArgs<P>
-): Interpreter {
-  const overrides = (args[0] ?? {}) as Record<string, Interpreter>;
+): Interpreter<ExtractPluginKinds<P[number]>> {
+  type K = ExtractPluginKinds<P[number]>;
+  const overrides = (args[0] ?? {}) as Record<string, Interpreter<string>>;
   const plugins = app.plugins as unknown as any[];
-  const composed: Interpreter = { ...coreInterpreter };
+  const composed: Record<string, (node: any) => AsyncGenerator<any, unknown, unknown>> = {
+    ...(coreInterpreter as unknown as Record<
+      string,
+      (node: any) => AsyncGenerator<any, unknown, unknown>
+    >),
+  };
 
   for (const plugin of plugins) {
     const name: string = plugin.name;
     if (name in overrides) {
-      Object.assign(composed, overrides[name]);
+      Object.assign(composed, overrides[name] as unknown as Record<string, unknown>);
     } else if (plugin.defaultInterpreter) {
-      Object.assign(composed, plugin.defaultInterpreter);
+      Object.assign(composed, plugin.defaultInterpreter as unknown as Record<string, unknown>);
+    } else if (Array.isArray(plugin.nodeKinds) && plugin.nodeKinds.length === 0) {
     } else {
       throw new Error(
         `Plugin "${name}" has no defaultInterpreter and no override was provided. ` +
@@ -109,5 +120,5 @@ export function defaults<const P extends readonly PluginInput[]>(
     }
   }
 
-  return composed;
+  return composed as unknown as Interpreter<K>;
 }

@@ -1,4 +1,5 @@
-import type { Expr, PluginContext, PluginDefinition, TypeclassSlot } from "../../core";
+import type { Expr, PluginContext } from "../../core";
+import { definePlugin } from "../../core";
 import { inferType } from "../../trait-utils";
 import { eqInterpreter } from "./interpreter";
 
@@ -26,7 +27,7 @@ declare module "../../core" {
  * Dispatches `eq` and `neq` to the appropriate type-specific implementation
  * based on runtime type inference.
  */
-export const eq: PluginDefinition<TypeclassSlot<"eq">> = {
+export const eq = definePlugin({
   name: "eq",
   nodeKinds: ["eq/neq"],
   defaultInterpreter: eqInterpreter,
@@ -68,4 +69,4 @@ export const eq: PluginDefinition<TypeclassSlot<"eq">> = {
       },
     };
   },
-};
+});

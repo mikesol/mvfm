@@ -1,5 +1,5 @@
 import type { TypedNode } from "../../fold";
-import { eval_, typedInterpreter } from "../../fold";
+import { defineInterpreter, eval_ } from "../../fold";
 
 // ---- Typed node interfaces ----------------------------------
 
@@ -149,7 +149,7 @@ type NumKinds =
 // ---- Interpreter map ----------------------------------------
 
 /** Interpreter handlers for `num/` node kinds. */
-export const numInterpreter = typedInterpreter<NumKinds>()({
+export const numInterpreter = defineInterpreter<NumKinds>()({
   "num/add": async function* (node: NumAddNode) {
     return (yield* eval_(node.left)) + (yield* eval_(node.right));
   },

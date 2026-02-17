@@ -1,4 +1,5 @@
-import type { Expr, PluginContext, PluginDefinition } from "../../core";
+import type { Expr, PluginContext } from "../../core";
+import { definePlugin } from "../../core";
 import { numInterpreter } from "./interpreter";
 
 /**
@@ -37,10 +38,7 @@ export interface NumMethods {
  * min/max. Also registers trait implementations for eq, ord, semiring,
  * show, and bounded.
  */
-export const num: PluginDefinition<
-  NumMethods,
-  { eq: number; ord: number; semiring: number; show: number; bounded: number }
-> = {
+export const num = definePlugin({
   name: "num",
   nodeKinds: [
     "num/add",
@@ -106,4 +104,4 @@ export const num: PluginDefinition<
         }),
     };
   },
-};
+});

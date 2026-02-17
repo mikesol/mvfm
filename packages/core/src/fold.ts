@@ -45,16 +45,6 @@ export function recurseScoped(child: TypedNode, bindings: ScopedBinding[]): Recu
 }
 
 /**
- * An interpreter is a plain record mapping node kind strings to
- * async generator handler functions. Composition is spread:
- * `{ ...num$, ...str$, ...console$ }`.
- */
-export type Interpreter = Record<
-  string,
-  (node: any) => AsyncGenerator<FoldYield, unknown, unknown>
->;
-
-/**
  * Handler type: an async generator for a specific typed node.
  * The return type is inferred from the node's phantom type.
  */
@@ -79,17 +69,6 @@ export interface NodeTypeMap {}
 /** Detect the `any` type. Returns `true` for `any`, `false` otherwise. */
 export type IsAny<T> = 0 extends 1 & T ? true : false;
 
-/** Look up the node type for a kind from the registry, falling back to TypedNode. */
-type NodeForKind<K extends string> = K extends keyof NodeTypeMap ? NodeTypeMap[K] : TypedNode;
-
-/** Extract the phantom return type from a TypedNode. */
-type ReturnOfNode<N extends TypedNode<any>> = N extends TypedNode<infer T> ? T : unknown;
-
-/** The exact handler signature required for a given kind. */
-type ExpectedHandler<K extends string> = (
-  node: NodeForKind<K>,
-) => AsyncGenerator<FoldYield, ReturnOfNode<NodeForKind<K>>, unknown>;
-
 /** Extract the node parameter type from a handler function. */
 type ExtractNodeParam<F> = F extends (node: infer N, ...args: any[]) => any ? N : unknown;
 
@@ -99,9 +78,21 @@ type ExtractNodeParam<F> = F extends (node: infer N, ...args: any[]) => any ? N 
  */
 type RejectAnyParam<_K extends string, H> = IsAny<ExtractNodeParam<H>> extends true ? never : H;
 
-/** Required handler shape for a set of kinds. */
-type RequiredShape<K extends string> = {
-  [P in K]: ExpectedHandler<P>;
+/** Raw handler map — structural shape without branding. */
+type AnyHandlerRecord = Record<string, (node: any) => AsyncGenerator<FoldYield, unknown, unknown>>;
+export type InterpreterHandlers<K extends string> = string extends K
+  ? AnyHandlerRecord
+  : {
+      [P in K]: P extends keyof NodeTypeMap ? Handler<NodeTypeMap[P]> : never;
+    };
+
+declare const interpreterBrand: unique symbol;
+
+/**
+ * Branded interpreter type. Can only be produced by trusted factories.
+ */
+export type Interpreter<K extends string = string> = InterpreterHandlers<K> & {
+  readonly [interpreterBrand]: K;
 };
 
 /**
@@ -117,18 +108,30 @@ type RequiredShape<K extends string> = {
  *
  * @example
  * ```ts
- * const interp = typedInterpreter<"redis/get" | "redis/set">()({
+ * const interp = defineInterpreter<"redis/get" | "redis/set">()({
  *   "redis/get": async function* (node: RedisGetNode) { ... },
  *   "redis/set": async function* (node: RedisSetNode) { ... },
  * });
  * ```
  */
-export function typedInterpreter<K extends string>() {
-  return <T extends RequiredShape<K>>(
-    handlers: T & {
-      [P in K]: P extends keyof T ? RejectAnyParam<P, T[P]> : ExpectedHandler<P>;
-    },
-  ): T => handlers;
+export function defineInterpreter<K extends string>() {
+  return <T extends InterpreterHandlers<K>>(
+    handlers: string extends K
+      ? T
+      : T & {
+          [P in K]: P extends keyof T ? RejectAnyParam<P, T[P]> : never;
+        },
+  ): Interpreter<K> => handlers as unknown as Interpreter<K>;
+}
+
+/**
+ * Merge two branded interpreters while preserving interpreter branding.
+ */
+export function mergeInterpreters<A extends string, B extends string>(
+  a: Interpreter<A>,
+  b: Interpreter<B>,
+): Interpreter<A | B> {
+  return { ...a, ...b } as unknown as Interpreter<A | B>;
 }
 
 /** Node kinds that are inherently volatile (never cached, always re-evaluated). */
@@ -153,24 +156,24 @@ type Frame = {
 };
 
 /** Stack-safe async fold with memoization and taint tracking. */
-export async function foldAST(
-  interpreter: Interpreter,
-  program: Program,
+export async function foldAST<K extends string>(
+  interpreter: Interpreter<K>,
+  program: Program<K>,
   state?: FoldState,
 ): Promise<unknown>;
-export async function foldAST(
-  interpreter: Interpreter,
+export async function foldAST<K extends string>(
+  interpreter: Interpreter<K>,
   root: TypedNode,
   state?: FoldState,
 ): Promise<unknown>;
 export async function foldAST(
-  interpreter: Interpreter,
-  rootOrProgram: TypedNode | Program,
+  interpreter: Interpreter<string>,
+  rootOrProgram: TypedNode | Program<string>,
   state?: FoldState,
 ): Promise<unknown> {
   const root =
     "ast" in rootOrProgram && "hash" in rootOrProgram
-      ? (rootOrProgram as Program).ast.result
+      ? (rootOrProgram as Program<string>).ast.result
       : (rootOrProgram as TypedNode);
   const { cache, tainted } = state ?? createFoldState();
   const stack: Frame[] = [];
@@ -211,7 +214,9 @@ export async function foldAST(
       return;
     }
 
-    const h = interpreter[node.kind];
+    const h = (interpreter as Record<string, (node: any) => AsyncGenerator<FoldYield, unknown>>)[
+      node.kind
+    ];
     if (!h) throw new Error(`No interpreter for: ${node.kind}`);
     stack.push({ gen: h(node), node, childNodes: new Set(), restoreScopeDepth });
   }
@@ -308,34 +313,4 @@ export async function foldAST(
   }
 
   return input;
-}
-
-/**
- * A program with phantom type `K` tracking all node kinds used.
- * `typedFoldAST` infers `K` and requires a complete interpreter.
- */
-export interface TypedProgram<K extends string> {
-  root: TypedNode;
-  readonly __kinds?: K;
-}
-
-/**
- * Complete interpreter type: must have a handler for every kind `K`.
- * All kinds must be registered in {@link NodeTypeMap} — unregistered kinds
- * produce `never`, making them a compile error.
- */
-export type CompleteInterpreter<K extends string> = {
-  [key in K]: key extends keyof NodeTypeMap ? Handler<NodeTypeMap[key]> : never;
-};
-
-/**
- * Type-safe fold that enforces interpreter completeness at compile time.
- * Program goes first so `K` is inferred before the interpreter is checked.
- */
-export async function typedFoldAST<K extends string>(
-  program: TypedProgram<K>,
-  interpreter: CompleteInterpreter<K>,
-  state?: FoldState,
-): Promise<unknown> {
-  return foldAST(interpreter as Interpreter, program.root, state);
 }

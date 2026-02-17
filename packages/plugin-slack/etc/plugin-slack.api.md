@@ -33,7 +33,7 @@ export function serverInterpreter(client: SlackClient): Interpreter;
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function slack(config: SlackConfig): PluginDefinition<SlackMethods>;
+export function slack(config: SlackConfig): PluginDefinition<SlackMethods, {}, "slack/chat_postMessage" | "slack/chat_update" | "slack/chat_delete" | "slack/chat_postEphemeral" | "slack/chat_scheduleMessage" | "slack/chat_getPermalink" | "slack/conversations_list" | "slack/conversations_info" | "slack/conversations_create" | "slack/conversations_invite" | "slack/conversations_history" | "slack/conversations_members" | "slack/conversations_open" | "slack/conversations_replies" | "slack/users_info" | "slack/users_list" | "slack/users_lookupByEmail" | "slack/users_conversations" | "slack/reactions_add" | "slack/reactions_get" | "slack/reactions_list" | "slack/reactions_remove" | "slack/files_list" | "slack/files_info" | "slack/files_delete">;
 
 // @public
 export interface SlackClient {

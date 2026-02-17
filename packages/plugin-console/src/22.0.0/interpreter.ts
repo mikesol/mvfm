@@ -1,5 +1,5 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
-import { eval_, typedInterpreter } from "@mvfm/core";
+import { defineInterpreter, eval_ } from "@mvfm/core";
 import { type ConsoleInstance, wrapConsole } from "./client-console";
 import type { ConsoleMethodName } from "./index";
 
@@ -104,7 +104,7 @@ export function createConsoleInterpreter(client: ConsoleClient): Interpreter {
     return undefined;
   };
 
-  return typedInterpreter<
+  return defineInterpreter<
     | "console/assert"
     | "console/clear"
     | "console/count"

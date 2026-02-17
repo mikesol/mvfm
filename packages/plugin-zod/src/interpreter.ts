@@ -1,5 +1,5 @@
 import type { FoldYield, Interpreter, TypedNode } from "@mvfm/core";
-import { eval_ } from "@mvfm/core";
+import { defineInterpreter, eval_ } from "@mvfm/core";
 import { z } from "zod";
 import { createArrayInterpreter } from "./array";
 import { bigintInterpreter } from "./bigint";
@@ -171,7 +171,9 @@ async function* handleParse(
 }
 
 export function createZodInterpreter(): Interpreter {
-  return {
+  return defineInterpreter<
+    "zod/parse" | "zod/safe_parse" | "zod/parse_async" | "zod/safe_parse_async"
+  >()({
     "zod/parse": async function* (node: ValidationASTNode) {
       return yield* handleParse(node, false);
     },
@@ -184,5 +186,5 @@ export function createZodInterpreter(): Interpreter {
     "zod/safe_parse_async": async function* (node: ValidationASTNode) {
       return yield* handleParse(node, true);
     },
-  };
+  });
 }

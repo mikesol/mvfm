@@ -1,5 +1,5 @@
 import type { TypedNode } from "../../fold";
-import { eval_, typedInterpreter } from "../../fold";
+import { defineInterpreter, eval_ } from "../../fold";
 
 // ---- Typed node interfaces ----------------------------------
 
@@ -83,7 +83,7 @@ type BooleanKinds =
 // ---- Interpreter map ----------------------------------------
 
 /** Interpreter handlers for `boolean/` node kinds. */
-export const booleanInterpreter = typedInterpreter<BooleanKinds>()({
+export const booleanInterpreter = defineInterpreter<BooleanKinds>()({
   "boolean/and": async function* (node: BooleanAndNode) {
     const left = yield* eval_(node.left);
     return left ? yield* eval_(node.right) : false;

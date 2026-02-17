@@ -581,6 +581,10 @@
               "text": "): "
             },
             {
+              "kind": "Content",
+              "text": "import(\"@mvfm/core\")."
+            },
+            {
               "kind": "Reference",
               "text": "PluginDefinition",
               "canonicalReference": "@mvfm/plugin-twilio!~PluginDefinition:interface"
@@ -596,7 +600,7 @@
             },
             {
               "kind": "Content",
-              "text": ">"
+              "text": ", {}, \"twilio/create_message\" | \"twilio/fetch_message\" | \"twilio/list_messages\" | \"twilio/create_call\" | \"twilio/fetch_call\" | \"twilio/list_calls\">"
             },
             {
               "kind": "Content",
@@ -606,7 +610,7 @@
           "fileUrlPath": "dist/5.5.1/index.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 3,
-            "endIndex": 7
+            "endIndex": 8
           },
           "releaseTag": "Public",
           "overloadIndex": 1,

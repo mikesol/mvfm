@@ -51,7 +51,8 @@
 // ============================================================
 
 import type { FalClient as FalSdkClient, QueueClient as FalSdkQueueClient } from "@fal-ai/client";
-import type { Expr, PluginContext, PluginDefinition } from "@mvfm/core";
+import type { Expr, PluginContext } from "@mvfm/core";
+import { definePlugin } from "@mvfm/core";
 import { falInterpreter } from "./interpreter";
 
 // ---- What the plugin adds to $ ----------------------------
@@ -162,8 +163,8 @@ export interface FalConfig {
  * @param config - A {@link FalConfig} with credentials.
  * @returns A PluginDefinition for the fal plugin.
  */
-export function fal(config: FalConfig): PluginDefinition<FalMethods> {
-  return {
+export function fal(config: FalConfig) {
+  return definePlugin({
     name: "fal",
     nodeKinds: [
       "fal/run",
@@ -244,7 +245,7 @@ export function fal(config: FalConfig): PluginDefinition<FalMethods> {
         },
       };
     },
-  };
+  });
 }
 
 // ============================================================

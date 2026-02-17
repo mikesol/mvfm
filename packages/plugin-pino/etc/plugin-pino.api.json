@@ -453,6 +453,10 @@
               "text": "): "
             },
             {
+              "kind": "Content",
+              "text": "import(\"@mvfm/core\")."
+            },
+            {
               "kind": "Reference",
               "text": "PluginDefinition",
               "canonicalReference": "@mvfm/plugin-pino!~PluginDefinition:interface"
@@ -468,7 +472,7 @@
             },
             {
               "kind": "Content",
-              "text": ">"
+              "text": ", {}, \"pino/trace\" | \"pino/debug\" | \"pino/info\" | \"pino/warn\" | \"pino/error\" | \"pino/fatal\">"
             },
             {
               "kind": "Content",
@@ -478,7 +482,7 @@
           "fileUrlPath": "dist/10.3.1/index.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 3,
-            "endIndex": 7
+            "endIndex": 8
           },
           "releaseTag": "Public",
           "overloadIndex": 1,

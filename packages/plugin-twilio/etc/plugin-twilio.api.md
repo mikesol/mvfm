@@ -31,7 +31,7 @@ export function serverInterpreter(client: TwilioClient): Interpreter;
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function twilio(config: TwilioConfig): PluginDefinition<TwilioMethods>;
+export function twilio(config: TwilioConfig): PluginDefinition<TwilioMethods, {}, "twilio/create_message" | "twilio/fetch_message" | "twilio/list_messages" | "twilio/create_call" | "twilio/fetch_call" | "twilio/list_calls">;
 
 // @public
 export interface TwilioCallContext {

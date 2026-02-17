@@ -1,5 +1,5 @@
 import type { TypedNode } from "../fold";
-import { eval_, typedInterpreter } from "../fold";
+import { defineInterpreter, eval_ } from "../fold";
 
 // ---- Typed node interfaces ----------------------------------
 
@@ -80,7 +80,7 @@ declare module "../fold" {
 // ---- Interpreter map ----------------------------------------
 
 /** Interpreter handlers for core node kinds. */
-export const coreInterpreter = typedInterpreter<
+export const coreInterpreter = defineInterpreter<
   | "core/literal"
   | "core/input"
   | "core/prop_access"

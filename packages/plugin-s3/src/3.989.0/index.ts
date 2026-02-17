@@ -63,7 +63,8 @@ import type {
   PutObjectCommandInput,
   PutObjectCommandOutput,
 } from "@aws-sdk/client-s3";
-import type { Expr, PluginContext, PluginDefinition } from "@mvfm/core";
+import type { Expr, PluginContext } from "@mvfm/core";
+import { definePlugin } from "@mvfm/core";
 
 type PutObjectInput = PutObjectCommandInput;
 type PutObjectResult = PutObjectCommandOutput;
@@ -171,8 +172,8 @@ export interface S3Config {
  * const prog = app(($) => $.s3.putObject({ Bucket: "b", Key: "k", Body: "hello" }));
  * ```
  */
-export function s3(config: S3Config): PluginDefinition<S3Methods> {
-  return {
+export function s3(config: S3Config) {
+  return definePlugin({
     name: "s3",
     nodeKinds: [
       "s3/put_object",
@@ -231,7 +232,7 @@ export function s3(config: S3Config): PluginDefinition<S3Methods> {
         },
       };
     },
-  };
+  });
 }
 
 // ============================================================

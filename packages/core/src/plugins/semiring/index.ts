@@ -1,4 +1,5 @@
-import type { Expr, PluginContext, PluginDefinition, TypeclassSlot } from "../../core";
+import type { Expr, PluginContext } from "../../core";
+import { definePlugin } from "../../core";
 import { inferType } from "../../trait-utils";
 
 /**
@@ -20,10 +21,9 @@ declare module "../../core" {
 }
 
 /** Semiring typeclass plugin. Dispatches `add` and `mul` to type-specific implementations. */
-export const semiring: PluginDefinition<TypeclassSlot<"semiring">> = {
+export const semiring = definePlugin({
   name: "semiring",
   nodeKinds: [],
-  defaultInterpreter: {},
   build(ctx: PluginContext): any {
     const impls = ctx.plugins.filter((p) => p.traits?.semiring).map((p) => p.traits!.semiring!);
 
@@ -58,4 +58,4 @@ export const semiring: PluginDefinition<TypeclassSlot<"semiring">> = {
       mul: dispatch("mul"),
     };
   },
-};
+});
