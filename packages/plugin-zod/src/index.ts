@@ -7,11 +7,15 @@ import type { ZodCoerceNamespace } from "./coerce";
 import { coerceNamespace, coerceNodeKinds } from "./coerce";
 import type { ZodDateNamespace } from "./date";
 import { dateNamespace, dateNodeKinds } from "./date";
+import type { ZodDiscriminatedUnionNamespace } from "./discriminated-union";
+import { discriminatedUnionNamespace, discriminatedUnionNodeKinds } from "./discriminated-union";
 import type { ZodEnumNamespace } from "./enum";
 import { enumNamespace, enumNodeKinds } from "./enum";
 import { createZodInterpreter } from "./interpreter";
 import type { ZodIntersectionNamespace } from "./intersection";
 import { intersectionNamespace, intersectionNodeKinds } from "./intersection";
+import type { ZodLazyNamespace } from "./lazy";
+import { lazyNamespace, lazyNodeKinds } from "./lazy";
 import type { ZodLiteralNamespace } from "./literal";
 import { literalNamespace, literalNodeKinds } from "./literal";
 import type { ZodMapSetNamespace } from "./map-set";
@@ -42,10 +46,12 @@ export { ZodArrayBuilder } from "./array";
 export { ZodSchemaBuilder, ZodWrappedBuilder } from "./base";
 export { ZodBigIntBuilder } from "./bigint";
 export { ZodDateBuilder } from "./date";
+export { ZodDiscriminatedUnionBuilder } from "./discriminated-union";
 export { ZodEnumBuilder, ZodNativeEnumBuilder } from "./enum";
 export { createZodInterpreter } from "./interpreter";
 export type { SchemaInterpreterMap } from "./interpreter-utils";
 export { ZodIntersectionBuilder } from "./intersection";
+export { ZodLazyBuilder } from "./lazy";
 export { ZodLiteralBuilder } from "./literal";
 export { ZodMapBuilder, ZodSetBuilder } from "./map-set";
 export { ZodNumberBuilder } from "./number";
@@ -89,8 +95,10 @@ export interface ZodNamespace
     ZodStringNamespace,
     ZodBigIntNamespace,
     ZodDateNamespace,
+    ZodDiscriminatedUnionNamespace,
     ZodEnumNamespace,
     ZodIntersectionNamespace,
+    ZodLazyNamespace,
     ZodLiteralNamespace,
     ZodMapSetNamespace,
     ZodNumberNamespace,
@@ -144,8 +152,10 @@ export const zod = definePlugin({
     ...stringNodeKinds,
     ...bigintNodeKinds,
     ...dateNodeKinds,
+    ...discriminatedUnionNodeKinds,
     ...enumNodeKinds,
     ...intersectionNodeKinds,
+    ...lazyNodeKinds,
     ...literalNodeKinds,
     ...mapSetNodeKinds,
     ...numberNodeKinds,
@@ -168,8 +178,10 @@ export const zod = definePlugin({
         ...stringNamespace(ctx, parseError),
         ...bigintNamespace(ctx, parseError),
         ...dateNamespace(ctx, parseError),
+        ...discriminatedUnionNamespace(ctx, parseError),
         ...enumNamespace(ctx, parseError),
         ...intersectionNamespace(ctx, parseError),
+        ...lazyNamespace(ctx),
         ...literalNamespace(ctx),
         ...mapSetNamespace(ctx, parseError),
         ...numberNamespace(ctx, parseError),

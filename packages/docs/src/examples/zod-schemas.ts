@@ -103,6 +103,51 @@ await foldAST(
 );`,
     plugins: ZP,
   },
+  "zod/lazy": {
+    description: "Schema for self-referential and mutually recursive data structures",
+    code: `const app = mvfm(prelude, zod);
+const prog = app({ value: "object" }, ($) => {
+  const Category = $.zod.object({
+    name: $.zod.string(),
+    subcategories: $.zod.lazy(() => $.zod.array(Category)),
+  });
+  return Category.parse($.input.value);
+});
+await foldAST(
+  defaults(app),
+  injectInput(prog, { 
+    value: { 
+      name: "Electronics", 
+      subcategories: [
+        { name: "Laptops", subcategories: [] }
+      ]
+    }
+  })
+);`,
+    plugins: ZP,
+  },
+  "zod/lazy_ref": {
+    description:
+      "Internal back-reference emitted inside recursive lazy schemas to keep the AST finite",
+    code: `const app = mvfm(prelude, zod);
+const prog = app({ value: "object" }, ($) => {
+  const Category = $.zod.object({
+    name: $.zod.string(),
+    subcategories: $.zod.lazy(() => $.zod.array(Category)),
+  });
+  return Category.parse($.input.value);
+});
+await foldAST(
+  defaults(app),
+  injectInput(prog, {
+    value: {
+      name: "Root",
+      subcategories: [{ name: "Leaf", subcategories: [] }],
+    },
+  })
+);`,
+    plugins: ZP,
+  },
   "zod/literal": {
     description: "Schema for an exact literal value",
     code: `const app = mvfm(prelude, zod);

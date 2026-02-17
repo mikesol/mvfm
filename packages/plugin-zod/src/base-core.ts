@@ -78,9 +78,17 @@ export abstract class ZodSchemaBuilderCore<T> {
     input: Expr<unknown> | unknown,
     opts?: { error?: ErrorConfig },
   ): TypedNode {
+    const rawSchema = this._buildSchemaNode();
+    const resolver = (
+      this._ctx as PluginContext & {
+        __zodResolveLazySchema?: (
+          schema: SchemaASTNode | WrapperASTNode,
+        ) => SchemaASTNode | WrapperASTNode;
+      }
+    ).__zodResolveLazySchema;
     const node = {
       kind: opKind,
-      schema: this._buildSchemaNode(),
+      schema: resolver ? resolver(rawSchema) : rawSchema,
       input: this._ctx.lift(input).__node,
     } as TypedNode & { parseError?: ErrorConfig };
 
