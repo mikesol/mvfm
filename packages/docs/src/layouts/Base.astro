@@ -1,0 +1,31 @@
+---
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+}
+
+const { title = "MVFM" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+  </head>
+  <body class="bg-base-950 text-base-400 font-sans min-h-svh antialiased">
+    <header class="px-6 pt-6">
+      <a
+        href="/"
+        class="text-base-50 text-base font-bold tracking-widest hover:text-base-300 transition-colors"
+      >
+        MVFM
+      </a>
+    </header>
+    <main class="px-6 py-6">
+      <slot />
+    </main>
+  </body>
+</html>

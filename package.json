@@ -7,7 +7,8 @@
     "check": "pnpm --filter @mvfm/core run check && pnpm --filter '@mvfm/plugin-*' -r run check",
     "test": "pnpm -r --filter '@mvfm/*' run test",
     "size": "pnpm -r --filter '@mvfm/*' run size",
-    "verify": "pnpm run build && pnpm run check && pnpm run test && pnpm run size"
+    "verify": "pnpm run build && pnpm run check && pnpm run test && pnpm run size",
+    "check:docs": "tsx scripts/check-docs-coverage.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.14",
@@ -16,6 +17,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "size-limit": "^12.0.0",
+    "tsx": "^4.19.0",
     "typescript": "^5.3.0",
     "vitest": "^4.0.18"
   },

@@ -1,0 +1,23 @@
+---
+import Base from "../layouts/Base.astro";
+import Playground from "../components/Playground";
+import { getAllExamples } from "../examples";
+
+export function getStaticPaths() {
+  const examples = getAllExamples();
+  return Object.entries(examples).map(([kind, example]) => ({
+    params: { slug: kind },
+    props: { kind, ...example },
+  }));
+}
+
+const { kind, description, code } = Astro.props;
+---
+
+<Base title={`${kind} — MVFM`}>
+  <div class="pt-4">
+    <h1 class="text-2xl font-bold text-base-50 tracking-tight">{kind}</h1>
+    <p class="mt-2 text-base text-base-500">{description}</p>
+    <Playground code={code} client:visible />
+  </div>
+</Base>
