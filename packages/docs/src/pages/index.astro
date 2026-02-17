@@ -15,7 +15,7 @@ const kinds = [...coreKinds, ...rest];
     {kinds.map((kind) => {
       const color = isNamespaceIndex(allExamples[kind]) ? "text-base-400" : "text-base-500";
       return (
-        <Fragment><a href={`/${kind}`} class={`${color} hover:text-base-50 transition-colors mr-4`}>{kind}</a>{" "}</Fragment>
+        <Fragment><a href={`${import.meta.env.BASE_URL}${kind}`} class={`${color} hover:text-base-50 transition-colors mr-4`}>{kind}</a>{" "}</Fragment>
       );
     })}
   </div>
