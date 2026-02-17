@@ -7,6 +7,7 @@ import error from "./error";
 import fiber from "./fiber";
 import num from "./num";
 import ord from "./ord";
+import postgres from "./postgres";
 import st from "./st";
 import str from "./str";
 import type { NodeExample } from "./types";
@@ -26,6 +27,7 @@ const modules: Record<string, NodeExample>[] = [
   error,
   fiber,
   console_,
+  postgres,
   zodSchemas,
   zodSchemasMore,
   zodWrappers,
