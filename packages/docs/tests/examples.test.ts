@@ -8,8 +8,7 @@ describe("docs examples", () => {
   for (const [kind, example] of Object.entries(examples)) {
     it(`${kind} runs without error`, async () => {
       const logs: string[] = [];
-      const noop = (...args: unknown[]) =>
-        logs.push(args.map(String).join(" "));
+      const noop = (...args: unknown[]) => logs.push(args.map(String).join(" "));
       const fakeConsole = {
         assert: noop,
         clear: noop,
@@ -38,9 +37,7 @@ describe("docs examples", () => {
       if (example.mockInterpreter) {
         // Step 1: get a base scope to access eval_/recurseScoped
         const base = await createPlaygroundScope(fakeConsole);
-        const AsyncFunction = Object.getPrototypeOf(
-          async function () {},
-        ).constructor;
+        const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
 
         // Step 2: evaluate mock interpreter inside scope
         const mockFn = new AsyncFunction(
@@ -50,19 +47,22 @@ describe("docs examples", () => {
         const mock = await mockFn(...base.paramValues);
 
         // Step 3: create scope with resolved mock
-        const { paramNames, paramValues } = await createPlaygroundScope(
-          fakeConsole,
-          mock,
-        );
+        const { paramNames, paramValues } = await createPlaygroundScope(fakeConsole, mock);
+        const fn = new AsyncFunction(...paramNames, example.code);
+        await fn(...paramValues);
+      } else if (example.pglite) {
+        // PGLite examples: spin up in-browser Postgres via PGLite
+        const { PGlite } = await import("@electric-sql/pglite");
+        const db = new PGlite();
+        await db.exec(example.pglite.seedSQL);
+
+        const { paramNames, paramValues } = await createPlaygroundScope(fakeConsole, undefined, db);
+        const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
         const fn = new AsyncFunction(...paramNames, example.code);
         await fn(...paramValues);
       } else {
-        const { paramNames, paramValues } = await createPlaygroundScope(
-          fakeConsole,
-        );
-        const AsyncFunction = Object.getPrototypeOf(
-          async function () {},
-        ).constructor;
+        const { paramNames, paramValues } = await createPlaygroundScope(fakeConsole);
+        const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
         const fn = new AsyncFunction(...paramNames, example.code);
         await fn(...paramValues);
       }
