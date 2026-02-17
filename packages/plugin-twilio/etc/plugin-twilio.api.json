@@ -661,12 +661,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "CallInstance",
+                  "canonicalReference": "twilio!CallInstance:class"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>"
+                  "text": ">"
                 },
                 {
                   "kind": "Content",
@@ -770,21 +770,17 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "CallListInstanceCreateOptions",
+                  "canonicalReference": "twilio!CallListInstanceCreateOptions:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": "> | "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>"
+                  "text": "CallListInstanceCreateOptions",
+                  "canonicalReference": "twilio!CallListInstanceCreateOptions:interface"
                 },
                 {
                   "kind": "Content",
@@ -801,12 +797,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "CallInstance",
+                  "canonicalReference": "twilio!CallInstance:class"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>"
+                  "text": ">"
                 },
                 {
                   "kind": "Content",
@@ -815,8 +811,8 @@
               ],
               "isOptional": false,
               "returnTypeTokenRange": {
-                "startIndex": 8,
-                "endIndex": 12
+                "startIndex": 7,
+                "endIndex": 11
               },
               "releaseTag": "Public",
               "overloadIndex": 1,
@@ -825,7 +821,7 @@
                   "parameterName": "params",
                   "parameterTypeTokenRange": {
                     "startIndex": 1,
-                    "endIndex": 7
+                    "endIndex": 6
                   },
                   "isOptional": false
                 }
@@ -852,21 +848,17 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "CallListInstanceOptions",
+                  "canonicalReference": "twilio!CallListInstanceOptions:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": "> | "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>"
+                  "text": "CallListInstanceOptions",
+                  "canonicalReference": "twilio!CallListInstanceOptions:interface"
                 },
                 {
                   "kind": "Content",
@@ -883,12 +875,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "CallInstance",
+                  "canonicalReference": "twilio!CallInstance:class"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>"
+                  "text": "[]>"
                 },
                 {
                   "kind": "Content",
@@ -897,8 +889,8 @@
               ],
               "isOptional": false,
               "returnTypeTokenRange": {
-                "startIndex": 8,
-                "endIndex": 12
+                "startIndex": 7,
+                "endIndex": 11
               },
               "releaseTag": "Public",
               "overloadIndex": 1,
@@ -907,7 +899,7 @@
                   "parameterName": "params",
                   "parameterTypeTokenRange": {
                     "startIndex": 1,
-                    "endIndex": 7
+                    "endIndex": 6
                   },
                   "isOptional": true
                 }
@@ -1153,12 +1145,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "MessageInstance",
+                  "canonicalReference": "twilio!MessageInstance:class"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>"
+                  "text": ">"
                 },
                 {
                   "kind": "Content",
@@ -1262,21 +1254,17 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "MessageListInstanceCreateOptions",
+                  "canonicalReference": "twilio!MessageListInstanceCreateOptions:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": "> | "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>"
+                  "text": "MessageListInstanceCreateOptions",
+                  "canonicalReference": "twilio!MessageListInstanceCreateOptions:interface"
                 },
                 {
                   "kind": "Content",
@@ -1293,12 +1281,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "MessageInstance",
+                  "canonicalReference": "twilio!MessageInstance:class"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>"
+                  "text": ">"
                 },
                 {
                   "kind": "Content",
@@ -1307,8 +1295,8 @@
               ],
               "isOptional": false,
               "returnTypeTokenRange": {
-                "startIndex": 8,
-                "endIndex": 12
+                "startIndex": 7,
+                "endIndex": 11
               },
               "releaseTag": "Public",
               "overloadIndex": 1,
@@ -1317,7 +1305,7 @@
                   "parameterName": "params",
                   "parameterTypeTokenRange": {
                     "startIndex": 1,
-                    "endIndex": 7
+                    "endIndex": 6
                   },
                   "isOptional": false
                 }
@@ -1344,21 +1332,17 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "MessageListInstanceOptions",
+                  "canonicalReference": "twilio!MessageListInstanceOptions:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
+                  "text": "> | "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>"
+                  "text": "MessageListInstanceOptions",
+                  "canonicalReference": "twilio!MessageListInstanceOptions:interface"
                 },
                 {
                   "kind": "Content",
@@ -1375,12 +1359,12 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
+                  "text": "MessageInstance",
+                  "canonicalReference": "twilio!MessageInstance:class"
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>>"
+                  "text": "[]>"
                 },
                 {
                   "kind": "Content",
@@ -1389,8 +1373,8 @@
               ],
               "isOptional": false,
               "returnTypeTokenRange": {
-                "startIndex": 8,
-                "endIndex": 12
+                "startIndex": 7,
+                "endIndex": 11
               },
               "releaseTag": "Public",
               "overloadIndex": 1,
@@ -1399,7 +1383,7 @@
                   "parameterName": "params",
                   "parameterTypeTokenRange": {
                     "startIndex": 1,
-                    "endIndex": 7
+                    "endIndex": 6
                   },
                   "isOptional": true
                 }

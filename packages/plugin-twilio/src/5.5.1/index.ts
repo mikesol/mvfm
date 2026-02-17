@@ -44,12 +44,12 @@ import type { Expr, PluginContext } from "@mvfm/core";
 import { definePlugin } from "@mvfm/core";
 import { twilioInterpreter } from "./interpreter";
 import type {
-  MessageListInstanceCreateOptions,
-  MessageListInstanceOptions,
-  MessageInstance,
+  CallInstance,
   CallListInstanceCreateOptions,
   CallListInstanceOptions,
-  CallInstance,
+  MessageInstance,
+  MessageListInstanceCreateOptions,
+  MessageListInstanceOptions,
 } from "./types";
 
 // ---- What the plugin adds to $ ----------------------------
@@ -95,9 +95,7 @@ export interface TwilioCallsResource {
     params: Expr<CallListInstanceCreateOptions> | CallListInstanceCreateOptions,
   ): Expr<CallInstance>;
   /** List calls with optional filter params. */
-  list(
-    params?: Expr<CallListInstanceOptions> | CallListInstanceOptions,
-  ): Expr<CallInstance[]>;
+  list(params?: Expr<CallListInstanceOptions> | CallListInstanceOptions): Expr<CallInstance[]>;
 }
 
 /**

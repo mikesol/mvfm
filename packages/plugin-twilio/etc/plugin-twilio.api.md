@@ -4,6 +4,13 @@
 
 ```ts
 
+import { CallInstance } from 'twilio/lib/rest/api/v2010/account/call';
+import { CallListInstanceCreateOptions } from 'twilio/lib/rest/api/v2010/account/call';
+import { CallListInstanceOptions } from 'twilio/lib/rest/api/v2010/account/call';
+import { MessageInstance } from 'twilio/lib/rest/api/v2010/account/message';
+import { MessageListInstanceCreateOptions } from 'twilio/lib/rest/api/v2010/account/message';
+import { MessageListInstanceOptions } from 'twilio/lib/rest/api/v2010/account/message';
+
 // @public
 export interface ClientHandlerOptions {
     baseUrl: string;
@@ -36,14 +43,14 @@ export function twilio(config: TwilioConfig): PluginDefinition<TwilioMethods, {}
 // @public
 export interface TwilioCallContext {
     // Warning: (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
-    fetch(): Expr<Record<string, unknown>>;
+    fetch(): Expr<CallInstance>;
 }
 
 // @public
 export interface TwilioCallsResource {
     (sid: Expr<string> | string): TwilioCallContext;
-    create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-    list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+    create(params: Expr<CallListInstanceCreateOptions> | CallListInstanceCreateOptions): Expr<CallInstance>;
+    list(params?: Expr<CallListInstanceOptions> | CallListInstanceOptions): Expr<CallInstance[]>;
 }
 
 // @public
@@ -62,14 +69,14 @@ export const twilioInterpreter: Interpreter;
 
 // @public
 export interface TwilioMessageContext {
-    fetch(): Expr<Record<string, unknown>>;
+    fetch(): Expr<MessageInstance>;
 }
 
 // @public
 export interface TwilioMessagesResource {
     (sid: Expr<string> | string): TwilioMessageContext;
-    create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-    list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
+    create(params: Expr<MessageListInstanceCreateOptions> | MessageListInstanceCreateOptions): Expr<MessageInstance>;
+    list(params?: Expr<MessageListInstanceOptions> | MessageListInstanceOptions): Expr<MessageInstance[]>;
 }
 
 // @public

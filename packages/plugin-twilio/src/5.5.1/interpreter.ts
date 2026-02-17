@@ -2,10 +2,10 @@ import type { Interpreter, TypedNode } from "@mvfm/core";
 import { defineInterpreter, eval_ } from "@mvfm/core";
 import { wrapTwilioSdk } from "./client-twilio-sdk";
 import type {
-  MessageListInstanceCreateOptions,
-  MessageListInstanceOptions,
   CallListInstanceCreateOptions,
   CallListInstanceOptions,
+  MessageListInstanceCreateOptions,
+  MessageListInstanceOptions,
 } from "./types";
 
 /**
