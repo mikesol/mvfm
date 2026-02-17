@@ -2,7 +2,7 @@
 
 *Extensible tagless final DSL for deterministic, verifiable TypeScript programs.*
 
-*MVFM stands for Maximum Viable Free Monad. Its fixed point is a free monad covering all TypeScript operations and all npm packages.*
+*MVFM stands for Minimum Viable Free Monad. Its fixed point is a free monad covering all TypeScript operations and all npm packages.*
 
 ---
 
