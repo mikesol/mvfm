@@ -3,29 +3,44 @@ import Base from "../layouts/Base.astro";
 import { Code } from "astro:components";
 import Playground from "../components/Playground";
 import { getAllExamples } from "../examples";
+import { isNamespaceIndex } from "../examples/types";
 import { MONO_THEME } from "../themes/mono";
 
 export function getStaticPaths() {
   const examples = getAllExamples();
   return Object.entries(examples).map(([kind, example]) => ({
     params: { slug: kind },
-    props: { kind, ...example },
+    props: { kind, example },
   }));
 }
 
-const { kind, description, code, pglite, mockInterpreter } = Astro.props;
+const { kind, example } = Astro.props;
+const isIndex = isNamespaceIndex(example);
 ---
 
 <Base title={`${kind} — MVFM`}>
   <div class="pt-4">
     <h1 class="text-2xl font-bold text-base-50 tracking-tight">{kind}</h1>
-    <p class="mt-2 text-base text-base-500">{description}</p>
-    <div class="playground-wrapper mt-10">
-      <div class="playground-fallback border border-base-800">
-        <Code code={code} lang="typescript" theme={MONO_THEME} />
+    {isIndex ? (
+      <div class="mt-4 prose-index">
+        <div set:html={example.content} />
+        {example.staticCode && (
+          <div class="mt-8 border border-base-800">
+            <Code code={example.staticCode} lang="typescript" theme={MONO_THEME} />
+          </div>
+        )}
       </div>
-      <Playground code={code} pglite={pglite} mockInterpreter={mockInterpreter} client:load />
-    </div>
+    ) : (
+      <>
+        <p class="mt-2 text-base text-base-500">{example.description}</p>
+        <div class="playground-wrapper mt-10">
+          <div class="playground-fallback border border-base-800">
+            <Code code={example.code} lang="typescript" theme={MONO_THEME} />
+          </div>
+          <Playground code={example.code} pglite={example.pglite} mockInterpreter={example.mockInterpreter} client:load />
+        </div>
+      </>
+    )}
   </div>
 </Base>
 
@@ -48,5 +63,23 @@ const { kind, description, code, pglite, mockInterpreter } = Astro.props;
     line-height: 1.625;
     tab-size: 2;
     margin: 0;
+  }
+  /* Namespace index prose styling */
+  .prose-index {
+    color: rgb(var(--base-400));
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+  .prose-index p {
+    margin-bottom: 1rem;
+  }
+  .prose-index ul {
+    list-style: disc;
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .prose-index code {
+    color: rgb(var(--base-300));
+    font-size: 0.875rem;
   }
 </style>
