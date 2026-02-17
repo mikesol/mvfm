@@ -1,5 +1,5 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
-import { eval_ } from "@mvfm/core";
+import { eval_, typedInterpreter } from "@mvfm/core";
 import { wrapPino } from "./client-pino";
 
 /**
@@ -18,15 +18,51 @@ export interface PinoClient {
   ): Promise<void>;
 }
 
-interface PinoNode extends TypedNode<void> {
-  kind: string;
+interface PinoNode<K extends string> extends TypedNode<void> {
+  kind: K;
   level: string;
   msg?: TypedNode<string>;
   mergeObject?: TypedNode<Record<string, unknown>>;
   bindings: TypedNode<Record<string, unknown>>[];
 }
 
-const LEVELS = ["trace", "debug", "info", "warn", "error", "fatal"] as const;
+interface PinoTraceNode extends PinoNode<"pino/trace"> {
+  level: "trace";
+}
+interface PinoDebugNode extends PinoNode<"pino/debug"> {
+  level: "debug";
+}
+interface PinoInfoNode extends PinoNode<"pino/info"> {
+  level: "info";
+}
+interface PinoWarnNode extends PinoNode<"pino/warn"> {
+  level: "warn";
+}
+interface PinoErrorNode extends PinoNode<"pino/error"> {
+  level: "error";
+}
+interface PinoFatalNode extends PinoNode<"pino/fatal"> {
+  level: "fatal";
+}
+
+type PinoAnyNode =
+  | PinoTraceNode
+  | PinoDebugNode
+  | PinoInfoNode
+  | PinoWarnNode
+  | PinoErrorNode
+  | PinoFatalNode;
+
+declare module "@mvfm/core" {
+  interface NodeTypeMap {
+    "pino/trace": PinoTraceNode;
+    "pino/debug": PinoDebugNode;
+    "pino/info": PinoInfoNode;
+    "pino/warn": PinoWarnNode;
+    "pino/error": PinoErrorNode;
+    "pino/fatal": PinoFatalNode;
+  }
+}
 
 /**
  * Creates an interpreter for `pino/*` node kinds.
@@ -35,7 +71,7 @@ const LEVELS = ["trace", "debug", "info", "warn", "error", "fatal"] as const;
  * @returns An Interpreter handling all pino node kinds.
  */
 export function createPinoInterpreter(client: PinoClient): Interpreter {
-  const handler = async function* (node: PinoNode) {
+  const handler = async function* (node: PinoAnyNode) {
     const msg = node.msg != null ? yield* eval_(node.msg) : undefined;
     const mergeObject = node.mergeObject != null ? yield* eval_(node.mergeObject) : undefined;
     const bindings: Record<string, unknown>[] = [];
@@ -46,7 +82,16 @@ export function createPinoInterpreter(client: PinoClient): Interpreter {
     return undefined;
   };
 
-  return Object.fromEntries(LEVELS.map((l) => [`pino/${l}`, handler]));
+  return typedInterpreter<
+    "pino/trace" | "pino/debug" | "pino/info" | "pino/warn" | "pino/error" | "pino/fatal"
+  >()({
+    "pino/trace": handler,
+    "pino/debug": handler,
+    "pino/info": handler,
+    "pino/warn": handler,
+    "pino/error": handler,
+    "pino/fatal": handler,
+  });
 }
 
 const dynamicImport = new Function("m", "return import(m)") as (moduleName: string) => Promise<any>;

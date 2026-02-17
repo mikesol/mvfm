@@ -1,5 +1,5 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
-import { eval_ } from "@mvfm/core";
+import { eval_, typedInterpreter } from "@mvfm/core";
 import { wrapStripeSdk } from "./client-stripe-sdk";
 
 /**
@@ -13,10 +13,53 @@ export interface StripeClient {
   request(method: string, path: string, params?: Record<string, unknown>): Promise<unknown>;
 }
 
-interface StripeNode extends TypedNode<unknown> {
-  kind: string;
+interface StripeNode<K extends string> extends TypedNode<unknown> {
+  kind: K;
   id?: TypedNode<string>;
   params?: TypedNode<Record<string, unknown>>;
+}
+
+interface StripeCreatePaymentIntentNode extends StripeNode<"stripe/create_payment_intent"> {
+  params: TypedNode<Record<string, unknown>>;
+}
+interface StripeRetrievePaymentIntentNode extends StripeNode<"stripe/retrieve_payment_intent"> {
+  id: TypedNode<string>;
+}
+interface StripeConfirmPaymentIntentNode extends StripeNode<"stripe/confirm_payment_intent"> {
+  id: TypedNode<string>;
+}
+interface StripeCreateCustomerNode extends StripeNode<"stripe/create_customer"> {
+  params: TypedNode<Record<string, unknown>>;
+}
+interface StripeRetrieveCustomerNode extends StripeNode<"stripe/retrieve_customer"> {
+  id: TypedNode<string>;
+}
+interface StripeUpdateCustomerNode extends StripeNode<"stripe/update_customer"> {
+  id: TypedNode<string>;
+  params: TypedNode<Record<string, unknown>>;
+}
+interface StripeListCustomersNode extends StripeNode<"stripe/list_customers"> {}
+interface StripeCreateChargeNode extends StripeNode<"stripe/create_charge"> {
+  params: TypedNode<Record<string, unknown>>;
+}
+interface StripeRetrieveChargeNode extends StripeNode<"stripe/retrieve_charge"> {
+  id: TypedNode<string>;
+}
+interface StripeListChargesNode extends StripeNode<"stripe/list_charges"> {}
+
+declare module "@mvfm/core" {
+  interface NodeTypeMap {
+    "stripe/create_payment_intent": StripeCreatePaymentIntentNode;
+    "stripe/retrieve_payment_intent": StripeRetrievePaymentIntentNode;
+    "stripe/confirm_payment_intent": StripeConfirmPaymentIntentNode;
+    "stripe/create_customer": StripeCreateCustomerNode;
+    "stripe/retrieve_customer": StripeRetrieveCustomerNode;
+    "stripe/update_customer": StripeUpdateCustomerNode;
+    "stripe/list_customers": StripeListCustomersNode;
+    "stripe/create_charge": StripeCreateChargeNode;
+    "stripe/retrieve_charge": StripeRetrieveChargeNode;
+    "stripe/list_charges": StripeListChargesNode;
+  }
 }
 
 /**
@@ -26,59 +69,70 @@ interface StripeNode extends TypedNode<unknown> {
  * @returns An Interpreter handling all stripe node kinds.
  */
 export function createStripeInterpreter(client: StripeClient): Interpreter {
-  return {
-    "stripe/create_payment_intent": async function* (node: StripeNode) {
+  return typedInterpreter<
+    | "stripe/create_payment_intent"
+    | "stripe/retrieve_payment_intent"
+    | "stripe/confirm_payment_intent"
+    | "stripe/create_customer"
+    | "stripe/retrieve_customer"
+    | "stripe/update_customer"
+    | "stripe/list_customers"
+    | "stripe/create_charge"
+    | "stripe/retrieve_charge"
+    | "stripe/list_charges"
+  >()({
+    "stripe/create_payment_intent": async function* (node: StripeCreatePaymentIntentNode) {
       const params = yield* eval_(node.params!);
       return await client.request("POST", "/v1/payment_intents", params);
     },
 
-    "stripe/retrieve_payment_intent": async function* (node: StripeNode) {
+    "stripe/retrieve_payment_intent": async function* (node: StripeRetrievePaymentIntentNode) {
       const id = yield* eval_(node.id!);
       return await client.request("GET", `/v1/payment_intents/${id}`);
     },
 
-    "stripe/confirm_payment_intent": async function* (node: StripeNode) {
+    "stripe/confirm_payment_intent": async function* (node: StripeConfirmPaymentIntentNode) {
       const id = yield* eval_(node.id!);
       const params = node.params != null ? yield* eval_(node.params) : undefined;
       return await client.request("POST", `/v1/payment_intents/${id}/confirm`, params);
     },
 
-    "stripe/create_customer": async function* (node: StripeNode) {
+    "stripe/create_customer": async function* (node: StripeCreateCustomerNode) {
       const params = yield* eval_(node.params!);
       return await client.request("POST", "/v1/customers", params);
     },
 
-    "stripe/retrieve_customer": async function* (node: StripeNode) {
+    "stripe/retrieve_customer": async function* (node: StripeRetrieveCustomerNode) {
       const id = yield* eval_(node.id!);
       return await client.request("GET", `/v1/customers/${id}`);
     },
 
-    "stripe/update_customer": async function* (node: StripeNode) {
+    "stripe/update_customer": async function* (node: StripeUpdateCustomerNode) {
       const id = yield* eval_(node.id!);
       const params = yield* eval_(node.params!);
       return await client.request("POST", `/v1/customers/${id}`, params);
     },
 
-    "stripe/list_customers": async function* (node: StripeNode) {
+    "stripe/list_customers": async function* (node: StripeListCustomersNode) {
       const params = node.params != null ? yield* eval_(node.params) : undefined;
       return await client.request("GET", "/v1/customers", params);
     },
 
-    "stripe/create_charge": async function* (node: StripeNode) {
+    "stripe/create_charge": async function* (node: StripeCreateChargeNode) {
       const params = yield* eval_(node.params!);
       return await client.request("POST", "/v1/charges", params);
     },
 
-    "stripe/retrieve_charge": async function* (node: StripeNode) {
+    "stripe/retrieve_charge": async function* (node: StripeRetrieveChargeNode) {
       const id = yield* eval_(node.id!);
       return await client.request("GET", `/v1/charges/${id}`);
     },
 
-    "stripe/list_charges": async function* (node: StripeNode) {
+    "stripe/list_charges": async function* (node: StripeListChargesNode) {
       const params = node.params != null ? yield* eval_(node.params) : undefined;
       return await client.request("GET", "/v1/charges", params);
     },
-  };
+  });
 }
 
 function requiredEnv(name: "STRIPE_API_KEY"): string {

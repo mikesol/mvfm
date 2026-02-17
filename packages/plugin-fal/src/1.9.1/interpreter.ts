@@ -5,7 +5,7 @@ import type {
   Result,
 } from "@fal-ai/client";
 import type { Interpreter, TypedNode } from "@mvfm/core";
-import { eval_ } from "@mvfm/core";
+import { eval_, typedInterpreter } from "@mvfm/core";
 import { wrapFalSdk } from "./client-fal-sdk";
 
 /**
@@ -44,10 +44,28 @@ export interface FalClient {
   ): Promise<void>;
 }
 
-interface FalNode extends TypedNode<unknown> {
-  kind: string;
+interface FalNode<K extends string, T> extends TypedNode<T> {
+  kind: K;
   endpointId: TypedNode<string>;
-  options?: TypedNode;
+  options?: TypedNode<unknown>;
+}
+
+interface FalRunNode extends FalNode<"fal/run", Result<unknown>> {}
+interface FalSubscribeNode extends FalNode<"fal/subscribe", Result<unknown>> {}
+interface FalQueueSubmitNode extends FalNode<"fal/queue_submit", unknown> {}
+interface FalQueueStatusNode extends FalNode<"fal/queue_status", QueueStatus> {}
+interface FalQueueResultNode extends FalNode<"fal/queue_result", unknown> {}
+interface FalQueueCancelNode extends FalNode<"fal/queue_cancel", void> {}
+
+declare module "@mvfm/core" {
+  interface NodeTypeMap {
+    "fal/run": FalRunNode;
+    "fal/subscribe": FalSubscribeNode;
+    "fal/queue_submit": FalQueueSubmitNode;
+    "fal/queue_status": FalQueueStatusNode;
+    "fal/queue_result": FalQueueResultNode;
+    "fal/queue_cancel": FalQueueCancelNode;
+  }
 }
 
 /**
@@ -57,44 +75,51 @@ interface FalNode extends TypedNode<unknown> {
  * @returns An Interpreter handling all fal node kinds.
  */
 export function createFalInterpreter(client: FalClient): Interpreter {
-  return {
-    "fal/run": async function* (node: FalNode) {
+  return typedInterpreter<
+    | "fal/run"
+    | "fal/subscribe"
+    | "fal/queue_submit"
+    | "fal/queue_status"
+    | "fal/queue_result"
+    | "fal/queue_cancel"
+  >()({
+    "fal/run": async function* (node: FalRunNode) {
       const endpointId = yield* eval_(node.endpointId);
       const options = node.options != null ? yield* eval_(node.options) : undefined;
       return await client.run(endpointId, options as any);
     },
 
-    "fal/subscribe": async function* (node: FalNode) {
+    "fal/subscribe": async function* (node: FalSubscribeNode) {
       const endpointId = yield* eval_(node.endpointId);
       const options = node.options != null ? yield* eval_(node.options) : undefined;
       return await client.subscribe(endpointId, options as any);
     },
 
-    "fal/queue_submit": async function* (node: FalNode) {
+    "fal/queue_submit": async function* (node: FalQueueSubmitNode) {
       const endpointId = yield* eval_(node.endpointId);
       const options = node.options != null ? yield* eval_(node.options) : undefined;
       return await client.queueSubmit(endpointId, options as any);
     },
 
-    "fal/queue_status": async function* (node: FalNode) {
+    "fal/queue_status": async function* (node: FalQueueStatusNode) {
       const endpointId = yield* eval_(node.endpointId);
       const options = node.options != null ? yield* eval_(node.options) : undefined;
       return await client.queueStatus(endpointId, options as any);
     },
 
-    "fal/queue_result": async function* (node: FalNode) {
+    "fal/queue_result": async function* (node: FalQueueResultNode) {
       const endpointId = yield* eval_(node.endpointId);
       const options = node.options != null ? yield* eval_(node.options) : undefined;
       return await client.queueResult(endpointId, options as any);
     },
 
-    "fal/queue_cancel": async function* (node: FalNode) {
+    "fal/queue_cancel": async function* (node: FalQueueCancelNode) {
       const endpointId = yield* eval_(node.endpointId);
       const options = node.options != null ? yield* eval_(node.options) : undefined;
       await client.queueCancel(endpointId, options as any);
       return undefined;
     },
-  };
+  });
 }
 
 function requiredEnv(name: "FAL_KEY"): string {
