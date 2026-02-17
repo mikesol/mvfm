@@ -25,7 +25,10 @@ export interface ClientHandlerOptions {
  * @param nodeKinds - Node kinds to create handlers for.
  * @returns An Interpreter that proxies all operations to the server.
  */
-export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter {
+export function clientInterpreter(
+  options: ClientHandlerOptions,
+  nodeKinds: string[],
+): Interpreter<string> {
   const { baseUrl, contractHash, headers = {} } = options;
   const fetchFn = options.fetch ?? globalThis.fetch;
   let stepIndex = 0;

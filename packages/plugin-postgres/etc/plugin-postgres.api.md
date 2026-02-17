@@ -23,7 +23,7 @@ export interface ClientHandlerOptions {
 // Warning: (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter;
+export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter<string>;
 
 // @public
 export function createPostgresInterpreter(client: PostgresClient): Interpreter<"postgres/query" | "postgres/identifier" | "postgres/insert_helper" | "postgres/set_helper" | "postgres/begin" | "postgres/savepoint" | "postgres/cursor" | "postgres/cursor_batch">;

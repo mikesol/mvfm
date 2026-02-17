@@ -44,9 +44,9 @@ TDD-style for type-level behavior:
 3. Run runtime tests to ensure no behavioral regressions.
 
 Final verification command set:
-- `npm run build`
-- `npm run check`
-- `npm test`
+- `pnpm build`
+- `pnpm check`
+- `pnpm test`
 
 ## Design Alignment
 
