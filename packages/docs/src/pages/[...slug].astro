@@ -13,7 +13,7 @@ export function getStaticPaths() {
   }));
 }
 
-const { kind, description, code } = Astro.props;
+const { kind, description, code, pglite, mockInterpreter } = Astro.props;
 ---
 
 <Base title={`${kind} — MVFM`}>
@@ -24,7 +24,7 @@ const { kind, description, code } = Astro.props;
       <div class="playground-fallback border border-base-800">
         <Code code={code} lang="typescript" theme={MONO_THEME} />
       </div>
-      <Playground code={code} client:load />
+      <Playground code={code} pglite={pglite} mockInterpreter={mockInterpreter} client:load />
     </div>
   </div>
 </Base>
