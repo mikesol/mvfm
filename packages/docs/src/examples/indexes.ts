@@ -88,7 +88,7 @@ await foldAST(defaults(app), injectInput(prog, { age: 21 }));`,
   st: {
     content: `<p>Mutable local state. Declares variables scoped to a single program execution, with operations for reading and writing their values.</p>
 <p>Included on the default interpreter.</p>`,
-    code: `const app = mvfm(prelude);
+    code: `const app = mvfm(prelude, st);
 
 const prog = app({ n: "number" }, ($) => {
   const counter = $.let($.input.n);
@@ -102,7 +102,7 @@ await foldAST(defaults(app), injectInput(prog, { n: 21 }));`,
   control: {
     content: `<p>Control flow operations for iteration over collections and conditional looping.</p>
 <p>Included on the default interpreter.</p>`,
-    code: `const app = mvfm(prelude, console_);
+    code: `const app = mvfm(prelude, st, control);
 
 const prog = app({ x: "number" }, ($) => {
   const sum = $.let(0);
@@ -118,7 +118,7 @@ await foldAST(defaults(app), injectInput(prog, { x: 1 }));`,
   error: {
     content: `<p>Explicit error handling as part of the AST structure. Errors are values that can be caught, recovered from, and accumulated rather than thrown as exceptions.</p>
 <p>Included on the default interpreter.</p>`,
-    code: `const app = mvfm(prelude);
+    code: `const app = mvfm(prelude, error);
 
 const prog = app({ x: "number" }, ($) => {
   const risky = $.cond($.gt($.input.x, 10))
@@ -135,7 +135,7 @@ await foldAST(defaults(app), injectInput(prog, { x: 3 }));`,
   fiber: {
     content: `<p>Concurrency primitives for parallel execution, racing, timeouts, and retries. Concurrency is opt-in and bounded.</p>
 <p>Included on the default interpreter.</p>`,
-    code: `const app = mvfm(prelude);
+    code: `const app = mvfm(prelude, fiber);
 
 const prog = app({ x: "number" }, ($) => {
   const fast = $.add($.input.x, 1);
