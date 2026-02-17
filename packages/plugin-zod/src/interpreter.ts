@@ -8,6 +8,7 @@ import { enumInterpreter } from "./enum";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
 import { toZodError } from "./interpreter-utils";
 import { createIntersectionInterpreter } from "./intersection";
+import { getLazySchema, type ZodLazyNode } from "./lazy";
 import { literalInterpreter } from "./literal";
 import { createMapSetInterpreter } from "./map-set";
 import { numberInterpreter } from "./number";
@@ -55,6 +56,9 @@ function getHandlers(): SchemaInterpreterMap {
   }
   return schemaHandlers;
 }
+
+// Cache for lazy schemas to avoid infinite loops
+const lazySchemaCache = new Map<string, z.ZodType>();
 
 async function* buildSchemaGen(
   node: AnyZodSchemaNode,
@@ -119,10 +123,35 @@ async function* buildSchemaGen(
     case "zod/preprocess":
       return yield* buildSchemaGen(node.inner as AnyZodSchemaNode);
     case "zod/lazy": {
-      // Build the inner schema
-      const innerSchema = yield* buildSchemaGen(node.schema as AnyZodSchemaNode);
-      // Wrap it in z.lazy with a function that returns the built schema
-      return z.lazy(() => innerSchema);
+      // Get the lazy reference ID
+      const lazyNode = node as ZodLazyNode;
+      const ref = lazyNode.ref;
+      
+      // Check if we've already started building this schema (circular reference)
+      if (lazySchemaCache.has(ref)) {
+        return lazySchemaCache.get(ref)!;
+      }
+      
+      // Create a placeholder lazy schema and cache it immediately
+      // This prevents infinite recursion for circular references
+      let builtSchema: z.ZodType | undefined;
+      const lazySchema = z.lazy(() => {
+        if (!builtSchema) {
+          throw new Error(`Lazy schema "${ref}" was accessed before being built`);
+        }
+        return builtSchema;
+      });
+      
+      // Cache the lazy wrapper immediately
+      lazySchemaCache.set(ref, lazySchema);
+      
+      // Now build the actual inner schema
+      const schemaNode = getLazySchema(ref);
+      if (schemaNode) {
+        builtSchema = yield* buildSchemaGen(schemaNode);
+      }
+      
+      return lazySchema;
     }
     case "zod/promise":
       return z.promise(yield* buildSchemaGen(node.inner as AnyZodSchemaNode));

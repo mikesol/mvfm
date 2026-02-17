@@ -22,7 +22,8 @@ describe("lazy schemas (#117, #154)", () => {
     const prog = app(($) => $.zod.lazy(() => $.zod.string()).parse($.input));
     const ast = strip(prog.ast) as any;
     expect(ast.result.schema.kind).toBe("zod/lazy");
-    expect(ast.result.schema.schema.kind).toBe("zod/string");
+    expect(ast.result.schema.ref).toBeDefined();
+    expect(typeof ast.result.schema.ref).toBe("string");
   });
 
   it("lazy schema with object produces correct AST", () => {
@@ -37,7 +38,7 @@ describe("lazy schemas (#117, #154)", () => {
     const ast = strip(prog.ast) as any;
     expect(ast.result.schema.kind).toBe("zod/object");
     expect(ast.result.schema.shape.subcategories.kind).toBe("zod/lazy");
-    expect(ast.result.schema.shape.subcategories.schema.kind).toBe("zod/array");
+    expect(ast.result.schema.shape.subcategories.ref).toBeDefined();
   });
 
   it("lazy inherits wrapper methods", () => {
@@ -46,7 +47,7 @@ describe("lazy schemas (#117, #154)", () => {
     const ast = strip(prog.ast) as any;
     expect(ast.result.schema.kind).toBe("zod/optional");
     expect(ast.result.schema.inner.kind).toBe("zod/lazy");
-    expect(ast.result.schema.inner.schema.kind).toBe("zod/string");
+    expect(ast.result.schema.inner.ref).toBeDefined();
   });
 
   it("lazy inherits refinement methods", () => {
