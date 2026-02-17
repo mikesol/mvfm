@@ -94,11 +94,10 @@ type ExpectedHandler<K extends string> = (
 type ExtractNodeParam<F> = F extends (node: infer N, ...args: any[]) => any ? N : unknown;
 
 /**
- * Reject handlers with `any`-typed node parameters for registered kinds.
- * Unregistered kinds (not in NodeTypeMap) allow `any` as a migration escape hatch.
+ * Reject handlers with `any`-typed node parameters.
+ * All kinds must have properly typed node parameters — no `any` escape hatch.
  */
-type RejectAnyParam<K extends string, H> =
-  IsAny<ExtractNodeParam<H>> extends true ? (K extends keyof NodeTypeMap ? never : H) : H;
+type RejectAnyParam<_K extends string, H> = IsAny<ExtractNodeParam<H>> extends true ? never : H;
 
 /** Required handler shape for a set of kinds. */
 type RequiredShape<K extends string> = {
@@ -322,13 +321,11 @@ export interface TypedProgram<K extends string> {
 
 /**
  * Complete interpreter type: must have a handler for every kind `K`.
- * Registered kinds (in {@link NodeTypeMap}) get full type checking via
- * {@link Handler}. Unregistered kinds fall back to `(node: any)`.
+ * All kinds must be registered in {@link NodeTypeMap} — unregistered kinds
+ * produce `never`, making them a compile error.
  */
 export type CompleteInterpreter<K extends string> = {
-  [key in K]: key extends keyof NodeTypeMap
-    ? Handler<NodeTypeMap[key]>
-    : (node: any) => AsyncGenerator<FoldYield, unknown, unknown>;
+  [key in K]: key extends keyof NodeTypeMap ? Handler<NodeTypeMap[key]> : never;
 };
 
 /**

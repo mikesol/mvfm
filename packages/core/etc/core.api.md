@@ -57,7 +57,7 @@ export function checkCompleteness(interpreter: Interpreter, root: TypedNode): vo
 
 // @public
 export type CompleteInterpreter<K extends string> = {
-    [key in K]: key extends keyof NodeTypeMap ? Handler<NodeTypeMap[key]> : (node: any) => AsyncGenerator<FoldYield, unknown, unknown>;
+    [key in K]: key extends keyof NodeTypeMap ? Handler<NodeTypeMap[key]> : never;
 };
 
 // @public

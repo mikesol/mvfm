@@ -66,9 +66,10 @@ const _badMissing = typedInterpreter<"core/literal" | "core/input">()({
   },
 });
 
-// --- Unregistered kind: any fallback (temporary) ---
+// --- Unregistered kind: any rejected (no fallback) ---
 
-const _unregistered = typedInterpreter<"unregistered/kind">()({
+const _unregisteredBadAny = typedInterpreter<"unregistered/kind">()({
+  // @ts-expect-error handler with node:any rejected even for unregistered kinds
   // biome-ignore lint/correctness/useYield: type test
   "unregistered/kind": async function* (node: any) {
     return node;

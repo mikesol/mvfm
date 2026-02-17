@@ -824,7 +824,7 @@
         {
           "kind": "TypeAlias",
           "canonicalReference": "@mvfm/core!CompleteInterpreter:type",
-          "docComment": "/**\n * Complete interpreter type: must have a handler for every kind `K`. Registered kinds (in {@link NodeTypeMap}) get full type checking via {@link Handler}. Unregistered kinds fall back to `(node: any)`.\n */\n",
+          "docComment": "/**\n * Complete interpreter type: must have a handler for every kind `K`. All kinds must be registered in {@link NodeTypeMap} — unregistered kinds produce `never`, making them a compile error.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -867,25 +867,7 @@
             },
             {
               "kind": "Content",
-              "text": "[key]> : (node: any) => "
-            },
-            {
-              "kind": "Reference",
-              "text": "AsyncGenerator",
-              "canonicalReference": "!AsyncGenerator:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "FoldYield",
-              "canonicalReference": "@mvfm/core!FoldYield:type"
-            },
-            {
-              "kind": "Content",
-              "text": ", unknown, unknown>;\n}"
+              "text": "[key]> : never;\n}"
             },
             {
               "kind": "Content",
@@ -910,7 +892,7 @@
           ],
           "typeTokenRange": {
             "startIndex": 3,
-            "endIndex": 14
+            "endIndex": 10
           }
         },
         {
