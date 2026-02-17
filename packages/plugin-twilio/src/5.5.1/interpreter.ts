@@ -1,6 +1,12 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
 import { defineInterpreter, eval_ } from "@mvfm/core";
 import { wrapTwilioSdk } from "./client-twilio-sdk";
+import type {
+  MessageListInstanceCreateOptions,
+  MessageListInstanceOptions,
+  CallListInstanceCreateOptions,
+  CallListInstanceOptions,
+} from "./types";
 
 /**
  * Twilio client interface consumed by the twilio handler.
@@ -27,7 +33,7 @@ interface TwilioNode<K extends TwilioKind = TwilioKind> extends TypedNode<unknow
 }
 
 export interface TwilioCreateMessageNode extends TwilioNode<"twilio/create_message"> {
-  params: TypedNode<Record<string, unknown>>;
+  params: TypedNode<MessageListInstanceCreateOptions>;
 }
 
 export interface TwilioFetchMessageNode extends TwilioNode<"twilio/fetch_message"> {
@@ -35,11 +41,11 @@ export interface TwilioFetchMessageNode extends TwilioNode<"twilio/fetch_message
 }
 
 export interface TwilioListMessagesNode extends TwilioNode<"twilio/list_messages"> {
-  params?: TypedNode<Record<string, unknown>> | null;
+  params?: TypedNode<MessageListInstanceOptions> | null;
 }
 
 export interface TwilioCreateCallNode extends TwilioNode<"twilio/create_call"> {
-  params: TypedNode<Record<string, unknown>>;
+  params: TypedNode<CallListInstanceCreateOptions>;
 }
 
 export interface TwilioFetchCallNode extends TwilioNode<"twilio/fetch_call"> {
@@ -47,7 +53,7 @@ export interface TwilioFetchCallNode extends TwilioNode<"twilio/fetch_call"> {
 }
 
 export interface TwilioListCallsNode extends TwilioNode<"twilio/list_calls"> {
-  params?: TypedNode<Record<string, unknown>> | null;
+  params?: TypedNode<CallListInstanceOptions> | null;
 }
 
 declare module "@mvfm/core" {
@@ -72,7 +78,11 @@ export function createTwilioInterpreter(client: TwilioClient): Interpreter {
     "twilio/create_message": async function* (node: TwilioCreateMessageNode) {
       const base = `/2010-04-01/Accounts/${node.config.accountSid}`;
       const params = yield* eval_(node.params);
-      return await client.request("POST", `${base}/Messages.json`, params);
+      return await client.request(
+        "POST",
+        `${base}/Messages.json`,
+        params as unknown as Record<string, unknown>,
+      );
     },
 
     "twilio/fetch_message": async function* (node: TwilioFetchMessageNode) {
@@ -84,13 +94,21 @@ export function createTwilioInterpreter(client: TwilioClient): Interpreter {
     "twilio/list_messages": async function* (node: TwilioListMessagesNode) {
       const base = `/2010-04-01/Accounts/${node.config.accountSid}`;
       const params = node.params != null ? yield* eval_(node.params) : undefined;
-      return await client.request("GET", `${base}/Messages.json`, params);
+      return await client.request(
+        "GET",
+        `${base}/Messages.json`,
+        params as unknown as Record<string, unknown> | undefined,
+      );
     },
 
     "twilio/create_call": async function* (node: TwilioCreateCallNode) {
       const base = `/2010-04-01/Accounts/${node.config.accountSid}`;
       const params = yield* eval_(node.params);
-      return await client.request("POST", `${base}/Calls.json`, params);
+      return await client.request(
+        "POST",
+        `${base}/Calls.json`,
+        params as unknown as Record<string, unknown>,
+      );
     },
 
     "twilio/fetch_call": async function* (node: TwilioFetchCallNode) {
@@ -102,7 +120,11 @@ export function createTwilioInterpreter(client: TwilioClient): Interpreter {
     "twilio/list_calls": async function* (node: TwilioListCallsNode) {
       const base = `/2010-04-01/Accounts/${node.config.accountSid}`;
       const params = node.params != null ? yield* eval_(node.params) : undefined;
-      return await client.request("GET", `${base}/Calls.json`, params);
+      return await client.request(
+        "GET",
+        `${base}/Calls.json`,
+        params as unknown as Record<string, unknown> | undefined,
+      );
     },
   });
 }
