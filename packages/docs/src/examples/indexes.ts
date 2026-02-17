@@ -23,7 +23,8 @@ await foldAST(
   },
 
   boolean: {
-    content: `<p>Boolean logic operations. Provides typeclass instances that allow boolean values to participate in equality, display, and logical algebra. Included on the default interpreter.</p>`,
+    content: `<p>Boolean logic operations. Provides typeclass instances that allow boolean values to participate in equality, display, and logical algebra.</p>
+<p>Included on the default interpreter.</p>`,
     code: `const app = mvfm(prelude);
 
 const prog = app({ x: "number" }, ($) =>
@@ -34,7 +35,8 @@ await foldAST(defaults(app), injectInput(prog, { x: 7 }));`,
   },
 
   num: {
-    content: `<p>Arithmetic and numeric operations. Provides typeclass instances for equality, ordering, and display of numbers. Included on the default interpreter.</p>`,
+    content: `<p>Arithmetic and numeric operations. Provides typeclass instances for equality, ordering, and display of numbers.</p>
+<p>Included on the default interpreter.</p>`,
     code: `const app = mvfm(prelude);
 
 const prog = app({ x: "number" }, ($) =>
@@ -45,7 +47,8 @@ await foldAST(defaults(app), injectInput(prog, { x: 11 }));`,
   },
 
   str: {
-    content: `<p>String manipulation operations. Provides typeclass instances for equality and display of strings. Included on the default interpreter.</p>`,
+    content: `<p>String manipulation operations. Provides typeclass instances for equality and display of strings.</p>
+<p>Included on the default interpreter.</p>`,
     code: `const app = mvfm(prelude);
 
 const prog = app({ first: "string", last: "string" }, ($) =>
@@ -59,7 +62,8 @@ await foldAST(
   },
 
   eq: {
-    content: `<p>Equality typeclass. Dispatches equality and inequality checks to type-specific implementations based on the inferred argument types. Included on the default interpreter.</p>`,
+    content: `<p>Equality typeclass. Dispatches equality and inequality checks to type-specific implementations based on the inferred argument types.</p>
+<p>Included on the default interpreter.</p>`,
     code: `const app = mvfm(prelude);
 
 const prog = app({ x: "number", y: "number" }, ($) =>
@@ -70,7 +74,8 @@ await foldAST(defaults(app), injectInput(prog, { x: 9, y: 10 }));`,
   },
 
   ord: {
-    content: `<p>Ordering typeclass. Dispatches comparison operations to type-specific implementations based on the inferred argument types. Builds on the equality typeclass. Included on the default interpreter.</p>`,
+    content: `<p>Ordering typeclass. Dispatches comparison operations to type-specific implementations based on the inferred argument types. Builds on the equality typeclass.</p>
+<p>Included on the default interpreter.</p>`,
     code: `const app = mvfm(prelude);
 
 const prog = app({ age: "number" }, ($) =>
@@ -81,7 +86,8 @@ await foldAST(defaults(app), injectInput(prog, { age: 21 }));`,
   },
 
   st: {
-    content: `<p>Mutable local state. Declares variables scoped to a single program execution, with operations for reading and writing their values. Included on the default interpreter.</p>`,
+    content: `<p>Mutable local state. Declares variables scoped to a single program execution, with operations for reading and writing their values.</p>
+<p>Included on the default interpreter.</p>`,
     code: `const app = mvfm(prelude);
 
 const prog = app({ n: "number" }, ($) => {
@@ -94,7 +100,8 @@ await foldAST(defaults(app), injectInput(prog, { n: 21 }));`,
   },
 
   control: {
-    content: `<p>Control flow operations for iteration over collections and conditional looping. Included on the default interpreter.</p>`,
+    content: `<p>Control flow operations for iteration over collections and conditional looping.</p>
+<p>Included on the default interpreter.</p>`,
     code: `const app = mvfm(prelude, console_);
 
 const prog = app({ x: "number" }, ($) => {
@@ -109,7 +116,8 @@ await foldAST(defaults(app), injectInput(prog, { x: 1 }));`,
   },
 
   error: {
-    content: `<p>Explicit error handling as part of the AST structure. Errors are values that can be caught, recovered from, and accumulated rather than thrown as exceptions. Included on the default interpreter.</p>`,
+    content: `<p>Explicit error handling as part of the AST structure. Errors are values that can be caught, recovered from, and accumulated rather than thrown as exceptions.</p>
+<p>Included on the default interpreter.</p>`,
     code: `const app = mvfm(prelude);
 
 const prog = app({ x: "number" }, ($) => {
@@ -125,7 +133,8 @@ await foldAST(defaults(app), injectInput(prog, { x: 3 }));`,
   },
 
   fiber: {
-    content: `<p>Concurrency primitives for parallel execution, racing, timeouts, and retries. Concurrency is opt-in and bounded. Included on the default interpreter.</p>`,
+    content: `<p>Concurrency primitives for parallel execution, racing, timeouts, and retries. Concurrency is opt-in and bounded.</p>
+<p>Included on the default interpreter.</p>`,
     code: `const app = mvfm(prelude);
 
 const prog = app({ x: "number" }, ($) => {
@@ -138,7 +147,8 @@ await foldAST(defaults(app), injectInput(prog, { x: 5 }));`,
   },
 
   console: {
-    content: `<p>Implementation of the <a href="https://developer.mozilla.org/en-US/docs/Web/API/console">Console API</a>. The interpreter requires a console object to write to. The playground redirects output using <code>createConsoleInterpreter()</code> so that logs appear inline.</p>`,
+    content: `<p>Implementation of the <a href="https://developer.mozilla.org/en-US/docs/Web/API/console">Console API</a>. The interpreter requires a console object to write to.</p>
+<p>The playground redirects output using <code>createConsoleInterpreter()</code> so that logs appear inline.</p>`,
     code: `const app = mvfm(prelude, console_);
 
 const prog = app({ name: "string" }, ($) =>
@@ -176,7 +186,8 @@ await foldAST(
   },
 
   zod: {
-    content: `<p>Implementation of <a href="https://github.com/colinhacks/zod">Zod</a>. Schemas are constructed as AST nodes and reconstructed into real Zod validators at runtime by the interpreter. The interpreter is not included on the default interpreter and must be passed explicitly via <code>createZodInterpreter()</code>.</p>`,
+    content: `<p>Implementation of <a href="https://github.com/colinhacks/zod">Zod</a>. Schemas are constructed as AST nodes and reconstructed into real Zod validators at runtime by the interpreter.</p>
+<p>Included on the default interpreter.</p>`,
     code: `const app = mvfm(prelude, zod);
 
 const prog = app({ value: "string" }, ($) =>
@@ -184,7 +195,7 @@ const prog = app({ value: "string" }, ($) =>
 );
 
 await foldAST(
-  defaults(app, { zod: createZodInterpreter() }),
+  defaults(app),
   injectInput(prog, { value: "hello" })
 );`,
   },
