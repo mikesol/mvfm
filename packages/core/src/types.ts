@@ -150,8 +150,8 @@ export interface PluginDefinition<
   name: string;
   nodeKinds: readonly K[];
   build: (ctx: PluginContext) => T;
-  /** Default interpreter handlers for this plugin's node kinds. */
-  defaultInterpreter?: Interpreter<K>;
+  /** Factory that creates a fresh interpreter for this plugin's node kinds. */
+  defaultInterpreter?: () => Interpreter<K>;
   traits?: {
     eq?: TraitImpl;
     ord?: TraitImpl;
@@ -226,7 +226,7 @@ export function definePlugin<
   name: string;
   nodeKinds: Kinds;
   build: (ctx: PluginContext) => T;
-  defaultInterpreter?: Interpreter<string>;
+  defaultInterpreter?: () => Interpreter<string>;
   traits?: PluginDefinition<any, Traits, Kinds[number]>["traits"];
 }): PluginDefinition<T, Traits, Kinds[number]>;
 export function definePlugin<
@@ -238,13 +238,15 @@ export function definePlugin<
   name: string;
   nodeKinds: Kinds;
   build: (ctx: PluginContext) => T;
-  defaultInterpreter?: CheckedInlineHandlers<Kinds[number], I>;
+  defaultInterpreter?: () => CheckedInlineHandlers<Kinds[number], I>;
   traits?: PluginDefinition<any, Traits, Kinds[number]>["traits"];
 }): PluginDefinition<T, Traits, Kinds[number]> {
   return {
     ...def,
     nodeKinds: [...def.nodeKinds],
-    defaultInterpreter: def.defaultInterpreter as unknown as Interpreter<Kinds[number]> | undefined,
+    defaultInterpreter: def.defaultInterpreter as unknown as
+      | (() => Interpreter<Kinds[number]>)
+      | undefined,
   };
 }
 

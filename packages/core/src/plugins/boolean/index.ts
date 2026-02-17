@@ -19,7 +19,7 @@ export const boolean = definePlugin({
     "boolean/top",
     "boolean/bottom",
   ],
-  defaultInterpreter: booleanInterpreter,
+  defaultInterpreter: () => booleanInterpreter,
   traits: {
     eq: { type: "boolean", nodeKinds: { eq: "boolean/eq" } },
     show: { type: "boolean", nodeKinds: { show: "boolean/show" } },

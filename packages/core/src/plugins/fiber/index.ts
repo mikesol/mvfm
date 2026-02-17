@@ -145,7 +145,7 @@ interface ParFn {
 export const fiber = definePlugin({
   name: "fiber",
   nodeKinds: ["fiber/par_map", "fiber/race", "fiber/timeout", "fiber/retry"],
-  defaultInterpreter: fiberInterpreter,
+  defaultInterpreter: () => fiberInterpreter,
 
   build(ctx: PluginContext): FiberMethods {
     const parFn: ParFn = ((...args: any[]) => {

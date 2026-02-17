@@ -9,7 +9,7 @@ import type { ExtractPluginKinds, PluginInput } from "./types";
 // ---- Type-level helpers -------------------------------------
 
 /** Detect whether a plugin structurally has `defaultInterpreter`. */
-type HasDefault<P> = P extends { defaultInterpreter: Record<string, any> } ? true : false;
+type HasDefault<P> = P extends { defaultInterpreter: () => Record<string, any> } ? true : false;
 
 /**
  * Identify plugins that require an override (no defaultInterpreter
@@ -110,7 +110,7 @@ export function defaults<const P extends readonly PluginInput[]>(
     if (name in overrides) {
       Object.assign(composed, overrides[name] as unknown as Record<string, unknown>);
     } else if (plugin.defaultInterpreter) {
-      Object.assign(composed, plugin.defaultInterpreter as unknown as Record<string, unknown>);
+      Object.assign(composed, plugin.defaultInterpreter() as unknown as Record<string, unknown>);
     } else if (Array.isArray(plugin.nodeKinds) && plugin.nodeKinds.length === 0) {
     } else {
       throw new Error(

@@ -22,19 +22,19 @@ describe("core plugins have defaultInterpreter", () => {
     ["fiber", fiber],
   ])("%s has defaultInterpreter", (_name, plugin) => {
     expect(plugin.defaultInterpreter).toBeDefined();
-    expect(typeof plugin.defaultInterpreter).toBe("object");
+    expect(typeof plugin.defaultInterpreter).toBe("function");
   });
 });
 
 describe("PluginDefinition.defaultInterpreter", () => {
   it("structural discrimination works at type level", () => {
-    type HasDefault<P> = P extends { defaultInterpreter: Record<string, any> } ? true : false;
+    type HasDefault<P> = P extends { defaultInterpreter: () => Record<string, any> } ? true : false;
 
     const withDefault = {
       name: "test" as const,
       nodeKinds: ["test/op"],
       build: () => ({}),
-      defaultInterpreter: {} as Interpreter,
+      defaultInterpreter: () => ({}) as Interpreter,
     };
 
     const withoutDefault = {
@@ -81,23 +81,23 @@ describe("defaults()", () => {
       name: "a" as const,
       nodeKinds: ["a/op"] as const,
       build: () => ({}),
-      defaultInterpreter: {
+      defaultInterpreter: () => ({
         // biome-ignore lint/correctness/useYield: stub
         "a/op": async function* () {
           return 1;
         },
-      },
+      }),
     };
     const pluginB = {
       name: "b" as const,
       nodeKinds: ["b/op"] as const,
       build: () => ({}),
-      defaultInterpreter: {
+      defaultInterpreter: () => ({
         // biome-ignore lint/correctness/useYield: stub
         "b/op": async function* () {
           return 2;
         },
-      },
+      }),
     };
 
     const app = mvfm(pluginA, pluginB);
@@ -115,12 +115,12 @@ describe("defaults()", () => {
       name: "a" as const,
       nodeKinds: ["a/op"] as const,
       build: () => ({}),
-      defaultInterpreter: {
+      defaultInterpreter: () => ({
         // biome-ignore lint/correctness/useYield: stub
         "a/op": async function* () {
           return "default";
         },
-      },
+      }),
     };
 
     const customInterp: Interpreter = {
@@ -141,12 +141,12 @@ describe("defaults()", () => {
       name: "hasdef" as const,
       nodeKinds: ["hasdef/op"] as const,
       build: () => ({}),
-      defaultInterpreter: {
+      defaultInterpreter: () => ({
         // biome-ignore lint/correctness/useYield: stub
         "hasdef/op": async function* () {
           return 1;
         },
-      },
+      }),
     };
     const noDefault = {
       name: "nodef" as const,
@@ -182,12 +182,12 @@ describe("defaults()", () => {
       name: "a" as const,
       nodeKinds: ["a/op"] as const,
       build: () => ({}),
-      defaultInterpreter: {
+      defaultInterpreter: () => ({
         // biome-ignore lint/correctness/useYield: stub
         "a/op": async function* () {
           return 1;
         },
-      },
+      }),
     };
 
     const app = mvfm(pluginA);

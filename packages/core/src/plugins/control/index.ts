@@ -32,7 +32,7 @@ export interface ControlMethods {
 export const control = definePlugin({
   name: "control",
   nodeKinds: ["control/each", "control/while"],
-  defaultInterpreter: controlInterpreter,
+  defaultInterpreter: () => controlInterpreter,
   build(ctx: PluginContext): ControlMethods {
     return {
       each<T>(collection: Expr<T[]>, body: (item: Expr<T>) => void) {

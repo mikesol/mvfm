@@ -36,7 +36,7 @@ declare module "../../core" {
 export const ord = definePlugin({
   name: "ord",
   nodeKinds: ["ord/gt", "ord/gte", "ord/lt", "ord/lte"],
-  defaultInterpreter: ordInterpreter,
+  defaultInterpreter: () => ordInterpreter,
   build(ctx: PluginContext): any {
     const impls = ctx.plugins.filter((p) => p.traits?.ord).map((p) => p.traits!.ord!);
 

@@ -200,7 +200,7 @@ interface TryBuilder<T> {
 export const error = definePlugin({
   name: "error",
   nodeKinds: ["error/try", "error/fail", "error/attempt", "error/guard", "error/settle"],
-  defaultInterpreter: errorInterpreter,
+  defaultInterpreter: () => errorInterpreter,
 
   build(ctx: PluginContext): ErrorMethods {
     function buildTryBuilder<T>(exprNode: any, finallyNode: any = null): TryBuilder<T> {

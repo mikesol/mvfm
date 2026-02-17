@@ -61,7 +61,7 @@ export const num = definePlugin({
     "num/top",
     "num/bottom",
   ],
-  defaultInterpreter: numInterpreter,
+  defaultInterpreter: () => numInterpreter,
   traits: {
     eq: { type: "number", nodeKinds: { eq: "num/eq" } },
     ord: { type: "number", nodeKinds: { compare: "num/compare" } },

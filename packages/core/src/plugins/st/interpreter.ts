@@ -53,12 +53,18 @@ export function createStInterpreter() {
     },
 
     "st/set": async function* (node: StSetNode) {
+      if (!store.has(node.ref)) {
+        throw new Error(`st/set: unknown ref "${node.ref}"`);
+      }
       const value = yield* eval_(node.value);
       store.set(node.ref, value);
       return undefined;
     },
 
     "st/push": async function* (node: StPushNode) {
+      if (!store.has(node.ref)) {
+        throw new Error(`st/push: unknown ref "${node.ref}"`);
+      }
       const value = yield* eval_(node.value);
       const arr = store.get(node.ref);
       if (!Array.isArray(arr)) {

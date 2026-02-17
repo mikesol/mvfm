@@ -30,7 +30,7 @@ declare module "../../core" {
 export const eq = definePlugin({
   name: "eq",
   nodeKinds: ["eq/neq"],
-  defaultInterpreter: eqInterpreter,
+  defaultInterpreter: () => eqInterpreter,
   build(ctx: PluginContext): any {
     const impls = ctx.plugins.filter((p) => p.traits?.eq).map((p) => p.traits!.eq!);
 

@@ -2257,7 +2257,7 @@
             },
             {
               "kind": "Content",
-              "text": ") => T;\n    defaultInterpreter?: "
+              "text": ") => T;\n    defaultInterpreter?: () => "
             },
             {
               "kind": "Reference",
@@ -7210,11 +7210,15 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "@mvfm/core!PluginDefinition#defaultInterpreter:member",
-              "docComment": "/**\n * Default interpreter handlers for this plugin's node kinds.\n */\n",
+              "docComment": "/**\n * Factory that creates a fresh interpreter for this plugin's node kinds.\n */\n",
               "excerptTokens": [
                 {
                   "kind": "Content",
                   "text": "defaultInterpreter?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "() => "
                 },
                 {
                   "kind": "Reference",
@@ -7236,7 +7240,7 @@
               "name": "defaultInterpreter",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 3
+                "endIndex": 4
               }
             },
             {

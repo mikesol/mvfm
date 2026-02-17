@@ -159,7 +159,7 @@ export function definePlugin<const Kinds extends readonly string[], T, Traits ex
     name: string;
     nodeKinds: Kinds;
     build: (ctx: PluginContext) => T;
-    defaultInterpreter?: Interpreter<string>;
+    defaultInterpreter?: () => Interpreter<string>;
     traits?: PluginDefinition<any, Traits, Kinds[number]>["traits"];
 }): PluginDefinition<T, Traits, Kinds[number]>;
 
@@ -398,7 +398,7 @@ export interface PluginDefinition<T = any, Traits extends Record<string, unknown
     readonly __traits?: Traits;
     // (undocumented)
     build: (ctx: PluginContext) => T;
-    defaultInterpreter?: Interpreter<K>;
+    defaultInterpreter?: () => Interpreter<K>;
     // (undocumented)
     name: string;
     // (undocumented)

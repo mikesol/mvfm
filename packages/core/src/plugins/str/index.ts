@@ -71,7 +71,7 @@ export const str = definePlugin({
     "str/append",
     "str/mempty",
   ],
-  defaultInterpreter: strInterpreter,
+  defaultInterpreter: () => strInterpreter,
   traits: {
     eq: { type: "string", nodeKinds: { eq: "str/eq" } },
     show: { type: "string", nodeKinds: { show: "str/show" } },
