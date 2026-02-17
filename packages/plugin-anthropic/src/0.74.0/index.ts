@@ -152,7 +152,7 @@ export function anthropic(config: AnthropicConfig) {
       "anthropic/retrieve_model",
       "anthropic/list_models",
     ],
-    defaultInterpreter: anthropicInterpreter,
+    defaultInterpreter: () => anthropicInterpreter,
 
     build(ctx: PluginContext): AnthropicMethods {
       // Helper: resolve an id argument to an AST node.

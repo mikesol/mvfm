@@ -159,7 +159,7 @@ export function stripe(config: StripeConfig) {
       "stripe/retrieve_charge",
       "stripe/list_charges",
     ],
-    defaultInterpreter: stripeInterpreter,
+    defaultInterpreter: () => stripeInterpreter,
 
     build(ctx: PluginContext): StripeMethods {
       // Helper: resolve an id argument to an AST node.

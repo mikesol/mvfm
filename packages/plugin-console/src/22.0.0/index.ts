@@ -153,7 +153,7 @@ export function console(config: ConsoleConfig = {}) {
   return definePlugin({
     name: "console",
     nodeKinds,
-    defaultInterpreter: consoleInterpreter,
+    defaultInterpreter: () => consoleInterpreter,
     build(ctx: PluginContext): ConsoleMethods {
       function call(method: ConsoleMethodName, args: ConsoleArg[]): Expr<void> {
         return ctx.expr<void>({

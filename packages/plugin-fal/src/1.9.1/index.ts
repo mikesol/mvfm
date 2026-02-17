@@ -174,7 +174,7 @@ export function fal(config: FalConfig) {
       "fal/queue_result",
       "fal/queue_cancel",
     ],
-    defaultInterpreter: falInterpreter,
+    defaultInterpreter: () => falInterpreter,
 
     build(ctx: PluginContext): FalMethods {
       function resolveEndpointId(endpointId: Expr<string> | string) {

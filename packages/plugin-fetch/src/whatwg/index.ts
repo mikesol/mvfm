@@ -144,7 +144,7 @@ export function fetch(config?: FetchConfig) {
   return definePlugin({
     name: "fetch",
     nodeKinds: ["fetch/request", "fetch/json", "fetch/text", "fetch/status", "fetch/headers"],
-    defaultInterpreter: fetchInterpreter,
+    defaultInterpreter: () => fetchInterpreter,
 
     build(ctx: PluginContext): FetchMethods {
       function resolveUrl(url: Expr<string> | string) {

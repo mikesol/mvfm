@@ -169,7 +169,7 @@ export function openai(config: OpenAIConfig) {
       "openai/create_moderation",
       "openai/create_completion",
     ],
-    defaultInterpreter: openaiInterpreter,
+    defaultInterpreter: () => openaiInterpreter,
 
     build(ctx: PluginContext): OpenAIMethods {
       function resolveId(id: Expr<string> | string) {

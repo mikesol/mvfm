@@ -136,7 +136,7 @@ export function pino(config: PinoConfig = {}) {
   return definePlugin({
     name: "pino",
     nodeKinds: ["pino/trace", "pino/debug", "pino/info", "pino/warn", "pino/error", "pino/fatal"],
-    defaultInterpreter: pinoInterpreter,
+    defaultInterpreter: () => pinoInterpreter,
 
     build(ctx: PluginContext): PinoMethods {
       function buildLogger(parentBindings: TypedNode[]): PinoLogger {

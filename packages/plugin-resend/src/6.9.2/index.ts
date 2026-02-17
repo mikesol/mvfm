@@ -142,7 +142,7 @@ export function resend(config: ResendConfig) {
       "resend/list_contacts",
       "resend/remove_contact",
     ],
-    defaultInterpreter: resendInterpreter,
+    defaultInterpreter: () => resendInterpreter,
 
     build(ctx: PluginContext): ResendMethods {
       // Helper: resolve an id argument to an AST node.

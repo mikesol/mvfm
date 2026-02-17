@@ -152,7 +152,7 @@ export function twilio(config: TwilioConfig) {
       "twilio/fetch_call",
       "twilio/list_calls",
     ],
-    defaultInterpreter: twilioInterpreter,
+    defaultInterpreter: () => twilioInterpreter,
 
     build(ctx: PluginContext): TwilioMethods {
       function resolveSid(sid: Expr<string> | string) {

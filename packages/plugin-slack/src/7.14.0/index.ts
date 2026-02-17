@@ -19,7 +19,7 @@ export function slack(config: SlackConfig) {
   return definePlugin({
     name: "slack",
     nodeKinds: [...SLACK_NODE_KINDS],
-    defaultInterpreter: slackInterpreter,
+    defaultInterpreter: () => slackInterpreter,
     build(ctx) {
       return buildSlackMethods(ctx, config);
     },
