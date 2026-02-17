@@ -10,3 +10,21 @@ export interface NodeExample {
   /** When set, the playground loads PGLite and seeds it with this SQL. */
   pglite?: { seedSQL: string };
 }
+
+/** Prose landing page for a plugin namespace (e.g. /core, /postgres). */
+export interface NamespaceIndex {
+  /** Prose content as raw HTML. */
+  content: string;
+  /** Optional non-runnable code example (rendered with Shiki Code component). */
+  staticCode?: string;
+}
+
+/** Union of all example entry types. */
+export type ExampleEntry = NodeExample | NamespaceIndex;
+
+/** Type guard: true when the entry is a namespace index page, not a runnable example. */
+export function isNamespaceIndex(
+  entry: ExampleEntry,
+): entry is NamespaceIndex {
+  return "content" in entry && !("code" in entry);
+}
