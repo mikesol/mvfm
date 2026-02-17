@@ -1,6 +1,6 @@
 /** Builds the injected scope for playground code execution. */
 export async function createPlaygroundScope(
-  fakeConsole: { log: (...args: unknown[]) => void },
+  fakeConsole: Record<string, (...args: unknown[]) => void>,
   mockInterpreter?: Record<string, unknown>,
 ) {
   const core = await import("@mvfm/core");

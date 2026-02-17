@@ -46,17 +46,16 @@ export default function Playground({ code: initialCode }: PlaygroundProps) {
 
   const run = useCallback(async () => {
     const logs: string[] = [];
-    const fakeConsole = {
-      log: (...args: unknown[]) => {
-        logs.push(
-          args
-            .map((a) =>
-              typeof a === "string" ? a : JSON.stringify(a, null, 2)
-            )
-            .join(" ")
-        );
-      },
-    };
+    const noop = (...args: unknown[]) =>
+      logs.push(args.map((a) => typeof a === "string" ? a : JSON.stringify(a, null, 2)).join(" "));
+    const fakeConsole: Record<string, (...args: unknown[]) => void> = {};
+    for (const m of [
+      "assert", "clear", "count", "countReset", "debug", "dir", "dirxml",
+      "error", "group", "groupCollapsed", "groupEnd", "info", "log",
+      "table", "time", "timeEnd", "timeLog", "trace", "warn",
+    ]) {
+      fakeConsole[m] = noop;
+    }
 
     try {
       const { createPlaygroundScope } = await import("../playground-scope");
