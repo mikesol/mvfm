@@ -1,17 +1,22 @@
 ---
 import Base from "../layouts/Base.astro";
 import { getAllExamples } from "../examples";
+import { isNamespaceIndex } from "../examples/types";
 
-const allKinds = Object.keys(getAllExamples()).sort();
-const coreKinds = allKinds.filter((k) => k.startsWith("core/"));
-const rest = allKinds.filter((k) => !k.startsWith("core/"));
+const allExamples = getAllExamples();
+const allKinds = Object.keys(allExamples).sort();
+const coreKinds = allKinds.filter((k) => k.startsWith("core/") || k === "core");
+const rest = allKinds.filter((k) => !k.startsWith("core/") && k !== "core");
 const kinds = [...coreKinds, ...rest];
 ---
 
 <Base>
   <div class="pt-16 text-lg leading-loose text-justify">
-    {kinds.map((kind) => (
-      <Fragment><a href={`/${kind}`} class="text-base-500 hover:text-base-50 transition-colors mr-4">{kind}</a>{" "}</Fragment>
-    ))}
+    {kinds.map((kind) => {
+      const color = isNamespaceIndex(allExamples[kind]) ? "text-base-400" : "text-base-500";
+      return (
+        <Fragment><a href={`/${kind}`} class={`${color} hover:text-base-50 transition-colors mr-4`}>{kind}</a>{" "}</Fragment>
+      );
+    })}
   </div>
 </Base>
