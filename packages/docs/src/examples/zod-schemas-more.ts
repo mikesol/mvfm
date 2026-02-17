@@ -62,6 +62,18 @@ await foldAST(
 );`,
     plugins: ZP,
   },
+  "zod/stringbool": {
+    description: "Schema that coerces string values to boolean based on truthy/falsy lists",
+    code: `const app = mvfm(prelude, zod);
+const prog = app({ value: "string" }, ($) => {
+  return $.zod.stringbool().parse($.input.value);
+});
+await foldAST(
+  defaults(app),
+  injectInput(prog, { value: "true" })
+);`,
+    plugins: ZP,
+  },
   "zod/symbol": {
     description: "Schema that validates symbol values",
     code: `const app = mvfm(prelude, zod);
@@ -71,6 +83,18 @@ const prog = app({ value: "string" }, ($) => {
 await foldAST(
   defaults(app),
   injectInput(prog, { value: Symbol("test") })
+);`,
+    plugins: ZP,
+  },
+  "zod/template_literal": {
+    description: "Schema for strings matching a template literal pattern with static and dynamic parts",
+    code: `const app = mvfm(prelude, zod);
+const prog = app({ value: "string" }, ($) => {
+  return $.zod.templateLiteral(["hello, ", $.zod.string(), "!"]).parse($.input.value);
+});
+await foldAST(
+  defaults(app),
+  injectInput(prog, { value: "hello, world!" })
 );`,
     plugins: ZP,
   },
