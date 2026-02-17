@@ -6,6 +6,7 @@ import { bigintInterpreter } from "./bigint";
 import { dateInterpreter } from "./date";
 import { enumInterpreter } from "./enum";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
+import { toZodError } from "./interpreter-utils";
 import { createIntersectionInterpreter } from "./intersection";
 import { literalInterpreter } from "./literal";
 import { createMapSetInterpreter } from "./map-set";
@@ -91,11 +92,13 @@ async function* buildSchemaGen(
     }
     case "zod/tuple": {
       const itemNodes = (node.items as AnyZodSchemaNode[] | undefined) ?? [];
+      const errorFn = toZodError(node.error);
+      const errOpt = errorFn ? { error: errorFn } : {};
       const builtItems: z.ZodType[] = [];
       for (const itemNode of itemNodes) {
         builtItems.push(yield* buildSchemaGen(itemNode));
       }
-      let tuple: z.ZodType = z.tuple(builtItems as [z.ZodType, ...z.ZodType[]]);
+      let tuple: z.ZodType = z.tuple(builtItems as [z.ZodType, ...z.ZodType[]], errOpt);
       if (node.rest) {
         const restSchema = yield* buildSchemaGen(node.rest as AnyZodSchemaNode);
         tuple = zodTupleRest(tuple, restSchema);
