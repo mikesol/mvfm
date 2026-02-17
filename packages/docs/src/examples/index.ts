@@ -35,6 +35,7 @@ const modules: Record<string, ExampleEntry>[] = [
   indexes,
 ];
 
+/** Returns all example entries (node-kind examples + namespace index pages). */
 export function getAllExamples(): Record<string, ExampleEntry> {
   return Object.assign({}, ...modules);
 }
