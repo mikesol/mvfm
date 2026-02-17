@@ -163,8 +163,8 @@ await foldAST(defaults(app), injectInput(prog, { name: "world" }));`,
   },
 
   postgres: {
-    content: `<p>Implementation of <a href="https://github.com/porsager/postgres">postgres.js</a>. The postgres plugin has no default interpreter because it requires a live database connection. You construct one by calling <code>serverInterpreter(client, baseInterpreter)</code> with a connected client.</p>
-<p>The playground examples on this site use <code>wasmPgInterpreter</code>, which is backed by PGLite, an in-browser WASM build of Postgres used here as a toy environment.</p>`,
+    content: `<p>Implementation of <a href="https://github.com/porsager/postgres">postgres.js</a>. There is no default interpreter because it requires a live database connection.</p>
+<p>You construct one by calling <code>serverInterpreter(client, baseInterpreter)</code> with a connected client. The playground examples on this site use <code>wasmPgInterpreter</code>, backed by PGLite, an in-browser WASM build of Postgres.</p>`,
     staticCode: `import { postgres, serverInterpreter, wrapPostgresJs } from "@mvfm/plugin-postgres";
 import postgresJs from "postgres";
 
