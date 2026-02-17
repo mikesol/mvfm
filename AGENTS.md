@@ -26,7 +26,9 @@ PR body must include:
 
 ## Required skills for all workflow operations
 
-**You MUST use the superpowers skills for brainstorming, planning, worktree management, and sub-agent dispatch.** Do NOT hand-roll these operations with raw Task tool calls — the skills handle permissions, directory routing, and agent coordination correctly. Raw background agents WILL fail on file writes due to auto-denied permissions.
+If you are implementing a GitHub issue and, having studied the codebase, feel that it is relatively straightforward and mechanical to implement and needs just a few decisions here and there, you can go about implemeneting directly and ask questions as they come up.
+
+Otherwise, for creative, open-ended, or large tickets, you MUST use the superpowers skills for brainstorming, planning, worktree management, and sub-agent dispatch. Do NOT hand-roll these operations with raw Task tool calls — the skills handle permissions, directory routing, and agent coordination correctly. Raw background agents WILL fail on file writes due to auto-denied permissions.
 
 | Operation | Required skill |
 |---|---|
