@@ -135,7 +135,11 @@ export function mergeInterpreters<A extends string, B extends string>(
 }
 
 /** Node kinds that are inherently volatile (never cached, always re-evaluated). */
-export const VOLATILE_KINDS = new Set<string>(["core/lambda_param", "postgres/cursor_batch"]);
+export const VOLATILE_KINDS = new Set<string>([
+  "core/lambda_param",
+  "postgres/cursor_batch",
+  "st/get",
+]);
 
 /** Externalized fold state for cache sharing across evaluations. */
 export interface FoldState {
