@@ -34,6 +34,10 @@ import type { ZodStringNamespace } from "./string";
 import { stringNamespace, stringNodeKinds } from "./string";
 import type { ZodStringFormatsNamespace } from "./string-formats";
 import { stringFormatsNamespace, stringFormatsNodeKinds } from "./string-formats";
+import type { ZodStringboolNamespace } from "./stringbool";
+import { stringboolNamespace, stringboolNodeKinds } from "./stringbool";
+import type { ZodTemplateLiteralNamespace } from "./template-literal";
+import { templateLiteralNamespace, templateLiteralNodeKinds } from "./template-literal";
 import type { ZodTransformNamespace } from "./transform";
 import { transformNamespace, transformNodeKinds } from "./transform";
 import type { ZodTupleNamespace } from "./tuple";
@@ -63,6 +67,8 @@ export { ZodSimpleBuilder } from "./special";
 export { ZodStringBuilder } from "./string";
 export type { ZodIsoNamespace, ZodStringFormatsNamespace } from "./string-formats";
 export { buildStringFormat } from "./string-formats";
+export { ZodStringboolBuilder } from "./stringbool";
+export { ZodTemplateLiteralBuilder } from "./template-literal";
 export { ZodTransformBuilder } from "./transform";
 export { ZodTupleBuilder } from "./tuple";
 export type {
@@ -106,7 +112,9 @@ export interface ZodNamespace
     ZodPrimitivesNamespace,
     ZodRecordNamespace,
     ZodSpecialNamespace,
+    ZodStringboolNamespace,
     ZodStringFormatsNamespace,
+    ZodTemplateLiteralNamespace,
     ZodTransformNamespace,
     ZodTupleNamespace,
     ZodUnionNamespace {
@@ -164,7 +172,9 @@ export const zod = definePlugin({
     ...coerceNodeKinds,
     ...recordNodeKinds,
     ...specialNodeKinds,
+    ...stringboolNodeKinds,
     ...stringFormatsNodeKinds,
+    ...templateLiteralNodeKinds,
     ...transformNodeKinds,
     ...tupleNodeKinds,
     ...unionNodeKinds,
@@ -190,7 +200,9 @@ export const zod = definePlugin({
         ...coerceNamespace(ctx, parseError),
         ...recordNamespace(ctx, parseError),
         ...specialNamespace(ctx, parseError),
+        ...stringboolNamespace(ctx),
         ...stringFormatsNamespace(ctx, parseError),
+        ...templateLiteralNamespace(ctx),
         ...transformNamespace(ctx),
         ...tupleNamespace(ctx, parseError),
         ...unionNamespace(ctx, parseError),
