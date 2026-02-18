@@ -1,0 +1,10 @@
+{
+  "request": {
+    "method": "DELETE",
+    "path": "/v1/messages/batches/msgbatch_014o7NeDQ9nwQb4Yjhgv4wKQ"
+  },
+  "response": {
+    "id": "msgbatch_014o7NeDQ9nwQb4Yjhgv4wKQ",
+    "type": "message_batch_deleted"
+  }
+}

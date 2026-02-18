@@ -1,0 +1,34 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/v1/messages/batches",
+    "params": {
+      "limit": 10
+    }
+  },
+  "response": {
+    "data": [
+      {
+        "id": "msgbatch_014o7NeDQ9nwQb4Yjhgv4wKQ",
+        "type": "message_batch",
+        "processing_status": "in_progress",
+        "request_counts": {
+          "processing": 1,
+          "succeeded": 0,
+          "errored": 0,
+          "canceled": 0,
+          "expired": 0
+        },
+        "ended_at": null,
+        "created_at": "2026-02-18T06:26:02.839355+00:00",
+        "expires_at": "2026-02-19T06:26:02.839355+00:00",
+        "archived_at": null,
+        "cancel_initiated_at": null,
+        "results_url": null
+      }
+    ],
+    "has_more": false,
+    "first_id": "msgbatch_014o7NeDQ9nwQb4Yjhgv4wKQ",
+    "last_id": "msgbatch_014o7NeDQ9nwQb4Yjhgv4wKQ"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/v1/messages/count_tokens",
+    "params": {
+      "model": "claude-sonnet-4-20250514",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Hello"
+        }
+      ]
+    }
+  },
+  "response": {
+    "input_tokens": 8
+  }
+}
