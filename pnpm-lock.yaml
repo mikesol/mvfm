@@ -52,6 +52,9 @@ importers:
       '@mvfm/plugin-anthropic':
         specifier: workspace:*
         version: link:../plugin-anthropic
+      '@mvfm/plugin-cloudflare-kv':
+        specifier: workspace:*
+        version: link:../plugin-cloudflare-kv
       '@mvfm/plugin-console':
         specifier: workspace:*
         version: link:../plugin-console

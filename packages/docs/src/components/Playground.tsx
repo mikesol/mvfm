@@ -12,6 +12,7 @@ interface PlaygroundProps {
   mockInterpreter?: string;
   redis?: true;
   s3?: true;
+  cloudflareKv?: true;
 }
 
 type DbState = "idle" | "loading" | "ready" | "error";
@@ -28,7 +29,7 @@ function getHighlighter() {
   return highlighterPromise;
 }
 
-export default function Playground({ code: initialCode, pglite, mockInterpreter, redis, s3 }: PlaygroundProps) {
+export default function Playground({ code: initialCode, pglite, mockInterpreter, redis, s3, cloudflareKv }: PlaygroundProps) {
   const [code, setCode] = useState(initialCode);
   const [output, setOutput] = useState<string>("");
   const [isError, setIsError] = useState(false);
@@ -113,6 +114,7 @@ export default function Playground({ code: initialCode, pglite, mockInterpreter,
         pglite ? dbRef.current : undefined,
         redis,
         s3,
+        cloudflareKv,
       );
       const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
       const fn = new AsyncFunction(...scope.paramNames, code);
@@ -141,7 +143,7 @@ export default function Playground({ code: initialCode, pglite, mockInterpreter,
       const prefix = line != null ? `Line ${line}: ` : "";
       setOutput(prefix + err.message);
     }
-  }, [code, pglite, dbState, redis, s3]);
+  }, [code, pglite, dbState, redis, s3, cloudflareKv]);
 
   if (dbState === "loading") {
     return (

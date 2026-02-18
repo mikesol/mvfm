@@ -10,6 +10,7 @@ export async function createPlaygroundScope(
   pgliteDb?: unknown,
   redis?: true,
   s3?: true,
+  cloudflareKv?: true,
 ) {
   const core = await import("@mvfm/core");
   const pluginConsole = await import("@mvfm/plugin-console");
@@ -119,6 +120,15 @@ export async function createPlaygroundScope(
     const client = new MemoryRedisClient();
     injected.redis = pluginRedis.redis();
     injected.memoryRedisInterpreter = pluginRedis.createRedisInterpreter(client);
+  }
+
+  // Wire in-memory Cloudflare KV when cloudflareKv flag is set
+  if (cloudflareKv) {
+    const { MemoryCloudflareKvClient } = await import("./memory-cloudflare-kv-client");
+    const pluginCfKv = await import("@mvfm/plugin-cloudflare-kv");
+    const client = new MemoryCloudflareKvClient();
+    injected.cloudflareKv = pluginCfKv.cloudflareKv;
+    injected.memoryCloudflareKvInterpreter = pluginCfKv.createCloudflareKvInterpreter(client);
   }
 
   // Wire in-memory S3 when s3 flag is set

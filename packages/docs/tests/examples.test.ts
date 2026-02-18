@@ -56,6 +56,12 @@ describe("docs examples", () => {
         const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
         const fn = new AsyncFunction(...paramNames, example.code);
         await fn(...paramValues);
+      } else if (example.cloudflareKv) {
+        // Cloudflare KV examples: spin up in-memory KV client
+        const { paramNames, paramValues } = await createPlaygroundScope(fakeConsole, undefined, undefined, undefined, undefined, true);
+        const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
+        const fn = new AsyncFunction(...paramNames, example.code);
+        await fn(...paramValues);
       } else if (example.s3) {
         // S3 examples: spin up in-memory S3 client
         const { paramNames, paramValues } = await createPlaygroundScope(fakeConsole, undefined, undefined, undefined, true);

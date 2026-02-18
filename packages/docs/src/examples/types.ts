@@ -13,6 +13,8 @@ export interface NodeExample {
   redis?: true;
   /** When set, the playground provides an in-memory S3 client. */
   s3?: true;
+  /** When set, the playground provides an in-memory Cloudflare KV client. */
+  cloudflareKv?: true;
 }
 
 /** Prose landing page for a plugin namespace (e.g. /core, /postgres). */

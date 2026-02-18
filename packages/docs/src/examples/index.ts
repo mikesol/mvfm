@@ -1,5 +1,6 @@
 import anthropic from "./anthropic";
 import boolean from "./boolean";
+import cloudflareKv from "./cloudflare-kv";
 import console_ from "./console";
 import control from "./control";
 import core from "./core";
@@ -46,6 +47,7 @@ const modules: Record<string, ExampleEntry>[] = [
   redisLists,
   redisStrings,
   s3,
+  cloudflareKv,
   zodSchemas,
   zodSchemasMore,
   zodWrappers,
