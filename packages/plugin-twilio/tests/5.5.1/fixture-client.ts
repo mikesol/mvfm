@@ -155,15 +155,15 @@ export function createRecordingClient(
 
       const response = await fetch(url, { method, headers, body });
 
-      const body: unknown = await response.json();
+      const responseBody: unknown = await response.json();
       const operation = resolveOperation(method, path);
 
       recorded.set(operation, {
         request: { method, path, ...(params !== undefined ? { params } : {}) },
-        response: body,
+        response: responseBody,
       });
 
-      return body;
+      return responseBody;
     },
 
     save(): void {

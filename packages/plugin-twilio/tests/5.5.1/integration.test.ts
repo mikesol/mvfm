@@ -1,6 +1,9 @@
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import type { Program } from "@mvfm/core";
 import {
   coreInterpreter,
+  foldAST,
   injectInput,
   mvfm,
   num,
@@ -10,77 +13,26 @@ import {
 } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { twilio as twilioPlugin } from "../../src/5.5.1";
-import { serverEvaluate } from "../../src/5.5.1/handler.server";
-import type { TwilioClient } from "../../src/5.5.1/interpreter";
 import { createTwilioInterpreter } from "../../src/5.5.1/interpreter";
+import { createFixtureClient } from "./fixture-client";
 
-const app = mvfm(num, str, twilioPlugin({ accountSid: "AC_test_123", authToken: "auth_test_456" }));
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const fixtureClient = createFixtureClient(join(__dirname, "fixtures"));
+const app = mvfm(
+  num,
+  str,
+  twilioPlugin({ accountSid: "AC_test_123", authToken: "auth_test_456" }),
+);
 
-/**
- * Mock Twilio client that returns canned responses based on method/path.
- */
-function createMockClient(): TwilioClient {
-  return {
-    async request(
-      method: string,
-      path: string,
-      params?: Record<string, unknown>,
-    ): Promise<unknown> {
-      if (method === "POST" && path.includes("/Messages.json")) {
-        return {
-          sid: "SM_mock_123",
-          status: "queued",
-          to: params?.to ?? "+10000000000",
-          from: params?.from ?? "+10000000001",
-          body: params?.body ?? "",
-        };
-      }
-      if (method === "GET" && path.includes("/Messages/")) {
-        return { sid: "SM_mock_123", status: "delivered", body: "Hello" };
-      }
-      if (method === "GET" && path.includes("/Messages.json")) {
-        return {
-          messages: [
-            { sid: "SM_1", status: "delivered" },
-            { sid: "SM_2", status: "queued" },
-          ],
-        };
-      }
-      if (method === "POST" && path.includes("/Calls.json")) {
-        return {
-          sid: "CA_mock_456",
-          status: "queued",
-          to: params?.to ?? "+10000000000",
-          from: params?.from ?? "+10000000001",
-        };
-      }
-      if (method === "GET" && path.includes("/Calls/")) {
-        return { sid: "CA_mock_456", status: "completed", duration: "42" };
-      }
-      if (method === "GET" && path.includes("/Calls.json")) {
-        return {
-          calls: [
-            { sid: "CA_1", status: "completed" },
-            { sid: "CA_2", status: "in-progress" },
-          ],
-        };
-      }
-      throw new Error(`Mock: unhandled ${method} ${path}`);
-    },
-  };
-}
-
-async function run(prog: Program, input: Record<string, unknown> = {}) {
-  const injected = injectInput(prog, input);
-  const client = createMockClient();
-  const baseInterpreter = {
-    ...createTwilioInterpreter(client),
+async function run(prog: Program) {
+  const injected = injectInput(prog, {});
+  const combined = {
+    ...createTwilioInterpreter(fixtureClient),
     ...coreInterpreter,
     ...numInterpreter,
     ...strInterpreter,
   };
-  const evaluate = serverEvaluate(client, baseInterpreter);
-  return await evaluate(injected.ast.result);
+  return await foldAST(combined, injected);
 }
 
 // ============================================================
@@ -90,24 +42,36 @@ async function run(prog: Program, input: Record<string, unknown> = {}) {
 describe("twilio integration: messages", () => {
   it("create message", async () => {
     const prog = app(($) =>
-      $.twilio.messages.create({ to: "+15551234567", from: "+15559876543", body: "Hello" }),
+      $.twilio.messages.create({
+        to: "+15551234567",
+        from: "+15559876543",
+        body: "Hello",
+      }),
     );
     const result = (await run(prog)) as any;
-    expect(result.sid).toBe("SM_mock_123");
+    expect(result.sid).toMatch(/^SM/);
     expect(result.status).toBe("queued");
+    expect(result.to).toBe("+15551234567");
+    expect(result.from).toBe("+15559876543");
+    expect(result.body).toBe("Hello");
+    expect(result.direction).toBe("outbound-api");
   });
 
   it("fetch message", async () => {
-    const prog = app(($) => $.twilio.messages("SM_mock_123").fetch());
+    const prog = app(($) =>
+      $.twilio.messages("SM00000000000000000000000000000001").fetch(),
+    );
     const result = (await run(prog)) as any;
-    expect(result.sid).toBe("SM_mock_123");
+    expect(result.sid).toMatch(/^SM/);
     expect(result.status).toBe("delivered");
+    expect(result.body).toBe("Hello");
   });
 
   it("list messages", async () => {
     const prog = app(($) => $.twilio.messages.list({ limit: 10 }));
     const result = (await run(prog)) as any;
     expect(result.messages).toHaveLength(2);
+    expect(result.messages[0].sid).toMatch(/^SM/);
   });
 });
 
@@ -125,21 +89,26 @@ describe("twilio integration: calls", () => {
       }),
     );
     const result = (await run(prog)) as any;
-    expect(result.sid).toBe("CA_mock_456");
+    expect(result.sid).toMatch(/^CA/);
     expect(result.status).toBe("queued");
+    expect(result.to).toBe("+15551234567");
   });
 
   it("fetch call", async () => {
-    const prog = app(($) => $.twilio.calls("CA_mock_456").fetch());
+    const prog = app(($) =>
+      $.twilio.calls("CA00000000000000000000000000000001").fetch(),
+    );
     const result = (await run(prog)) as any;
-    expect(result.sid).toBe("CA_mock_456");
+    expect(result.sid).toMatch(/^CA/);
     expect(result.status).toBe("completed");
+    expect(result.duration).toBe("42");
   });
 
   it("list calls", async () => {
     const prog = app(($) => $.twilio.calls.list({ limit: 20 }));
     const result = (await run(prog)) as any;
     expect(result.calls).toHaveLength(2);
+    expect(result.calls[0].sid).toMatch(/^CA/);
   });
 });
 
@@ -153,12 +122,13 @@ describe("twilio integration: chaining", () => {
       const msg = $.twilio.messages.create({
         to: "+15551234567",
         from: "+15559876543",
-        body: "Chain test",
+        body: "Hello",
       });
       return $.twilio.messages((msg as any).sid).fetch();
     });
     const result = (await run(prog)) as any;
-    // The fetch uses the mock sid from the create response
+    // Fetch uses the fixture's fetch_message response regardless of SID
     expect(result.sid).toBeDefined();
+    expect(result.status).toBe("delivered");
   });
 });
