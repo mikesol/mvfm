@@ -4,5 +4,5 @@ export { wrapSlackWebClient } from "./7.14.0/client-slack-web-api";
 export type { ClientHandlerOptions } from "./7.14.0/handler.client";
 export { clientInterpreter } from "./7.14.0/handler.client";
 export { serverEvaluate, serverInterpreter } from "./7.14.0/handler.server";
-export type { SlackClient } from "./7.14.0/interpreter";
-export { createSlackInterpreter, slackInterpreter } from "./7.14.0/interpreter";
+export type { SlackClient } from "./7.14.0";
+export { createSlackInterpreter, slackInterpreter } from "./7.14.0";

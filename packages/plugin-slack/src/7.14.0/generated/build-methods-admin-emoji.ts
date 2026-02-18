@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminEmoji } from "./types-admin-emoji";
 
 export function buildSlackAdminEmoji(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminEmoji {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     add(params) {

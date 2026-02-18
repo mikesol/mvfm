@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsTeam } from "./types-team";
 
 export function buildSlackTeam(ctx: PluginContext, config: SlackConfig): SlackMethodsTeam {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     billing: {

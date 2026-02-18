@@ -1,5 +1,5 @@
 import type { WebClient } from "@slack/web-api";
-import type { SlackClient } from "./interpreter";
+import type { SlackClient } from "./generated/interpreter";
 
 /**
  * Wraps a `@slack/web-api` `WebClient` instance into the

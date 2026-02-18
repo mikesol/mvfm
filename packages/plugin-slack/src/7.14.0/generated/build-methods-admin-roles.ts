@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminRoles } from "./types-admin-roles";
 
 export function buildSlackAdminRoles(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminRoles {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     addAssignments(params) {

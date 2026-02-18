@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsUsers } from "./types-users";
 
 export function buildSlackUsers(ctx: PluginContext, config: SlackConfig): SlackMethodsUsers {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     discoverableContacts: {

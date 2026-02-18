@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminAnalytics } from "./types-admin-analytics";
 
 export function buildSlackAdminAnalytics(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminAnalytics {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     getFile(params) {

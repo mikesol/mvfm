@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsDialog } from "./types-dialog";
 
 export function buildSlackDialog(ctx: PluginContext, config: SlackConfig): SlackMethodsDialog {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     open(params) {

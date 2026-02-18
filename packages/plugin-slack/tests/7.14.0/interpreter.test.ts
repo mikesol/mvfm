@@ -3,7 +3,7 @@ import { coreInterpreter, foldAST, injectInput, mvfm, num, str } from "@mvfm/cor
 import { describe, expect, it, vi } from "vitest";
 import { slackInterpreter } from "../../src";
 import { slack } from "../../src/7.14.0";
-import { createSlackInterpreter, type SlackClient } from "../../src/7.14.0/interpreter";
+import { createSlackInterpreter, type SlackClient } from "../../src/7.14.0/generated/interpreter";
 
 const app = mvfm(num, str, slack({ token: "xoxb-test-token" }));
 

@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminUsergroups } from "./types-admin-usergroups";
 
 export function buildSlackAdminUsergroups(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminUsergroups {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     addChannels(params) {

@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsConversations } from "./types-conversations";
 
 export function buildSlackConversations(ctx: PluginContext, config: SlackConfig): SlackMethodsConversations {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     canvases: {

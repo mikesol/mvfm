@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsWorkflows } from "./types-workflows";
 
 export function buildSlackWorkflows(ctx: PluginContext, config: SlackConfig): SlackMethodsWorkflows {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     featured: {

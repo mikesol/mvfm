@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsChat } from "./types-chat";
 
 export function buildSlackChat(ctx: PluginContext, config: SlackConfig): SlackMethodsChat {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     scheduledMessages: {

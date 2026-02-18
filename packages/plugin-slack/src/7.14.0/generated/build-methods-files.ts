@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsFiles } from "./types-files";
 
 export function buildSlackFiles(ctx: PluginContext, config: SlackConfig): SlackMethodsFiles {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     comments: {

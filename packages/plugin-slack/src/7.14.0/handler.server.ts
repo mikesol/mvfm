@@ -1,6 +1,6 @@
 import type { Interpreter, TypedNode } from "@mvfm/core";
 import { foldAST } from "@mvfm/core";
-import { createSlackInterpreter, type SlackClient } from "./interpreter";
+import { createSlackInterpreter, type SlackClient } from "./generated/interpreter";
 
 /**
  * Creates a server-side interpreter for `slack/*` node kinds.

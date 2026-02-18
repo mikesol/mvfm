@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminConversations } from "./types-admin-conversations";
 
 export function buildSlackAdminConversations(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminConversations {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     ekm: {

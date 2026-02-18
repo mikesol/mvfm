@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsOpenid } from "./types-openid";
 
 export function buildSlackOpenid(ctx: PluginContext, config: SlackConfig): SlackMethodsOpenid {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     connect: {

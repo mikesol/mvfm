@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsApps } from "./types-apps";
 
 export function buildSlackApps(ctx: PluginContext, config: SlackConfig): SlackMethodsApps {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     connections: {

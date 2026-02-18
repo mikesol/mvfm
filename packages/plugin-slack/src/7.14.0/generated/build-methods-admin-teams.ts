@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminTeams } from "./types-admin-teams";
 
 export function buildSlackAdminTeams(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminTeams {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     admins: {

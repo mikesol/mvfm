@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsAssistant } from "./types-assistant";
 
 export function buildSlackAssistant(ctx: PluginContext, config: SlackConfig): SlackMethodsAssistant {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     threads: {

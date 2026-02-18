@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminUsers } from "./types-admin-users";
 
 export function buildSlackAdminUsers(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminUsers {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     session: {

@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsReactions } from "./types-reactions";
 
 export function buildSlackReactions(ctx: PluginContext, config: SlackConfig): SlackMethodsReactions {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     add(params) {

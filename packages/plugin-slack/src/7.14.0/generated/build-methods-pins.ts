@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsPins } from "./types-pins";
 
 export function buildSlackPins(ctx: PluginContext, config: SlackConfig): SlackMethodsPins {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     add(params) {

@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminAuth } from "./types-admin-auth";
 
 export function buildSlackAdminAuth(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminAuth {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     policy: {

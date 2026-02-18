@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminInviteRequests } from "./types-admin-inviteRequests";
 
 export function buildSlackAdminInviteRequests(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminInviteRequests {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     approved: {

@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsUsergroups } from "./types-usergroups";
 
 export function buildSlackUsergroups(ctx: PluginContext, config: SlackConfig): SlackMethodsUsergroups {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     users: {

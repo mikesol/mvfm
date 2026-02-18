@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsOauth } from "./types-oauth";
 
 export function buildSlackOauth(ctx: PluginContext, config: SlackConfig): SlackMethodsOauth {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     v2: {

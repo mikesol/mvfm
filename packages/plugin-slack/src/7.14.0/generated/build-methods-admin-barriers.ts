@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminBarriers } from "./types-admin-barriers";
 
 export function buildSlackAdminBarriers(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminBarriers {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     create(params) {

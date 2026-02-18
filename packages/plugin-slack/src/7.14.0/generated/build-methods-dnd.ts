@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsDnd } from "./types-dnd";
 
 export function buildSlackDnd(ctx: PluginContext, config: SlackConfig): SlackMethodsDnd {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     endDnd(params?) {

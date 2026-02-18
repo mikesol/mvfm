@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsEmoji } from "./types-emoji";
 
 export function buildSlackEmoji(ctx: PluginContext, config: SlackConfig): SlackMethodsEmoji {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     list(params?) {

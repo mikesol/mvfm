@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsMigration } from "./types-migration";
 
 export function buildSlackMigration(ctx: PluginContext, config: SlackConfig): SlackMethodsMigration {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     exchange(params) {

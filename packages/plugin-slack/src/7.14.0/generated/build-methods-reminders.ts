@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsReminders } from "./types-reminders";
 
 export function buildSlackReminders(ctx: PluginContext, config: SlackConfig): SlackMethodsReminders {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     add(params) {

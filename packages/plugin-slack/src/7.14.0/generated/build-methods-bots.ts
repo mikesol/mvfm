@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsBots } from "./types-bots";
 
 export function buildSlackBots(ctx: PluginContext, config: SlackConfig): SlackMethodsBots {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     info(params?) {

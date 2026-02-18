@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminWorkflows } from "./types-admin-workflows";
 
 export function buildSlackAdminWorkflows(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminWorkflows {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     collaborators: {

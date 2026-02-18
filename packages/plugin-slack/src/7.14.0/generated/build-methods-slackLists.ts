@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsSlackLists } from "./types-slackLists";
 
 export function buildSlackSlackLists(ctx: PluginContext, config: SlackConfig): SlackMethodsSlackLists {
-  const resolveParams = (params: unknown) => ctx.lift(params).__node;
+  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
 
   return {
     access: {
