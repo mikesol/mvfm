@@ -28,6 +28,7 @@ import { fetch as fetchPlugin } from "../packages/plugin-fetch/src/whatwg/index.
 import { pino as pinoPlugin } from "../packages/plugin-pino/src/10.3.1/index.js";
 import { zod as zodPlugin } from "../packages/plugin-zod/src/index.js";
 import { openai as openaiPlugin } from "../packages/plugin-openai/src/6.21.0/index.js";
+import { anthropic as anthropicPlugin } from "../packages/plugin-anthropic/src/0.74.0/index.js";
 import { getAllExamples } from "../packages/docs/src/examples/index.js";
 
 // Internal node kinds excluded from coverage requirements.
@@ -63,6 +64,7 @@ const plugins: Array<{ nodeKinds: string[]; traits?: any }> = [
   pinoPlugin(),
   zodPlugin,
   openaiPlugin({ apiKey: "unused" }),
+  anthropicPlugin({ apiKey: "unused" }),
 ];
 
 // Also include core node kinds that aren't from plugins

@@ -49,6 +49,9 @@ importers:
       '@mvfm/core':
         specifier: workspace:*
         version: link:../core
+      '@mvfm/plugin-anthropic':
+        specifier: workspace:*
+        version: link:../plugin-anthropic
       '@mvfm/plugin-console':
         specifier: workspace:*
         version: link:../plugin-console

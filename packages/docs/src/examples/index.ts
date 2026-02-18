@@ -1,3 +1,4 @@
+import anthropic from "./anthropic";
 import boolean from "./boolean";
 import console_ from "./console";
 import control from "./control";
@@ -35,6 +36,7 @@ const modules: Record<string, ExampleEntry>[] = [
   error,
   fiber,
   console_,
+  anthropic,
   fetch,
   openai,
   postgres,
