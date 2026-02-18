@@ -53,6 +53,8 @@ export async function createPlaygroundScope(
   };
   const fakePinoInterpreter = pluginPino.createPinoInterpreter(fakePinoClient);
 
+  const pluginSlack = await import("@mvfm/plugin-slack");
+
   const pluginOpenAI = await import("@mvfm/plugin-openai");
   const crystalBallOpenAIInterpreter = pluginOpenAI.createOpenAIInterpreter(
     createCrystalBallOpenAIClient(),
@@ -91,6 +93,7 @@ export async function createPlaygroundScope(
 
     stripe_: pluginStripe.stripe({ apiKey: "sk_test_crystal_ball" }),
     crystalBallStripeInterpreter,
+    slack_: pluginSlack.slack({ token: "xoxb-mock-token" }),
   };
 
   // Wire PGLite-backed postgres when a db instance is provided
