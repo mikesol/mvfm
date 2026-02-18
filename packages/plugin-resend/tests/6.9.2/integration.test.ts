@@ -1,7 +1,9 @@
-import http from "node:http";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import type { Program } from "@mvfm/core";
 import {
   coreInterpreter,
+  foldAST,
   injectInput,
   mvfm,
   num,
@@ -9,106 +11,25 @@ import {
   str,
   strInterpreter,
 } from "@mvfm/core";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { resend as resendPlugin } from "../../src/6.9.2";
-import { serverEvaluate } from "../../src/6.9.2/handler.server";
-import type { ResendClient } from "../../src/6.9.2/interpreter";
 import { createResendInterpreter } from "../../src/6.9.2/interpreter";
+import { createFixtureClient } from "./fixture-client";
 
-let server: http.Server;
-let port: number;
-
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const fixtureClient = createFixtureClient(join(__dirname, "fixtures"));
 const app = mvfm(num, str, resendPlugin({ apiKey: "re_test_fake" }));
 
-function createMockClient(): ResendClient {
-  return {
-    async request(method: string, path: string, params?: unknown): Promise<unknown> {
-      const response = await fetch(`http://127.0.0.1:${port}${path}`, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        ...(params !== undefined ? { body: JSON.stringify(params) } : {}),
-      });
-      return response.json();
-    },
-  };
-}
-
-async function run(prog: Program, input: Record<string, unknown> = {}) {
-  const injected = injectInput(prog, input);
-  const client = createMockClient();
-  const baseInterpreter = {
-    ...createResendInterpreter(client),
+async function run(prog: Program) {
+  const injected = injectInput(prog, {});
+  const combined = {
+    ...createResendInterpreter(fixtureClient),
     ...coreInterpreter,
     ...numInterpreter,
     ...strInterpreter,
   };
-  const evaluate = serverEvaluate(client, baseInterpreter);
-  return await evaluate(injected.ast.result);
+  return await foldAST(combined, injected);
 }
-
-beforeAll(async () => {
-  server = http.createServer((req, res) => {
-    let body = "";
-    req.on("data", (chunk) => {
-      body += chunk;
-    });
-    req.on("end", () => {
-      res.setHeader("Content-Type", "application/json");
-
-      if (req.method === "POST" && req.url === "/emails") {
-        res.end(JSON.stringify({ id: "email_mock_001", object: "email" }));
-      } else if (req.method === "GET" && req.url?.startsWith("/emails/")) {
-        const id = req.url.split("/emails/")[1];
-        res.end(
-          JSON.stringify({
-            id,
-            object: "email",
-            from: "sender@example.com",
-            to: ["recipient@example.com"],
-            subject: "Test",
-            created_at: "2026-01-01T00:00:00Z",
-          }),
-        );
-      } else if (req.method === "POST" && req.url === "/emails/batch") {
-        const emails = JSON.parse(body || "[]");
-        res.end(
-          JSON.stringify({
-            data: emails.map((_: unknown, i: number) => ({ id: `email_batch_${i}` })),
-          }),
-        );
-      } else if (req.method === "POST" && req.url === "/contacts") {
-        res.end(JSON.stringify({ id: "contact_mock_001", object: "contact" }));
-      } else if (req.method === "GET" && req.url?.startsWith("/contacts/")) {
-        const id = req.url.split("/contacts/")[1];
-        res.end(JSON.stringify({ id, object: "contact", email: "user@example.com" }));
-      } else if (req.method === "GET" && req.url === "/contacts") {
-        res.end(
-          JSON.stringify({
-            object: "list",
-            data: [{ id: "contact_1", email: "a@example.com" }],
-          }),
-        );
-      } else if (req.method === "DELETE" && req.url?.startsWith("/contacts/")) {
-        res.end(JSON.stringify({ object: "contact", id: "contact_mock_001", deleted: true }));
-      } else {
-        res.statusCode = 404;
-        res.end(JSON.stringify({ error: "not found" }));
-      }
-    });
-  });
-
-  await new Promise<void>((resolve) => {
-    server.listen(0, "127.0.0.1", () => {
-      const addr = server.address();
-      port = typeof addr === "object" && addr ? addr.port : 0;
-      resolve();
-    });
-  });
-});
-
-afterAll(async () => {
-  await new Promise<void>((resolve) => server.close(() => resolve()));
-});
 
 // ============================================================
 // Emails
@@ -194,10 +115,10 @@ describe("resend integration: chaining", () => {
   it("send email then get it by id", async () => {
     const prog = app(($) => {
       const sent = $.resend.emails.send({
-        from: "a@example.com",
-        to: "b@example.com",
-        subject: "Chain",
-        html: "<p>Test</p>",
+        from: "sender@example.com",
+        to: "recipient@example.com",
+        subject: "Hello",
+        html: "<p>World</p>",
       });
       return $.resend.emails.get((sent as any).id);
     });
