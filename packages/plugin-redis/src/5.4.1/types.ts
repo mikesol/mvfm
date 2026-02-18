@@ -77,8 +77,8 @@ export interface RedisMethods {
       key: Expr<string> | string,
       ...fields: (Expr<string> | string)[]
     ): Expr<(string | null)[]>;
-    /** Get all fields and values in a hash. */
-    hgetall(key: Expr<string> | string): Expr<Record<string, string>>;
+    /** Get all fields and values in a hash as a flat key/value array. */
+    hgetall(key: Expr<string> | string): Expr<string[]>;
     /** Delete one or more hash fields. */
     hdel(key: Expr<string> | string, ...fields: (Expr<string> | string)[]): Expr<number>;
     /** Check if a hash field exists. */
@@ -107,9 +107,9 @@ export interface RedisMethods {
       ...elements: (Expr<string | number> | string | number)[]
     ): Expr<number>;
     /** Remove and return the first element(s) of a list. */
-    lpop(key: Expr<string> | string, count?: Expr<number> | number): Expr<string | null>;
+    lpop(key: Expr<string> | string, count?: Expr<number> | number): Expr<string | null | string[]>;
     /** Remove and return the last element(s) of a list. */
-    rpop(key: Expr<string> | string, count?: Expr<number> | number): Expr<string | null>;
+    rpop(key: Expr<string> | string, count?: Expr<number> | number): Expr<string | null | string[]>;
     /** Get the length of a list. */
     llen(key: Expr<string> | string): Expr<number>;
     /** Get a range of elements from a list. */

@@ -34,7 +34,7 @@ export interface RedisPushNode<K extends string> extends TypedNode<number> {
   elements: TypedNode<string | number>[];
 }
 
-export interface RedisPopNode<K extends string> extends TypedNode<string | null> {
+export interface RedisPopNode<K extends string> extends TypedNode<string | null | string[]> {
   kind: K;
   key: TypedNode<string>;
   count?: TypedNode<number>;
@@ -101,7 +101,7 @@ export interface RedisHSetNode extends TypedNode<number> {
   mapping: TypedNode<Record<string, string | number>>;
 }
 export interface RedisHMGetNode extends RedisHashFieldsNode<"redis/hmget", (string | null)[]> {}
-export interface RedisHGetAllNode extends RedisKeyNode<"redis/hgetall", Record<string, string>> {}
+export interface RedisHGetAllNode extends RedisKeyNode<"redis/hgetall", string[]> {}
 export interface RedisHDelNode extends RedisHashFieldsNode<"redis/hdel", number> {}
 export interface RedisHExistsNode extends RedisHashFieldNode<"redis/hexists", number> {}
 export interface RedisHLenNode extends RedisKeyNode<"redis/hlen", number> {}

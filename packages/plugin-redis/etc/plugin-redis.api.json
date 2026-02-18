@@ -1367,16 +1367,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, string>>;\n        hdel(key: "
+                  "text": "<string[]>;\n        hdel(key: "
                 },
                 {
                   "kind": "Reference",
@@ -1601,7 +1592,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<string | null>;\n        rpop(key: "
+                  "text": "<string | null | string[]>;\n        rpop(key: "
                 },
                 {
                   "kind": "Reference",
@@ -1628,7 +1619,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<string | null>;\n        llen(key: "
+                  "text": "<string | null | string[]>;\n        llen(key: "
                 },
                 {
                   "kind": "Reference",
@@ -1830,7 +1821,7 @@
               "name": "redis",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 222
+                "endIndex": 220
               }
             }
           ],

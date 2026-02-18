@@ -184,7 +184,7 @@ export function createRedisInterpreter(client: RedisClient) {
       )[];
     },
     "redis/hgetall": async function* (node: RedisHGetAllNode) {
-      return (await client.command("HGETALL", yield* eval_(node.key))) as Record<string, string>;
+      return (await client.command("HGETALL", yield* eval_(node.key))) as string[];
     },
     "redis/hdel": async function* (node: RedisHDelNode) {
       const fields: unknown[] = [];
@@ -228,12 +228,12 @@ export function createRedisInterpreter(client: RedisClient) {
     "redis/lpop": async function* (node: RedisLPopNode) {
       const args: unknown[] = [yield* eval_(node.key)];
       if (node.count != null) args.push(yield* eval_(node.count));
-      return (await client.command("LPOP", ...args)) as string | null;
+      return (await client.command("LPOP", ...args)) as string | null | string[];
     },
     "redis/rpop": async function* (node: RedisRPopNode) {
       const args: unknown[] = [yield* eval_(node.key)];
       if (node.count != null) args.push(yield* eval_(node.count));
-      return (await client.command("RPOP", ...args)) as string | null;
+      return (await client.command("RPOP", ...args)) as string | null | string[];
     },
     "redis/llen": async function* (node: RedisLLenNode) {
       return (await client.command("LLEN", yield* eval_(node.key))) as number;

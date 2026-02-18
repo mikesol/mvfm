@@ -64,7 +64,7 @@ export interface RedisMethods {
         hget(key: Expr<string> | string, field: Expr<string> | string): Expr<string | null>;
         hset(key: Expr<string> | string, mapping: Expr<Record<string, string | number>> | Record<string, string | number>): Expr<number>;
         hmget(key: Expr<string> | string, ...fields: (Expr<string> | string)[]): Expr<(string | null)[]>;
-        hgetall(key: Expr<string> | string): Expr<Record<string, string>>;
+        hgetall(key: Expr<string> | string): Expr<string[]>;
         hdel(key: Expr<string> | string, ...fields: (Expr<string> | string)[]): Expr<number>;
         hexists(key: Expr<string> | string, field: Expr<string> | string): Expr<number>;
         hlen(key: Expr<string> | string): Expr<number>;
@@ -73,8 +73,8 @@ export interface RedisMethods {
         hincrby(key: Expr<string> | string, field: Expr<string> | string, increment: Expr<number> | number): Expr<number>;
         lpush(key: Expr<string> | string, ...elements: (Expr<string | number> | string | number)[]): Expr<number>;
         rpush(key: Expr<string> | string, ...elements: (Expr<string | number> | string | number)[]): Expr<number>;
-        lpop(key: Expr<string> | string, count?: Expr<number> | number): Expr<string | null>;
-        rpop(key: Expr<string> | string, count?: Expr<number> | number): Expr<string | null>;
+        lpop(key: Expr<string> | string, count?: Expr<number> | number): Expr<string | null | string[]>;
+        rpop(key: Expr<string> | string, count?: Expr<number> | number): Expr<string | null | string[]>;
         llen(key: Expr<string> | string): Expr<number>;
         lrange(key: Expr<string> | string, start: Expr<number> | number, stop: Expr<number> | number): Expr<string[]>;
         lindex(key: Expr<string> | string, index: Expr<number> | number): Expr<string | null>;

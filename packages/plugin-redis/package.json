@@ -23,6 +23,8 @@
     "@mvfm/core": "workspace:*"
   },
   "devDependencies": {
-    "@mvfm/core": "workspace:*"
+    "@mvfm/core": "workspace:*",
+    "ioredis": "^5.4.2",
+    "testcontainers": "^10.0.0"
   }
 }
