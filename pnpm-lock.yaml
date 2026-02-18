@@ -52,6 +52,9 @@ importers:
       '@mvfm/plugin-console':
         specifier: workspace:*
         version: link:../plugin-console
+      '@mvfm/plugin-fetch':
+        specifier: workspace:*
+        version: link:../plugin-fetch
       '@mvfm/plugin-postgres':
         specifier: workspace:*
         version: link:../plugin-postgres
@@ -136,7 +139,7 @@ importers:
         version: link:../core
       openai:
         specifier: ^6.22.0
-        version: 6.22.0(zod@4.3.6)
+        version: 6.22.0(ws@8.18.0)(zod@4.3.6)
 
   packages/plugin-pino:
     devDependencies:
@@ -4021,6 +4024,18 @@ packages:
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
 
+  ws@8.18.0:
+    resolution: {integrity: sha512-8VbfWfHLbbwu3+N6OKsOMpBdT4kXPDDB9cJk2bJ6mh9ucxdlnNvH1e+roYkKmN9Nxw2yjz7VzeO9oOz2zJ04Pw==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+
   xmlbuilder@13.0.2:
     resolution: {integrity: sha512-Eux0i2QdDYKbdbA6AM6xE4m6ZTZr4G4xF9kahI2ukSEMCzwce2eX9WlTI5J3s+NU7hpasFsr8hWIONae7LluAQ==}
     engines: {node: '>=6.0'}
@@ -7544,8 +7559,9 @@ snapshots:
       regex: 6.1.0
       regex-recursion: 6.0.2
 
-  openai@6.22.0(zod@4.3.6):
+  openai@6.22.0(ws@8.18.0)(zod@4.3.6):
     optionalDependencies:
+      ws: 8.18.0
       zod: 4.3.6
 
   p-finally@1.0.0: {}
@@ -8544,6 +8560,9 @@ snapshots:
       strip-ansi: 7.1.2
 
   wrappy@1.0.2: {}
+
+  ws@8.18.0:
+    optional: true
 
   xmlbuilder@13.0.2: {}
 

@@ -4,7 +4,9 @@ import control from "./control";
 import core from "./core";
 import eq from "./eq";
 import error from "./error";
+import fetch from "./fetch";
 import fiber from "./fiber";
+import indexes from "./indexes";
 import num from "./num";
 import ord from "./ord";
 import postgres from "./postgres";
@@ -14,7 +16,6 @@ import redisLists from "./redis-lists";
 import redisStrings from "./redis-strings";
 import st from "./st";
 import str from "./str";
-import indexes from "./indexes";
 import type { ExampleEntry } from "./types";
 import zodSchemas from "./zod-schemas";
 import zodSchemasMore from "./zod-schemas-more";
@@ -32,6 +33,7 @@ const modules: Record<string, ExampleEntry>[] = [
   error,
   fiber,
   console_,
+  fetch,
   postgres,
   redisHashes,
   redisKeys,

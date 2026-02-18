@@ -29,6 +29,8 @@ export async function createPlaygroundScope(
   // Track the last foldAST return value for display in the playground.
   let lastFoldResult: unknown;
 
+  const pluginFetch = await import("@mvfm/plugin-fetch");
+
   const injected: Record<string, unknown> = {
     ...core,
     console_: pluginConsole.consolePlugin(),
@@ -37,6 +39,7 @@ export async function createPlaygroundScope(
     z: pluginZod.z,
     createZodInterpreter: pluginZod.createZodInterpreter,
     consoleInterpreter: fakeConsoleInterpreter,
+    fetch_: pluginFetch.fetch(),
   };
 
   // Wire PGLite-backed postgres when a db instance is provided

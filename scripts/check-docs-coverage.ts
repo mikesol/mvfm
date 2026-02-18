@@ -24,6 +24,7 @@ import { str } from "../packages/core/src/plugins/str/index.js";
 import { consolePlugin } from "../packages/plugin-console/src/22.0.0/index.js";
 import { postgres as postgresPlugin } from "../packages/plugin-postgres/src/3.4.8/index.js";
 import { redis as redisPlugin } from "../packages/plugin-redis/src/5.4.1/index.js";
+import { fetch as fetchPlugin } from "../packages/plugin-fetch/src/whatwg/index.js";
 import { zod as zodPlugin } from "../packages/plugin-zod/src/index.js";
 import { getAllExamples } from "../packages/docs/src/examples/index.js";
 
@@ -56,6 +57,7 @@ const plugins: Array<{ nodeKinds: string[]; traits?: any }> = [
   consolePlugin(),
   postgresPlugin(),
   redisPlugin(),
+  fetchPlugin(),
   zodPlugin,
 ];
 
