@@ -22,6 +22,7 @@
     "@mvfm/plugin-pino": "workspace:*",
     "@mvfm/plugin-postgres": "workspace:*",
     "@mvfm/plugin-redis": "workspace:*",
+    "@mvfm/plugin-resend": "workspace:*",
     "@mvfm/plugin-s3": "workspace:*",
     "@mvfm/plugin-slack": "workspace:*",
     "@mvfm/plugin-stripe": "workspace:*",

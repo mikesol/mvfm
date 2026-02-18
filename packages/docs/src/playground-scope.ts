@@ -2,6 +2,7 @@ import {
   createCrystalBallAnthropicClient,
   createCrystalBallFalClient,
   createCrystalBallOpenAIClient,
+  createCrystalBallResendClient,
   createCrystalBallStripeClient,
 } from "./crystal-ball-clients";
 
@@ -73,6 +74,11 @@ export async function createPlaygroundScope(
     createCrystalBallStripeClient(),
   );
 
+  const pluginResend = await import("@mvfm/plugin-resend");
+  const crystalBallResendInterpreter = pluginResend.createResendInterpreter(
+    createCrystalBallResendClient(),
+  );
+
   const injected: Record<string, unknown> = {
     ...core,
     console_: pluginConsole.consolePlugin(),
@@ -94,6 +100,9 @@ export async function createPlaygroundScope(
     stripe_: pluginStripe.stripe({ apiKey: "sk_test_crystal_ball" }),
     crystalBallStripeInterpreter,
     slack_: pluginSlack.slack({ token: "xoxb-mock-token" }),
+
+    resend_: pluginResend.resend({ apiKey: "re_crystal_ball" }),
+    crystalBallResendInterpreter,
   };
 
   // Wire PGLite-backed postgres when a db instance is provided

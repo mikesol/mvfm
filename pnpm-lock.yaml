@@ -76,6 +76,9 @@ importers:
       '@mvfm/plugin-redis':
         specifier: workspace:*
         version: link:../plugin-redis
+      '@mvfm/plugin-resend':
+        specifier: workspace:*
+        version: link:../plugin-resend
       '@mvfm/plugin-s3':
         specifier: workspace:*
         version: link:../plugin-s3
