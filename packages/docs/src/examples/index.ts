@@ -20,6 +20,7 @@ import redisLists from "./redis-lists";
 import redisStrings from "./redis-strings";
 import s3 from "./s3";
 import st from "./st";
+import stripe from "./stripe";
 import str from "./str";
 import type { ExampleEntry } from "./types";
 import zodSchemas from "./zod-schemas";
@@ -47,6 +48,7 @@ const modules: Record<string, ExampleEntry>[] = [
   redisLists,
   redisStrings,
   s3,
+  stripe,
   cloudflareKv,
   zodSchemas,
   zodSchemasMore,

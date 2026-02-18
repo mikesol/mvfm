@@ -76,6 +76,9 @@ importers:
       '@mvfm/plugin-s3':
         specifier: workspace:*
         version: link:../plugin-s3
+      '@mvfm/plugin-stripe':
+        specifier: workspace:*
+        version: link:../plugin-stripe
       '@mvfm/plugin-zod':
         specifier: workspace:*
         version: link:../plugin-zod

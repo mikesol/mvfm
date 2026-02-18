@@ -232,3 +232,147 @@ export function createCrystalBallAnthropicClient(): import("@mvfm/plugin-anthrop
     },
   };
 }
+
+// ---- Stripe crystal-ball client ---------------------------------
+
+let stripeIdCounter = 0;
+function nextStripeId(prefix: string): string {
+  return `${prefix}_crystal_ball_${String(++stripeIdCounter).padStart(3, "0")}`;
+}
+
+/** Creates a Stripe mock client returning prefab crystal-ball responses. */
+export function createCrystalBallStripeClient(): import("@mvfm/plugin-stripe").StripeClient {
+  return {
+    async request(method: string, path: string, params?: Record<string, unknown>) {
+      // PaymentIntents
+      if (method === "POST" && path === "/v1/payment_intents") {
+        return {
+          id: nextStripeId("pi"),
+          object: "payment_intent",
+          amount: (params?.amount as number) ?? 1000,
+          currency: (params?.currency as string) ?? "usd",
+          status: "requires_payment_method",
+          created: 1700000000,
+          livemode: false,
+        };
+      }
+      if (method === "GET" && /^\/v1\/payment_intents\/[^/]+$/.test(path)) {
+        return {
+          id: path.split("/").pop(),
+          object: "payment_intent",
+          amount: 2000,
+          currency: "usd",
+          status: "requires_payment_method",
+          created: 1700000000,
+          livemode: false,
+        };
+      }
+      if (method === "POST" && /^\/v1\/payment_intents\/[^/]+\/confirm$/.test(path)) {
+        const id = path.split("/").at(-2);
+        return {
+          id,
+          object: "payment_intent",
+          amount: 2000,
+          currency: "usd",
+          status: "succeeded",
+          created: 1700000000,
+          livemode: false,
+        };
+      }
+
+      // Customers
+      if (method === "POST" && path === "/v1/customers") {
+        return {
+          id: nextStripeId("cus"),
+          object: "customer",
+          email: (params?.email as string) ?? null,
+          name: (params?.name as string) ?? null,
+          created: 1700000000,
+          livemode: false,
+        };
+      }
+      if (method === "GET" && /^\/v1\/customers\/[^/]+$/.test(path)) {
+        return {
+          id: path.split("/").pop(),
+          object: "customer",
+          email: "crystal@example.com",
+          name: "Crystal Ball",
+          created: 1700000000,
+          livemode: false,
+        };
+      }
+      if (method === "POST" && /^\/v1\/customers\/[^/]+$/.test(path)) {
+        return {
+          id: path.split("/").pop(),
+          object: "customer",
+          email: (params?.email as string) ?? "crystal@example.com",
+          name: (params?.name as string) ?? "Crystal Ball",
+          created: 1700000000,
+          livemode: false,
+        };
+      }
+      if (method === "GET" && path === "/v1/customers") {
+        return {
+          object: "list",
+          data: [
+            {
+              id: "cus_crystal_ball_001",
+              object: "customer",
+              email: "crystal@example.com",
+              name: "Crystal Ball",
+              created: 1700000000,
+            },
+          ],
+          has_more: false,
+          url: "/v1/customers",
+        };
+      }
+
+      // Charges
+      if (method === "POST" && path === "/v1/charges") {
+        return {
+          id: nextStripeId("ch"),
+          object: "charge",
+          amount: (params?.amount as number) ?? 1000,
+          currency: (params?.currency as string) ?? "usd",
+          status: "succeeded",
+          paid: true,
+          created: 1700000000,
+          livemode: false,
+        };
+      }
+      if (method === "GET" && /^\/v1\/charges\/[^/]+$/.test(path)) {
+        return {
+          id: path.split("/").pop(),
+          object: "charge",
+          amount: 5000,
+          currency: "usd",
+          status: "succeeded",
+          paid: true,
+          created: 1700000000,
+          livemode: false,
+        };
+      }
+      if (method === "GET" && path === "/v1/charges") {
+        return {
+          object: "list",
+          data: [
+            {
+              id: "ch_crystal_ball_001",
+              object: "charge",
+              amount: 5000,
+              currency: "usd",
+              status: "succeeded",
+              paid: true,
+              created: 1700000000,
+            },
+          ],
+          has_more: false,
+          url: "/v1/charges",
+        };
+      }
+
+      throw new Error(`Crystal ball Stripe client: unhandled ${method} ${path}`);
+    },
+  };
+}
