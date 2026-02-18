@@ -8,6 +8,7 @@ import fetch from "./fetch";
 import fiber from "./fiber";
 import indexes from "./indexes";
 import num from "./num";
+import openai from "./openai";
 import ord from "./ord";
 import pino from "./pino";
 import postgres from "./postgres";
@@ -35,6 +36,7 @@ const modules: Record<string, ExampleEntry>[] = [
   fiber,
   console_,
   fetch,
+  openai,
   postgres,
   redisHashes,
   redisKeys,

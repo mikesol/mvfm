@@ -55,6 +55,9 @@ importers:
       '@mvfm/plugin-fetch':
         specifier: workspace:*
         version: link:../plugin-fetch
+      '@mvfm/plugin-openai':
+        specifier: workspace:*
+        version: link:../plugin-openai
       '@mvfm/plugin-pino':
         specifier: workspace:*
         version: link:../plugin-pino

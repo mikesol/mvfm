@@ -15,6 +15,7 @@
     "@mvfm/core": "workspace:*",
     "@mvfm/plugin-console": "workspace:*",
     "@mvfm/plugin-fetch": "workspace:*",
+    "@mvfm/plugin-openai": "workspace:*",
     "@mvfm/plugin-pino": "workspace:*",
     "@mvfm/plugin-postgres": "workspace:*",
     "@mvfm/plugin-redis": "workspace:*",
