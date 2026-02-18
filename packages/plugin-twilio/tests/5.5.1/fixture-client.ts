@@ -133,22 +133,27 @@ export function createRecordingClient(
       path: string,
       params?: Record<string, unknown>,
     ): Promise<unknown> {
-      const url = `${baseUrl}${path}`;
       const encodedAuth = btoa(`${credentials.accountSid}:${credentials.authToken}`);
+      const headers: Record<string, string> = {
+        Authorization: `Basic ${encodedAuth}`,
+      };
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          Authorization: `Basic ${encodedAuth}`,
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body:
-          params == null
-            ? undefined
-            : new URLSearchParams(
-                Object.entries(params).map(([key, value]) => [key, String(value)]),
-              ).toString(),
-      });
+      let url = `${baseUrl}${path}`;
+      let body: string | undefined;
+
+      if (method === "POST" && params != null) {
+        headers["Content-Type"] = "application/x-www-form-urlencoded";
+        body = new URLSearchParams(
+          Object.entries(params).map(([key, value]) => [key, String(value)]),
+        ).toString();
+      } else if (params != null) {
+        const qs = new URLSearchParams(
+          Object.entries(params).map(([key, value]) => [key, String(value)]),
+        ).toString();
+        url = `${url}?${qs}`;
+      }
+
+      const response = await fetch(url, { method, headers, body });
 
       const body: unknown = await response.json();
       const operation = resolveOperation(method, path);
