@@ -162,6 +162,36 @@ const prog = app({ name: "string" }, ($) =>
 await foldAST(defaults(app), injectInput(prog, { name: "world" }));`,
   },
 
+  anthropic: {
+    content: `<p>Implementation of the <a href="https://docs.anthropic.com/en/api/messages">Anthropic Messages API</a>. There is no default interpreter because this plugin requires API credentials.</p>
+<p>Use <code>anthropic({ apiKey })</code> in your app and provide a configured interpreter at runtime.</p>`,
+  },
+
+  "cloudflare-kv": {
+    content: `<p>Implementation of Cloudflare KV operations. There is no default interpreter because KV requires a configured namespace.</p>
+<p>The playground uses an in-memory KV mock to keep examples deterministic and side-effect free.</p>`,
+  },
+
+  fal: {
+    content: `<p>Implementation of the <a href="https://fal.ai/models">Fal AI API</a>. There is no default interpreter because calls require credentials and network access.</p>
+<p>Examples use mocked responses via <code>mockInterpreter</code> so each node kind remains runnable in docs.</p>`,
+  },
+
+  fetch: {
+    content: `<p>Implementation of the WHATWG Fetch API. The plugin models request/response operations as explicit AST nodes.</p>
+<p>Use this for deterministic HTTP interaction patterns, including status/header/body extraction.</p>`,
+  },
+
+  openai: {
+    content: `<p>Implementation of the <a href="https://platform.openai.com/docs/api-reference">OpenAI API</a>. There is no default interpreter because this plugin requires an API key.</p>
+<p>Examples run with mocked interpreters to make output deterministic while preserving realistic call shapes.</p>`,
+  },
+
+  pino: {
+    content: `<p>Implementation of the <a href="https://github.com/pinojs/pino">Pino logger API</a>. There is no default interpreter because logging targets are application-defined.</p>
+<p>The docs playground routes logs to an in-memory sink so you can inspect behavior directly.</p>`,
+  },
+
   postgres: {
     content: `<p>Implementation of <a href="https://github.com/porsager/postgres">postgres.js</a>. There is no default interpreter because it requires a live database connection.</p>
 <p>You construct one by calling <code>serverInterpreter(client, baseInterpreter)</code> with a connected client. The playground examples on this site use <code>wasmPgInterpreter</code>, backed by PGLite, an in-browser WASM build of Postgres.</p>`,
@@ -183,6 +213,31 @@ await foldAST(
   { ...baseInterp, ...pgInterp },
   injectInput(prog, { userId: 42 })
 );`,
+  },
+
+  redis: {
+    content: `<p>Implementation of Redis command groups (strings, hashes, lists, and keys). There is no default interpreter because Redis requires a client connection.</p>
+<p>The docs playground uses an in-memory Redis interpreter so examples remain deterministic.</p>`,
+  },
+
+  resend: {
+    content: `<p>Implementation of the <a href="https://resend.com/docs/api-reference">Resend API</a>. There is no default interpreter because this plugin requires an API key.</p>
+<p>Examples are wired to fixture-backed mocks so request/response behavior is reproducible in the playground.</p>`,
+  },
+
+  s3: {
+    content: `<p>Implementation of Amazon S3 object operations. There is no default interpreter because this plugin requires configured AWS client access.</p>
+<p>Docs examples use an in-memory S3 mock so behavior is deterministic and runnable in-browser.</p>`,
+  },
+
+  stripe: {
+    content: `<p>Implementation of the <a href="https://docs.stripe.com/api">Stripe API</a>. There is no default interpreter because this plugin requires an API key.</p>
+<p>Examples use mocked interpreters to keep all payment node kinds runnable in docs without external side effects.</p>`,
+  },
+
+  twilio: {
+    content: `<p>Implementation of the <a href="https://www.twilio.com/docs/usage/api">Twilio REST API</a>. There is no default interpreter because this plugin requires account credentials.</p>
+<p>The documented node kinds currently cover message and call operations with deterministic mocked execution in the playground.</p>`,
   },
 
   zod: {

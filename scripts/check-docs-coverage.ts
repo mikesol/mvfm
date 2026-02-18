@@ -1,14 +1,9 @@
 /**
- * Checks that every non-internal node kind emitted by core + documented
- * plugins has a corresponding example in the docs registry.
+ * Checks docs coverage for every checked plugin.
  *
- * Design decision: this script only checks plugins that are imported by
- * the docs site (core prelude + plugin-console + st + control + error +
- * fiber). External plugins (postgres, zod, etc.) are NOT checked because
- * they don't have docs examples yet. When examples are added for a new
- * plugin, add its import here to include it in coverage.
- *
- * Exit code 1 if any documented plugin has node kinds without examples.
+ * CI fails when either:
+ * 1) a node kind is missing a docs example entry, or
+ * 2) a plugin namespace is missing a namespace index page.
  */
 
 // Use relative paths to source to avoid pnpm workspace resolution issues
@@ -35,7 +30,9 @@ import { stripe as stripePlugin } from "../packages/plugin-stripe/src/2025-04-30
 import { resend as resendPlugin } from "../packages/plugin-resend/src/6.9.2/index.js";
 import { cloudflareKv as cloudflareKvPlugin } from "../packages/plugin-cloudflare-kv/src/4.20260213.0/index.js";
 import { twilio as twilioPlugin } from "../packages/plugin-twilio/src/5.5.1/index.js";
+import { slack as slackPlugin } from "../packages/plugin-slack/src/7.14.0/index.js";
 import { getAllExamples } from "../packages/docs/src/examples/index.js";
+import { isNamespaceIndex } from "../packages/docs/src/examples/types.js";
 
 // Internal node kinds excluded from coverage requirements.
 // These are structural/implicit and not user-facing.
@@ -77,6 +74,7 @@ const plugins: Array<{ nodeKinds: string[]; traits?: any }> = [
   resendPlugin({ apiKey: "unused" }),
   cloudflareKvPlugin({ namespaceId: "unused" }),
   twilioPlugin({ accountSid: "unused", authToken: "unused" }),
+  slackPlugin({ token: "unused" }),
 ];
 
 // Also include core node kinds that aren't from plugins
@@ -122,9 +120,24 @@ for (const plugin of plugins) {
 // Collect documented kinds from examples registry
 const examples = getAllExamples();
 const documentedKinds = new Set(Object.keys(examples));
+const namespaceKeys = new Set(
+  Object.entries(examples)
+    .filter(([, entry]) => isNamespaceIndex(entry))
+    .map(([kind]) => kind),
+);
+
+// Every namespace with checked node kinds must have a namespace landing page.
+const expectedNamespaces = new Set<string>(["core"]);
+for (const kind of allKinds) {
+  const [namespace] = kind.split("/");
+  expectedNamespaces.add(namespace);
+}
 
 // Find missing
 const missing = [...allKinds].filter((k) => !documentedKinds.has(k)).sort();
+const missingNamespaceIndexes = [...expectedNamespaces]
+  .filter((namespace) => !namespaceKeys.has(namespace))
+  .sort();
 
 if (missing.length > 0) {
   console.error(
@@ -139,6 +152,19 @@ if (missing.length > 0) {
   process.exit(1);
 }
 
+if (missingNamespaceIndexes.length > 0) {
+  console.error(
+    `\n${missingNamespaceIndexes.length} plugin namespace index page(s) missing:\n`,
+  );
+  for (const namespace of missingNamespaceIndexes) {
+    console.error(`  - ${namespace}`);
+  }
+  console.error(
+    "\nAdd namespace entries to packages/docs/src/examples/indexes.ts for each missing plugin.",
+  );
+  process.exit(1);
+}
+
 console.log(
-  `\nAll ${allKinds.size} node kinds have documentation examples.\n`,
+  `\nAll ${allKinds.size} node kinds have docs examples and plugin namespace index pages.\n`,
 );
