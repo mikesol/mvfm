@@ -1,3 +1,4 @@
+import anthropic from "./anthropic";
 import boolean from "./boolean";
 import console_ from "./console";
 import control from "./control";
@@ -8,6 +9,7 @@ import fetch from "./fetch";
 import fiber from "./fiber";
 import indexes from "./indexes";
 import num from "./num";
+import openai from "./openai";
 import ord from "./ord";
 import pino from "./pino";
 import postgres from "./postgres";
@@ -15,6 +17,7 @@ import redisHashes from "./redis-hashes";
 import redisKeys from "./redis-keys";
 import redisLists from "./redis-lists";
 import redisStrings from "./redis-strings";
+import s3 from "./s3";
 import st from "./st";
 import str from "./str";
 import type { ExampleEntry } from "./types";
@@ -34,12 +37,15 @@ const modules: Record<string, ExampleEntry>[] = [
   error,
   fiber,
   console_,
+  anthropic,
   fetch,
+  openai,
   postgres,
   redisHashes,
   redisKeys,
   redisLists,
   redisStrings,
+  s3,
   zodSchemas,
   zodSchemasMore,
   zodWrappers,

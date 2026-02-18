@@ -47,7 +47,7 @@ const isIndex = isNamespaceIndex(example);
           <div class="playground-fallback border border-base-800">
             <Code code={example.code} lang="typescript" theme={MONO_THEME} />
           </div>
-          <Playground code={example.code} pglite={example.pglite} mockInterpreter={example.mockInterpreter} redis={example.redis} client:load />
+          <Playground code={example.code} pglite={example.pglite} mockInterpreter={example.mockInterpreter} redis={example.redis} s3={example.s3} client:load />
         </div>
       </>
     )}

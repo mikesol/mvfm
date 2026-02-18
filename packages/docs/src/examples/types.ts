@@ -11,6 +11,8 @@ export interface NodeExample {
   pglite?: { seedSQL: string };
   /** When set, the playground provides an in-memory Redis client. */
   redis?: true;
+  /** When set, the playground provides an in-memory S3 client. */
+  s3?: true;
 }
 
 /** Prose landing page for a plugin namespace (e.g. /core, /postgres). */
@@ -27,8 +29,6 @@ export interface NamespaceIndex {
 export type ExampleEntry = NodeExample | NamespaceIndex;
 
 /** Type guard: true when the entry is a namespace index page, not a runnable example. */
-export function isNamespaceIndex(
-  entry: ExampleEntry,
-): entry is NamespaceIndex {
+export function isNamespaceIndex(entry: ExampleEntry): entry is NamespaceIndex {
   return "content" in entry;
 }

@@ -24,9 +24,12 @@ import { str } from "../packages/core/src/plugins/str/index.js";
 import { consolePlugin } from "../packages/plugin-console/src/22.0.0/index.js";
 import { postgres as postgresPlugin } from "../packages/plugin-postgres/src/3.4.8/index.js";
 import { redis as redisPlugin } from "../packages/plugin-redis/src/5.4.1/index.js";
+import { s3 as s3Plugin } from "../packages/plugin-s3/src/3.989.0/index.js";
 import { fetch as fetchPlugin } from "../packages/plugin-fetch/src/whatwg/index.js";
 import { pino as pinoPlugin } from "../packages/plugin-pino/src/10.3.1/index.js";
 import { zod as zodPlugin } from "../packages/plugin-zod/src/index.js";
+import { openai as openaiPlugin } from "../packages/plugin-openai/src/6.21.0/index.js";
+import { anthropic as anthropicPlugin } from "../packages/plugin-anthropic/src/0.74.0/index.js";
 import { getAllExamples } from "../packages/docs/src/examples/index.js";
 
 // Internal node kinds excluded from coverage requirements.
@@ -58,9 +61,12 @@ const plugins: Array<{ nodeKinds: string[]; traits?: any }> = [
   consolePlugin(),
   postgresPlugin(),
   redisPlugin(),
+  s3Plugin({ region: "us-east-1" }),
   fetchPlugin(),
   pinoPlugin(),
   zodPlugin,
+  openaiPlugin({ apiKey: "unused" }),
+  anthropicPlugin({ apiKey: "unused" }),
 ];
 
 // Also include core node kinds that aren't from plugins
