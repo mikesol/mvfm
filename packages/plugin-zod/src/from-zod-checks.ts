@@ -1,13 +1,17 @@
 import type { CheckDescriptor } from "./types";
 
 function readCheckDef(raw: unknown): Record<string, unknown> | undefined {
-  return (
-    (raw as { _zod?: { def?: Record<string, unknown> }; def?: Record<string, unknown> })?._zod
-      ?.def ?? (raw as { def?: Record<string, unknown> }).def
-  );
+  if (!raw || typeof raw !== "object") return undefined;
+  const value = raw as { _zod?: { def?: Record<string, unknown> }; def?: Record<string, unknown> };
+  return value._zod?.def ?? value.def;
 }
 
 type Unsupported = (message: string) => void;
+
+function extractNormalizeForm(tx: string): "NFC" | "NFD" | "NFKC" | "NFKD" {
+  const match = tx.match(/\.normalize\(\s*(['"]?)(NFC|NFD|NFKC|NFKD)\1\s*\)/);
+  return (match?.[2] as "NFC" | "NFD" | "NFKC" | "NFKD" | undefined) ?? "NFC";
+}
 
 export function mapStringChecks(
   checks: unknown[],
@@ -65,7 +69,8 @@ export function mapStringChecks(
       if (tx.includes(".trim()")) out.push({ kind: "trim" });
       else if (tx.includes(".toLowerCase()")) out.push({ kind: "to_lower_case" });
       else if (tx.includes(".toUpperCase()")) out.push({ kind: "to_upper_case" });
-      else if (tx.includes(".normalize(")) out.push({ kind: "normalize", form: "NFC" });
+      else if (tx.includes(".normalize("))
+        out.push({ kind: "normalize", form: extractNormalizeForm(tx) });
       else onUnsupported("unsupported overwrite transform closure");
     } else if (kind === "custom") onUnsupported("cannot convert custom/refinement closure");
     else onUnsupported(`unsupported string check "${String(kind)}"`);
@@ -110,6 +115,7 @@ export function mapComparableChecks(
   for (const raw of checks) {
     const def = readCheckDef(raw);
     const kind = def?.check;
+    if (!kind) continue;
     const value = bigintMode ? String(def?.value) : def?.value;
     if (kind === "greater_than") out.push({ kind: def?.inclusive ? "gte" : "gt", value });
     else if (kind === "less_than") out.push({ kind: def?.inclusive ? "lte" : "lt", value });

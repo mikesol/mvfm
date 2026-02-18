@@ -20,9 +20,8 @@ export type ConvertState = {
   nextLazyId: number;
 };
 
-function fail(state: ConvertState, path: string, message: string): void {
+const fail = (state: ConvertState, path: string, message: string): void =>
   warnOrThrow(state.strict, state.warnings, path, message);
-}
 
 function convert(schema: unknown, state: ConvertState, path: string): ZodNode {
   const def = readSchemaDef(schema);
@@ -119,13 +118,18 @@ function convert(schema: unknown, state: ConvertState, path: string): ZodNode {
       kind: "zod/date",
       checks: mapComparableChecks((def.checks as unknown[]) ?? [], false, (message) =>
         fail(state, path, message),
-      ).flatMap((c) =>
-        c.kind === "gte"
-          ? [{ kind: "min", value: new Date(c.value as string | number | Date).toISOString() }]
-          : c.kind === "lte"
-            ? [{ kind: "max", value: new Date(c.value as string | number | Date).toISOString() }]
-            : [],
-      ),
+      ).flatMap((c) => {
+        if (c.kind === "gte")
+          return [
+            { kind: "min", value: new Date(c.value as string | number | Date).toISOString() },
+          ];
+        if (c.kind === "lte")
+          return [
+            { kind: "max", value: new Date(c.value as string | number | Date).toISOString() },
+          ];
+        fail(state, path, `unsupported exclusive date check "${c.kind}"`);
+        return [];
+      }),
       refinements: [],
       ...(typeof def.error === "string" ? { error: def.error } : {}),
     } as SchemaASTNode;
@@ -144,11 +148,12 @@ function convert(schema: unknown, state: ConvertState, path: string): ZodNode {
   if (type === "never") return { kind: "zod/never", checks: [], refinements: [] } as SchemaASTNode;
   if (type === "nan") return { kind: "zod/nan", checks: [], refinements: [] } as SchemaASTNode;
   if (type === "literal") {
+    const values = (def.values as unknown[]) ?? [];
     return {
       kind: "zod/literal",
       checks: [],
       refinements: [],
-      value: (def.values as unknown[])[0],
+      value: values.length <= 1 ? values[0] : values,
     } as SchemaASTNode;
   }
   if (type === "enum") {
@@ -270,7 +275,7 @@ function convert(schema: unknown, state: ConvertState, path: string): ZodNode {
       } as SchemaASTNode;
     }
     return {
-      kind: def.inclusive === false ? "zod/xor" : "zod/union",
+      kind: "zod/union",
       checks: [],
       refinements: [],
       options,

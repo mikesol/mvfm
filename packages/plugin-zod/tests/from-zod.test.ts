@@ -35,6 +35,29 @@ describe("$.zod.from()", () => {
     expect(ast.result.schema.shape.tags.kind).toBe("zod/array");
   });
 
+  it("maps runtime unions to zod/union", () => {
+    const app = mvfm(zod);
+    const source = nativeZod.union([nativeZod.string(), nativeZod.number()]);
+
+    const prog = app(($) => $.zod.from(source).parse($.input));
+    const ast = strip(prog.ast) as any;
+
+    expect(ast.result.schema.kind).toBe("zod/union");
+    expect(ast.result.schema.options).toHaveLength(2);
+  });
+
+  it("preserves multi-value literals", async () => {
+    const app = mvfm(zod);
+    const source = nativeZod.literal(["a", "b"]);
+    const prog = app(($) => $.zod.from(source).safeParse($.input));
+    const ast = strip(prog.ast) as any;
+
+    expect(ast.result.schema.kind).toBe("zod/literal");
+    expect(ast.result.schema.value).toEqual(["a", "b"]);
+    expect(((await run(prog, "a")) as any).success).toBe(true);
+    expect(((await run(prog, "c")) as any).success).toBe(false);
+  });
+
   it("throws in strict mode when refinement closures are present", () => {
     const app = mvfm(zod);
     const source = nativeZod.string().refine((val) => val.length > 0, { message: "required" });
@@ -50,13 +73,25 @@ describe("$.zod.from()", () => {
       name: nativeZod.string().refine((val) => val.startsWith("a")),
     });
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const prog = app(($) => $.zod.from(source, { strict: false }).parse($.input));
+      const ast = strip(prog.ast) as any;
 
-    const prog = app(($) => $.zod.from(source, { strict: false }).parse($.input));
-    const ast = strip(prog.ast) as any;
+      expect(ast.result.schema.shape.name.refinements).toEqual([]);
+      expect(warn).toHaveBeenCalled();
+    } finally {
+      warn.mockRestore();
+    }
+  });
 
-    expect(ast.result.schema.shape.name.refinements).toEqual([]);
-    expect(warn).toHaveBeenCalled();
-    warn.mockRestore();
+  it("throws in strict mode for exclusive date comparisons", () => {
+    const app = mvfm(zod);
+    const source = nativeZod.date().min(new Date("2020-01-01"));
+    const checkDef = (((source as any)._def.checks as any[])[0]?._zod?.def ??
+      ((source as any)._def.checks as any[])[0]?.def) as { inclusive?: boolean };
+    checkDef.inclusive = false;
+
+    expect(() => app(($) => $.zod.from(source).parse($.input))).toThrow(/exclusive|date|check/i);
   });
 
   it("preserves parse behavior for supported schemas", async () => {
