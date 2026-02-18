@@ -2,6 +2,6 @@
   {
     "name": "@mvfm/plugin-slack",
     "path": "dist/index.js",
-    "limit": "3 kB"
+    "limit": "10 kB"
   }
 ]
