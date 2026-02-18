@@ -8,6 +8,7 @@ import fiber from "./fiber";
 import num from "./num";
 import ord from "./ord";
 import postgres from "./postgres";
+import redisKeys from "./redis-keys";
 import redisStrings from "./redis-strings";
 import st from "./st";
 import str from "./str";
@@ -30,6 +31,7 @@ const modules: Record<string, ExampleEntry>[] = [
   fiber,
   console_,
   postgres,
+  redisKeys,
   redisStrings,
   zodSchemas,
   zodSchemasMore,
