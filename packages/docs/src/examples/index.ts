@@ -9,6 +9,7 @@ import fiber from "./fiber";
 import indexes from "./indexes";
 import num from "./num";
 import ord from "./ord";
+import pino from "./pino";
 import postgres from "./postgres";
 import redisHashes from "./redis-hashes";
 import redisKeys from "./redis-keys";
@@ -43,6 +44,7 @@ const modules: Record<string, ExampleEntry>[] = [
   zodSchemasMore,
   zodWrappers,
   indexes,
+  pino,
 ];
 
 /** Returns all example entries (node-kind examples + namespace index pages). */

@@ -30,6 +30,19 @@ export async function createPlaygroundScope(
   let lastFoldResult: unknown;
 
   const pluginFetch = await import("@mvfm/plugin-fetch");
+  const pluginPino = await import("@mvfm/plugin-pino");
+
+  // Build a fake pino client that routes log output to fakeConsole
+  const fakePinoClient: import("@mvfm/plugin-pino").PinoClient = {
+    async log(level, bindings, mergeObject, msg) {
+      const parts: unknown[] = [`[pino:${level}]`];
+      for (const b of bindings) parts.push(JSON.stringify(b));
+      if (mergeObject) parts.push(JSON.stringify(mergeObject));
+      if (msg) parts.push(msg);
+      fakeConsole.log(...parts);
+    },
+  };
+  const fakePinoInterpreter = pluginPino.createPinoInterpreter(fakePinoClient);
 
   const injected: Record<string, unknown> = {
     ...core,
@@ -40,6 +53,8 @@ export async function createPlaygroundScope(
     createZodInterpreter: pluginZod.createZodInterpreter,
     consoleInterpreter: fakeConsoleInterpreter,
     fetch_: pluginFetch.fetch(),
+    pino_: pluginPino.pino(),
+    createPinoInterpreter: pluginPino.createPinoInterpreter,
   };
 
   // Wire PGLite-backed postgres when a db instance is provided
@@ -64,7 +79,7 @@ export async function createPlaygroundScope(
         ...mockOverrides,
         ...userOverrides,
       });
-      Object.assign(interp, fakeConsoleInterpreter);
+      Object.assign(interp, fakeConsoleInterpreter, fakePinoInterpreter);
       return interp;
     };
   } else {
@@ -72,7 +87,7 @@ export async function createPlaygroundScope(
       const userOverrides = (args[0] ?? {}) as Record<string, unknown>;
       const merged = { ...mockOverrides, ...userOverrides };
       const interp = realDefaults(app, merged);
-      Object.assign(interp, fakeConsoleInterpreter);
+      Object.assign(interp, fakeConsoleInterpreter, fakePinoInterpreter);
       return interp;
     };
   }
