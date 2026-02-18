@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/emails",
+    "params": {
+      "from": "sender@example.com",
+      "to": "recipient@example.com",
+      "subject": "Hello",
+      "html": "<p>World</p>"
+    }
+  },
+  "response": {
+    "id": "email_mock_001",
+    "object": "email"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/emails/batch",
+    "params": [
+      { "from": "a@example.com", "to": "b@example.com", "subject": "One", "html": "<p>1</p>" },
+      { "from": "a@example.com", "to": "c@example.com", "subject": "Two", "html": "<p>2</p>" }
+    ]
+  },
+  "response": {
+    "data": [
+      { "id": "email_batch_0" },
+      { "id": "email_batch_1" }
+    ]
+  }
+}
