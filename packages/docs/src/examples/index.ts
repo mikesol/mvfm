@@ -10,6 +10,7 @@ import ord from "./ord";
 import postgres from "./postgres";
 import redisHashes from "./redis-hashes";
 import redisKeys from "./redis-keys";
+import redisLists from "./redis-lists";
 import redisStrings from "./redis-strings";
 import st from "./st";
 import str from "./str";
@@ -34,6 +35,7 @@ const modules: Record<string, ExampleEntry>[] = [
   postgres,
   redisHashes,
   redisKeys,
+  redisLists,
   redisStrings,
   zodSchemas,
   zodSchemasMore,
