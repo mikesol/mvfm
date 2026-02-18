@@ -159,6 +159,22 @@ await foldAST(
 );`,
     plugins: ZP,
   },
+  "zod/from": {
+    description: "Import a runtime Zod schema into the mvfm zod namespace",
+    code: `const userSchema = z.object({
+  name: z.string().min(2),
+  age: z.number().int().gte(18),
+});
+const app = mvfm(prelude, zod);
+const prog = app(($) => {
+  return $.zod.from(userSchema).safeParse($.input);
+});
+await foldAST(
+  defaults(app),
+  injectInput(prog, { name: "Ada", age: 21 })
+);`,
+    plugins: ZP,
+  },
 };
 
 export default examples;

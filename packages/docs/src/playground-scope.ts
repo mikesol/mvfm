@@ -33,6 +33,7 @@ export async function createPlaygroundScope(
     console_: pluginConsole.consolePlugin(),
     ...consoleRest,
     zod: pluginZod.zod,
+    z: pluginZod.z,
     createZodInterpreter: pluginZod.createZodInterpreter,
     consoleInterpreter: fakeConsoleInterpreter,
   };

@@ -1,4 +1,7 @@
 import { definePlugin } from "@mvfm/core";
+
+export { z } from "zod";
+
 import type { ZodArrayNamespace } from "./array";
 import { arrayNamespace, arrayNodeKinds } from "./array";
 import type { ZodBigIntNamespace } from "./bigint";
@@ -11,6 +14,8 @@ import type { ZodDiscriminatedUnionNamespace } from "./discriminated-union";
 import { discriminatedUnionNamespace, discriminatedUnionNodeKinds } from "./discriminated-union";
 import type { ZodEnumNamespace } from "./enum";
 import { enumNamespace, enumNodeKinds } from "./enum";
+import type { ZodFromNamespace } from "./from-zod";
+import { fromZodNamespace } from "./from-zod";
 import { createZodInterpreter } from "./interpreter";
 import type { ZodIntersectionNamespace } from "./intersection";
 import { intersectionNamespace, intersectionNodeKinds } from "./intersection";
@@ -52,6 +57,7 @@ export { ZodBigIntBuilder } from "./bigint";
 export { ZodDateBuilder } from "./date";
 export { ZodDiscriminatedUnionBuilder } from "./discriminated-union";
 export { ZodEnumBuilder, ZodNativeEnumBuilder } from "./enum";
+export type { ZodFromOptions } from "./from-zod";
 export { createZodInterpreter } from "./interpreter";
 export type { SchemaInterpreterMap } from "./interpreter-utils";
 export { ZodIntersectionBuilder } from "./intersection";
@@ -117,7 +123,8 @@ export interface ZodNamespace
     ZodTemplateLiteralNamespace,
     ZodTransformNamespace,
     ZodTupleNamespace,
-    ZodUnionNamespace {
+    ZodUnionNamespace,
+    ZodFromNamespace {
   /** Coercion constructors -- convert input before validating. */
   coerce: ZodCoerceNamespace;
   // ^^^ Each new schema type adds ONE extends clause here
@@ -190,6 +197,7 @@ export const zod = definePlugin({
         ...dateNamespace(ctx, parseError),
         ...discriminatedUnionNamespace(ctx, parseError),
         ...enumNamespace(ctx, parseError),
+        ...fromZodNamespace(ctx),
         ...intersectionNamespace(ctx, parseError),
         ...lazyNamespace(ctx),
         ...literalNamespace(ctx),
