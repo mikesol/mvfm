@@ -56,6 +56,12 @@ describe("docs examples", () => {
         const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
         const fn = new AsyncFunction(...paramNames, example.code);
         await fn(...paramValues);
+      } else if (example.s3) {
+        // S3 examples: spin up in-memory S3 client
+        const { paramNames, paramValues } = await createPlaygroundScope(fakeConsole, undefined, undefined, undefined, true);
+        const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
+        const fn = new AsyncFunction(...paramNames, example.code);
+        await fn(...paramValues);
       } else if (example.pglite) {
         // PGLite examples: spin up in-browser Postgres via PGLite
         const { PGlite } = await import("@electric-sql/pglite");

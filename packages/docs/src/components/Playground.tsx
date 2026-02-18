@@ -11,6 +11,7 @@ interface PlaygroundProps {
   pglite?: { seedSQL: string };
   mockInterpreter?: string;
   redis?: true;
+  s3?: true;
 }
 
 type DbState = "idle" | "loading" | "ready" | "error";
@@ -27,7 +28,7 @@ function getHighlighter() {
   return highlighterPromise;
 }
 
-export default function Playground({ code: initialCode, pglite, mockInterpreter, redis }: PlaygroundProps) {
+export default function Playground({ code: initialCode, pglite, mockInterpreter, redis, s3 }: PlaygroundProps) {
   const [code, setCode] = useState(initialCode);
   const [output, setOutput] = useState<string>("");
   const [isError, setIsError] = useState(false);
@@ -111,6 +112,7 @@ export default function Playground({ code: initialCode, pglite, mockInterpreter,
         parsedMockInterpreter.current,
         pglite ? dbRef.current : undefined,
         redis,
+        s3,
       );
       const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
       const fn = new AsyncFunction(...scope.paramNames, code);
@@ -139,7 +141,7 @@ export default function Playground({ code: initialCode, pglite, mockInterpreter,
       const prefix = line != null ? `Line ${line}: ` : "";
       setOutput(prefix + err.message);
     }
-  }, [code, pglite, dbState]);
+  }, [code, pglite, dbState, redis, s3]);
 
   if (dbState === "loading") {
     return (

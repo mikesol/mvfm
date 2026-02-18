@@ -9,6 +9,7 @@ export async function createPlaygroundScope(
   mockInterpreter?: Record<string, unknown>,
   pgliteDb?: unknown,
   redis?: true,
+  s3?: true,
 ) {
   const core = await import("@mvfm/core");
   const pluginConsole = await import("@mvfm/plugin-console");
@@ -118,6 +119,15 @@ export async function createPlaygroundScope(
     const client = new MemoryRedisClient();
     injected.redis = pluginRedis.redis();
     injected.memoryRedisInterpreter = pluginRedis.createRedisInterpreter(client);
+  }
+
+  // Wire in-memory S3 when s3 flag is set
+  if (s3) {
+    const { MemoryS3Client } = await import("./memory-s3-client");
+    const pluginS3 = await import("@mvfm/plugin-s3");
+    const client = new MemoryS3Client();
+    injected.s3_ = pluginS3.s3({ region: "us-east-1" });
+    injected.memoryS3Interpreter = pluginS3.createS3Interpreter(client);
   }
 
   injected.foldAST = async (...args: any[]) => {

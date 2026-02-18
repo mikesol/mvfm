@@ -20,6 +20,7 @@
     "@mvfm/plugin-pino": "workspace:*",
     "@mvfm/plugin-postgres": "workspace:*",
     "@mvfm/plugin-redis": "workspace:*",
+    "@mvfm/plugin-s3": "workspace:*",
     "@mvfm/plugin-zod": "workspace:*",
     "astro": "^5.9.4",
     "react": "^19.1.0",
