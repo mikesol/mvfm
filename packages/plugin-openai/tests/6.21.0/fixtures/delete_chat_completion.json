@@ -1,0 +1,11 @@
+{
+  "request": {
+    "method": "DELETE",
+    "path": "/chat/completions/chatcmpl-DAVl2ZB4COVKjhhcn0ynKpB3Yf289"
+  },
+  "response": {
+    "object": "chat.completion.deleted",
+    "id": "chatcmpl-DAVl2ZB4COVKjhhcn0ynKpB3Yf289",
+    "deleted": true
+  }
+}

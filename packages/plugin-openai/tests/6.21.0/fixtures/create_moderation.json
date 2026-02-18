@@ -1,0 +1,90 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/moderations",
+    "body": {
+      "model": "omni-moderation-latest",
+      "input": "This is a test of the moderation endpoint."
+    }
+  },
+  "response": {
+    "id": "modr-246",
+    "model": "omni-moderation-latest",
+    "results": [
+      {
+        "flagged": false,
+        "categories": {
+          "harassment": false,
+          "harassment/threatening": false,
+          "sexual": false,
+          "hate": false,
+          "hate/threatening": false,
+          "illicit": false,
+          "illicit/violent": false,
+          "self-harm/intent": false,
+          "self-harm/instructions": false,
+          "self-harm": false,
+          "sexual/minors": false,
+          "violence": false,
+          "violence/graphic": false
+        },
+        "category_scores": {
+          "harassment": 0.0006186232241064608,
+          "harassment/threatening": 0.00001941131867789626,
+          "sexual": 0.00007793660930208434,
+          "hate": 0.00004044814978420809,
+          "hate/threatening": 0.0000013420013504783412,
+          "illicit": 0.0015086444739336401,
+          "illicit/violent": 0.000020662982488383408,
+          "self-harm/intent": 0.00021642339588120966,
+          "self-harm/instructions": 0.000003373722476473661,
+          "self-harm": 0.000015118199327273332,
+          "sexual/minors": 0.000010229985472581487,
+          "violence": 0.0005775117631028116,
+          "violence/graphic": 0.000013765463368900109
+        },
+        "category_applied_input_types": {
+          "harassment": [
+            "text"
+          ],
+          "harassment/threatening": [
+            "text"
+          ],
+          "sexual": [
+            "text"
+          ],
+          "hate": [
+            "text"
+          ],
+          "hate/threatening": [
+            "text"
+          ],
+          "illicit": [
+            "text"
+          ],
+          "illicit/violent": [
+            "text"
+          ],
+          "self-harm/intent": [
+            "text"
+          ],
+          "self-harm/instructions": [
+            "text"
+          ],
+          "self-harm": [
+            "text"
+          ],
+          "sexual/minors": [
+            "text"
+          ],
+          "violence": [
+            "text"
+          ],
+          "violence/graphic": [
+            "text"
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/completions",
+    "body": {
+      "model": "gpt-3.5-turbo-instruct",
+      "prompt": "Say hello.",
+      "max_tokens": 16
+    }
+  },
+  "response": {
+    "id": "cmpl-DAVlHRuWjxew2rPW3TqDLL8IKpMrw",
+    "object": "text_completion",
+    "created": 1771397743,
+    "model": "gpt-3.5-turbo-instruct:20230824-v2",
+    "choices": [
+      {
+        "text": "\n\nHello! Nice to meet you.\n",
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 3,
+      "completion_tokens": 8,
+      "total_tokens": 11
+    }
+  }
+}

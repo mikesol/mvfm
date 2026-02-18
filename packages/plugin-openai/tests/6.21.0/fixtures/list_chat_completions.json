@@ -1,0 +1,91 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/chat/completions",
+    "body": {
+      "limit": 5
+    }
+  },
+  "response": {
+    "object": "list",
+    "data": [
+      {
+        "object": "chat.completion",
+        "id": "chatcmpl-DAVl2ZB4COVKjhhcn0ynKpB3Yf289",
+        "model": "gpt-4o-mini-2024-07-18",
+        "created": 1771397728,
+        "request_id": "req_fb9b081a694247d58e8c54b3f8691d2f",
+        "tool_choice": null,
+        "usage": {
+          "total_tokens": 16,
+          "completion_tokens": 2,
+          "prompt_tokens": 14
+        },
+        "seed": -7189458191829338000,
+        "top_p": 1,
+        "temperature": 1,
+        "presence_penalty": 0,
+        "frequency_penalty": 0,
+        "system_fingerprint": "fp_373a14eb6f",
+        "input_user": null,
+        "service_tier": "default",
+        "tools": null,
+        "metadata": {},
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "content": "Hello.",
+              "role": "assistant",
+              "tool_calls": null,
+              "function_call": null
+            },
+            "finish_reason": "stop",
+            "logprobs": null
+          }
+        ],
+        "response_format": null
+      },
+      {
+        "object": "chat.completion",
+        "id": "chatcmpl-DAVkejzQwh2BuBGlutesYMt92y6ds",
+        "model": "gpt-4o-mini-2024-07-18",
+        "created": 1771397704,
+        "request_id": "req_0c4bb80216984d229dbbab5c83e982d3",
+        "tool_choice": null,
+        "usage": {
+          "total_tokens": 16,
+          "completion_tokens": 2,
+          "prompt_tokens": 14
+        },
+        "seed": -5419106208218365000,
+        "top_p": 1,
+        "temperature": 1,
+        "presence_penalty": 0,
+        "frequency_penalty": 0,
+        "system_fingerprint": "fp_373a14eb6f",
+        "input_user": null,
+        "service_tier": "default",
+        "tools": null,
+        "metadata": {},
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "content": "Hello!",
+              "role": "assistant",
+              "tool_calls": null,
+              "function_call": null
+            },
+            "finish_reason": "stop",
+            "logprobs": null
+          }
+        ],
+        "response_format": null
+      }
+    ],
+    "first_id": "chatcmpl-DAVl2ZB4COVKjhhcn0ynKpB3Yf289",
+    "last_id": "chatcmpl-DAVkejzQwh2BuBGlutesYMt92y6ds",
+    "has_more": false
+  }
+}

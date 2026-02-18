@@ -1,0 +1,50 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/chat/completions/chatcmpl-DAVl2ZB4COVKjhhcn0ynKpB3Yf289",
+    "body": {
+      "metadata": {
+        "fixture": "true"
+      }
+    }
+  },
+  "response": {
+    "object": "chat.completion",
+    "id": "chatcmpl-DAVl2ZB4COVKjhhcn0ynKpB3Yf289",
+    "model": "gpt-4o-mini-2024-07-18",
+    "created": 1771397728,
+    "request_id": "req_fb9b081a694247d58e8c54b3f8691d2f",
+    "tool_choice": null,
+    "usage": {
+      "total_tokens": 16,
+      "completion_tokens": 2,
+      "prompt_tokens": 14
+    },
+    "seed": -7189458191829338000,
+    "top_p": 1,
+    "temperature": 1,
+    "presence_penalty": 0,
+    "frequency_penalty": 0,
+    "system_fingerprint": "fp_373a14eb6f",
+    "input_user": null,
+    "service_tier": "default",
+    "tools": null,
+    "metadata": {
+      "fixture": "true"
+    },
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "content": "Hello.",
+          "role": "assistant",
+          "tool_calls": null,
+          "function_call": null
+        },
+        "finish_reason": "stop",
+        "logprobs": null
+      }
+    ],
+    "response_format": null
+  }
+}

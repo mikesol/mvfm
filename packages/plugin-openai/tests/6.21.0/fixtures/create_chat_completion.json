@@ -1,0 +1,53 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/chat/completions",
+    "body": {
+      "model": "gpt-4o-mini",
+      "max_tokens": 16,
+      "messages": [
+        {
+          "role": "user",
+          "content": "Say hello in exactly one word."
+        }
+      ],
+      "store": true
+    }
+  },
+  "response": {
+    "id": "chatcmpl-DAVl2ZB4COVKjhhcn0ynKpB3Yf289",
+    "object": "chat.completion",
+    "created": 1771397728,
+    "model": "gpt-4o-mini-2024-07-18",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "Hello.",
+          "refusal": null,
+          "annotations": []
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 14,
+      "completion_tokens": 2,
+      "total_tokens": 16,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": "fp_373a14eb6f"
+  }
+}
