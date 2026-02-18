@@ -6,7 +6,8 @@ import type { SLACK_NODE_KINDS_DIALOG } from "./node-kinds-dialog";
 
 type SlackDialogKind = (typeof SLACK_NODE_KINDS_DIALOG)[number];
 
-interface SlackDialogBaseNode<K extends SlackDialogKind = SlackDialogKind> extends TypedNode<unknown> {
+interface SlackDialogBaseNode<K extends SlackDialogKind = SlackDialogKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
@@ -37,6 +38,8 @@ export function createSlackDialogInterpreter(client: SlackClientLike): Interpret
   };
 
   return defineInterpreter<SlackDialogKind>()({
-    "slack/dialog_open": async function* (node: SlackDialogOpenNode) { return yield* handler(node); },
+    "slack/dialog_open": async function* (node: SlackDialogOpenNode) {
+      return yield* handler(node);
+    },
   });
 }

@@ -6,18 +6,22 @@ import type { SLACK_NODE_KINDS_CANVASES } from "./node-kinds-canvases";
 
 type SlackCanvasesKind = (typeof SLACK_NODE_KINDS_CANVASES)[number];
 
-interface SlackCanvasesBaseNode<K extends SlackCanvasesKind = SlackCanvasesKind> extends TypedNode<unknown> {
+interface SlackCanvasesBaseNode<K extends SlackCanvasesKind = SlackCanvasesKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackCanvasesAccessDeleteNode extends SlackCanvasesBaseNode<"slack/canvases_access_delete"> {}
-export interface SlackCanvasesAccessSetNode extends SlackCanvasesBaseNode<"slack/canvases_access_set"> {}
+export interface SlackCanvasesAccessDeleteNode
+  extends SlackCanvasesBaseNode<"slack/canvases_access_delete"> {}
+export interface SlackCanvasesAccessSetNode
+  extends SlackCanvasesBaseNode<"slack/canvases_access_set"> {}
 export interface SlackCanvasesCreateNode extends SlackCanvasesBaseNode<"slack/canvases_create"> {}
 export interface SlackCanvasesDeleteNode extends SlackCanvasesBaseNode<"slack/canvases_delete"> {}
 export interface SlackCanvasesEditNode extends SlackCanvasesBaseNode<"slack/canvases_edit"> {}
-export interface SlackCanvasesSectionsLookupNode extends SlackCanvasesBaseNode<"slack/canvases_sections_lookup"> {}
+export interface SlackCanvasesSectionsLookupNode
+  extends SlackCanvasesBaseNode<"slack/canvases_sections_lookup"> {}
 
 export const NODE_TO_METHOD_CANVASES: Record<string, string> = {
   "slack/canvases_access_delete": "canvases.access.delete",
@@ -52,11 +56,23 @@ export function createSlackCanvasesInterpreter(client: SlackClientLike): Interpr
   };
 
   return defineInterpreter<SlackCanvasesKind>()({
-    "slack/canvases_access_delete": async function* (node: SlackCanvasesAccessDeleteNode) { return yield* handler(node); },
-    "slack/canvases_access_set": async function* (node: SlackCanvasesAccessSetNode) { return yield* handler(node); },
-    "slack/canvases_create": async function* (node: SlackCanvasesCreateNode) { return yield* handler(node); },
-    "slack/canvases_delete": async function* (node: SlackCanvasesDeleteNode) { return yield* handler(node); },
-    "slack/canvases_edit": async function* (node: SlackCanvasesEditNode) { return yield* handler(node); },
-    "slack/canvases_sections_lookup": async function* (node: SlackCanvasesSectionsLookupNode) { return yield* handler(node); },
+    "slack/canvases_access_delete": async function* (node: SlackCanvasesAccessDeleteNode) {
+      return yield* handler(node);
+    },
+    "slack/canvases_access_set": async function* (node: SlackCanvasesAccessSetNode) {
+      return yield* handler(node);
+    },
+    "slack/canvases_create": async function* (node: SlackCanvasesCreateNode) {
+      return yield* handler(node);
+    },
+    "slack/canvases_delete": async function* (node: SlackCanvasesDeleteNode) {
+      return yield* handler(node);
+    },
+    "slack/canvases_edit": async function* (node: SlackCanvasesEditNode) {
+      return yield* handler(node);
+    },
+    "slack/canvases_sections_lookup": async function* (node: SlackCanvasesSectionsLookupNode) {
+      return yield* handler(node);
+    },
   });
 }

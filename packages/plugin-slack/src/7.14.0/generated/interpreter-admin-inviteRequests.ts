@@ -6,17 +6,24 @@ import type { SLACK_NODE_KINDS_ADMIN_INVITEREQUESTS } from "./node-kinds-admin-i
 
 type SlackAdminInviteRequestsKind = (typeof SLACK_NODE_KINDS_ADMIN_INVITEREQUESTS)[number];
 
-interface SlackAdminInviteRequestsBaseNode<K extends SlackAdminInviteRequestsKind = SlackAdminInviteRequestsKind> extends TypedNode<unknown> {
+interface SlackAdminInviteRequestsBaseNode<
+  K extends SlackAdminInviteRequestsKind = SlackAdminInviteRequestsKind,
+> extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackAdminInviteRequestsApproveNode extends SlackAdminInviteRequestsBaseNode<"slack/admin_inviteRequests_approve"> {}
-export interface SlackAdminInviteRequestsApprovedListNode extends SlackAdminInviteRequestsBaseNode<"slack/admin_inviteRequests_approved_list"> {}
-export interface SlackAdminInviteRequestsDeniedListNode extends SlackAdminInviteRequestsBaseNode<"slack/admin_inviteRequests_denied_list"> {}
-export interface SlackAdminInviteRequestsDenyNode extends SlackAdminInviteRequestsBaseNode<"slack/admin_inviteRequests_deny"> {}
-export interface SlackAdminInviteRequestsListNode extends SlackAdminInviteRequestsBaseNode<"slack/admin_inviteRequests_list"> {}
+export interface SlackAdminInviteRequestsApproveNode
+  extends SlackAdminInviteRequestsBaseNode<"slack/admin_inviteRequests_approve"> {}
+export interface SlackAdminInviteRequestsApprovedListNode
+  extends SlackAdminInviteRequestsBaseNode<"slack/admin_inviteRequests_approved_list"> {}
+export interface SlackAdminInviteRequestsDeniedListNode
+  extends SlackAdminInviteRequestsBaseNode<"slack/admin_inviteRequests_denied_list"> {}
+export interface SlackAdminInviteRequestsDenyNode
+  extends SlackAdminInviteRequestsBaseNode<"slack/admin_inviteRequests_deny"> {}
+export interface SlackAdminInviteRequestsListNode
+  extends SlackAdminInviteRequestsBaseNode<"slack/admin_inviteRequests_list"> {}
 
 export const NODE_TO_METHOD_ADMIN_INVITEREQUESTS: Record<string, string> = {
   "slack/admin_inviteRequests_approve": "admin.inviteRequests.approve",
@@ -49,10 +56,26 @@ export function createSlackAdminInviteRequestsInterpreter(client: SlackClientLik
   };
 
   return defineInterpreter<SlackAdminInviteRequestsKind>()({
-    "slack/admin_inviteRequests_approve": async function* (node: SlackAdminInviteRequestsApproveNode) { return yield* handler(node); },
-    "slack/admin_inviteRequests_approved_list": async function* (node: SlackAdminInviteRequestsApprovedListNode) { return yield* handler(node); },
-    "slack/admin_inviteRequests_denied_list": async function* (node: SlackAdminInviteRequestsDeniedListNode) { return yield* handler(node); },
-    "slack/admin_inviteRequests_deny": async function* (node: SlackAdminInviteRequestsDenyNode) { return yield* handler(node); },
-    "slack/admin_inviteRequests_list": async function* (node: SlackAdminInviteRequestsListNode) { return yield* handler(node); },
+    "slack/admin_inviteRequests_approve": async function* (
+      node: SlackAdminInviteRequestsApproveNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_inviteRequests_approved_list": async function* (
+      node: SlackAdminInviteRequestsApprovedListNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_inviteRequests_denied_list": async function* (
+      node: SlackAdminInviteRequestsDeniedListNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_inviteRequests_deny": async function* (node: SlackAdminInviteRequestsDenyNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_inviteRequests_list": async function* (node: SlackAdminInviteRequestsListNode) {
+      return yield* handler(node);
+    },
   });
 }

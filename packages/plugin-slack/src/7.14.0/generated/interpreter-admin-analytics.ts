@@ -6,13 +6,15 @@ import type { SLACK_NODE_KINDS_ADMIN_ANALYTICS } from "./node-kinds-admin-analyt
 
 type SlackAdminAnalyticsKind = (typeof SLACK_NODE_KINDS_ADMIN_ANALYTICS)[number];
 
-interface SlackAdminAnalyticsBaseNode<K extends SlackAdminAnalyticsKind = SlackAdminAnalyticsKind> extends TypedNode<unknown> {
+interface SlackAdminAnalyticsBaseNode<K extends SlackAdminAnalyticsKind = SlackAdminAnalyticsKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackAdminAnalyticsGetFileNode extends SlackAdminAnalyticsBaseNode<"slack/admin_analytics_getFile"> {}
+export interface SlackAdminAnalyticsGetFileNode
+  extends SlackAdminAnalyticsBaseNode<"slack/admin_analytics_getFile"> {}
 
 export const NODE_TO_METHOD_ADMIN_ANALYTICS: Record<string, string> = {
   "slack/admin_analytics_getFile": "admin.analytics.getFile",
@@ -37,6 +39,8 @@ export function createSlackAdminAnalyticsInterpreter(client: SlackClientLike): I
   };
 
   return defineInterpreter<SlackAdminAnalyticsKind>()({
-    "slack/admin_analytics_getFile": async function* (node: SlackAdminAnalyticsGetFileNode) { return yield* handler(node); },
+    "slack/admin_analytics_getFile": async function* (node: SlackAdminAnalyticsGetFileNode) {
+      return yield* handler(node);
+    },
   });
 }

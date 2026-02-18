@@ -4,40 +4,410 @@
 
 ```ts
 
+import type { AdminAnalyticsGetFileArguments } from '@slack/web-api';
+import type { AdminAnalyticsGetFileResponse } from '@slack/web-api';
+import type { AdminAppsActivitiesListArguments } from '@slack/web-api';
+import type { AdminAppsActivitiesListResponse } from '@slack/web-api';
+import type { AdminAppsApproveArguments } from '@slack/web-api';
+import type { AdminAppsApprovedListArguments } from '@slack/web-api';
+import type { AdminAppsApprovedListResponse } from '@slack/web-api';
+import type { AdminAppsApproveResponse } from '@slack/web-api';
+import type { AdminAppsClearResolutionArguments } from '@slack/web-api';
+import type { AdminAppsClearResolutionResponse } from '@slack/web-api';
+import type { AdminAppsConfigLookupArguments } from '@slack/web-api';
+import type { AdminAppsConfigLookupResponse } from '@slack/web-api';
+import type { AdminAppsConfigSetArguments } from '@slack/web-api';
+import type { AdminAppsConfigSetResponse } from '@slack/web-api';
+import type { AdminAppsRequestsCancelArguments } from '@slack/web-api';
+import type { AdminAppsRequestsCancelResponse } from '@slack/web-api';
+import type { AdminAppsRequestsListArguments } from '@slack/web-api';
+import type { AdminAppsRequestsListResponse } from '@slack/web-api';
+import type { AdminAppsRestrictArguments } from '@slack/web-api';
+import type { AdminAppsRestrictedListArguments } from '@slack/web-api';
+import type { AdminAppsRestrictedListResponse } from '@slack/web-api';
+import type { AdminAppsRestrictResponse } from '@slack/web-api';
+import type { AdminAppsUninstallArguments } from '@slack/web-api';
+import type { AdminAppsUninstallResponse } from '@slack/web-api';
+import type { AdminAuthPolicyAssignEntitiesArguments } from '@slack/web-api';
+import type { AdminAuthPolicyAssignEntitiesResponse } from '@slack/web-api';
+import type { AdminAuthPolicyGetEntitiesArguments } from '@slack/web-api';
+import type { AdminAuthPolicyGetEntitiesResponse } from '@slack/web-api';
+import type { AdminAuthPolicyRemoveEntitiesArguments } from '@slack/web-api';
+import type { AdminAuthPolicyRemoveEntitiesResponse } from '@slack/web-api';
+import type { AdminBarriersCreateArguments } from '@slack/web-api';
+import type { AdminBarriersCreateResponse } from '@slack/web-api';
+import type { AdminBarriersDeleteArguments } from '@slack/web-api';
+import type { AdminBarriersDeleteResponse } from '@slack/web-api';
+import type { AdminBarriersListArguments } from '@slack/web-api';
+import type { AdminBarriersListResponse } from '@slack/web-api';
+import type { AdminBarriersUpdateArguments } from '@slack/web-api';
+import type { AdminBarriersUpdateResponse } from '@slack/web-api';
+import type { AdminConversationsArchiveArguments } from '@slack/web-api';
+import type { AdminConversationsArchiveResponse } from '@slack/web-api';
+import type { AdminConversationsBulkArchiveArguments } from '@slack/web-api';
+import type { AdminConversationsBulkArchiveResponse } from '@slack/web-api';
+import type { AdminConversationsBulkDeleteArguments } from '@slack/web-api';
+import type { AdminConversationsBulkDeleteResponse } from '@slack/web-api';
+import type { AdminConversationsBulkMoveArguments } from '@slack/web-api';
+import type { AdminConversationsBulkMoveResponse } from '@slack/web-api';
+import type { AdminConversationsConvertToPrivateArguments } from '@slack/web-api';
+import type { AdminConversationsConvertToPrivateResponse } from '@slack/web-api';
+import type { AdminConversationsConvertToPublicArguments } from '@slack/web-api';
+import type { AdminConversationsConvertToPublicResponse } from '@slack/web-api';
+import type { AdminConversationsCreateArguments } from '@slack/web-api';
+import type { AdminConversationsCreateResponse } from '@slack/web-api';
+import type { AdminConversationsDeleteArguments } from '@slack/web-api';
+import type { AdminConversationsDeleteResponse } from '@slack/web-api';
+import type { AdminConversationsDisconnectSharedArguments } from '@slack/web-api';
+import type { AdminConversationsDisconnectSharedResponse } from '@slack/web-api';
+import type { AdminConversationsEKMListOriginalConnectedChannelInfoArguments } from '@slack/web-api';
+import type { AdminConversationsEkmListOriginalConnectedChannelInfoResponse } from '@slack/web-api';
+import type { AdminConversationsGetConversationPrefsArguments } from '@slack/web-api';
+import type { AdminConversationsGetConversationPrefsResponse } from '@slack/web-api';
+import type { AdminConversationsGetCustomRetentionArguments } from '@slack/web-api';
+import type { AdminConversationsGetCustomRetentionResponse } from '@slack/web-api';
+import type { AdminConversationsGetTeamsArguments } from '@slack/web-api';
+import type { AdminConversationsGetTeamsResponse } from '@slack/web-api';
+import type { AdminConversationsInviteArguments } from '@slack/web-api';
+import type { AdminConversationsInviteResponse } from '@slack/web-api';
+import type { AdminConversationsLookupArguments } from '@slack/web-api';
+import type { AdminConversationsLookupResponse } from '@slack/web-api';
+import type { AdminConversationsRemoveCustomRetentionArguments } from '@slack/web-api';
+import type { AdminConversationsRemoveCustomRetentionResponse } from '@slack/web-api';
+import type { AdminConversationsRenameArguments } from '@slack/web-api';
+import type { AdminConversationsRenameResponse } from '@slack/web-api';
+import type { AdminConversationsRestrictAccessAddGroupArguments } from '@slack/web-api';
+import type { AdminConversationsRestrictAccessAddGroupResponse } from '@slack/web-api';
+import type { AdminConversationsRestrictAccessListGroupsArguments } from '@slack/web-api';
+import type { AdminConversationsRestrictAccessListGroupsResponse } from '@slack/web-api';
+import type { AdminConversationsRestrictAccessRemoveGroupArguments } from '@slack/web-api';
+import type { AdminConversationsRestrictAccessRemoveGroupResponse } from '@slack/web-api';
+import type { AdminConversationsSearchArguments } from '@slack/web-api';
+import type { AdminConversationsSearchResponse } from '@slack/web-api';
+import type { AdminConversationsSetConversationPrefsArguments } from '@slack/web-api';
+import type { AdminConversationsSetConversationPrefsResponse } from '@slack/web-api';
+import type { AdminConversationsSetCustomRetentionArguments } from '@slack/web-api';
+import type { AdminConversationsSetCustomRetentionResponse } from '@slack/web-api';
+import type { AdminConversationsSetTeamsArguments } from '@slack/web-api';
+import type { AdminConversationsSetTeamsResponse } from '@slack/web-api';
+import type { AdminConversationsUnarchiveArguments } from '@slack/web-api';
+import type { AdminConversationsUnarchiveResponse } from '@slack/web-api';
+import type { AdminEmojiAddAliasArguments } from '@slack/web-api';
+import type { AdminEmojiAddAliasResponse } from '@slack/web-api';
+import type { AdminEmojiAddArguments } from '@slack/web-api';
+import type { AdminEmojiAddResponse } from '@slack/web-api';
+import type { AdminEmojiListArguments } from '@slack/web-api';
+import type { AdminEmojiListResponse } from '@slack/web-api';
+import type { AdminEmojiRemoveArguments } from '@slack/web-api';
+import type { AdminEmojiRemoveResponse } from '@slack/web-api';
+import type { AdminEmojiRenameArguments } from '@slack/web-api';
+import type { AdminEmojiRenameResponse } from '@slack/web-api';
+import type { AdminFunctionsListArguments } from '@slack/web-api';
+import type { AdminFunctionsListResponse } from '@slack/web-api';
+import type { AdminFunctionsPermissionsLookupArguments } from '@slack/web-api';
+import type { AdminFunctionsPermissionsLookupResponse } from '@slack/web-api';
+import type { AdminFunctionsPermissionsSetArguments } from '@slack/web-api';
+import type { AdminFunctionsPermissionsSetResponse } from '@slack/web-api';
+import type { AdminInviteRequestsApproveArguments } from '@slack/web-api';
+import type { AdminInviteRequestsApprovedListArguments } from '@slack/web-api';
+import type { AdminInviteRequestsApprovedListResponse } from '@slack/web-api';
+import type { AdminInviteRequestsApproveResponse } from '@slack/web-api';
+import type { AdminInviteRequestsDeniedListArguments } from '@slack/web-api';
+import type { AdminInviteRequestsDeniedListResponse } from '@slack/web-api';
+import type { AdminInviteRequestsDenyArguments } from '@slack/web-api';
+import type { AdminInviteRequestsDenyResponse } from '@slack/web-api';
+import type { AdminInviteRequestsListArguments } from '@slack/web-api';
+import type { AdminInviteRequestsListResponse } from '@slack/web-api';
+import type { AdminRolesAddAssignmentsArguments } from '@slack/web-api';
+import type { AdminRolesAddAssignmentsResponse } from '@slack/web-api';
+import type { AdminRolesListAssignmentsArguments } from '@slack/web-api';
+import type { AdminRolesListAssignmentsResponse } from '@slack/web-api';
+import type { AdminRolesRemoveAssignmentsArguments } from '@slack/web-api';
+import type { AdminRolesRemoveAssignmentsResponse } from '@slack/web-api';
+import type { AdminTeamsAdminsListArguments } from '@slack/web-api';
+import type { AdminTeamsAdminsListResponse } from '@slack/web-api';
+import type { AdminTeamsCreateArguments } from '@slack/web-api';
+import type { AdminTeamsCreateResponse } from '@slack/web-api';
+import type { AdminTeamsListArguments } from '@slack/web-api';
+import type { AdminTeamsListResponse } from '@slack/web-api';
+import type { AdminTeamsOwnersListArguments } from '@slack/web-api';
+import type { AdminTeamsOwnersListResponse } from '@slack/web-api';
+import type { AdminTeamsSettingsInfoArguments } from '@slack/web-api';
+import type { AdminTeamsSettingsInfoResponse } from '@slack/web-api';
+import type { AdminTeamsSettingsSetDefaultChannelsArguments } from '@slack/web-api';
+import type { AdminTeamsSettingsSetDefaultChannelsResponse } from '@slack/web-api';
+import type { AdminTeamsSettingsSetDescriptionArguments } from '@slack/web-api';
+import type { AdminTeamsSettingsSetDescriptionResponse } from '@slack/web-api';
+import type { AdminTeamsSettingsSetDiscoverabilityArguments } from '@slack/web-api';
+import type { AdminTeamsSettingsSetDiscoverabilityResponse } from '@slack/web-api';
+import type { AdminTeamsSettingsSetIconArguments } from '@slack/web-api';
+import type { AdminTeamsSettingsSetIconResponse } from '@slack/web-api';
+import type { AdminTeamsSettingsSetNameArguments } from '@slack/web-api';
+import type { AdminTeamsSettingsSetNameResponse } from '@slack/web-api';
+import type { AdminUsergroupsAddChannelsArguments } from '@slack/web-api';
+import type { AdminUsergroupsAddChannelsResponse } from '@slack/web-api';
+import type { AdminUsergroupsAddTeamsArguments } from '@slack/web-api';
+import type { AdminUsergroupsAddTeamsResponse } from '@slack/web-api';
+import type { AdminUsergroupsListChannelsArguments } from '@slack/web-api';
+import type { AdminUsergroupsListChannelsResponse } from '@slack/web-api';
+import type { AdminUsergroupsRemoveChannelsArguments } from '@slack/web-api';
+import type { AdminUsergroupsRemoveChannelsResponse } from '@slack/web-api';
+import type { AdminUsersAssignArguments } from '@slack/web-api';
+import type { AdminUsersAssignResponse } from '@slack/web-api';
+import type { AdminUsersInviteArguments } from '@slack/web-api';
+import type { AdminUsersInviteResponse } from '@slack/web-api';
+import type { AdminUsersListArguments } from '@slack/web-api';
+import type { AdminUsersListResponse } from '@slack/web-api';
+import type { AdminUsersRemoveArguments } from '@slack/web-api';
+import type { AdminUsersRemoveResponse } from '@slack/web-api';
+import type { AdminUsersSessionClearSettingsArguments } from '@slack/web-api';
+import type { AdminUsersSessionClearSettingsResponse } from '@slack/web-api';
+import type { AdminUsersSessionGetSettingsArguments } from '@slack/web-api';
+import type { AdminUsersSessionGetSettingsResponse } from '@slack/web-api';
+import type { AdminUsersSessionInvalidateArguments } from '@slack/web-api';
+import type { AdminUsersSessionInvalidateResponse } from '@slack/web-api';
+import type { AdminUsersSessionListArguments } from '@slack/web-api';
+import type { AdminUsersSessionListResponse } from '@slack/web-api';
+import type { AdminUsersSessionResetArguments } from '@slack/web-api';
+import type { AdminUsersSessionResetBulkArguments } from '@slack/web-api';
+import type { AdminUsersSessionResetBulkResponse } from '@slack/web-api';
+import type { AdminUsersSessionResetResponse } from '@slack/web-api';
+import type { AdminUsersSessionSetSettingsArguments } from '@slack/web-api';
+import type { AdminUsersSessionSetSettingsResponse } from '@slack/web-api';
+import type { AdminUsersSetAdminArguments } from '@slack/web-api';
+import type { AdminUsersSetAdminResponse } from '@slack/web-api';
+import type { AdminUsersSetExpirationArguments } from '@slack/web-api';
+import type { AdminUsersSetExpirationResponse } from '@slack/web-api';
+import type { AdminUsersSetOwnerArguments } from '@slack/web-api';
+import type { AdminUsersSetOwnerResponse } from '@slack/web-api';
+import type { AdminUsersSetRegularArguments } from '@slack/web-api';
+import type { AdminUsersSetRegularResponse } from '@slack/web-api';
+import type { AdminUsersUnsupportedVersionsExportArguments } from '@slack/web-api';
+import type { AdminUsersUnsupportedVersionsExportResponse } from '@slack/web-api';
+import type { AdminWorkflowsCollaboratorsAddArguments } from '@slack/web-api';
+import type { AdminWorkflowsCollaboratorsAddResponse } from '@slack/web-api';
+import type { AdminWorkflowsCollaboratorsRemoveArguments } from '@slack/web-api';
+import type { AdminWorkflowsCollaboratorsRemoveResponse } from '@slack/web-api';
+import type { AdminWorkflowsPermissionsLookupArguments } from '@slack/web-api';
+import type { AdminWorkflowsPermissionsLookupResponse } from '@slack/web-api';
+import type { AdminWorkflowsSearchArguments } from '@slack/web-api';
+import type { AdminWorkflowsSearchResponse } from '@slack/web-api';
+import type { AdminWorkflowsUnpublishArguments } from '@slack/web-api';
+import type { AdminWorkflowsUnpublishResponse } from '@slack/web-api';
+import type { APITestArguments } from '@slack/web-api';
+import type { ApiTestResponse } from '@slack/web-api';
+import type { AppsConnectionsOpenArguments } from '@slack/web-api';
+import type { AppsConnectionsOpenResponse } from '@slack/web-api';
+import type { AppsEventAuthorizationsListArguments } from '@slack/web-api';
+import type { AppsEventAuthorizationsListResponse } from '@slack/web-api';
+import type { AppsManifestCreateArguments } from '@slack/web-api';
+import type { AppsManifestCreateResponse } from '@slack/web-api';
+import type { AppsManifestDeleteArguments } from '@slack/web-api';
+import type { AppsManifestDeleteResponse } from '@slack/web-api';
+import type { AppsManifestExportArguments } from '@slack/web-api';
+import type { AppsManifestExportResponse } from '@slack/web-api';
+import type { AppsManifestUpdateArguments } from '@slack/web-api';
+import type { AppsManifestUpdateResponse } from '@slack/web-api';
+import type { AppsManifestValidateArguments } from '@slack/web-api';
+import type { AppsManifestValidateResponse } from '@slack/web-api';
+import type { AppsUninstallArguments } from '@slack/web-api';
+import type { AppsUninstallResponse } from '@slack/web-api';
+import type { AssistantThreadsSetStatusArguments } from '@slack/web-api';
+import type { AssistantThreadsSetStatusResponse } from '@slack/web-api';
+import type { AssistantThreadsSetSuggestedPromptsArguments } from '@slack/web-api';
+import type { AssistantThreadsSetSuggestedPromptsResponse } from '@slack/web-api';
+import type { AssistantThreadsSetTitleArguments } from '@slack/web-api';
+import type { AssistantThreadsSetTitleResponse } from '@slack/web-api';
+import type { AuthRevokeArguments } from '@slack/web-api';
+import type { AuthRevokeResponse } from '@slack/web-api';
+import type { AuthTeamsListArguments } from '@slack/web-api';
+import type { AuthTeamsListResponse } from '@slack/web-api';
+import type { AuthTestArguments } from '@slack/web-api';
+import type { AuthTestResponse } from '@slack/web-api';
+import type { BookmarksAddArguments } from '@slack/web-api';
+import type { BookmarksAddResponse } from '@slack/web-api';
+import type { BookmarksEditArguments } from '@slack/web-api';
+import type { BookmarksEditResponse } from '@slack/web-api';
+import type { BookmarksListArguments } from '@slack/web-api';
+import type { BookmarksListResponse } from '@slack/web-api';
+import type { BookmarksRemoveArguments } from '@slack/web-api';
+import type { BookmarksRemoveResponse } from '@slack/web-api';
+import type { BotsInfoArguments } from '@slack/web-api';
+import type { BotsInfoResponse } from '@slack/web-api';
+import type { CallsAddArguments } from '@slack/web-api';
+import type { CallsAddResponse } from '@slack/web-api';
+import type { CallsEndArguments } from '@slack/web-api';
+import type { CallsEndResponse } from '@slack/web-api';
+import type { CallsInfoArguments } from '@slack/web-api';
+import type { CallsInfoResponse } from '@slack/web-api';
+import type { CallsParticipantsAddArguments } from '@slack/web-api';
+import type { CallsParticipantsAddResponse } from '@slack/web-api';
+import type { CallsParticipantsRemoveArguments } from '@slack/web-api';
+import type { CallsParticipantsRemoveResponse } from '@slack/web-api';
+import type { CallsUpdateArguments } from '@slack/web-api';
+import type { CallsUpdateResponse } from '@slack/web-api';
+import type { CanvasesAccessDeleteArguments } from '@slack/web-api';
+import type { CanvasesAccessDeleteResponse } from '@slack/web-api';
+import type { CanvasesAccessSetArguments } from '@slack/web-api';
+import type { CanvasesAccessSetResponse } from '@slack/web-api';
+import type { CanvasesCreateArguments } from '@slack/web-api';
+import type { CanvasesCreateResponse } from '@slack/web-api';
+import type { CanvasesDeleteArguments } from '@slack/web-api';
+import type { CanvasesDeleteResponse } from '@slack/web-api';
+import type { CanvasesEditArguments } from '@slack/web-api';
+import type { CanvasesEditResponse } from '@slack/web-api';
+import type { CanvasesSectionsLookupArguments } from '@slack/web-api';
+import type { CanvasesSectionsLookupResponse } from '@slack/web-api';
+import type { ChatAppendStreamArguments } from '@slack/web-api';
+import type { ChatAppendStreamResponse } from '@slack/web-api';
 import type { ChatDeleteArguments } from '@slack/web-api';
 import type { ChatDeleteResponse } from '@slack/web-api';
+import type { ChatDeleteScheduledMessageArguments } from '@slack/web-api';
+import type { ChatDeleteScheduledMessageResponse } from '@slack/web-api';
 import type { ChatGetPermalinkArguments } from '@slack/web-api';
 import type { ChatGetPermalinkResponse } from '@slack/web-api';
+import type { ChatMeMessageArguments } from '@slack/web-api';
+import type { ChatMeMessageResponse } from '@slack/web-api';
 import type { ChatPostEphemeralArguments } from '@slack/web-api';
 import type { ChatPostEphemeralResponse } from '@slack/web-api';
 import type { ChatPostMessageArguments } from '@slack/web-api';
 import type { ChatPostMessageResponse } from '@slack/web-api';
+import type { ChatScheduledMessagesListArguments } from '@slack/web-api';
+import type { ChatScheduledMessagesListResponse } from '@slack/web-api';
 import type { ChatScheduleMessageArguments } from '@slack/web-api';
 import type { ChatScheduleMessageResponse } from '@slack/web-api';
+import type { ChatStartStreamArguments } from '@slack/web-api';
+import type { ChatStartStreamResponse } from '@slack/web-api';
+import type { ChatStopStreamArguments } from '@slack/web-api';
+import type { ChatStopStreamResponse } from '@slack/web-api';
+import type { ChatUnfurlArguments } from '@slack/web-api';
+import type { ChatUnfurlResponse } from '@slack/web-api';
 import type { ChatUpdateArguments } from '@slack/web-api';
 import type { ChatUpdateResponse } from '@slack/web-api';
+import type { ConversationsAcceptSharedInviteArguments } from '@slack/web-api';
+import type { ConversationsAcceptSharedInviteResponse } from '@slack/web-api';
+import type { ConversationsApproveSharedInviteArguments } from '@slack/web-api';
+import type { ConversationsApproveSharedInviteResponse } from '@slack/web-api';
+import type { ConversationsArchiveArguments } from '@slack/web-api';
+import type { ConversationsArchiveResponse } from '@slack/web-api';
+import type { ConversationsCanvasesCreateArguments } from '@slack/web-api';
+import type { ConversationsCanvasesCreateResponse } from '@slack/web-api';
+import type { ConversationsCloseArguments } from '@slack/web-api';
+import type { ConversationsCloseResponse } from '@slack/web-api';
 import type { ConversationsCreateArguments } from '@slack/web-api';
 import type { ConversationsCreateResponse } from '@slack/web-api';
+import type { ConversationsDeclineSharedInviteArguments } from '@slack/web-api';
+import type { ConversationsDeclineSharedInviteResponse } from '@slack/web-api';
+import type { ConversationsExternalInvitePermissionsSetArguments } from '@slack/web-api';
+import type { ConversationsExternalInvitePermissionsSetResponse } from '@slack/web-api';
 import type { ConversationsHistoryArguments } from '@slack/web-api';
 import type { ConversationsHistoryResponse } from '@slack/web-api';
 import type { ConversationsInfoArguments } from '@slack/web-api';
 import type { ConversationsInfoResponse } from '@slack/web-api';
 import type { ConversationsInviteArguments } from '@slack/web-api';
 import type { ConversationsInviteResponse } from '@slack/web-api';
+import type { ConversationsInviteSharedArguments } from '@slack/web-api';
+import type { ConversationsInviteSharedResponse } from '@slack/web-api';
+import type { ConversationsJoinArguments } from '@slack/web-api';
+import type { ConversationsJoinResponse } from '@slack/web-api';
+import type { ConversationsKickArguments } from '@slack/web-api';
+import type { ConversationsKickResponse } from '@slack/web-api';
+import type { ConversationsLeaveArguments } from '@slack/web-api';
+import type { ConversationsLeaveResponse } from '@slack/web-api';
 import type { ConversationsListArguments } from '@slack/web-api';
+import type { ConversationsListConnectInvitesArguments } from '@slack/web-api';
+import type { ConversationsListConnectInvitesResponse } from '@slack/web-api';
 import type { ConversationsListResponse } from '@slack/web-api';
+import type { ConversationsMarkArguments } from '@slack/web-api';
+import type { ConversationsMarkResponse } from '@slack/web-api';
 import type { ConversationsMembersArguments } from '@slack/web-api';
 import type { ConversationsMembersResponse } from '@slack/web-api';
 import type { ConversationsOpenArguments } from '@slack/web-api';
 import type { ConversationsOpenResponse } from '@slack/web-api';
+import type { ConversationsRenameArguments } from '@slack/web-api';
+import type { ConversationsRenameResponse } from '@slack/web-api';
 import type { ConversationsRepliesArguments } from '@slack/web-api';
 import type { ConversationsRepliesResponse } from '@slack/web-api';
+import type { ConversationsRequestSharedInviteApproveArguments } from '@slack/web-api';
+import type { ConversationsRequestSharedInviteApproveResponse } from '@slack/web-api';
+import type { ConversationsRequestSharedInviteDenyArguments } from '@slack/web-api';
+import type { ConversationsRequestSharedInviteDenyResponse } from '@slack/web-api';
+import type { ConversationsRequestSharedInviteListArguments } from '@slack/web-api';
+import type { ConversationsRequestSharedInviteListResponse } from '@slack/web-api';
+import type { ConversationsSetPurposeArguments } from '@slack/web-api';
+import type { ConversationsSetPurposeResponse } from '@slack/web-api';
+import type { ConversationsSetTopicArguments } from '@slack/web-api';
+import type { ConversationsSetTopicResponse } from '@slack/web-api';
+import type { ConversationsUnarchiveArguments } from '@slack/web-api';
+import type { ConversationsUnarchiveResponse } from '@slack/web-api';
+import type { DialogOpenArguments } from '@slack/web-api';
+import type { DialogOpenResponse } from '@slack/web-api';
+import type { DndEndDndArguments } from '@slack/web-api';
+import type { DndEndDndResponse } from '@slack/web-api';
+import type { DndEndSnoozeArguments } from '@slack/web-api';
+import type { DndEndSnoozeResponse } from '@slack/web-api';
+import type { DndInfoArguments } from '@slack/web-api';
+import type { DndInfoResponse } from '@slack/web-api';
+import type { DndSetSnoozeArguments } from '@slack/web-api';
+import type { DndSetSnoozeResponse } from '@slack/web-api';
+import type { DndTeamInfoArguments } from '@slack/web-api';
+import type { DndTeamInfoResponse } from '@slack/web-api';
+import type { EmojiListArguments } from '@slack/web-api';
+import type { EmojiListResponse } from '@slack/web-api';
+import type { EntityPresentDetailsArguments } from '@slack/web-api';
+import type { EntityPresentDetailsResponse } from '@slack/web-api';
+import type { FilesCommentsDeleteArguments } from '@slack/web-api';
+import type { FilesCommentsDeleteResponse } from '@slack/web-api';
+import type { FilesCompleteUploadExternalArguments } from '@slack/web-api';
+import type { FilesCompleteUploadExternalResponse } from '@slack/web-api';
 import type { FilesDeleteArguments } from '@slack/web-api';
 import type { FilesDeleteResponse } from '@slack/web-api';
+import type { FilesGetUploadURLExternalArguments } from '@slack/web-api';
+import type { FilesGetUploadURLExternalResponse } from '@slack/web-api';
 import type { FilesInfoArguments } from '@slack/web-api';
 import type { FilesInfoResponse } from '@slack/web-api';
 import type { FilesListArguments } from '@slack/web-api';
 import type { FilesListResponse } from '@slack/web-api';
+import type { FilesRemoteAddArguments } from '@slack/web-api';
+import type { FilesRemoteAddResponse } from '@slack/web-api';
+import type { FilesRemoteInfoArguments } from '@slack/web-api';
+import type { FilesRemoteInfoResponse } from '@slack/web-api';
+import type { FilesRemoteListArguments } from '@slack/web-api';
+import type { FilesRemoteListResponse } from '@slack/web-api';
+import type { FilesRemoteRemoveArguments } from '@slack/web-api';
+import type { FilesRemoteRemoveResponse } from '@slack/web-api';
+import type { FilesRemoteShareArguments } from '@slack/web-api';
+import type { FilesRemoteShareResponse } from '@slack/web-api';
+import type { FilesRemoteUpdateArguments } from '@slack/web-api';
+import type { FilesRemoteUpdateResponse } from '@slack/web-api';
+import type { FilesRevokePublicURLArguments } from '@slack/web-api';
+import type { FilesRevokePublicURLResponse } from '@slack/web-api';
+import type { FilesSharedPublicURLArguments } from '@slack/web-api';
+import type { FilesSharedPublicURLResponse } from '@slack/web-api';
+import type { FilesUploadArguments } from '@slack/web-api';
+import type { FilesUploadResponse } from '@slack/web-api';
+import type { FunctionsCompleteErrorArguments } from '@slack/web-api';
+import type { FunctionsCompleteErrorResponse } from '@slack/web-api';
+import type { FunctionsCompleteSuccessArguments } from '@slack/web-api';
+import type { FunctionsCompleteSuccessResponse } from '@slack/web-api';
+import type { MigrationExchangeArguments } from '@slack/web-api';
+import type { MigrationExchangeResponse } from '@slack/web-api';
+import type { OAuthAccessArguments } from '@slack/web-api';
+import type { OauthAccessResponse } from '@slack/web-api';
+import type { OAuthV2AccessArguments } from '@slack/web-api';
+import type { OauthV2AccessResponse } from '@slack/web-api';
+import type { OAuthV2ExchangeArguments } from '@slack/web-api';
+import type { OauthV2ExchangeResponse } from '@slack/web-api';
+import type { OpenIDConnectTokenArguments } from '@slack/web-api';
+import type { OpenIDConnectTokenResponse } from '@slack/web-api';
+import type { OpenIDConnectUserInfoArguments } from '@slack/web-api';
+import type { OpenIDConnectUserInfoResponse } from '@slack/web-api';
+import type { PinsAddArguments } from '@slack/web-api';
+import type { PinsAddResponse } from '@slack/web-api';
+import type { PinsListArguments } from '@slack/web-api';
+import type { PinsListResponse } from '@slack/web-api';
+import type { PinsRemoveArguments } from '@slack/web-api';
+import type { PinsRemoveResponse } from '@slack/web-api';
 import type { ReactionsAddArguments } from '@slack/web-api';
 import type { ReactionsAddResponse } from '@slack/web-api';
 import type { ReactionsGetArguments } from '@slack/web-api';
@@ -46,15 +416,136 @@ import type { ReactionsListArguments } from '@slack/web-api';
 import type { ReactionsListResponse } from '@slack/web-api';
 import type { ReactionsRemoveArguments } from '@slack/web-api';
 import type { ReactionsRemoveResponse } from '@slack/web-api';
+import type { RemindersAddArguments } from '@slack/web-api';
+import type { RemindersAddResponse } from '@slack/web-api';
+import type { RemindersCompleteArguments } from '@slack/web-api';
+import type { RemindersCompleteResponse } from '@slack/web-api';
+import type { RemindersDeleteArguments } from '@slack/web-api';
+import type { RemindersDeleteResponse } from '@slack/web-api';
+import type { RemindersInfoArguments } from '@slack/web-api';
+import type { RemindersInfoResponse } from '@slack/web-api';
+import type { RemindersListArguments } from '@slack/web-api';
+import type { RemindersListResponse } from '@slack/web-api';
+import type { RTMConnectArguments } from '@slack/web-api';
+import type { RtmConnectResponse } from '@slack/web-api';
+import type { RTMStartArguments } from '@slack/web-api';
+import type { RtmStartResponse } from '@slack/web-api';
+import type { SearchAllArguments } from '@slack/web-api';
+import type { SearchAllResponse } from '@slack/web-api';
+import type { SearchFilesArguments } from '@slack/web-api';
+import type { SearchFilesResponse } from '@slack/web-api';
+import type { SearchMessagesArguments } from '@slack/web-api';
+import type { SearchMessagesResponse } from '@slack/web-api';
+import type { SlackListsAccessDeleteArguments } from '@slack/web-api';
+import type { SlackListsAccessDeleteResponse } from '@slack/web-api';
+import type { SlackListsAccessSetArguments } from '@slack/web-api';
+import type { SlackListsAccessSetResponse } from '@slack/web-api';
+import type { SlackListsCreateArguments } from '@slack/web-api';
+import type { SlackListsCreateResponse } from '@slack/web-api';
+import type { SlackListsDownloadGetArguments } from '@slack/web-api';
+import type { SlackListsDownloadGetResponse } from '@slack/web-api';
+import type { SlackListsDownloadStartArguments } from '@slack/web-api';
+import type { SlackListsDownloadStartResponse } from '@slack/web-api';
+import type { SlackListsItemsCreateArguments } from '@slack/web-api';
+import type { SlackListsItemsCreateResponse } from '@slack/web-api';
+import type { SlackListsItemsDeleteArguments } from '@slack/web-api';
+import type { SlackListsItemsDeleteMultipleArguments } from '@slack/web-api';
+import type { SlackListsItemsDeleteMultipleResponse } from '@slack/web-api';
+import type { SlackListsItemsDeleteResponse } from '@slack/web-api';
+import type { SlackListsItemsInfoArguments } from '@slack/web-api';
+import type { SlackListsItemsInfoResponse } from '@slack/web-api';
+import type { SlackListsItemsListArguments } from '@slack/web-api';
+import type { SlackListsItemsListResponse } from '@slack/web-api';
+import type { SlackListsItemsUpdateArguments } from '@slack/web-api';
+import type { SlackListsItemsUpdateResponse } from '@slack/web-api';
+import type { SlackListsUpdateArguments } from '@slack/web-api';
+import type { SlackListsUpdateResponse } from '@slack/web-api';
+import type { StarsAddRemoveArguments } from '@slack/web-api';
+import type { StarsAddResponse } from '@slack/web-api';
+import type { StarsListArguments } from '@slack/web-api';
+import type { StarsListResponse } from '@slack/web-api';
+import type { StarsRemoveResponse } from '@slack/web-api';
+import type { TeamAccessLogsArguments } from '@slack/web-api';
+import type { TeamAccessLogsResponse } from '@slack/web-api';
+import type { TeamBillableInfoArguments } from '@slack/web-api';
+import type { TeamBillableInfoResponse } from '@slack/web-api';
+import type { TeamBillingInfoArguments } from '@slack/web-api';
+import type { TeamBillingInfoResponse } from '@slack/web-api';
+import type { TeamExternalTeamsDisconnectArguments } from '@slack/web-api';
+import type { TeamExternalTeamsDisconnectResponse } from '@slack/web-api';
+import type { TeamExternalTeamsListArguments } from '@slack/web-api';
+import type { TeamExternalTeamsListResponse } from '@slack/web-api';
+import type { TeamInfoArguments } from '@slack/web-api';
+import type { TeamInfoResponse } from '@slack/web-api';
+import type { TeamIntegrationLogsArguments } from '@slack/web-api';
+import type { TeamIntegrationLogsResponse } from '@slack/web-api';
+import type { TeamPreferencesListArguments } from '@slack/web-api';
+import type { TeamPreferencesListResponse } from '@slack/web-api';
+import type { TeamProfileGetArguments } from '@slack/web-api';
+import type { TeamProfileGetResponse } from '@slack/web-api';
+import type { ToolingTokensRotateArguments } from '@slack/web-api';
+import type { ToolingTokensRotateResponse } from '@slack/web-api';
+import type { UsergroupsCreateArguments } from '@slack/web-api';
+import type { UsergroupsCreateResponse } from '@slack/web-api';
+import type { UsergroupsDisableArguments } from '@slack/web-api';
+import type { UsergroupsDisableResponse } from '@slack/web-api';
+import type { UsergroupsEnableArguments } from '@slack/web-api';
+import type { UsergroupsEnableResponse } from '@slack/web-api';
+import type { UsergroupsListArguments } from '@slack/web-api';
+import type { UsergroupsListResponse } from '@slack/web-api';
+import type { UsergroupsUpdateArguments } from '@slack/web-api';
+import type { UsergroupsUpdateResponse } from '@slack/web-api';
+import type { UsergroupsUsersListArguments } from '@slack/web-api';
+import type { UsergroupsUsersListResponse } from '@slack/web-api';
+import type { UsergroupsUsersUpdateArguments } from '@slack/web-api';
+import type { UsergroupsUsersUpdateResponse } from '@slack/web-api';
 import type { UsersConversationsArguments } from '@slack/web-api';
 import type { UsersConversationsResponse } from '@slack/web-api';
+import type { UsersDeletePhotoArguments } from '@slack/web-api';
+import type { UsersDeletePhotoResponse } from '@slack/web-api';
+import type { UsersDiscoverableContactsLookupArguments } from '@slack/web-api';
+import type { UsersDiscoverableContactsLookupResponse } from '@slack/web-api';
+import type { UsersGetPresenceArguments } from '@slack/web-api';
+import type { UsersGetPresenceResponse } from '@slack/web-api';
+import type { UsersIdentityArguments } from '@slack/web-api';
+import type { UsersIdentityResponse } from '@slack/web-api';
 import type { UsersInfoArguments } from '@slack/web-api';
 import type { UsersInfoResponse } from '@slack/web-api';
 import type { UsersListArguments } from '@slack/web-api';
 import type { UsersListResponse } from '@slack/web-api';
 import type { UsersLookupByEmailArguments } from '@slack/web-api';
 import type { UsersLookupByEmailResponse } from '@slack/web-api';
+import type { UsersProfileGetArguments } from '@slack/web-api';
+import type { UsersProfileGetResponse } from '@slack/web-api';
+import type { UsersProfileSetArguments } from '@slack/web-api';
+import type { UsersProfileSetResponse } from '@slack/web-api';
+import type { UsersSetPhotoArguments } from '@slack/web-api';
+import type { UsersSetPhotoResponse } from '@slack/web-api';
+import type { UsersSetPresenceArguments } from '@slack/web-api';
+import type { UsersSetPresenceResponse } from '@slack/web-api';
+import type { ViewsOpenArguments } from '@slack/web-api';
+import type { ViewsOpenResponse } from '@slack/web-api';
+import type { ViewsPublishArguments } from '@slack/web-api';
+import type { ViewsPublishResponse } from '@slack/web-api';
+import type { ViewsPushArguments } from '@slack/web-api';
+import type { ViewsPushResponse } from '@slack/web-api';
+import type { ViewsUpdateArguments } from '@slack/web-api';
+import type { ViewsUpdateResponse } from '@slack/web-api';
 import type { WebClient } from '@slack/web-api';
+import type { WorkflowsFeaturedAddArguments } from '@slack/web-api';
+import type { WorkflowsFeaturedAddResponse } from '@slack/web-api';
+import type { WorkflowsFeaturedListArguments } from '@slack/web-api';
+import type { WorkflowsFeaturedListResponse } from '@slack/web-api';
+import type { WorkflowsFeaturedRemoveArguments } from '@slack/web-api';
+import type { WorkflowsFeaturedRemoveResponse } from '@slack/web-api';
+import type { WorkflowsFeaturedSetArguments } from '@slack/web-api';
+import type { WorkflowsFeaturedSetResponse } from '@slack/web-api';
+import type { WorkflowsStepCompletedArguments } from '@slack/web-api';
+import type { WorkflowsStepCompletedResponse } from '@slack/web-api';
+import type { WorkflowsStepFailedArguments } from '@slack/web-api';
+import type { WorkflowsStepFailedResponse } from '@slack/web-api';
+import type { WorkflowsUpdateStepArguments } from '@slack/web-api';
+import type { WorkflowsUpdateStepResponse } from '@slack/web-api';
 
 // @public
 export interface ClientHandlerOptions {
@@ -69,7 +560,7 @@ export interface ClientHandlerOptions {
 // @public
 export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter;
 
-// @public
+// @public (undocumented)
 export function createSlackInterpreter(client: SlackClient): Interpreter;
 
 // Warning: (ae-forgotten-export) The symbol "TypedNode" needs to be exported by the entry point index.d.ts
@@ -83,59 +574,74 @@ export function serverInterpreter(client: SlackClient): Interpreter;
 // Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function slack(config: SlackConfig): PluginDefinition<SlackMethods, {}, "slack/chat_postMessage" | "slack/chat_update" | "slack/chat_delete" | "slack/chat_postEphemeral" | "slack/chat_scheduleMessage" | "slack/chat_getPermalink" | "slack/conversations_list" | "slack/conversations_info" | "slack/conversations_create" | "slack/conversations_invite" | "slack/conversations_history" | "slack/conversations_members" | "slack/conversations_open" | "slack/conversations_replies" | "slack/users_info" | "slack/users_list" | "slack/users_lookupByEmail" | "slack/users_conversations" | "slack/reactions_add" | "slack/reactions_get" | "slack/reactions_list" | "slack/reactions_remove" | "slack/files_list" | "slack/files_info" | "slack/files_delete">;
+export function slack(config: SlackConfig): PluginDefinition<SlackMethods, {}, "slack/admin_analytics_getFile" | "slack/admin_apps_activities_list" | "slack/admin_apps_approve" | "slack/admin_apps_approved_list" | "slack/admin_apps_clearResolution" | "slack/admin_apps_config_lookup" | "slack/admin_apps_config_set" | "slack/admin_apps_requests_cancel" | "slack/admin_apps_requests_list" | "slack/admin_apps_restrict" | "slack/admin_apps_restricted_list" | "slack/admin_apps_uninstall" | "slack/admin_auth_policy_assignEntities" | "slack/admin_auth_policy_getEntities" | "slack/admin_auth_policy_removeEntities" | "slack/admin_barriers_create" | "slack/admin_barriers_delete" | "slack/admin_barriers_list" | "slack/admin_barriers_update" | "slack/admin_conversations_archive" | "slack/admin_conversations_bulkArchive" | "slack/admin_conversations_bulkDelete" | "slack/admin_conversations_bulkMove" | "slack/admin_conversations_convertToPrivate" | "slack/admin_conversations_convertToPublic" | "slack/admin_conversations_create" | "slack/admin_conversations_delete" | "slack/admin_conversations_disconnectShared" | "slack/admin_conversations_ekm_listOriginalConnectedChannelInfo" | "slack/admin_conversations_getConversationPrefs" | "slack/admin_conversations_getCustomRetention" | "slack/admin_conversations_getTeams" | "slack/admin_conversations_invite" | "slack/admin_conversations_lookup" | "slack/admin_conversations_removeCustomRetention" | "slack/admin_conversations_rename" | "slack/admin_conversations_restrictAccess_addGroup" | "slack/admin_conversations_restrictAccess_listGroups" | "slack/admin_conversations_restrictAccess_removeGroup" | "slack/admin_conversations_search" | "slack/admin_conversations_setConversationPrefs" | "slack/admin_conversations_setCustomRetention" | "slack/admin_conversations_setTeams" | "slack/admin_conversations_unarchive" | "slack/admin_emoji_add" | "slack/admin_emoji_addAlias" | "slack/admin_emoji_list" | "slack/admin_emoji_remove" | "slack/admin_emoji_rename" | "slack/admin_functions_list" | "slack/admin_functions_permissions_lookup" | "slack/admin_functions_permissions_set" | "slack/admin_inviteRequests_approve" | "slack/admin_inviteRequests_approved_list" | "slack/admin_inviteRequests_denied_list" | "slack/admin_inviteRequests_deny" | "slack/admin_inviteRequests_list" | "slack/admin_roles_addAssignments" | "slack/admin_roles_listAssignments" | "slack/admin_roles_removeAssignments" | "slack/admin_teams_admins_list" | "slack/admin_teams_create" | "slack/admin_teams_list" | "slack/admin_teams_owners_list" | "slack/admin_teams_settings_info" | "slack/admin_teams_settings_setDefaultChannels" | "slack/admin_teams_settings_setDescription" | "slack/admin_teams_settings_setDiscoverability" | "slack/admin_teams_settings_setIcon" | "slack/admin_teams_settings_setName" | "slack/admin_usergroups_addChannels" | "slack/admin_usergroups_addTeams" | "slack/admin_usergroups_listChannels" | "slack/admin_usergroups_removeChannels" | "slack/admin_users_assign" | "slack/admin_users_invite" | "slack/admin_users_list" | "slack/admin_users_remove" | "slack/admin_users_session_clearSettings" | "slack/admin_users_session_getSettings" | "slack/admin_users_session_invalidate" | "slack/admin_users_session_list" | "slack/admin_users_session_reset" | "slack/admin_users_session_resetBulk" | "slack/admin_users_session_setSettings" | "slack/admin_users_setAdmin" | "slack/admin_users_setExpiration" | "slack/admin_users_setOwner" | "slack/admin_users_setRegular" | "slack/admin_users_unsupportedVersions_export" | "slack/admin_workflows_collaborators_add" | "slack/admin_workflows_collaborators_remove" | "slack/admin_workflows_permissions_lookup" | "slack/admin_workflows_search" | "slack/admin_workflows_unpublish" | "slack/api_test" | "slack/apps_connections_open" | "slack/apps_event_authorizations_list" | "slack/apps_manifest_create" | "slack/apps_manifest_delete" | "slack/apps_manifest_export" | "slack/apps_manifest_update" | "slack/apps_manifest_validate" | "slack/apps_uninstall" | "slack/assistant_threads_setStatus" | "slack/assistant_threads_setSuggestedPrompts" | "slack/assistant_threads_setTitle" | "slack/auth_revoke" | "slack/auth_teams_list" | "slack/auth_test" | "slack/bookmarks_add" | "slack/bookmarks_edit" | "slack/bookmarks_list" | "slack/bookmarks_remove" | "slack/bots_info" | "slack/calls_add" | "slack/calls_end" | "slack/calls_info" | "slack/calls_update" | "slack/calls_participants_add" | "slack/calls_participants_remove" | "slack/canvases_access_delete" | "slack/canvases_access_set" | "slack/canvases_create" | "slack/canvases_delete" | "slack/canvases_edit" | "slack/canvases_sections_lookup" | "slack/chat_appendStream" | "slack/chat_delete" | "slack/chat_deleteScheduledMessage" | "slack/chat_getPermalink" | "slack/chat_meMessage" | "slack/chat_postEphemeral" | "slack/chat_postMessage" | "slack/chat_scheduleMessage" | "slack/chat_scheduledMessages_list" | "slack/chat_startStream" | "slack/chat_stopStream" | "slack/chat_unfurl" | "slack/chat_update" | "slack/conversations_acceptSharedInvite" | "slack/conversations_approveSharedInvite" | "slack/conversations_archive" | "slack/conversations_canvases_create" | "slack/conversations_close" | "slack/conversations_create" | "slack/conversations_declineSharedInvite" | "slack/conversations_externalInvitePermissions_set" | "slack/conversations_history" | "slack/conversations_info" | "slack/conversations_invite" | "slack/conversations_inviteShared" | "slack/conversations_join" | "slack/conversations_kick" | "slack/conversations_leave" | "slack/conversations_list" | "slack/conversations_listConnectInvites" | "slack/conversations_mark" | "slack/conversations_members" | "slack/conversations_open" | "slack/conversations_rename" | "slack/conversations_replies" | "slack/conversations_requestSharedInvite_approve" | "slack/conversations_requestSharedInvite_deny" | "slack/conversations_requestSharedInvite_list" | "slack/conversations_setPurpose" | "slack/conversations_setTopic" | "slack/conversations_unarchive" | "slack/dialog_open" | "slack/dnd_endDnd" | "slack/dnd_endSnooze" | "slack/dnd_info" | "slack/dnd_setSnooze" | "slack/dnd_teamInfo" | "slack/emoji_list" | "slack/entity_presentDetails" | "slack/files_completeUploadExternal" | "slack/files_delete" | "slack/files_getUploadURLExternal" | "slack/files_info" | "slack/files_list" | "slack/files_revokePublicURL" | "slack/files_sharedPublicURL" | "slack/files_upload" | "slack/files_comments_delete" | "slack/files_remote_add" | "slack/files_remote_info" | "slack/files_remote_list" | "slack/files_remote_remove" | "slack/files_remote_share" | "slack/files_remote_update" | "slack/functions_completeError" | "slack/functions_completeSuccess" | "slack/migration_exchange" | "slack/oauth_access" | "slack/oauth_v2_access" | "slack/oauth_v2_exchange" | "slack/openid_connect_token" | "slack/openid_connect_userInfo" | "slack/pins_add" | "slack/pins_list" | "slack/pins_remove" | "slack/reactions_add" | "slack/reactions_get" | "slack/reactions_list" | "slack/reactions_remove" | "slack/reminders_add" | "slack/reminders_complete" | "slack/reminders_delete" | "slack/reminders_info" | "slack/reminders_list" | "slack/rtm_connect" | "slack/rtm_start" | "slack/search_all" | "slack/search_files" | "slack/search_messages" | "slack/slackLists_access_delete" | "slack/slackLists_access_set" | "slack/slackLists_create" | "slack/slackLists_download_get" | "slack/slackLists_download_start" | "slack/slackLists_items_create" | "slack/slackLists_items_delete" | "slack/slackLists_items_deleteMultiple" | "slack/slackLists_items_info" | "slack/slackLists_items_list" | "slack/slackLists_items_update" | "slack/slackLists_update" | "slack/stars_add" | "slack/stars_list" | "slack/stars_remove" | "slack/team_accessLogs" | "slack/team_billableInfo" | "slack/team_billing_info" | "slack/team_externalTeams_disconnect" | "slack/team_externalTeams_list" | "slack/team_info" | "slack/team_integrationLogs" | "slack/team_preferences_list" | "slack/team_profile_get" | "slack/tooling_tokens_rotate" | "slack/usergroups_create" | "slack/usergroups_disable" | "slack/usergroups_enable" | "slack/usergroups_list" | "slack/usergroups_update" | "slack/usergroups_users_list" | "slack/usergroups_users_update" | "slack/users_conversations" | "slack/users_deletePhoto" | "slack/users_discoverableContacts_lookup" | "slack/users_getPresence" | "slack/users_identity" | "slack/users_info" | "slack/users_list" | "slack/users_lookupByEmail" | "slack/users_setPhoto" | "slack/users_setPresence" | "slack/users_profile_get" | "slack/users_profile_set" | "slack/views_open" | "slack/views_publish" | "slack/views_push" | "slack/views_update" | "slack/workflows_featured_add" | "slack/workflows_featured_list" | "slack/workflows_featured_remove" | "slack/workflows_featured_set" | "slack/workflows_stepCompleted" | "slack/workflows_stepFailed" | "slack/workflows_updateStep">;
 
-// @public
+// @public (undocumented)
 export interface SlackClient {
+    // (undocumented)
     apiCall(method: string, params?: Record<string, unknown>): Promise<unknown>;
 }
 
-// @public
+// @public (undocumented)
 export interface SlackConfig {
+    // (undocumented)
     token: string;
 }
 
 // @public
 export const slackInterpreter: Interpreter;
 
-// @public
+// @public (undocumented)
 export interface SlackMethods {
+    // (undocumented)
     slack: {
-        chat: {
-            postMessage(params: SlackParams<ChatPostMessageArguments>): Expr<ChatPostMessageResponse>;
-            update(params: SlackParams<ChatUpdateArguments>): Expr<ChatUpdateResponse>;
-            delete(params: SlackParams<ChatDeleteArguments>): Expr<ChatDeleteResponse>;
-            postEphemeral(params: SlackParams<ChatPostEphemeralArguments>): Expr<ChatPostEphemeralResponse>;
-            scheduleMessage(params: SlackParams<ChatScheduleMessageArguments>): Expr<ChatScheduleMessageResponse>;
-            getPermalink(params: SlackParams<ChatGetPermalinkArguments>): Expr<ChatGetPermalinkResponse>;
+        admin: {
+            analytics: SlackMethodsAdminAnalytics;
+            apps: SlackMethodsAdminApps;
+            auth: SlackMethodsAdminAuth;
+            barriers: SlackMethodsAdminBarriers;
+            conversations: SlackMethodsAdminConversations;
+            emoji: SlackMethodsAdminEmoji;
+            functions: SlackMethodsAdminFunctions;
+            inviteRequests: SlackMethodsAdminInviteRequests;
+            roles: SlackMethodsAdminRoles;
+            teams: SlackMethodsAdminTeams;
+            usergroups: SlackMethodsAdminUsergroups;
+            users: SlackMethodsAdminUsers;
+            workflows: SlackMethodsAdminWorkflows;
         };
-        conversations: {
-            list(params?: SlackParams<ConversationsListArguments>): Expr<ConversationsListResponse>;
-            info(params: SlackParams<ConversationsInfoArguments>): Expr<ConversationsInfoResponse>;
-            create(params: SlackParams<ConversationsCreateArguments>): Expr<ConversationsCreateResponse>;
-            invite(params: SlackParams<ConversationsInviteArguments>): Expr<ConversationsInviteResponse>;
-            history(params: SlackParams<ConversationsHistoryArguments>): Expr<ConversationsHistoryResponse>;
-            members(params: SlackParams<ConversationsMembersArguments>): Expr<ConversationsMembersResponse>;
-            open(params: SlackParams<ConversationsOpenArguments>): Expr<ConversationsOpenResponse>;
-            replies(params: SlackParams<ConversationsRepliesArguments>): Expr<ConversationsRepliesResponse>;
-        };
-        users: {
-            info(params: SlackParams<UsersInfoArguments>): Expr<UsersInfoResponse>;
-            list(params?: SlackParams<UsersListArguments>): Expr<UsersListResponse>;
-            lookupByEmail(params: SlackParams<UsersLookupByEmailArguments>): Expr<UsersLookupByEmailResponse>;
-            conversations(params: SlackParams<UsersConversationsArguments>): Expr<UsersConversationsResponse>;
-        };
-        reactions: {
-            add(params: SlackParams<ReactionsAddArguments>): Expr<ReactionsAddResponse>;
-            get(params: SlackParams<ReactionsGetArguments>): Expr<ReactionsGetResponse>;
-            list(params?: SlackParams<ReactionsListArguments>): Expr<ReactionsListResponse>;
-            remove(params: SlackParams<ReactionsRemoveArguments>): Expr<ReactionsRemoveResponse>;
-        };
-        files: {
-            list(params?: SlackParams<FilesListArguments>): Expr<FilesListResponse>;
-            info(params: SlackParams<FilesInfoArguments>): Expr<FilesInfoResponse>;
-            delete(params: SlackParams<FilesDeleteArguments>): Expr<FilesDeleteResponse>;
-        };
+        api: SlackMethodsApi;
+        apps: SlackMethodsApps;
+        assistant: SlackMethodsAssistant;
+        auth: SlackMethodsAuth;
+        bookmarks: SlackMethodsBookmarks;
+        bots: SlackMethodsBots;
+        calls: SlackMethodsCalls;
+        canvases: SlackMethodsCanvases;
+        chat: SlackMethodsChat;
+        conversations: SlackMethodsConversations;
+        dialog: SlackMethodsDialog;
+        dnd: SlackMethodsDnd;
+        emoji: SlackMethodsEmoji;
+        entity: SlackMethodsEntity;
+        files: SlackMethodsFiles;
+        functions: SlackMethodsFunctions;
+        migration: SlackMethodsMigration;
+        oauth: SlackMethodsOauth;
+        openid: SlackMethodsOpenid;
+        pins: SlackMethodsPins;
+        reactions: SlackMethodsReactions;
+        reminders: SlackMethodsReminders;
+        rtm: SlackMethodsRtm;
+        search: SlackMethodsSearch;
+        slackLists: SlackMethodsSlackLists;
+        stars: SlackMethodsStars;
+        team: SlackMethodsTeam;
+        tooling: SlackMethodsTooling;
+        usergroups: SlackMethodsUsergroups;
+        users: SlackMethodsUsers;
+        views: SlackMethodsViews;
+        workflows: SlackMethodsWorkflows;
     };
 }
 
@@ -144,8 +650,51 @@ export function wrapSlackWebClient(client: WebClient): SlackClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/7.14.0/types.d.ts:20:13 - (ae-forgotten-export) The symbol "SlackParams" needs to be exported by the entry point index.d.ts
-// dist/7.14.0/types.d.ts:20:13 - (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:103:13 - (ae-forgotten-export) The symbol "SlackMethodsAdminAnalytics" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:104:13 - (ae-forgotten-export) The symbol "SlackMethodsAdminApps" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:105:13 - (ae-forgotten-export) The symbol "SlackMethodsAdminAuth" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:106:13 - (ae-forgotten-export) The symbol "SlackMethodsAdminBarriers" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:107:13 - (ae-forgotten-export) The symbol "SlackMethodsAdminConversations" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:108:13 - (ae-forgotten-export) The symbol "SlackMethodsAdminEmoji" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:109:13 - (ae-forgotten-export) The symbol "SlackMethodsAdminFunctions" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:110:13 - (ae-forgotten-export) The symbol "SlackMethodsAdminInviteRequests" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:111:13 - (ae-forgotten-export) The symbol "SlackMethodsAdminRoles" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:112:13 - (ae-forgotten-export) The symbol "SlackMethodsAdminTeams" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:113:13 - (ae-forgotten-export) The symbol "SlackMethodsAdminUsergroups" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:114:13 - (ae-forgotten-export) The symbol "SlackMethodsAdminUsers" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:115:13 - (ae-forgotten-export) The symbol "SlackMethodsAdminWorkflows" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:117:9 - (ae-forgotten-export) The symbol "SlackMethodsApi" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:118:9 - (ae-forgotten-export) The symbol "SlackMethodsApps" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:119:9 - (ae-forgotten-export) The symbol "SlackMethodsAssistant" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:120:9 - (ae-forgotten-export) The symbol "SlackMethodsAuth" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:121:9 - (ae-forgotten-export) The symbol "SlackMethodsBookmarks" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:122:9 - (ae-forgotten-export) The symbol "SlackMethodsBots" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:123:9 - (ae-forgotten-export) The symbol "SlackMethodsCalls" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:124:9 - (ae-forgotten-export) The symbol "SlackMethodsCanvases" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:125:9 - (ae-forgotten-export) The symbol "SlackMethodsChat" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:126:9 - (ae-forgotten-export) The symbol "SlackMethodsConversations" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:127:9 - (ae-forgotten-export) The symbol "SlackMethodsDialog" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:128:9 - (ae-forgotten-export) The symbol "SlackMethodsDnd" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:129:9 - (ae-forgotten-export) The symbol "SlackMethodsEmoji" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:130:9 - (ae-forgotten-export) The symbol "SlackMethodsEntity" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:131:9 - (ae-forgotten-export) The symbol "SlackMethodsFiles" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:132:9 - (ae-forgotten-export) The symbol "SlackMethodsFunctions" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:133:9 - (ae-forgotten-export) The symbol "SlackMethodsMigration" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:134:9 - (ae-forgotten-export) The symbol "SlackMethodsOauth" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:135:9 - (ae-forgotten-export) The symbol "SlackMethodsOpenid" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:136:9 - (ae-forgotten-export) The symbol "SlackMethodsPins" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:137:9 - (ae-forgotten-export) The symbol "SlackMethodsReactions" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:138:9 - (ae-forgotten-export) The symbol "SlackMethodsReminders" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:139:9 - (ae-forgotten-export) The symbol "SlackMethodsRtm" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:140:9 - (ae-forgotten-export) The symbol "SlackMethodsSearch" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:141:9 - (ae-forgotten-export) The symbol "SlackMethodsSlackLists" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:142:9 - (ae-forgotten-export) The symbol "SlackMethodsStars" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:143:9 - (ae-forgotten-export) The symbol "SlackMethodsTeam" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:144:9 - (ae-forgotten-export) The symbol "SlackMethodsTooling" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:145:9 - (ae-forgotten-export) The symbol "SlackMethodsUsergroups" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:146:9 - (ae-forgotten-export) The symbol "SlackMethodsUsers" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:147:9 - (ae-forgotten-export) The symbol "SlackMethodsViews" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/generated/types.d.ts:148:9 - (ae-forgotten-export) The symbol "SlackMethodsWorkflows" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

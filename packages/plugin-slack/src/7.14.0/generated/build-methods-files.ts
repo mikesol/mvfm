@@ -5,12 +5,16 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsFiles } from "./types-files";
 
 export function buildSlackFiles(ctx: PluginContext, config: SlackConfig): SlackMethodsFiles {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     comments: {
       delete(params) {
-        return ctx.expr({ kind: "slack/files_comments_delete", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/files_comments_delete",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     remote: {
@@ -24,23 +28,43 @@ export function buildSlackFiles(ctx: PluginContext, config: SlackConfig): SlackM
         return ctx.expr({ kind: "slack/files_remote_list", params: resolveParams(params), config });
       },
       remove(params) {
-        return ctx.expr({ kind: "slack/files_remote_remove", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/files_remote_remove",
+          params: resolveParams(params),
+          config,
+        });
       },
       share(params) {
-        return ctx.expr({ kind: "slack/files_remote_share", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/files_remote_share",
+          params: resolveParams(params),
+          config,
+        });
       },
       update(params) {
-        return ctx.expr({ kind: "slack/files_remote_update", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/files_remote_update",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     completeUploadExternal(params) {
-      return ctx.expr({ kind: "slack/files_completeUploadExternal", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/files_completeUploadExternal",
+        params: resolveParams(params),
+        config,
+      });
     },
     delete(params) {
       return ctx.expr({ kind: "slack/files_delete", params: resolveParams(params), config });
     },
     getUploadURLExternal(params) {
-      return ctx.expr({ kind: "slack/files_getUploadURLExternal", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/files_getUploadURLExternal",
+        params: resolveParams(params),
+        config,
+      });
     },
     info(params) {
       return ctx.expr({ kind: "slack/files_info", params: resolveParams(params), config });
@@ -49,10 +73,18 @@ export function buildSlackFiles(ctx: PluginContext, config: SlackConfig): SlackM
       return ctx.expr({ kind: "slack/files_list", params: resolveParams(params), config });
     },
     revokePublicURL(params) {
-      return ctx.expr({ kind: "slack/files_revokePublicURL", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/files_revokePublicURL",
+        params: resolveParams(params),
+        config,
+      });
     },
     sharedPublicURL(params) {
-      return ctx.expr({ kind: "slack/files_sharedPublicURL", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/files_sharedPublicURL",
+        params: resolveParams(params),
+        config,
+      });
     },
     upload(params) {
       return ctx.expr({ kind: "slack/files_upload", params: resolveParams(params), config });

@@ -5,12 +5,16 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsTooling } from "./types-tooling";
 
 export function buildSlackTooling(ctx: PluginContext, config: SlackConfig): SlackMethodsTooling {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     tokens: {
       rotate(params) {
-        return ctx.expr({ kind: "slack/tooling_tokens_rotate", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/tooling_tokens_rotate",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
   };

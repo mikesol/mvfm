@@ -31,7 +31,9 @@ import type { SlackParams } from "./types";
 
 export interface SlackMethodsUsers {
   discoverableContacts: {
-    lookup(params: SlackParams<UsersDiscoverableContactsLookupArguments>): Expr<UsersDiscoverableContactsLookupResponse>;
+    lookup(
+      params: SlackParams<UsersDiscoverableContactsLookupArguments>,
+    ): Expr<UsersDiscoverableContactsLookupResponse>;
   };
   profile: {
     get(params: SlackParams<UsersProfileGetArguments>): Expr<UsersProfileGetResponse>;

@@ -13,8 +13,12 @@ import type { SlackParams } from "./types";
 
 export interface SlackMethodsAdminFunctions {
   permissions: {
-    lookup(params: SlackParams<AdminFunctionsPermissionsLookupArguments>): Expr<AdminFunctionsPermissionsLookupResponse>;
-    set(params: SlackParams<AdminFunctionsPermissionsSetArguments>): Expr<AdminFunctionsPermissionsSetResponse>;
+    lookup(
+      params: SlackParams<AdminFunctionsPermissionsLookupArguments>,
+    ): Expr<AdminFunctionsPermissionsLookupResponse>;
+    set(
+      params: SlackParams<AdminFunctionsPermissionsSetArguments>,
+    ): Expr<AdminFunctionsPermissionsSetResponse>;
   };
   list(params: SlackParams<AdminFunctionsListArguments>): Expr<AdminFunctionsListResponse>;
 }

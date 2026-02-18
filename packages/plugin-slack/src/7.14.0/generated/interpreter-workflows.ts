@@ -6,19 +6,27 @@ import type { SLACK_NODE_KINDS_WORKFLOWS } from "./node-kinds-workflows";
 
 type SlackWorkflowsKind = (typeof SLACK_NODE_KINDS_WORKFLOWS)[number];
 
-interface SlackWorkflowsBaseNode<K extends SlackWorkflowsKind = SlackWorkflowsKind> extends TypedNode<unknown> {
+interface SlackWorkflowsBaseNode<K extends SlackWorkflowsKind = SlackWorkflowsKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackWorkflowsFeaturedAddNode extends SlackWorkflowsBaseNode<"slack/workflows_featured_add"> {}
-export interface SlackWorkflowsFeaturedListNode extends SlackWorkflowsBaseNode<"slack/workflows_featured_list"> {}
-export interface SlackWorkflowsFeaturedRemoveNode extends SlackWorkflowsBaseNode<"slack/workflows_featured_remove"> {}
-export interface SlackWorkflowsFeaturedSetNode extends SlackWorkflowsBaseNode<"slack/workflows_featured_set"> {}
-export interface SlackWorkflowsStepCompletedNode extends SlackWorkflowsBaseNode<"slack/workflows_stepCompleted"> {}
-export interface SlackWorkflowsStepFailedNode extends SlackWorkflowsBaseNode<"slack/workflows_stepFailed"> {}
-export interface SlackWorkflowsUpdateStepNode extends SlackWorkflowsBaseNode<"slack/workflows_updateStep"> {}
+export interface SlackWorkflowsFeaturedAddNode
+  extends SlackWorkflowsBaseNode<"slack/workflows_featured_add"> {}
+export interface SlackWorkflowsFeaturedListNode
+  extends SlackWorkflowsBaseNode<"slack/workflows_featured_list"> {}
+export interface SlackWorkflowsFeaturedRemoveNode
+  extends SlackWorkflowsBaseNode<"slack/workflows_featured_remove"> {}
+export interface SlackWorkflowsFeaturedSetNode
+  extends SlackWorkflowsBaseNode<"slack/workflows_featured_set"> {}
+export interface SlackWorkflowsStepCompletedNode
+  extends SlackWorkflowsBaseNode<"slack/workflows_stepCompleted"> {}
+export interface SlackWorkflowsStepFailedNode
+  extends SlackWorkflowsBaseNode<"slack/workflows_stepFailed"> {}
+export interface SlackWorkflowsUpdateStepNode
+  extends SlackWorkflowsBaseNode<"slack/workflows_updateStep"> {}
 
 export const NODE_TO_METHOD_WORKFLOWS: Record<string, string> = {
   "slack/workflows_featured_add": "workflows.featured.add",
@@ -55,12 +63,26 @@ export function createSlackWorkflowsInterpreter(client: SlackClientLike): Interp
   };
 
   return defineInterpreter<SlackWorkflowsKind>()({
-    "slack/workflows_featured_add": async function* (node: SlackWorkflowsFeaturedAddNode) { return yield* handler(node); },
-    "slack/workflows_featured_list": async function* (node: SlackWorkflowsFeaturedListNode) { return yield* handler(node); },
-    "slack/workflows_featured_remove": async function* (node: SlackWorkflowsFeaturedRemoveNode) { return yield* handler(node); },
-    "slack/workflows_featured_set": async function* (node: SlackWorkflowsFeaturedSetNode) { return yield* handler(node); },
-    "slack/workflows_stepCompleted": async function* (node: SlackWorkflowsStepCompletedNode) { return yield* handler(node); },
-    "slack/workflows_stepFailed": async function* (node: SlackWorkflowsStepFailedNode) { return yield* handler(node); },
-    "slack/workflows_updateStep": async function* (node: SlackWorkflowsUpdateStepNode) { return yield* handler(node); },
+    "slack/workflows_featured_add": async function* (node: SlackWorkflowsFeaturedAddNode) {
+      return yield* handler(node);
+    },
+    "slack/workflows_featured_list": async function* (node: SlackWorkflowsFeaturedListNode) {
+      return yield* handler(node);
+    },
+    "slack/workflows_featured_remove": async function* (node: SlackWorkflowsFeaturedRemoveNode) {
+      return yield* handler(node);
+    },
+    "slack/workflows_featured_set": async function* (node: SlackWorkflowsFeaturedSetNode) {
+      return yield* handler(node);
+    },
+    "slack/workflows_stepCompleted": async function* (node: SlackWorkflowsStepCompletedNode) {
+      return yield* handler(node);
+    },
+    "slack/workflows_stepFailed": async function* (node: SlackWorkflowsStepFailedNode) {
+      return yield* handler(node);
+    },
+    "slack/workflows_updateStep": async function* (node: SlackWorkflowsUpdateStepNode) {
+      return yield* handler(node);
+    },
   });
 }

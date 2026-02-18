@@ -16,10 +16,10 @@ import type {
   ChatPostEphemeralResponse,
   ChatPostMessageArguments,
   ChatPostMessageResponse,
-  ChatScheduleMessageArguments,
-  ChatScheduleMessageResponse,
   ChatScheduledMessagesListArguments,
   ChatScheduledMessagesListResponse,
+  ChatScheduleMessageArguments,
+  ChatScheduleMessageResponse,
   ChatStartStreamArguments,
   ChatStartStreamResponse,
   ChatStopStreamArguments,
@@ -33,16 +33,22 @@ import type { SlackParams } from "./types";
 
 export interface SlackMethodsChat {
   scheduledMessages: {
-    list(params?: SlackParams<ChatScheduledMessagesListArguments>): Expr<ChatScheduledMessagesListResponse>;
+    list(
+      params?: SlackParams<ChatScheduledMessagesListArguments>,
+    ): Expr<ChatScheduledMessagesListResponse>;
   };
   appendStream(params: SlackParams<ChatAppendStreamArguments>): Expr<ChatAppendStreamResponse>;
   delete(params: SlackParams<ChatDeleteArguments>): Expr<ChatDeleteResponse>;
-  deleteScheduledMessage(params: SlackParams<ChatDeleteScheduledMessageArguments>): Expr<ChatDeleteScheduledMessageResponse>;
+  deleteScheduledMessage(
+    params: SlackParams<ChatDeleteScheduledMessageArguments>,
+  ): Expr<ChatDeleteScheduledMessageResponse>;
   getPermalink(params: SlackParams<ChatGetPermalinkArguments>): Expr<ChatGetPermalinkResponse>;
   meMessage(params: SlackParams<ChatMeMessageArguments>): Expr<ChatMeMessageResponse>;
   postEphemeral(params: SlackParams<ChatPostEphemeralArguments>): Expr<ChatPostEphemeralResponse>;
   postMessage(params: SlackParams<ChatPostMessageArguments>): Expr<ChatPostMessageResponse>;
-  scheduleMessage(params: SlackParams<ChatScheduleMessageArguments>): Expr<ChatScheduleMessageResponse>;
+  scheduleMessage(
+    params: SlackParams<ChatScheduleMessageArguments>,
+  ): Expr<ChatScheduleMessageResponse>;
   startStream(params: SlackParams<ChatStartStreamArguments>): Expr<ChatStartStreamResponse>;
   stopStream(params: SlackParams<ChatStopStreamArguments>): Expr<ChatStopStreamResponse>;
   unfurl(params: SlackParams<ChatUnfurlArguments>): Expr<ChatUnfurlResponse>;

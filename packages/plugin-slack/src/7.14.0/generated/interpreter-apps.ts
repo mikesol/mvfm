@@ -12,13 +12,20 @@ interface SlackAppsBaseNode<K extends SlackAppsKind = SlackAppsKind> extends Typ
   config: { token: string };
 }
 
-export interface SlackAppsConnectionsOpenNode extends SlackAppsBaseNode<"slack/apps_connections_open"> {}
-export interface SlackAppsEventAuthorizationsListNode extends SlackAppsBaseNode<"slack/apps_event_authorizations_list"> {}
-export interface SlackAppsManifestCreateNode extends SlackAppsBaseNode<"slack/apps_manifest_create"> {}
-export interface SlackAppsManifestDeleteNode extends SlackAppsBaseNode<"slack/apps_manifest_delete"> {}
-export interface SlackAppsManifestExportNode extends SlackAppsBaseNode<"slack/apps_manifest_export"> {}
-export interface SlackAppsManifestUpdateNode extends SlackAppsBaseNode<"slack/apps_manifest_update"> {}
-export interface SlackAppsManifestValidateNode extends SlackAppsBaseNode<"slack/apps_manifest_validate"> {}
+export interface SlackAppsConnectionsOpenNode
+  extends SlackAppsBaseNode<"slack/apps_connections_open"> {}
+export interface SlackAppsEventAuthorizationsListNode
+  extends SlackAppsBaseNode<"slack/apps_event_authorizations_list"> {}
+export interface SlackAppsManifestCreateNode
+  extends SlackAppsBaseNode<"slack/apps_manifest_create"> {}
+export interface SlackAppsManifestDeleteNode
+  extends SlackAppsBaseNode<"slack/apps_manifest_delete"> {}
+export interface SlackAppsManifestExportNode
+  extends SlackAppsBaseNode<"slack/apps_manifest_export"> {}
+export interface SlackAppsManifestUpdateNode
+  extends SlackAppsBaseNode<"slack/apps_manifest_update"> {}
+export interface SlackAppsManifestValidateNode
+  extends SlackAppsBaseNode<"slack/apps_manifest_validate"> {}
 export interface SlackAppsUninstallNode extends SlackAppsBaseNode<"slack/apps_uninstall"> {}
 
 export const NODE_TO_METHOD_APPS: Record<string, string> = {
@@ -58,13 +65,31 @@ export function createSlackAppsInterpreter(client: SlackClientLike): Interpreter
   };
 
   return defineInterpreter<SlackAppsKind>()({
-    "slack/apps_connections_open": async function* (node: SlackAppsConnectionsOpenNode) { return yield* handler(node); },
-    "slack/apps_event_authorizations_list": async function* (node: SlackAppsEventAuthorizationsListNode) { return yield* handler(node); },
-    "slack/apps_manifest_create": async function* (node: SlackAppsManifestCreateNode) { return yield* handler(node); },
-    "slack/apps_manifest_delete": async function* (node: SlackAppsManifestDeleteNode) { return yield* handler(node); },
-    "slack/apps_manifest_export": async function* (node: SlackAppsManifestExportNode) { return yield* handler(node); },
-    "slack/apps_manifest_update": async function* (node: SlackAppsManifestUpdateNode) { return yield* handler(node); },
-    "slack/apps_manifest_validate": async function* (node: SlackAppsManifestValidateNode) { return yield* handler(node); },
-    "slack/apps_uninstall": async function* (node: SlackAppsUninstallNode) { return yield* handler(node); },
+    "slack/apps_connections_open": async function* (node: SlackAppsConnectionsOpenNode) {
+      return yield* handler(node);
+    },
+    "slack/apps_event_authorizations_list": async function* (
+      node: SlackAppsEventAuthorizationsListNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/apps_manifest_create": async function* (node: SlackAppsManifestCreateNode) {
+      return yield* handler(node);
+    },
+    "slack/apps_manifest_delete": async function* (node: SlackAppsManifestDeleteNode) {
+      return yield* handler(node);
+    },
+    "slack/apps_manifest_export": async function* (node: SlackAppsManifestExportNode) {
+      return yield* handler(node);
+    },
+    "slack/apps_manifest_update": async function* (node: SlackAppsManifestUpdateNode) {
+      return yield* handler(node);
+    },
+    "slack/apps_manifest_validate": async function* (node: SlackAppsManifestValidateNode) {
+      return yield* handler(node);
+    },
+    "slack/apps_uninstall": async function* (node: SlackAppsUninstallNode) {
+      return yield* handler(node);
+    },
   });
 }

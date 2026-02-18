@@ -1,16 +1,16 @@
-import { definePlugin } from "@mvfm/core";
 import type { Interpreter } from "@mvfm/core";
+import { definePlugin } from "@mvfm/core";
+import { wrapSlackWebClient } from "./client-slack-web-api";
 import { buildSlackMethods } from "./generated/build-methods";
-import { createSlackInterpreter } from "./generated/interpreter";
 import type { SlackClient } from "./generated/interpreter";
+import { createSlackInterpreter } from "./generated/interpreter";
 import { SLACK_NODE_KINDS } from "./generated/node-kinds";
 import type { SlackConfig } from "./generated/types";
-import { wrapSlackWebClient } from "./client-slack-web-api";
 
-export type { SlackConfig, SlackMethods } from "./generated/types";
 export type { SlackClient } from "./generated/interpreter";
 export { createSlackInterpreter } from "./generated/interpreter";
 export { SLACK_NODE_KINDS } from "./generated/node-kinds";
+export type { SlackConfig, SlackMethods } from "./generated/types";
 
 function requiredEnv(name: "SLACK_BOT_TOKEN"): string {
   const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process

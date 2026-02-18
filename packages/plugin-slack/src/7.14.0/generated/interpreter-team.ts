@@ -15,11 +15,15 @@ interface SlackTeamBaseNode<K extends SlackTeamKind = SlackTeamKind> extends Typ
 export interface SlackTeamAccessLogsNode extends SlackTeamBaseNode<"slack/team_accessLogs"> {}
 export interface SlackTeamBillableInfoNode extends SlackTeamBaseNode<"slack/team_billableInfo"> {}
 export interface SlackTeamBillingInfoNode extends SlackTeamBaseNode<"slack/team_billing_info"> {}
-export interface SlackTeamExternalTeamsDisconnectNode extends SlackTeamBaseNode<"slack/team_externalTeams_disconnect"> {}
-export interface SlackTeamExternalTeamsListNode extends SlackTeamBaseNode<"slack/team_externalTeams_list"> {}
+export interface SlackTeamExternalTeamsDisconnectNode
+  extends SlackTeamBaseNode<"slack/team_externalTeams_disconnect"> {}
+export interface SlackTeamExternalTeamsListNode
+  extends SlackTeamBaseNode<"slack/team_externalTeams_list"> {}
 export interface SlackTeamInfoNode extends SlackTeamBaseNode<"slack/team_info"> {}
-export interface SlackTeamIntegrationLogsNode extends SlackTeamBaseNode<"slack/team_integrationLogs"> {}
-export interface SlackTeamPreferencesListNode extends SlackTeamBaseNode<"slack/team_preferences_list"> {}
+export interface SlackTeamIntegrationLogsNode
+  extends SlackTeamBaseNode<"slack/team_integrationLogs"> {}
+export interface SlackTeamPreferencesListNode
+  extends SlackTeamBaseNode<"slack/team_preferences_list"> {}
 export interface SlackTeamProfileGetNode extends SlackTeamBaseNode<"slack/team_profile_get"> {}
 
 export const NODE_TO_METHOD_TEAM: Record<string, string> = {
@@ -61,14 +65,34 @@ export function createSlackTeamInterpreter(client: SlackClientLike): Interpreter
   };
 
   return defineInterpreter<SlackTeamKind>()({
-    "slack/team_accessLogs": async function* (node: SlackTeamAccessLogsNode) { return yield* handler(node); },
-    "slack/team_billableInfo": async function* (node: SlackTeamBillableInfoNode) { return yield* handler(node); },
-    "slack/team_billing_info": async function* (node: SlackTeamBillingInfoNode) { return yield* handler(node); },
-    "slack/team_externalTeams_disconnect": async function* (node: SlackTeamExternalTeamsDisconnectNode) { return yield* handler(node); },
-    "slack/team_externalTeams_list": async function* (node: SlackTeamExternalTeamsListNode) { return yield* handler(node); },
-    "slack/team_info": async function* (node: SlackTeamInfoNode) { return yield* handler(node); },
-    "slack/team_integrationLogs": async function* (node: SlackTeamIntegrationLogsNode) { return yield* handler(node); },
-    "slack/team_preferences_list": async function* (node: SlackTeamPreferencesListNode) { return yield* handler(node); },
-    "slack/team_profile_get": async function* (node: SlackTeamProfileGetNode) { return yield* handler(node); },
+    "slack/team_accessLogs": async function* (node: SlackTeamAccessLogsNode) {
+      return yield* handler(node);
+    },
+    "slack/team_billableInfo": async function* (node: SlackTeamBillableInfoNode) {
+      return yield* handler(node);
+    },
+    "slack/team_billing_info": async function* (node: SlackTeamBillingInfoNode) {
+      return yield* handler(node);
+    },
+    "slack/team_externalTeams_disconnect": async function* (
+      node: SlackTeamExternalTeamsDisconnectNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/team_externalTeams_list": async function* (node: SlackTeamExternalTeamsListNode) {
+      return yield* handler(node);
+    },
+    "slack/team_info": async function* (node: SlackTeamInfoNode) {
+      return yield* handler(node);
+    },
+    "slack/team_integrationLogs": async function* (node: SlackTeamIntegrationLogsNode) {
+      return yield* handler(node);
+    },
+    "slack/team_preferences_list": async function* (node: SlackTeamPreferencesListNode) {
+      return yield* handler(node);
+    },
+    "slack/team_profile_get": async function* (node: SlackTeamProfileGetNode) {
+      return yield* handler(node);
+    },
   });
 }

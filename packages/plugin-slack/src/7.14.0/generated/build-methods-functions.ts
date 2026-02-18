@@ -4,15 +4,26 @@ import type { PluginContext } from "@mvfm/core";
 import type { SlackConfig } from "./types";
 import type { SlackMethodsFunctions } from "./types-functions";
 
-export function buildSlackFunctions(ctx: PluginContext, config: SlackConfig): SlackMethodsFunctions {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+export function buildSlackFunctions(
+  ctx: PluginContext,
+  config: SlackConfig,
+): SlackMethodsFunctions {
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     completeError(params) {
-      return ctx.expr({ kind: "slack/functions_completeError", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/functions_completeError",
+        params: resolveParams(params),
+        config,
+      });
     },
     completeSuccess(params) {
-      return ctx.expr({ kind: "slack/functions_completeSuccess", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/functions_completeSuccess",
+        params: resolveParams(params),
+        config,
+      });
     },
   };
 }

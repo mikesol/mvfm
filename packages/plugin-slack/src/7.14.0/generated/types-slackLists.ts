@@ -31,20 +31,32 @@ import type { SlackParams } from "./types";
 
 export interface SlackMethodsSlackLists {
   access: {
-    delete(params: SlackParams<SlackListsAccessDeleteArguments>): Expr<SlackListsAccessDeleteResponse>;
+    delete(
+      params: SlackParams<SlackListsAccessDeleteArguments>,
+    ): Expr<SlackListsAccessDeleteResponse>;
     set(params: SlackParams<SlackListsAccessSetArguments>): Expr<SlackListsAccessSetResponse>;
   };
   download: {
     get(params: SlackParams<SlackListsDownloadGetArguments>): Expr<SlackListsDownloadGetResponse>;
-    start(params: SlackParams<SlackListsDownloadStartArguments>): Expr<SlackListsDownloadStartResponse>;
+    start(
+      params: SlackParams<SlackListsDownloadStartArguments>,
+    ): Expr<SlackListsDownloadStartResponse>;
   };
   items: {
-    create(params: SlackParams<SlackListsItemsCreateArguments>): Expr<SlackListsItemsCreateResponse>;
-    delete(params: SlackParams<SlackListsItemsDeleteArguments>): Expr<SlackListsItemsDeleteResponse>;
-    deleteMultiple(params: SlackParams<SlackListsItemsDeleteMultipleArguments>): Expr<SlackListsItemsDeleteMultipleResponse>;
+    create(
+      params: SlackParams<SlackListsItemsCreateArguments>,
+    ): Expr<SlackListsItemsCreateResponse>;
+    delete(
+      params: SlackParams<SlackListsItemsDeleteArguments>,
+    ): Expr<SlackListsItemsDeleteResponse>;
+    deleteMultiple(
+      params: SlackParams<SlackListsItemsDeleteMultipleArguments>,
+    ): Expr<SlackListsItemsDeleteMultipleResponse>;
     info(params: SlackParams<SlackListsItemsInfoArguments>): Expr<SlackListsItemsInfoResponse>;
     list(params: SlackParams<SlackListsItemsListArguments>): Expr<SlackListsItemsListResponse>;
-    update(params: SlackParams<SlackListsItemsUpdateArguments>): Expr<SlackListsItemsUpdateResponse>;
+    update(
+      params: SlackParams<SlackListsItemsUpdateArguments>,
+    ): Expr<SlackListsItemsUpdateResponse>;
   };
   create(params: SlackParams<SlackListsCreateArguments>): Expr<SlackListsCreateResponse>;
   update(params: SlackParams<SlackListsUpdateArguments>): Expr<SlackListsUpdateResponse>;

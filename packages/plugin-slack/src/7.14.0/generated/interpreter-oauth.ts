@@ -43,8 +43,14 @@ export function createSlackOauthInterpreter(client: SlackClientLike): Interprete
   };
 
   return defineInterpreter<SlackOauthKind>()({
-    "slack/oauth_access": async function* (node: SlackOauthAccessNode) { return yield* handler(node); },
-    "slack/oauth_v2_access": async function* (node: SlackOauthV2AccessNode) { return yield* handler(node); },
-    "slack/oauth_v2_exchange": async function* (node: SlackOauthV2ExchangeNode) { return yield* handler(node); },
+    "slack/oauth_access": async function* (node: SlackOauthAccessNode) {
+      return yield* handler(node);
+    },
+    "slack/oauth_v2_access": async function* (node: SlackOauthV2AccessNode) {
+      return yield* handler(node);
+    },
+    "slack/oauth_v2_exchange": async function* (node: SlackOauthV2ExchangeNode) {
+      return yield* handler(node);
+    },
   });
 }

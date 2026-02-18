@@ -4,16 +4,27 @@ import type { PluginContext } from "@mvfm/core";
 import type { SlackConfig } from "./types";
 import type { SlackMethodsUsergroups } from "./types-usergroups";
 
-export function buildSlackUsergroups(ctx: PluginContext, config: SlackConfig): SlackMethodsUsergroups {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+export function buildSlackUsergroups(
+  ctx: PluginContext,
+  config: SlackConfig,
+): SlackMethodsUsergroups {
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     users: {
       list(params) {
-        return ctx.expr({ kind: "slack/usergroups_users_list", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/usergroups_users_list",
+          params: resolveParams(params),
+          config,
+        });
       },
       update(params) {
-        return ctx.expr({ kind: "slack/usergroups_users_update", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/usergroups_users_update",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     create(params) {
@@ -26,7 +37,11 @@ export function buildSlackUsergroups(ctx: PluginContext, config: SlackConfig): S
       return ctx.expr({ kind: "slack/usergroups_enable", params: resolveParams(params), config });
     },
     list(params?) {
-      return ctx.expr({ kind: "slack/usergroups_list", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/usergroups_list",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
     update(params) {
       return ctx.expr({ kind: "slack/usergroups_update", params: resolveParams(params), config });

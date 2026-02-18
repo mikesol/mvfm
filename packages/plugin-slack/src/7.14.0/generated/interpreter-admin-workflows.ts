@@ -6,17 +6,23 @@ import type { SLACK_NODE_KINDS_ADMIN_WORKFLOWS } from "./node-kinds-admin-workfl
 
 type SlackAdminWorkflowsKind = (typeof SLACK_NODE_KINDS_ADMIN_WORKFLOWS)[number];
 
-interface SlackAdminWorkflowsBaseNode<K extends SlackAdminWorkflowsKind = SlackAdminWorkflowsKind> extends TypedNode<unknown> {
+interface SlackAdminWorkflowsBaseNode<K extends SlackAdminWorkflowsKind = SlackAdminWorkflowsKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackAdminWorkflowsCollaboratorsAddNode extends SlackAdminWorkflowsBaseNode<"slack/admin_workflows_collaborators_add"> {}
-export interface SlackAdminWorkflowsCollaboratorsRemoveNode extends SlackAdminWorkflowsBaseNode<"slack/admin_workflows_collaborators_remove"> {}
-export interface SlackAdminWorkflowsPermissionsLookupNode extends SlackAdminWorkflowsBaseNode<"slack/admin_workflows_permissions_lookup"> {}
-export interface SlackAdminWorkflowsSearchNode extends SlackAdminWorkflowsBaseNode<"slack/admin_workflows_search"> {}
-export interface SlackAdminWorkflowsUnpublishNode extends SlackAdminWorkflowsBaseNode<"slack/admin_workflows_unpublish"> {}
+export interface SlackAdminWorkflowsCollaboratorsAddNode
+  extends SlackAdminWorkflowsBaseNode<"slack/admin_workflows_collaborators_add"> {}
+export interface SlackAdminWorkflowsCollaboratorsRemoveNode
+  extends SlackAdminWorkflowsBaseNode<"slack/admin_workflows_collaborators_remove"> {}
+export interface SlackAdminWorkflowsPermissionsLookupNode
+  extends SlackAdminWorkflowsBaseNode<"slack/admin_workflows_permissions_lookup"> {}
+export interface SlackAdminWorkflowsSearchNode
+  extends SlackAdminWorkflowsBaseNode<"slack/admin_workflows_search"> {}
+export interface SlackAdminWorkflowsUnpublishNode
+  extends SlackAdminWorkflowsBaseNode<"slack/admin_workflows_unpublish"> {}
 
 export const NODE_TO_METHOD_ADMIN_WORKFLOWS: Record<string, string> = {
   "slack/admin_workflows_collaborators_add": "admin.workflows.collaborators.add",
@@ -49,10 +55,26 @@ export function createSlackAdminWorkflowsInterpreter(client: SlackClientLike): I
   };
 
   return defineInterpreter<SlackAdminWorkflowsKind>()({
-    "slack/admin_workflows_collaborators_add": async function* (node: SlackAdminWorkflowsCollaboratorsAddNode) { return yield* handler(node); },
-    "slack/admin_workflows_collaborators_remove": async function* (node: SlackAdminWorkflowsCollaboratorsRemoveNode) { return yield* handler(node); },
-    "slack/admin_workflows_permissions_lookup": async function* (node: SlackAdminWorkflowsPermissionsLookupNode) { return yield* handler(node); },
-    "slack/admin_workflows_search": async function* (node: SlackAdminWorkflowsSearchNode) { return yield* handler(node); },
-    "slack/admin_workflows_unpublish": async function* (node: SlackAdminWorkflowsUnpublishNode) { return yield* handler(node); },
+    "slack/admin_workflows_collaborators_add": async function* (
+      node: SlackAdminWorkflowsCollaboratorsAddNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_workflows_collaborators_remove": async function* (
+      node: SlackAdminWorkflowsCollaboratorsRemoveNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_workflows_permissions_lookup": async function* (
+      node: SlackAdminWorkflowsPermissionsLookupNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_workflows_search": async function* (node: SlackAdminWorkflowsSearchNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_workflows_unpublish": async function* (node: SlackAdminWorkflowsUnpublishNode) {
+      return yield* handler(node);
+    },
   });
 }

@@ -6,14 +6,17 @@ import type { SLACK_NODE_KINDS_OPENID } from "./node-kinds-openid";
 
 type SlackOpenidKind = (typeof SLACK_NODE_KINDS_OPENID)[number];
 
-interface SlackOpenidBaseNode<K extends SlackOpenidKind = SlackOpenidKind> extends TypedNode<unknown> {
+interface SlackOpenidBaseNode<K extends SlackOpenidKind = SlackOpenidKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackOpenidConnectTokenNode extends SlackOpenidBaseNode<"slack/openid_connect_token"> {}
-export interface SlackOpenidConnectUserInfoNode extends SlackOpenidBaseNode<"slack/openid_connect_userInfo"> {}
+export interface SlackOpenidConnectTokenNode
+  extends SlackOpenidBaseNode<"slack/openid_connect_token"> {}
+export interface SlackOpenidConnectUserInfoNode
+  extends SlackOpenidBaseNode<"slack/openid_connect_userInfo"> {}
 
 export const NODE_TO_METHOD_OPENID: Record<string, string> = {
   "slack/openid_connect_token": "openid.connect.token",
@@ -40,7 +43,11 @@ export function createSlackOpenidInterpreter(client: SlackClientLike): Interpret
   };
 
   return defineInterpreter<SlackOpenidKind>()({
-    "slack/openid_connect_token": async function* (node: SlackOpenidConnectTokenNode) { return yield* handler(node); },
-    "slack/openid_connect_userInfo": async function* (node: SlackOpenidConnectUserInfoNode) { return yield* handler(node); },
+    "slack/openid_connect_token": async function* (node: SlackOpenidConnectTokenNode) {
+      return yield* handler(node);
+    },
+    "slack/openid_connect_userInfo": async function* (node: SlackOpenidConnectUserInfoNode) {
+      return yield* handler(node);
+    },
   });
 }

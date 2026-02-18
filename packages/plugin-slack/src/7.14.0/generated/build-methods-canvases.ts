@@ -5,24 +5,40 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsCanvases } from "./types-canvases";
 
 export function buildSlackCanvases(ctx: PluginContext, config: SlackConfig): SlackMethodsCanvases {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     access: {
       delete(params) {
-        return ctx.expr({ kind: "slack/canvases_access_delete", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/canvases_access_delete",
+          params: resolveParams(params),
+          config,
+        });
       },
       set(params) {
-        return ctx.expr({ kind: "slack/canvases_access_set", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/canvases_access_set",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     sections: {
       lookup(params) {
-        return ctx.expr({ kind: "slack/canvases_sections_lookup", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/canvases_sections_lookup",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     create(params?) {
-      return ctx.expr({ kind: "slack/canvases_create", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/canvases_create",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
     delete(params) {
       return ctx.expr({ kind: "slack/canvases_delete", params: resolveParams(params), config });

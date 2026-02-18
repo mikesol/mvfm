@@ -5,15 +5,23 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsCalls } from "./types-calls";
 
 export function buildSlackCalls(ctx: PluginContext, config: SlackConfig): SlackMethodsCalls {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     participants: {
       add(params) {
-        return ctx.expr({ kind: "slack/calls_participants_add", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/calls_participants_add",
+          params: resolveParams(params),
+          config,
+        });
       },
       remove(params) {
-        return ctx.expr({ kind: "slack/calls_participants_remove", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/calls_participants_remove",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     add(params) {

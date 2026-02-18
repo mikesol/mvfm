@@ -4,45 +4,84 @@ import type { PluginContext } from "@mvfm/core";
 import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminTeams } from "./types-admin-teams";
 
-export function buildSlackAdminTeams(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminTeams {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+export function buildSlackAdminTeams(
+  ctx: PluginContext,
+  config: SlackConfig,
+): SlackMethodsAdminTeams {
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     admins: {
       list(params) {
-        return ctx.expr({ kind: "slack/admin_teams_admins_list", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_teams_admins_list",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     owners: {
       list(params) {
-        return ctx.expr({ kind: "slack/admin_teams_owners_list", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_teams_owners_list",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     settings: {
       info(params) {
-        return ctx.expr({ kind: "slack/admin_teams_settings_info", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_teams_settings_info",
+          params: resolveParams(params),
+          config,
+        });
       },
       setDefaultChannels(params) {
-        return ctx.expr({ kind: "slack/admin_teams_settings_setDefaultChannels", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_teams_settings_setDefaultChannels",
+          params: resolveParams(params),
+          config,
+        });
       },
       setDescription(params) {
-        return ctx.expr({ kind: "slack/admin_teams_settings_setDescription", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_teams_settings_setDescription",
+          params: resolveParams(params),
+          config,
+        });
       },
       setDiscoverability(params) {
-        return ctx.expr({ kind: "slack/admin_teams_settings_setDiscoverability", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_teams_settings_setDiscoverability",
+          params: resolveParams(params),
+          config,
+        });
       },
       setIcon(params) {
-        return ctx.expr({ kind: "slack/admin_teams_settings_setIcon", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_teams_settings_setIcon",
+          params: resolveParams(params),
+          config,
+        });
       },
       setName(params) {
-        return ctx.expr({ kind: "slack/admin_teams_settings_setName", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_teams_settings_setName",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     create(params) {
       return ctx.expr({ kind: "slack/admin_teams_create", params: resolveParams(params), config });
     },
     list(params?) {
-      return ctx.expr({ kind: "slack/admin_teams_list", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/admin_teams_list",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
   };
 }

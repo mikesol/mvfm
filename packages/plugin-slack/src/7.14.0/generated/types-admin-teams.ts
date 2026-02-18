@@ -33,12 +33,24 @@ export interface SlackMethodsAdminTeams {
     list(params: SlackParams<AdminTeamsOwnersListArguments>): Expr<AdminTeamsOwnersListResponse>;
   };
   settings: {
-    info(params: SlackParams<AdminTeamsSettingsInfoArguments>): Expr<AdminTeamsSettingsInfoResponse>;
-    setDefaultChannels(params: SlackParams<AdminTeamsSettingsSetDefaultChannelsArguments>): Expr<AdminTeamsSettingsSetDefaultChannelsResponse>;
-    setDescription(params: SlackParams<AdminTeamsSettingsSetDescriptionArguments>): Expr<AdminTeamsSettingsSetDescriptionResponse>;
-    setDiscoverability(params: SlackParams<AdminTeamsSettingsSetDiscoverabilityArguments>): Expr<AdminTeamsSettingsSetDiscoverabilityResponse>;
-    setIcon(params: SlackParams<AdminTeamsSettingsSetIconArguments>): Expr<AdminTeamsSettingsSetIconResponse>;
-    setName(params: SlackParams<AdminTeamsSettingsSetNameArguments>): Expr<AdminTeamsSettingsSetNameResponse>;
+    info(
+      params: SlackParams<AdminTeamsSettingsInfoArguments>,
+    ): Expr<AdminTeamsSettingsInfoResponse>;
+    setDefaultChannels(
+      params: SlackParams<AdminTeamsSettingsSetDefaultChannelsArguments>,
+    ): Expr<AdminTeamsSettingsSetDefaultChannelsResponse>;
+    setDescription(
+      params: SlackParams<AdminTeamsSettingsSetDescriptionArguments>,
+    ): Expr<AdminTeamsSettingsSetDescriptionResponse>;
+    setDiscoverability(
+      params: SlackParams<AdminTeamsSettingsSetDiscoverabilityArguments>,
+    ): Expr<AdminTeamsSettingsSetDiscoverabilityResponse>;
+    setIcon(
+      params: SlackParams<AdminTeamsSettingsSetIconArguments>,
+    ): Expr<AdminTeamsSettingsSetIconResponse>;
+    setName(
+      params: SlackParams<AdminTeamsSettingsSetNameArguments>,
+    ): Expr<AdminTeamsSettingsSetNameResponse>;
   };
   create(params: SlackParams<AdminTeamsCreateArguments>): Expr<AdminTeamsCreateResponse>;
   list(params?: SlackParams<AdminTeamsListArguments>): Expr<AdminTeamsListResponse>;

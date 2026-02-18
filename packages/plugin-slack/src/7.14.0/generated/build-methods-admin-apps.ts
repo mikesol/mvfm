@@ -4,52 +4,91 @@ import type { PluginContext } from "@mvfm/core";
 import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminApps } from "./types-admin-apps";
 
-export function buildSlackAdminApps(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminApps {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+export function buildSlackAdminApps(
+  ctx: PluginContext,
+  config: SlackConfig,
+): SlackMethodsAdminApps {
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     activities: {
       list(params?) {
-        return ctx.expr({ kind: "slack/admin_apps_activities_list", params: params != null ? resolveParams(params) : null, config });
+        return ctx.expr({
+          kind: "slack/admin_apps_activities_list",
+          params: params != null ? resolveParams(params) : null,
+          config,
+        });
       },
     },
     approved: {
       list(params) {
-        return ctx.expr({ kind: "slack/admin_apps_approved_list", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_apps_approved_list",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     config: {
       lookup(params) {
-        return ctx.expr({ kind: "slack/admin_apps_config_lookup", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_apps_config_lookup",
+          params: resolveParams(params),
+          config,
+        });
       },
       set(params) {
-        return ctx.expr({ kind: "slack/admin_apps_config_set", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_apps_config_set",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     requests: {
       cancel(params) {
-        return ctx.expr({ kind: "slack/admin_apps_requests_cancel", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_apps_requests_cancel",
+          params: resolveParams(params),
+          config,
+        });
       },
       list(params) {
-        return ctx.expr({ kind: "slack/admin_apps_requests_list", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_apps_requests_list",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     restricted: {
       list(params) {
-        return ctx.expr({ kind: "slack/admin_apps_restricted_list", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_apps_restricted_list",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     approve(params) {
       return ctx.expr({ kind: "slack/admin_apps_approve", params: resolveParams(params), config });
     },
     clearResolution(params) {
-      return ctx.expr({ kind: "slack/admin_apps_clearResolution", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/admin_apps_clearResolution",
+        params: resolveParams(params),
+        config,
+      });
     },
     restrict(params) {
       return ctx.expr({ kind: "slack/admin_apps_restrict", params: resolveParams(params), config });
     },
     uninstall(params) {
-      return ctx.expr({ kind: "slack/admin_apps_uninstall", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/admin_apps_uninstall",
+        params: resolveParams(params),
+        config,
+      });
     },
   };
 }

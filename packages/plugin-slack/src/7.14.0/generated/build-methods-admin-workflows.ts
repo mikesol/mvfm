@@ -4,28 +4,51 @@ import type { PluginContext } from "@mvfm/core";
 import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminWorkflows } from "./types-admin-workflows";
 
-export function buildSlackAdminWorkflows(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminWorkflows {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+export function buildSlackAdminWorkflows(
+  ctx: PluginContext,
+  config: SlackConfig,
+): SlackMethodsAdminWorkflows {
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     collaborators: {
       add(params) {
-        return ctx.expr({ kind: "slack/admin_workflows_collaborators_add", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_workflows_collaborators_add",
+          params: resolveParams(params),
+          config,
+        });
       },
       remove(params) {
-        return ctx.expr({ kind: "slack/admin_workflows_collaborators_remove", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_workflows_collaborators_remove",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     permissions: {
       lookup(params) {
-        return ctx.expr({ kind: "slack/admin_workflows_permissions_lookup", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_workflows_permissions_lookup",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     search(params?) {
-      return ctx.expr({ kind: "slack/admin_workflows_search", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/admin_workflows_search",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
     unpublish(params) {
-      return ctx.expr({ kind: "slack/admin_workflows_unpublish", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/admin_workflows_unpublish",
+        params: resolveParams(params),
+        config,
+      });
     },
   };
 }

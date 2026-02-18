@@ -6,13 +6,15 @@ import type { SLACK_NODE_KINDS_ENTITY } from "./node-kinds-entity";
 
 type SlackEntityKind = (typeof SLACK_NODE_KINDS_ENTITY)[number];
 
-interface SlackEntityBaseNode<K extends SlackEntityKind = SlackEntityKind> extends TypedNode<unknown> {
+interface SlackEntityBaseNode<K extends SlackEntityKind = SlackEntityKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackEntityPresentDetailsNode extends SlackEntityBaseNode<"slack/entity_presentDetails"> {}
+export interface SlackEntityPresentDetailsNode
+  extends SlackEntityBaseNode<"slack/entity_presentDetails"> {}
 
 export const NODE_TO_METHOD_ENTITY: Record<string, string> = {
   "slack/entity_presentDetails": "entity.presentDetails",
@@ -37,6 +39,8 @@ export function createSlackEntityInterpreter(client: SlackClientLike): Interpret
   };
 
   return defineInterpreter<SlackEntityKind>()({
-    "slack/entity_presentDetails": async function* (node: SlackEntityPresentDetailsNode) { return yield* handler(node); },
+    "slack/entity_presentDetails": async function* (node: SlackEntityPresentDetailsNode) {
+      return yield* handler(node);
+    },
   });
 }

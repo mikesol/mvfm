@@ -6,23 +6,35 @@ import type { SLACK_NODE_KINDS_ADMIN_APPS } from "./node-kinds-admin-apps";
 
 type SlackAdminAppsKind = (typeof SLACK_NODE_KINDS_ADMIN_APPS)[number];
 
-interface SlackAdminAppsBaseNode<K extends SlackAdminAppsKind = SlackAdminAppsKind> extends TypedNode<unknown> {
+interface SlackAdminAppsBaseNode<K extends SlackAdminAppsKind = SlackAdminAppsKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackAdminAppsActivitiesListNode extends SlackAdminAppsBaseNode<"slack/admin_apps_activities_list"> {}
-export interface SlackAdminAppsApproveNode extends SlackAdminAppsBaseNode<"slack/admin_apps_approve"> {}
-export interface SlackAdminAppsApprovedListNode extends SlackAdminAppsBaseNode<"slack/admin_apps_approved_list"> {}
-export interface SlackAdminAppsClearResolutionNode extends SlackAdminAppsBaseNode<"slack/admin_apps_clearResolution"> {}
-export interface SlackAdminAppsConfigLookupNode extends SlackAdminAppsBaseNode<"slack/admin_apps_config_lookup"> {}
-export interface SlackAdminAppsConfigSetNode extends SlackAdminAppsBaseNode<"slack/admin_apps_config_set"> {}
-export interface SlackAdminAppsRequestsCancelNode extends SlackAdminAppsBaseNode<"slack/admin_apps_requests_cancel"> {}
-export interface SlackAdminAppsRequestsListNode extends SlackAdminAppsBaseNode<"slack/admin_apps_requests_list"> {}
-export interface SlackAdminAppsRestrictNode extends SlackAdminAppsBaseNode<"slack/admin_apps_restrict"> {}
-export interface SlackAdminAppsRestrictedListNode extends SlackAdminAppsBaseNode<"slack/admin_apps_restricted_list"> {}
-export interface SlackAdminAppsUninstallNode extends SlackAdminAppsBaseNode<"slack/admin_apps_uninstall"> {}
+export interface SlackAdminAppsActivitiesListNode
+  extends SlackAdminAppsBaseNode<"slack/admin_apps_activities_list"> {}
+export interface SlackAdminAppsApproveNode
+  extends SlackAdminAppsBaseNode<"slack/admin_apps_approve"> {}
+export interface SlackAdminAppsApprovedListNode
+  extends SlackAdminAppsBaseNode<"slack/admin_apps_approved_list"> {}
+export interface SlackAdminAppsClearResolutionNode
+  extends SlackAdminAppsBaseNode<"slack/admin_apps_clearResolution"> {}
+export interface SlackAdminAppsConfigLookupNode
+  extends SlackAdminAppsBaseNode<"slack/admin_apps_config_lookup"> {}
+export interface SlackAdminAppsConfigSetNode
+  extends SlackAdminAppsBaseNode<"slack/admin_apps_config_set"> {}
+export interface SlackAdminAppsRequestsCancelNode
+  extends SlackAdminAppsBaseNode<"slack/admin_apps_requests_cancel"> {}
+export interface SlackAdminAppsRequestsListNode
+  extends SlackAdminAppsBaseNode<"slack/admin_apps_requests_list"> {}
+export interface SlackAdminAppsRestrictNode
+  extends SlackAdminAppsBaseNode<"slack/admin_apps_restrict"> {}
+export interface SlackAdminAppsRestrictedListNode
+  extends SlackAdminAppsBaseNode<"slack/admin_apps_restricted_list"> {}
+export interface SlackAdminAppsUninstallNode
+  extends SlackAdminAppsBaseNode<"slack/admin_apps_uninstall"> {}
 
 export const NODE_TO_METHOD_ADMIN_APPS: Record<string, string> = {
   "slack/admin_apps_activities_list": "admin.apps.activities.list",
@@ -67,16 +79,38 @@ export function createSlackAdminAppsInterpreter(client: SlackClientLike): Interp
   };
 
   return defineInterpreter<SlackAdminAppsKind>()({
-    "slack/admin_apps_activities_list": async function* (node: SlackAdminAppsActivitiesListNode) { return yield* handler(node); },
-    "slack/admin_apps_approve": async function* (node: SlackAdminAppsApproveNode) { return yield* handler(node); },
-    "slack/admin_apps_approved_list": async function* (node: SlackAdminAppsApprovedListNode) { return yield* handler(node); },
-    "slack/admin_apps_clearResolution": async function* (node: SlackAdminAppsClearResolutionNode) { return yield* handler(node); },
-    "slack/admin_apps_config_lookup": async function* (node: SlackAdminAppsConfigLookupNode) { return yield* handler(node); },
-    "slack/admin_apps_config_set": async function* (node: SlackAdminAppsConfigSetNode) { return yield* handler(node); },
-    "slack/admin_apps_requests_cancel": async function* (node: SlackAdminAppsRequestsCancelNode) { return yield* handler(node); },
-    "slack/admin_apps_requests_list": async function* (node: SlackAdminAppsRequestsListNode) { return yield* handler(node); },
-    "slack/admin_apps_restrict": async function* (node: SlackAdminAppsRestrictNode) { return yield* handler(node); },
-    "slack/admin_apps_restricted_list": async function* (node: SlackAdminAppsRestrictedListNode) { return yield* handler(node); },
-    "slack/admin_apps_uninstall": async function* (node: SlackAdminAppsUninstallNode) { return yield* handler(node); },
+    "slack/admin_apps_activities_list": async function* (node: SlackAdminAppsActivitiesListNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_apps_approve": async function* (node: SlackAdminAppsApproveNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_apps_approved_list": async function* (node: SlackAdminAppsApprovedListNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_apps_clearResolution": async function* (node: SlackAdminAppsClearResolutionNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_apps_config_lookup": async function* (node: SlackAdminAppsConfigLookupNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_apps_config_set": async function* (node: SlackAdminAppsConfigSetNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_apps_requests_cancel": async function* (node: SlackAdminAppsRequestsCancelNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_apps_requests_list": async function* (node: SlackAdminAppsRequestsListNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_apps_restrict": async function* (node: SlackAdminAppsRestrictNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_apps_restricted_list": async function* (node: SlackAdminAppsRestrictedListNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_apps_uninstall": async function* (node: SlackAdminAppsUninstallNode) {
+      return yield* handler(node);
+    },
   });
 }

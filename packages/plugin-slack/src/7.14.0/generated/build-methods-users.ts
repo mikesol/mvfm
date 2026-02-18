@@ -5,12 +5,16 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsUsers } from "./types-users";
 
 export function buildSlackUsers(ctx: PluginContext, config: SlackConfig): SlackMethodsUsers {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     discoverableContacts: {
       lookup(params) {
-        return ctx.expr({ kind: "slack/users_discoverableContacts_lookup", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/users_discoverableContacts_lookup",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     profile: {

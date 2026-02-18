@@ -6,24 +6,37 @@ import type { SLACK_NODE_KINDS_SLACKLISTS } from "./node-kinds-slackLists";
 
 type SlackSlackListsKind = (typeof SLACK_NODE_KINDS_SLACKLISTS)[number];
 
-interface SlackSlackListsBaseNode<K extends SlackSlackListsKind = SlackSlackListsKind> extends TypedNode<unknown> {
+interface SlackSlackListsBaseNode<K extends SlackSlackListsKind = SlackSlackListsKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackSlackListsAccessDeleteNode extends SlackSlackListsBaseNode<"slack/slackLists_access_delete"> {}
-export interface SlackSlackListsAccessSetNode extends SlackSlackListsBaseNode<"slack/slackLists_access_set"> {}
-export interface SlackSlackListsCreateNode extends SlackSlackListsBaseNode<"slack/slackLists_create"> {}
-export interface SlackSlackListsDownloadGetNode extends SlackSlackListsBaseNode<"slack/slackLists_download_get"> {}
-export interface SlackSlackListsDownloadStartNode extends SlackSlackListsBaseNode<"slack/slackLists_download_start"> {}
-export interface SlackSlackListsItemsCreateNode extends SlackSlackListsBaseNode<"slack/slackLists_items_create"> {}
-export interface SlackSlackListsItemsDeleteNode extends SlackSlackListsBaseNode<"slack/slackLists_items_delete"> {}
-export interface SlackSlackListsItemsDeleteMultipleNode extends SlackSlackListsBaseNode<"slack/slackLists_items_deleteMultiple"> {}
-export interface SlackSlackListsItemsInfoNode extends SlackSlackListsBaseNode<"slack/slackLists_items_info"> {}
-export interface SlackSlackListsItemsListNode extends SlackSlackListsBaseNode<"slack/slackLists_items_list"> {}
-export interface SlackSlackListsItemsUpdateNode extends SlackSlackListsBaseNode<"slack/slackLists_items_update"> {}
-export interface SlackSlackListsUpdateNode extends SlackSlackListsBaseNode<"slack/slackLists_update"> {}
+export interface SlackSlackListsAccessDeleteNode
+  extends SlackSlackListsBaseNode<"slack/slackLists_access_delete"> {}
+export interface SlackSlackListsAccessSetNode
+  extends SlackSlackListsBaseNode<"slack/slackLists_access_set"> {}
+export interface SlackSlackListsCreateNode
+  extends SlackSlackListsBaseNode<"slack/slackLists_create"> {}
+export interface SlackSlackListsDownloadGetNode
+  extends SlackSlackListsBaseNode<"slack/slackLists_download_get"> {}
+export interface SlackSlackListsDownloadStartNode
+  extends SlackSlackListsBaseNode<"slack/slackLists_download_start"> {}
+export interface SlackSlackListsItemsCreateNode
+  extends SlackSlackListsBaseNode<"slack/slackLists_items_create"> {}
+export interface SlackSlackListsItemsDeleteNode
+  extends SlackSlackListsBaseNode<"slack/slackLists_items_delete"> {}
+export interface SlackSlackListsItemsDeleteMultipleNode
+  extends SlackSlackListsBaseNode<"slack/slackLists_items_deleteMultiple"> {}
+export interface SlackSlackListsItemsInfoNode
+  extends SlackSlackListsBaseNode<"slack/slackLists_items_info"> {}
+export interface SlackSlackListsItemsListNode
+  extends SlackSlackListsBaseNode<"slack/slackLists_items_list"> {}
+export interface SlackSlackListsItemsUpdateNode
+  extends SlackSlackListsBaseNode<"slack/slackLists_items_update"> {}
+export interface SlackSlackListsUpdateNode
+  extends SlackSlackListsBaseNode<"slack/slackLists_update"> {}
 
 export const NODE_TO_METHOD_SLACKLISTS: Record<string, string> = {
   "slack/slackLists_access_delete": "slackLists.access.delete",
@@ -70,17 +83,43 @@ export function createSlackSlackListsInterpreter(client: SlackClientLike): Inter
   };
 
   return defineInterpreter<SlackSlackListsKind>()({
-    "slack/slackLists_access_delete": async function* (node: SlackSlackListsAccessDeleteNode) { return yield* handler(node); },
-    "slack/slackLists_access_set": async function* (node: SlackSlackListsAccessSetNode) { return yield* handler(node); },
-    "slack/slackLists_create": async function* (node: SlackSlackListsCreateNode) { return yield* handler(node); },
-    "slack/slackLists_download_get": async function* (node: SlackSlackListsDownloadGetNode) { return yield* handler(node); },
-    "slack/slackLists_download_start": async function* (node: SlackSlackListsDownloadStartNode) { return yield* handler(node); },
-    "slack/slackLists_items_create": async function* (node: SlackSlackListsItemsCreateNode) { return yield* handler(node); },
-    "slack/slackLists_items_delete": async function* (node: SlackSlackListsItemsDeleteNode) { return yield* handler(node); },
-    "slack/slackLists_items_deleteMultiple": async function* (node: SlackSlackListsItemsDeleteMultipleNode) { return yield* handler(node); },
-    "slack/slackLists_items_info": async function* (node: SlackSlackListsItemsInfoNode) { return yield* handler(node); },
-    "slack/slackLists_items_list": async function* (node: SlackSlackListsItemsListNode) { return yield* handler(node); },
-    "slack/slackLists_items_update": async function* (node: SlackSlackListsItemsUpdateNode) { return yield* handler(node); },
-    "slack/slackLists_update": async function* (node: SlackSlackListsUpdateNode) { return yield* handler(node); },
+    "slack/slackLists_access_delete": async function* (node: SlackSlackListsAccessDeleteNode) {
+      return yield* handler(node);
+    },
+    "slack/slackLists_access_set": async function* (node: SlackSlackListsAccessSetNode) {
+      return yield* handler(node);
+    },
+    "slack/slackLists_create": async function* (node: SlackSlackListsCreateNode) {
+      return yield* handler(node);
+    },
+    "slack/slackLists_download_get": async function* (node: SlackSlackListsDownloadGetNode) {
+      return yield* handler(node);
+    },
+    "slack/slackLists_download_start": async function* (node: SlackSlackListsDownloadStartNode) {
+      return yield* handler(node);
+    },
+    "slack/slackLists_items_create": async function* (node: SlackSlackListsItemsCreateNode) {
+      return yield* handler(node);
+    },
+    "slack/slackLists_items_delete": async function* (node: SlackSlackListsItemsDeleteNode) {
+      return yield* handler(node);
+    },
+    "slack/slackLists_items_deleteMultiple": async function* (
+      node: SlackSlackListsItemsDeleteMultipleNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/slackLists_items_info": async function* (node: SlackSlackListsItemsInfoNode) {
+      return yield* handler(node);
+    },
+    "slack/slackLists_items_list": async function* (node: SlackSlackListsItemsListNode) {
+      return yield* handler(node);
+    },
+    "slack/slackLists_items_update": async function* (node: SlackSlackListsItemsUpdateNode) {
+      return yield* handler(node);
+    },
+    "slack/slackLists_update": async function* (node: SlackSlackListsUpdateNode) {
+      return yield* handler(node);
+    },
   });
 }

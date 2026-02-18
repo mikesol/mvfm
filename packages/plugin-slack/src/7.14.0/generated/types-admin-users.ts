@@ -39,23 +39,41 @@ import type { SlackParams } from "./types";
 
 export interface SlackMethodsAdminUsers {
   session: {
-    clearSettings(params: SlackParams<AdminUsersSessionClearSettingsArguments>): Expr<AdminUsersSessionClearSettingsResponse>;
-    getSettings(params: SlackParams<AdminUsersSessionGetSettingsArguments>): Expr<AdminUsersSessionGetSettingsResponse>;
-    invalidate(params: SlackParams<AdminUsersSessionInvalidateArguments>): Expr<AdminUsersSessionInvalidateResponse>;
+    clearSettings(
+      params: SlackParams<AdminUsersSessionClearSettingsArguments>,
+    ): Expr<AdminUsersSessionClearSettingsResponse>;
+    getSettings(
+      params: SlackParams<AdminUsersSessionGetSettingsArguments>,
+    ): Expr<AdminUsersSessionGetSettingsResponse>;
+    invalidate(
+      params: SlackParams<AdminUsersSessionInvalidateArguments>,
+    ): Expr<AdminUsersSessionInvalidateResponse>;
     list(params?: SlackParams<AdminUsersSessionListArguments>): Expr<AdminUsersSessionListResponse>;
-    reset(params: SlackParams<AdminUsersSessionResetArguments>): Expr<AdminUsersSessionResetResponse>;
-    resetBulk(params: SlackParams<AdminUsersSessionResetBulkArguments>): Expr<AdminUsersSessionResetBulkResponse>;
-    setSettings(params: SlackParams<AdminUsersSessionSetSettingsArguments>): Expr<AdminUsersSessionSetSettingsResponse>;
+    reset(
+      params: SlackParams<AdminUsersSessionResetArguments>,
+    ): Expr<AdminUsersSessionResetResponse>;
+    resetBulk(
+      params: SlackParams<AdminUsersSessionResetBulkArguments>,
+    ): Expr<AdminUsersSessionResetBulkResponse>;
+    setSettings(
+      params: SlackParams<AdminUsersSessionSetSettingsArguments>,
+    ): Expr<AdminUsersSessionSetSettingsResponse>;
   };
   unsupportedVersions: {
-    export(params: SlackParams<AdminUsersUnsupportedVersionsExportArguments>): Expr<AdminUsersUnsupportedVersionsExportResponse>;
+    export(
+      params: SlackParams<AdminUsersUnsupportedVersionsExportArguments>,
+    ): Expr<AdminUsersUnsupportedVersionsExportResponse>;
   };
   assign(params: SlackParams<AdminUsersAssignArguments>): Expr<AdminUsersAssignResponse>;
   invite(params: SlackParams<AdminUsersInviteArguments>): Expr<AdminUsersInviteResponse>;
   list(params?: SlackParams<AdminUsersListArguments>): Expr<AdminUsersListResponse>;
   remove(params: SlackParams<AdminUsersRemoveArguments>): Expr<AdminUsersRemoveResponse>;
   setAdmin(params: SlackParams<AdminUsersSetAdminArguments>): Expr<AdminUsersSetAdminResponse>;
-  setExpiration(params: SlackParams<AdminUsersSetExpirationArguments>): Expr<AdminUsersSetExpirationResponse>;
+  setExpiration(
+    params: SlackParams<AdminUsersSetExpirationArguments>,
+  ): Expr<AdminUsersSetExpirationResponse>;
   setOwner(params: SlackParams<AdminUsersSetOwnerArguments>): Expr<AdminUsersSetOwnerResponse>;
-  setRegular(params: SlackParams<AdminUsersSetRegularArguments>): Expr<AdminUsersSetRegularResponse>;
+  setRegular(
+    params: SlackParams<AdminUsersSetRegularArguments>,
+  ): Expr<AdminUsersSetRegularResponse>;
 }

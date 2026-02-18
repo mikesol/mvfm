@@ -27,7 +27,9 @@ export interface SlackMethodsApps {
   };
   event: {
     authorizations: {
-      list(params: SlackParams<AppsEventAuthorizationsListArguments>): Expr<AppsEventAuthorizationsListResponse>;
+      list(
+        params: SlackParams<AppsEventAuthorizationsListArguments>,
+      ): Expr<AppsEventAuthorizationsListResponse>;
     };
   };
   manifest: {
@@ -35,7 +37,9 @@ export interface SlackMethodsApps {
     delete(params: SlackParams<AppsManifestDeleteArguments>): Expr<AppsManifestDeleteResponse>;
     export(params: SlackParams<AppsManifestExportArguments>): Expr<AppsManifestExportResponse>;
     update(params: SlackParams<AppsManifestUpdateArguments>): Expr<AppsManifestUpdateResponse>;
-    validate(params: SlackParams<AppsManifestValidateArguments>): Expr<AppsManifestValidateResponse>;
+    validate(
+      params: SlackParams<AppsManifestValidateArguments>,
+    ): Expr<AppsManifestValidateResponse>;
   };
   uninstall(params: SlackParams<AppsUninstallArguments>): Expr<AppsUninstallResponse>;
 }

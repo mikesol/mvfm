@@ -5,11 +5,15 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsEntity } from "./types-entity";
 
 export function buildSlackEntity(ctx: PluginContext, config: SlackConfig): SlackMethodsEntity {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     presentDetails(params) {
-      return ctx.expr({ kind: "slack/entity_presentDetails", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/entity_presentDetails",
+        params: resolveParams(params),
+        config,
+      });
     },
   };
 }

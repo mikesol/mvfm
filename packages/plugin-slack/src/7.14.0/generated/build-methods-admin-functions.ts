@@ -4,20 +4,35 @@ import type { PluginContext } from "@mvfm/core";
 import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminFunctions } from "./types-admin-functions";
 
-export function buildSlackAdminFunctions(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminFunctions {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+export function buildSlackAdminFunctions(
+  ctx: PluginContext,
+  config: SlackConfig,
+): SlackMethodsAdminFunctions {
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     permissions: {
       lookup(params) {
-        return ctx.expr({ kind: "slack/admin_functions_permissions_lookup", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_functions_permissions_lookup",
+          params: resolveParams(params),
+          config,
+        });
       },
       set(params) {
-        return ctx.expr({ kind: "slack/admin_functions_permissions_set", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_functions_permissions_set",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     list(params) {
-      return ctx.expr({ kind: "slack/admin_functions_list", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/admin_functions_list",
+        params: resolveParams(params),
+        config,
+      });
     },
   };
 }

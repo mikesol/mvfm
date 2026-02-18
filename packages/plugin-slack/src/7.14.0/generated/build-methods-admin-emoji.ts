@@ -4,18 +4,29 @@ import type { PluginContext } from "@mvfm/core";
 import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminEmoji } from "./types-admin-emoji";
 
-export function buildSlackAdminEmoji(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminEmoji {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+export function buildSlackAdminEmoji(
+  ctx: PluginContext,
+  config: SlackConfig,
+): SlackMethodsAdminEmoji {
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     add(params) {
       return ctx.expr({ kind: "slack/admin_emoji_add", params: resolveParams(params), config });
     },
     addAlias(params) {
-      return ctx.expr({ kind: "slack/admin_emoji_addAlias", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/admin_emoji_addAlias",
+        params: resolveParams(params),
+        config,
+      });
     },
     list(params?) {
-      return ctx.expr({ kind: "slack/admin_emoji_list", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/admin_emoji_list",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
     remove(params) {
       return ctx.expr({ kind: "slack/admin_emoji_remove", params: resolveParams(params), config });

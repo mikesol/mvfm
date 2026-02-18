@@ -12,21 +12,28 @@ interface SlackFilesBaseNode<K extends SlackFilesKind = SlackFilesKind> extends 
   config: { token: string };
 }
 
-export interface SlackFilesCompleteUploadExternalNode extends SlackFilesBaseNode<"slack/files_completeUploadExternal"> {}
+export interface SlackFilesCompleteUploadExternalNode
+  extends SlackFilesBaseNode<"slack/files_completeUploadExternal"> {}
 export interface SlackFilesDeleteNode extends SlackFilesBaseNode<"slack/files_delete"> {}
-export interface SlackFilesGetUploadURLExternalNode extends SlackFilesBaseNode<"slack/files_getUploadURLExternal"> {}
+export interface SlackFilesGetUploadURLExternalNode
+  extends SlackFilesBaseNode<"slack/files_getUploadURLExternal"> {}
 export interface SlackFilesInfoNode extends SlackFilesBaseNode<"slack/files_info"> {}
 export interface SlackFilesListNode extends SlackFilesBaseNode<"slack/files_list"> {}
-export interface SlackFilesRevokePublicURLNode extends SlackFilesBaseNode<"slack/files_revokePublicURL"> {}
-export interface SlackFilesSharedPublicURLNode extends SlackFilesBaseNode<"slack/files_sharedPublicURL"> {}
+export interface SlackFilesRevokePublicURLNode
+  extends SlackFilesBaseNode<"slack/files_revokePublicURL"> {}
+export interface SlackFilesSharedPublicURLNode
+  extends SlackFilesBaseNode<"slack/files_sharedPublicURL"> {}
 export interface SlackFilesUploadNode extends SlackFilesBaseNode<"slack/files_upload"> {}
-export interface SlackFilesCommentsDeleteNode extends SlackFilesBaseNode<"slack/files_comments_delete"> {}
+export interface SlackFilesCommentsDeleteNode
+  extends SlackFilesBaseNode<"slack/files_comments_delete"> {}
 export interface SlackFilesRemoteAddNode extends SlackFilesBaseNode<"slack/files_remote_add"> {}
 export interface SlackFilesRemoteInfoNode extends SlackFilesBaseNode<"slack/files_remote_info"> {}
 export interface SlackFilesRemoteListNode extends SlackFilesBaseNode<"slack/files_remote_list"> {}
-export interface SlackFilesRemoteRemoveNode extends SlackFilesBaseNode<"slack/files_remote_remove"> {}
+export interface SlackFilesRemoteRemoveNode
+  extends SlackFilesBaseNode<"slack/files_remote_remove"> {}
 export interface SlackFilesRemoteShareNode extends SlackFilesBaseNode<"slack/files_remote_share"> {}
-export interface SlackFilesRemoteUpdateNode extends SlackFilesBaseNode<"slack/files_remote_update"> {}
+export interface SlackFilesRemoteUpdateNode
+  extends SlackFilesBaseNode<"slack/files_remote_update"> {}
 
 export const NODE_TO_METHOD_FILES: Record<string, string> = {
   "slack/files_completeUploadExternal": "files.completeUploadExternal",
@@ -79,20 +86,52 @@ export function createSlackFilesInterpreter(client: SlackClientLike): Interprete
   };
 
   return defineInterpreter<SlackFilesKind>()({
-    "slack/files_completeUploadExternal": async function* (node: SlackFilesCompleteUploadExternalNode) { return yield* handler(node); },
-    "slack/files_delete": async function* (node: SlackFilesDeleteNode) { return yield* handler(node); },
-    "slack/files_getUploadURLExternal": async function* (node: SlackFilesGetUploadURLExternalNode) { return yield* handler(node); },
-    "slack/files_info": async function* (node: SlackFilesInfoNode) { return yield* handler(node); },
-    "slack/files_list": async function* (node: SlackFilesListNode) { return yield* handler(node); },
-    "slack/files_revokePublicURL": async function* (node: SlackFilesRevokePublicURLNode) { return yield* handler(node); },
-    "slack/files_sharedPublicURL": async function* (node: SlackFilesSharedPublicURLNode) { return yield* handler(node); },
-    "slack/files_upload": async function* (node: SlackFilesUploadNode) { return yield* handler(node); },
-    "slack/files_comments_delete": async function* (node: SlackFilesCommentsDeleteNode) { return yield* handler(node); },
-    "slack/files_remote_add": async function* (node: SlackFilesRemoteAddNode) { return yield* handler(node); },
-    "slack/files_remote_info": async function* (node: SlackFilesRemoteInfoNode) { return yield* handler(node); },
-    "slack/files_remote_list": async function* (node: SlackFilesRemoteListNode) { return yield* handler(node); },
-    "slack/files_remote_remove": async function* (node: SlackFilesRemoteRemoveNode) { return yield* handler(node); },
-    "slack/files_remote_share": async function* (node: SlackFilesRemoteShareNode) { return yield* handler(node); },
-    "slack/files_remote_update": async function* (node: SlackFilesRemoteUpdateNode) { return yield* handler(node); },
+    "slack/files_completeUploadExternal": async function* (
+      node: SlackFilesCompleteUploadExternalNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/files_delete": async function* (node: SlackFilesDeleteNode) {
+      return yield* handler(node);
+    },
+    "slack/files_getUploadURLExternal": async function* (node: SlackFilesGetUploadURLExternalNode) {
+      return yield* handler(node);
+    },
+    "slack/files_info": async function* (node: SlackFilesInfoNode) {
+      return yield* handler(node);
+    },
+    "slack/files_list": async function* (node: SlackFilesListNode) {
+      return yield* handler(node);
+    },
+    "slack/files_revokePublicURL": async function* (node: SlackFilesRevokePublicURLNode) {
+      return yield* handler(node);
+    },
+    "slack/files_sharedPublicURL": async function* (node: SlackFilesSharedPublicURLNode) {
+      return yield* handler(node);
+    },
+    "slack/files_upload": async function* (node: SlackFilesUploadNode) {
+      return yield* handler(node);
+    },
+    "slack/files_comments_delete": async function* (node: SlackFilesCommentsDeleteNode) {
+      return yield* handler(node);
+    },
+    "slack/files_remote_add": async function* (node: SlackFilesRemoteAddNode) {
+      return yield* handler(node);
+    },
+    "slack/files_remote_info": async function* (node: SlackFilesRemoteInfoNode) {
+      return yield* handler(node);
+    },
+    "slack/files_remote_list": async function* (node: SlackFilesRemoteListNode) {
+      return yield* handler(node);
+    },
+    "slack/files_remote_remove": async function* (node: SlackFilesRemoteRemoveNode) {
+      return yield* handler(node);
+    },
+    "slack/files_remote_share": async function* (node: SlackFilesRemoteShareNode) {
+      return yield* handler(node);
+    },
+    "slack/files_remote_update": async function* (node: SlackFilesRemoteUpdateNode) {
+      return yield* handler(node);
+    },
   });
 }

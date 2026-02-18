@@ -5,9 +5,9 @@ import type {
   AdminAppsActivitiesListArguments,
   AdminAppsActivitiesListResponse,
   AdminAppsApproveArguments,
-  AdminAppsApproveResponse,
   AdminAppsApprovedListArguments,
   AdminAppsApprovedListResponse,
+  AdminAppsApproveResponse,
   AdminAppsClearResolutionArguments,
   AdminAppsClearResolutionResponse,
   AdminAppsConfigLookupArguments,
@@ -19,9 +19,9 @@ import type {
   AdminAppsRequestsListArguments,
   AdminAppsRequestsListResponse,
   AdminAppsRestrictArguments,
-  AdminAppsRestrictResponse,
   AdminAppsRestrictedListArguments,
   AdminAppsRestrictedListResponse,
+  AdminAppsRestrictResponse,
   AdminAppsUninstallArguments,
   AdminAppsUninstallResponse,
 } from "@slack/web-api";
@@ -29,24 +29,34 @@ import type { SlackParams } from "./types";
 
 export interface SlackMethodsAdminApps {
   activities: {
-    list(params?: SlackParams<AdminAppsActivitiesListArguments>): Expr<AdminAppsActivitiesListResponse>;
+    list(
+      params?: SlackParams<AdminAppsActivitiesListArguments>,
+    ): Expr<AdminAppsActivitiesListResponse>;
   };
   approved: {
     list(params: SlackParams<AdminAppsApprovedListArguments>): Expr<AdminAppsApprovedListResponse>;
   };
   config: {
-    lookup(params: SlackParams<AdminAppsConfigLookupArguments>): Expr<AdminAppsConfigLookupResponse>;
+    lookup(
+      params: SlackParams<AdminAppsConfigLookupArguments>,
+    ): Expr<AdminAppsConfigLookupResponse>;
     set(params: SlackParams<AdminAppsConfigSetArguments>): Expr<AdminAppsConfigSetResponse>;
   };
   requests: {
-    cancel(params: SlackParams<AdminAppsRequestsCancelArguments>): Expr<AdminAppsRequestsCancelResponse>;
+    cancel(
+      params: SlackParams<AdminAppsRequestsCancelArguments>,
+    ): Expr<AdminAppsRequestsCancelResponse>;
     list(params: SlackParams<AdminAppsRequestsListArguments>): Expr<AdminAppsRequestsListResponse>;
   };
   restricted: {
-    list(params: SlackParams<AdminAppsRestrictedListArguments>): Expr<AdminAppsRestrictedListResponse>;
+    list(
+      params: SlackParams<AdminAppsRestrictedListArguments>,
+    ): Expr<AdminAppsRestrictedListResponse>;
   };
   approve(params: SlackParams<AdminAppsApproveArguments>): Expr<AdminAppsApproveResponse>;
-  clearResolution(params: SlackParams<AdminAppsClearResolutionArguments>): Expr<AdminAppsClearResolutionResponse>;
+  clearResolution(
+    params: SlackParams<AdminAppsClearResolutionArguments>,
+  ): Expr<AdminAppsClearResolutionResponse>;
   restrict(params: SlackParams<AdminAppsRestrictArguments>): Expr<AdminAppsRestrictResponse>;
   uninstall(params: SlackParams<AdminAppsUninstallArguments>): Expr<AdminAppsUninstallResponse>;
 }

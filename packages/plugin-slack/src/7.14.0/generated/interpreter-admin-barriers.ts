@@ -6,16 +6,21 @@ import type { SLACK_NODE_KINDS_ADMIN_BARRIERS } from "./node-kinds-admin-barrier
 
 type SlackAdminBarriersKind = (typeof SLACK_NODE_KINDS_ADMIN_BARRIERS)[number];
 
-interface SlackAdminBarriersBaseNode<K extends SlackAdminBarriersKind = SlackAdminBarriersKind> extends TypedNode<unknown> {
+interface SlackAdminBarriersBaseNode<K extends SlackAdminBarriersKind = SlackAdminBarriersKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackAdminBarriersCreateNode extends SlackAdminBarriersBaseNode<"slack/admin_barriers_create"> {}
-export interface SlackAdminBarriersDeleteNode extends SlackAdminBarriersBaseNode<"slack/admin_barriers_delete"> {}
-export interface SlackAdminBarriersListNode extends SlackAdminBarriersBaseNode<"slack/admin_barriers_list"> {}
-export interface SlackAdminBarriersUpdateNode extends SlackAdminBarriersBaseNode<"slack/admin_barriers_update"> {}
+export interface SlackAdminBarriersCreateNode
+  extends SlackAdminBarriersBaseNode<"slack/admin_barriers_create"> {}
+export interface SlackAdminBarriersDeleteNode
+  extends SlackAdminBarriersBaseNode<"slack/admin_barriers_delete"> {}
+export interface SlackAdminBarriersListNode
+  extends SlackAdminBarriersBaseNode<"slack/admin_barriers_list"> {}
+export interface SlackAdminBarriersUpdateNode
+  extends SlackAdminBarriersBaseNode<"slack/admin_barriers_update"> {}
 
 export const NODE_TO_METHOD_ADMIN_BARRIERS: Record<string, string> = {
   "slack/admin_barriers_create": "admin.barriers.create",
@@ -46,9 +51,17 @@ export function createSlackAdminBarriersInterpreter(client: SlackClientLike): In
   };
 
   return defineInterpreter<SlackAdminBarriersKind>()({
-    "slack/admin_barriers_create": async function* (node: SlackAdminBarriersCreateNode) { return yield* handler(node); },
-    "slack/admin_barriers_delete": async function* (node: SlackAdminBarriersDeleteNode) { return yield* handler(node); },
-    "slack/admin_barriers_list": async function* (node: SlackAdminBarriersListNode) { return yield* handler(node); },
-    "slack/admin_barriers_update": async function* (node: SlackAdminBarriersUpdateNode) { return yield* handler(node); },
+    "slack/admin_barriers_create": async function* (node: SlackAdminBarriersCreateNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_barriers_delete": async function* (node: SlackAdminBarriersDeleteNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_barriers_list": async function* (node: SlackAdminBarriersListNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_barriers_update": async function* (node: SlackAdminBarriersUpdateNode) {
+      return yield* handler(node);
+    },
   });
 }

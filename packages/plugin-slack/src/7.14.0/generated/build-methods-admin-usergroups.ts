@@ -4,21 +4,40 @@ import type { PluginContext } from "@mvfm/core";
 import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminUsergroups } from "./types-admin-usergroups";
 
-export function buildSlackAdminUsergroups(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminUsergroups {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+export function buildSlackAdminUsergroups(
+  ctx: PluginContext,
+  config: SlackConfig,
+): SlackMethodsAdminUsergroups {
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     addChannels(params) {
-      return ctx.expr({ kind: "slack/admin_usergroups_addChannels", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/admin_usergroups_addChannels",
+        params: resolveParams(params),
+        config,
+      });
     },
     addTeams(params) {
-      return ctx.expr({ kind: "slack/admin_usergroups_addTeams", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/admin_usergroups_addTeams",
+        params: resolveParams(params),
+        config,
+      });
     },
     listChannels(params) {
-      return ctx.expr({ kind: "slack/admin_usergroups_listChannels", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/admin_usergroups_listChannels",
+        params: resolveParams(params),
+        config,
+      });
     },
     removeChannels(params) {
-      return ctx.expr({ kind: "slack/admin_usergroups_removeChannels", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/admin_usergroups_removeChannels",
+        params: resolveParams(params),
+        config,
+      });
     },
   };
 }

@@ -20,7 +20,9 @@ import type { SlackParams } from "./types";
 export interface SlackMethodsCalls {
   participants: {
     add(params: SlackParams<CallsParticipantsAddArguments>): Expr<CallsParticipantsAddResponse>;
-    remove(params: SlackParams<CallsParticipantsRemoveArguments>): Expr<CallsParticipantsRemoveResponse>;
+    remove(
+      params: SlackParams<CallsParticipantsRemoveArguments>,
+    ): Expr<CallsParticipantsRemoveResponse>;
   };
   add(params: SlackParams<CallsAddArguments>): Expr<CallsAddResponse>;
   end(params: SlackParams<CallsEndArguments>): Expr<CallsEndResponse>;

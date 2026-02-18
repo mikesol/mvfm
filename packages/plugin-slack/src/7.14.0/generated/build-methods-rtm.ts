@@ -5,14 +5,22 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsRtm } from "./types-rtm";
 
 export function buildSlackRtm(ctx: PluginContext, config: SlackConfig): SlackMethodsRtm {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     connect(params?) {
-      return ctx.expr({ kind: "slack/rtm_connect", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/rtm_connect",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
     start(params?) {
-      return ctx.expr({ kind: "slack/rtm_start", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/rtm_start",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
   };
 }

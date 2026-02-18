@@ -6,15 +6,19 @@ import type { SLACK_NODE_KINDS_ADMIN_ROLES } from "./node-kinds-admin-roles";
 
 type SlackAdminRolesKind = (typeof SLACK_NODE_KINDS_ADMIN_ROLES)[number];
 
-interface SlackAdminRolesBaseNode<K extends SlackAdminRolesKind = SlackAdminRolesKind> extends TypedNode<unknown> {
+interface SlackAdminRolesBaseNode<K extends SlackAdminRolesKind = SlackAdminRolesKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackAdminRolesAddAssignmentsNode extends SlackAdminRolesBaseNode<"slack/admin_roles_addAssignments"> {}
-export interface SlackAdminRolesListAssignmentsNode extends SlackAdminRolesBaseNode<"slack/admin_roles_listAssignments"> {}
-export interface SlackAdminRolesRemoveAssignmentsNode extends SlackAdminRolesBaseNode<"slack/admin_roles_removeAssignments"> {}
+export interface SlackAdminRolesAddAssignmentsNode
+  extends SlackAdminRolesBaseNode<"slack/admin_roles_addAssignments"> {}
+export interface SlackAdminRolesListAssignmentsNode
+  extends SlackAdminRolesBaseNode<"slack/admin_roles_listAssignments"> {}
+export interface SlackAdminRolesRemoveAssignmentsNode
+  extends SlackAdminRolesBaseNode<"slack/admin_roles_removeAssignments"> {}
 
 export const NODE_TO_METHOD_ADMIN_ROLES: Record<string, string> = {
   "slack/admin_roles_addAssignments": "admin.roles.addAssignments",
@@ -43,8 +47,18 @@ export function createSlackAdminRolesInterpreter(client: SlackClientLike): Inter
   };
 
   return defineInterpreter<SlackAdminRolesKind>()({
-    "slack/admin_roles_addAssignments": async function* (node: SlackAdminRolesAddAssignmentsNode) { return yield* handler(node); },
-    "slack/admin_roles_listAssignments": async function* (node: SlackAdminRolesListAssignmentsNode) { return yield* handler(node); },
-    "slack/admin_roles_removeAssignments": async function* (node: SlackAdminRolesRemoveAssignmentsNode) { return yield* handler(node); },
+    "slack/admin_roles_addAssignments": async function* (node: SlackAdminRolesAddAssignmentsNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_roles_listAssignments": async function* (
+      node: SlackAdminRolesListAssignmentsNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_roles_removeAssignments": async function* (
+      node: SlackAdminRolesRemoveAssignmentsNode,
+    ) {
+      return yield* handler(node);
+    },
   });
 }

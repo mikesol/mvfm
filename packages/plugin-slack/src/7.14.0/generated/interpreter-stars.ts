@@ -43,8 +43,14 @@ export function createSlackStarsInterpreter(client: SlackClientLike): Interprete
   };
 
   return defineInterpreter<SlackStarsKind>()({
-    "slack/stars_add": async function* (node: SlackStarsAddNode) { return yield* handler(node); },
-    "slack/stars_list": async function* (node: SlackStarsListNode) { return yield* handler(node); },
-    "slack/stars_remove": async function* (node: SlackStarsRemoveNode) { return yield* handler(node); },
+    "slack/stars_add": async function* (node: SlackStarsAddNode) {
+      return yield* handler(node);
+    },
+    "slack/stars_list": async function* (node: SlackStarsListNode) {
+      return yield* handler(node);
+    },
+    "slack/stars_remove": async function* (node: SlackStarsRemoveNode) {
+      return yield* handler(node);
+    },
   });
 }

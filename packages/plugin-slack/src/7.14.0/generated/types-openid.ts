@@ -12,6 +12,8 @@ import type { SlackParams } from "./types";
 export interface SlackMethodsOpenid {
   connect: {
     token(params: SlackParams<OpenIDConnectTokenArguments>): Expr<OpenIDConnectTokenResponse>;
-    userInfo(params?: SlackParams<OpenIDConnectUserInfoArguments>): Expr<OpenIDConnectUserInfoResponse>;
+    userInfo(
+      params?: SlackParams<OpenIDConnectUserInfoArguments>,
+    ): Expr<OpenIDConnectUserInfoResponse>;
   };
 }

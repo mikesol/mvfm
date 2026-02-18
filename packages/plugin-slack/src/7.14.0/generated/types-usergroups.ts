@@ -22,7 +22,9 @@ import type { SlackParams } from "./types";
 export interface SlackMethodsUsergroups {
   users: {
     list(params: SlackParams<UsergroupsUsersListArguments>): Expr<UsergroupsUsersListResponse>;
-    update(params: SlackParams<UsergroupsUsersUpdateArguments>): Expr<UsergroupsUsersUpdateResponse>;
+    update(
+      params: SlackParams<UsergroupsUsersUpdateArguments>,
+    ): Expr<UsergroupsUsersUpdateResponse>;
   };
   create(params: SlackParams<UsergroupsCreateArguments>): Expr<UsergroupsCreateResponse>;
   disable(params: SlackParams<UsergroupsDisableArguments>): Expr<UsergroupsDisableResponse>;

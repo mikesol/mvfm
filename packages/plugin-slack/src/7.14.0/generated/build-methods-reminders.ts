@@ -4,8 +4,11 @@ import type { PluginContext } from "@mvfm/core";
 import type { SlackConfig } from "./types";
 import type { SlackMethodsReminders } from "./types-reminders";
 
-export function buildSlackReminders(ctx: PluginContext, config: SlackConfig): SlackMethodsReminders {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+export function buildSlackReminders(
+  ctx: PluginContext,
+  config: SlackConfig,
+): SlackMethodsReminders {
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     add(params) {
@@ -21,7 +24,11 @@ export function buildSlackReminders(ctx: PluginContext, config: SlackConfig): Sl
       return ctx.expr({ kind: "slack/reminders_info", params: resolveParams(params), config });
     },
     list(params?) {
-      return ctx.expr({ kind: "slack/reminders_list", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/reminders_list",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
   };
 }

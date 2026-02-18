@@ -4,19 +4,34 @@ import type { PluginContext } from "@mvfm/core";
 import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminAuth } from "./types-admin-auth";
 
-export function buildSlackAdminAuth(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminAuth {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+export function buildSlackAdminAuth(
+  ctx: PluginContext,
+  config: SlackConfig,
+): SlackMethodsAdminAuth {
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     policy: {
       assignEntities(params) {
-        return ctx.expr({ kind: "slack/admin_auth_policy_assignEntities", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_auth_policy_assignEntities",
+          params: resolveParams(params),
+          config,
+        });
       },
       getEntities(params) {
-        return ctx.expr({ kind: "slack/admin_auth_policy_getEntities", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_auth_policy_getEntities",
+          params: resolveParams(params),
+          config,
+        });
       },
       removeEntities(params) {
-        return ctx.expr({ kind: "slack/admin_auth_policy_removeEntities", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_auth_policy_removeEntities",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
   };

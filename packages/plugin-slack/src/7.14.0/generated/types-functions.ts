@@ -10,6 +10,10 @@ import type {
 import type { SlackParams } from "./types";
 
 export interface SlackMethodsFunctions {
-  completeError(params: SlackParams<FunctionsCompleteErrorArguments>): Expr<FunctionsCompleteErrorResponse>;
-  completeSuccess(params: SlackParams<FunctionsCompleteSuccessArguments>): Expr<FunctionsCompleteSuccessResponse>;
+  completeError(
+    params: SlackParams<FunctionsCompleteErrorArguments>,
+  ): Expr<FunctionsCompleteErrorResponse>;
+  completeSuccess(
+    params: SlackParams<FunctionsCompleteSuccessArguments>,
+  ): Expr<FunctionsCompleteSuccessResponse>;
 }

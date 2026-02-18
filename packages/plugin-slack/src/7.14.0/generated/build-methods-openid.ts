@@ -5,15 +5,23 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsOpenid } from "./types-openid";
 
 export function buildSlackOpenid(ctx: PluginContext, config: SlackConfig): SlackMethodsOpenid {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     connect: {
       token(params) {
-        return ctx.expr({ kind: "slack/openid_connect_token", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/openid_connect_token",
+          params: resolveParams(params),
+          config,
+        });
       },
       userInfo(params?) {
-        return ctx.expr({ kind: "slack/openid_connect_userInfo", params: params != null ? resolveParams(params) : null, config });
+        return ctx.expr({
+          kind: "slack/openid_connect_userInfo",
+          params: params != null ? resolveParams(params) : null,
+          config,
+        });
       },
     },
   };

@@ -46,9 +46,17 @@ export function createSlackViewsInterpreter(client: SlackClientLike): Interprete
   };
 
   return defineInterpreter<SlackViewsKind>()({
-    "slack/views_open": async function* (node: SlackViewsOpenNode) { return yield* handler(node); },
-    "slack/views_publish": async function* (node: SlackViewsPublishNode) { return yield* handler(node); },
-    "slack/views_push": async function* (node: SlackViewsPushNode) { return yield* handler(node); },
-    "slack/views_update": async function* (node: SlackViewsUpdateNode) { return yield* handler(node); },
+    "slack/views_open": async function* (node: SlackViewsOpenNode) {
+      return yield* handler(node);
+    },
+    "slack/views_publish": async function* (node: SlackViewsPublishNode) {
+      return yield* handler(node);
+    },
+    "slack/views_push": async function* (node: SlackViewsPushNode) {
+      return yield* handler(node);
+    },
+    "slack/views_update": async function* (node: SlackViewsUpdateNode) {
+      return yield* handler(node);
+    },
   });
 }

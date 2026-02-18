@@ -5,11 +5,15 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsBots } from "./types-bots";
 
 export function buildSlackBots(ctx: PluginContext, config: SlackConfig): SlackMethodsBots {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     info(params?) {
-      return ctx.expr({ kind: "slack/bots_info", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/bots_info",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
   };
 }

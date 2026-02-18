@@ -6,19 +6,26 @@ import type { SLACK_NODE_KINDS_USERGROUPS } from "./node-kinds-usergroups";
 
 type SlackUsergroupsKind = (typeof SLACK_NODE_KINDS_USERGROUPS)[number];
 
-interface SlackUsergroupsBaseNode<K extends SlackUsergroupsKind = SlackUsergroupsKind> extends TypedNode<unknown> {
+interface SlackUsergroupsBaseNode<K extends SlackUsergroupsKind = SlackUsergroupsKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackUsergroupsCreateNode extends SlackUsergroupsBaseNode<"slack/usergroups_create"> {}
-export interface SlackUsergroupsDisableNode extends SlackUsergroupsBaseNode<"slack/usergroups_disable"> {}
-export interface SlackUsergroupsEnableNode extends SlackUsergroupsBaseNode<"slack/usergroups_enable"> {}
+export interface SlackUsergroupsCreateNode
+  extends SlackUsergroupsBaseNode<"slack/usergroups_create"> {}
+export interface SlackUsergroupsDisableNode
+  extends SlackUsergroupsBaseNode<"slack/usergroups_disable"> {}
+export interface SlackUsergroupsEnableNode
+  extends SlackUsergroupsBaseNode<"slack/usergroups_enable"> {}
 export interface SlackUsergroupsListNode extends SlackUsergroupsBaseNode<"slack/usergroups_list"> {}
-export interface SlackUsergroupsUpdateNode extends SlackUsergroupsBaseNode<"slack/usergroups_update"> {}
-export interface SlackUsergroupsUsersListNode extends SlackUsergroupsBaseNode<"slack/usergroups_users_list"> {}
-export interface SlackUsergroupsUsersUpdateNode extends SlackUsergroupsBaseNode<"slack/usergroups_users_update"> {}
+export interface SlackUsergroupsUpdateNode
+  extends SlackUsergroupsBaseNode<"slack/usergroups_update"> {}
+export interface SlackUsergroupsUsersListNode
+  extends SlackUsergroupsBaseNode<"slack/usergroups_users_list"> {}
+export interface SlackUsergroupsUsersUpdateNode
+  extends SlackUsergroupsBaseNode<"slack/usergroups_users_update"> {}
 
 export const NODE_TO_METHOD_USERGROUPS: Record<string, string> = {
   "slack/usergroups_create": "usergroups.create",
@@ -55,12 +62,26 @@ export function createSlackUsergroupsInterpreter(client: SlackClientLike): Inter
   };
 
   return defineInterpreter<SlackUsergroupsKind>()({
-    "slack/usergroups_create": async function* (node: SlackUsergroupsCreateNode) { return yield* handler(node); },
-    "slack/usergroups_disable": async function* (node: SlackUsergroupsDisableNode) { return yield* handler(node); },
-    "slack/usergroups_enable": async function* (node: SlackUsergroupsEnableNode) { return yield* handler(node); },
-    "slack/usergroups_list": async function* (node: SlackUsergroupsListNode) { return yield* handler(node); },
-    "slack/usergroups_update": async function* (node: SlackUsergroupsUpdateNode) { return yield* handler(node); },
-    "slack/usergroups_users_list": async function* (node: SlackUsergroupsUsersListNode) { return yield* handler(node); },
-    "slack/usergroups_users_update": async function* (node: SlackUsergroupsUsersUpdateNode) { return yield* handler(node); },
+    "slack/usergroups_create": async function* (node: SlackUsergroupsCreateNode) {
+      return yield* handler(node);
+    },
+    "slack/usergroups_disable": async function* (node: SlackUsergroupsDisableNode) {
+      return yield* handler(node);
+    },
+    "slack/usergroups_enable": async function* (node: SlackUsergroupsEnableNode) {
+      return yield* handler(node);
+    },
+    "slack/usergroups_list": async function* (node: SlackUsergroupsListNode) {
+      return yield* handler(node);
+    },
+    "slack/usergroups_update": async function* (node: SlackUsergroupsUpdateNode) {
+      return yield* handler(node);
+    },
+    "slack/usergroups_users_list": async function* (node: SlackUsergroupsUsersListNode) {
+      return yield* handler(node);
+    },
+    "slack/usergroups_users_update": async function* (node: SlackUsergroupsUsersUpdateNode) {
+      return yield* handler(node);
+    },
   });
 }

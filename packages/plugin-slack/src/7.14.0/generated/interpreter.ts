@@ -3,19 +3,58 @@
 import type { Interpreter } from "@mvfm/core";
 import { mergeInterpreters } from "@mvfm/core";
 
-import { createSlackAdminAnalyticsInterpreter, NODE_TO_METHOD_ADMIN_ANALYTICS } from "./interpreter-admin-analytics";
-import { createSlackAdminAppsInterpreter, NODE_TO_METHOD_ADMIN_APPS } from "./interpreter-admin-apps";
-import { createSlackAdminAuthInterpreter, NODE_TO_METHOD_ADMIN_AUTH } from "./interpreter-admin-auth";
-import { createSlackAdminBarriersInterpreter, NODE_TO_METHOD_ADMIN_BARRIERS } from "./interpreter-admin-barriers";
-import { createSlackAdminConversationsInterpreter, NODE_TO_METHOD_ADMIN_CONVERSATIONS } from "./interpreter-admin-conversations";
-import { createSlackAdminEmojiInterpreter, NODE_TO_METHOD_ADMIN_EMOJI } from "./interpreter-admin-emoji";
-import { createSlackAdminFunctionsInterpreter, NODE_TO_METHOD_ADMIN_FUNCTIONS } from "./interpreter-admin-functions";
-import { createSlackAdminInviteRequestsInterpreter, NODE_TO_METHOD_ADMIN_INVITEREQUESTS } from "./interpreter-admin-inviteRequests";
-import { createSlackAdminRolesInterpreter, NODE_TO_METHOD_ADMIN_ROLES } from "./interpreter-admin-roles";
-import { createSlackAdminTeamsInterpreter, NODE_TO_METHOD_ADMIN_TEAMS } from "./interpreter-admin-teams";
-import { createSlackAdminUsergroupsInterpreter, NODE_TO_METHOD_ADMIN_USERGROUPS } from "./interpreter-admin-usergroups";
-import { createSlackAdminUsersInterpreter, NODE_TO_METHOD_ADMIN_USERS } from "./interpreter-admin-users";
-import { createSlackAdminWorkflowsInterpreter, NODE_TO_METHOD_ADMIN_WORKFLOWS } from "./interpreter-admin-workflows";
+import {
+  createSlackAdminAnalyticsInterpreter,
+  NODE_TO_METHOD_ADMIN_ANALYTICS,
+} from "./interpreter-admin-analytics";
+import {
+  createSlackAdminAppsInterpreter,
+  NODE_TO_METHOD_ADMIN_APPS,
+} from "./interpreter-admin-apps";
+import {
+  createSlackAdminAuthInterpreter,
+  NODE_TO_METHOD_ADMIN_AUTH,
+} from "./interpreter-admin-auth";
+import {
+  createSlackAdminBarriersInterpreter,
+  NODE_TO_METHOD_ADMIN_BARRIERS,
+} from "./interpreter-admin-barriers";
+import {
+  createSlackAdminConversationsInterpreter,
+  NODE_TO_METHOD_ADMIN_CONVERSATIONS,
+} from "./interpreter-admin-conversations";
+import {
+  createSlackAdminEmojiInterpreter,
+  NODE_TO_METHOD_ADMIN_EMOJI,
+} from "./interpreter-admin-emoji";
+import {
+  createSlackAdminFunctionsInterpreter,
+  NODE_TO_METHOD_ADMIN_FUNCTIONS,
+} from "./interpreter-admin-functions";
+import {
+  createSlackAdminInviteRequestsInterpreter,
+  NODE_TO_METHOD_ADMIN_INVITEREQUESTS,
+} from "./interpreter-admin-inviteRequests";
+import {
+  createSlackAdminRolesInterpreter,
+  NODE_TO_METHOD_ADMIN_ROLES,
+} from "./interpreter-admin-roles";
+import {
+  createSlackAdminTeamsInterpreter,
+  NODE_TO_METHOD_ADMIN_TEAMS,
+} from "./interpreter-admin-teams";
+import {
+  createSlackAdminUsergroupsInterpreter,
+  NODE_TO_METHOD_ADMIN_USERGROUPS,
+} from "./interpreter-admin-usergroups";
+import {
+  createSlackAdminUsersInterpreter,
+  NODE_TO_METHOD_ADMIN_USERS,
+} from "./interpreter-admin-users";
+import {
+  createSlackAdminWorkflowsInterpreter,
+  NODE_TO_METHOD_ADMIN_WORKFLOWS,
+} from "./interpreter-admin-workflows";
 import { createSlackApiInterpreter, NODE_TO_METHOD_API } from "./interpreter-api";
 import { createSlackAppsInterpreter, NODE_TO_METHOD_APPS } from "./interpreter-apps";
 import { createSlackAssistantInterpreter, NODE_TO_METHOD_ASSISTANT } from "./interpreter-assistant";
@@ -25,7 +64,10 @@ import { createSlackBotsInterpreter, NODE_TO_METHOD_BOTS } from "./interpreter-b
 import { createSlackCallsInterpreter, NODE_TO_METHOD_CALLS } from "./interpreter-calls";
 import { createSlackCanvasesInterpreter, NODE_TO_METHOD_CANVASES } from "./interpreter-canvases";
 import { createSlackChatInterpreter, NODE_TO_METHOD_CHAT } from "./interpreter-chat";
-import { createSlackConversationsInterpreter, NODE_TO_METHOD_CONVERSATIONS } from "./interpreter-conversations";
+import {
+  createSlackConversationsInterpreter,
+  NODE_TO_METHOD_CONVERSATIONS,
+} from "./interpreter-conversations";
 import { createSlackDialogInterpreter, NODE_TO_METHOD_DIALOG } from "./interpreter-dialog";
 import { createSlackDndInterpreter, NODE_TO_METHOD_DND } from "./interpreter-dnd";
 import { createSlackEmojiInterpreter, NODE_TO_METHOD_EMOJI } from "./interpreter-emoji";
@@ -40,11 +82,17 @@ import { createSlackReactionsInterpreter, NODE_TO_METHOD_REACTIONS } from "./int
 import { createSlackRemindersInterpreter, NODE_TO_METHOD_REMINDERS } from "./interpreter-reminders";
 import { createSlackRtmInterpreter, NODE_TO_METHOD_RTM } from "./interpreter-rtm";
 import { createSlackSearchInterpreter, NODE_TO_METHOD_SEARCH } from "./interpreter-search";
-import { createSlackSlackListsInterpreter, NODE_TO_METHOD_SLACKLISTS } from "./interpreter-slackLists";
+import {
+  createSlackSlackListsInterpreter,
+  NODE_TO_METHOD_SLACKLISTS,
+} from "./interpreter-slackLists";
 import { createSlackStarsInterpreter, NODE_TO_METHOD_STARS } from "./interpreter-stars";
 import { createSlackTeamInterpreter, NODE_TO_METHOD_TEAM } from "./interpreter-team";
 import { createSlackToolingInterpreter, NODE_TO_METHOD_TOOLING } from "./interpreter-tooling";
-import { createSlackUsergroupsInterpreter, NODE_TO_METHOD_USERGROUPS } from "./interpreter-usergroups";
+import {
+  createSlackUsergroupsInterpreter,
+  NODE_TO_METHOD_USERGROUPS,
+} from "./interpreter-usergroups";
 import { createSlackUsersInterpreter, NODE_TO_METHOD_USERS } from "./interpreter-users";
 import { createSlackViewsInterpreter, NODE_TO_METHOD_VIEWS } from "./interpreter-views";
 import { createSlackWorkflowsInterpreter, NODE_TO_METHOD_WORKFLOWS } from "./interpreter-workflows";

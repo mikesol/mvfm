@@ -5,36 +5,64 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsApps } from "./types-apps";
 
 export function buildSlackApps(ctx: PluginContext, config: SlackConfig): SlackMethodsApps {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     connections: {
       open(params?) {
-        return ctx.expr({ kind: "slack/apps_connections_open", params: params != null ? resolveParams(params) : null, config });
+        return ctx.expr({
+          kind: "slack/apps_connections_open",
+          params: params != null ? resolveParams(params) : null,
+          config,
+        });
       },
     },
     event: {
       authorizations: {
         list(params) {
-          return ctx.expr({ kind: "slack/apps_event_authorizations_list", params: resolveParams(params), config });
+          return ctx.expr({
+            kind: "slack/apps_event_authorizations_list",
+            params: resolveParams(params),
+            config,
+          });
         },
       },
     },
     manifest: {
       create(params) {
-        return ctx.expr({ kind: "slack/apps_manifest_create", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/apps_manifest_create",
+          params: resolveParams(params),
+          config,
+        });
       },
       delete(params) {
-        return ctx.expr({ kind: "slack/apps_manifest_delete", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/apps_manifest_delete",
+          params: resolveParams(params),
+          config,
+        });
       },
       export(params) {
-        return ctx.expr({ kind: "slack/apps_manifest_export", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/apps_manifest_export",
+          params: resolveParams(params),
+          config,
+        });
       },
       update(params) {
-        return ctx.expr({ kind: "slack/apps_manifest_update", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/apps_manifest_update",
+          params: resolveParams(params),
+          config,
+        });
       },
       validate(params) {
-        return ctx.expr({ kind: "slack/apps_manifest_validate", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/apps_manifest_validate",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     uninstall(params) {

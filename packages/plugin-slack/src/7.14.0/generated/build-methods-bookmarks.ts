@@ -4,8 +4,11 @@ import type { PluginContext } from "@mvfm/core";
 import type { SlackConfig } from "./types";
 import type { SlackMethodsBookmarks } from "./types-bookmarks";
 
-export function buildSlackBookmarks(ctx: PluginContext, config: SlackConfig): SlackMethodsBookmarks {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+export function buildSlackBookmarks(
+  ctx: PluginContext,
+  config: SlackConfig,
+): SlackMethodsBookmarks {
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     add(params) {

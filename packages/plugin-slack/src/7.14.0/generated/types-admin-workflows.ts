@@ -17,12 +17,20 @@ import type { SlackParams } from "./types";
 
 export interface SlackMethodsAdminWorkflows {
   collaborators: {
-    add(params: SlackParams<AdminWorkflowsCollaboratorsAddArguments>): Expr<AdminWorkflowsCollaboratorsAddResponse>;
-    remove(params: SlackParams<AdminWorkflowsCollaboratorsRemoveArguments>): Expr<AdminWorkflowsCollaboratorsRemoveResponse>;
+    add(
+      params: SlackParams<AdminWorkflowsCollaboratorsAddArguments>,
+    ): Expr<AdminWorkflowsCollaboratorsAddResponse>;
+    remove(
+      params: SlackParams<AdminWorkflowsCollaboratorsRemoveArguments>,
+    ): Expr<AdminWorkflowsCollaboratorsRemoveResponse>;
   };
   permissions: {
-    lookup(params: SlackParams<AdminWorkflowsPermissionsLookupArguments>): Expr<AdminWorkflowsPermissionsLookupResponse>;
+    lookup(
+      params: SlackParams<AdminWorkflowsPermissionsLookupArguments>,
+    ): Expr<AdminWorkflowsPermissionsLookupResponse>;
   };
   search(params?: SlackParams<AdminWorkflowsSearchArguments>): Expr<AdminWorkflowsSearchResponse>;
-  unpublish(params: SlackParams<AdminWorkflowsUnpublishArguments>): Expr<AdminWorkflowsUnpublishResponse>;
+  unpublish(
+    params: SlackParams<AdminWorkflowsUnpublishArguments>,
+  ): Expr<AdminWorkflowsUnpublishResponse>;
 }

@@ -6,15 +6,19 @@ import type { SLACK_NODE_KINDS_ADMIN_FUNCTIONS } from "./node-kinds-admin-functi
 
 type SlackAdminFunctionsKind = (typeof SLACK_NODE_KINDS_ADMIN_FUNCTIONS)[number];
 
-interface SlackAdminFunctionsBaseNode<K extends SlackAdminFunctionsKind = SlackAdminFunctionsKind> extends TypedNode<unknown> {
+interface SlackAdminFunctionsBaseNode<K extends SlackAdminFunctionsKind = SlackAdminFunctionsKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackAdminFunctionsListNode extends SlackAdminFunctionsBaseNode<"slack/admin_functions_list"> {}
-export interface SlackAdminFunctionsPermissionsLookupNode extends SlackAdminFunctionsBaseNode<"slack/admin_functions_permissions_lookup"> {}
-export interface SlackAdminFunctionsPermissionsSetNode extends SlackAdminFunctionsBaseNode<"slack/admin_functions_permissions_set"> {}
+export interface SlackAdminFunctionsListNode
+  extends SlackAdminFunctionsBaseNode<"slack/admin_functions_list"> {}
+export interface SlackAdminFunctionsPermissionsLookupNode
+  extends SlackAdminFunctionsBaseNode<"slack/admin_functions_permissions_lookup"> {}
+export interface SlackAdminFunctionsPermissionsSetNode
+  extends SlackAdminFunctionsBaseNode<"slack/admin_functions_permissions_set"> {}
 
 export const NODE_TO_METHOD_ADMIN_FUNCTIONS: Record<string, string> = {
   "slack/admin_functions_list": "admin.functions.list",
@@ -43,8 +47,18 @@ export function createSlackAdminFunctionsInterpreter(client: SlackClientLike): I
   };
 
   return defineInterpreter<SlackAdminFunctionsKind>()({
-    "slack/admin_functions_list": async function* (node: SlackAdminFunctionsListNode) { return yield* handler(node); },
-    "slack/admin_functions_permissions_lookup": async function* (node: SlackAdminFunctionsPermissionsLookupNode) { return yield* handler(node); },
-    "slack/admin_functions_permissions_set": async function* (node: SlackAdminFunctionsPermissionsSetNode) { return yield* handler(node); },
+    "slack/admin_functions_list": async function* (node: SlackAdminFunctionsListNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_functions_permissions_lookup": async function* (
+      node: SlackAdminFunctionsPermissionsLookupNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_functions_permissions_set": async function* (
+      node: SlackAdminFunctionsPermissionsSetNode,
+    ) {
+      return yield* handler(node);
+    },
   });
 }

@@ -4,12 +4,19 @@ import type { PluginContext } from "@mvfm/core";
 import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminAnalytics } from "./types-admin-analytics";
 
-export function buildSlackAdminAnalytics(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminAnalytics {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+export function buildSlackAdminAnalytics(
+  ctx: PluginContext,
+  config: SlackConfig,
+): SlackMethodsAdminAnalytics {
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     getFile(params) {
-      return ctx.expr({ kind: "slack/admin_analytics_getFile", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/admin_analytics_getFile",
+        params: resolveParams(params),
+        config,
+      });
     },
   };
 }

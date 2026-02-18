@@ -16,8 +16,10 @@ export interface SlackCallsAddNode extends SlackCallsBaseNode<"slack/calls_add">
 export interface SlackCallsEndNode extends SlackCallsBaseNode<"slack/calls_end"> {}
 export interface SlackCallsInfoNode extends SlackCallsBaseNode<"slack/calls_info"> {}
 export interface SlackCallsUpdateNode extends SlackCallsBaseNode<"slack/calls_update"> {}
-export interface SlackCallsParticipantsAddNode extends SlackCallsBaseNode<"slack/calls_participants_add"> {}
-export interface SlackCallsParticipantsRemoveNode extends SlackCallsBaseNode<"slack/calls_participants_remove"> {}
+export interface SlackCallsParticipantsAddNode
+  extends SlackCallsBaseNode<"slack/calls_participants_add"> {}
+export interface SlackCallsParticipantsRemoveNode
+  extends SlackCallsBaseNode<"slack/calls_participants_remove"> {}
 
 export const NODE_TO_METHOD_CALLS: Record<string, string> = {
   "slack/calls_add": "calls.add",
@@ -52,11 +54,23 @@ export function createSlackCallsInterpreter(client: SlackClientLike): Interprete
   };
 
   return defineInterpreter<SlackCallsKind>()({
-    "slack/calls_add": async function* (node: SlackCallsAddNode) { return yield* handler(node); },
-    "slack/calls_end": async function* (node: SlackCallsEndNode) { return yield* handler(node); },
-    "slack/calls_info": async function* (node: SlackCallsInfoNode) { return yield* handler(node); },
-    "slack/calls_update": async function* (node: SlackCallsUpdateNode) { return yield* handler(node); },
-    "slack/calls_participants_add": async function* (node: SlackCallsParticipantsAddNode) { return yield* handler(node); },
-    "slack/calls_participants_remove": async function* (node: SlackCallsParticipantsRemoveNode) { return yield* handler(node); },
+    "slack/calls_add": async function* (node: SlackCallsAddNode) {
+      return yield* handler(node);
+    },
+    "slack/calls_end": async function* (node: SlackCallsEndNode) {
+      return yield* handler(node);
+    },
+    "slack/calls_info": async function* (node: SlackCallsInfoNode) {
+      return yield* handler(node);
+    },
+    "slack/calls_update": async function* (node: SlackCallsUpdateNode) {
+      return yield* handler(node);
+    },
+    "slack/calls_participants_add": async function* (node: SlackCallsParticipantsAddNode) {
+      return yield* handler(node);
+    },
+    "slack/calls_participants_remove": async function* (node: SlackCallsParticipantsRemoveNode) {
+      return yield* handler(node);
+    },
   });
 }

@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsTeam } from "./types-team";
 
 export function buildSlackTeam(ctx: PluginContext, config: SlackConfig): SlackMethodsTeam {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     billing: {
@@ -15,33 +15,65 @@ export function buildSlackTeam(ctx: PluginContext, config: SlackConfig): SlackMe
     },
     externalTeams: {
       disconnect(params) {
-        return ctx.expr({ kind: "slack/team_externalTeams_disconnect", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/team_externalTeams_disconnect",
+          params: resolveParams(params),
+          config,
+        });
       },
       list(params) {
-        return ctx.expr({ kind: "slack/team_externalTeams_list", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/team_externalTeams_list",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     preferences: {
       list(params?) {
-        return ctx.expr({ kind: "slack/team_preferences_list", params: params != null ? resolveParams(params) : null, config });
+        return ctx.expr({
+          kind: "slack/team_preferences_list",
+          params: params != null ? resolveParams(params) : null,
+          config,
+        });
       },
     },
     profile: {
       get(params?) {
-        return ctx.expr({ kind: "slack/team_profile_get", params: params != null ? resolveParams(params) : null, config });
+        return ctx.expr({
+          kind: "slack/team_profile_get",
+          params: params != null ? resolveParams(params) : null,
+          config,
+        });
       },
     },
     accessLogs(params?) {
-      return ctx.expr({ kind: "slack/team_accessLogs", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/team_accessLogs",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
     billableInfo(params?) {
-      return ctx.expr({ kind: "slack/team_billableInfo", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/team_billableInfo",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
     info(params?) {
-      return ctx.expr({ kind: "slack/team_info", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/team_info",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
     integrationLogs(params?) {
-      return ctx.expr({ kind: "slack/team_integrationLogs", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/team_integrationLogs",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
   };
 }

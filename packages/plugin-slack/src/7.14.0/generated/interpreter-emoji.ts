@@ -37,6 +37,8 @@ export function createSlackEmojiInterpreter(client: SlackClientLike): Interprete
   };
 
   return defineInterpreter<SlackEmojiKind>()({
-    "slack/emoji_list": async function* (node: SlackEmojiListNode) { return yield* handler(node); },
+    "slack/emoji_list": async function* (node: SlackEmojiListNode) {
+      return yield* handler(node);
+    },
   });
 }

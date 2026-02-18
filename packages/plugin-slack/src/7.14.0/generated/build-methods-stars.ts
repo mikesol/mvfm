@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsStars } from "./types-stars";
 
 export function buildSlackStars(ctx: PluginContext, config: SlackConfig): SlackMethodsStars {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     add(params) {

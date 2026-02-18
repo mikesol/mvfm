@@ -5,11 +5,15 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsApi } from "./types-api";
 
 export function buildSlackApi(ctx: PluginContext, config: SlackConfig): SlackMethodsApi {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     test(params?) {
-      return ctx.expr({ kind: "slack/api_test", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/api_test",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
   };
 }

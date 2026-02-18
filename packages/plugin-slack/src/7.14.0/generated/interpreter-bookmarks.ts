@@ -6,7 +6,8 @@ import type { SLACK_NODE_KINDS_BOOKMARKS } from "./node-kinds-bookmarks";
 
 type SlackBookmarksKind = (typeof SLACK_NODE_KINDS_BOOKMARKS)[number];
 
-interface SlackBookmarksBaseNode<K extends SlackBookmarksKind = SlackBookmarksKind> extends TypedNode<unknown> {
+interface SlackBookmarksBaseNode<K extends SlackBookmarksKind = SlackBookmarksKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
@@ -15,7 +16,8 @@ interface SlackBookmarksBaseNode<K extends SlackBookmarksKind = SlackBookmarksKi
 export interface SlackBookmarksAddNode extends SlackBookmarksBaseNode<"slack/bookmarks_add"> {}
 export interface SlackBookmarksEditNode extends SlackBookmarksBaseNode<"slack/bookmarks_edit"> {}
 export interface SlackBookmarksListNode extends SlackBookmarksBaseNode<"slack/bookmarks_list"> {}
-export interface SlackBookmarksRemoveNode extends SlackBookmarksBaseNode<"slack/bookmarks_remove"> {}
+export interface SlackBookmarksRemoveNode
+  extends SlackBookmarksBaseNode<"slack/bookmarks_remove"> {}
 
 export const NODE_TO_METHOD_BOOKMARKS: Record<string, string> = {
   "slack/bookmarks_add": "bookmarks.add",
@@ -46,9 +48,17 @@ export function createSlackBookmarksInterpreter(client: SlackClientLike): Interp
   };
 
   return defineInterpreter<SlackBookmarksKind>()({
-    "slack/bookmarks_add": async function* (node: SlackBookmarksAddNode) { return yield* handler(node); },
-    "slack/bookmarks_edit": async function* (node: SlackBookmarksEditNode) { return yield* handler(node); },
-    "slack/bookmarks_list": async function* (node: SlackBookmarksListNode) { return yield* handler(node); },
-    "slack/bookmarks_remove": async function* (node: SlackBookmarksRemoveNode) { return yield* handler(node); },
+    "slack/bookmarks_add": async function* (node: SlackBookmarksAddNode) {
+      return yield* handler(node);
+    },
+    "slack/bookmarks_edit": async function* (node: SlackBookmarksEditNode) {
+      return yield* handler(node);
+    },
+    "slack/bookmarks_list": async function* (node: SlackBookmarksListNode) {
+      return yield* handler(node);
+    },
+    "slack/bookmarks_remove": async function* (node: SlackBookmarksRemoveNode) {
+      return yield* handler(node);
+    },
   });
 }

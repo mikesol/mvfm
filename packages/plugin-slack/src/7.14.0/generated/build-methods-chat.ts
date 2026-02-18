@@ -5,12 +5,16 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsChat } from "./types-chat";
 
 export function buildSlackChat(ctx: PluginContext, config: SlackConfig): SlackMethodsChat {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     scheduledMessages: {
       list(params?) {
-        return ctx.expr({ kind: "slack/chat_scheduledMessages_list", params: params != null ? resolveParams(params) : null, config });
+        return ctx.expr({
+          kind: "slack/chat_scheduledMessages_list",
+          params: params != null ? resolveParams(params) : null,
+          config,
+        });
       },
     },
     appendStream(params) {
@@ -20,7 +24,11 @@ export function buildSlackChat(ctx: PluginContext, config: SlackConfig): SlackMe
       return ctx.expr({ kind: "slack/chat_delete", params: resolveParams(params), config });
     },
     deleteScheduledMessage(params) {
-      return ctx.expr({ kind: "slack/chat_deleteScheduledMessage", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/chat_deleteScheduledMessage",
+        params: resolveParams(params),
+        config,
+      });
     },
     getPermalink(params) {
       return ctx.expr({ kind: "slack/chat_getPermalink", params: resolveParams(params), config });
@@ -35,7 +43,11 @@ export function buildSlackChat(ctx: PluginContext, config: SlackConfig): SlackMe
       return ctx.expr({ kind: "slack/chat_postMessage", params: resolveParams(params), config });
     },
     scheduleMessage(params) {
-      return ctx.expr({ kind: "slack/chat_scheduleMessage", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/chat_scheduleMessage",
+        params: resolveParams(params),
+        config,
+      });
     },
     startStream(params) {
       return ctx.expr({ kind: "slack/chat_startStream", params: resolveParams(params), config });

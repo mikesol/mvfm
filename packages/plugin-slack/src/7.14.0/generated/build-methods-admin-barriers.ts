@@ -4,21 +4,40 @@ import type { PluginContext } from "@mvfm/core";
 import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminBarriers } from "./types-admin-barriers";
 
-export function buildSlackAdminBarriers(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminBarriers {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+export function buildSlackAdminBarriers(
+  ctx: PluginContext,
+  config: SlackConfig,
+): SlackMethodsAdminBarriers {
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     create(params) {
-      return ctx.expr({ kind: "slack/admin_barriers_create", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/admin_barriers_create",
+        params: resolveParams(params),
+        config,
+      });
     },
     delete(params) {
-      return ctx.expr({ kind: "slack/admin_barriers_delete", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/admin_barriers_delete",
+        params: resolveParams(params),
+        config,
+      });
     },
     list(params?) {
-      return ctx.expr({ kind: "slack/admin_barriers_list", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/admin_barriers_list",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
     update(params) {
-      return ctx.expr({ kind: "slack/admin_barriers_update", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/admin_barriers_update",
+        params: resolveParams(params),
+        config,
+      });
     },
   };
 }

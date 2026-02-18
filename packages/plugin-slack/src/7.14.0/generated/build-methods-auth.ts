@@ -5,19 +5,31 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsAuth } from "./types-auth";
 
 export function buildSlackAuth(ctx: PluginContext, config: SlackConfig): SlackMethodsAuth {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     teams: {
       list(params?) {
-        return ctx.expr({ kind: "slack/auth_teams_list", params: params != null ? resolveParams(params) : null, config });
+        return ctx.expr({
+          kind: "slack/auth_teams_list",
+          params: params != null ? resolveParams(params) : null,
+          config,
+        });
       },
     },
     revoke(params?) {
-      return ctx.expr({ kind: "slack/auth_revoke", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/auth_revoke",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
     test(params?) {
-      return ctx.expr({ kind: "slack/auth_test", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/auth_test",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
   };
 }

@@ -6,22 +6,33 @@ import type { SLACK_NODE_KINDS_ADMIN_TEAMS } from "./node-kinds-admin-teams";
 
 type SlackAdminTeamsKind = (typeof SLACK_NODE_KINDS_ADMIN_TEAMS)[number];
 
-interface SlackAdminTeamsBaseNode<K extends SlackAdminTeamsKind = SlackAdminTeamsKind> extends TypedNode<unknown> {
+interface SlackAdminTeamsBaseNode<K extends SlackAdminTeamsKind = SlackAdminTeamsKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackAdminTeamsAdminsListNode extends SlackAdminTeamsBaseNode<"slack/admin_teams_admins_list"> {}
-export interface SlackAdminTeamsCreateNode extends SlackAdminTeamsBaseNode<"slack/admin_teams_create"> {}
-export interface SlackAdminTeamsListNode extends SlackAdminTeamsBaseNode<"slack/admin_teams_list"> {}
-export interface SlackAdminTeamsOwnersListNode extends SlackAdminTeamsBaseNode<"slack/admin_teams_owners_list"> {}
-export interface SlackAdminTeamsSettingsInfoNode extends SlackAdminTeamsBaseNode<"slack/admin_teams_settings_info"> {}
-export interface SlackAdminTeamsSettingsSetDefaultChannelsNode extends SlackAdminTeamsBaseNode<"slack/admin_teams_settings_setDefaultChannels"> {}
-export interface SlackAdminTeamsSettingsSetDescriptionNode extends SlackAdminTeamsBaseNode<"slack/admin_teams_settings_setDescription"> {}
-export interface SlackAdminTeamsSettingsSetDiscoverabilityNode extends SlackAdminTeamsBaseNode<"slack/admin_teams_settings_setDiscoverability"> {}
-export interface SlackAdminTeamsSettingsSetIconNode extends SlackAdminTeamsBaseNode<"slack/admin_teams_settings_setIcon"> {}
-export interface SlackAdminTeamsSettingsSetNameNode extends SlackAdminTeamsBaseNode<"slack/admin_teams_settings_setName"> {}
+export interface SlackAdminTeamsAdminsListNode
+  extends SlackAdminTeamsBaseNode<"slack/admin_teams_admins_list"> {}
+export interface SlackAdminTeamsCreateNode
+  extends SlackAdminTeamsBaseNode<"slack/admin_teams_create"> {}
+export interface SlackAdminTeamsListNode
+  extends SlackAdminTeamsBaseNode<"slack/admin_teams_list"> {}
+export interface SlackAdminTeamsOwnersListNode
+  extends SlackAdminTeamsBaseNode<"slack/admin_teams_owners_list"> {}
+export interface SlackAdminTeamsSettingsInfoNode
+  extends SlackAdminTeamsBaseNode<"slack/admin_teams_settings_info"> {}
+export interface SlackAdminTeamsSettingsSetDefaultChannelsNode
+  extends SlackAdminTeamsBaseNode<"slack/admin_teams_settings_setDefaultChannels"> {}
+export interface SlackAdminTeamsSettingsSetDescriptionNode
+  extends SlackAdminTeamsBaseNode<"slack/admin_teams_settings_setDescription"> {}
+export interface SlackAdminTeamsSettingsSetDiscoverabilityNode
+  extends SlackAdminTeamsBaseNode<"slack/admin_teams_settings_setDiscoverability"> {}
+export interface SlackAdminTeamsSettingsSetIconNode
+  extends SlackAdminTeamsBaseNode<"slack/admin_teams_settings_setIcon"> {}
+export interface SlackAdminTeamsSettingsSetNameNode
+  extends SlackAdminTeamsBaseNode<"slack/admin_teams_settings_setName"> {}
 
 export const NODE_TO_METHOD_ADMIN_TEAMS: Record<string, string> = {
   "slack/admin_teams_admins_list": "admin.teams.admins.list",
@@ -64,15 +75,45 @@ export function createSlackAdminTeamsInterpreter(client: SlackClientLike): Inter
   };
 
   return defineInterpreter<SlackAdminTeamsKind>()({
-    "slack/admin_teams_admins_list": async function* (node: SlackAdminTeamsAdminsListNode) { return yield* handler(node); },
-    "slack/admin_teams_create": async function* (node: SlackAdminTeamsCreateNode) { return yield* handler(node); },
-    "slack/admin_teams_list": async function* (node: SlackAdminTeamsListNode) { return yield* handler(node); },
-    "slack/admin_teams_owners_list": async function* (node: SlackAdminTeamsOwnersListNode) { return yield* handler(node); },
-    "slack/admin_teams_settings_info": async function* (node: SlackAdminTeamsSettingsInfoNode) { return yield* handler(node); },
-    "slack/admin_teams_settings_setDefaultChannels": async function* (node: SlackAdminTeamsSettingsSetDefaultChannelsNode) { return yield* handler(node); },
-    "slack/admin_teams_settings_setDescription": async function* (node: SlackAdminTeamsSettingsSetDescriptionNode) { return yield* handler(node); },
-    "slack/admin_teams_settings_setDiscoverability": async function* (node: SlackAdminTeamsSettingsSetDiscoverabilityNode) { return yield* handler(node); },
-    "slack/admin_teams_settings_setIcon": async function* (node: SlackAdminTeamsSettingsSetIconNode) { return yield* handler(node); },
-    "slack/admin_teams_settings_setName": async function* (node: SlackAdminTeamsSettingsSetNameNode) { return yield* handler(node); },
+    "slack/admin_teams_admins_list": async function* (node: SlackAdminTeamsAdminsListNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_teams_create": async function* (node: SlackAdminTeamsCreateNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_teams_list": async function* (node: SlackAdminTeamsListNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_teams_owners_list": async function* (node: SlackAdminTeamsOwnersListNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_teams_settings_info": async function* (node: SlackAdminTeamsSettingsInfoNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_teams_settings_setDefaultChannels": async function* (
+      node: SlackAdminTeamsSettingsSetDefaultChannelsNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_teams_settings_setDescription": async function* (
+      node: SlackAdminTeamsSettingsSetDescriptionNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_teams_settings_setDiscoverability": async function* (
+      node: SlackAdminTeamsSettingsSetDiscoverabilityNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_teams_settings_setIcon": async function* (
+      node: SlackAdminTeamsSettingsSetIconNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_teams_settings_setName": async function* (
+      node: SlackAdminTeamsSettingsSetNameNode,
+    ) {
+      return yield* handler(node);
+    },
   });
 }

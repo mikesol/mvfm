@@ -43,8 +43,14 @@ export function createSlackPinsInterpreter(client: SlackClientLike): Interpreter
   };
 
   return defineInterpreter<SlackPinsKind>()({
-    "slack/pins_add": async function* (node: SlackPinsAddNode) { return yield* handler(node); },
-    "slack/pins_list": async function* (node: SlackPinsListNode) { return yield* handler(node); },
-    "slack/pins_remove": async function* (node: SlackPinsRemoveNode) { return yield* handler(node); },
+    "slack/pins_add": async function* (node: SlackPinsAddNode) {
+      return yield* handler(node);
+    },
+    "slack/pins_list": async function* (node: SlackPinsListNode) {
+      return yield* handler(node);
+    },
+    "slack/pins_remove": async function* (node: SlackPinsRemoveNode) {
+      return yield* handler(node);
+    },
   });
 }

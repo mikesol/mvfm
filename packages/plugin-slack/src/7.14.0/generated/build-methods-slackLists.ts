@@ -4,44 +4,87 @@ import type { PluginContext } from "@mvfm/core";
 import type { SlackConfig } from "./types";
 import type { SlackMethodsSlackLists } from "./types-slackLists";
 
-export function buildSlackSlackLists(ctx: PluginContext, config: SlackConfig): SlackMethodsSlackLists {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+export function buildSlackSlackLists(
+  ctx: PluginContext,
+  config: SlackConfig,
+): SlackMethodsSlackLists {
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     access: {
       delete(params) {
-        return ctx.expr({ kind: "slack/slackLists_access_delete", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/slackLists_access_delete",
+          params: resolveParams(params),
+          config,
+        });
       },
       set(params) {
-        return ctx.expr({ kind: "slack/slackLists_access_set", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/slackLists_access_set",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     download: {
       get(params) {
-        return ctx.expr({ kind: "slack/slackLists_download_get", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/slackLists_download_get",
+          params: resolveParams(params),
+          config,
+        });
       },
       start(params) {
-        return ctx.expr({ kind: "slack/slackLists_download_start", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/slackLists_download_start",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     items: {
       create(params) {
-        return ctx.expr({ kind: "slack/slackLists_items_create", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/slackLists_items_create",
+          params: resolveParams(params),
+          config,
+        });
       },
       delete(params) {
-        return ctx.expr({ kind: "slack/slackLists_items_delete", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/slackLists_items_delete",
+          params: resolveParams(params),
+          config,
+        });
       },
       deleteMultiple(params) {
-        return ctx.expr({ kind: "slack/slackLists_items_deleteMultiple", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/slackLists_items_deleteMultiple",
+          params: resolveParams(params),
+          config,
+        });
       },
       info(params) {
-        return ctx.expr({ kind: "slack/slackLists_items_info", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/slackLists_items_info",
+          params: resolveParams(params),
+          config,
+        });
       },
       list(params) {
-        return ctx.expr({ kind: "slack/slackLists_items_list", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/slackLists_items_list",
+          params: resolveParams(params),
+          config,
+        });
       },
       update(params) {
-        return ctx.expr({ kind: "slack/slackLists_items_update", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/slackLists_items_update",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     create(params) {

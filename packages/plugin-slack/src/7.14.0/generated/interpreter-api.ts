@@ -37,6 +37,8 @@ export function createSlackApiInterpreter(client: SlackClientLike): Interpreter 
   };
 
   return defineInterpreter<SlackApiKind>()({
-    "slack/api_test": async function* (node: SlackApiTestNode) { return yield* handler(node); },
+    "slack/api_test": async function* (node: SlackApiTestNode) {
+      return yield* handler(node);
+    },
   });
 }

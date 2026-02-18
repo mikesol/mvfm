@@ -6,15 +6,19 @@ import type { SLACK_NODE_KINDS_ADMIN_AUTH } from "./node-kinds-admin-auth";
 
 type SlackAdminAuthKind = (typeof SLACK_NODE_KINDS_ADMIN_AUTH)[number];
 
-interface SlackAdminAuthBaseNode<K extends SlackAdminAuthKind = SlackAdminAuthKind> extends TypedNode<unknown> {
+interface SlackAdminAuthBaseNode<K extends SlackAdminAuthKind = SlackAdminAuthKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackAdminAuthPolicyAssignEntitiesNode extends SlackAdminAuthBaseNode<"slack/admin_auth_policy_assignEntities"> {}
-export interface SlackAdminAuthPolicyGetEntitiesNode extends SlackAdminAuthBaseNode<"slack/admin_auth_policy_getEntities"> {}
-export interface SlackAdminAuthPolicyRemoveEntitiesNode extends SlackAdminAuthBaseNode<"slack/admin_auth_policy_removeEntities"> {}
+export interface SlackAdminAuthPolicyAssignEntitiesNode
+  extends SlackAdminAuthBaseNode<"slack/admin_auth_policy_assignEntities"> {}
+export interface SlackAdminAuthPolicyGetEntitiesNode
+  extends SlackAdminAuthBaseNode<"slack/admin_auth_policy_getEntities"> {}
+export interface SlackAdminAuthPolicyRemoveEntitiesNode
+  extends SlackAdminAuthBaseNode<"slack/admin_auth_policy_removeEntities"> {}
 
 export const NODE_TO_METHOD_ADMIN_AUTH: Record<string, string> = {
   "slack/admin_auth_policy_assignEntities": "admin.auth.policy.assignEntities",
@@ -43,8 +47,20 @@ export function createSlackAdminAuthInterpreter(client: SlackClientLike): Interp
   };
 
   return defineInterpreter<SlackAdminAuthKind>()({
-    "slack/admin_auth_policy_assignEntities": async function* (node: SlackAdminAuthPolicyAssignEntitiesNode) { return yield* handler(node); },
-    "slack/admin_auth_policy_getEntities": async function* (node: SlackAdminAuthPolicyGetEntitiesNode) { return yield* handler(node); },
-    "slack/admin_auth_policy_removeEntities": async function* (node: SlackAdminAuthPolicyRemoveEntitiesNode) { return yield* handler(node); },
+    "slack/admin_auth_policy_assignEntities": async function* (
+      node: SlackAdminAuthPolicyAssignEntitiesNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_auth_policy_getEntities": async function* (
+      node: SlackAdminAuthPolicyGetEntitiesNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_auth_policy_removeEntities": async function* (
+      node: SlackAdminAuthPolicyRemoveEntitiesNode,
+    ) {
+      return yield* handler(node);
+    },
   });
 }

@@ -6,37 +6,64 @@ import type { SLACK_NODE_KINDS_ADMIN_CONVERSATIONS } from "./node-kinds-admin-co
 
 type SlackAdminConversationsKind = (typeof SLACK_NODE_KINDS_ADMIN_CONVERSATIONS)[number];
 
-interface SlackAdminConversationsBaseNode<K extends SlackAdminConversationsKind = SlackAdminConversationsKind> extends TypedNode<unknown> {
+interface SlackAdminConversationsBaseNode<
+  K extends SlackAdminConversationsKind = SlackAdminConversationsKind,
+> extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackAdminConversationsArchiveNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_archive"> {}
-export interface SlackAdminConversationsBulkArchiveNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_bulkArchive"> {}
-export interface SlackAdminConversationsBulkDeleteNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_bulkDelete"> {}
-export interface SlackAdminConversationsBulkMoveNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_bulkMove"> {}
-export interface SlackAdminConversationsConvertToPrivateNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_convertToPrivate"> {}
-export interface SlackAdminConversationsConvertToPublicNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_convertToPublic"> {}
-export interface SlackAdminConversationsCreateNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_create"> {}
-export interface SlackAdminConversationsDeleteNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_delete"> {}
-export interface SlackAdminConversationsDisconnectSharedNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_disconnectShared"> {}
-export interface SlackAdminConversationsEkmListOriginalConnectedChannelInfoNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_ekm_listOriginalConnectedChannelInfo"> {}
-export interface SlackAdminConversationsGetConversationPrefsNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_getConversationPrefs"> {}
-export interface SlackAdminConversationsGetCustomRetentionNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_getCustomRetention"> {}
-export interface SlackAdminConversationsGetTeamsNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_getTeams"> {}
-export interface SlackAdminConversationsInviteNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_invite"> {}
-export interface SlackAdminConversationsLookupNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_lookup"> {}
-export interface SlackAdminConversationsRemoveCustomRetentionNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_removeCustomRetention"> {}
-export interface SlackAdminConversationsRenameNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_rename"> {}
-export interface SlackAdminConversationsRestrictAccessAddGroupNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_restrictAccess_addGroup"> {}
-export interface SlackAdminConversationsRestrictAccessListGroupsNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_restrictAccess_listGroups"> {}
-export interface SlackAdminConversationsRestrictAccessRemoveGroupNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_restrictAccess_removeGroup"> {}
-export interface SlackAdminConversationsSearchNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_search"> {}
-export interface SlackAdminConversationsSetConversationPrefsNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_setConversationPrefs"> {}
-export interface SlackAdminConversationsSetCustomRetentionNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_setCustomRetention"> {}
-export interface SlackAdminConversationsSetTeamsNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_setTeams"> {}
-export interface SlackAdminConversationsUnarchiveNode extends SlackAdminConversationsBaseNode<"slack/admin_conversations_unarchive"> {}
+export interface SlackAdminConversationsArchiveNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_archive"> {}
+export interface SlackAdminConversationsBulkArchiveNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_bulkArchive"> {}
+export interface SlackAdminConversationsBulkDeleteNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_bulkDelete"> {}
+export interface SlackAdminConversationsBulkMoveNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_bulkMove"> {}
+export interface SlackAdminConversationsConvertToPrivateNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_convertToPrivate"> {}
+export interface SlackAdminConversationsConvertToPublicNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_convertToPublic"> {}
+export interface SlackAdminConversationsCreateNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_create"> {}
+export interface SlackAdminConversationsDeleteNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_delete"> {}
+export interface SlackAdminConversationsDisconnectSharedNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_disconnectShared"> {}
+export interface SlackAdminConversationsEkmListOriginalConnectedChannelInfoNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_ekm_listOriginalConnectedChannelInfo"> {}
+export interface SlackAdminConversationsGetConversationPrefsNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_getConversationPrefs"> {}
+export interface SlackAdminConversationsGetCustomRetentionNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_getCustomRetention"> {}
+export interface SlackAdminConversationsGetTeamsNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_getTeams"> {}
+export interface SlackAdminConversationsInviteNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_invite"> {}
+export interface SlackAdminConversationsLookupNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_lookup"> {}
+export interface SlackAdminConversationsRemoveCustomRetentionNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_removeCustomRetention"> {}
+export interface SlackAdminConversationsRenameNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_rename"> {}
+export interface SlackAdminConversationsRestrictAccessAddGroupNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_restrictAccess_addGroup"> {}
+export interface SlackAdminConversationsRestrictAccessListGroupsNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_restrictAccess_listGroups"> {}
+export interface SlackAdminConversationsRestrictAccessRemoveGroupNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_restrictAccess_removeGroup"> {}
+export interface SlackAdminConversationsSearchNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_search"> {}
+export interface SlackAdminConversationsSetConversationPrefsNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_setConversationPrefs"> {}
+export interface SlackAdminConversationsSetCustomRetentionNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_setCustomRetention"> {}
+export interface SlackAdminConversationsSetTeamsNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_setTeams"> {}
+export interface SlackAdminConversationsUnarchiveNode
+  extends SlackAdminConversationsBaseNode<"slack/admin_conversations_unarchive"> {}
 
 export const NODE_TO_METHOD_ADMIN_CONVERSATIONS: Record<string, string> = {
   "slack/admin_conversations_archive": "admin.conversations.archive",
@@ -48,7 +75,8 @@ export const NODE_TO_METHOD_ADMIN_CONVERSATIONS: Record<string, string> = {
   "slack/admin_conversations_create": "admin.conversations.create",
   "slack/admin_conversations_delete": "admin.conversations.delete",
   "slack/admin_conversations_disconnectShared": "admin.conversations.disconnectShared",
-  "slack/admin_conversations_ekm_listOriginalConnectedChannelInfo": "admin.conversations.ekm.listOriginalConnectedChannelInfo",
+  "slack/admin_conversations_ekm_listOriginalConnectedChannelInfo":
+    "admin.conversations.ekm.listOriginalConnectedChannelInfo",
   "slack/admin_conversations_getConversationPrefs": "admin.conversations.getConversationPrefs",
   "slack/admin_conversations_getCustomRetention": "admin.conversations.getCustomRetention",
   "slack/admin_conversations_getTeams": "admin.conversations.getTeams",
@@ -56,9 +84,12 @@ export const NODE_TO_METHOD_ADMIN_CONVERSATIONS: Record<string, string> = {
   "slack/admin_conversations_lookup": "admin.conversations.lookup",
   "slack/admin_conversations_removeCustomRetention": "admin.conversations.removeCustomRetention",
   "slack/admin_conversations_rename": "admin.conversations.rename",
-  "slack/admin_conversations_restrictAccess_addGroup": "admin.conversations.restrictAccess.addGroup",
-  "slack/admin_conversations_restrictAccess_listGroups": "admin.conversations.restrictAccess.listGroups",
-  "slack/admin_conversations_restrictAccess_removeGroup": "admin.conversations.restrictAccess.removeGroup",
+  "slack/admin_conversations_restrictAccess_addGroup":
+    "admin.conversations.restrictAccess.addGroup",
+  "slack/admin_conversations_restrictAccess_listGroups":
+    "admin.conversations.restrictAccess.listGroups",
+  "slack/admin_conversations_restrictAccess_removeGroup":
+    "admin.conversations.restrictAccess.removeGroup",
   "slack/admin_conversations_search": "admin.conversations.search",
   "slack/admin_conversations_setConversationPrefs": "admin.conversations.setConversationPrefs",
   "slack/admin_conversations_setCustomRetention": "admin.conversations.setCustomRetention",
@@ -109,30 +140,118 @@ export function createSlackAdminConversationsInterpreter(client: SlackClientLike
   };
 
   return defineInterpreter<SlackAdminConversationsKind>()({
-    "slack/admin_conversations_archive": async function* (node: SlackAdminConversationsArchiveNode) { return yield* handler(node); },
-    "slack/admin_conversations_bulkArchive": async function* (node: SlackAdminConversationsBulkArchiveNode) { return yield* handler(node); },
-    "slack/admin_conversations_bulkDelete": async function* (node: SlackAdminConversationsBulkDeleteNode) { return yield* handler(node); },
-    "slack/admin_conversations_bulkMove": async function* (node: SlackAdminConversationsBulkMoveNode) { return yield* handler(node); },
-    "slack/admin_conversations_convertToPrivate": async function* (node: SlackAdminConversationsConvertToPrivateNode) { return yield* handler(node); },
-    "slack/admin_conversations_convertToPublic": async function* (node: SlackAdminConversationsConvertToPublicNode) { return yield* handler(node); },
-    "slack/admin_conversations_create": async function* (node: SlackAdminConversationsCreateNode) { return yield* handler(node); },
-    "slack/admin_conversations_delete": async function* (node: SlackAdminConversationsDeleteNode) { return yield* handler(node); },
-    "slack/admin_conversations_disconnectShared": async function* (node: SlackAdminConversationsDisconnectSharedNode) { return yield* handler(node); },
-    "slack/admin_conversations_ekm_listOriginalConnectedChannelInfo": async function* (node: SlackAdminConversationsEkmListOriginalConnectedChannelInfoNode) { return yield* handler(node); },
-    "slack/admin_conversations_getConversationPrefs": async function* (node: SlackAdminConversationsGetConversationPrefsNode) { return yield* handler(node); },
-    "slack/admin_conversations_getCustomRetention": async function* (node: SlackAdminConversationsGetCustomRetentionNode) { return yield* handler(node); },
-    "slack/admin_conversations_getTeams": async function* (node: SlackAdminConversationsGetTeamsNode) { return yield* handler(node); },
-    "slack/admin_conversations_invite": async function* (node: SlackAdminConversationsInviteNode) { return yield* handler(node); },
-    "slack/admin_conversations_lookup": async function* (node: SlackAdminConversationsLookupNode) { return yield* handler(node); },
-    "slack/admin_conversations_removeCustomRetention": async function* (node: SlackAdminConversationsRemoveCustomRetentionNode) { return yield* handler(node); },
-    "slack/admin_conversations_rename": async function* (node: SlackAdminConversationsRenameNode) { return yield* handler(node); },
-    "slack/admin_conversations_restrictAccess_addGroup": async function* (node: SlackAdminConversationsRestrictAccessAddGroupNode) { return yield* handler(node); },
-    "slack/admin_conversations_restrictAccess_listGroups": async function* (node: SlackAdminConversationsRestrictAccessListGroupsNode) { return yield* handler(node); },
-    "slack/admin_conversations_restrictAccess_removeGroup": async function* (node: SlackAdminConversationsRestrictAccessRemoveGroupNode) { return yield* handler(node); },
-    "slack/admin_conversations_search": async function* (node: SlackAdminConversationsSearchNode) { return yield* handler(node); },
-    "slack/admin_conversations_setConversationPrefs": async function* (node: SlackAdminConversationsSetConversationPrefsNode) { return yield* handler(node); },
-    "slack/admin_conversations_setCustomRetention": async function* (node: SlackAdminConversationsSetCustomRetentionNode) { return yield* handler(node); },
-    "slack/admin_conversations_setTeams": async function* (node: SlackAdminConversationsSetTeamsNode) { return yield* handler(node); },
-    "slack/admin_conversations_unarchive": async function* (node: SlackAdminConversationsUnarchiveNode) { return yield* handler(node); },
+    "slack/admin_conversations_archive": async function* (
+      node: SlackAdminConversationsArchiveNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_bulkArchive": async function* (
+      node: SlackAdminConversationsBulkArchiveNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_bulkDelete": async function* (
+      node: SlackAdminConversationsBulkDeleteNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_bulkMove": async function* (
+      node: SlackAdminConversationsBulkMoveNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_convertToPrivate": async function* (
+      node: SlackAdminConversationsConvertToPrivateNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_convertToPublic": async function* (
+      node: SlackAdminConversationsConvertToPublicNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_create": async function* (node: SlackAdminConversationsCreateNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_delete": async function* (node: SlackAdminConversationsDeleteNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_disconnectShared": async function* (
+      node: SlackAdminConversationsDisconnectSharedNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_ekm_listOriginalConnectedChannelInfo": async function* (
+      node: SlackAdminConversationsEkmListOriginalConnectedChannelInfoNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_getConversationPrefs": async function* (
+      node: SlackAdminConversationsGetConversationPrefsNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_getCustomRetention": async function* (
+      node: SlackAdminConversationsGetCustomRetentionNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_getTeams": async function* (
+      node: SlackAdminConversationsGetTeamsNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_invite": async function* (node: SlackAdminConversationsInviteNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_lookup": async function* (node: SlackAdminConversationsLookupNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_removeCustomRetention": async function* (
+      node: SlackAdminConversationsRemoveCustomRetentionNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_rename": async function* (node: SlackAdminConversationsRenameNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_restrictAccess_addGroup": async function* (
+      node: SlackAdminConversationsRestrictAccessAddGroupNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_restrictAccess_listGroups": async function* (
+      node: SlackAdminConversationsRestrictAccessListGroupsNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_restrictAccess_removeGroup": async function* (
+      node: SlackAdminConversationsRestrictAccessRemoveGroupNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_search": async function* (node: SlackAdminConversationsSearchNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_setConversationPrefs": async function* (
+      node: SlackAdminConversationsSetConversationPrefsNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_setCustomRetention": async function* (
+      node: SlackAdminConversationsSetCustomRetentionNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_setTeams": async function* (
+      node: SlackAdminConversationsSetTeamsNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_conversations_unarchive": async function* (
+      node: SlackAdminConversationsUnarchiveNode,
+    ) {
+      return yield* handler(node);
+    },
   });
 }

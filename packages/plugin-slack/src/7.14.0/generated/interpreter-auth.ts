@@ -43,8 +43,14 @@ export function createSlackAuthInterpreter(client: SlackClientLike): Interpreter
   };
 
   return defineInterpreter<SlackAuthKind>()({
-    "slack/auth_revoke": async function* (node: SlackAuthRevokeNode) { return yield* handler(node); },
-    "slack/auth_teams_list": async function* (node: SlackAuthTeamsListNode) { return yield* handler(node); },
-    "slack/auth_test": async function* (node: SlackAuthTestNode) { return yield* handler(node); },
+    "slack/auth_revoke": async function* (node: SlackAuthRevokeNode) {
+      return yield* handler(node);
+    },
+    "slack/auth_teams_list": async function* (node: SlackAuthTeamsListNode) {
+      return yield* handler(node);
+    },
+    "slack/auth_test": async function* (node: SlackAuthTestNode) {
+      return yield* handler(node);
+    },
   });
 }

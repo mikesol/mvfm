@@ -13,8 +13,14 @@ import type { SlackParams } from "./types";
 
 export interface SlackMethodsAssistant {
   threads: {
-    setStatus(params: SlackParams<AssistantThreadsSetStatusArguments>): Expr<AssistantThreadsSetStatusResponse>;
-    setSuggestedPrompts(params: SlackParams<AssistantThreadsSetSuggestedPromptsArguments>): Expr<AssistantThreadsSetSuggestedPromptsResponse>;
-    setTitle(params: SlackParams<AssistantThreadsSetTitleArguments>): Expr<AssistantThreadsSetTitleResponse>;
+    setStatus(
+      params: SlackParams<AssistantThreadsSetStatusArguments>,
+    ): Expr<AssistantThreadsSetStatusResponse>;
+    setSuggestedPrompts(
+      params: SlackParams<AssistantThreadsSetSuggestedPromptsArguments>,
+    ): Expr<AssistantThreadsSetSuggestedPromptsResponse>;
+    setTitle(
+      params: SlackParams<AssistantThreadsSetTitleArguments>,
+    ): Expr<AssistantThreadsSetTitleResponse>;
   };
 }

@@ -6,16 +6,22 @@ import type { SLACK_NODE_KINDS_ADMIN_USERGROUPS } from "./node-kinds-admin-userg
 
 type SlackAdminUsergroupsKind = (typeof SLACK_NODE_KINDS_ADMIN_USERGROUPS)[number];
 
-interface SlackAdminUsergroupsBaseNode<K extends SlackAdminUsergroupsKind = SlackAdminUsergroupsKind> extends TypedNode<unknown> {
+interface SlackAdminUsergroupsBaseNode<
+  K extends SlackAdminUsergroupsKind = SlackAdminUsergroupsKind,
+> extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackAdminUsergroupsAddChannelsNode extends SlackAdminUsergroupsBaseNode<"slack/admin_usergroups_addChannels"> {}
-export interface SlackAdminUsergroupsAddTeamsNode extends SlackAdminUsergroupsBaseNode<"slack/admin_usergroups_addTeams"> {}
-export interface SlackAdminUsergroupsListChannelsNode extends SlackAdminUsergroupsBaseNode<"slack/admin_usergroups_listChannels"> {}
-export interface SlackAdminUsergroupsRemoveChannelsNode extends SlackAdminUsergroupsBaseNode<"slack/admin_usergroups_removeChannels"> {}
+export interface SlackAdminUsergroupsAddChannelsNode
+  extends SlackAdminUsergroupsBaseNode<"slack/admin_usergroups_addChannels"> {}
+export interface SlackAdminUsergroupsAddTeamsNode
+  extends SlackAdminUsergroupsBaseNode<"slack/admin_usergroups_addTeams"> {}
+export interface SlackAdminUsergroupsListChannelsNode
+  extends SlackAdminUsergroupsBaseNode<"slack/admin_usergroups_listChannels"> {}
+export interface SlackAdminUsergroupsRemoveChannelsNode
+  extends SlackAdminUsergroupsBaseNode<"slack/admin_usergroups_removeChannels"> {}
 
 export const NODE_TO_METHOD_ADMIN_USERGROUPS: Record<string, string> = {
   "slack/admin_usergroups_addChannels": "admin.usergroups.addChannels",
@@ -46,9 +52,23 @@ export function createSlackAdminUsergroupsInterpreter(client: SlackClientLike): 
   };
 
   return defineInterpreter<SlackAdminUsergroupsKind>()({
-    "slack/admin_usergroups_addChannels": async function* (node: SlackAdminUsergroupsAddChannelsNode) { return yield* handler(node); },
-    "slack/admin_usergroups_addTeams": async function* (node: SlackAdminUsergroupsAddTeamsNode) { return yield* handler(node); },
-    "slack/admin_usergroups_listChannels": async function* (node: SlackAdminUsergroupsListChannelsNode) { return yield* handler(node); },
-    "slack/admin_usergroups_removeChannels": async function* (node: SlackAdminUsergroupsRemoveChannelsNode) { return yield* handler(node); },
+    "slack/admin_usergroups_addChannels": async function* (
+      node: SlackAdminUsergroupsAddChannelsNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_usergroups_addTeams": async function* (node: SlackAdminUsergroupsAddTeamsNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_usergroups_listChannels": async function* (
+      node: SlackAdminUsergroupsListChannelsNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_usergroups_removeChannels": async function* (
+      node: SlackAdminUsergroupsRemoveChannelsNode,
+    ) {
+      return yield* handler(node);
+    },
   });
 }

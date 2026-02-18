@@ -4,18 +4,33 @@ import type { PluginContext } from "@mvfm/core";
 import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminRoles } from "./types-admin-roles";
 
-export function buildSlackAdminRoles(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminRoles {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+export function buildSlackAdminRoles(
+  ctx: PluginContext,
+  config: SlackConfig,
+): SlackMethodsAdminRoles {
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     addAssignments(params) {
-      return ctx.expr({ kind: "slack/admin_roles_addAssignments", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/admin_roles_addAssignments",
+        params: resolveParams(params),
+        config,
+      });
     },
     listAssignments(params?) {
-      return ctx.expr({ kind: "slack/admin_roles_listAssignments", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/admin_roles_listAssignments",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
     removeAssignments(params) {
-      return ctx.expr({ kind: "slack/admin_roles_removeAssignments", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/admin_roles_removeAssignments",
+        params: resolveParams(params),
+        config,
+      });
     },
   };
 }

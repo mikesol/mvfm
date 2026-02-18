@@ -40,7 +40,11 @@ export function createSlackRtmInterpreter(client: SlackClientLike): Interpreter 
   };
 
   return defineInterpreter<SlackRtmKind>()({
-    "slack/rtm_connect": async function* (node: SlackRtmConnectNode) { return yield* handler(node); },
-    "slack/rtm_start": async function* (node: SlackRtmStartNode) { return yield* handler(node); },
+    "slack/rtm_connect": async function* (node: SlackRtmConnectNode) {
+      return yield* handler(node);
+    },
+    "slack/rtm_start": async function* (node: SlackRtmStartNode) {
+      return yield* handler(node);
+    },
   });
 }

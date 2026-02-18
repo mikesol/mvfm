@@ -4,28 +4,51 @@ import type { PluginContext } from "@mvfm/core";
 import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminInviteRequests } from "./types-admin-inviteRequests";
 
-export function buildSlackAdminInviteRequests(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminInviteRequests {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+export function buildSlackAdminInviteRequests(
+  ctx: PluginContext,
+  config: SlackConfig,
+): SlackMethodsAdminInviteRequests {
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     approved: {
       list(params) {
-        return ctx.expr({ kind: "slack/admin_inviteRequests_approved_list", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_inviteRequests_approved_list",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     denied: {
       list(params) {
-        return ctx.expr({ kind: "slack/admin_inviteRequests_denied_list", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_inviteRequests_denied_list",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     approve(params) {
-      return ctx.expr({ kind: "slack/admin_inviteRequests_approve", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/admin_inviteRequests_approve",
+        params: resolveParams(params),
+        config,
+      });
     },
     deny(params) {
-      return ctx.expr({ kind: "slack/admin_inviteRequests_deny", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/admin_inviteRequests_deny",
+        params: resolveParams(params),
+        config,
+      });
     },
     list(params) {
-      return ctx.expr({ kind: "slack/admin_inviteRequests_list", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/admin_inviteRequests_list",
+        params: resolveParams(params),
+        config,
+      });
     },
   };
 }

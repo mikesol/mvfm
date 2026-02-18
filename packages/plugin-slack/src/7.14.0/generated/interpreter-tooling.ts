@@ -6,13 +6,15 @@ import type { SLACK_NODE_KINDS_TOOLING } from "./node-kinds-tooling";
 
 type SlackToolingKind = (typeof SLACK_NODE_KINDS_TOOLING)[number];
 
-interface SlackToolingBaseNode<K extends SlackToolingKind = SlackToolingKind> extends TypedNode<unknown> {
+interface SlackToolingBaseNode<K extends SlackToolingKind = SlackToolingKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackToolingTokensRotateNode extends SlackToolingBaseNode<"slack/tooling_tokens_rotate"> {}
+export interface SlackToolingTokensRotateNode
+  extends SlackToolingBaseNode<"slack/tooling_tokens_rotate"> {}
 
 export const NODE_TO_METHOD_TOOLING: Record<string, string> = {
   "slack/tooling_tokens_rotate": "tooling.tokens.rotate",
@@ -37,6 +39,8 @@ export function createSlackToolingInterpreter(client: SlackClientLike): Interpre
   };
 
   return defineInterpreter<SlackToolingKind>()({
-    "slack/tooling_tokens_rotate": async function* (node: SlackToolingTokensRotateNode) { return yield* handler(node); },
+    "slack/tooling_tokens_rotate": async function* (node: SlackToolingTokensRotateNode) {
+      return yield* handler(node);
+    },
   });
 }

@@ -4,19 +4,34 @@ import type { PluginContext } from "@mvfm/core";
 import type { SlackConfig } from "./types";
 import type { SlackMethodsAssistant } from "./types-assistant";
 
-export function buildSlackAssistant(ctx: PluginContext, config: SlackConfig): SlackMethodsAssistant {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+export function buildSlackAssistant(
+  ctx: PluginContext,
+  config: SlackConfig,
+): SlackMethodsAssistant {
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     threads: {
       setStatus(params) {
-        return ctx.expr({ kind: "slack/assistant_threads_setStatus", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/assistant_threads_setStatus",
+          params: resolveParams(params),
+          config,
+        });
       },
       setSuggestedPrompts(params) {
-        return ctx.expr({ kind: "slack/assistant_threads_setSuggestedPrompts", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/assistant_threads_setSuggestedPrompts",
+          params: resolveParams(params),
+          config,
+        });
       },
       setTitle(params) {
-        return ctx.expr({ kind: "slack/assistant_threads_setTitle", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/assistant_threads_setTitle",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
   };

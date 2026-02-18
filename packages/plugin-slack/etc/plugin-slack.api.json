@@ -390,7 +390,7 @@
         {
           "kind": "Function",
           "canonicalReference": "@mvfm/plugin-slack!createSlackInterpreter:function(1)",
-          "docComment": "/**\n * Creates an interpreter for `slack/*` node kinds.\n *\n * All 25 methods follow the same uniform pattern: look up the API method, resolve params, and call `client.apiCall()`.\n *\n * @param client - The {@link SlackClient} to execute against.\n *\n * @returns An Interpreter handling all slack node kinds.\n */\n",
+          "docComment": "",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -415,7 +415,7 @@
               "text": ";"
             }
           ],
-          "fileUrlPath": "dist/7.14.0/interpreter.d.ts",
+          "fileUrlPath": "dist/7.14.0/generated/interpreter.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 3,
             "endIndex": 4
@@ -591,7 +591,7 @@
             },
             {
               "kind": "Content",
-              "text": "<import(\"./types\")."
+              "text": "<import(\".\")."
             },
             {
               "kind": "Reference",
@@ -600,7 +600,7 @@
             },
             {
               "kind": "Content",
-              "text": ", {}, \"slack/chat_postMessage\" | \"slack/chat_update\" | \"slack/chat_delete\" | \"slack/chat_postEphemeral\" | \"slack/chat_scheduleMessage\" | \"slack/chat_getPermalink\" | \"slack/conversations_list\" | \"slack/conversations_info\" | \"slack/conversations_create\" | \"slack/conversations_invite\" | \"slack/conversations_history\" | \"slack/conversations_members\" | \"slack/conversations_open\" | \"slack/conversations_replies\" | \"slack/users_info\" | \"slack/users_list\" | \"slack/users_lookupByEmail\" | \"slack/users_conversations\" | \"slack/reactions_add\" | \"slack/reactions_get\" | \"slack/reactions_list\" | \"slack/reactions_remove\" | \"slack/files_list\" | \"slack/files_info\" | \"slack/files_delete\">"
+              "text": ", {}, \"slack/admin_analytics_getFile\" | \"slack/admin_apps_activities_list\" | \"slack/admin_apps_approve\" | \"slack/admin_apps_approved_list\" | \"slack/admin_apps_clearResolution\" | \"slack/admin_apps_config_lookup\" | \"slack/admin_apps_config_set\" | \"slack/admin_apps_requests_cancel\" | \"slack/admin_apps_requests_list\" | \"slack/admin_apps_restrict\" | \"slack/admin_apps_restricted_list\" | \"slack/admin_apps_uninstall\" | \"slack/admin_auth_policy_assignEntities\" | \"slack/admin_auth_policy_getEntities\" | \"slack/admin_auth_policy_removeEntities\" | \"slack/admin_barriers_create\" | \"slack/admin_barriers_delete\" | \"slack/admin_barriers_list\" | \"slack/admin_barriers_update\" | \"slack/admin_conversations_archive\" | \"slack/admin_conversations_bulkArchive\" | \"slack/admin_conversations_bulkDelete\" | \"slack/admin_conversations_bulkMove\" | \"slack/admin_conversations_convertToPrivate\" | \"slack/admin_conversations_convertToPublic\" | \"slack/admin_conversations_create\" | \"slack/admin_conversations_delete\" | \"slack/admin_conversations_disconnectShared\" | \"slack/admin_conversations_ekm_listOriginalConnectedChannelInfo\" | \"slack/admin_conversations_getConversationPrefs\" | \"slack/admin_conversations_getCustomRetention\" | \"slack/admin_conversations_getTeams\" | \"slack/admin_conversations_invite\" | \"slack/admin_conversations_lookup\" | \"slack/admin_conversations_removeCustomRetention\" | \"slack/admin_conversations_rename\" | \"slack/admin_conversations_restrictAccess_addGroup\" | \"slack/admin_conversations_restrictAccess_listGroups\" | \"slack/admin_conversations_restrictAccess_removeGroup\" | \"slack/admin_conversations_search\" | \"slack/admin_conversations_setConversationPrefs\" | \"slack/admin_conversations_setCustomRetention\" | \"slack/admin_conversations_setTeams\" | \"slack/admin_conversations_unarchive\" | \"slack/admin_emoji_add\" | \"slack/admin_emoji_addAlias\" | \"slack/admin_emoji_list\" | \"slack/admin_emoji_remove\" | \"slack/admin_emoji_rename\" | \"slack/admin_functions_list\" | \"slack/admin_functions_permissions_lookup\" | \"slack/admin_functions_permissions_set\" | \"slack/admin_inviteRequests_approve\" | \"slack/admin_inviteRequests_approved_list\" | \"slack/admin_inviteRequests_denied_list\" | \"slack/admin_inviteRequests_deny\" | \"slack/admin_inviteRequests_list\" | \"slack/admin_roles_addAssignments\" | \"slack/admin_roles_listAssignments\" | \"slack/admin_roles_removeAssignments\" | \"slack/admin_teams_admins_list\" | \"slack/admin_teams_create\" | \"slack/admin_teams_list\" | \"slack/admin_teams_owners_list\" | \"slack/admin_teams_settings_info\" | \"slack/admin_teams_settings_setDefaultChannels\" | \"slack/admin_teams_settings_setDescription\" | \"slack/admin_teams_settings_setDiscoverability\" | \"slack/admin_teams_settings_setIcon\" | \"slack/admin_teams_settings_setName\" | \"slack/admin_usergroups_addChannels\" | \"slack/admin_usergroups_addTeams\" | \"slack/admin_usergroups_listChannels\" | \"slack/admin_usergroups_removeChannels\" | \"slack/admin_users_assign\" | \"slack/admin_users_invite\" | \"slack/admin_users_list\" | \"slack/admin_users_remove\" | \"slack/admin_users_session_clearSettings\" | \"slack/admin_users_session_getSettings\" | \"slack/admin_users_session_invalidate\" | \"slack/admin_users_session_list\" | \"slack/admin_users_session_reset\" | \"slack/admin_users_session_resetBulk\" | \"slack/admin_users_session_setSettings\" | \"slack/admin_users_setAdmin\" | \"slack/admin_users_setExpiration\" | \"slack/admin_users_setOwner\" | \"slack/admin_users_setRegular\" | \"slack/admin_users_unsupportedVersions_export\" | \"slack/admin_workflows_collaborators_add\" | \"slack/admin_workflows_collaborators_remove\" | \"slack/admin_workflows_permissions_lookup\" | \"slack/admin_workflows_search\" | \"slack/admin_workflows_unpublish\" | \"slack/api_test\" | \"slack/apps_connections_open\" | \"slack/apps_event_authorizations_list\" | \"slack/apps_manifest_create\" | \"slack/apps_manifest_delete\" | \"slack/apps_manifest_export\" | \"slack/apps_manifest_update\" | \"slack/apps_manifest_validate\" | \"slack/apps_uninstall\" | \"slack/assistant_threads_setStatus\" | \"slack/assistant_threads_setSuggestedPrompts\" | \"slack/assistant_threads_setTitle\" | \"slack/auth_revoke\" | \"slack/auth_teams_list\" | \"slack/auth_test\" | \"slack/bookmarks_add\" | \"slack/bookmarks_edit\" | \"slack/bookmarks_list\" | \"slack/bookmarks_remove\" | \"slack/bots_info\" | \"slack/calls_add\" | \"slack/calls_end\" | \"slack/calls_info\" | \"slack/calls_update\" | \"slack/calls_participants_add\" | \"slack/calls_participants_remove\" | \"slack/canvases_access_delete\" | \"slack/canvases_access_set\" | \"slack/canvases_create\" | \"slack/canvases_delete\" | \"slack/canvases_edit\" | \"slack/canvases_sections_lookup\" | \"slack/chat_appendStream\" | \"slack/chat_delete\" | \"slack/chat_deleteScheduledMessage\" | \"slack/chat_getPermalink\" | \"slack/chat_meMessage\" | \"slack/chat_postEphemeral\" | \"slack/chat_postMessage\" | \"slack/chat_scheduleMessage\" | \"slack/chat_scheduledMessages_list\" | \"slack/chat_startStream\" | \"slack/chat_stopStream\" | \"slack/chat_unfurl\" | \"slack/chat_update\" | \"slack/conversations_acceptSharedInvite\" | \"slack/conversations_approveSharedInvite\" | \"slack/conversations_archive\" | \"slack/conversations_canvases_create\" | \"slack/conversations_close\" | \"slack/conversations_create\" | \"slack/conversations_declineSharedInvite\" | \"slack/conversations_externalInvitePermissions_set\" | \"slack/conversations_history\" | \"slack/conversations_info\" | \"slack/conversations_invite\" | \"slack/conversations_inviteShared\" | \"slack/conversations_join\" | \"slack/conversations_kick\" | \"slack/conversations_leave\" | \"slack/conversations_list\" | \"slack/conversations_listConnectInvites\" | \"slack/conversations_mark\" | \"slack/conversations_members\" | \"slack/conversations_open\" | \"slack/conversations_rename\" | \"slack/conversations_replies\" | \"slack/conversations_requestSharedInvite_approve\" | \"slack/conversations_requestSharedInvite_deny\" | \"slack/conversations_requestSharedInvite_list\" | \"slack/conversations_setPurpose\" | \"slack/conversations_setTopic\" | \"slack/conversations_unarchive\" | \"slack/dialog_open\" | \"slack/dnd_endDnd\" | \"slack/dnd_endSnooze\" | \"slack/dnd_info\" | \"slack/dnd_setSnooze\" | \"slack/dnd_teamInfo\" | \"slack/emoji_list\" | \"slack/entity_presentDetails\" | \"slack/files_completeUploadExternal\" | \"slack/files_delete\" | \"slack/files_getUploadURLExternal\" | \"slack/files_info\" | \"slack/files_list\" | \"slack/files_revokePublicURL\" | \"slack/files_sharedPublicURL\" | \"slack/files_upload\" | \"slack/files_comments_delete\" | \"slack/files_remote_add\" | \"slack/files_remote_info\" | \"slack/files_remote_list\" | \"slack/files_remote_remove\" | \"slack/files_remote_share\" | \"slack/files_remote_update\" | \"slack/functions_completeError\" | \"slack/functions_completeSuccess\" | \"slack/migration_exchange\" | \"slack/oauth_access\" | \"slack/oauth_v2_access\" | \"slack/oauth_v2_exchange\" | \"slack/openid_connect_token\" | \"slack/openid_connect_userInfo\" | \"slack/pins_add\" | \"slack/pins_list\" | \"slack/pins_remove\" | \"slack/reactions_add\" | \"slack/reactions_get\" | \"slack/reactions_list\" | \"slack/reactions_remove\" | \"slack/reminders_add\" | \"slack/reminders_complete\" | \"slack/reminders_delete\" | \"slack/reminders_info\" | \"slack/reminders_list\" | \"slack/rtm_connect\" | \"slack/rtm_start\" | \"slack/search_all\" | \"slack/search_files\" | \"slack/search_messages\" | \"slack/slackLists_access_delete\" | \"slack/slackLists_access_set\" | \"slack/slackLists_create\" | \"slack/slackLists_download_get\" | \"slack/slackLists_download_start\" | \"slack/slackLists_items_create\" | \"slack/slackLists_items_delete\" | \"slack/slackLists_items_deleteMultiple\" | \"slack/slackLists_items_info\" | \"slack/slackLists_items_list\" | \"slack/slackLists_items_update\" | \"slack/slackLists_update\" | \"slack/stars_add\" | \"slack/stars_list\" | \"slack/stars_remove\" | \"slack/team_accessLogs\" | \"slack/team_billableInfo\" | \"slack/team_billing_info\" | \"slack/team_externalTeams_disconnect\" | \"slack/team_externalTeams_list\" | \"slack/team_info\" | \"slack/team_integrationLogs\" | \"slack/team_preferences_list\" | \"slack/team_profile_get\" | \"slack/tooling_tokens_rotate\" | \"slack/usergroups_create\" | \"slack/usergroups_disable\" | \"slack/usergroups_enable\" | \"slack/usergroups_list\" | \"slack/usergroups_update\" | \"slack/usergroups_users_list\" | \"slack/usergroups_users_update\" | \"slack/users_conversations\" | \"slack/users_deletePhoto\" | \"slack/users_discoverableContacts_lookup\" | \"slack/users_getPresence\" | \"slack/users_identity\" | \"slack/users_info\" | \"slack/users_list\" | \"slack/users_lookupByEmail\" | \"slack/users_setPhoto\" | \"slack/users_setPresence\" | \"slack/users_profile_get\" | \"slack/users_profile_set\" | \"slack/views_open\" | \"slack/views_publish\" | \"slack/views_push\" | \"slack/views_update\" | \"slack/workflows_featured_add\" | \"slack/workflows_featured_list\" | \"slack/workflows_featured_remove\" | \"slack/workflows_featured_set\" | \"slack/workflows_stepCompleted\" | \"slack/workflows_stepFailed\" | \"slack/workflows_updateStep\">"
             },
             {
               "kind": "Content",
@@ -629,14 +629,14 @@
         {
           "kind": "Interface",
           "canonicalReference": "@mvfm/plugin-slack!SlackClient:interface",
-          "docComment": "/**\n * Abstract Slack client interface consumed by the slack handler.\n *\n * Abstracts over the actual `@slack/web-api` `WebClient` so handlers can be tested with mock clients. Mirrors the `WebClient.apiCall()` signature.\n */\n",
+          "docComment": "",
           "excerptTokens": [
             {
               "kind": "Content",
               "text": "export interface SlackClient "
             }
           ],
-          "fileUrlPath": "dist/7.14.0/interpreter.d.ts",
+          "fileUrlPath": "dist/7.14.0/generated/interpreter.d.ts",
           "releaseTag": "Public",
           "name": "SlackClient",
           "preserveMemberOrder": false,
@@ -644,7 +644,7 @@
             {
               "kind": "MethodSignature",
               "canonicalReference": "@mvfm/plugin-slack!SlackClient#apiCall:member(1)",
-              "docComment": "/**\n * Execute a Slack API request and return the parsed response.\n */\n",
+              "docComment": "",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -718,14 +718,14 @@
         {
           "kind": "Interface",
           "canonicalReference": "@mvfm/plugin-slack!SlackConfig:interface",
-          "docComment": "/**\n * Configuration for the slack plugin.\n *\n * Requires a bot or user token (`xoxb-...` or `xoxp-...`).\n */\n",
+          "docComment": "",
           "excerptTokens": [
             {
               "kind": "Content",
               "text": "export interface SlackConfig "
             }
           ],
-          "fileUrlPath": "dist/7.14.0/types.d.ts",
+          "fileUrlPath": "dist/7.14.0/generated/types.d.ts",
           "releaseTag": "Public",
           "name": "SlackConfig",
           "preserveMemberOrder": false,
@@ -733,7 +733,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "@mvfm/plugin-slack!SlackConfig#token:member",
-              "docComment": "/**\n * Slack bot or user token (e.g. `xoxb-...` or `xoxp-...`).\n */\n",
+              "docComment": "",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -775,7 +775,7 @@
               "canonicalReference": "@mvfm/plugin-slack!~Interpreter:type"
             }
           ],
-          "fileUrlPath": "dist/7.14.0/interpreter.d.ts",
+          "fileUrlPath": "dist/7.14.0/index.d.ts",
           "isReadonly": true,
           "releaseTag": "Public",
           "name": "slackInterpreter",
@@ -787,14 +787,14 @@
         {
           "kind": "Interface",
           "canonicalReference": "@mvfm/plugin-slack!SlackMethods:interface",
-          "docComment": "/**\n * Slack operations added to the DSL context by the slack plugin.\n *\n * Mirrors the `@slack/web-api` SDK resource API: chat, conversations, users, reactions, and files. Each resource group exposes methods that produce namespaced AST nodes.\n */\n",
+          "docComment": "",
           "excerptTokens": [
             {
               "kind": "Content",
               "text": "export interface SlackMethods "
             }
           ],
-          "fileUrlPath": "dist/7.14.0/types.d.ts",
+          "fileUrlPath": "dist/7.14.0/generated/types.d.ts",
           "releaseTag": "Public",
           "name": "SlackMethods",
           "preserveMemberOrder": false,
@@ -802,7 +802,7 @@
             {
               "kind": "PropertySignature",
               "canonicalReference": "@mvfm/plugin-slack!SlackMethods#slack:member",
-              "docComment": "/**\n * Slack API operations, namespaced under `$.slack`.\n */\n",
+              "docComment": "",
               "excerptTokens": [
                 {
                   "kind": "Content",
@@ -810,907 +810,412 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "{\n        chat: {\n            postMessage(params: "
+                  "text": "{\n        admin: {\n            analytics: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                  "text": "SlackMethodsAdminAnalytics",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsAdminAnalytics:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": ";\n            apps: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ChatPostMessageArguments",
-                  "canonicalReference": "@slack/web-api!ChatPostMessageArguments:type"
+                  "text": "SlackMethodsAdminApps",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsAdminApps:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ">): "
+                  "text": ";\n            auth: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
+                  "text": "SlackMethodsAdminAuth",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsAdminAuth:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": ";\n            barriers: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ChatPostMessageResponse",
-                  "canonicalReference": "@slack/web-api!ChatPostMessageResponse:type"
+                  "text": "SlackMethodsAdminBarriers",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsAdminBarriers:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ">;\n            update(params: "
+                  "text": ";\n            conversations: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                  "text": "SlackMethodsAdminConversations",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsAdminConversations:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": ";\n            emoji: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ChatUpdateArguments",
-                  "canonicalReference": "@slack/web-api!ChatUpdateArguments:type"
+                  "text": "SlackMethodsAdminEmoji",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsAdminEmoji:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ">): "
+                  "text": ";\n            functions: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
+                  "text": "SlackMethodsAdminFunctions",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsAdminFunctions:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": ";\n            inviteRequests: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ChatUpdateResponse",
-                  "canonicalReference": "@slack/web-api!ChatUpdateResponse:type"
+                  "text": "SlackMethodsAdminInviteRequests",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsAdminInviteRequests:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ">;\n            delete(params: "
+                  "text": ";\n            roles: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                  "text": "SlackMethodsAdminRoles",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsAdminRoles:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": ";\n            teams: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ChatDeleteArguments",
-                  "canonicalReference": "@slack/web-api!ChatDeleteArguments:interface"
+                  "text": "SlackMethodsAdminTeams",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsAdminTeams:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ">): "
+                  "text": ";\n            usergroups: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
+                  "text": "SlackMethodsAdminUsergroups",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsAdminUsergroups:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": ";\n            users: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ChatDeleteResponse",
-                  "canonicalReference": "@slack/web-api!ChatDeleteResponse:type"
+                  "text": "SlackMethodsAdminUsers",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsAdminUsers:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ">;\n            postEphemeral(params: "
+                  "text": ";\n            workflows: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                  "text": "SlackMethodsAdminWorkflows",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsAdminWorkflows:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": ";\n        };\n        api: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ChatPostEphemeralArguments",
-                  "canonicalReference": "@slack/web-api!ChatPostEphemeralArguments:type"
+                  "text": "SlackMethodsApi",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsApi:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ">): "
+                  "text": ";\n        apps: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
+                  "text": "SlackMethodsApps",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsApps:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": ";\n        assistant: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ChatPostEphemeralResponse",
-                  "canonicalReference": "@slack/web-api!ChatPostEphemeralResponse:type"
+                  "text": "SlackMethodsAssistant",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsAssistant:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ">;\n            scheduleMessage(params: "
+                  "text": ";\n        auth: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                  "text": "SlackMethodsAuth",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsAuth:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": ";\n        bookmarks: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ChatScheduleMessageArguments",
-                  "canonicalReference": "@slack/web-api!ChatScheduleMessageArguments:type"
+                  "text": "SlackMethodsBookmarks",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsBookmarks:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ">): "
+                  "text": ";\n        bots: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
+                  "text": "SlackMethodsBots",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsBots:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": ";\n        calls: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ChatScheduleMessageResponse",
-                  "canonicalReference": "@slack/web-api!ChatScheduleMessageResponse:type"
+                  "text": "SlackMethodsCalls",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsCalls:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ">;\n            getPermalink(params: "
+                  "text": ";\n        canvases: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                  "text": "SlackMethodsCanvases",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsCanvases:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": ";\n        chat: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ChatGetPermalinkArguments",
-                  "canonicalReference": "@slack/web-api!ChatGetPermalinkArguments:interface"
+                  "text": "SlackMethodsChat",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsChat:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ">): "
+                  "text": ";\n        conversations: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
+                  "text": "SlackMethodsConversations",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsConversations:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": ";\n        dialog: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ChatGetPermalinkResponse",
-                  "canonicalReference": "@slack/web-api!ChatGetPermalinkResponse:type"
+                  "text": "SlackMethodsDialog",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsDialog:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ">;\n        };\n        conversations: {\n            list(params?: "
+                  "text": ";\n        dnd: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                  "text": "SlackMethodsDnd",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsDnd:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": ";\n        emoji: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ConversationsListArguments",
-                  "canonicalReference": "@slack/web-api!ConversationsListArguments:type"
+                  "text": "SlackMethodsEmoji",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsEmoji:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ">): "
+                  "text": ";\n        entity: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
+                  "text": "SlackMethodsEntity",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsEntity:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": ";\n        files: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ConversationsListResponse",
-                  "canonicalReference": "@slack/web-api!ConversationsListResponse:type"
+                  "text": "SlackMethodsFiles",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsFiles:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ">;\n            info(params: "
+                  "text": ";\n        functions: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                  "text": "SlackMethodsFunctions",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsFunctions:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": ";\n        migration: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ConversationsInfoArguments",
-                  "canonicalReference": "@slack/web-api!ConversationsInfoArguments:interface"
+                  "text": "SlackMethodsMigration",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsMigration:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ">): "
+                  "text": ";\n        oauth: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
+                  "text": "SlackMethodsOauth",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsOauth:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": ";\n        openid: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ConversationsInfoResponse",
-                  "canonicalReference": "@slack/web-api!ConversationsInfoResponse:type"
+                  "text": "SlackMethodsOpenid",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsOpenid:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ">;\n            create(params: "
+                  "text": ";\n        pins: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                  "text": "SlackMethodsPins",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsPins:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": ";\n        reactions: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ConversationsCreateArguments",
-                  "canonicalReference": "@slack/web-api!ConversationsCreateArguments:interface"
+                  "text": "SlackMethodsReactions",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsReactions:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ">): "
+                  "text": ";\n        reminders: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
+                  "text": "SlackMethodsReminders",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsReminders:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": ";\n        rtm: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ConversationsCreateResponse",
-                  "canonicalReference": "@slack/web-api!ConversationsCreateResponse:type"
+                  "text": "SlackMethodsRtm",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsRtm:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ">;\n            invite(params: "
+                  "text": ";\n        search: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                  "text": "SlackMethodsSearch",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsSearch:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": ";\n        slackLists: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ConversationsInviteArguments",
-                  "canonicalReference": "@slack/web-api!ConversationsInviteArguments:interface"
+                  "text": "SlackMethodsSlackLists",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsSlackLists:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ">): "
+                  "text": ";\n        stars: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
+                  "text": "SlackMethodsStars",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsStars:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": ";\n        team: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ConversationsInviteResponse",
-                  "canonicalReference": "@slack/web-api!ConversationsInviteResponse:type"
+                  "text": "SlackMethodsTeam",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsTeam:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ">;\n            history(params: "
+                  "text": ";\n        tooling: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                  "text": "SlackMethodsTooling",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsTooling:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": ";\n        usergroups: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ConversationsHistoryArguments",
-                  "canonicalReference": "@slack/web-api!ConversationsHistoryArguments:interface"
+                  "text": "SlackMethodsUsergroups",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsUsergroups:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ">): "
+                  "text": ";\n        users: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
+                  "text": "SlackMethodsUsers",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsUsers:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
+                  "text": ";\n        views: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "ConversationsHistoryResponse",
-                  "canonicalReference": "@slack/web-api!ConversationsHistoryResponse:type"
+                  "text": "SlackMethodsViews",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsViews:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": ">;\n            members(params: "
+                  "text": ";\n        workflows: "
                 },
                 {
                   "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
+                  "text": "SlackMethodsWorkflows",
+                  "canonicalReference": "@mvfm/plugin-slack!~SlackMethodsWorkflows:interface"
                 },
                 {
                   "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConversationsMembersArguments",
-                  "canonicalReference": "@slack/web-api!ConversationsMembersArguments:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConversationsMembersResponse",
-                  "canonicalReference": "@slack/web-api!ConversationsMembersResponse:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n            open(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConversationsOpenArguments",
-                  "canonicalReference": "@slack/web-api!ConversationsOpenArguments:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConversationsOpenResponse",
-                  "canonicalReference": "@slack/web-api!ConversationsOpenResponse:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n            replies(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConversationsRepliesArguments",
-                  "canonicalReference": "@slack/web-api!ConversationsRepliesArguments:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConversationsRepliesResponse",
-                  "canonicalReference": "@slack/web-api!ConversationsRepliesResponse:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n        };\n        users: {\n            info(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "UsersInfoArguments",
-                  "canonicalReference": "@slack/web-api!UsersInfoArguments:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "UsersInfoResponse",
-                  "canonicalReference": "@slack/web-api!UsersInfoResponse:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n            list(params?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "UsersListArguments",
-                  "canonicalReference": "@slack/web-api!UsersListArguments:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "UsersListResponse",
-                  "canonicalReference": "@slack/web-api!UsersListResponse:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n            lookupByEmail(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "UsersLookupByEmailArguments",
-                  "canonicalReference": "@slack/web-api!UsersLookupByEmailArguments:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "UsersLookupByEmailResponse",
-                  "canonicalReference": "@slack/web-api!UsersLookupByEmailResponse:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n            conversations(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "UsersConversationsArguments",
-                  "canonicalReference": "@slack/web-api!UsersConversationsArguments:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "UsersConversationsResponse",
-                  "canonicalReference": "@slack/web-api!UsersConversationsResponse:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n        };\n        reactions: {\n            add(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ReactionsAddArguments",
-                  "canonicalReference": "@slack/web-api!ReactionsAddArguments:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ReactionsAddResponse",
-                  "canonicalReference": "@slack/web-api!ReactionsAddResponse:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n            get(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ReactionsGetArguments",
-                  "canonicalReference": "@slack/web-api!ReactionsGetArguments:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ReactionsGetResponse",
-                  "canonicalReference": "@slack/web-api!ReactionsGetResponse:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n            list(params?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ReactionsListArguments",
-                  "canonicalReference": "@slack/web-api!ReactionsListArguments:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ReactionsListResponse",
-                  "canonicalReference": "@slack/web-api!ReactionsListResponse:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n            remove(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ReactionsRemoveArguments",
-                  "canonicalReference": "@slack/web-api!ReactionsRemoveArguments:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ReactionsRemoveResponse",
-                  "canonicalReference": "@slack/web-api!ReactionsRemoveResponse:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n        };\n        files: {\n            list(params?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "FilesListArguments",
-                  "canonicalReference": "@slack/web-api!FilesListArguments:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "FilesListResponse",
-                  "canonicalReference": "@slack/web-api!FilesListResponse:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n            info(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "FilesInfoArguments",
-                  "canonicalReference": "@slack/web-api!FilesInfoArguments:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "FilesInfoResponse",
-                  "canonicalReference": "@slack/web-api!FilesInfoResponse:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n            delete(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "SlackParams",
-                  "canonicalReference": "@mvfm/plugin-slack!~SlackParams:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "FilesDeleteArguments",
-                  "canonicalReference": "@slack/web-api!FilesDeleteArguments:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-slack!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "FilesDeleteResponse",
-                  "canonicalReference": "@slack/web-api!FilesDeleteResponse:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n        };\n    }"
+                  "text": ";\n    }"
                 },
                 {
                   "kind": "Content",
@@ -1723,7 +1228,7 @@
               "name": "slack",
               "propertyTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 202
+                "endIndex": 92
               }
             }
           ],

@@ -63,37 +63,63 @@ import type { SlackParams } from "./types";
 
 export interface SlackMethodsConversations {
   canvases: {
-    create(params: SlackParams<ConversationsCanvasesCreateArguments>): Expr<ConversationsCanvasesCreateResponse>;
+    create(
+      params: SlackParams<ConversationsCanvasesCreateArguments>,
+    ): Expr<ConversationsCanvasesCreateResponse>;
   };
   externalInvitePermissions: {
-    set(params: SlackParams<ConversationsExternalInvitePermissionsSetArguments>): Expr<ConversationsExternalInvitePermissionsSetResponse>;
+    set(
+      params: SlackParams<ConversationsExternalInvitePermissionsSetArguments>,
+    ): Expr<ConversationsExternalInvitePermissionsSetResponse>;
   };
   requestSharedInvite: {
-    approve(params: SlackParams<ConversationsRequestSharedInviteApproveArguments>): Expr<ConversationsRequestSharedInviteApproveResponse>;
-    deny(params: SlackParams<ConversationsRequestSharedInviteDenyArguments>): Expr<ConversationsRequestSharedInviteDenyResponse>;
-    list(params?: SlackParams<ConversationsRequestSharedInviteListArguments>): Expr<ConversationsRequestSharedInviteListResponse>;
+    approve(
+      params: SlackParams<ConversationsRequestSharedInviteApproveArguments>,
+    ): Expr<ConversationsRequestSharedInviteApproveResponse>;
+    deny(
+      params: SlackParams<ConversationsRequestSharedInviteDenyArguments>,
+    ): Expr<ConversationsRequestSharedInviteDenyResponse>;
+    list(
+      params?: SlackParams<ConversationsRequestSharedInviteListArguments>,
+    ): Expr<ConversationsRequestSharedInviteListResponse>;
   };
-  acceptSharedInvite(params: SlackParams<ConversationsAcceptSharedInviteArguments>): Expr<ConversationsAcceptSharedInviteResponse>;
-  approveSharedInvite(params: SlackParams<ConversationsApproveSharedInviteArguments>): Expr<ConversationsApproveSharedInviteResponse>;
+  acceptSharedInvite(
+    params: SlackParams<ConversationsAcceptSharedInviteArguments>,
+  ): Expr<ConversationsAcceptSharedInviteResponse>;
+  approveSharedInvite(
+    params: SlackParams<ConversationsApproveSharedInviteArguments>,
+  ): Expr<ConversationsApproveSharedInviteResponse>;
   archive(params: SlackParams<ConversationsArchiveArguments>): Expr<ConversationsArchiveResponse>;
   close(params: SlackParams<ConversationsCloseArguments>): Expr<ConversationsCloseResponse>;
   create(params: SlackParams<ConversationsCreateArguments>): Expr<ConversationsCreateResponse>;
-  declineSharedInvite(params: SlackParams<ConversationsDeclineSharedInviteArguments>): Expr<ConversationsDeclineSharedInviteResponse>;
+  declineSharedInvite(
+    params: SlackParams<ConversationsDeclineSharedInviteArguments>,
+  ): Expr<ConversationsDeclineSharedInviteResponse>;
   history(params: SlackParams<ConversationsHistoryArguments>): Expr<ConversationsHistoryResponse>;
   info(params: SlackParams<ConversationsInfoArguments>): Expr<ConversationsInfoResponse>;
   invite(params: SlackParams<ConversationsInviteArguments>): Expr<ConversationsInviteResponse>;
-  inviteShared(params: SlackParams<ConversationsInviteSharedArguments>): Expr<ConversationsInviteSharedResponse>;
+  inviteShared(
+    params: SlackParams<ConversationsInviteSharedArguments>,
+  ): Expr<ConversationsInviteSharedResponse>;
   join(params: SlackParams<ConversationsJoinArguments>): Expr<ConversationsJoinResponse>;
   kick(params: SlackParams<ConversationsKickArguments>): Expr<ConversationsKickResponse>;
   leave(params: SlackParams<ConversationsLeaveArguments>): Expr<ConversationsLeaveResponse>;
   list(params?: SlackParams<ConversationsListArguments>): Expr<ConversationsListResponse>;
-  listConnectInvites(params?: SlackParams<ConversationsListConnectInvitesArguments>): Expr<ConversationsListConnectInvitesResponse>;
+  listConnectInvites(
+    params?: SlackParams<ConversationsListConnectInvitesArguments>,
+  ): Expr<ConversationsListConnectInvitesResponse>;
   mark(params: SlackParams<ConversationsMarkArguments>): Expr<ConversationsMarkResponse>;
   members(params: SlackParams<ConversationsMembersArguments>): Expr<ConversationsMembersResponse>;
   open(params: SlackParams<ConversationsOpenArguments>): Expr<ConversationsOpenResponse>;
   rename(params: SlackParams<ConversationsRenameArguments>): Expr<ConversationsRenameResponse>;
   replies(params: SlackParams<ConversationsRepliesArguments>): Expr<ConversationsRepliesResponse>;
-  setPurpose(params: SlackParams<ConversationsSetPurposeArguments>): Expr<ConversationsSetPurposeResponse>;
-  setTopic(params: SlackParams<ConversationsSetTopicArguments>): Expr<ConversationsSetTopicResponse>;
-  unarchive(params: SlackParams<ConversationsUnarchiveArguments>): Expr<ConversationsUnarchiveResponse>;
+  setPurpose(
+    params: SlackParams<ConversationsSetPurposeArguments>,
+  ): Expr<ConversationsSetPurposeResponse>;
+  setTopic(
+    params: SlackParams<ConversationsSetTopicArguments>,
+  ): Expr<ConversationsSetTopicResponse>;
+  unarchive(
+    params: SlackParams<ConversationsUnarchiveArguments>,
+  ): Expr<ConversationsUnarchiveResponse>;
 }

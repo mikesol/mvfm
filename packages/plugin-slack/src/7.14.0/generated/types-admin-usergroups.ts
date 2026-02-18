@@ -14,8 +14,16 @@ import type {
 import type { SlackParams } from "./types";
 
 export interface SlackMethodsAdminUsergroups {
-  addChannels(params: SlackParams<AdminUsergroupsAddChannelsArguments>): Expr<AdminUsergroupsAddChannelsResponse>;
-  addTeams(params: SlackParams<AdminUsergroupsAddTeamsArguments>): Expr<AdminUsergroupsAddTeamsResponse>;
-  listChannels(params: SlackParams<AdminUsergroupsListChannelsArguments>): Expr<AdminUsergroupsListChannelsResponse>;
-  removeChannels(params: SlackParams<AdminUsergroupsRemoveChannelsArguments>): Expr<AdminUsergroupsRemoveChannelsResponse>;
+  addChannels(
+    params: SlackParams<AdminUsergroupsAddChannelsArguments>,
+  ): Expr<AdminUsergroupsAddChannelsResponse>;
+  addTeams(
+    params: SlackParams<AdminUsergroupsAddTeamsArguments>,
+  ): Expr<AdminUsergroupsAddTeamsResponse>;
+  listChannels(
+    params: SlackParams<AdminUsergroupsListChannelsArguments>,
+  ): Expr<AdminUsergroupsListChannelsResponse>;
+  removeChannels(
+    params: SlackParams<AdminUsergroupsRemoveChannelsArguments>,
+  ): Expr<AdminUsergroupsRemoveChannelsResponse>;
 }

@@ -6,7 +6,8 @@ import type { SLACK_NODE_KINDS_REACTIONS } from "./node-kinds-reactions";
 
 type SlackReactionsKind = (typeof SLACK_NODE_KINDS_REACTIONS)[number];
 
-interface SlackReactionsBaseNode<K extends SlackReactionsKind = SlackReactionsKind> extends TypedNode<unknown> {
+interface SlackReactionsBaseNode<K extends SlackReactionsKind = SlackReactionsKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
@@ -15,7 +16,8 @@ interface SlackReactionsBaseNode<K extends SlackReactionsKind = SlackReactionsKi
 export interface SlackReactionsAddNode extends SlackReactionsBaseNode<"slack/reactions_add"> {}
 export interface SlackReactionsGetNode extends SlackReactionsBaseNode<"slack/reactions_get"> {}
 export interface SlackReactionsListNode extends SlackReactionsBaseNode<"slack/reactions_list"> {}
-export interface SlackReactionsRemoveNode extends SlackReactionsBaseNode<"slack/reactions_remove"> {}
+export interface SlackReactionsRemoveNode
+  extends SlackReactionsBaseNode<"slack/reactions_remove"> {}
 
 export const NODE_TO_METHOD_REACTIONS: Record<string, string> = {
   "slack/reactions_add": "reactions.add",
@@ -46,9 +48,17 @@ export function createSlackReactionsInterpreter(client: SlackClientLike): Interp
   };
 
   return defineInterpreter<SlackReactionsKind>()({
-    "slack/reactions_add": async function* (node: SlackReactionsAddNode) { return yield* handler(node); },
-    "slack/reactions_get": async function* (node: SlackReactionsGetNode) { return yield* handler(node); },
-    "slack/reactions_list": async function* (node: SlackReactionsListNode) { return yield* handler(node); },
-    "slack/reactions_remove": async function* (node: SlackReactionsRemoveNode) { return yield* handler(node); },
+    "slack/reactions_add": async function* (node: SlackReactionsAddNode) {
+      return yield* handler(node);
+    },
+    "slack/reactions_get": async function* (node: SlackReactionsGetNode) {
+      return yield* handler(node);
+    },
+    "slack/reactions_list": async function* (node: SlackReactionsListNode) {
+      return yield* handler(node);
+    },
+    "slack/reactions_remove": async function* (node: SlackReactionsRemoveNode) {
+      return yield* handler(node);
+    },
   });
 }

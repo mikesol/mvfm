@@ -49,10 +49,20 @@ export function createSlackDndInterpreter(client: SlackClientLike): Interpreter 
   };
 
   return defineInterpreter<SlackDndKind>()({
-    "slack/dnd_endDnd": async function* (node: SlackDndEndDndNode) { return yield* handler(node); },
-    "slack/dnd_endSnooze": async function* (node: SlackDndEndSnoozeNode) { return yield* handler(node); },
-    "slack/dnd_info": async function* (node: SlackDndInfoNode) { return yield* handler(node); },
-    "slack/dnd_setSnooze": async function* (node: SlackDndSetSnoozeNode) { return yield* handler(node); },
-    "slack/dnd_teamInfo": async function* (node: SlackDndTeamInfoNode) { return yield* handler(node); },
+    "slack/dnd_endDnd": async function* (node: SlackDndEndDndNode) {
+      return yield* handler(node);
+    },
+    "slack/dnd_endSnooze": async function* (node: SlackDndEndSnoozeNode) {
+      return yield* handler(node);
+    },
+    "slack/dnd_info": async function* (node: SlackDndInfoNode) {
+      return yield* handler(node);
+    },
+    "slack/dnd_setSnooze": async function* (node: SlackDndSetSnoozeNode) {
+      return yield* handler(node);
+    },
+    "slack/dnd_teamInfo": async function* (node: SlackDndTeamInfoNode) {
+      return yield* handler(node);
+    },
   });
 }

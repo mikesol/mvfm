@@ -6,17 +6,22 @@ import type { SLACK_NODE_KINDS_ADMIN_EMOJI } from "./node-kinds-admin-emoji";
 
 type SlackAdminEmojiKind = (typeof SLACK_NODE_KINDS_ADMIN_EMOJI)[number];
 
-interface SlackAdminEmojiBaseNode<K extends SlackAdminEmojiKind = SlackAdminEmojiKind> extends TypedNode<unknown> {
+interface SlackAdminEmojiBaseNode<K extends SlackAdminEmojiKind = SlackAdminEmojiKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
 export interface SlackAdminEmojiAddNode extends SlackAdminEmojiBaseNode<"slack/admin_emoji_add"> {}
-export interface SlackAdminEmojiAddAliasNode extends SlackAdminEmojiBaseNode<"slack/admin_emoji_addAlias"> {}
-export interface SlackAdminEmojiListNode extends SlackAdminEmojiBaseNode<"slack/admin_emoji_list"> {}
-export interface SlackAdminEmojiRemoveNode extends SlackAdminEmojiBaseNode<"slack/admin_emoji_remove"> {}
-export interface SlackAdminEmojiRenameNode extends SlackAdminEmojiBaseNode<"slack/admin_emoji_rename"> {}
+export interface SlackAdminEmojiAddAliasNode
+  extends SlackAdminEmojiBaseNode<"slack/admin_emoji_addAlias"> {}
+export interface SlackAdminEmojiListNode
+  extends SlackAdminEmojiBaseNode<"slack/admin_emoji_list"> {}
+export interface SlackAdminEmojiRemoveNode
+  extends SlackAdminEmojiBaseNode<"slack/admin_emoji_remove"> {}
+export interface SlackAdminEmojiRenameNode
+  extends SlackAdminEmojiBaseNode<"slack/admin_emoji_rename"> {}
 
 export const NODE_TO_METHOD_ADMIN_EMOJI: Record<string, string> = {
   "slack/admin_emoji_add": "admin.emoji.add",
@@ -49,10 +54,20 @@ export function createSlackAdminEmojiInterpreter(client: SlackClientLike): Inter
   };
 
   return defineInterpreter<SlackAdminEmojiKind>()({
-    "slack/admin_emoji_add": async function* (node: SlackAdminEmojiAddNode) { return yield* handler(node); },
-    "slack/admin_emoji_addAlias": async function* (node: SlackAdminEmojiAddAliasNode) { return yield* handler(node); },
-    "slack/admin_emoji_list": async function* (node: SlackAdminEmojiListNode) { return yield* handler(node); },
-    "slack/admin_emoji_remove": async function* (node: SlackAdminEmojiRemoveNode) { return yield* handler(node); },
-    "slack/admin_emoji_rename": async function* (node: SlackAdminEmojiRenameNode) { return yield* handler(node); },
+    "slack/admin_emoji_add": async function* (node: SlackAdminEmojiAddNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_emoji_addAlias": async function* (node: SlackAdminEmojiAddAliasNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_emoji_list": async function* (node: SlackAdminEmojiListNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_emoji_remove": async function* (node: SlackAdminEmojiRemoveNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_emoji_rename": async function* (node: SlackAdminEmojiRenameNode) {
+      return yield* handler(node);
+    },
   });
 }

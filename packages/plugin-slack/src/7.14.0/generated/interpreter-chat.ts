@@ -14,13 +14,16 @@ interface SlackChatBaseNode<K extends SlackChatKind = SlackChatKind> extends Typ
 
 export interface SlackChatAppendStreamNode extends SlackChatBaseNode<"slack/chat_appendStream"> {}
 export interface SlackChatDeleteNode extends SlackChatBaseNode<"slack/chat_delete"> {}
-export interface SlackChatDeleteScheduledMessageNode extends SlackChatBaseNode<"slack/chat_deleteScheduledMessage"> {}
+export interface SlackChatDeleteScheduledMessageNode
+  extends SlackChatBaseNode<"slack/chat_deleteScheduledMessage"> {}
 export interface SlackChatGetPermalinkNode extends SlackChatBaseNode<"slack/chat_getPermalink"> {}
 export interface SlackChatMeMessageNode extends SlackChatBaseNode<"slack/chat_meMessage"> {}
 export interface SlackChatPostEphemeralNode extends SlackChatBaseNode<"slack/chat_postEphemeral"> {}
 export interface SlackChatPostMessageNode extends SlackChatBaseNode<"slack/chat_postMessage"> {}
-export interface SlackChatScheduleMessageNode extends SlackChatBaseNode<"slack/chat_scheduleMessage"> {}
-export interface SlackChatScheduledMessagesListNode extends SlackChatBaseNode<"slack/chat_scheduledMessages_list"> {}
+export interface SlackChatScheduleMessageNode
+  extends SlackChatBaseNode<"slack/chat_scheduleMessage"> {}
+export interface SlackChatScheduledMessagesListNode
+  extends SlackChatBaseNode<"slack/chat_scheduledMessages_list"> {}
 export interface SlackChatStartStreamNode extends SlackChatBaseNode<"slack/chat_startStream"> {}
 export interface SlackChatStopStreamNode extends SlackChatBaseNode<"slack/chat_stopStream"> {}
 export interface SlackChatUnfurlNode extends SlackChatBaseNode<"slack/chat_unfurl"> {}
@@ -73,18 +76,48 @@ export function createSlackChatInterpreter(client: SlackClientLike): Interpreter
   };
 
   return defineInterpreter<SlackChatKind>()({
-    "slack/chat_appendStream": async function* (node: SlackChatAppendStreamNode) { return yield* handler(node); },
-    "slack/chat_delete": async function* (node: SlackChatDeleteNode) { return yield* handler(node); },
-    "slack/chat_deleteScheduledMessage": async function* (node: SlackChatDeleteScheduledMessageNode) { return yield* handler(node); },
-    "slack/chat_getPermalink": async function* (node: SlackChatGetPermalinkNode) { return yield* handler(node); },
-    "slack/chat_meMessage": async function* (node: SlackChatMeMessageNode) { return yield* handler(node); },
-    "slack/chat_postEphemeral": async function* (node: SlackChatPostEphemeralNode) { return yield* handler(node); },
-    "slack/chat_postMessage": async function* (node: SlackChatPostMessageNode) { return yield* handler(node); },
-    "slack/chat_scheduleMessage": async function* (node: SlackChatScheduleMessageNode) { return yield* handler(node); },
-    "slack/chat_scheduledMessages_list": async function* (node: SlackChatScheduledMessagesListNode) { return yield* handler(node); },
-    "slack/chat_startStream": async function* (node: SlackChatStartStreamNode) { return yield* handler(node); },
-    "slack/chat_stopStream": async function* (node: SlackChatStopStreamNode) { return yield* handler(node); },
-    "slack/chat_unfurl": async function* (node: SlackChatUnfurlNode) { return yield* handler(node); },
-    "slack/chat_update": async function* (node: SlackChatUpdateNode) { return yield* handler(node); },
+    "slack/chat_appendStream": async function* (node: SlackChatAppendStreamNode) {
+      return yield* handler(node);
+    },
+    "slack/chat_delete": async function* (node: SlackChatDeleteNode) {
+      return yield* handler(node);
+    },
+    "slack/chat_deleteScheduledMessage": async function* (
+      node: SlackChatDeleteScheduledMessageNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/chat_getPermalink": async function* (node: SlackChatGetPermalinkNode) {
+      return yield* handler(node);
+    },
+    "slack/chat_meMessage": async function* (node: SlackChatMeMessageNode) {
+      return yield* handler(node);
+    },
+    "slack/chat_postEphemeral": async function* (node: SlackChatPostEphemeralNode) {
+      return yield* handler(node);
+    },
+    "slack/chat_postMessage": async function* (node: SlackChatPostMessageNode) {
+      return yield* handler(node);
+    },
+    "slack/chat_scheduleMessage": async function* (node: SlackChatScheduleMessageNode) {
+      return yield* handler(node);
+    },
+    "slack/chat_scheduledMessages_list": async function* (
+      node: SlackChatScheduledMessagesListNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/chat_startStream": async function* (node: SlackChatStartStreamNode) {
+      return yield* handler(node);
+    },
+    "slack/chat_stopStream": async function* (node: SlackChatStopStreamNode) {
+      return yield* handler(node);
+    },
+    "slack/chat_unfurl": async function* (node: SlackChatUnfurlNode) {
+      return yield* handler(node);
+    },
+    "slack/chat_update": async function* (node: SlackChatUpdateNode) {
+      return yield* handler(node);
+    },
   });
 }

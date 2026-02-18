@@ -6,14 +6,17 @@ import type { SLACK_NODE_KINDS_FUNCTIONS } from "./node-kinds-functions";
 
 type SlackFunctionsKind = (typeof SLACK_NODE_KINDS_FUNCTIONS)[number];
 
-interface SlackFunctionsBaseNode<K extends SlackFunctionsKind = SlackFunctionsKind> extends TypedNode<unknown> {
+interface SlackFunctionsBaseNode<K extends SlackFunctionsKind = SlackFunctionsKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackFunctionsCompleteErrorNode extends SlackFunctionsBaseNode<"slack/functions_completeError"> {}
-export interface SlackFunctionsCompleteSuccessNode extends SlackFunctionsBaseNode<"slack/functions_completeSuccess"> {}
+export interface SlackFunctionsCompleteErrorNode
+  extends SlackFunctionsBaseNode<"slack/functions_completeError"> {}
+export interface SlackFunctionsCompleteSuccessNode
+  extends SlackFunctionsBaseNode<"slack/functions_completeSuccess"> {}
 
 export const NODE_TO_METHOD_FUNCTIONS: Record<string, string> = {
   "slack/functions_completeError": "functions.completeError",
@@ -40,7 +43,11 @@ export function createSlackFunctionsInterpreter(client: SlackClientLike): Interp
   };
 
   return defineInterpreter<SlackFunctionsKind>()({
-    "slack/functions_completeError": async function* (node: SlackFunctionsCompleteErrorNode) { return yield* handler(node); },
-    "slack/functions_completeSuccess": async function* (node: SlackFunctionsCompleteSuccessNode) { return yield* handler(node); },
+    "slack/functions_completeError": async function* (node: SlackFunctionsCompleteErrorNode) {
+      return yield* handler(node);
+    },
+    "slack/functions_completeSuccess": async function* (node: SlackFunctionsCompleteSuccessNode) {
+      return yield* handler(node);
+    },
   });
 }

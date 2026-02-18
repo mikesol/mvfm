@@ -4,8 +4,11 @@ import type { PluginContext } from "@mvfm/core";
 import type { SlackConfig } from "./types";
 import type { SlackMethodsReactions } from "./types-reactions";
 
-export function buildSlackReactions(ctx: PluginContext, config: SlackConfig): SlackMethodsReactions {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+export function buildSlackReactions(
+  ctx: PluginContext,
+  config: SlackConfig,
+): SlackMethodsReactions {
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     add(params) {
@@ -15,7 +18,11 @@ export function buildSlackReactions(ctx: PluginContext, config: SlackConfig): Sl
       return ctx.expr({ kind: "slack/reactions_get", params: resolveParams(params), config });
     },
     list(params?) {
-      return ctx.expr({ kind: "slack/reactions_list", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/reactions_list",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
     remove(params) {
       return ctx.expr({ kind: "slack/reactions_remove", params: resolveParams(params), config });

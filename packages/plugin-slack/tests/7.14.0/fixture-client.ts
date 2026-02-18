@@ -55,9 +55,7 @@ export function createFixtureClient(fixturesDir: string): SlackClient {
         const actual = sortedStringify(params);
         if (expected !== actual) {
           throw new Error(
-            `Contract drift for "${method}".\n` +
-              `Expected: ${expected}\n` +
-              `Actual:   ${actual}`,
+            `Contract drift for "${method}".\n` + `Expected: ${expected}\n` + `Actual:   ${actual}`,
           );
         }
       }

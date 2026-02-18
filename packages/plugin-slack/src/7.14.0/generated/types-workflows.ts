@@ -23,10 +23,14 @@ export interface SlackMethodsWorkflows {
   featured: {
     add(params: SlackParams<WorkflowsFeaturedAddArguments>): Expr<WorkflowsFeaturedAddResponse>;
     list(params: SlackParams<WorkflowsFeaturedListArguments>): Expr<WorkflowsFeaturedListResponse>;
-    remove(params: SlackParams<WorkflowsFeaturedRemoveArguments>): Expr<WorkflowsFeaturedRemoveResponse>;
+    remove(
+      params: SlackParams<WorkflowsFeaturedRemoveArguments>,
+    ): Expr<WorkflowsFeaturedRemoveResponse>;
     set(params: SlackParams<WorkflowsFeaturedSetArguments>): Expr<WorkflowsFeaturedSetResponse>;
   };
-  stepCompleted(params: SlackParams<WorkflowsStepCompletedArguments>): Expr<WorkflowsStepCompletedResponse>;
+  stepCompleted(
+    params: SlackParams<WorkflowsStepCompletedArguments>,
+  ): Expr<WorkflowsStepCompletedResponse>;
   stepFailed(params: SlackParams<WorkflowsStepFailedArguments>): Expr<WorkflowsStepFailedResponse>;
   updateStep(params: SlackParams<WorkflowsUpdateStepArguments>): Expr<WorkflowsUpdateStepResponse>;
 }

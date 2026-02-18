@@ -5,17 +5,29 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsDnd } from "./types-dnd";
 
 export function buildSlackDnd(ctx: PluginContext, config: SlackConfig): SlackMethodsDnd {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     endDnd(params?) {
-      return ctx.expr({ kind: "slack/dnd_endDnd", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/dnd_endDnd",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
     endSnooze(params?) {
-      return ctx.expr({ kind: "slack/dnd_endSnooze", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/dnd_endSnooze",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
     info(params?) {
-      return ctx.expr({ kind: "slack/dnd_info", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/dnd_info",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
     setSnooze(params) {
       return ctx.expr({ kind: "slack/dnd_setSnooze", params: resolveParams(params), config });

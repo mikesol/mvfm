@@ -6,15 +6,18 @@ import type { SLACK_NODE_KINDS_REMINDERS } from "./node-kinds-reminders";
 
 type SlackRemindersKind = (typeof SLACK_NODE_KINDS_REMINDERS)[number];
 
-interface SlackRemindersBaseNode<K extends SlackRemindersKind = SlackRemindersKind> extends TypedNode<unknown> {
+interface SlackRemindersBaseNode<K extends SlackRemindersKind = SlackRemindersKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
 export interface SlackRemindersAddNode extends SlackRemindersBaseNode<"slack/reminders_add"> {}
-export interface SlackRemindersCompleteNode extends SlackRemindersBaseNode<"slack/reminders_complete"> {}
-export interface SlackRemindersDeleteNode extends SlackRemindersBaseNode<"slack/reminders_delete"> {}
+export interface SlackRemindersCompleteNode
+  extends SlackRemindersBaseNode<"slack/reminders_complete"> {}
+export interface SlackRemindersDeleteNode
+  extends SlackRemindersBaseNode<"slack/reminders_delete"> {}
 export interface SlackRemindersInfoNode extends SlackRemindersBaseNode<"slack/reminders_info"> {}
 export interface SlackRemindersListNode extends SlackRemindersBaseNode<"slack/reminders_list"> {}
 
@@ -49,10 +52,20 @@ export function createSlackRemindersInterpreter(client: SlackClientLike): Interp
   };
 
   return defineInterpreter<SlackRemindersKind>()({
-    "slack/reminders_add": async function* (node: SlackRemindersAddNode) { return yield* handler(node); },
-    "slack/reminders_complete": async function* (node: SlackRemindersCompleteNode) { return yield* handler(node); },
-    "slack/reminders_delete": async function* (node: SlackRemindersDeleteNode) { return yield* handler(node); },
-    "slack/reminders_info": async function* (node: SlackRemindersInfoNode) { return yield* handler(node); },
-    "slack/reminders_list": async function* (node: SlackRemindersListNode) { return yield* handler(node); },
+    "slack/reminders_add": async function* (node: SlackRemindersAddNode) {
+      return yield* handler(node);
+    },
+    "slack/reminders_complete": async function* (node: SlackRemindersCompleteNode) {
+      return yield* handler(node);
+    },
+    "slack/reminders_delete": async function* (node: SlackRemindersDeleteNode) {
+      return yield* handler(node);
+    },
+    "slack/reminders_info": async function* (node: SlackRemindersInfoNode) {
+      return yield* handler(node);
+    },
+    "slack/reminders_list": async function* (node: SlackRemindersListNode) {
+      return yield* handler(node);
+    },
   });
 }

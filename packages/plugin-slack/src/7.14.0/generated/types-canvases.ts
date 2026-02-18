@@ -23,7 +23,9 @@ export interface SlackMethodsCanvases {
     set(params: SlackParams<CanvasesAccessSetArguments>): Expr<CanvasesAccessSetResponse>;
   };
   sections: {
-    lookup(params: SlackParams<CanvasesSectionsLookupArguments>): Expr<CanvasesSectionsLookupResponse>;
+    lookup(
+      params: SlackParams<CanvasesSectionsLookupArguments>,
+    ): Expr<CanvasesSectionsLookupResponse>;
   };
   create(params?: SlackParams<CanvasesCreateArguments>): Expr<CanvasesCreateResponse>;
   delete(params: SlackParams<CanvasesDeleteArguments>): Expr<CanvasesDeleteResponse>;

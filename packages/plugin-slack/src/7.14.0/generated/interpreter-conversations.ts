@@ -6,40 +6,69 @@ import type { SLACK_NODE_KINDS_CONVERSATIONS } from "./node-kinds-conversations"
 
 type SlackConversationsKind = (typeof SLACK_NODE_KINDS_CONVERSATIONS)[number];
 
-interface SlackConversationsBaseNode<K extends SlackConversationsKind = SlackConversationsKind> extends TypedNode<unknown> {
+interface SlackConversationsBaseNode<K extends SlackConversationsKind = SlackConversationsKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackConversationsAcceptSharedInviteNode extends SlackConversationsBaseNode<"slack/conversations_acceptSharedInvite"> {}
-export interface SlackConversationsApproveSharedInviteNode extends SlackConversationsBaseNode<"slack/conversations_approveSharedInvite"> {}
-export interface SlackConversationsArchiveNode extends SlackConversationsBaseNode<"slack/conversations_archive"> {}
-export interface SlackConversationsCanvasesCreateNode extends SlackConversationsBaseNode<"slack/conversations_canvases_create"> {}
-export interface SlackConversationsCloseNode extends SlackConversationsBaseNode<"slack/conversations_close"> {}
-export interface SlackConversationsCreateNode extends SlackConversationsBaseNode<"slack/conversations_create"> {}
-export interface SlackConversationsDeclineSharedInviteNode extends SlackConversationsBaseNode<"slack/conversations_declineSharedInvite"> {}
-export interface SlackConversationsExternalInvitePermissionsSetNode extends SlackConversationsBaseNode<"slack/conversations_externalInvitePermissions_set"> {}
-export interface SlackConversationsHistoryNode extends SlackConversationsBaseNode<"slack/conversations_history"> {}
-export interface SlackConversationsInfoNode extends SlackConversationsBaseNode<"slack/conversations_info"> {}
-export interface SlackConversationsInviteNode extends SlackConversationsBaseNode<"slack/conversations_invite"> {}
-export interface SlackConversationsInviteSharedNode extends SlackConversationsBaseNode<"slack/conversations_inviteShared"> {}
-export interface SlackConversationsJoinNode extends SlackConversationsBaseNode<"slack/conversations_join"> {}
-export interface SlackConversationsKickNode extends SlackConversationsBaseNode<"slack/conversations_kick"> {}
-export interface SlackConversationsLeaveNode extends SlackConversationsBaseNode<"slack/conversations_leave"> {}
-export interface SlackConversationsListNode extends SlackConversationsBaseNode<"slack/conversations_list"> {}
-export interface SlackConversationsListConnectInvitesNode extends SlackConversationsBaseNode<"slack/conversations_listConnectInvites"> {}
-export interface SlackConversationsMarkNode extends SlackConversationsBaseNode<"slack/conversations_mark"> {}
-export interface SlackConversationsMembersNode extends SlackConversationsBaseNode<"slack/conversations_members"> {}
-export interface SlackConversationsOpenNode extends SlackConversationsBaseNode<"slack/conversations_open"> {}
-export interface SlackConversationsRenameNode extends SlackConversationsBaseNode<"slack/conversations_rename"> {}
-export interface SlackConversationsRepliesNode extends SlackConversationsBaseNode<"slack/conversations_replies"> {}
-export interface SlackConversationsRequestSharedInviteApproveNode extends SlackConversationsBaseNode<"slack/conversations_requestSharedInvite_approve"> {}
-export interface SlackConversationsRequestSharedInviteDenyNode extends SlackConversationsBaseNode<"slack/conversations_requestSharedInvite_deny"> {}
-export interface SlackConversationsRequestSharedInviteListNode extends SlackConversationsBaseNode<"slack/conversations_requestSharedInvite_list"> {}
-export interface SlackConversationsSetPurposeNode extends SlackConversationsBaseNode<"slack/conversations_setPurpose"> {}
-export interface SlackConversationsSetTopicNode extends SlackConversationsBaseNode<"slack/conversations_setTopic"> {}
-export interface SlackConversationsUnarchiveNode extends SlackConversationsBaseNode<"slack/conversations_unarchive"> {}
+export interface SlackConversationsAcceptSharedInviteNode
+  extends SlackConversationsBaseNode<"slack/conversations_acceptSharedInvite"> {}
+export interface SlackConversationsApproveSharedInviteNode
+  extends SlackConversationsBaseNode<"slack/conversations_approveSharedInvite"> {}
+export interface SlackConversationsArchiveNode
+  extends SlackConversationsBaseNode<"slack/conversations_archive"> {}
+export interface SlackConversationsCanvasesCreateNode
+  extends SlackConversationsBaseNode<"slack/conversations_canvases_create"> {}
+export interface SlackConversationsCloseNode
+  extends SlackConversationsBaseNode<"slack/conversations_close"> {}
+export interface SlackConversationsCreateNode
+  extends SlackConversationsBaseNode<"slack/conversations_create"> {}
+export interface SlackConversationsDeclineSharedInviteNode
+  extends SlackConversationsBaseNode<"slack/conversations_declineSharedInvite"> {}
+export interface SlackConversationsExternalInvitePermissionsSetNode
+  extends SlackConversationsBaseNode<"slack/conversations_externalInvitePermissions_set"> {}
+export interface SlackConversationsHistoryNode
+  extends SlackConversationsBaseNode<"slack/conversations_history"> {}
+export interface SlackConversationsInfoNode
+  extends SlackConversationsBaseNode<"slack/conversations_info"> {}
+export interface SlackConversationsInviteNode
+  extends SlackConversationsBaseNode<"slack/conversations_invite"> {}
+export interface SlackConversationsInviteSharedNode
+  extends SlackConversationsBaseNode<"slack/conversations_inviteShared"> {}
+export interface SlackConversationsJoinNode
+  extends SlackConversationsBaseNode<"slack/conversations_join"> {}
+export interface SlackConversationsKickNode
+  extends SlackConversationsBaseNode<"slack/conversations_kick"> {}
+export interface SlackConversationsLeaveNode
+  extends SlackConversationsBaseNode<"slack/conversations_leave"> {}
+export interface SlackConversationsListNode
+  extends SlackConversationsBaseNode<"slack/conversations_list"> {}
+export interface SlackConversationsListConnectInvitesNode
+  extends SlackConversationsBaseNode<"slack/conversations_listConnectInvites"> {}
+export interface SlackConversationsMarkNode
+  extends SlackConversationsBaseNode<"slack/conversations_mark"> {}
+export interface SlackConversationsMembersNode
+  extends SlackConversationsBaseNode<"slack/conversations_members"> {}
+export interface SlackConversationsOpenNode
+  extends SlackConversationsBaseNode<"slack/conversations_open"> {}
+export interface SlackConversationsRenameNode
+  extends SlackConversationsBaseNode<"slack/conversations_rename"> {}
+export interface SlackConversationsRepliesNode
+  extends SlackConversationsBaseNode<"slack/conversations_replies"> {}
+export interface SlackConversationsRequestSharedInviteApproveNode
+  extends SlackConversationsBaseNode<"slack/conversations_requestSharedInvite_approve"> {}
+export interface SlackConversationsRequestSharedInviteDenyNode
+  extends SlackConversationsBaseNode<"slack/conversations_requestSharedInvite_deny"> {}
+export interface SlackConversationsRequestSharedInviteListNode
+  extends SlackConversationsBaseNode<"slack/conversations_requestSharedInvite_list"> {}
+export interface SlackConversationsSetPurposeNode
+  extends SlackConversationsBaseNode<"slack/conversations_setPurpose"> {}
+export interface SlackConversationsSetTopicNode
+  extends SlackConversationsBaseNode<"slack/conversations_setTopic"> {}
+export interface SlackConversationsUnarchiveNode
+  extends SlackConversationsBaseNode<"slack/conversations_unarchive"> {}
 
 export const NODE_TO_METHOD_CONVERSATIONS: Record<string, string> = {
   "slack/conversations_acceptSharedInvite": "conversations.acceptSharedInvite",
@@ -49,7 +78,8 @@ export const NODE_TO_METHOD_CONVERSATIONS: Record<string, string> = {
   "slack/conversations_close": "conversations.close",
   "slack/conversations_create": "conversations.create",
   "slack/conversations_declineSharedInvite": "conversations.declineSharedInvite",
-  "slack/conversations_externalInvitePermissions_set": "conversations.externalInvitePermissions.set",
+  "slack/conversations_externalInvitePermissions_set":
+    "conversations.externalInvitePermissions.set",
   "slack/conversations_history": "conversations.history",
   "slack/conversations_info": "conversations.info",
   "slack/conversations_invite": "conversations.invite",
@@ -118,33 +148,107 @@ export function createSlackConversationsInterpreter(client: SlackClientLike): In
   };
 
   return defineInterpreter<SlackConversationsKind>()({
-    "slack/conversations_acceptSharedInvite": async function* (node: SlackConversationsAcceptSharedInviteNode) { return yield* handler(node); },
-    "slack/conversations_approveSharedInvite": async function* (node: SlackConversationsApproveSharedInviteNode) { return yield* handler(node); },
-    "slack/conversations_archive": async function* (node: SlackConversationsArchiveNode) { return yield* handler(node); },
-    "slack/conversations_canvases_create": async function* (node: SlackConversationsCanvasesCreateNode) { return yield* handler(node); },
-    "slack/conversations_close": async function* (node: SlackConversationsCloseNode) { return yield* handler(node); },
-    "slack/conversations_create": async function* (node: SlackConversationsCreateNode) { return yield* handler(node); },
-    "slack/conversations_declineSharedInvite": async function* (node: SlackConversationsDeclineSharedInviteNode) { return yield* handler(node); },
-    "slack/conversations_externalInvitePermissions_set": async function* (node: SlackConversationsExternalInvitePermissionsSetNode) { return yield* handler(node); },
-    "slack/conversations_history": async function* (node: SlackConversationsHistoryNode) { return yield* handler(node); },
-    "slack/conversations_info": async function* (node: SlackConversationsInfoNode) { return yield* handler(node); },
-    "slack/conversations_invite": async function* (node: SlackConversationsInviteNode) { return yield* handler(node); },
-    "slack/conversations_inviteShared": async function* (node: SlackConversationsInviteSharedNode) { return yield* handler(node); },
-    "slack/conversations_join": async function* (node: SlackConversationsJoinNode) { return yield* handler(node); },
-    "slack/conversations_kick": async function* (node: SlackConversationsKickNode) { return yield* handler(node); },
-    "slack/conversations_leave": async function* (node: SlackConversationsLeaveNode) { return yield* handler(node); },
-    "slack/conversations_list": async function* (node: SlackConversationsListNode) { return yield* handler(node); },
-    "slack/conversations_listConnectInvites": async function* (node: SlackConversationsListConnectInvitesNode) { return yield* handler(node); },
-    "slack/conversations_mark": async function* (node: SlackConversationsMarkNode) { return yield* handler(node); },
-    "slack/conversations_members": async function* (node: SlackConversationsMembersNode) { return yield* handler(node); },
-    "slack/conversations_open": async function* (node: SlackConversationsOpenNode) { return yield* handler(node); },
-    "slack/conversations_rename": async function* (node: SlackConversationsRenameNode) { return yield* handler(node); },
-    "slack/conversations_replies": async function* (node: SlackConversationsRepliesNode) { return yield* handler(node); },
-    "slack/conversations_requestSharedInvite_approve": async function* (node: SlackConversationsRequestSharedInviteApproveNode) { return yield* handler(node); },
-    "slack/conversations_requestSharedInvite_deny": async function* (node: SlackConversationsRequestSharedInviteDenyNode) { return yield* handler(node); },
-    "slack/conversations_requestSharedInvite_list": async function* (node: SlackConversationsRequestSharedInviteListNode) { return yield* handler(node); },
-    "slack/conversations_setPurpose": async function* (node: SlackConversationsSetPurposeNode) { return yield* handler(node); },
-    "slack/conversations_setTopic": async function* (node: SlackConversationsSetTopicNode) { return yield* handler(node); },
-    "slack/conversations_unarchive": async function* (node: SlackConversationsUnarchiveNode) { return yield* handler(node); },
+    "slack/conversations_acceptSharedInvite": async function* (
+      node: SlackConversationsAcceptSharedInviteNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/conversations_approveSharedInvite": async function* (
+      node: SlackConversationsApproveSharedInviteNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/conversations_archive": async function* (node: SlackConversationsArchiveNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_canvases_create": async function* (
+      node: SlackConversationsCanvasesCreateNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/conversations_close": async function* (node: SlackConversationsCloseNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_create": async function* (node: SlackConversationsCreateNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_declineSharedInvite": async function* (
+      node: SlackConversationsDeclineSharedInviteNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/conversations_externalInvitePermissions_set": async function* (
+      node: SlackConversationsExternalInvitePermissionsSetNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/conversations_history": async function* (node: SlackConversationsHistoryNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_info": async function* (node: SlackConversationsInfoNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_invite": async function* (node: SlackConversationsInviteNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_inviteShared": async function* (node: SlackConversationsInviteSharedNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_join": async function* (node: SlackConversationsJoinNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_kick": async function* (node: SlackConversationsKickNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_leave": async function* (node: SlackConversationsLeaveNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_list": async function* (node: SlackConversationsListNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_listConnectInvites": async function* (
+      node: SlackConversationsListConnectInvitesNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/conversations_mark": async function* (node: SlackConversationsMarkNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_members": async function* (node: SlackConversationsMembersNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_open": async function* (node: SlackConversationsOpenNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_rename": async function* (node: SlackConversationsRenameNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_replies": async function* (node: SlackConversationsRepliesNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_requestSharedInvite_approve": async function* (
+      node: SlackConversationsRequestSharedInviteApproveNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/conversations_requestSharedInvite_deny": async function* (
+      node: SlackConversationsRequestSharedInviteDenyNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/conversations_requestSharedInvite_list": async function* (
+      node: SlackConversationsRequestSharedInviteListNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/conversations_setPurpose": async function* (node: SlackConversationsSetPurposeNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_setTopic": async function* (node: SlackConversationsSetTopicNode) {
+      return yield* handler(node);
+    },
+    "slack/conversations_unarchive": async function* (node: SlackConversationsUnarchiveNode) {
+      return yield* handler(node);
+    },
   });
 }

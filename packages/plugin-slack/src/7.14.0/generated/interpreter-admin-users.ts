@@ -6,28 +6,45 @@ import type { SLACK_NODE_KINDS_ADMIN_USERS } from "./node-kinds-admin-users";
 
 type SlackAdminUsersKind = (typeof SLACK_NODE_KINDS_ADMIN_USERS)[number];
 
-interface SlackAdminUsersBaseNode<K extends SlackAdminUsersKind = SlackAdminUsersKind> extends TypedNode<unknown> {
+interface SlackAdminUsersBaseNode<K extends SlackAdminUsersKind = SlackAdminUsersKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackAdminUsersAssignNode extends SlackAdminUsersBaseNode<"slack/admin_users_assign"> {}
-export interface SlackAdminUsersInviteNode extends SlackAdminUsersBaseNode<"slack/admin_users_invite"> {}
-export interface SlackAdminUsersListNode extends SlackAdminUsersBaseNode<"slack/admin_users_list"> {}
-export interface SlackAdminUsersRemoveNode extends SlackAdminUsersBaseNode<"slack/admin_users_remove"> {}
-export interface SlackAdminUsersSessionClearSettingsNode extends SlackAdminUsersBaseNode<"slack/admin_users_session_clearSettings"> {}
-export interface SlackAdminUsersSessionGetSettingsNode extends SlackAdminUsersBaseNode<"slack/admin_users_session_getSettings"> {}
-export interface SlackAdminUsersSessionInvalidateNode extends SlackAdminUsersBaseNode<"slack/admin_users_session_invalidate"> {}
-export interface SlackAdminUsersSessionListNode extends SlackAdminUsersBaseNode<"slack/admin_users_session_list"> {}
-export interface SlackAdminUsersSessionResetNode extends SlackAdminUsersBaseNode<"slack/admin_users_session_reset"> {}
-export interface SlackAdminUsersSessionResetBulkNode extends SlackAdminUsersBaseNode<"slack/admin_users_session_resetBulk"> {}
-export interface SlackAdminUsersSessionSetSettingsNode extends SlackAdminUsersBaseNode<"slack/admin_users_session_setSettings"> {}
-export interface SlackAdminUsersSetAdminNode extends SlackAdminUsersBaseNode<"slack/admin_users_setAdmin"> {}
-export interface SlackAdminUsersSetExpirationNode extends SlackAdminUsersBaseNode<"slack/admin_users_setExpiration"> {}
-export interface SlackAdminUsersSetOwnerNode extends SlackAdminUsersBaseNode<"slack/admin_users_setOwner"> {}
-export interface SlackAdminUsersSetRegularNode extends SlackAdminUsersBaseNode<"slack/admin_users_setRegular"> {}
-export interface SlackAdminUsersUnsupportedVersionsExportNode extends SlackAdminUsersBaseNode<"slack/admin_users_unsupportedVersions_export"> {}
+export interface SlackAdminUsersAssignNode
+  extends SlackAdminUsersBaseNode<"slack/admin_users_assign"> {}
+export interface SlackAdminUsersInviteNode
+  extends SlackAdminUsersBaseNode<"slack/admin_users_invite"> {}
+export interface SlackAdminUsersListNode
+  extends SlackAdminUsersBaseNode<"slack/admin_users_list"> {}
+export interface SlackAdminUsersRemoveNode
+  extends SlackAdminUsersBaseNode<"slack/admin_users_remove"> {}
+export interface SlackAdminUsersSessionClearSettingsNode
+  extends SlackAdminUsersBaseNode<"slack/admin_users_session_clearSettings"> {}
+export interface SlackAdminUsersSessionGetSettingsNode
+  extends SlackAdminUsersBaseNode<"slack/admin_users_session_getSettings"> {}
+export interface SlackAdminUsersSessionInvalidateNode
+  extends SlackAdminUsersBaseNode<"slack/admin_users_session_invalidate"> {}
+export interface SlackAdminUsersSessionListNode
+  extends SlackAdminUsersBaseNode<"slack/admin_users_session_list"> {}
+export interface SlackAdminUsersSessionResetNode
+  extends SlackAdminUsersBaseNode<"slack/admin_users_session_reset"> {}
+export interface SlackAdminUsersSessionResetBulkNode
+  extends SlackAdminUsersBaseNode<"slack/admin_users_session_resetBulk"> {}
+export interface SlackAdminUsersSessionSetSettingsNode
+  extends SlackAdminUsersBaseNode<"slack/admin_users_session_setSettings"> {}
+export interface SlackAdminUsersSetAdminNode
+  extends SlackAdminUsersBaseNode<"slack/admin_users_setAdmin"> {}
+export interface SlackAdminUsersSetExpirationNode
+  extends SlackAdminUsersBaseNode<"slack/admin_users_setExpiration"> {}
+export interface SlackAdminUsersSetOwnerNode
+  extends SlackAdminUsersBaseNode<"slack/admin_users_setOwner"> {}
+export interface SlackAdminUsersSetRegularNode
+  extends SlackAdminUsersBaseNode<"slack/admin_users_setRegular"> {}
+export interface SlackAdminUsersUnsupportedVersionsExportNode
+  extends SlackAdminUsersBaseNode<"slack/admin_users_unsupportedVersions_export"> {}
 
 export const NODE_TO_METHOD_ADMIN_USERS: Record<string, string> = {
   "slack/admin_users_assign": "admin.users.assign",
@@ -82,21 +99,65 @@ export function createSlackAdminUsersInterpreter(client: SlackClientLike): Inter
   };
 
   return defineInterpreter<SlackAdminUsersKind>()({
-    "slack/admin_users_assign": async function* (node: SlackAdminUsersAssignNode) { return yield* handler(node); },
-    "slack/admin_users_invite": async function* (node: SlackAdminUsersInviteNode) { return yield* handler(node); },
-    "slack/admin_users_list": async function* (node: SlackAdminUsersListNode) { return yield* handler(node); },
-    "slack/admin_users_remove": async function* (node: SlackAdminUsersRemoveNode) { return yield* handler(node); },
-    "slack/admin_users_session_clearSettings": async function* (node: SlackAdminUsersSessionClearSettingsNode) { return yield* handler(node); },
-    "slack/admin_users_session_getSettings": async function* (node: SlackAdminUsersSessionGetSettingsNode) { return yield* handler(node); },
-    "slack/admin_users_session_invalidate": async function* (node: SlackAdminUsersSessionInvalidateNode) { return yield* handler(node); },
-    "slack/admin_users_session_list": async function* (node: SlackAdminUsersSessionListNode) { return yield* handler(node); },
-    "slack/admin_users_session_reset": async function* (node: SlackAdminUsersSessionResetNode) { return yield* handler(node); },
-    "slack/admin_users_session_resetBulk": async function* (node: SlackAdminUsersSessionResetBulkNode) { return yield* handler(node); },
-    "slack/admin_users_session_setSettings": async function* (node: SlackAdminUsersSessionSetSettingsNode) { return yield* handler(node); },
-    "slack/admin_users_setAdmin": async function* (node: SlackAdminUsersSetAdminNode) { return yield* handler(node); },
-    "slack/admin_users_setExpiration": async function* (node: SlackAdminUsersSetExpirationNode) { return yield* handler(node); },
-    "slack/admin_users_setOwner": async function* (node: SlackAdminUsersSetOwnerNode) { return yield* handler(node); },
-    "slack/admin_users_setRegular": async function* (node: SlackAdminUsersSetRegularNode) { return yield* handler(node); },
-    "slack/admin_users_unsupportedVersions_export": async function* (node: SlackAdminUsersUnsupportedVersionsExportNode) { return yield* handler(node); },
+    "slack/admin_users_assign": async function* (node: SlackAdminUsersAssignNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_users_invite": async function* (node: SlackAdminUsersInviteNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_users_list": async function* (node: SlackAdminUsersListNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_users_remove": async function* (node: SlackAdminUsersRemoveNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_users_session_clearSettings": async function* (
+      node: SlackAdminUsersSessionClearSettingsNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_users_session_getSettings": async function* (
+      node: SlackAdminUsersSessionGetSettingsNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_users_session_invalidate": async function* (
+      node: SlackAdminUsersSessionInvalidateNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_users_session_list": async function* (node: SlackAdminUsersSessionListNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_users_session_reset": async function* (node: SlackAdminUsersSessionResetNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_users_session_resetBulk": async function* (
+      node: SlackAdminUsersSessionResetBulkNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_users_session_setSettings": async function* (
+      node: SlackAdminUsersSessionSetSettingsNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/admin_users_setAdmin": async function* (node: SlackAdminUsersSetAdminNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_users_setExpiration": async function* (node: SlackAdminUsersSetExpirationNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_users_setOwner": async function* (node: SlackAdminUsersSetOwnerNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_users_setRegular": async function* (node: SlackAdminUsersSetRegularNode) {
+      return yield* handler(node);
+    },
+    "slack/admin_users_unsupportedVersions_export": async function* (
+      node: SlackAdminUsersUnsupportedVersionsExportNode,
+    ) {
+      return yield* handler(node);
+    },
   });
 }

@@ -37,6 +37,8 @@ export function createSlackBotsInterpreter(client: SlackClientLike): Interpreter
   };
 
   return defineInterpreter<SlackBotsKind>()({
-    "slack/bots_info": async function* (node: SlackBotsInfoNode) { return yield* handler(node); },
+    "slack/bots_info": async function* (node: SlackBotsInfoNode) {
+      return yield* handler(node);
+    },
   });
 }

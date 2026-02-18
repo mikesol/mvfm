@@ -12,7 +12,13 @@ import type {
 import type { SlackParams } from "./types";
 
 export interface SlackMethodsAdminRoles {
-  addAssignments(params: SlackParams<AdminRolesAddAssignmentsArguments>): Expr<AdminRolesAddAssignmentsResponse>;
-  listAssignments(params?: SlackParams<AdminRolesListAssignmentsArguments>): Expr<AdminRolesListAssignmentsResponse>;
-  removeAssignments(params: SlackParams<AdminRolesRemoveAssignmentsArguments>): Expr<AdminRolesRemoveAssignmentsResponse>;
+  addAssignments(
+    params: SlackParams<AdminRolesAddAssignmentsArguments>,
+  ): Expr<AdminRolesAddAssignmentsResponse>;
+  listAssignments(
+    params?: SlackParams<AdminRolesListAssignmentsArguments>,
+  ): Expr<AdminRolesListAssignmentsResponse>;
+  removeAssignments(
+    params: SlackParams<AdminRolesRemoveAssignmentsArguments>,
+  ): Expr<AdminRolesRemoveAssignmentsResponse>;
 }

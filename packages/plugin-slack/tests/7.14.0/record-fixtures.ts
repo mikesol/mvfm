@@ -32,7 +32,7 @@ function loadToken(): string {
 
 function save(name: string, fixture: Fixture): void {
   const filePath = resolve(FIXTURES_DIR, `${name}.json`);
-  writeFileSync(filePath, JSON.stringify(fixture, null, 2) + "\n");
+  writeFileSync(filePath, `${JSON.stringify(fixture, null, 2)}\n`);
   console.log(`  saved ${name}.json`);
 }
 

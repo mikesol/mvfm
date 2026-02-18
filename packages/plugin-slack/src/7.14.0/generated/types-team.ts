@@ -28,7 +28,9 @@ export interface SlackMethodsTeam {
     info(params: SlackParams<TeamBillingInfoArguments>): Expr<TeamBillingInfoResponse>;
   };
   externalTeams: {
-    disconnect(params: SlackParams<TeamExternalTeamsDisconnectArguments>): Expr<TeamExternalTeamsDisconnectResponse>;
+    disconnect(
+      params: SlackParams<TeamExternalTeamsDisconnectArguments>,
+    ): Expr<TeamExternalTeamsDisconnectResponse>;
     list(params: SlackParams<TeamExternalTeamsListArguments>): Expr<TeamExternalTeamsListResponse>;
   };
   preferences: {
@@ -40,5 +42,7 @@ export interface SlackMethodsTeam {
   accessLogs(params?: SlackParams<TeamAccessLogsArguments>): Expr<TeamAccessLogsResponse>;
   billableInfo(params?: SlackParams<TeamBillableInfoArguments>): Expr<TeamBillableInfoResponse>;
   info(params?: SlackParams<TeamInfoArguments>): Expr<TeamInfoResponse>;
-  integrationLogs(params?: SlackParams<TeamIntegrationLogsArguments>): Expr<TeamIntegrationLogsResponse>;
+  integrationLogs(
+    params?: SlackParams<TeamIntegrationLogsArguments>,
+  ): Expr<TeamIntegrationLogsResponse>;
 }

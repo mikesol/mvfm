@@ -6,7 +6,8 @@ import type { SLACK_NODE_KINDS_SEARCH } from "./node-kinds-search";
 
 type SlackSearchKind = (typeof SLACK_NODE_KINDS_SEARCH)[number];
 
-interface SlackSearchBaseNode<K extends SlackSearchKind = SlackSearchKind> extends TypedNode<unknown> {
+interface SlackSearchBaseNode<K extends SlackSearchKind = SlackSearchKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
@@ -43,8 +44,14 @@ export function createSlackSearchInterpreter(client: SlackClientLike): Interpret
   };
 
   return defineInterpreter<SlackSearchKind>()({
-    "slack/search_all": async function* (node: SlackSearchAllNode) { return yield* handler(node); },
-    "slack/search_files": async function* (node: SlackSearchFilesNode) { return yield* handler(node); },
-    "slack/search_messages": async function* (node: SlackSearchMessagesNode) { return yield* handler(node); },
+    "slack/search_all": async function* (node: SlackSearchAllNode) {
+      return yield* handler(node);
+    },
+    "slack/search_files": async function* (node: SlackSearchFilesNode) {
+      return yield* handler(node);
+    },
+    "slack/search_messages": async function* (node: SlackSearchMessagesNode) {
+      return yield* handler(node);
+    },
   });
 }

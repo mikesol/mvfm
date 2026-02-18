@@ -12,14 +12,17 @@ interface SlackUsersBaseNode<K extends SlackUsersKind = SlackUsersKind> extends 
   config: { token: string };
 }
 
-export interface SlackUsersConversationsNode extends SlackUsersBaseNode<"slack/users_conversations"> {}
+export interface SlackUsersConversationsNode
+  extends SlackUsersBaseNode<"slack/users_conversations"> {}
 export interface SlackUsersDeletePhotoNode extends SlackUsersBaseNode<"slack/users_deletePhoto"> {}
-export interface SlackUsersDiscoverableContactsLookupNode extends SlackUsersBaseNode<"slack/users_discoverableContacts_lookup"> {}
+export interface SlackUsersDiscoverableContactsLookupNode
+  extends SlackUsersBaseNode<"slack/users_discoverableContacts_lookup"> {}
 export interface SlackUsersGetPresenceNode extends SlackUsersBaseNode<"slack/users_getPresence"> {}
 export interface SlackUsersIdentityNode extends SlackUsersBaseNode<"slack/users_identity"> {}
 export interface SlackUsersInfoNode extends SlackUsersBaseNode<"slack/users_info"> {}
 export interface SlackUsersListNode extends SlackUsersBaseNode<"slack/users_list"> {}
-export interface SlackUsersLookupByEmailNode extends SlackUsersBaseNode<"slack/users_lookupByEmail"> {}
+export interface SlackUsersLookupByEmailNode
+  extends SlackUsersBaseNode<"slack/users_lookupByEmail"> {}
 export interface SlackUsersSetPhotoNode extends SlackUsersBaseNode<"slack/users_setPhoto"> {}
 export interface SlackUsersSetPresenceNode extends SlackUsersBaseNode<"slack/users_setPresence"> {}
 export interface SlackUsersProfileGetNode extends SlackUsersBaseNode<"slack/users_profile_get"> {}
@@ -70,17 +73,43 @@ export function createSlackUsersInterpreter(client: SlackClientLike): Interprete
   };
 
   return defineInterpreter<SlackUsersKind>()({
-    "slack/users_conversations": async function* (node: SlackUsersConversationsNode) { return yield* handler(node); },
-    "slack/users_deletePhoto": async function* (node: SlackUsersDeletePhotoNode) { return yield* handler(node); },
-    "slack/users_discoverableContacts_lookup": async function* (node: SlackUsersDiscoverableContactsLookupNode) { return yield* handler(node); },
-    "slack/users_getPresence": async function* (node: SlackUsersGetPresenceNode) { return yield* handler(node); },
-    "slack/users_identity": async function* (node: SlackUsersIdentityNode) { return yield* handler(node); },
-    "slack/users_info": async function* (node: SlackUsersInfoNode) { return yield* handler(node); },
-    "slack/users_list": async function* (node: SlackUsersListNode) { return yield* handler(node); },
-    "slack/users_lookupByEmail": async function* (node: SlackUsersLookupByEmailNode) { return yield* handler(node); },
-    "slack/users_setPhoto": async function* (node: SlackUsersSetPhotoNode) { return yield* handler(node); },
-    "slack/users_setPresence": async function* (node: SlackUsersSetPresenceNode) { return yield* handler(node); },
-    "slack/users_profile_get": async function* (node: SlackUsersProfileGetNode) { return yield* handler(node); },
-    "slack/users_profile_set": async function* (node: SlackUsersProfileSetNode) { return yield* handler(node); },
+    "slack/users_conversations": async function* (node: SlackUsersConversationsNode) {
+      return yield* handler(node);
+    },
+    "slack/users_deletePhoto": async function* (node: SlackUsersDeletePhotoNode) {
+      return yield* handler(node);
+    },
+    "slack/users_discoverableContacts_lookup": async function* (
+      node: SlackUsersDiscoverableContactsLookupNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/users_getPresence": async function* (node: SlackUsersGetPresenceNode) {
+      return yield* handler(node);
+    },
+    "slack/users_identity": async function* (node: SlackUsersIdentityNode) {
+      return yield* handler(node);
+    },
+    "slack/users_info": async function* (node: SlackUsersInfoNode) {
+      return yield* handler(node);
+    },
+    "slack/users_list": async function* (node: SlackUsersListNode) {
+      return yield* handler(node);
+    },
+    "slack/users_lookupByEmail": async function* (node: SlackUsersLookupByEmailNode) {
+      return yield* handler(node);
+    },
+    "slack/users_setPhoto": async function* (node: SlackUsersSetPhotoNode) {
+      return yield* handler(node);
+    },
+    "slack/users_setPresence": async function* (node: SlackUsersSetPresenceNode) {
+      return yield* handler(node);
+    },
+    "slack/users_profile_get": async function* (node: SlackUsersProfileGetNode) {
+      return yield* handler(node);
+    },
+    "slack/users_profile_set": async function* (node: SlackUsersProfileSetNode) {
+      return yield* handler(node);
+    },
   });
 }

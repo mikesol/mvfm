@@ -6,15 +6,19 @@ import type { SLACK_NODE_KINDS_ASSISTANT } from "./node-kinds-assistant";
 
 type SlackAssistantKind = (typeof SLACK_NODE_KINDS_ASSISTANT)[number];
 
-interface SlackAssistantBaseNode<K extends SlackAssistantKind = SlackAssistantKind> extends TypedNode<unknown> {
+interface SlackAssistantBaseNode<K extends SlackAssistantKind = SlackAssistantKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackAssistantThreadsSetStatusNode extends SlackAssistantBaseNode<"slack/assistant_threads_setStatus"> {}
-export interface SlackAssistantThreadsSetSuggestedPromptsNode extends SlackAssistantBaseNode<"slack/assistant_threads_setSuggestedPrompts"> {}
-export interface SlackAssistantThreadsSetTitleNode extends SlackAssistantBaseNode<"slack/assistant_threads_setTitle"> {}
+export interface SlackAssistantThreadsSetStatusNode
+  extends SlackAssistantBaseNode<"slack/assistant_threads_setStatus"> {}
+export interface SlackAssistantThreadsSetSuggestedPromptsNode
+  extends SlackAssistantBaseNode<"slack/assistant_threads_setSuggestedPrompts"> {}
+export interface SlackAssistantThreadsSetTitleNode
+  extends SlackAssistantBaseNode<"slack/assistant_threads_setTitle"> {}
 
 export const NODE_TO_METHOD_ASSISTANT: Record<string, string> = {
   "slack/assistant_threads_setStatus": "assistant.threads.setStatus",
@@ -43,8 +47,18 @@ export function createSlackAssistantInterpreter(client: SlackClientLike): Interp
   };
 
   return defineInterpreter<SlackAssistantKind>()({
-    "slack/assistant_threads_setStatus": async function* (node: SlackAssistantThreadsSetStatusNode) { return yield* handler(node); },
-    "slack/assistant_threads_setSuggestedPrompts": async function* (node: SlackAssistantThreadsSetSuggestedPromptsNode) { return yield* handler(node); },
-    "slack/assistant_threads_setTitle": async function* (node: SlackAssistantThreadsSetTitleNode) { return yield* handler(node); },
+    "slack/assistant_threads_setStatus": async function* (
+      node: SlackAssistantThreadsSetStatusNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/assistant_threads_setSuggestedPrompts": async function* (
+      node: SlackAssistantThreadsSetSuggestedPromptsNode,
+    ) {
+      return yield* handler(node);
+    },
+    "slack/assistant_threads_setTitle": async function* (node: SlackAssistantThreadsSetTitleNode) {
+      return yield* handler(node);
+    },
   });
 }

@@ -4,36 +4,71 @@ import type { PluginContext } from "@mvfm/core";
 import type { SlackConfig } from "./types";
 import type { SlackMethodsAdminUsers } from "./types-admin-users";
 
-export function buildSlackAdminUsers(ctx: PluginContext, config: SlackConfig): SlackMethodsAdminUsers {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+export function buildSlackAdminUsers(
+  ctx: PluginContext,
+  config: SlackConfig,
+): SlackMethodsAdminUsers {
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     session: {
       clearSettings(params) {
-        return ctx.expr({ kind: "slack/admin_users_session_clearSettings", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_users_session_clearSettings",
+          params: resolveParams(params),
+          config,
+        });
       },
       getSettings(params) {
-        return ctx.expr({ kind: "slack/admin_users_session_getSettings", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_users_session_getSettings",
+          params: resolveParams(params),
+          config,
+        });
       },
       invalidate(params) {
-        return ctx.expr({ kind: "slack/admin_users_session_invalidate", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_users_session_invalidate",
+          params: resolveParams(params),
+          config,
+        });
       },
       list(params?) {
-        return ctx.expr({ kind: "slack/admin_users_session_list", params: params != null ? resolveParams(params) : null, config });
+        return ctx.expr({
+          kind: "slack/admin_users_session_list",
+          params: params != null ? resolveParams(params) : null,
+          config,
+        });
       },
       reset(params) {
-        return ctx.expr({ kind: "slack/admin_users_session_reset", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_users_session_reset",
+          params: resolveParams(params),
+          config,
+        });
       },
       resetBulk(params) {
-        return ctx.expr({ kind: "slack/admin_users_session_resetBulk", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_users_session_resetBulk",
+          params: resolveParams(params),
+          config,
+        });
       },
       setSettings(params) {
-        return ctx.expr({ kind: "slack/admin_users_session_setSettings", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_users_session_setSettings",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     unsupportedVersions: {
       export(params) {
-        return ctx.expr({ kind: "slack/admin_users_unsupportedVersions_export", params: resolveParams(params), config });
+        return ctx.expr({
+          kind: "slack/admin_users_unsupportedVersions_export",
+          params: resolveParams(params),
+          config,
+        });
       },
     },
     assign(params) {
@@ -43,22 +78,42 @@ export function buildSlackAdminUsers(ctx: PluginContext, config: SlackConfig): S
       return ctx.expr({ kind: "slack/admin_users_invite", params: resolveParams(params), config });
     },
     list(params?) {
-      return ctx.expr({ kind: "slack/admin_users_list", params: params != null ? resolveParams(params) : null, config });
+      return ctx.expr({
+        kind: "slack/admin_users_list",
+        params: params != null ? resolveParams(params) : null,
+        config,
+      });
     },
     remove(params) {
       return ctx.expr({ kind: "slack/admin_users_remove", params: resolveParams(params), config });
     },
     setAdmin(params) {
-      return ctx.expr({ kind: "slack/admin_users_setAdmin", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/admin_users_setAdmin",
+        params: resolveParams(params),
+        config,
+      });
     },
     setExpiration(params) {
-      return ctx.expr({ kind: "slack/admin_users_setExpiration", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/admin_users_setExpiration",
+        params: resolveParams(params),
+        config,
+      });
     },
     setOwner(params) {
-      return ctx.expr({ kind: "slack/admin_users_setOwner", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/admin_users_setOwner",
+        params: resolveParams(params),
+        config,
+      });
     },
     setRegular(params) {
-      return ctx.expr({ kind: "slack/admin_users_setRegular", params: resolveParams(params), config });
+      return ctx.expr({
+        kind: "slack/admin_users_setRegular",
+        params: resolveParams(params),
+        config,
+      });
     },
   };
 }

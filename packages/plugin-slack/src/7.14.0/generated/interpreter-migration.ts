@@ -6,13 +6,15 @@ import type { SLACK_NODE_KINDS_MIGRATION } from "./node-kinds-migration";
 
 type SlackMigrationKind = (typeof SLACK_NODE_KINDS_MIGRATION)[number];
 
-interface SlackMigrationBaseNode<K extends SlackMigrationKind = SlackMigrationKind> extends TypedNode<unknown> {
+interface SlackMigrationBaseNode<K extends SlackMigrationKind = SlackMigrationKind>
+  extends TypedNode<unknown> {
   kind: K;
   params?: TypedNode<Record<string, unknown>> | null;
   config: { token: string };
 }
 
-export interface SlackMigrationExchangeNode extends SlackMigrationBaseNode<"slack/migration_exchange"> {}
+export interface SlackMigrationExchangeNode
+  extends SlackMigrationBaseNode<"slack/migration_exchange"> {}
 
 export const NODE_TO_METHOD_MIGRATION: Record<string, string> = {
   "slack/migration_exchange": "migration.exchange",
@@ -37,6 +39,8 @@ export function createSlackMigrationInterpreter(client: SlackClientLike): Interp
   };
 
   return defineInterpreter<SlackMigrationKind>()({
-    "slack/migration_exchange": async function* (node: SlackMigrationExchangeNode) { return yield* handler(node); },
+    "slack/migration_exchange": async function* (node: SlackMigrationExchangeNode) {
+      return yield* handler(node);
+    },
   });
 }

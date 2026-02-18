@@ -13,8 +13,14 @@ import type { SlackParams } from "./types";
 
 export interface SlackMethodsAdminAuth {
   policy: {
-    assignEntities(params: SlackParams<AdminAuthPolicyAssignEntitiesArguments>): Expr<AdminAuthPolicyAssignEntitiesResponse>;
-    getEntities(params: SlackParams<AdminAuthPolicyGetEntitiesArguments>): Expr<AdminAuthPolicyGetEntitiesResponse>;
-    removeEntities(params: SlackParams<AdminAuthPolicyRemoveEntitiesArguments>): Expr<AdminAuthPolicyRemoveEntitiesResponse>;
+    assignEntities(
+      params: SlackParams<AdminAuthPolicyAssignEntitiesArguments>,
+    ): Expr<AdminAuthPolicyAssignEntitiesResponse>;
+    getEntities(
+      params: SlackParams<AdminAuthPolicyGetEntitiesArguments>,
+    ): Expr<AdminAuthPolicyGetEntitiesResponse>;
+    removeEntities(
+      params: SlackParams<AdminAuthPolicyRemoveEntitiesArguments>,
+    ): Expr<AdminAuthPolicyRemoveEntitiesResponse>;
   };
 }

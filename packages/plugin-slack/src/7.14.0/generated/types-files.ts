@@ -47,12 +47,20 @@ export interface SlackMethodsFiles {
     share(params: SlackParams<FilesRemoteShareArguments>): Expr<FilesRemoteShareResponse>;
     update(params: SlackParams<FilesRemoteUpdateArguments>): Expr<FilesRemoteUpdateResponse>;
   };
-  completeUploadExternal(params: SlackParams<FilesCompleteUploadExternalArguments>): Expr<FilesCompleteUploadExternalResponse>;
+  completeUploadExternal(
+    params: SlackParams<FilesCompleteUploadExternalArguments>,
+  ): Expr<FilesCompleteUploadExternalResponse>;
   delete(params: SlackParams<FilesDeleteArguments>): Expr<FilesDeleteResponse>;
-  getUploadURLExternal(params: SlackParams<FilesGetUploadURLExternalArguments>): Expr<FilesGetUploadURLExternalResponse>;
+  getUploadURLExternal(
+    params: SlackParams<FilesGetUploadURLExternalArguments>,
+  ): Expr<FilesGetUploadURLExternalResponse>;
   info(params: SlackParams<FilesInfoArguments>): Expr<FilesInfoResponse>;
   list(params: SlackParams<FilesListArguments>): Expr<FilesListResponse>;
-  revokePublicURL(params: SlackParams<FilesRevokePublicURLArguments>): Expr<FilesRevokePublicURLResponse>;
-  sharedPublicURL(params: SlackParams<FilesSharedPublicURLArguments>): Expr<FilesSharedPublicURLResponse>;
+  revokePublicURL(
+    params: SlackParams<FilesRevokePublicURLArguments>,
+  ): Expr<FilesRevokePublicURLResponse>;
+  sharedPublicURL(
+    params: SlackParams<FilesSharedPublicURLArguments>,
+  ): Expr<FilesSharedPublicURLResponse>;
   upload(params: SlackParams<FilesUploadArguments>): Expr<FilesUploadResponse>;
 }

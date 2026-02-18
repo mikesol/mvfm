@@ -5,7 +5,7 @@ import type { SlackConfig } from "./types";
 import type { SlackMethodsSearch } from "./types-search";
 
 export function buildSlackSearch(ctx: PluginContext, config: SlackConfig): SlackMethodsSearch {
-  const resolveParams = (params: unknown) => params != null ? ctx.lift(params).__node : null;
+  const resolveParams = (params: unknown) => (params != null ? ctx.lift(params).__node : null);
 
   return {
     all(params) {
