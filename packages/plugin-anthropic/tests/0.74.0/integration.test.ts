@@ -97,6 +97,9 @@ describe("anthropic integration: batches", () => {
     expect(result.processing_status).toBe("in_progress");
   });
 
+  // ID-based operations: the fixture client matches by operation name only,
+  // not by the actual ID in the path. Contract drift is caught for param-based
+  // operations; for ID-based ones we verify the response shape is correct.
   it("retrieve_message_batch", async () => {
     const prog = app(($) => $.anthropic.messages.batches.retrieve("msgbatch_any"));
     const result = (await run(prog)) as any;
