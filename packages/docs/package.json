@@ -23,6 +23,7 @@
     "@mvfm/plugin-postgres": "workspace:*",
     "@mvfm/plugin-redis": "workspace:*",
     "@mvfm/plugin-s3": "workspace:*",
+    "@mvfm/plugin-slack": "workspace:*",
     "@mvfm/plugin-stripe": "workspace:*",
     "@mvfm/plugin-zod": "workspace:*",
     "astro": "^5.9.4",
@@ -32,6 +33,7 @@
     "shiki": "^3.22.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.3.0",
     "@tailwindcss/vite": "^4.1.10",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",

@@ -8,7 +8,7 @@ import { SLACK_NODE_KINDS } from "./generated/node-kinds";
 import type { SlackConfig } from "./generated/types";
 
 export type { SlackClient } from "./generated/interpreter";
-export { createSlackInterpreter } from "./generated/interpreter";
+export { createSlackInterpreter, NODE_TO_METHOD } from "./generated/interpreter";
 export { SLACK_NODE_KINDS } from "./generated/node-kinds";
 export type { SlackConfig, SlackMethods } from "./generated/types";
 

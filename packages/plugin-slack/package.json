@@ -18,12 +18,17 @@
     "test": "vitest run",
     "size": "size-limit"
   },
-  "files": ["dist", "etc"],
+  "files": [
+    "dist",
+    "etc"
+  ],
   "peerDependencies": {
     "@mvfm/core": "workspace:*"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.3.0",
     "@mvfm/core": "workspace:*",
-    "@slack/web-api": "^7.14.1"
+    "@slack/web-api": "^7.14.1",
+    "fast-check": "^4.5.3"
   }
 }
