@@ -18,11 +18,7 @@ import { createFixtureClient } from "./fixture-client";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const fixtureClient = createFixtureClient(join(__dirname, "fixtures"));
-const app = mvfm(
-  num,
-  str,
-  twilioPlugin({ accountSid: "AC_test_123", authToken: "auth_test_456" }),
-);
+const app = mvfm(num, str, twilioPlugin({ accountSid: "AC_test_123", authToken: "auth_test_456" }));
 
 async function run(prog: Program) {
   const injected = injectInput(prog, {});
@@ -58,9 +54,7 @@ describe("twilio integration: messages", () => {
   });
 
   it("fetch message", async () => {
-    const prog = app(($) =>
-      $.twilio.messages("SM00000000000000000000000000000001").fetch(),
-    );
+    const prog = app(($) => $.twilio.messages("SM00000000000000000000000000000001").fetch());
     const result = (await run(prog)) as any;
     expect(result.sid).toMatch(/^SM/);
     expect(result.status).toBe("delivered");
@@ -95,9 +89,7 @@ describe("twilio integration: calls", () => {
   });
 
   it("fetch call", async () => {
-    const prog = app(($) =>
-      $.twilio.calls("CA00000000000000000000000000000001").fetch(),
-    );
+    const prog = app(($) => $.twilio.calls("CA00000000000000000000000000000001").fetch());
     const result = (await run(prog)) as any;
     expect(result.sid).toMatch(/^CA/);
     expect(result.status).toBe("completed");
