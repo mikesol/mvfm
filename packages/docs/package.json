@@ -23,6 +23,7 @@
     "@mvfm/plugin-postgres": "workspace:*",
     "@mvfm/plugin-redis": "workspace:*",
     "@mvfm/plugin-s3": "workspace:*",
+    "@mvfm/plugin-slack": "workspace:*",
     "@mvfm/plugin-stripe": "workspace:*",
     "@mvfm/plugin-zod": "workspace:*",
     "astro": "^5.9.4",
