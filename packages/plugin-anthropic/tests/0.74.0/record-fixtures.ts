@@ -14,6 +14,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import Anthropic from "@anthropic-ai/sdk";
 import { wrapAnthropicSdk } from "../../src/0.74.0/client-anthropic-sdk";
+import type { Fixture } from "./fixture-client";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -42,11 +43,6 @@ function loadApiKey(): string {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-interface Fixture {
-  request: { method: string; path: string; params?: unknown };
-  response: unknown;
-}
 
 function save(name: string, fixture: Fixture): void {
   const filePath = resolve(FIXTURES_DIR, `${name}.json`);
