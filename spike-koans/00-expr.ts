@@ -47,7 +47,7 @@ declare const nexprBrand: unique symbol;
 export interface CExpr<
   O,
   Id extends string,
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
 > {
   readonly [cexprBrand]: { readonly o: O; readonly id: Id; readonly adj: Adj };
   readonly __id: string;
@@ -58,7 +58,7 @@ export interface CExpr<
 export interface NExpr<
   O,
   RootId extends string,
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   Ctr extends string,
 > {
   readonly [nexprBrand]: {
@@ -91,7 +91,7 @@ export type OutOf<E> =
 export function makeCExpr<
   O,
   Id extends string,
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
 >(id: Id, adj: Record<string, RuntimeEntry>): CExpr<O, Id, Adj> {
   return { __id: id, __adj: adj } as unknown as CExpr<O, Id, Adj>;
 }
@@ -99,7 +99,7 @@ export function makeCExpr<
 export function makeNExpr<
   O,
   RootId extends string,
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   Ctr extends string,
 >(
   rootId: RootId,

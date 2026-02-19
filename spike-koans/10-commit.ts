@@ -51,7 +51,7 @@ import {
 export function gc<
   O,
   R extends string,
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   C extends string,
 >(d: DirtyExpr<O, R, Adj, C>): DirtyExpr<O, R, LiveAdj<Adj, R>, C> {
   const live = liveAdj(d.__adj, d.__id);
@@ -62,7 +62,7 @@ export function gc<
 export function commit<
   O,
   R extends string,
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   C extends string,
 >(d: DirtyExpr<O, R, Adj, C>): NExpr<O, R, Adj, C> {
   const adj = d.__adj;

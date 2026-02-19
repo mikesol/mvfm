@@ -54,7 +54,7 @@ import { makeNExpr, incrementId, numLit, add, mul } from "./02-build";
 //   NewId: the new ID assigned to the processed node
 
 export type ProcessNode<
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   NodeId extends string,
   Map,
   Entries,
@@ -84,7 +84,7 @@ export type ProcessNode<
     : never;
 
 export type ProcessChildren<
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   Children extends string[],
   Map,
   Entries,
@@ -115,18 +115,18 @@ export type ProcessChildren<
 import type { Increment } from "./02-build";
 
 export type Normalize<
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   RootId extends string,
 > = ProcessNode<Adj, RootId, {}, {}, "a">;
 
 // ─── AppResult: single extraction from Normalize ─────────────────────
 type AppResult<
   O,
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   RootId extends string,
 > = Normalize<Adj, RootId> extends [
   any,
-  infer E extends Record<string, NodeEntry<string, string[], any>>,
+  infer E,
   infer C extends string,
   infer R extends string,
 ]
@@ -137,7 +137,7 @@ type AppResult<
 export function app<
   O,
   Id extends string,
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
 >(cexpr: CExpr<O, Id, Adj>): AppResult<O, Adj, Id> {
   const oldAdj = cexpr.__adj;
   const rootId = cexpr.__id;

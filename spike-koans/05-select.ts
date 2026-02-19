@@ -46,7 +46,7 @@ import {
 export function selectWhere<
   O,
   R extends string,
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   C extends string,
   P extends PredBase,
 >(

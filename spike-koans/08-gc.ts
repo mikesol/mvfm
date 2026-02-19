@@ -60,7 +60,7 @@ export type CollectReachable<
 // ─── LiveAdj: filter adj to reachable nodes only ─────────────────────
 // Single mapped type at the end — no nesting per iteration.
 export type LiveAdj<
-  Adj extends Record<string, any>,
+  Adj,
   RootID extends string,
 > = {
   [K in keyof Adj as K extends CollectReachable<Adj, [RootID]>

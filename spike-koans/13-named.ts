@@ -64,7 +64,7 @@ type TargetOut<Adj, ID extends string> = ID extends keyof Adj
 export function name<
   O,
   R extends string,
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   C extends string,
   N extends string,
   T extends string,
@@ -98,7 +98,7 @@ export type PreserveAliases<Adj> = {
 export function gcPreservingAliases<
   O,
   R extends string,
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   C extends string,
 >(
   d: DirtyExpr<O, R, Adj, C>,

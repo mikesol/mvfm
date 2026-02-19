@@ -59,7 +59,7 @@ export type RewireParents<
 // 2. Add wrapper entry with children = [targetId]
 // Wrapper is added AFTER rewiring, so its child is NOT self-rewired.
 export type WrapOneResult<
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   TargetID extends string,
   WrapperKind extends string,
   WrapperID extends string,
@@ -80,7 +80,7 @@ type WrapRoot<
 export function wrapByName<
   O,
   R extends string,
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   C extends string,
   TargetID extends string,
   WrapperKind extends string,

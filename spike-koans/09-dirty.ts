@@ -35,7 +35,7 @@ declare const dirtyBrand: unique symbol;
 export interface DirtyExpr<
   O,
   RootId extends string,
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   Ctr extends string,
 > {
   readonly [dirtyBrand]: {
@@ -62,7 +62,7 @@ export type DirtyOutOf<D> =
 // ─── dirty: NExpr → DirtyExpr ────────────────────────────────────────
 export function dirty<
   O, R extends string,
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   C extends string,
 >(expr: NExpr<O, R, Adj, C>): DirtyExpr<O, R, Adj, C> {
   return {
@@ -73,7 +73,7 @@ export function dirty<
 // ─── addEntry: adj grows via intersection ────────────────────────────
 export function addEntry<
   O, R extends string,
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   C extends string,
   Id extends string,
   E extends NodeEntry<string, string[], any>,
@@ -87,7 +87,7 @@ export function addEntry<
 // ─── removeEntry: adj shrinks via Omit ───────────────────────────────
 export function removeEntry<
   O, R extends string,
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   C extends string,
   Id extends string,
 >(
@@ -101,7 +101,7 @@ export function removeEntry<
 // ─── swapEntry: replace via Omit & Record ────────────────────────────
 export function swapEntry<
   O, R extends string,
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   C extends string,
   Id extends string,
   E extends NodeEntry<string, string[], any>,
@@ -131,7 +131,7 @@ export type RewireAdj<
 
 export function rewireChildren<
   O, R extends string,
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   C extends string,
   Old extends string, New extends string,
 >(
@@ -150,7 +150,7 @@ export function rewireChildren<
 // ─── setRoot: change root ID ─────────────────────────────────────────
 export function setRoot<
   O, R extends string,
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   C extends string,
   NewRoot extends string,
 >(

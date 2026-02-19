@@ -91,7 +91,7 @@ type SpliceRoot<
 export function spliceWhere<
   O,
   R extends string,
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   C extends string,
   P extends PredBase,
 >(

@@ -81,7 +81,7 @@ export type MatchingEntries<Adj, P> = {
 export function mapWhere<
   O,
   R extends string,
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   C extends string,
   P extends PredBase,
   NewEntry extends NodeEntry<string, string[], any>,
@@ -92,8 +92,7 @@ export function mapWhere<
 ): NExpr<
   MapOut<O, Adj, R, P, NewEntry>,
   R,
-  MapAdj<Adj, P, NewEntry> &
-    Record<string, NodeEntry<string, string[], any>>,
+  MapAdj<Adj, P, NewEntry>,
   C
 > {
   const newAdj: Record<string, RuntimeEntry> = {};

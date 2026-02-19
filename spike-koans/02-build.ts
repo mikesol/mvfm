@@ -55,9 +55,9 @@ export function numLit<V extends number>(
 // ID = "A({leftId},{rightId})"
 // Adj = CAdjOf<L> & CAdjOf<R> & Record<newId, NodeEntry<"num/add", [leftId, rightId], number>>
 export function add<
-  LA extends Record<string, NodeEntry<string, string[], any>>,
+  LA,
   LId extends string,
-  RA extends Record<string, NodeEntry<string, string[], any>>,
+  RA,
   RId extends string,
 >(
   left: CExpr<number, LId, LA>,
@@ -87,9 +87,9 @@ export function add<
 // ─── mul: binary multiplication node ─────────────────────────────────
 // ID = "M({leftId},{rightId})"
 export function mul<
-  LA extends Record<string, NodeEntry<string, string[], any>>,
+  LA,
   LId extends string,
-  RA extends Record<string, NodeEntry<string, string[], any>>,
+  RA,
   RId extends string,
 >(
   left: CExpr<number, LId, LA>,

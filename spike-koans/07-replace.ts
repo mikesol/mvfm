@@ -54,7 +54,7 @@ type ReplaceKind<
 export function replaceWhere<
   O,
   R extends string,
-  Adj extends Record<string, NodeEntry<string, string[], any>>,
+  Adj,
   C extends string,
   P extends PredBase,
   NewKind extends string,
@@ -65,11 +65,10 @@ export function replaceWhere<
 ): NExpr<
   MapOut<O, Adj, R, P, ReplaceKind<MatchingEntries<Adj, P>, NewKind>>,
   R,
-  MapAdj<Adj, P, ReplaceKind<MatchingEntries<Adj, P>, NewKind>> &
-    Record<string, NodeEntry<string, string[], any>>,
+  MapAdj<Adj, P, ReplaceKind<MatchingEntries<Adj, P>, NewKind>>,
   C
 > {
-  return mapWhere(expr, pred, (entry) => ({
+  return mapWhere(expr, pred, (entry: any) => ({
     kind: newKind,
     children: entry.children,
     out: entry.out,

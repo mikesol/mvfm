@@ -100,7 +100,7 @@ export type EvalPred<
 
 // ─── SelectKeys: compute matching key union ──────────────────────────
 export type SelectKeys<
-  Adj extends Record<string, any>,
+  Adj,
   P,
 > = {
   [K in keyof Adj]: K extends string
