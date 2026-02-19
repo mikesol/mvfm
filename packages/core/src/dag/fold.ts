@@ -9,6 +9,7 @@
  * - Stack-safe: explicit stack, no recursion
  * - Memoizing: shared DAG nodes evaluate exactly once
  * - Short-circuit: handlers control which children are evaluated
+ * - Volatile/taint: volatile nodes always re-evaluate, taint propagates
  */
 
 import type { NExpr, RuntimeEntry } from "./00-expr";
@@ -62,12 +63,29 @@ export function defaults(
   return composed;
 }
 
+// ─── Volatile kinds ─────────────────────────────────────────────────
+
+/** Node kinds that always re-evaluate (never memoized). */
+export const VOLATILE_KINDS: Set<string> = new Set([
+  "core/lambda_param",
+  "st/get",
+]);
+
+// ─── FoldOptions ────────────────────────────────────────────────────
+
+/** Options for fold(). */
+export interface FoldOptions {
+  /** Set of node kinds that should always re-evaluate. Defaults to VOLATILE_KINDS. */
+  volatileKinds?: Set<string>;
+}
+
 // ─── Frame: one activation on the evaluation stack ──────────────────
 
 interface Frame {
   id: string;
   gen: AsyncGenerator<number, unknown, unknown>;
   pendingValue: unknown;
+  tainted: boolean;
 }
 
 // ─── fold() ─────────────────────────────────────────────────────────
@@ -79,23 +97,39 @@ interface Frame {
  * then returns its own result. The trampoline drives the generators
  * using an explicit stack, making it stack-safe for arbitrarily deep
  * DAGs. Shared nodes are memoized and evaluated exactly once.
+ *
+ * Volatile nodes (kinds in volatileKinds) always re-evaluate.
+ * Taint propagates transitively: any node depending on a volatile
+ * or tainted child is itself tainted and will re-evaluate.
  */
 export async function fold<O>(
   expr: NExpr<O, string, unknown, string>,
   interp: Interpreter,
+  options?: FoldOptions,
 ): Promise<O> {
   const rootId = expr.__id;
   const adj = expr.__adj;
   const memo: Record<string, unknown> = {};
+  const tainted: Set<string> = new Set();
+  const volatile = options?.volatileKinds ?? VOLATILE_KINDS;
   const stack: Frame[] = [];
 
+  function isVolatile(id: string): boolean {
+    const entry = adj[id];
+    return entry !== undefined && volatile.has(entry.kind);
+  }
+
   function pushNode(id: string): void {
-    if (id in memo) return;
     const entry = adj[id];
     if (!entry) throw new Error(`fold: missing node "${id}"`);
     const handler = interp[entry.kind];
     if (!handler) throw new Error(`fold: no handler for "${entry.kind}"`);
-    stack.push({ id, gen: handler(entry), pendingValue: undefined });
+    stack.push({
+      id,
+      gen: handler(entry),
+      pendingValue: undefined,
+      tainted: false,
+    });
   }
 
   pushNode(rootId);
@@ -103,7 +137,8 @@ export async function fold<O>(
   while (stack.length > 0) {
     const frame = stack[stack.length - 1];
 
-    if (frame.id in memo) {
+    // If node is already memoized AND not volatile/tainted, skip
+    if (frame.id in memo && !isVolatile(frame.id) && !tainted.has(frame.id)) {
       stack.pop();
       continue;
     }
@@ -114,9 +149,18 @@ export async function fold<O>(
 
     if (iterResult.done) {
       memo[frame.id] = iterResult.value;
+      // Track taint: volatile nodes and nodes depending on them
+      if (frame.tainted || isVolatile(frame.id)) {
+        tainted.add(frame.id);
+      }
       stack.pop();
       if (stack.length > 0) {
-        stack[stack.length - 1].pendingValue = iterResult.value;
+        const parent = stack[stack.length - 1];
+        parent.pendingValue = iterResult.value;
+        // Propagate taint to parent
+        if (tainted.has(frame.id)) {
+          parent.tainted = true;
+        }
       }
       continue;
     }
@@ -128,6 +172,13 @@ export async function fold<O>(
       throw new Error(
         `fold: node "${frame.id}" (${entry.kind}) has no child at index ${childIndex}`,
       );
+    }
+
+    // If child is volatile or tainted, always re-evaluate
+    if (isVolatile(childId) || tainted.has(childId)) {
+      delete memo[childId];
+      pushNode(childId);
+      continue;
     }
 
     if (childId in memo) {
