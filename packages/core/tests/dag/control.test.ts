@@ -7,9 +7,9 @@ import { node } from "../../src/dag/builder";
 import { app } from "../../src/dag/03-normalize";
 import { fold } from "../../src/dag/fold";
 import { createCoreDagInterpreter } from "../../src/dag/core-interpreter";
-import { createControlDagInterpreter } from "../../src/plugins/control/dag-interpreter";
-import { createStDagInterpreter } from "../../src/plugins/st/dag-interpreter";
-import { createNumDagInterpreter } from "../../src/plugins/num/dag-interpreter";
+import { createControlDagInterpreter } from "../../src/plugins/control/interpreter";
+import { createStDagInterpreter } from "../../src/plugins/st/interpreter";
+import { createNumDagInterpreter } from "../../src/plugins/num/interpreter";
 
 describe("control DAG interpreter", () => {
   it("control/each iterates over collection with scoped body", async () => {

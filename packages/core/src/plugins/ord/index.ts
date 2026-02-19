@@ -1,82 +1,38 @@
-import type { Expr, PluginContext } from "../../core";
-import { definePlugin } from "../../core";
-import { inferType } from "../../trait-utils";
-import { ordInterpreter } from "./interpreter";
-
 /**
- * Ord typeclass template — generates comparison methods for a specific type T.
- * Resolved by MergePlugins based on which type plugins are loaded.
- */
-export interface OrdFor<T> {
-  /** Three-way comparison returning -1, 0, or 1. */
-  compare(a: Expr<T> | T, b: Expr<T> | T): Expr<number>;
-  /** Greater than. */
-  gt(a: Expr<T> | T, b: Expr<T> | T): Expr<boolean>;
-  /** Greater than or equal. */
-  gte(a: Expr<T> | T, b: Expr<T> | T): Expr<boolean>;
-  /** Less than. */
-  lt(a: Expr<T> | T, b: Expr<T> | T): Expr<boolean>;
-  /** Less than or equal. */
-  lte(a: Expr<T> | T, b: Expr<T> | T): Expr<boolean>;
-}
-
-// Register with the typeclass mapping
-declare module "../../core" {
-  interface TypeclassMapping<T> {
-    ord: OrdFor<T>;
-  }
-}
-
-/**
- * Ordering typeclass plugin. Namespace: `ord/`.
+ * DAG-model ord plugin definition.
  *
- * Dispatches comparisons to type-specific implementations. Derives
- * `gt`, `gte`, `lt`, `lte` from the base `compare` operation.
+ * The ord plugin derives gt, gte, lt, lte from a compare result.
+ * The actual compare dispatch is handled by type-specific plugins
+ * (e.g., num/compare).
  */
-export const ord = definePlugin({
+
+import type { PluginDefWithBuild, BuildContext } from "../../dag/builder";
+import { createOrdDagInterpreter } from "./interpreter";
+import type { CExpr } from "../../dag/00-expr";
+
+type E<T = unknown> = CExpr<T, string, unknown>;
+
+/** DAG-model ord plugin definition. */
+export const ordDagPlugin: PluginDefWithBuild = {
   name: "ord",
   nodeKinds: ["ord/gt", "ord/gte", "ord/lt", "ord/lte"],
-  defaultInterpreter: () => ordInterpreter,
-  build(ctx: PluginContext): any {
-    const impls = ctx.plugins.filter((p) => p.traits?.ord).map((p) => p.traits!.ord!);
-
-    function dispatchCompare(a: any, b: any): Expr<number> {
-      const aNode = ctx.lift(a).__node;
-      const bNode = ctx.lift(b).__node;
-      const type =
-        inferType(aNode, impls, ctx.inputSchema) ?? inferType(bNode, impls, ctx.inputSchema);
-      const impl = type
-        ? impls.find((i) => i.type === type)
-        : impls.length === 1
-          ? impls[0]
-          : undefined;
-      if (!impl) {
-        throw new Error(
-          type
-            ? `No ord implementation for type: ${type}`
-            : "Cannot infer type for compare — both arguments are untyped",
-        );
-      }
-      return ctx.expr<number>({
-        kind: impl.nodeKinds.compare,
-        left: aNode,
-        right: bNode,
-      });
-    }
-
-    function derived(op: "ord/gt" | "ord/gte" | "ord/lt" | "ord/lte") {
-      return (a: any, b: any): Expr<boolean> => {
-        const compareNode = dispatchCompare(a, b).__node;
-        return ctx.expr<boolean>({ kind: op, operand: compareNode });
-      };
-    }
-
+  defaultInterpreter: createOrdDagInterpreter,
+  build(ctx: BuildContext): Record<string, unknown> {
     return {
-      compare: dispatchCompare,
-      gt: derived("ord/gt"),
-      gte: derived("ord/gte"),
-      lt: derived("ord/lt"),
-      lte: derived("ord/lte"),
+      ord: {
+        /** Greater than: compare > 0. */
+        gt: (compareResult: E<number>) =>
+          ctx.node("ord/gt", [compareResult]),
+        /** Greater than or equal: compare >= 0. */
+        gte: (compareResult: E<number>) =>
+          ctx.node("ord/gte", [compareResult]),
+        /** Less than: compare < 0. */
+        lt: (compareResult: E<number>) =>
+          ctx.node("ord/lt", [compareResult]),
+        /** Less than or equal: compare <= 0. */
+        lte: (compareResult: E<number>) =>
+          ctx.node("ord/lte", [compareResult]),
+      },
     };
   },
-});
+};

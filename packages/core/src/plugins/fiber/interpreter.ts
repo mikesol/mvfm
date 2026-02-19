@@ -1,155 +1,40 @@
-import type { Interpreter, TypedNode } from "../../fold";
-import { defineInterpreter, eval_, foldAST, recurseScoped } from "../../fold";
-import { injectLambdaParam } from "../../utils";
-
-// ---- Typed node interfaces ----------------------------------
-
-interface FiberParam {
-  __id: number;
-  name: string;
-}
-
-interface FiberParMap extends TypedNode<unknown[]> {
-  kind: "fiber/par_map";
-  collection: TypedNode<unknown[]>;
-  concurrency: number;
-  param: FiberParam;
-  body: TypedNode;
-}
-
-interface FiberRace extends TypedNode<unknown> {
-  kind: "fiber/race";
-  branches: TypedNode[];
-}
-
-interface FiberTimeout extends TypedNode<unknown> {
-  kind: "fiber/timeout";
-  expr: TypedNode;
-  ms: TypedNode<number>;
-  fallback: TypedNode;
-}
-
-interface FiberRetry extends TypedNode<unknown> {
-  kind: "fiber/retry";
-  expr: TypedNode;
-  attempts: number;
-  delay: number;
-}
-
-declare module "@mvfm/core" {
-  interface NodeTypeMap {
-    "fiber/par_map": FiberParMap;
-    "fiber/race": FiberRace;
-    "fiber/timeout": FiberTimeout;
-    "fiber/retry": FiberRetry;
-  }
-}
-
-type FiberKinds = "fiber/par_map" | "fiber/race" | "fiber/timeout" | "fiber/retry";
-
-// ---- Sequential interpreter (default) -----------------------
-
-/** Sequential interpreter handlers for `fiber/` node kinds. */
-export const fiberInterpreter = defineInterpreter<FiberKinds>()({
-  "fiber/par_map": async function* (node: FiberParMap) {
-    const collection = yield* eval_(node.collection);
-    const results: unknown[] = [];
-    for (let i = 0; i < collection.length; i += node.concurrency) {
-      const batch = collection.slice(i, i + node.concurrency);
-      for (const item of batch) {
-        results.push(yield recurseScoped(node.body, [{ paramId: node.param.__id, value: item }]));
-      }
-    }
-    return results;
-  },
-
-  "fiber/race": async function* (node: FiberRace) {
-    if (node.branches.length === 0) throw new Error("fiber/race: no branches");
-    return yield* eval_(node.branches[0]);
-  },
-
-  "fiber/timeout": async function* (node: FiberTimeout) {
-    return yield* eval_(node.expr);
-  },
-
-  "fiber/retry": async function* (node: FiberRetry) {
-    let lastError: unknown;
-    for (let i = 0; i < node.attempts; i++) {
-      try {
-        const exprClone = structuredClone(node.expr);
-        return yield* eval_(exprClone);
-      } catch (e) {
-        lastError = e;
-      }
-    }
-    throw lastError;
-  },
-});
-
-// ---- Parallel interpreter factory ---------------------------
-
 /**
- * Create fiber handlers that use true parallel execution.
- * Requires the full interpreter map for spawning parallel foldAST calls.
+ * DAG-model interpreter for fiber/* node kinds.
  *
- * Usage:
- * ```ts
- * const interp: Interpreter = { ...coreInterpreter, ...numInterpreter };
- * Object.assign(interp, createParallelFiberInterpreter(interp));
- * ```
+ * Child layout:
+ * - fiber/par: children[0..N-1] = parallel branches (sequential default)
+ * - fiber/race: children[0..N-1] = race branches (returns first, sequential)
+ * - fiber/seq: children[0..N-1] = sequential steps (returns last)
+ *
+ * The default interpreter evaluates sequentially. True parallel
+ * execution would require a factory that receives the full adj map.
  */
-export function createParallelFiberInterpreter(interpreter: Interpreter): Interpreter {
-  return defineInterpreter<FiberKinds>()({
-    "fiber/par_map": async function* (node: FiberParMap) {
-      const collection = yield* eval_(node.collection);
+
+import type { Interpreter } from "../../dag/fold";
+
+/** Create the fiber plugin interpreter for fold(). */
+export function createFiberDagInterpreter(): Interpreter {
+  return {
+    "fiber/par": async function* (entry) {
       const results: unknown[] = [];
-      for (let i = 0; i < collection.length; i += node.concurrency) {
-        const batch = collection.slice(i, i + node.concurrency);
-        const batchResults = await Promise.all(
-          batch.map((item) => {
-            const bodyClone = structuredClone(node.body);
-            injectLambdaParam(bodyClone, node.param.name, item);
-            return foldAST(interpreter, bodyClone);
-          }),
-        );
-        results.push(...batchResults);
+      for (let i = 0; i < entry.children.length; i++) {
+        results.push(yield i);
       }
       return results;
     },
-
-    "fiber/race": async function* (node: FiberRace) {
-      if (node.branches.length === 0) {
+    "fiber/race": async function* (entry) {
+      if (entry.children.length === 0) {
         throw new Error("fiber/race: no branches");
       }
-      return await Promise.race(node.branches.map((b) => foldAST(interpreter, b)));
+      // Sequential: return first branch result
+      return yield 0;
     },
-
-    "fiber/timeout": async function* (node: FiberTimeout) {
-      const ms = yield* eval_(node.ms);
-      const expr = foldAST(interpreter, node.expr);
-      let timerId: ReturnType<typeof setTimeout>;
-      const timer = new Promise<unknown>((resolve) => {
-        timerId = setTimeout(async () => {
-          resolve(await foldAST(interpreter, node.fallback));
-        }, ms);
-      });
-      return await Promise.race([expr, timer]).finally(() => clearTimeout(timerId!));
-    },
-
-    "fiber/retry": async function* (node: FiberRetry) {
-      let lastError: unknown;
-      for (let i = 0; i < node.attempts; i++) {
-        try {
-          const exprClone = structuredClone(node.expr);
-          return await foldAST(interpreter, exprClone);
-        } catch (err) {
-          lastError = err;
-          if (i < node.attempts - 1 && node.delay > 0) {
-            await new Promise((r) => setTimeout(r, node.delay));
-          }
-        }
+    "fiber/seq": async function* (entry) {
+      let last: unknown;
+      for (let i = 0; i < entry.children.length; i++) {
+        last = yield i;
       }
-      throw lastError;
+      return last;
     },
-  });
+  };
 }

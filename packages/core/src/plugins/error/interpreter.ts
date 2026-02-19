@@ -1,110 +1,61 @@
-import type { TypedNode } from "../../fold";
-import { defineInterpreter, eval_, recurseScoped } from "../../fold";
+/**
+ * DAG-model interpreter for error/* node kinds.
+ *
+ * Child layout:
+ * - error/fail: child 0 = error value, throws it
+ * - error/try: child 0 = expr, child 1 = catch body (optional)
+ * - error/attempt: child 0 = expr, returns {ok, err}
+ * - error/guard: child 0 = condition, child 1 = error value
+ * - error/settle: children[0..N-1] = expressions to settle
+ */
 
-// ---- Typed node interfaces ----------------------------------
+import type { Interpreter } from "../../dag/fold";
 
-interface ErrorParam {
-  __id: number;
-}
-
-interface ErrorTry extends TypedNode<unknown> {
-  kind: "error/try";
-  expr: TypedNode;
-  catch?: { param: ErrorParam; body: TypedNode };
-  match?: { param: ErrorParam; branches: Record<string, TypedNode> };
-  finally?: TypedNode;
-}
-
-interface ErrorFail extends TypedNode<never> {
-  kind: "error/fail";
-  error: TypedNode;
-}
-
-interface ErrorAttempt extends TypedNode<{ ok: unknown | null; err: unknown | null }> {
-  kind: "error/attempt";
-  expr: TypedNode;
-}
-
-interface ErrorGuard extends TypedNode<void> {
-  kind: "error/guard";
-  condition: TypedNode<boolean>;
-  error: TypedNode;
-}
-
-interface ErrorSettle extends TypedNode<{ fulfilled: unknown[]; rejected: unknown[] }> {
-  kind: "error/settle";
-  exprs: TypedNode[];
-}
-
-declare module "@mvfm/core" {
-  interface NodeTypeMap {
-    "error/try": ErrorTry;
-    "error/fail": ErrorFail;
-    "error/attempt": ErrorAttempt;
-    "error/guard": ErrorGuard;
-    "error/settle": ErrorSettle;
-  }
-}
-
-// ---- Interpreter map ----------------------------------------
-
-/** Interpreter handlers for `error/` node kinds. */
-export const errorInterpreter = defineInterpreter<
-  "error/try" | "error/fail" | "error/attempt" | "error/guard" | "error/settle"
->()({
-  "error/try": async function* (node: ErrorTry) {
-    try {
-      return yield* eval_(node.expr);
-    } catch (e) {
-      if (node.catch) {
-        return yield recurseScoped(node.catch.body, [{ paramId: node.catch.param.__id, value: e }]);
-      }
-      if (node.match) {
-        const errObj = e as any;
-        const key = typeof errObj === "string" ? errObj : (errObj?.code ?? errObj?.type ?? "_");
-        const branch = node.match.branches[key] ?? node.match.branches._ ?? null;
-        if (!branch) throw e;
-        return yield recurseScoped(branch, [{ paramId: node.match.param.__id, value: e }]);
-      }
-      throw e;
-    } finally {
-      if (node.finally) {
-        yield* eval_(node.finally);
-      }
-    }
-  },
-
-  "error/fail": async function* (node: ErrorFail) {
-    throw yield* eval_(node.error);
-  },
-
-  "error/attempt": async function* (node: ErrorAttempt) {
-    try {
-      const ok = yield* eval_(node.expr);
-      return { ok, err: null };
-    } catch (e) {
-      return { ok: null, err: e };
-    }
-  },
-
-  "error/guard": async function* (node: ErrorGuard) {
-    const condition = yield* eval_(node.condition);
-    if (!condition) {
-      throw yield* eval_(node.error);
-    }
-    return undefined;
-  },
-
-  "error/settle": async function* (node: ErrorSettle) {
-    const fulfilled: unknown[] = [];
-    const rejected: unknown[] = [];
-    for (const expr of node.exprs) {
+/** Create the error plugin interpreter for fold(). */
+export function createErrorDagInterpreter(): Interpreter {
+  return {
+    "error/fail": async function* () {
+      const error = yield 0;
+      throw error;
+    },
+    "error/try": async function* (entry) {
       try {
-        fulfilled.push(yield* eval_(expr));
+        return yield 0;
       } catch (e) {
-        rejected.push(e);
+        if (entry.children.length > 1) {
+          // child 1 is the catch body — yield it with error in scope
+          return yield { child: 1, scope: { __error: e } };
+        }
+        throw e;
       }
-    }
-    return { fulfilled, rejected };
-  },
-});
+    },
+    "error/attempt": async function* () {
+      try {
+        const ok = yield 0;
+        return { ok, err: null };
+      } catch (e) {
+        return { ok: null, err: e };
+      }
+    },
+    "error/guard": async function* () {
+      const condition = (yield 0) as boolean;
+      if (!condition) {
+        const error = yield 1;
+        throw error;
+      }
+      return undefined;
+    },
+    "error/settle": async function* (entry) {
+      const fulfilled: unknown[] = [];
+      const rejected: unknown[] = [];
+      for (let i = 0; i < entry.children.length; i++) {
+        try {
+          fulfilled.push(yield i);
+        } catch (e) {
+          rejected.push(e);
+        }
+      }
+      return { fulfilled, rejected };
+    },
+  };
+}

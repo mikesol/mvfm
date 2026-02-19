@@ -7,8 +7,8 @@ import { node, mvfm } from "../../src/dag/builder";
 import { app } from "../../src/dag/03-normalize";
 import { fold } from "../../src/dag/fold";
 import { createCoreDagInterpreter } from "../../src/dag/core-interpreter";
-import { createStrDagInterpreter } from "../../src/plugins/str/dag-interpreter";
-import { strDagPlugin } from "../../src/plugins/str/dag-index";
+import { createStrDagInterpreter } from "../../src/plugins/str/interpreter";
+import { strDagPlugin } from "../../src/plugins/str/index";
 
 const interp = {
   ...createCoreDagInterpreter(),

@@ -7,12 +7,12 @@ import { node, mvfm } from "../../src/dag/builder";
 import { app } from "../../src/dag/03-normalize";
 import { fold } from "../../src/dag/fold";
 import { createCoreDagInterpreter } from "../../src/dag/core-interpreter";
-import { createNumDagInterpreter } from "../../src/plugins/num/dag-interpreter";
-import { createEqDagInterpreter } from "../../src/plugins/eq/dag-interpreter";
-import { createOrdDagInterpreter } from "../../src/plugins/ord/dag-interpreter";
-import { numDagPlugin } from "../../src/plugins/num/dag-index";
-import { eqDagPlugin } from "../../src/plugins/eq/dag-index";
-import { ordDagPlugin } from "../../src/plugins/ord/dag-index";
+import { createNumDagInterpreter } from "../../src/plugins/num/interpreter";
+import { createEqDagInterpreter } from "../../src/plugins/eq/interpreter";
+import { createOrdDagInterpreter } from "../../src/plugins/ord/interpreter";
+import { numDagPlugin } from "../../src/plugins/num/index";
+import { eqDagPlugin } from "../../src/plugins/eq/index";
+import { ordDagPlugin } from "../../src/plugins/ord/index";
 
 const interp = {
   ...createCoreDagInterpreter(),

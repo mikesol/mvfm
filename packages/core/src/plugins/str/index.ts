@@ -1,56 +1,17 @@
-import type { Expr, PluginContext } from "../../core";
-import { definePlugin } from "../../core";
-import { strInterpreter } from "./interpreter";
-
 /**
- * String manipulation operations.
+ * DAG-model str plugin definition.
  *
- * All methods accept raw strings or `Expr<string>` (auto-lifted).
+ * Provides string manipulation operations as CExpr builders.
  */
-export interface StrMethods {
-  /** Tagged template literal for string interpolation. */
-  str(strings: TemplateStringsArray, ...exprs: (Expr<any> | string | number)[]): Expr<string>;
-  /** Concatenate multiple string values. */
-  concat(...parts: (Expr<string> | string)[]): Expr<string>;
-  /** Convert to uppercase. */
-  upper(s: Expr<string> | string): Expr<string>;
-  /** Convert to lowercase. */
-  lower(s: Expr<string> | string): Expr<string>;
-  /** Remove leading and trailing whitespace. */
-  trim(s: Expr<string> | string): Expr<string>;
-  /** Extract a substring by start/end index. */
-  slice(
-    s: Expr<string> | string,
-    start: Expr<number> | number,
-    end?: Expr<number> | number,
-  ): Expr<string>;
-  /** Test whether a string contains a substring. */
-  includes(haystack: Expr<string> | string, needle: Expr<string> | string): Expr<boolean>;
-  /** Test whether a string starts with a prefix. */
-  startsWith(s: Expr<string> | string, prefix: Expr<string> | string): Expr<boolean>;
-  /** Test whether a string ends with a suffix. */
-  endsWith(s: Expr<string> | string, suffix: Expr<string> | string): Expr<boolean>;
-  /** Split a string by delimiter into an array. */
-  split(s: Expr<string> | string, delimiter: Expr<string> | string): Expr<string[]>;
-  /** Join an array of strings with a separator. */
-  join(arr: Expr<string[]>, separator: Expr<string> | string): Expr<string>;
-  /** Replace the first occurrence of a search string. */
-  replace(
-    s: Expr<string> | string,
-    search: Expr<string> | string,
-    replacement: Expr<string> | string,
-  ): Expr<string>;
-  /** Get the length of a string. */
-  len(s: Expr<string> | string): Expr<number>;
-}
 
-/**
- * String operations plugin. Namespace: `str/`.
- *
- * Provides template literals, concatenation, case conversion, search, and
- * splitting. Registers trait implementations for eq, show, semigroup, and monoid.
- */
-export const str = definePlugin({
+import type { PluginDefWithBuild, BuildContext } from "../../dag/builder";
+import { createStrDagInterpreter } from "./interpreter";
+import type { CExpr } from "../../dag/00-expr";
+
+type E<T = unknown> = CExpr<T, string, unknown>;
+
+/** DAG-model str plugin definition. */
+export const strDagPlugin: PluginDefWithBuild = {
   name: "str",
   nodeKinds: [
     "str/template",
@@ -71,76 +32,60 @@ export const str = definePlugin({
     "str/append",
     "str/mempty",
   ],
-  defaultInterpreter: () => strInterpreter,
-  traits: {
-    eq: { type: "string", nodeKinds: { eq: "str/eq" } },
-    show: { type: "string", nodeKinds: { show: "str/show" } },
-    semigroup: { type: "string", nodeKinds: { append: "str/append" } },
-    monoid: { type: "string", nodeKinds: { mempty: "str/mempty" } },
-  },
-  build(ctx: PluginContext): StrMethods {
+  defaultInterpreter: createStrDagInterpreter,
+  build(ctx: BuildContext): Record<string, unknown> {
     return {
-      str(strings: TemplateStringsArray, ...exprs: (Expr<any> | string | number)[]) {
-        return ctx.expr<string>({
-          kind: "str/template",
-          strings: Array.from(strings),
-          exprs: exprs.map((e) => ctx.lift(e).__node),
-        });
+      str: {
+        /** Create a string literal. */
+        literal: (value: string) => ctx.core.literal(value),
+        /** Concatenate multiple strings. */
+        concat: (...parts: E<string>[]) =>
+          ctx.node("str/concat", parts),
+        /** Template literal: strings[] stored in out, exprs as children. */
+        template: (strings: string[], ...exprs: E[]) =>
+          ctx.node("str/template", exprs, strings),
+        /** Convert to uppercase. */
+        upper: (s: E<string>) => ctx.node("str/upper", [s]),
+        /** Convert to lowercase. */
+        lower: (s: E<string>) => ctx.node("str/lower", [s]),
+        /** Trim whitespace. */
+        trim: (s: E<string>) => ctx.node("str/trim", [s]),
+        /** Slice a string. */
+        slice: (s: E<string>, start: E<number>, end?: E<number>) =>
+          end
+            ? ctx.node("str/slice", [s, start, end])
+            : ctx.node("str/slice", [s, start]),
+        /** Test if haystack includes needle. */
+        includes: (haystack: E<string>, needle: E<string>) =>
+          ctx.node("str/includes", [haystack, needle]),
+        /** Test if string starts with prefix. */
+        startsWith: (s: E<string>, prefix: E<string>) =>
+          ctx.node("str/startsWith", [s, prefix]),
+        /** Test if string ends with suffix. */
+        endsWith: (s: E<string>, suffix: E<string>) =>
+          ctx.node("str/endsWith", [s, suffix]),
+        /** Split string by delimiter. */
+        split: (s: E<string>, delimiter: E<string>) =>
+          ctx.node("str/split", [s, delimiter]),
+        /** Join array with separator. */
+        join: (arr: E<string[]>, separator: E<string>) =>
+          ctx.node("str/join", [arr, separator]),
+        /** Replace first occurrence. */
+        replace: (s: E<string>, search: E<string>, replacement: E<string>) =>
+          ctx.node("str/replace", [s, search, replacement]),
+        /** Get string length. */
+        len: (s: E<string>) => ctx.node("str/len", [s]),
+        /** String equality. */
+        eq: (a: E<string>, b: E<string>) =>
+          ctx.node("str/eq", [a, b]),
+        /** Show (identity for strings). */
+        show: (s: E<string>) => ctx.node("str/show", [s]),
+        /** Semigroup append (concatenation). */
+        append: (a: E<string>, b: E<string>) =>
+          ctx.node("str/append", [a, b]),
+        /** Monoid mempty (empty string). */
+        mempty: () => ctx.node("str/mempty", []),
       },
-      concat(...parts) {
-        return ctx.expr<string>({
-          kind: "str/concat",
-          parts: parts.map((p) => ctx.lift(p).__node),
-        });
-      },
-      upper: (s) => ctx.expr<string>({ kind: "str/upper", operand: ctx.lift(s).__node }),
-      lower: (s) => ctx.expr<string>({ kind: "str/lower", operand: ctx.lift(s).__node }),
-      trim: (s) => ctx.expr<string>({ kind: "str/trim", operand: ctx.lift(s).__node }),
-      slice: (s, start, end) =>
-        ctx.expr<string>({
-          kind: "str/slice",
-          operand: ctx.lift(s).__node,
-          start: ctx.lift(start).__node,
-          ...(end !== undefined ? { end: ctx.lift(end).__node } : {}),
-        }),
-      includes: (h, n) =>
-        ctx.expr<boolean>({
-          kind: "str/includes",
-          haystack: ctx.lift(h).__node,
-          needle: ctx.lift(n).__node,
-        }),
-      startsWith: (s, p) =>
-        ctx.expr<boolean>({
-          kind: "str/startsWith",
-          operand: ctx.lift(s).__node,
-          prefix: ctx.lift(p).__node,
-        }),
-      endsWith: (s, su) =>
-        ctx.expr<boolean>({
-          kind: "str/endsWith",
-          operand: ctx.lift(s).__node,
-          suffix: ctx.lift(su).__node,
-        }),
-      split: (s, d) =>
-        ctx.expr<string[]>({
-          kind: "str/split",
-          operand: ctx.lift(s).__node,
-          delimiter: ctx.lift(d).__node,
-        }),
-      join: (arr, sep) =>
-        ctx.expr<string>({
-          kind: "str/join",
-          array: arr.__node,
-          separator: ctx.lift(sep).__node,
-        }),
-      replace: (s, search, replacement) =>
-        ctx.expr<string>({
-          kind: "str/replace",
-          operand: ctx.lift(s).__node,
-          search: ctx.lift(search).__node,
-          replacement: ctx.lift(replacement).__node,
-        }),
-      len: (s) => ctx.expr<number>({ kind: "str/len", operand: ctx.lift(s).__node }),
     };
   },
-});
+};

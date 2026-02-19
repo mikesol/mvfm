@@ -7,7 +7,7 @@ import { node } from "../../src/dag/builder";
 import { app } from "../../src/dag/03-normalize";
 import { fold } from "../../src/dag/fold";
 import { createCoreDagInterpreter } from "../../src/dag/core-interpreter";
-import { createErrorDagInterpreter } from "../../src/plugins/error/dag-interpreter";
+import { createErrorDagInterpreter } from "../../src/plugins/error/interpreter";
 
 const interp = {
   ...createCoreDagInterpreter(),

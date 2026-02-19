@@ -6,10 +6,10 @@ import { describe, it, expect } from "vitest";
 import { defaults } from "../../src/dag/fold";
 import type { PluginDef, Interpreter } from "../../src/dag/fold";
 import { createCoreDagInterpreter } from "../../src/dag/core-interpreter";
-import { createNumDagInterpreter } from "../../src/plugins/num/dag-interpreter";
-import { createStrDagInterpreter } from "../../src/plugins/str/dag-interpreter";
-import { numDagPlugin } from "../../src/plugins/num/dag-index";
-import { strDagPlugin } from "../../src/plugins/str/dag-index";
+import { createNumDagInterpreter } from "../../src/plugins/num/interpreter";
+import { createStrDagInterpreter } from "../../src/plugins/str/interpreter";
+import { numDagPlugin } from "../../src/plugins/num/index";
+import { strDagPlugin } from "../../src/plugins/str/index";
 
 const corePlugin: PluginDef = {
   name: "core",

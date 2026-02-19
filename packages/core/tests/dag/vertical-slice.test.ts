@@ -9,8 +9,8 @@ import { node, mvfm } from "../../src/dag/builder";
 import { app } from "../../src/dag/03-normalize";
 import { fold, defaults } from "../../src/dag/fold";
 import { createCoreDagInterpreter } from "../../src/dag/core-interpreter";
-import { createNumDagInterpreter } from "../../src/plugins/num/dag-interpreter";
-import { numDagPlugin } from "../../src/plugins/num/dag-index";
+import { createNumDagInterpreter } from "../../src/plugins/num/interpreter";
+import { numDagPlugin } from "../../src/plugins/num/index";
 
 describe("vertical slice — end-to-end DAG model", () => {
   it("builds and evaluates (3 + 4) * 5 = 35 via raw node()", async () => {

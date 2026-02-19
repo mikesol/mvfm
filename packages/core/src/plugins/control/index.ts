@@ -1,69 +1,30 @@
-import type { Expr, PluginContext } from "../../core";
-import { definePlugin } from "../../core";
-import { controlInterpreter } from "./interpreter";
-
 /**
- * Control flow operations for iteration.
- */
-export interface ControlMethods {
-  /**
-   * Iterate over each element of a collection, executing side effects.
-   *
-   * @param collection - The array expression to iterate, or a raw array to auto-lift.
-   * @param body - Callback receiving each element as an `Expr<T>`.
-   */
-  each<T>(collection: Expr<T[]> | T[], body: (item: Expr<T>) => void): void;
-  /**
-   * Loop while a condition is true.
-   *
-   * @param condition - Boolean expression to evaluate each iteration.
-   * @returns A builder with a `body` callback for the loop statements.
-   */
-  while(condition: Expr<boolean>): {
-    body: (fn: () => void) => void;
-  };
-}
-
-/**
- * Control flow plugin. Namespace: `control/`.
+ * DAG-model control plugin definition.
  *
- * Provides `each` for collection iteration and `while` for conditional loops.
+ * Provides each (collection iteration) and while (conditional loop).
  */
-export const control = definePlugin({
+
+import type { PluginDefWithBuild, BuildContext } from "../../dag/builder";
+import { createControlDagInterpreter } from "./interpreter";
+import type { CExpr } from "../../dag/00-expr";
+
+type E<T = unknown> = CExpr<T, string, unknown>;
+
+/** DAG-model control plugin definition. */
+export const controlDagPlugin: PluginDefWithBuild = {
   name: "control",
   nodeKinds: ["control/each", "control/while"],
-  defaultInterpreter: () => controlInterpreter,
-  build(ctx: PluginContext): ControlMethods {
+  defaultInterpreter: createControlDagInterpreter,
+  build(ctx: BuildContext): Record<string, unknown> {
     return {
-      each<T>(collection: Expr<T[]> | T[], body: (item: Expr<T>) => void) {
-        const lifted = ctx.lift(collection as Expr<T[]> | T[]);
-        const paramNode: any = { kind: "core/lambda_param", name: "item" };
-        const paramProxy = ctx.expr<T>(paramNode) as Expr<T>;
-        const prevLen = ctx.statements.length;
-        body(paramProxy);
-        const bodyStatements = ctx.statements.splice(prevLen);
-        ctx.emit({
-          kind: "control/each",
-          collection: lifted.__node,
-          param: paramNode,
-          body: bodyStatements,
-        });
-      },
-
-      while(condition: Expr<boolean>) {
-        return {
-          body: (fn: () => void) => {
-            const prevLen = ctx.statements.length;
-            fn();
-            const bodyStatements = ctx.statements.splice(prevLen);
-            ctx.emit({
-              kind: "control/while",
-              condition: condition.__node,
-              body: bodyStatements,
-            });
-          },
-        };
+      control: {
+        /** Iterate over collection. child 0 = collection, children[1..N] = body. */
+        each: (collection: E<unknown[]>, ...body: E[]) =>
+          ctx.node("control/each", [collection, ...body]),
+        /** While loop. child 0 = condition, children[1..N] = body. */
+        while: (condition: E<boolean>, ...body: E[]) =>
+          ctx.node("control/while", [condition, ...body]),
       },
     };
   },
-});
+};

@@ -1,58 +1,42 @@
-import type { Expr, PluginContext } from "../../core";
-import { definePlugin } from "../../core";
-import { createStInterpreter } from "./interpreter";
-
 /**
- * Mutable state operations for local variables within a program.
- */
-export interface StMethods {
-  /**
-   * Declare a mutable local variable.
-   *
-   * @param initial - The initial value.
-   * @returns An object with `get`, `set`, and `push` methods.
-   */
-  let<T>(initial: Expr<T> | T): {
-    get: () => Expr<T>;
-    set: (value: Expr<T> | T) => void;
-    push: (value: Expr<T>) => void;
-  };
-}
-
-/**
- * Mutable state plugin. Namespace: `st/`.
+ * DAG-model st (mutable state) plugin definition.
  *
- * Provides `let` for declaring local mutable variables with get/set/push access.
+ * Provides let/get/set/push for mutable local variables.
+ * The ref name is stored in `out`. st/get is volatile (always re-evaluates).
  */
-export const st = definePlugin({
+
+import type { PluginDefWithBuild, BuildContext } from "../../dag/builder";
+import { createStDagInterpreter } from "./interpreter";
+import type { CExpr } from "../../dag/00-expr";
+
+type E<T = unknown> = CExpr<T, string, unknown>;
+
+/** DAG-model st plugin definition. */
+export const stDagPlugin: PluginDefWithBuild = {
   name: "st",
   nodeKinds: ["st/let", "st/get", "st/set", "st/push"],
-  defaultInterpreter: createStInterpreter,
-  build(ctx: PluginContext): StMethods {
+  defaultInterpreter: createStDagInterpreter,
+  build(ctx: BuildContext): Record<string, unknown> {
     let refCounter = 0;
-
     return {
-      let<T>(initial: Expr<T> | T) {
-        const ref = `st_${refCounter++}`;
-        const initNode = ctx.lift(initial).__node;
-        ctx.emit({ kind: "st/let", ref, initial: initNode });
-
-        return {
-          get: () => ctx.expr<T>({ kind: "st/get", ref }),
-          set: (value: Expr<T> | T) =>
-            ctx.emit({
-              kind: "st/set",
-              ref,
-              value: ctx.lift(value).__node,
-            }),
-          push: (value: Expr<T>) =>
-            ctx.emit({
-              kind: "st/push",
-              ref,
-              value: value.__node,
-            }),
-        };
+      st: {
+        /** Declare a mutable variable with initial value. Returns ref name. */
+        let: (initial: E, refName?: string) => {
+          const ref = refName ?? `st_${refCounter++}`;
+          return {
+            /** The let node (must be evaluated to initialize). */
+            init: ctx.node("st/let", [initial], ref),
+            /** Get current value (volatile). */
+            get: () => ctx.node("st/get", [], ref),
+            /** Set new value. */
+            set: (value: E) => ctx.node("st/set", [value], ref),
+            /** Push to array. */
+            push: (value: E) => ctx.node("st/push", [value], ref),
+            /** The ref name for debugging. */
+            ref,
+          };
+        },
       },
     };
   },
-});
+};

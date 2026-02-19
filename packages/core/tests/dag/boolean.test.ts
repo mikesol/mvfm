@@ -7,8 +7,8 @@ import { node, mvfm } from "../../src/dag/builder";
 import { app } from "../../src/dag/03-normalize";
 import { fold } from "../../src/dag/fold";
 import { createCoreDagInterpreter } from "../../src/dag/core-interpreter";
-import { createBooleanDagInterpreter } from "../../src/plugins/boolean/dag-interpreter";
-import { booleanDagPlugin } from "../../src/plugins/boolean/dag-index";
+import { createBooleanDagInterpreter } from "../../src/plugins/boolean/interpreter";
+import { booleanDagPlugin } from "../../src/plugins/boolean/index";
 
 const interp = {
   ...createCoreDagInterpreter(),

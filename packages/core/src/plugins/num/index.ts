@@ -1,44 +1,52 @@
-import type { Expr, PluginContext } from "../../core";
-import { definePlugin } from "../../core";
-import { numInterpreter } from "./interpreter";
-
 /**
- * Numeric operations beyond what the semiring typeclass provides.
+ * DAG-model num plugin definition.
  *
- * Includes subtraction, division, modular arithmetic, rounding, and min/max.
- * All methods accept raw numbers or `Expr<number>` (auto-lifted).
+ * Provides the plugin definition with nodeKinds, defaultInterpreter,
+ * and build() method that returns num-specific CExpr builders.
  */
-export interface NumMethods {
-  /** Subtract two numbers. */
-  sub(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
-  /** Divide two numbers. */
-  div(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
-  /** Modulo (remainder) of two numbers. */
-  mod(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
-  /** Negate a number. */
-  neg(a: Expr<number> | number): Expr<number>;
-  /** Absolute value. */
-  abs(a: Expr<number> | number): Expr<number>;
-  /** Round down to nearest integer. */
-  floor(a: Expr<number> | number): Expr<number>;
-  /** Round up to nearest integer. */
-  ceil(a: Expr<number> | number): Expr<number>;
-  /** Round to nearest integer. */
-  round(a: Expr<number> | number): Expr<number>;
-  /** Minimum of one or more numbers. */
-  min(...values: (Expr<number> | number)[]): Expr<number>;
-  /** Maximum of one or more numbers. */
-  max(...values: (Expr<number> | number)[]): Expr<number>;
+
+import type { PluginDefWithBuild, BuildContext } from "../../dag/builder";
+import { createNumDagInterpreter } from "./interpreter";
+import type { CExpr } from "../../dag/00-expr";
+
+/** Builder methods contributed by the num plugin to the $ object. */
+export interface NumDollar {
+  num: {
+    /** Create a numeric literal node. */
+    literal: (value: number) => CExpr<number, string, unknown>;
+    /** Add two numbers. */
+    add: (
+      a: CExpr<number, string, unknown>,
+      b: CExpr<number, string, unknown>,
+    ) => CExpr<number, string, unknown>;
+    /** Subtract b from a. */
+    sub: (
+      a: CExpr<number, string, unknown>,
+      b: CExpr<number, string, unknown>,
+    ) => CExpr<number, string, unknown>;
+    /** Multiply two numbers. */
+    mul: (
+      a: CExpr<number, string, unknown>,
+      b: CExpr<number, string, unknown>,
+    ) => CExpr<number, string, unknown>;
+    /** Divide a by b. */
+    div: (
+      a: CExpr<number, string, unknown>,
+      b: CExpr<number, string, unknown>,
+    ) => CExpr<number, string, unknown>;
+    /** Negate a number. */
+    neg: (
+      a: CExpr<number, string, unknown>,
+    ) => CExpr<number, string, unknown>;
+    /** Absolute value. */
+    abs: (
+      a: CExpr<number, string, unknown>,
+    ) => CExpr<number, string, unknown>;
+  };
 }
 
-/**
- * Numeric operations plugin. Namespace: `num/`.
- *
- * Provides arithmetic beyond semiring (sub, div, mod), rounding, and
- * min/max. Also registers trait implementations for eq, ord, semiring,
- * show, and bounded.
- */
-export const num = definePlugin({
+/** DAG-model num plugin definition. */
+export const numDagPlugin: PluginDefWithBuild = {
   name: "num",
   nodeKinds: [
     "num/add",
@@ -61,47 +69,33 @@ export const num = definePlugin({
     "num/top",
     "num/bottom",
   ],
-  defaultInterpreter: () => numInterpreter,
-  traits: {
-    eq: { type: "number", nodeKinds: { eq: "num/eq" } },
-    ord: { type: "number", nodeKinds: { compare: "num/compare" } },
-    semiring: {
-      type: "number",
-      nodeKinds: { add: "num/add", zero: "num/zero", mul: "num/mul", one: "num/one" },
-    },
-    show: { type: "number", nodeKinds: { show: "num/show" } },
-    bounded: { type: "number", nodeKinds: { top: "num/top", bottom: "num/bottom" } },
-  },
-  build(ctx: PluginContext): NumMethods {
-    const binop = (kind: string) => (a: Expr<number> | number, b: Expr<number> | number) =>
-      ctx.expr<number>({
-        kind,
-        left: ctx.lift(a).__node,
-        right: ctx.lift(b).__node,
-      });
-
-    const unop = (kind: string) => (a: Expr<number> | number) =>
-      ctx.expr<number>({ kind, operand: ctx.lift(a).__node });
-
+  defaultInterpreter: createNumDagInterpreter,
+  build(ctx: BuildContext): Record<string, unknown> {
     return {
-      sub: binop("num/sub"),
-      div: binop("num/div"),
-      mod: binop("num/mod"),
-      neg: unop("num/neg"),
-      abs: unop("num/abs"),
-      floor: unop("num/floor"),
-      ceil: unop("num/ceil"),
-      round: unop("num/round"),
-      min: (...values) =>
-        ctx.expr<number>({
-          kind: "num/min",
-          values: values.map((v) => ctx.lift(v).__node),
-        }),
-      max: (...values) =>
-        ctx.expr<number>({
-          kind: "num/max",
-          values: values.map((v) => ctx.lift(v).__node),
-        }),
+      num: {
+        literal: (value: number) =>
+          ctx.core.literal(value),
+        add: (
+          a: CExpr<number, string, unknown>,
+          b: CExpr<number, string, unknown>,
+        ) => ctx.node("num/add", [a, b]),
+        sub: (
+          a: CExpr<number, string, unknown>,
+          b: CExpr<number, string, unknown>,
+        ) => ctx.node("num/sub", [a, b]),
+        mul: (
+          a: CExpr<number, string, unknown>,
+          b: CExpr<number, string, unknown>,
+        ) => ctx.node("num/mul", [a, b]),
+        div: (
+          a: CExpr<number, string, unknown>,
+          b: CExpr<number, string, unknown>,
+        ) => ctx.node("num/div", [a, b]),
+        neg: (a: CExpr<number, string, unknown>) =>
+          ctx.node("num/neg", [a]),
+        abs: (a: CExpr<number, string, unknown>) =>
+          ctx.node("num/abs", [a]),
+      },
     };
   },
-});
+};

@@ -1,49 +1,34 @@
-import type { TypedNode } from "../../fold";
-import { defineInterpreter, eval_, recurseScoped } from "../../fold";
+/**
+ * DAG-model interpreter for control/* node kinds.
+ *
+ * Child layout:
+ * - control/each: child 0 = collection, children[1..N-1] = body statements
+ *   Each body statement is yielded with the current item in scope.
+ * - control/while: child 0 = condition, children[1..N-1] = body statements
+ *   Condition is re-evaluated each iteration (volatile-aware via taint).
+ */
 
-interface ControlParam {
-  __id: number;
-}
+import type { Interpreter } from "../../dag/fold";
 
-interface ControlEachNode extends TypedNode<void> {
-  kind: "control/each";
-  collection: TypedNode<unknown[]>;
-  param: ControlParam;
-  body: TypedNode[];
-}
-
-interface ControlWhileNode extends TypedNode<void> {
-  kind: "control/while";
-  condition: TypedNode<boolean>;
-  body: TypedNode[];
-}
-
-declare module "@mvfm/core" {
-  interface NodeTypeMap {
-    "control/each": ControlEachNode;
-    "control/while": ControlWhileNode;
-  }
-}
-
-/** Interpreter handlers for `control/` node kinds. */
-export const controlInterpreter = defineInterpreter<"control/each" | "control/while">()({
-  "control/each": async function* (node: ControlEachNode) {
-    const collection = yield* eval_(node.collection);
-    for (const item of collection) {
-      for (const statement of node.body) {
-        yield recurseScoped(statement, [{ paramId: node.param.__id, value: item }]);
+/** Create the control plugin interpreter for fold(). */
+export function createControlDagInterpreter(): Interpreter {
+  return {
+    "control/each": async function* (entry) {
+      const collection = (yield 0) as unknown[];
+      for (const item of collection) {
+        for (let i = 1; i < entry.children.length; i++) {
+          yield { child: i, scope: { __item: item } };
+        }
       }
-    }
-    return undefined;
-  },
-
-  "control/while": async function* (node: ControlWhileNode) {
-    // Evaluate condition before each iteration to preserve while-loop semantics.
-    while (yield* eval_(node.condition)) {
-      for (const statement of node.body) {
-        yield* eval_(statement);
+      return undefined;
+    },
+    "control/while": async function* (entry) {
+      while ((yield 0) as boolean) {
+        for (let i = 1; i < entry.children.length; i++) {
+          yield i;
+        }
       }
-    }
-    return undefined;
-  },
-});
+      return undefined;
+    },
+  };
+}

@@ -7,7 +7,7 @@ import { node } from "../../src/dag/builder";
 import { app } from "../../src/dag/03-normalize";
 import { fold, VOLATILE_KINDS } from "../../src/dag/fold";
 import { createCoreDagInterpreter } from "../../src/dag/core-interpreter";
-import { createStDagInterpreter } from "../../src/plugins/st/dag-interpreter";
+import { createStDagInterpreter } from "../../src/plugins/st/interpreter";
 
 describe("st DAG interpreter", () => {
   it("st/let + st/get: initialize and read", async () => {

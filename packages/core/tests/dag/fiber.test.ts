@@ -7,8 +7,8 @@ import { node, mvfm } from "../../src/dag/builder";
 import { app } from "../../src/dag/03-normalize";
 import { fold } from "../../src/dag/fold";
 import { createCoreDagInterpreter } from "../../src/dag/core-interpreter";
-import { createFiberDagInterpreter } from "../../src/plugins/fiber/dag-interpreter";
-import { fiberDagPlugin } from "../../src/plugins/fiber/dag-index";
+import { createFiberDagInterpreter } from "../../src/plugins/fiber/interpreter";
+import { fiberDagPlugin } from "../../src/plugins/fiber/index";
 
 const interp = {
   ...createCoreDagInterpreter(),

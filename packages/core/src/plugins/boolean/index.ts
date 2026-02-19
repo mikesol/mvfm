@@ -1,11 +1,17 @@
-import { definePlugin } from "../../core";
-import { booleanInterpreter } from "./interpreter";
+/**
+ * DAG-model boolean plugin definition.
+ *
+ * Provides boolean operations as CExpr builders.
+ */
 
-/** Boolean type plugin. Provides no direct methods — exposes trait implementations for eq, show, bounded, and heytingAlgebra. */
-export type BooleanMethods = {};
+import type { PluginDefWithBuild, BuildContext } from "../../dag/builder";
+import { createBooleanDagInterpreter } from "./interpreter";
+import type { CExpr } from "../../dag/00-expr";
 
-/** Boolean type plugin. Namespace: `boolean/`. Registers boolean trait implementations for use by typeclass plugins. */
-export const boolean = definePlugin({
+type E<T = unknown> = CExpr<T, string, unknown>;
+
+/** DAG-model boolean plugin definition. */
+export const booleanDagPlugin: PluginDefWithBuild = {
   name: "boolean",
   nodeKinds: [
     "boolean/and",
@@ -19,24 +25,35 @@ export const boolean = definePlugin({
     "boolean/top",
     "boolean/bottom",
   ],
-  defaultInterpreter: () => booleanInterpreter,
-  traits: {
-    eq: { type: "boolean", nodeKinds: { eq: "boolean/eq" } },
-    show: { type: "boolean", nodeKinds: { show: "boolean/show" } },
-    bounded: { type: "boolean", nodeKinds: { top: "boolean/top", bottom: "boolean/bottom" } },
-    heytingAlgebra: {
-      type: "boolean",
-      nodeKinds: {
-        conj: "boolean/and",
-        disj: "boolean/or",
-        not: "boolean/not",
-        ff: "boolean/ff",
-        tt: "boolean/tt",
-        implies: "boolean/implies",
+  defaultInterpreter: createBooleanDagInterpreter,
+  build(ctx: BuildContext): Record<string, unknown> {
+    return {
+      boolean: {
+        /** Logical AND (short-circuits). */
+        and: (a: E<boolean>, b: E<boolean>) =>
+          ctx.node("boolean/and", [a, b]),
+        /** Logical OR (short-circuits). */
+        or: (a: E<boolean>, b: E<boolean>) =>
+          ctx.node("boolean/or", [a, b]),
+        /** Logical NOT. */
+        not: (a: E<boolean>) => ctx.node("boolean/not", [a]),
+        /** Boolean equality. */
+        eq: (a: E<boolean>, b: E<boolean>) =>
+          ctx.node("boolean/eq", [a, b]),
+        /** False literal. */
+        ff: () => ctx.node("boolean/ff", []),
+        /** True literal. */
+        tt: () => ctx.node("boolean/tt", []),
+        /** Logical implication. */
+        implies: (a: E<boolean>, b: E<boolean>) =>
+          ctx.node("boolean/implies", [a, b]),
+        /** Show boolean as string. */
+        show: (a: E<boolean>) => ctx.node("boolean/show", [a]),
+        /** Top (true). */
+        top: () => ctx.node("boolean/top", []),
+        /** Bottom (false). */
+        bottom: () => ctx.node("boolean/bottom", []),
       },
-    },
+    };
   },
-  build(): BooleanMethods {
-    return {};
-  },
-});
+};

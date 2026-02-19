@@ -1,214 +1,111 @@
-import type { TypedNode } from "../../fold";
-import { defineInterpreter, eval_ } from "../../fold";
+/**
+ * DAG-model interpreter for str/* node kinds.
+ *
+ * Uses positional child indices (yield 0, yield 1, etc.)
+ * compatible with the fold() trampoline evaluator.
+ *
+ * Child layout per kind:
+ * - str/template: children[0..N-1] are interpolation expressions, `out` holds strings[]
+ * - str/concat: children[0..N-1] are parts
+ * - str/upper, str/lower, str/trim, str/show: child 0 = operand
+ * - str/len: child 0 = operand
+ * - str/slice: child 0 = operand, child 1 = start, child 2 = end (optional)
+ * - str/includes: child 0 = haystack, child 1 = needle
+ * - str/startsWith: child 0 = operand, child 1 = prefix
+ * - str/endsWith: child 0 = operand, child 1 = suffix
+ * - str/split: child 0 = operand, child 1 = delimiter
+ * - str/join: child 0 = array, child 1 = separator
+ * - str/replace: child 0 = operand, child 1 = search, child 2 = replacement
+ * - str/eq: child 0 = left, child 1 = right
+ * - str/append: child 0 = left, child 1 = right
+ * - str/mempty: no children, returns ""
+ */
 
-// ---- Typed node interfaces ----------------------------------
+import type { Interpreter } from "../../dag/fold";
 
-export interface StrTemplateNode extends TypedNode<string> {
-  kind: "str/template";
-  strings: string[];
-  exprs: TypedNode[];
+/** Create the str plugin interpreter for fold(). */
+export function createStrDagInterpreter(): Interpreter {
+  return {
+    "str/template": async function* (entry) {
+      const strings = entry.out as string[];
+      let result = strings[0];
+      for (let i = 0; i < entry.children.length; i++) {
+        result += String(yield i);
+        result += strings[i + 1];
+      }
+      return result;
+    },
+    "str/concat": async function* (entry) {
+      const parts: string[] = [];
+      for (let i = 0; i < entry.children.length; i++) {
+        parts.push((yield i) as string);
+      }
+      return parts.join("");
+    },
+    "str/upper": async function* () {
+      return ((yield 0) as string).toUpperCase();
+    },
+    "str/lower": async function* () {
+      return ((yield 0) as string).toLowerCase();
+    },
+    "str/trim": async function* () {
+      return ((yield 0) as string).trim();
+    },
+    "str/slice": async function* (entry) {
+      const s = (yield 0) as string;
+      const start = (yield 1) as number;
+      // If there's a 3rd child, use it as end
+      if (entry.children.length > 2) {
+        const end = (yield 2) as number;
+        return s.slice(start, end);
+      }
+      return s.slice(start);
+    },
+    "str/includes": async function* () {
+      const haystack = (yield 0) as string;
+      const needle = (yield 1) as string;
+      return haystack.includes(needle);
+    },
+    "str/startsWith": async function* () {
+      const s = (yield 0) as string;
+      const prefix = (yield 1) as string;
+      return s.startsWith(prefix);
+    },
+    "str/endsWith": async function* () {
+      const s = (yield 0) as string;
+      const suffix = (yield 1) as string;
+      return s.endsWith(suffix);
+    },
+    "str/split": async function* () {
+      const s = (yield 0) as string;
+      const delimiter = (yield 1) as string;
+      return s.split(delimiter);
+    },
+    "str/join": async function* () {
+      const arr = (yield 0) as string[];
+      const separator = (yield 1) as string;
+      return arr.join(separator);
+    },
+    "str/replace": async function* () {
+      const s = (yield 0) as string;
+      const search = (yield 1) as string;
+      const replacement = (yield 2) as string;
+      return s.replace(search, replacement);
+    },
+    "str/len": async function* () {
+      return ((yield 0) as string).length;
+    },
+    "str/eq": async function* () {
+      return ((yield 0) as string) === ((yield 1) as string);
+    },
+    "str/show": async function* () {
+      return yield 0;
+    },
+    "str/append": async function* () {
+      return ((yield 0) as string) + ((yield 1) as string);
+    },
+    "str/mempty": async function* () {
+      return "";
+    },
+  };
 }
-
-export interface StrConcatNode extends TypedNode<string> {
-  kind: "str/concat";
-  parts: TypedNode<string>[];
-}
-
-export interface StrUpperNode extends TypedNode<string> {
-  kind: "str/upper";
-  operand: TypedNode<string>;
-}
-
-export interface StrLowerNode extends TypedNode<string> {
-  kind: "str/lower";
-  operand: TypedNode<string>;
-}
-
-export interface StrTrimNode extends TypedNode<string> {
-  kind: "str/trim";
-  operand: TypedNode<string>;
-}
-
-export interface StrShowNode extends TypedNode<string> {
-  kind: "str/show";
-  operand: TypedNode<string>;
-}
-
-export interface StrLenNode extends TypedNode<number> {
-  kind: "str/len";
-  operand: TypedNode<string>;
-}
-
-export interface StrSliceNode extends TypedNode<string> {
-  kind: "str/slice";
-  operand: TypedNode<string>;
-  start: TypedNode<number>;
-  end?: TypedNode<number>;
-}
-
-export interface StrIncludesNode extends TypedNode<boolean> {
-  kind: "str/includes";
-  haystack: TypedNode<string>;
-  needle: TypedNode<string>;
-}
-
-export interface StrStartsWithNode extends TypedNode<boolean> {
-  kind: "str/startsWith";
-  operand: TypedNode<string>;
-  prefix: TypedNode<string>;
-}
-
-export interface StrEndsWithNode extends TypedNode<boolean> {
-  kind: "str/endsWith";
-  operand: TypedNode<string>;
-  suffix: TypedNode<string>;
-}
-
-export interface StrSplitNode extends TypedNode<string[]> {
-  kind: "str/split";
-  operand: TypedNode<string>;
-  delimiter: TypedNode<string>;
-}
-
-export interface StrJoinNode extends TypedNode<string> {
-  kind: "str/join";
-  array: TypedNode<string[]>;
-  separator: TypedNode<string>;
-}
-
-export interface StrReplaceNode extends TypedNode<string> {
-  kind: "str/replace";
-  operand: TypedNode<string>;
-  search: TypedNode<string>;
-  replacement: TypedNode<string>;
-}
-
-export interface StrEqNode extends TypedNode<boolean> {
-  kind: "str/eq";
-  left: TypedNode<string>;
-  right: TypedNode<string>;
-}
-
-export interface StrAppendNode extends TypedNode<string> {
-  kind: "str/append";
-  left: TypedNode<string>;
-  right: TypedNode<string>;
-}
-
-export interface StrMemptyNode extends TypedNode<string> {
-  kind: "str/mempty";
-}
-
-declare module "@mvfm/core" {
-  interface NodeTypeMap {
-    "str/template": StrTemplateNode;
-    "str/concat": StrConcatNode;
-    "str/upper": StrUpperNode;
-    "str/lower": StrLowerNode;
-    "str/trim": StrTrimNode;
-    "str/slice": StrSliceNode;
-    "str/includes": StrIncludesNode;
-    "str/startsWith": StrStartsWithNode;
-    "str/endsWith": StrEndsWithNode;
-    "str/split": StrSplitNode;
-    "str/join": StrJoinNode;
-    "str/replace": StrReplaceNode;
-    "str/len": StrLenNode;
-    "str/eq": StrEqNode;
-    "str/show": StrShowNode;
-    "str/append": StrAppendNode;
-    "str/mempty": StrMemptyNode;
-  }
-}
-
-type StrKinds =
-  | "str/template"
-  | "str/concat"
-  | "str/upper"
-  | "str/lower"
-  | "str/trim"
-  | "str/slice"
-  | "str/includes"
-  | "str/startsWith"
-  | "str/endsWith"
-  | "str/split"
-  | "str/join"
-  | "str/replace"
-  | "str/len"
-  | "str/eq"
-  | "str/show"
-  | "str/append"
-  | "str/mempty";
-
-// ---- Interpreter map ----------------------------------------
-
-/** Interpreter handlers for `str/` node kinds. */
-export const strInterpreter = defineInterpreter<StrKinds>()({
-  "str/template": async function* (node: StrTemplateNode) {
-    let result = node.strings[0];
-    for (let i = 0; i < node.exprs.length; i++) {
-      result += String(yield* eval_(node.exprs[i]));
-      result += node.strings[i + 1];
-    }
-    return result;
-  },
-  "str/concat": async function* (node: StrConcatNode) {
-    const results: string[] = [];
-    for (const p of node.parts) results.push(yield* eval_(p));
-    return results.join("");
-  },
-  "str/upper": async function* (node: StrUpperNode) {
-    return (yield* eval_(node.operand)).toUpperCase();
-  },
-  "str/lower": async function* (node: StrLowerNode) {
-    return (yield* eval_(node.operand)).toLowerCase();
-  },
-  "str/trim": async function* (node: StrTrimNode) {
-    return (yield* eval_(node.operand)).trim();
-  },
-  "str/slice": async function* (node: StrSliceNode) {
-    const s = yield* eval_(node.operand);
-    const start = yield* eval_(node.start);
-    const end = node.end ? yield* eval_(node.end) : undefined;
-    return s.slice(start, end);
-  },
-  "str/includes": async function* (node: StrIncludesNode) {
-    const haystack = yield* eval_(node.haystack);
-    return haystack.includes(yield* eval_(node.needle));
-  },
-  "str/startsWith": async function* (node: StrStartsWithNode) {
-    return (yield* eval_(node.operand)).startsWith(yield* eval_(node.prefix));
-  },
-  "str/endsWith": async function* (node: StrEndsWithNode) {
-    return (yield* eval_(node.operand)).endsWith(yield* eval_(node.suffix));
-  },
-  "str/split": async function* (node: StrSplitNode) {
-    return (yield* eval_(node.operand)).split(yield* eval_(node.delimiter));
-  },
-  "str/join": async function* (node: StrJoinNode) {
-    const arr = yield* eval_(node.array);
-    return arr.join(yield* eval_(node.separator));
-  },
-  "str/replace": async function* (node: StrReplaceNode) {
-    return (yield* eval_(node.operand)).replace(
-      yield* eval_(node.search),
-      yield* eval_(node.replacement),
-    );
-  },
-  "str/len": async function* (node: StrLenNode) {
-    return (yield* eval_(node.operand)).length;
-  },
-  "str/eq": async function* (node: StrEqNode) {
-    return (yield* eval_(node.left)) === (yield* eval_(node.right));
-  },
-  "str/show": async function* (node: StrShowNode) {
-    return yield* eval_(node.operand);
-  },
-  "str/append": async function* (node: StrAppendNode) {
-    return (yield* eval_(node.left)) + (yield* eval_(node.right));
-  },
-  // biome-ignore lint/correctness/useYield: leaf handler
-  "str/mempty": async function* (_node: StrMemptyNode) {
-    return "";
-  },
-});

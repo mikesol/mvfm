@@ -1,80 +1,57 @@
-import type { TypedNode } from "../../fold";
-import { defineInterpreter, eval_ } from "../../fold";
+/**
+ * DAG-model interpreter for st/* node kinds.
+ *
+ * Each call to createStDagInterpreter() returns a fresh interpreter
+ * with its own mutable store (Map<string, unknown>).
+ *
+ * Child layout:
+ * - st/let: child 0 = initial value, `out` holds the ref name
+ * - st/get: no children, `out` holds the ref name (volatile — always re-evaluates)
+ * - st/set: child 0 = new value, `out` holds the ref name
+ * - st/push: child 0 = value to push, `out` holds the ref name
+ */
 
-interface StLetNode extends TypedNode<void> {
-  kind: "st/let";
-  ref: string;
-  initial: TypedNode;
-}
-
-interface StGetNode extends TypedNode<unknown> {
-  kind: "st/get";
-  ref: string;
-}
-
-interface StSetNode extends TypedNode<void> {
-  kind: "st/set";
-  ref: string;
-  value: TypedNode;
-}
-
-interface StPushNode extends TypedNode<void> {
-  kind: "st/push";
-  ref: string;
-  value: TypedNode;
-}
-
-declare module "@mvfm/core" {
-  interface NodeTypeMap {
-    "st/let": StLetNode;
-    "st/get": StGetNode;
-    "st/set": StSetNode;
-    "st/push": StPushNode;
-  }
-}
+import type { Interpreter } from "../../dag/fold";
 
 /** Create a fresh st interpreter with its own mutable variable store. */
-export function createStInterpreter() {
+export function createStDagInterpreter(): Interpreter {
   const store = new Map<string, unknown>();
 
-  return defineInterpreter<"st/let" | "st/get" | "st/set" | "st/push">()({
-    "st/let": async function* (node: StLetNode) {
-      const value = yield* eval_(node.initial);
-      store.set(node.ref, value);
+  return {
+    "st/let": async function* (entry) {
+      const ref = entry.out as string;
+      const value = yield 0;
+      store.set(ref, value);
       return undefined;
     },
-
-    // biome-ignore lint/correctness/useYield: leaf handler reads from store directly
-    "st/get": async function* (node: StGetNode) {
-      if (!store.has(node.ref)) {
-        throw new Error(`st/get: unknown ref "${node.ref}"`);
+    "st/get": async function* (entry) {
+      const ref = entry.out as string;
+      if (!store.has(ref)) {
+        throw new Error(`st/get: unknown ref "${ref}"`);
       }
-      return store.get(node.ref);
+      return store.get(ref);
     },
-
-    "st/set": async function* (node: StSetNode) {
-      if (!store.has(node.ref)) {
-        throw new Error(`st/set: unknown ref "${node.ref}"`);
+    "st/set": async function* (entry) {
+      const ref = entry.out as string;
+      if (!store.has(ref)) {
+        throw new Error(`st/set: unknown ref "${ref}"`);
       }
-      const value = yield* eval_(node.value);
-      store.set(node.ref, value);
+      const value = yield 0;
+      store.set(ref, value);
       return undefined;
     },
-
-    "st/push": async function* (node: StPushNode) {
-      if (!store.has(node.ref)) {
-        throw new Error(`st/push: unknown ref "${node.ref}"`);
+    "st/push": async function* (entry) {
+      const ref = entry.out as string;
+      if (!store.has(ref)) {
+        throw new Error(`st/push: unknown ref "${ref}"`);
       }
-      const value = yield* eval_(node.value);
-      const arr = store.get(node.ref);
+      const value = yield 0;
+      const arr = store.get(ref);
       if (!Array.isArray(arr)) {
-        throw new Error(`st/push: ref "${node.ref}" is not an array`);
+        throw new Error(`st/push: ref "${ref}" is not an array`);
       }
       arr.push(value);
       return undefined;
     },
-  });
+  };
 }
-
-/** Pre-created st interpreter instance for use as defaultInterpreter. */
-export const stInterpreter = createStInterpreter();

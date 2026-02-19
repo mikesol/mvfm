@@ -1,32 +1,28 @@
-import type { TypedNode } from "../../fold";
-import { defineInterpreter, eval_ } from "../../fold";
+/**
+ * DAG-model interpreter for ord/* node kinds.
+ *
+ * Child layout:
+ * - ord/gt, ord/gte, ord/lt, ord/lte: child 0 = compare result (number)
+ *   The compare result is a three-way comparison (-1, 0, 1).
+ *   These derive boolean results from it.
+ */
 
-export interface OrdCmp extends TypedNode<boolean> {
-  kind: "ord/gt" | "ord/gte" | "ord/lt" | "ord/lte";
-  operand: TypedNode<number>;
+import type { Interpreter } from "../../dag/fold";
+
+/** Create the ord plugin interpreter for fold(). */
+export function createOrdDagInterpreter(): Interpreter {
+  return {
+    "ord/gt": async function* () {
+      return ((yield 0) as number) > 0;
+    },
+    "ord/gte": async function* () {
+      return ((yield 0) as number) >= 0;
+    },
+    "ord/lt": async function* () {
+      return ((yield 0) as number) < 0;
+    },
+    "ord/lte": async function* () {
+      return ((yield 0) as number) <= 0;
+    },
+  };
 }
-
-declare module "@mvfm/core" {
-  interface NodeTypeMap {
-    "ord/gt": OrdCmp;
-    "ord/gte": OrdCmp;
-    "ord/lt": OrdCmp;
-    "ord/lte": OrdCmp;
-  }
-}
-
-/** Interpreter handlers for `ord/` node kinds. */
-export const ordInterpreter = defineInterpreter<"ord/gt" | "ord/gte" | "ord/lt" | "ord/lte">()({
-  "ord/gt": async function* (node: OrdCmp) {
-    return (yield* eval_(node.operand)) > 0;
-  },
-  "ord/gte": async function* (node: OrdCmp) {
-    return (yield* eval_(node.operand)) >= 0;
-  },
-  "ord/lt": async function* (node: OrdCmp) {
-    return (yield* eval_(node.operand)) < 0;
-  },
-  "ord/lte": async function* (node: OrdCmp) {
-    return (yield* eval_(node.operand)) <= 0;
-  },
-});
