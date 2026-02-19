@@ -2,7 +2,7 @@
  * DAG-model fiber plugin definition.
  *
  * Provides par, race, seq concurrency primitives.
- * The interpreter needs access to the full interpreter for foldFrom.
+ * Default interpreter evaluates sequentially.
  */
 
 import type { PluginDefWithBuild, BuildContext } from "../../dag/builder";
@@ -15,14 +15,7 @@ type E<T = unknown> = CExpr<T, string, unknown>;
 export const fiberDagPlugin: PluginDefWithBuild = {
   name: "fiber",
   nodeKinds: ["fiber/par", "fiber/race", "fiber/seq"],
-  defaultInterpreter: () => {
-    // Default: sequential-only (par acts like seq)
-    // For true parallelism, use createFiberDagInterpreter with the full interp
-    let _interp: Record<string, unknown> = {};
-    const interp = createFiberDagInterpreter(() => _interp as any);
-    _interp = interp;
-    return interp;
-  },
+  defaultInterpreter: createFiberDagInterpreter,
   build(ctx: BuildContext): Record<string, unknown> {
     return {
       fiber: {
