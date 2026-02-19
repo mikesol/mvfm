@@ -13,3 +13,4 @@ export * from "./11-wrap";
 export * from "./12-splice";
 export * from "./13-named";
 export * from "./14-pipe";
+export * from "./fold";
