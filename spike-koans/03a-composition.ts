@@ -35,9 +35,10 @@ export interface TraitDef<O, Mapping extends Record<string, string>> {
 }
 
 // ─── Handler / Interpreter (canonical definition) ──────────────────
+// Yield number = positional child index. Yield string = direct node ID.
 export type Handler = (
   entry: RuntimeEntry,
-) => AsyncGenerator<number, unknown, unknown>;
+) => AsyncGenerator<number | string, unknown, unknown>;
 
 export type Interpreter = Record<string, Handler>;
 
@@ -54,6 +55,7 @@ export interface Plugin<
   readonly kinds: Kinds;
   readonly traits: Traits;
   readonly lifts: Lifts;
+  readonly nodeKinds: readonly string[];
   readonly defaultInterpreter?: () => Interpreter;
 }
 
@@ -183,6 +185,7 @@ export const numPluginU = {
     eq: { output: false as boolean, mapping: { number: "num/eq" } } as TraitDef<boolean, { number: "num/eq" }>,
   },
   lifts: { number: "num/literal" },
+  nodeKinds: ["num/literal", "num/add", "num/mul", "num/sub", "num/eq"],
   defaultInterpreter: (): Interpreter => ({
     "num/literal": async function* (e) { return e.out as number; },
     "num/add": async function* () { return ((yield 0) as number) + ((yield 1) as number); },
@@ -203,6 +206,7 @@ export const strPluginU = {
     eq: { output: false as boolean, mapping: { string: "str/eq" } } as TraitDef<boolean, { string: "str/eq" }>,
   },
   lifts: { string: "str/literal" },
+  nodeKinds: ["str/literal", "str/eq"],
   defaultInterpreter: (): Interpreter => ({
     "str/literal": async function* (e) { return e.out as string; },
     "str/eq": async function* () { return ((yield 0) as string) === ((yield 1) as string); },
@@ -220,6 +224,7 @@ export const boolPluginU = {
     eq: { output: false as boolean, mapping: { boolean: "bool/eq" } } as TraitDef<boolean, { boolean: "bool/eq" }>,
   },
   lifts: { boolean: "bool/literal" },
+  nodeKinds: ["bool/literal", "bool/eq"],
   defaultInterpreter: (): Interpreter => ({
     "bool/literal": async function* (e) { return e.out as boolean; },
     "bool/eq": async function* () { return ((yield 0) as boolean) === ((yield 1) as boolean); },
@@ -229,11 +234,11 @@ export const boolPluginU = {
 export const stdPlugins = [numPluginU, strPluginU, boolPluginU] as const;
 
 // ─── Ord plugin: proves extensibility ──────────────────────────────
-function lt<A, B>(a: A, b: B): CExpr<boolean, "lt", [A, B]> {
+export function lt<A, B>(a: A, b: B): CExpr<boolean, "lt", [A, B]> {
   return makeCExpr("lt", [a, b]);
 }
 
-const ordPlugin = {
+export const ordPlugin = {
   name: "ord",
   ctors: { lt },
   kinds: {
@@ -244,6 +249,7 @@ const ordPlugin = {
     lt: { output: false as boolean, mapping: { number: "num/lt", string: "str/lt" } } as TraitDef<boolean, { number: "num/lt"; string: "str/lt" }>,
   },
   lifts: {},
+  nodeKinds: ["num/lt", "str/lt"],
   defaultInterpreter: (): Interpreter => ({
     "num/lt": async function* () { return ((yield 0) as number) < ((yield 1) as number); },
     "str/lt": async function* () { return ((yield 0) as string) < ((yield 1) as string); },

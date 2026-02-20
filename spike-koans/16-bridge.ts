@@ -27,7 +27,7 @@
 
 export * from "./15-dagql";
 
-import type { RuntimeEntry } from "./15-dagql";
+import type { RuntimeEntry, NExpr, OutOf } from "./15-dagql";
 import {
   numLit,
   add,
@@ -43,14 +43,19 @@ import {
   strPlugin as strPluginShape,
   boolPlugin as boolPluginShape,
   selectWhere,
+  numPluginU,
+  strPluginU,
+  boolPluginU,
+  stdPlugins,
 } from "./15-dagql";
 
-// ─── Handler: async generator yielding child indices ────────────────
-// yield <index> → receives the evaluated result of child at that index.
+// ─── Handler: async generator yielding child indices or node IDs ────
+// yield <number> → receives the evaluated result of child at that index.
+// yield <string> → receives the evaluated result of the node with that ID.
 // Return value is the node's result.
 export type Handler = (
   entry: RuntimeEntry,
-) => AsyncGenerator<number, unknown, unknown>;
+) => AsyncGenerator<number | string, unknown, unknown>;
 
 export type Interpreter = Record<string, Handler>;
 
@@ -62,14 +67,37 @@ export type Interpreter = Record<string, Handler>;
 
 interface Frame {
   id: string;
-  gen: AsyncGenerator<number, unknown, unknown>;
+  gen: AsyncGenerator<number | string, unknown, unknown>;
 }
 
+// Overload: pass NExpr directly → infers output type
+export async function fold<E extends NExpr<any, any, any, any>>(
+  expr: E,
+  interp: Interpreter,
+): Promise<OutOf<E>>;
+// Overload: pass rootId + adj manually
 export async function fold<T>(
   rootId: string,
   adj: Record<string, RuntimeEntry>,
   interp: Interpreter,
-): Promise<T> {
+): Promise<T>;
+export async function fold(
+  rootIdOrExpr: string | NExpr<any, any, any, any>,
+  adjOrInterp: Record<string, RuntimeEntry> | Interpreter,
+  maybeInterp?: Interpreter,
+): Promise<unknown> {
+  let rootId: string;
+  let adj: Record<string, RuntimeEntry>;
+  let interp: Interpreter;
+  if (typeof rootIdOrExpr === "string") {
+    rootId = rootIdOrExpr;
+    adj = adjOrInterp as Record<string, RuntimeEntry>;
+    interp = maybeInterp!;
+  } else {
+    rootId = rootIdOrExpr.__id;
+    adj = rootIdOrExpr.__adj;
+    interp = adjOrInterp as Interpreter;
+  }
   const memo: Record<string, unknown> = {};
   const stack: Frame[] = [];
 
@@ -102,7 +130,7 @@ export async function fold<T>(
     // we resolved it, and now resume. Let's restructure:
 
     // Drive the top generator until it yields a child we can't resolve.
-    let iterResult: IteratorResult<number, unknown>;
+    let iterResult: IteratorResult<number | string, unknown>;
 
     // First call or resume — we'll handle this in the loop below.
     // On first push, we send undefined. On resume, the caller
@@ -124,14 +152,20 @@ export async function fold<T>(
       continue;
     }
 
-    // Generator yielded a child index.
-    const childIndex = iterResult.value;
-    const entry = adj[frame.id];
-    const childId = entry.children[childIndex];
-    if (childId === undefined) {
-      throw new Error(
-        `fold: node "${frame.id}" (${entry.kind}) has no child at index ${childIndex}`,
-      );
+    // Generator yielded a child index (number) or direct node ID (string).
+    const yieldedValue = iterResult.value;
+    let childId: string;
+    if (typeof yieldedValue === "string") {
+      // Direct node ID — used for structural/named children
+      childId = yieldedValue;
+    } else {
+      const entry = adj[frame.id];
+      childId = entry.children[yieldedValue];
+      if (childId === undefined) {
+        throw new Error(
+          `fold: node "${frame.id}" (${entry.kind}) has no child at index ${yieldedValue}`,
+        );
+      }
     }
 
     if (childId in memo) {
@@ -149,7 +183,7 @@ export async function fold<T>(
   if (!(rootId in memo)) {
     throw new Error(`fold: root "${rootId}" was not evaluated`);
   }
-  return memo[rootId] as T;
+  return memo[rootId];
 }
 
 // ─── PluginDef: minimal plugin definition ───────────────────────────
@@ -160,6 +194,7 @@ export interface PluginDef {
 }
 
 // ─── defaults: merge interpreters from plugin list ──────────────────
+// Accepts PluginDef[] or unified Plugin[] (from 03a-composition).
 export function defaults(
   plugins: readonly PluginDef[],
   overrides: Record<string, Interpreter> = {},
@@ -618,6 +653,90 @@ async function run() {
     await fold<number>(rewritten2.__id, rewritten2.__adj, fullInterp) === -5,
     "full pipeline: (3-4)*5 = -5 after dagql rewrite",
   );
+
+  // ═══════════════════════════════════════════════════════════════════
+  // FOLD OVERLOAD: NExpr convenience + type inference
+  // ═══════════════════════════════════════════════════════════════════
+
+  // fold(expr, interp) — pass NExpr directly, infers output type
+  const inferProg = app(mul(add(numLit(3), numLit(4)), numLit(5)));
+  const inferResult = await fold(inferProg, numInterp);
+  // Type test: inferResult is number (not unknown), no manual <T> needed
+  const _inferCheck: number = inferResult;
+  assert(inferResult === 35, "fold overload: NExpr → inferred number");
+
+  // Old 3-arg form still works
+  const oldResult = await fold<number>(inferProg.__id, inferProg.__adj, numInterp);
+  assert(oldResult === 35, "fold overload: 3-arg still works");
+
+  // ═══════════════════════════════════════════════════════════════════
+  // STRUCTURAL FOLD: string yields as direct node IDs
+  // ═══════════════════════════════════════════════════════════════════
+
+  // Build a "geom/point" manually with named children stored in `out`
+  // The handler yields string node IDs directly (not positional indices)
+  const structAdj: Record<string, RuntimeEntry> = {
+    a: { kind: "num/literal", children: [], out: 1 },
+    b: { kind: "num/literal", children: [], out: 2 },
+    c: { kind: "num/literal", children: [], out: 3 },
+    d: { kind: "num/add", children: ["a", "b"], out: undefined },
+    // point node: children are empty (named refs stored in out)
+    e: { kind: "geom/point", children: [], out: { x: "d", y: "c" } },
+  };
+  const structInterp: Interpreter = {
+    ...numInterp,
+    "geom/point": async function* (entry) {
+      const childMap = entry.out as Record<string, string>;
+      // yield string → direct node ID lookup
+      const x = (yield childMap.x) as number;
+      const y = (yield childMap.y) as number;
+      return { x, y };
+    },
+  };
+  const structResult = await fold<{ x: number; y: number }>(
+    "e", structAdj, structInterp,
+  );
+  assert(structResult.x === 3, `structural fold: x = ${structResult.x} (expected 3)`);
+  assert(structResult.y === 3, `structural fold: y = ${structResult.y} (expected 3)`);
+
+  // ═══════════════════════════════════════════════════════════════════
+  // UNIFIED PLUGINS: feed 03a's unified Plugin[] into defaults()
+  // ═══════════════════════════════════════════════════════════════════
+
+  // stdPlugins from 03a are unified Plugin types with defaultInterpreter
+  const unifiedInterp = defaults(stdPlugins);
+  const unifiedProg = app(add(numLit(10), numLit(20)));
+  assert(
+    await fold<number>(unifiedProg.__id, unifiedProg.__adj, unifiedInterp) === 30,
+    "unified plugins: 10 + 20 = 30 via defaults(stdPlugins)",
+  );
+
+  // Individual unified plugins work too
+  const numOnlyInterp = defaults([numPluginU]);
+  assert(
+    await fold<number>(prog.__id, prog.__adj, numOnlyInterp) === 35,
+    "unified plugins: numPluginU in defaults()",
+  );
+
+  // Unified plugin with override
+  const eqOverrideInterp = defaults(stdPlugins, {
+    num: {
+      "num/literal": async function* (entry) { return (entry.out as number) * 10; },
+      "num/add": async function* () {
+        return ((yield 0) as number) + ((yield 1) as number);
+      },
+      "num/mul": async function* () {
+        return ((yield 0) as number) * ((yield 1) as number);
+      },
+      "num/sub": async function* () {
+        return ((yield 0) as number) - ((yield 1) as number);
+      },
+    },
+  });
+  const scaledResult = await fold<number>(
+    unifiedProg.__id, unifiedProg.__adj, eqOverrideInterp,
+  );
+  assert(scaledResult === 300, `unified override: 10*10 + 20*10 = ${scaledResult}`);
 
   console.log(`\n16-bridge: ${passed} passed, ${failed} failed`);
   if (failed > 0) process.exit(1);

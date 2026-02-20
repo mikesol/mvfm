@@ -33,10 +33,13 @@ import type {
   StdRegistry,
   LiftKind,
   TypeKey,
+  Plugin,
+  RegistryOf,
 } from "./03a-composition";
 import {
   makeNExpr, incrementId, isCExpr, add, mul, sub, eq,
   buildLiftMap, buildTraitMap, buildKindInputs, stdPlugins,
+  lt, ordPlugin,
 } from "./03a-composition";
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -233,35 +236,47 @@ export type AppResult<Reg, Expr> =
     : never;
 
 // ═══════════════════════════════════════════════════════════════════════
-// RUNTIME app()
+// RUNTIME: elaborate + createApp + app
 // ═══════════════════════════════════════════════════════════════════════
 
-// Runtime registry — derived from plugins, not hardcoded
+// Module-level maps for backward compatibility (04a uses LIFT_MAP)
 export const LIFT_MAP: Record<string, string> = buildLiftMap(stdPlugins);
 export const TRAIT_MAP: Record<string, Record<string, string>> = buildTraitMap(stdPlugins);
 export const KIND_INPUTS: Record<string, string[]> = buildKindInputs(stdPlugins);
 
-export function app<
-  Expr extends CExpr<any, string, readonly unknown[]>,
-  Reg = StdRegistry,
->(
-  expr: Expr,
-): AppResult<Reg, Expr> {
+// Build kind→outputTypeTag map from plugin specs
+function buildKindOutputs(plugins: readonly Plugin[]): Record<string, string> {
+  const m: Record<string, string> = {};
+  for (const p of plugins) {
+    for (const [kind, spec] of Object.entries(p.kinds)) {
+      m[kind] = typeof (spec as KindSpec<any, any>).output;
+    }
+  }
+  return m;
+}
+
+// Core elaboration logic — parameterized over maps
+function elaborate(
+  expr: CExpr<unknown>,
+  liftMap: Record<string, string>,
+  traitMap: Record<string, Record<string, string>>,
+  kindInputs: Record<string, string[]>,
+  kindOutputs: Record<string, string>,
+): { rootId: string; entries: Record<string, RuntimeEntry>; counter: string } {
   const entries: Record<string, RuntimeEntry> = {};
   let counter = "a";
 
   function visit(arg: unknown, expected?: string): [string, string] {
-    // Returns [nodeId, outputTypeTag]
     if (isCExpr(arg)) {
       const cexpr = arg as CExpr<unknown>;
       let kind = cexpr.__kind;
       const args = cexpr.__args;
 
-      // Trait resolution: elaborate children first, then resolve kind
-      if (kind in TRAIT_MAP) {
+      // Trait resolution
+      if (kind in traitMap) {
         const childResults = args.map((a) => visit(a));
-        const childType = childResults[0][1]; // type of first arg
-        const resolved = TRAIT_MAP[kind][childType];
+        const childType = childResults[0][1];
+        const resolved = traitMap[kind]?.[childType];
         if (!resolved) {
           throw new Error(`No trait "${kind}" instance for type "${childType}"`);
         }
@@ -269,54 +284,38 @@ export function app<
         const childIds = childResults.map(([id]) => id);
         const nodeId = counter;
         counter = incrementId(counter);
-        const expectedInputs = KIND_INPUTS[kind];
-        // Validate second arg matches first arg's type
-        if (expectedInputs && childResults[1][1] !== childResults[0][1]) {
+        if (kindInputs[kind] && childResults[1][1] !== childResults[0][1]) {
           throw new Error(
             `Trait "${cexpr.__kind}": args have different types (${childResults[0][1]} vs ${childResults[1][1]})`,
           );
         }
         entries[nodeId] = { kind, children: childIds, out: undefined };
-        return [nodeId, "boolean"];
+        return [nodeId, kindOutputs[kind] ?? "unknown"];
       }
 
-      // Regular node: elaborate children against expected inputs
-      const expectedInputs = KIND_INPUTS[kind];
+      // Regular node
+      const expectedInputs = kindInputs[kind];
       const childIds: string[] = [];
       for (let i = 0; i < args.length; i++) {
         const exp = expectedInputs ? expectedInputs[i] : undefined;
         const [childId, childType] = visit(args[i], exp);
         if (exp && childType !== exp) {
-          throw new Error(
-            `${kind}: expected ${exp} for arg ${i}, got ${childType}`,
-          );
+          throw new Error(`${kind}: expected ${exp} for arg ${i}, got ${childType}`);
         }
         childIds.push(childId);
       }
       const nodeId = counter;
       counter = incrementId(counter);
-      // Determine output type from kind
-      const outputType = kind.startsWith("num/") && !kind.includes("/eq")
-        ? "number"
-        : kind.includes("/eq")
-          ? "boolean"
-          : kind.startsWith("str/")
-            ? "string"
-            : "unknown";
       entries[nodeId] = { kind, children: childIds, out: undefined };
-      return [nodeId, outputType];
+      return [nodeId, kindOutputs[kind] ?? "unknown"];
     }
 
-    // Raw value: lift to literal
+    // Raw value: lift
     const typeTag = typeof arg;
-    const liftKind = LIFT_MAP[typeTag];
-    if (!liftKind) {
-      throw new Error(`Cannot lift value of type "${typeTag}"`);
-    }
+    const liftKind = liftMap[typeTag];
+    if (!liftKind) throw new Error(`Cannot lift value of type "${typeTag}"`);
     if (expected && typeTag !== expected) {
-      throw new Error(
-        `Expected ${expected}, got ${typeTag} (value: ${String(arg)})`,
-      );
+      throw new Error(`Expected ${expected}, got ${typeTag} (value: ${String(arg)})`);
     }
     const nodeId = counter;
     counter = incrementId(counter);
@@ -325,6 +324,30 @@ export function app<
   }
 
   const [rootId] = visit(expr);
+  return { rootId, entries, counter };
+}
+
+/** Create a typed app() from a plugin set. Forces the elaborator to be generic. */
+export function createApp<const P extends readonly Plugin[]>(...plugins: P) {
+  const lm = buildLiftMap(plugins);
+  const tm = buildTraitMap(plugins);
+  const ki = buildKindInputs(plugins);
+  const ko = buildKindOutputs(plugins);
+  return function <Expr extends CExpr<any, string, readonly unknown[]>>(
+    expr: Expr,
+  ): AppResult<RegistryOf<P>, Expr> {
+    const { rootId, entries, counter } = elaborate(expr, lm, tm, ki, ko);
+    return makeNExpr(rootId, entries, counter) as any;
+  };
+}
+
+/** Default app: uses stdPlugins. */
+export function app<
+  Expr extends CExpr<any, string, readonly unknown[]>,
+  Reg = StdRegistry,
+>(expr: Expr): AppResult<Reg, Expr> {
+  const ko = buildKindOutputs(stdPlugins);
+  const { rootId, entries, counter } = elaborate(expr, LIFT_MAP, TRAIT_MAP, KIND_INPUTS, ko);
   return makeNExpr(rootId, entries, counter) as any;
 }
 
@@ -455,6 +478,47 @@ try {
   threwMixed = e.message.includes("different types");
 }
 assert(threwMixed, "eq(3, 'foo') throws for mixed types");
+
+// ═══════════════════════════════════════════════════════════════════════
+// EXTENDED REGISTRY TESTS — proves elaborator is generic, not hardcoded
+// ═══════════════════════════════════════════════════════════════════════
+
+// --- Type-level: lt(3,4) through extended registry resolves to num/lt ---
+type ExtPlugins = [...typeof stdPlugins, typeof ordPlugin];
+type ExtReg = RegistryOf<ExtPlugins>;
+type LtResult = AppResult<ExtReg, ReturnType<typeof lt<3, 4>>>;
+type LtAdj = AdjOf<LtResult>;
+const _ltA: LtAdj["a"]["kind"] = "num/literal";
+const _ltB: LtAdj["b"]["kind"] = "num/literal";
+const _ltC: LtAdj["c"]["kind"] = "num/lt"; // resolved from "lt" trait
+type LtOut = OutOf<LtResult>;
+const _ltOutBool: LtOut = true;
+// @ts-expect-error — boolean, not number
+const _ltOutBad: LtOut = 42;
+
+// --- Runtime: createApp with ordPlugin elaborates lt(3,4) ---
+const extApp = createApp(...stdPlugins, ordPlugin);
+const ltProg = extApp(lt(3, 4));
+assert(ltProg.__adj[ltProg.__id].kind === "num/lt", "createApp: lt(3,4) → num/lt");
+assert(Object.keys(ltProg.__adj).length === 3, "createApp: lt has 3 nodes");
+
+// --- createApp with string lt ---
+const ltStrProg = extApp(lt("a", "b"));
+assert(ltStrProg.__adj[ltStrProg.__id].kind === "str/lt", "createApp: lt('a','b') → str/lt");
+
+// --- Default app leaves lt unresolved (not in stdPlugins trait map) ---
+// Type-level: AppResult<StdRegistry, lt(3,4)> = never (correctly rejected)
+type _LtNever = AssertNever<AppResult<StdRegistry, ReturnType<typeof lt<3, 4>>>>;
+// Runtime: passes through unresolved (permissive runtime)
+const ltUnresolved: any = app(lt(3, 4) as any);
+assert(
+  ltUnresolved.__adj[ltUnresolved.__id].kind === "lt",
+  "default app: lt stays unresolved (no trait map entry)",
+);
+
+// --- createApp still handles eq ---
+const extEqProg = extApp(eq(3, 4));
+assert(extEqProg.__adj[extEqProg.__id].kind === "num/eq", "createApp: eq(3,4) → num/eq");
 
 console.log(`\n04-normalize: ${passed} passed, ${failed} failed`);
 if (failed > 0) process.exit(1);
