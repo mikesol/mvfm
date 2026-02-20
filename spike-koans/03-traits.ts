@@ -399,6 +399,43 @@ function _negativeProofs(): never {
 // RUNTIME TESTS
 // ═══════════════════════════════════════════════════════════════════════
 
+// ─── Invariant: __outType matches the declared phantom O for every ctor ─
+function assertOutType(
+  expr: { __outType: string },
+  expected: string,
+  label: string,
+): void {
+  console.assert(
+    expr.__outType === expected,
+    `${label}: __outType should be "${expected}", got "${expr.__outType}"`,
+  );
+}
+
+// Literals
+assertOutType(numLit(1), "number", "numLit");
+assertOutType(strLit("a"), "string", "strLit");
+assertOutType(boolLit(true), "boolean", "boolLit");
+
+// Arithmetic (output stays number)
+assertOutType(add(numLit(1), numLit(2)), "number", "add");
+
+// Eq (output is ALWAYS boolean, regardless of input type)
+assertOutType(eq2(numLit(1), numLit(2)), "boolean", "numEq");
+assertOutType(eq2(strLit("a"), strLit("b")), "boolean", "strEq");
+
+// Composed via mvfm
+const rt$ = mvfm(numPlugin, strPlugin, boolPlugin);
+assertOutType(rt$.eq(numLit(1), numLit(2)), "boolean", "mvfm numEq");
+assertOutType(rt$.eq(strLit("a"), strLit("b")), "boolean", "mvfm strEq");
+assertOutType(rt$.eq(boolLit(true), boolLit(false)), "boolean", "mvfm boolEq");
+
+// Depth-2 crossing: eq output feeds back into eq
+assertOutType(
+  rt$.eq(rt$.eq(numLit(1), numLit(2)), rt$.eq(numLit(3), numLit(4))),
+  "boolean",
+  "nested eq(eq,eq)",
+);
+
 // Runtime dispatch: eq picks the right constructor based on __outType
 const rtEqNum = eq2(numLit(3), numLit(4));
 const rtNumEntry = rtEqNum.__adj[rtEqNum.__id] as RuntimeEntry;
@@ -410,18 +447,18 @@ const rtStrEntry = rtEqStr.__adj[rtEqStr.__id] as RuntimeEntry;
 console.assert(rtStrEntry.kind === "str/eq", `expected str/eq, got ${rtStrEntry.kind}`);
 
 // Runtime: mvfm-composed eq dispatches correctly
-const rt$ = mvfm(numPlugin, strPlugin, boolPlugin);
-const rtMvfmNum = rt$.eq(numLit(5), numLit(6));
+const rt$2 = mvfm(numPlugin, strPlugin, boolPlugin);
+const rtMvfmNum = rt$2.eq(numLit(5), numLit(6));
 console.assert(
   (rtMvfmNum.__adj[rtMvfmNum.__id] as RuntimeEntry).kind === "num/eq",
   "mvfm eq dispatches to num/eq",
 );
-const rtMvfmStr = rt$.eq(strLit("x"), strLit("y"));
+const rtMvfmStr = rt$2.eq(strLit("x"), strLit("y"));
 console.assert(
   (rtMvfmStr.__adj[rtMvfmStr.__id] as RuntimeEntry).kind === "str/eq",
   "mvfm eq dispatches to str/eq",
 );
-const rtMvfmBool = rt$.eq(boolLit(true), boolLit(false));
+const rtMvfmBool = rt$2.eq(boolLit(true), boolLit(false));
 console.assert(
   (rtMvfmBool.__adj[rtMvfmBool.__id] as RuntimeEntry).kind === "bool/eq",
   "mvfm eq dispatches to bool/eq",
@@ -440,9 +477,9 @@ console.assert(threwNoInstance, "composeEq throws for unregistered type at runti
 
 // ─── Nested eq: eq(eq(num,num), eq(num,num)) → bool/eq ──────────────
 // eq produces CExpr<boolean>, so nesting dispatches to boolEq at runtime
-const rtInner1 = rt$.eq(numLit(3), numLit(4));
-const rtInner2 = rt$.eq(numLit(5), numLit(6));
-const rtNested = rt$.eq(rtInner1, rtInner2);
+const rtInner1 = rt$2.eq(numLit(3), numLit(4));
+const rtInner2 = rt$2.eq(numLit(5), numLit(6));
+const rtNested = rt$2.eq(rtInner1, rtInner2);
 
 // Runtime: outer eq should use bool/eq (not num/eq!)
 const rtNestedEntry = rtNested.__adj[rtNested.__id] as RuntimeEntry;
