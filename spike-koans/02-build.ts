@@ -1,22 +1,9 @@
 /**
- * Koan 02: Build — content-addressed program construction
+ * Koan 02: Build — permissive constructors + registry
  *
- * RULE: Never rewrite this file. Later koans import from here.
- *
- * What we prove:
- * - numLit(n) produces CExpr with content-addressed ID "L{n}"
- * - add(a, b) produces CExpr with ID "A({leftId},{rightId})"
- * - mul(a, b) produces CExpr with ID "M({leftId},{rightId})"
- * - No counter needed — IDs are deterministic from structure
- * - Adj is built via intersection: CAdjOf<L> & CAdjOf<R> & Record<newId, ...>
- * - DAG sharing is automatic: numLit(3) used twice → one "L3" entry
- * - Sibling composition has no collisions (unlike counter-based approaches)
- *
- * What we do NOT prove yet:
- * - Normalization to sequential IDs (see 03-normalize)
- * - Content-addressed IDs are ephemeral — never seen by downstream consumers
- *
- * Imports: 01-increment (re-exports chain)
+ * Constructors accept ANYTHING. No validation at construction time.
+ * The registry declares expected input/output types per node kind.
+ * Validation happens at app() time (see 04-normalize).
  *
  * Gate:
  *   npx tsc --noEmit --strict spike-koans/02-build.ts
@@ -24,173 +11,127 @@
 
 export * from "./01-increment";
 
-import type {
-  NodeEntry,
-  CExpr,
-  CIdOf,
-  CAdjOf,
-  RuntimeEntry,
-} from "./01-increment";
+import type { CExpr, NodeEntry } from "./01-increment";
 import { makeCExpr } from "./01-increment";
 
-// ─── numLit: literal number node ─────────────────────────────────────
-// ID = "L{n}", adj = { "L{n}": NodeEntry<"num/literal", [], number> }
-export function numLit<V extends number>(
-  value: V,
-): CExpr<
-  number,
-  `L${V}`,
-  Record<`L${V}`, NodeEntry<"num/literal", [], number>>
-> {
-  const id = `L${value}` as `L${V}`;
-  const entry: RuntimeEntry = { kind: "num/literal", children: [], out: value };
-  return makeCExpr<
-    number,
-    `L${V}`,
-    Record<`L${V}`, NodeEntry<"num/literal", [], number>>
-  >(id, { [id]: entry } as Record<string, RuntimeEntry>, "number");
+// ─── Registry types ─────────────────────────────────────────────────
+export interface KindSpec<I extends readonly unknown[], O> {
+  readonly inputs: I;
+  readonly output: O;
 }
 
-// ─── add: binary addition node ───────────────────────────────────────
-// ID = "A({leftId},{rightId})"
-// Adj = CAdjOf<L> & CAdjOf<R> & Record<newId, NodeEntry<"num/add", [leftId, rightId], number>>
-export function add<
-  LA,
-  LId extends string,
-  RA,
-  RId extends string,
->(
-  left: CExpr<number, LId, LA>,
-  right: CExpr<number, RId, RA>,
-): CExpr<
-  number,
-  `A(${LId},${RId})`,
-  LA & RA & Record<`A(${LId},${RId})`, NodeEntry<"num/add", [LId, RId], number>>
-> {
-  type NewId = `A(${LId},${RId})`;
-  const lId = left.__id as LId;
-  const rId = right.__id as RId;
-  const id = `A(${lId},${rId})` as NewId;
-  const entry: RuntimeEntry = {
-    kind: "num/add",
-    children: [lId, rId],
-    out: undefined,
-  };
-  const adj = { ...left.__adj, ...right.__adj, [id]: entry };
-  return makeCExpr<
-    number,
-    NewId,
-    LA & RA & Record<NewId, NodeEntry<"num/add", [LId, RId], number>>
-  >(id, adj, "number");
+export interface TraitKindSpec<O, Mapping extends Record<string, string>> {
+  readonly trait: true;
+  readonly output: O;
+  readonly mapping: Mapping;
 }
 
-// ─── mul: binary multiplication node ─────────────────────────────────
-// ID = "M({leftId},{rightId})"
-export function mul<
-  LA,
-  LId extends string,
-  RA,
-  RId extends string,
->(
-  left: CExpr<number, LId, LA>,
-  right: CExpr<number, RId, RA>,
-): CExpr<
-  number,
-  `M(${LId},${RId})`,
-  LA & RA & Record<`M(${LId},${RId})`, NodeEntry<"num/mul", [LId, RId], number>>
-> {
-  type NewId = `M(${LId},${RId})`;
-  const lId = left.__id as LId;
-  const rId = right.__id as RId;
-  const id = `M(${lId},${rId})` as NewId;
-  const entry: RuntimeEntry = {
-    kind: "num/mul",
-    children: [lId, rId],
-    out: undefined,
-  };
-  const adj = { ...left.__adj, ...right.__adj, [id]: entry };
-  return makeCExpr<
-    number,
-    NewId,
-    LA & RA & Record<NewId, NodeEntry<"num/mul", [LId, RId], number>>
-  >(id, adj, "number");
+export type RegistryEntry = KindSpec<any, any> | TraitKindSpec<any, any>;
+
+// ─── LiftKind: which node kind to create when lifting a raw value ───
+export type LiftKind<T> =
+  T extends number ? "num/literal" :
+  T extends string ? "str/literal" :
+  T extends boolean ? "bool/literal" :
+  never;
+
+// ─── TypeKey: map TS type to string key for trait resolution ────────
+export type TypeKey<T> =
+  T extends number ? "number" :
+  T extends string ? "string" :
+  T extends boolean ? "boolean" :
+  never;
+
+// ─── Standard registry ──────────────────────────────────────────────
+export type StdRegistry = {
+  "num/literal": KindSpec<[], number>;
+  "num/add": KindSpec<[number, number], number>;
+  "num/mul": KindSpec<[number, number], number>;
+  "num/sub": KindSpec<[number, number], number>;
+  "str/literal": KindSpec<[], string>;
+  "bool/literal": KindSpec<[], boolean>;
+  "num/eq": KindSpec<[number, number], boolean>;
+  "str/eq": KindSpec<[string, string], boolean>;
+  "bool/eq": KindSpec<[boolean, boolean], boolean>;
+  "eq": TraitKindSpec<boolean, {
+    number: "num/eq";
+    string: "str/eq";
+    boolean: "bool/eq";
+  }>;
+};
+
+// ─── Permissive constructors ────────────────────────────────────────
+// Accept anything. Output type is declared (optimistic).
+// Validation deferred to app().
+
+export function add<A, B>(a: A, b: B): CExpr<number, "num/add", [A, B]> {
+  return makeCExpr<number, "num/add", [A, B]>("num/add", [a, b]);
 }
+
+export function mul<A, B>(a: A, b: B): CExpr<number, "num/mul", [A, B]> {
+  return makeCExpr<number, "num/mul", [A, B]>("num/mul", [a, b]);
+}
+
+export function sub<A, B>(a: A, b: B): CExpr<number, "num/sub", [A, B]> {
+  return makeCExpr<number, "num/sub", [A, B]>("num/sub", [a, b]);
+}
+
+export function eq<A, B>(a: A, b: B): CExpr<boolean, "eq", [A, B]> {
+  return makeCExpr<boolean, "eq", [A, B]>("eq", [a, b]);
+}
+
+// ─── Backward-compat passthroughs ───────────────────────────────────
+// numLit(3) === 3. Exists so old-style code still compiles.
+export function numLit<V extends number>(v: V): V { return v; }
+export function strLit<V extends string>(v: V): V { return v; }
+export function boolLit<V extends boolean>(v: V): V { return v; }
 
 // ═══════════════════════════════════════════════════════════════════════
 // COMPILE-TIME TESTS
 // ═══════════════════════════════════════════════════════════════════════
 
-// --- numLit produces correct CExpr ---
+import type { COutOf, CKindOf, CArgsOf } from "./01-increment";
+
+// --- add captures exact arg types ---
+const sum = add(3, 4);
+type SumOut = COutOf<typeof sum>;
+const _sumOut: SumOut = 42;
+// @ts-expect-error — output is number
+const _sumOutBad: SumOut = "nope";
+type SumKind = CKindOf<typeof sum>;
+const _sumKind: SumKind = "num/add";
+type SumArgs = CArgsOf<typeof sum>;
+const _sumArgs: SumArgs = [3, 4];
+
+// --- Nested: mul(add(3,4), 5) ---
+const product = mul(add(3, 4), 5);
+type ProdKind = CKindOf<typeof product>;
+const _prodKind: ProdKind = "num/mul";
+type ProdArgs = CArgsOf<typeof product>;
+// Arg 0 is a CExpr, arg 1 is 5
+type ProdArg0 = ProdArgs[0];
+type ProdArg0Kind = CKindOf<ProdArg0>;
+const _prodArg0Kind: ProdArg0Kind = "num/add";
+
+// --- Permissive: add(false, "foo") compiles ---
+const bad = add(false, "foo");
+type BadArgs = CArgsOf<typeof bad>;
+const _badArgs: BadArgs = [false, "foo"];
+// Still declares number output (optimistic)
+type BadOut = COutOf<typeof bad>;
+const _badOut: BadOut = 42;
+
+// --- eq captures args ---
+const eqExpr = eq(add(3, 4), add(5, 6));
+type EqOut = COutOf<typeof eqExpr>;
+const _eqOut: EqOut = true;
+// @ts-expect-error — eq output is boolean
+const _eqOutBad: EqOut = 42;
+
+// --- numLit is now just a passthrough ---
 const three = numLit(3);
-type ThreeId = CIdOf<typeof three>;
-const _threeId: ThreeId = "L3";
-// @ts-expect-error — wrong ID
-const _threeIdBad: ThreeId = "L4";
-
-type ThreeAdj = CAdjOf<typeof three>;
-const _threeKind: ThreeAdj["L3"]["kind"] = "num/literal";
-const _threeChildren: ThreeAdj["L3"]["children"] = [];
-
-// --- add produces correct CExpr ---
-const four = numLit(4);
-const sum = add(three, four);
-type SumId = CIdOf<typeof sum>;
-const _sumId: SumId = "A(L3,L4)";
-// @ts-expect-error — wrong ID
-const _sumIdBad: SumId = "A(L4,L3)";
-
-type SumAdj = CAdjOf<typeof sum>;
-// Merged adj contains both children and the add node
-const _sumL3Kind: SumAdj["L3"]["kind"] = "num/literal";
-const _sumL4Kind: SumAdj["L4"]["kind"] = "num/literal";
-const _sumAddKind: SumAdj["A(L3,L4)"]["kind"] = "num/add";
-const _sumAddChildren: SumAdj["A(L3,L4)"]["children"] = ["L3", "L4"];
-
-// --- mul produces correct CExpr ---
-const five = numLit(5);
-const product = mul(sum, five);
-type ProductId = CIdOf<typeof product>;
-const _productId: ProductId = "M(A(L3,L4),L5)";
-// @ts-expect-error — wrong ID
-const _productIdBad: ProductId = "M(L3,L4)";
-
-type ProductAdj = CAdjOf<typeof product>;
-const _prodL3: ProductAdj["L3"]["kind"] = "num/literal";
-const _prodL4: ProductAdj["L4"]["kind"] = "num/literal";
-const _prodL5: ProductAdj["L5"]["kind"] = "num/literal";
-const _prodAdd: ProductAdj["A(L3,L4)"]["kind"] = "num/add";
-const _prodMul: ProductAdj["M(A(L3,L4),L5)"]["kind"] = "num/mul";
-const _prodMulChildren: ProductAdj["M(A(L3,L4),L5)"]["children"] = [
-  "A(L3,L4)",
-  "L5",
-];
-
-// --- DAG sharing: same subtree used twice → one entry ---
-const shared = add(three, three);
-type SharedId = CIdOf<typeof shared>;
-const _sharedId: SharedId = "A(L3,L3)";
-type SharedAdj = CAdjOf<typeof shared>;
-// Only one "L3" entry exists (intersection of identical types)
-const _sharedL3Kind: SharedAdj["L3"]["kind"] = "num/literal";
-const _sharedAddChildren: SharedAdj["A(L3,L3)"]["children"] = ["L3", "L3"];
-
-// --- Sibling composition: no collisions ---
-const leftSum = add(numLit(1), numLit(2));
-const rightSum = add(numLit(3), numLit(4));
-const combined = add(leftSum, rightSum);
-type CombinedId = CIdOf<typeof combined>;
-const _combinedId: CombinedId = "A(A(L1,L2),A(L3,L4))";
-type CombinedAdj = CAdjOf<typeof combined>;
-const _cL1: CombinedAdj["L1"]["kind"] = "num/literal";
-const _cL2: CombinedAdj["L2"]["kind"] = "num/literal";
-const _cLeftAdd: CombinedAdj["A(L1,L2)"]["kind"] = "num/add";
-const _cRightAdd: CombinedAdj["A(L3,L4)"]["kind"] = "num/add";
-const _cTopAdd: CombinedAdj["A(A(L1,L2),A(L3,L4))"]["kind"] = "num/add";
-
-// --- Runtime adj has all expected keys ---
-const _runtimeKeys = Object.keys(product.__adj);
-// At runtime, adj should have 5 entries
-type _RuntimeCheck = typeof product.__adj extends Record<string, RuntimeEntry>
-  ? true
-  : never;
-const _rtCheck: _RuntimeCheck = true;
+const _threeVal: 3 = three;
+// add(numLit(3), numLit(4)) still works — add accepts anything
+const oldStyle = add(numLit(3), numLit(4));
+type OldKind = CKindOf<typeof oldStyle>;
+const _oldKind: OldKind = "num/add";

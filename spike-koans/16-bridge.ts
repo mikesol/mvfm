@@ -27,7 +27,7 @@
 
 export * from "./15-dagql";
 
-import type { RuntimeEntry, CAdjOf } from "./15-dagql";
+import type { RuntimeEntry } from "./15-dagql";
 import {
   numLit,
   add,
@@ -39,11 +39,9 @@ import {
   strLit,
   boolLit,
   mvfm,
-  numEqInstance,
-  strEqInstance,
-  boolEqInstance,
-  type TraitInstance,
-  type PluginShape,
+  numPlugin as numPluginShape,
+  strPlugin as strPluginShape,
+  boolPlugin as boolPluginShape,
   selectWhere,
 } from "./15-dagql";
 
@@ -361,6 +359,8 @@ async function run() {
   assert(threwNoInterp, "defaults throws without interpreter or override");
 
   // --- Memoization: shared node evaluated once ---
+  // In the new system, app() doesn't content-address, so we construct
+  // a manually shared adj where both children of add point to the same node.
   let litEvals = 0;
   const countingInterp: Interpreter = {
     "num/literal": async function* (entry) { litEvals++; return entry.out as number; },
@@ -370,9 +370,12 @@ async function run() {
       return l + r;
     },
   };
-  const shared = app(add(numLit(3), numLit(3)));
+  const sharedAdj: Record<string, RuntimeEntry> = {
+    a: { kind: "num/literal", children: [], out: 3 },
+    b: { kind: "num/add", children: ["a", "a"], out: undefined },
+  };
   litEvals = 0;
-  const sharedResult = await fold<number>(shared.__id, shared.__adj, countingInterp);
+  const sharedResult = await fold<number>("b", sharedAdj, countingInterp);
   assert(sharedResult === 6, `shared 3+3 = ${sharedResult}`);
   assert(litEvals === 1, `shared literal evaluated ${litEvals} time(s) (expected 1)`);
 
@@ -535,42 +538,20 @@ async function run() {
   // Compose interpreters for all plugins
   const fullInterp = defaults([fpNum, fpStr, fpBool, fpEq]);
 
-  // --- Trait-aware plugin shapes for mvfm (reuse instances from 03-traits) ---
-  const fpNumPlugin = {
-    ctors: { numLit, add, mul },
-    instances: [numEqInstance] as const,
-  } satisfies PluginShape<any, readonly TraitInstance<any, any>[]>;
-
-  const fpStrPlugin = {
-    ctors: { strLit },
-    instances: [strEqInstance] as const,
-  } satisfies PluginShape<any, readonly TraitInstance<any, any>[]>;
-
-  const fpBoolPlugin = {
-    ctors: { boolLit },
-    instances: [boolEqInstance] as const,
-  } satisfies PluginShape<any, readonly TraitInstance<any, any>[]>;
-
   // --- mvfm: compose into $ ---
-  const $ = mvfm(fpNumPlugin, fpStrPlugin, fpBoolPlugin);
+  const $ = mvfm(numPluginShape, strPluginShape, boolPluginShape);
 
   // --- Build a program using trait dispatch ---
-  // add(eq(3, 4) ? 10 : 20, 5) — eq dispatches to num/eq
-  const eqExpr = $.eq($.numLit(3), $.numLit(4));
+  const eqExpr = $.eq(3, 4);
 
-  // Verify: at the type level, the eq node has kind "num/eq"
-  type PipelineEqAdj = CAdjOf<typeof eqExpr>;
-  const _pipeEqKind: PipelineEqAdj["E(L3,L4)"]["kind"] = "num/eq";
-
-  // Build a simple program: add(eq(3,4) as 0|1, 100)
-  // We can't directly add a boolean to a number, but we can test eq → app → fold
+  // Build eq(3,4) → app → fold
   const eqProg = app(eqExpr);
   const eqResult = await fold<boolean>(eqProg.__id, eqProg.__adj, fullInterp);
   assert(eqResult === false, "pipeline: eq(3,4) = false");
 
   // --- Pipeline with dagql transform ---
   // Build eq(3,3) → true, then transform num/eq → str/eq via dagql
-  const eqTrue = app($.eq($.numLit(3), $.numLit(3)));
+  const eqTrue = app($.eq(3, 3));
   assert(
     await fold<boolean>(eqTrue.__id, eqTrue.__adj, fullInterp) === true,
     "pipeline: eq(3,3) = true before transform",
@@ -589,19 +570,19 @@ async function run() {
   assert(addResult === 6, `pipeline: eq(3,3) rewritten to add(3,3) = ${addResult}`);
 
   // --- String eq through the full pipeline ---
-  const strEqProg = app($.eq($.strLit("hello"), $.strLit("hello")));
+  const strEqProg = app($.eq("hello", "hello"));
   assert(
     await fold<boolean>(strEqProg.__id, strEqProg.__adj, fullInterp) === true,
     "pipeline: str eq('hello','hello') = true",
   );
-  const strNeqProg = app($.eq($.strLit("a"), $.strLit("b")));
+  const strNeqProg = app($.eq("a", "b"));
   assert(
     await fold<boolean>(strNeqProg.__id, strNeqProg.__adj, fullInterp) === false,
     "pipeline: str eq('a','b') = false",
   );
 
   // --- Bool eq through the full pipeline ---
-  const boolEqProg = app($.eq(boolLit(true), boolLit(true)));
+  const boolEqProg = app($.eq(true, true));
   assert(
     await fold<boolean>(boolEqProg.__id, boolEqProg.__adj, fullInterp) === true,
     "pipeline: bool eq(true,true) = true",
@@ -610,19 +591,13 @@ async function run() {
   // --- Nested eq through the full pipeline ---
   // eq(eq(3,3), eq(5,5)) → eq(true, true) → true
   // This tests that eq's boolean output dispatches to bool/eq at runtime
-  const nestedEqProg = app($.eq(
-    $.eq($.numLit(3), $.numLit(3)),
-    $.eq($.numLit(5), $.numLit(5)),
-  ));
+  const nestedEqProg = app($.eq($.eq(3, 3), $.eq(5, 5)));
   assert(
     await fold<boolean>(nestedEqProg.__id, nestedEqProg.__adj, fullInterp) === true,
     "pipeline: eq(eq(3,3), eq(5,5)) = true",
   );
   // eq(eq(3,4), eq(5,5)) → eq(false, true) → false
-  const nestedEqProg2 = app($.eq(
-    $.eq($.numLit(3), $.numLit(4)),
-    $.eq($.numLit(5), $.numLit(5)),
-  ));
+  const nestedEqProg2 = app($.eq($.eq(3, 4), $.eq(5, 5)));
   assert(
     await fold<boolean>(nestedEqProg2.__id, nestedEqProg2.__adj, fullInterp) === false,
     "pipeline: eq(eq(3,4), eq(5,5)) = false",
@@ -630,7 +605,7 @@ async function run() {
 
   // --- Full pipeline: build + transform + fold ---
   // mul(add(3, 4), 5) = 35, then rewrite add→sub: mul(sub(3,4), 5) = -5
-  const fullProg = app($.mul($.add($.numLit(3), $.numLit(4)), $.numLit(5)));
+  const fullProg = app($.mul($.add(3, 4), 5));
   assert(
     await fold<number>(fullProg.__id, fullProg.__adj, fullInterp) === 35,
     "full pipeline: (3+4)*5 = 35",

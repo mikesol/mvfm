@@ -1,27 +1,15 @@
 /**
- * Koan 00: Expr — the core phantom-typed expression
+ * Koan 00: Expr — permissive CExpr + typed NExpr
  *
- * RULE: Never rewrite this file. Later koans import from here.
- *
- * What we prove:
- * - NodeEntry<Kind, ChildIDs, Out> is the unit of the adjacency map
- * - CExpr<O, Id, Adj> is the construction-time expression (content-addressed IDs)
- * - NExpr<O, RootId, Adj, Ctr> is the normalized expression (sequential IDs)
- * - Both are phantom-branded — runtime data + compile-time DAG structure
- * - RuntimeEntry is the untyped runtime mirror of NodeEntry
- * - IdOf, AdjOf extract from either expression type
- *
- * What we do NOT prove yet:
- * - ID generation (see 01-increment)
- * - Content-addressed construction (see 02-build)
- * - Normalization (see 03-normalize)
- * - DirtyExpr (see 09-dirty)
+ * CExpr is maximally permissive: records kind + raw args, no validation.
+ * NExpr is strict: validated adjacency map with sequential IDs.
+ * app() bridges the gap (see 04-normalize).
  *
  * Gate:
  *   npx tsc --noEmit --strict spike-koans/00-expr.ts
  */
 
-// ─── NodeEntry: one node in the adjacency map ────────────────────────
+// ─── NodeEntry: one node in the normalized adjacency map ────────────
 export type NodeEntry<
   Kind extends string,
   ChildIDs extends string[],
@@ -39,23 +27,55 @@ export interface RuntimeEntry {
   out: unknown;
 }
 
-// ─── Phantom brands ──────────────────────────────────────────────────
-declare const cexprBrand: unique symbol;
-declare const nexprBrand: unique symbol;
+// ─── CREF: unguessable brand for CExpr detection at runtime ─────────
+export const CREF = Symbol.for("mvfm/cref");
 
-// ─── CExpr: construction-time expression (content-addressed IDs) ─────
+// ─── CExpr: permissive construction-time expression ─────────────────
+// O = output type (declared by constructor, validated at app() time)
+// Kind = node kind string
+// Args = raw arguments — CExprs, literals, records, anything
+declare const cexprBrand: unique symbol;
+
 export interface CExpr<
   O,
-  Id extends string,
-  Adj,
+  Kind extends string = string,
+  Args extends readonly unknown[] = readonly unknown[],
 > {
-  readonly [cexprBrand]: { readonly o: O; readonly id: Id; readonly adj: Adj };
-  readonly __id: string;
-  readonly __adj: Record<string, RuntimeEntry>;
-  readonly __outType: string;
+  readonly [cexprBrand]: { readonly o: O; readonly kind: Kind; readonly args: Args };
+  readonly [CREF]: true;
+  readonly __kind: Kind;
+  readonly __args: readonly unknown[];
 }
 
-// ─── NExpr: normalized expression (sequential IDs) ───────────────────
+export function makeCExpr<
+  O,
+  Kind extends string,
+  Args extends readonly unknown[],
+>(kind: Kind, args: [...Args]): CExpr<O, Kind, Args> {
+  return {
+    [CREF]: true,
+    __kind: kind,
+    __args: args,
+  } as unknown as CExpr<O, Kind, Args>;
+}
+
+export function isCExpr(x: unknown): x is CExpr<unknown> {
+  return (
+    typeof x === "object" &&
+    x !== null &&
+    CREF in x &&
+    (x as any)[CREF] === true
+  );
+}
+
+// ─── CExpr extractors ──────────────────────────────────────────────
+export type COutOf<E> = E extends CExpr<infer O, any, any> ? O : never;
+export type CKindOf<E> = E extends CExpr<any, infer K, any> ? K : never;
+export type CArgsOf<E> = E extends CExpr<any, any, infer A> ? A : never;
+
+// ─── NExpr: normalized expression (unchanged from original) ─────────
+declare const nexprBrand: unique symbol;
+
 export interface NExpr<
   O,
   RootId extends string,
@@ -73,12 +93,7 @@ export interface NExpr<
   readonly __counter: string;
 }
 
-// ─── Extractors for CExpr ────────────────────────────────────────────
-export type CIdOf<E> = E extends CExpr<any, infer Id, any> ? Id : never;
-export type CAdjOf<E> = E extends CExpr<any, any, infer Adj> ? Adj : never;
-export type COutOf<E> = E extends CExpr<infer O, any, any> ? O : never;
-
-// ─── Extractors for NExpr ────────────────────────────────────────────
+// ─── NExpr extractors (unchanged) ──────────────────────────────────
 export type IdOf<E> =
   E extends NExpr<any, infer R, any, any> ? R : never;
 export type AdjOf<E> =
@@ -87,15 +102,6 @@ export type CtrOf<E> =
   E extends NExpr<any, any, any, infer C> ? C : never;
 export type OutOf<E> =
   E extends NExpr<infer O, any, any, any> ? O : never;
-
-// ─── Runtime constructors ────────────────────────────────────────────
-export function makeCExpr<
-  O,
-  Id extends string,
-  Adj,
->(id: Id, adj: Record<string, RuntimeEntry>, outType: string): CExpr<O, Id, Adj> {
-  return { __id: id, __adj: adj, __outType: outType } as unknown as CExpr<O, Id, Adj>;
-}
 
 export function makeNExpr<
   O,
@@ -115,7 +121,7 @@ export function makeNExpr<
 }
 
 // ═══════════════════════════════════════════════════════════════════════
-// INLINE TESTS — compile-time checks
+// COMPILE-TIME TESTS
 // ═══════════════════════════════════════════════════════════════════════
 
 // --- NodeEntry: kind, children, out are tracked ---
@@ -134,27 +140,30 @@ const _wrongKind: TestLeaf["kind"] = "num/add";
 // @ts-expect-error — wrong children type
 const _wrongChildren: TestLeaf["children"] = ["a"];
 
-// --- CExpr phantom branding ---
-type TestCAdj = { L3: NodeEntry<"num/literal", [], number> };
-type TestCExpr = CExpr<number, "L3", TestCAdj>;
-
-// CIdOf extracts the content-addressed ID
-type _CheckCId = CIdOf<TestCExpr>;
-const _cid: _CheckCId = "L3";
-// @ts-expect-error — wrong ID
-const _cidBad: _CheckCId = "L4";
-
-// CAdjOf extracts the adjacency map
-type _CheckCAdj = CAdjOf<TestCExpr>;
-const _cadj: _CheckCAdj["L3"]["kind"] = "num/literal";
-
-// COutOf extracts the output type
-type _CheckCOut = COutOf<TestCExpr>;
+// --- CExpr: permissive, carries output type ---
+const testCExpr = makeCExpr<number, "num/add", [3, 4]>("num/add", [3, 4]);
+type _CheckCOut = COutOf<typeof testCExpr>;
 const _cout: _CheckCOut = 42;
-// @ts-expect-error — wrong output type
-const _coutBad: _CheckCOut = "not a number";
+// @ts-expect-error — output is number, not string
+const _coutBad: _CheckCOut = "nope";
+type _CheckCKind = CKindOf<typeof testCExpr>;
+const _ckind: _CheckCKind = "num/add";
+// @ts-expect-error — wrong kind
+const _ckindBad: _CheckCKind = "num/mul";
+type _CheckCArgs = CArgsOf<typeof testCExpr>;
+const _cargs: _CheckCArgs = [3, 4];
 
-// --- NExpr phantom branding ---
+// --- CExpr accepts arbitrary args (validated later at app()) ---
+const permissive = makeCExpr<number, "num/add", [boolean, string]>(
+  "num/add", [true, "foo"],
+);
+// Compiles fine! Validation happens at app() time.
+
+// --- isCExpr detection ---
+const _isC: boolean = isCExpr(testCExpr);
+const _isNotC: boolean = isCExpr(42);
+
+// --- NExpr tests (same as original) ---
 type TestNAdj = {
   a: NodeEntry<"num/literal", [], number>;
   b: NodeEntry<"num/literal", [], number>;
@@ -162,59 +171,30 @@ type TestNAdj = {
 };
 type TestNExpr = NExpr<number, "c", TestNAdj, "d">;
 
-// IdOf extracts the root ID
 type _CheckNId = IdOf<TestNExpr>;
 const _nid: _CheckNId = "c";
 // @ts-expect-error — wrong root ID
 const _nidBad: _CheckNId = "a";
 
-// AdjOf extracts the adjacency map
 type _CheckNAdj = AdjOf<TestNExpr>;
 const _nadjKind: _CheckNAdj["a"]["kind"] = "num/literal";
 const _nadjKind2: _CheckNAdj["c"]["kind"] = "num/add";
 
-// CtrOf extracts the counter
 type _CheckCtr = CtrOf<TestNExpr>;
 const _nctr: _CheckCtr = "d";
 // @ts-expect-error — wrong counter
 const _nctrBad: _CheckCtr = "e";
 
-// OutOf extracts the output type
 type _CheckNOut = OutOf<TestNExpr>;
 const _nout: _CheckNOut = 35;
 // @ts-expect-error — wrong output type
 const _noutBad: _CheckNOut = "not a number";
 
-// --- CExpr and NExpr are structurally distinct (phantom brands) ---
-// CExpr cannot be assigned to NExpr and vice versa.
-// We verify this by checking that the extractors return never for the wrong type.
-type _CExprIdOfNever = IdOf<TestCExpr>; // should be never
-type _NExprCIdOfNever = CIdOf<TestNExpr>; // should be never
-
+// --- CExpr and NExpr are structurally distinct ---
 type AssertNever<T extends never> = T;
+type _CExprIdOfNever = IdOf<typeof testCExpr>;
 type _check1 = AssertNever<_CExprIdOfNever>;
-type _check2 = AssertNever<_NExprCIdOfNever>;
 
-// --- RuntimeEntry is assignable from a concrete NodeEntry's runtime shape ---
+// --- RuntimeEntry is assignable from a concrete NodeEntry ---
 const _re: RuntimeEntry = { kind: "num/literal", children: [], out: 3 };
 const _re2: RuntimeEntry = { kind: "num/add", children: ["a", "b"], out: 7 };
-
-// --- makeCExpr and makeNExpr produce correctly branded values ---
-const testCExpr = makeCExpr<number, "L3", TestCAdj>(
-  "L3",
-  { L3: { kind: "num/literal", children: [], out: 3 } },
-  "number",
-);
-const _checkMakeCId: CIdOf<typeof testCExpr> = "L3";
-
-const testNExpr = makeNExpr<number, "c", TestNAdj, "d">(
-  "c",
-  {
-    a: { kind: "num/literal", children: [], out: 3 },
-    b: { kind: "num/literal", children: [], out: 4 },
-    c: { kind: "num/add", children: ["a", "b"], out: 7 },
-  },
-  "d",
-);
-const _checkMakeNId: IdOf<typeof testNExpr> = "c";
-const _checkMakeNCtr: CtrOf<typeof testNExpr> = "d";

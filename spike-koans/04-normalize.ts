@@ -1,33 +1,19 @@
 /**
- * Koan 03: Normalize — app boundary, CExpr → NExpr
+ * Koan 04: Normalize — elaborating app()
  *
- * RULE: Never rewrite this file. Later koans import from here.
+ * app() takes a permissive CExpr and a registry, then:
+ * 1. Walks the CExpr tree
+ * 2. Lifts raw values into literal nodes
+ * 3. Validates types against the registry
+ * 4. Resolves traits (eq → num/eq, str/eq, etc.)
+ * 5. Produces a clean NExpr with sequential IDs
  *
- * What we prove:
- * - Normalize<Adj, RootId> performs type-level post-order DFS
- * - ProcessNode/ProcessChildren walk the content-addressed adj
- * - Each visited node gets a sequential ID ("a", "b", "c", ...)
- * - DAG sharing: already-visited nodes reuse their assigned ID (no duplication)
- * - AccMap tracks old→new ID mapping, AccEntries accumulates the new adj
- * - app(cexpr) calls Normalize and returns NExpr<O, RootId, Adj, Ctr>
- *
- * Example: mul(add(numLit(3), numLit(4)), numLit(5))
- *   Content-addressed: "M(A(L3,L4),L5)" with keys L3, L4, A(L3,L4), L5, M(...)
- *   Normalized:        "e" with keys a, b, c, d, e (post-order DFS)
- *     a: num/literal []
- *     b: num/literal []
- *     c: num/add ["a","b"]
- *     d: num/literal []
- *     e: num/mul ["c","d"]
- *
- * This is the boundary between construction (ephemeral CExpr) and
- * everything downstream (NExpr with clean sequential IDs).
- *
- * Imports: 02-build (re-exports chain)
+ * Type-level: Elaborate<Reg, Expr> mirrors the runtime walk.
+ * Errors become `never`, surfacing as type errors at the call site.
  *
  * Gate:
- *   npx tsc --noEmit --strict spike-koans/03-normalize.ts
- *   npx tsx spike-koans/03-normalize.ts
+ *   npx tsc --noEmit --strict spike-koans/04-normalize.ts
+ *   npx tsx spike-koans/04-normalize.ts
  */
 
 export * from "./03-traits";
@@ -35,180 +21,390 @@ export * from "./03-traits";
 import type {
   NodeEntry,
   CExpr,
-  CIdOf,
-  CAdjOf,
-  COutOf,
   NExpr,
   IdOf,
   AdjOf,
   CtrOf,
+  OutOf,
   RuntimeEntry,
+  Increment,
+  KindSpec,
+  TraitKindSpec,
+  StdRegistry,
+  LiftKind,
+  TypeKey,
 } from "./03-traits";
-import { makeNExpr, incrementId, numLit, add, mul } from "./03-traits";
+import { makeNExpr, incrementId, isCExpr, add, mul, sub, eq } from "./03-traits";
 
-// ─── Type-level normalizer ───────────────────────────────────────────
-// Result tuple: [Map, Entries, Counter, NewId]
-//   Map: Record<oldId, newId> — tracks visited nodes
-//   Entries: accumulated normalized adjacency map
-//   Counter: next available sequential ID
-//   NewId: the new ID assigned to the processed node
+// ═══════════════════════════════════════════════════════════════════════
+// TYPE-LEVEL ELABORATOR
+// ═══════════════════════════════════════════════════════════════════════
 
-export type ProcessNode<
+// All elaborate results: [Adj, NextCtr, ThisNodeId, OutputType]
+
+// ─── NeverGuard: prevents `never extends [infer ...]` from matching ──
+// `never` is the bottom type and extends everything, so
+// `never extends [infer A, infer B]` matches and infers unknown.
+// Wrapping in [X] extends [never] catches this before matching.
+type NeverGuard<T, Then> = [T] extends [never] ? never : Then;
+
+// ─── ElaborateArg: elaborate one argument against an expected type ───
+// If arg is a CExpr: recursively elaborate, check output matches expected.
+// If arg is a raw value: lift to a literal node if it matches expected.
+type ElaborateArg<
+  Reg,
+  Arg,
+  Expected,
   Adj,
-  NodeId extends string,
-  Map,
-  Entries,
   Ctr extends string,
-> = NodeId extends keyof Map
-  ? [Map, Entries, Ctr, Map[NodeId & keyof Map]]
-  : NodeId extends keyof Adj
-    ? Adj[NodeId] extends NodeEntry<
-        infer K extends string,
-        infer C extends string[],
-        infer O
+> =
+  // Case 1: CExpr — recurse
+  Arg extends CExpr<any, infer K extends string, infer A extends readonly unknown[]>
+    ? NeverGuard<
+        ElaborateExpr<Reg, K, A, Adj, Ctr>,
+        ElaborateExpr<Reg, K, A, Adj, Ctr> extends [
+          infer A2, infer C2 extends string, infer Id extends string, infer O,
+        ]
+          ? O extends Expected
+            ? [A2, C2, Id, O]
+            : never // output type mismatch
+          : never
       >
-      ? ProcessChildren<Adj, C, Map, Entries, Ctr> extends [
-          infer M2,
-          infer E2,
-          infer C2 extends string,
-          infer NC extends string[],
-        ]
+    // Case 2: raw value — lift
+    : Arg extends Expected
+      ? LiftKind<Expected> extends infer LK extends string
         ? [
-            M2 & Record<NodeId, C2>,
-            E2 & Record<C2, NodeEntry<K, NC, O>>,
-            Increment<C2>,
-            C2,
+            Adj & Record<Ctr, NodeEntry<LK, [], Expected>>,
+            Increment<Ctr>,
+            Ctr,
+            Expected,
           ]
-        : never
-      : never
-    : never;
+        : never // no lifter for this type
+      : never; // can't lift — type mismatch
 
-export type ProcessChildren<
+// ─── ElaborateExpr: elaborate a CExpr node ──────────────────────────
+type ElaborateExpr<
+  Reg,
+  Kind extends string,
+  Args extends readonly unknown[],
   Adj,
-  Children extends string[],
-  Map,
-  Entries,
   Ctr extends string,
-> = Children extends []
-  ? [Map, Entries, Ctr, []]
-  : Children extends [
-        infer Head extends string,
-        ...infer Tail extends string[],
-      ]
-    ? ProcessNode<Adj, Head, Map, Entries, Ctr> extends [
-        infer M2,
-        infer E2,
-        infer C2 extends string,
-        infer NewId extends string,
-      ]
-      ? ProcessChildren<Adj, Tail, M2, E2, C2> extends [
-          infer M3,
-          infer E3,
-          infer C3 extends string,
-          infer NC extends string[],
-        ]
-        ? [M3, E3, C3, [NewId, ...NC]]
+> =
+  Kind extends keyof Reg
+    ? Reg[Kind] extends KindSpec<infer Inputs extends readonly unknown[], infer O>
+      ? NeverGuard<
+          ElaborateChildren<Reg, Args, Inputs, Adj, Ctr>,
+          ElaborateChildren<Reg, Args, Inputs, Adj, Ctr> extends [
+            infer A2, infer C2 extends string, infer Ids extends string[],
+          ]
+            ? [
+                A2 & Record<C2, NodeEntry<Kind, Ids, O>>,
+                Increment<C2>,
+                C2,
+                O,
+              ]
+            : never
+        >
+      : Reg[Kind] extends TraitKindSpec<infer O, infer Mapping>
+        ? ElaborateTraitExpr<Reg, O, Mapping, Args, Adj, Ctr>
         : never
-      : never
     : never;
 
-import type { Increment } from "./03-traits";
-
-export type Normalize<
+// ─── ElaborateChildren: elaborate each arg against expected types ────
+type ElaborateChildren<
+  Reg,
+  Args extends readonly unknown[],
+  Expected extends readonly unknown[],
   Adj,
-  RootId extends string,
-> = ProcessNode<Adj, RootId, {}, {}, "a">;
+  Ctr extends string,
+> =
+  Args extends readonly []
+    ? Expected extends readonly []
+      ? [Adj, Ctr, []]
+      : never // arity mismatch
+    : Args extends readonly [infer AH, ...infer AT extends readonly unknown[]]
+      ? Expected extends readonly [infer EH, ...infer ET extends readonly unknown[]]
+        ? NeverGuard<
+            ElaborateArg<Reg, AH, EH, Adj, Ctr>,
+            ElaborateArg<Reg, AH, EH, Adj, Ctr> extends [
+              infer A2, infer C2 extends string, infer Id extends string, any,
+            ]
+              ? NeverGuard<
+                  ElaborateChildren<Reg, AT, ET, A2, C2>,
+                  ElaborateChildren<Reg, AT, ET, A2, C2> extends [
+                    infer A3, infer C3 extends string, infer Ids extends string[],
+                  ]
+                    ? [A3, C3, [Id, ...Ids]]
+                    : never
+                >
+              : never
+          >
+        : never
+      : never;
 
-// ─── AppResult: single extraction from Normalize ─────────────────────
-type AppResult<
+// ─── ElaborateTraitExpr: elaborate a trait (e.g. "eq") ──────────────
+// 1. Infer the type of the first arg (unconstrained)
+// 2. Elaborate second arg with that same type as constraint
+// 3. Resolve the trait via mapping
+type ElaborateTraitExpr<
+  Reg,
   O,
+  Mapping,
+  Args extends readonly unknown[],
   Adj,
-  RootId extends string,
-> = Normalize<Adj, RootId> extends [
-  any,
-  infer E,
-  infer C extends string,
-  infer R extends string,
-]
-  ? NExpr<O, R, E, C>
-  : never;
+  Ctr extends string,
+> =
+  Args extends readonly [infer A, infer B]
+    ? NeverGuard<
+        ElaborateArgInfer<Reg, A, Adj, Ctr>,
+        ElaborateArgInfer<Reg, A, Adj, Ctr> extends [
+          infer A2, infer C2 extends string, infer Id1 extends string, infer T1,
+        ]
+          ? NeverGuard<
+              ElaborateArg<Reg, B, T1, A2, C2>,
+              ElaborateArg<Reg, B, T1, A2, C2> extends [
+                infer A3, infer C3 extends string, infer Id2 extends string, any,
+              ]
+                ? TypeKey<T1> extends infer TK extends string
+                  ? TK extends keyof Mapping
+                    ? Mapping[TK] extends infer RK extends string
+                      ? [
+                          A3 & Record<C3, NodeEntry<RK, [Id1, Id2], O>>,
+                          Increment<C3>,
+                          C3,
+                          O,
+                        ]
+                      : never
+                    : never
+                  : never
+                : never
+            >
+          : never
+      >
+    : never;
 
-// ─── app: CExpr → NExpr ─────────────────────────────────────────────
+// ─── ElaborateArgInfer: elaborate an arg, inferring its type ────────
+// Used for trait first-arg where we don't know the expected type yet.
+type ElaborateArgInfer<
+  Reg,
+  Arg,
+  Adj,
+  Ctr extends string,
+> =
+  Arg extends CExpr<any, infer K extends string, infer A extends readonly unknown[]>
+    ? ElaborateExpr<Reg, K, A, Adj, Ctr>
+    : Arg extends number
+      ? [
+          Adj & Record<Ctr, NodeEntry<"num/literal", [], number>>,
+          Increment<Ctr>,
+          Ctr,
+          number,
+        ]
+      : Arg extends string
+        ? [
+            Adj & Record<Ctr, NodeEntry<"str/literal", [], string>>,
+            Increment<Ctr>,
+            Ctr,
+            string,
+          ]
+        : Arg extends boolean
+          ? [
+              Adj & Record<Ctr, NodeEntry<"bool/literal", [], boolean>>,
+              Increment<Ctr>,
+              Ctr,
+              boolean,
+            ]
+          : never;
+
+// ─── AppResult: top-level elaboration ───────────────────────────────
+export type AppResult<Reg, Expr> =
+  Expr extends CExpr<any, infer K extends string, infer A extends readonly unknown[]>
+    ? NeverGuard<
+        ElaborateExpr<Reg, K, A, {}, "a">,
+        ElaborateExpr<Reg, K, A, {}, "a"> extends [
+          infer Adj, infer C extends string, infer R extends string, infer O,
+        ]
+          ? NExpr<O, R, Adj, C>
+          : never
+      >
+    : never;
+
+// ═══════════════════════════════════════════════════════════════════════
+// RUNTIME app()
+// ═══════════════════════════════════════════════════════════════════════
+
+// Runtime registry for lifting and validation
+const LIFT_MAP: Record<string, string> = {
+  number: "num/literal",
+  string: "str/literal",
+  boolean: "bool/literal",
+};
+
+const TRAIT_MAP: Record<string, Record<string, string>> = {
+  eq: { number: "num/eq", string: "str/eq", boolean: "bool/eq" },
+};
+
+const KIND_INPUTS: Record<string, string[]> = {
+  "num/add": ["number", "number"],
+  "num/mul": ["number", "number"],
+  "num/sub": ["number", "number"],
+  "num/eq": ["number", "number"],
+  "str/eq": ["string", "string"],
+  "bool/eq": ["boolean", "boolean"],
+};
+
 export function app<
-  O,
-  Id extends string,
-  Adj,
->(cexpr: CExpr<O, Id, Adj>): AppResult<O, Adj, Id> {
-  const oldAdj = cexpr.__adj;
-  const rootId = cexpr.__id;
-  const map: Record<string, string> = {};
+  Expr extends CExpr<any, string, readonly unknown[]>,
+  Reg = StdRegistry,
+>(
+  expr: Expr,
+): AppResult<Reg, Expr> {
   const entries: Record<string, RuntimeEntry> = {};
   let counter = "a";
 
-  function visit(nodeId: string): string {
-    if (map[nodeId] !== undefined) return map[nodeId];
-    const entry = oldAdj[nodeId];
-    const newChildren = entry.children.map(visit);
-    const newId = counter;
+  function visit(arg: unknown, expected?: string): [string, string] {
+    // Returns [nodeId, outputTypeTag]
+    if (isCExpr(arg)) {
+      const cexpr = arg as CExpr<unknown>;
+      let kind = cexpr.__kind;
+      const args = cexpr.__args;
+
+      // Trait resolution: elaborate children first, then resolve kind
+      if (kind in TRAIT_MAP) {
+        const childResults = args.map((a) => visit(a));
+        const childType = childResults[0][1]; // type of first arg
+        const resolved = TRAIT_MAP[kind][childType];
+        if (!resolved) {
+          throw new Error(`No trait "${kind}" instance for type "${childType}"`);
+        }
+        kind = resolved;
+        const childIds = childResults.map(([id]) => id);
+        const nodeId = counter;
+        counter = incrementId(counter);
+        const expectedInputs = KIND_INPUTS[kind];
+        // Validate second arg matches first arg's type
+        if (expectedInputs && childResults[1][1] !== childResults[0][1]) {
+          throw new Error(
+            `Trait "${cexpr.__kind}": args have different types (${childResults[0][1]} vs ${childResults[1][1]})`,
+          );
+        }
+        entries[nodeId] = { kind, children: childIds, out: undefined };
+        return [nodeId, "boolean"];
+      }
+
+      // Regular node: elaborate children against expected inputs
+      const expectedInputs = KIND_INPUTS[kind];
+      const childIds: string[] = [];
+      for (let i = 0; i < args.length; i++) {
+        const exp = expectedInputs ? expectedInputs[i] : undefined;
+        const [childId, childType] = visit(args[i], exp);
+        if (exp && childType !== exp) {
+          throw new Error(
+            `${kind}: expected ${exp} for arg ${i}, got ${childType}`,
+          );
+        }
+        childIds.push(childId);
+      }
+      const nodeId = counter;
+      counter = incrementId(counter);
+      // Determine output type from kind
+      const outputType = kind.startsWith("num/") && !kind.includes("/eq")
+        ? "number"
+        : kind.includes("/eq")
+          ? "boolean"
+          : kind.startsWith("str/")
+            ? "string"
+            : "unknown";
+      entries[nodeId] = { kind, children: childIds, out: undefined };
+      return [nodeId, outputType];
+    }
+
+    // Raw value: lift to literal
+    const typeTag = typeof arg;
+    const liftKind = LIFT_MAP[typeTag];
+    if (!liftKind) {
+      throw new Error(`Cannot lift value of type "${typeTag}"`);
+    }
+    if (expected && typeTag !== expected) {
+      throw new Error(
+        `Expected ${expected}, got ${typeTag} (value: ${String(arg)})`,
+      );
+    }
+    const nodeId = counter;
     counter = incrementId(counter);
-    map[nodeId] = newId;
-    entries[newId] = {
-      kind: entry.kind,
-      children: newChildren,
-      out: entry.out,
-    };
-    return newId;
+    entries[nodeId] = { kind: liftKind, children: [], out: arg };
+    return [nodeId, typeTag];
   }
 
-  const newRoot = visit(rootId);
-  return makeNExpr(newRoot, entries, counter) as any;
+  const [rootId] = visit(expr);
+  return makeNExpr(rootId, entries, counter) as any;
 }
 
 // ═══════════════════════════════════════════════════════════════════════
 // COMPILE-TIME TESTS
 // ═══════════════════════════════════════════════════════════════════════
 
-// Build: (3 + 4) * 5
-const cexpr = mul(add(numLit(3), numLit(4)), numLit(5));
-const prog = app(cexpr);
+// --- add(3, 4) → same as old app(add(numLit(3), numLit(4))) ---
+const prog1 = app(add(3, 4));
+type P1Id = IdOf<typeof prog1>;
+const _p1Id: P1Id = "c";
+type P1Adj = AdjOf<typeof prog1>;
+const _p1a: P1Adj["a"]["kind"] = "num/literal";
+const _p1b: P1Adj["b"]["kind"] = "num/literal";
+const _p1c: P1Adj["c"]["kind"] = "num/add";
+const _p1cCh: P1Adj["c"]["children"] = ["a", "b"];
 
-// --- Root ID is "e" ---
-type ProgId = IdOf<typeof prog>;
-const _progId: ProgId = "e";
-// @ts-expect-error — root is "e", not "a"
-const _progIdBad: ProgId = "a";
+// --- mul(add(3,4), 5) → 5 nodes, root "e" ---
+const prog2 = app(mul(add(3, 4), 5));
+type P2Id = IdOf<typeof prog2>;
+const _p2Id: P2Id = "e";
+type P2Adj = AdjOf<typeof prog2>;
+const _p2a: P2Adj["a"]["kind"] = "num/literal";
+const _p2b: P2Adj["b"]["kind"] = "num/literal";
+const _p2c: P2Adj["c"]["kind"] = "num/add";
+const _p2d: P2Adj["d"]["kind"] = "num/literal";
+const _p2e: P2Adj["e"]["kind"] = "num/mul";
+const _p2eCh: P2Adj["e"]["children"] = ["c", "d"];
 
-// --- Counter is "f" (next after "e") ---
-type ProgCtr = CtrOf<typeof prog>;
-const _progCtr: ProgCtr = "f";
-// @ts-expect-error — counter is "f", not "e"
-const _progCtrBad: ProgCtr = "e";
+// Counter
+type P2Ctr = CtrOf<typeof prog2>;
+const _p2Ctr: P2Ctr = "f";
 
-// --- Adj has correct kinds ---
-type ProgAdj = AdjOf<typeof prog>;
-const _aKind: ProgAdj["a"]["kind"] = "num/literal";
-const _bKind: ProgAdj["b"]["kind"] = "num/literal";
-const _cKind: ProgAdj["c"]["kind"] = "num/add";
-const _dKind: ProgAdj["d"]["kind"] = "num/literal";
-const _eKind: ProgAdj["e"]["kind"] = "num/mul";
+// Output type
+type P2Out = OutOf<typeof prog2>;
+const _p2Out: P2Out = 42;
+// @ts-expect-error — number, not string
+const _p2OutBad: P2Out = "nope";
 
-// --- Children are remapped ---
-const _cChildren: ProgAdj["c"]["children"] = ["a", "b"];
-const _eChildren: ProgAdj["e"]["children"] = ["c", "d"];
-const _aChildren: ProgAdj["a"]["children"] = [];
+// --- eq(3, 4) → resolves to num/eq ---
+const prog3 = app(eq(3, 4));
+type P3Adj = AdjOf<typeof prog3>;
+const _p3a: P3Adj["a"]["kind"] = "num/literal";
+const _p3b: P3Adj["b"]["kind"] = "num/literal";
+const _p3c: P3Adj["c"]["kind"] = "num/eq";
+type P3Out = OutOf<typeof prog3>;
+const _p3Out: P3Out = true;
 
-// @ts-expect-error — "c" children are ["a","b"], not ["L3","L4"]
-const _cChildrenBad: ProgAdj["c"]["children"] = ["L3", "L4"];
+// --- eq("hello", "world") → resolves to str/eq ---
+const prog4 = app(eq("hello", "world"));
+type P4Adj = AdjOf<typeof prog4>;
+const _p4a: P4Adj["a"]["kind"] = "str/literal";
+const _p4c: P4Adj["c"]["kind"] = "str/eq";
 
-// --- DAG sharing: same subtree used twice gets one ID ---
-const shared = app(add(numLit(3), numLit(3)));
-type SharedAdj = AdjOf<typeof shared>;
-// Only one literal node ("a"), add references it twice
-type SharedId = IdOf<typeof shared>;
-const _sharedId: SharedId = "b";
-const _sharedAKind: SharedAdj["a"]["kind"] = "num/literal";
-const _sharedBKind: SharedAdj["b"]["kind"] = "num/add";
-const _sharedBChildren: SharedAdj["b"]["children"] = ["a", "a"];
+// --- Nested eq: eq(eq(3,3), eq(5,5)) → bool/eq ---
+const prog5 = app(eq(eq(3, 3), eq(5, 5)));
+type P5Adj = AdjOf<typeof prog5>;
+// Inner eqs are num/eq
+const _p5c: P5Adj["c"]["kind"] = "num/eq";
+const _p5f: P5Adj["f"]["kind"] = "num/eq";
+// Outer eq resolves to bool/eq (children output boolean)
+const _p5g: P5Adj["g"]["kind"] = "bool/eq";
+
+// --- NEGATIVE: invalid programs produce never at the type level ---
+type AssertNever<T extends never> = T;
+type _Bad1 = AssertNever<AppResult<StdRegistry, ReturnType<typeof add<false, "foo">>>>;
+type _Bad2 = AssertNever<AppResult<StdRegistry, ReturnType<typeof mul<ReturnType<typeof add<3, 4>>, "hello">>>>;
+type _Bad3 = AssertNever<AppResult<StdRegistry, ReturnType<typeof eq<ReturnType<typeof add<3, 4>>, ReturnType<typeof eq<"a", "b">>>>>>;
 
 // ═══════════════════════════════════════════════════════════════════════
 // RUNTIME TESTS
@@ -226,36 +422,51 @@ function assert(cond: boolean, msg: string) {
   }
 }
 
-// (3 + 4) * 5
-assert(prog.__id === "e", "root ID is e");
-assert(prog.__counter === "f", "counter is f");
-
-const adj = prog.__adj;
-assert(Object.keys(adj).length === 5, "5 entries in adj");
-assert(adj["a"].kind === "num/literal", "a is num/literal");
-assert(adj["b"].kind === "num/literal", "b is num/literal");
-assert(adj["c"].kind === "num/add", "c is num/add");
-assert(adj["d"].kind === "num/literal", "d is num/literal");
-assert(adj["e"].kind === "num/mul", "e is num/mul");
-
-assert(JSON.stringify(adj["a"].children) === "[]", "a has no children");
-assert(JSON.stringify(adj["c"].children) === '["a","b"]', "c children");
-assert(JSON.stringify(adj["e"].children) === '["c","d"]', "e children");
-
-// DAG sharing
-const sh = app(add(numLit(3), numLit(3)));
-assert(sh.__id === "b", "shared root is b");
-assert(Object.keys(sh.__adj).length === 2, "shared has 2 entries");
+// add(3, 4)
+assert(prog1.__id === "c", "add(3,4) root is c");
+assert(prog1.__adj["a"].kind === "num/literal", "a is literal");
+assert(prog1.__adj["a"].out === 3, "a.out is 3");
+assert(prog1.__adj["b"].kind === "num/literal", "b is literal");
+assert(prog1.__adj["b"].out === 4, "b.out is 4");
+assert(prog1.__adj["c"].kind === "num/add", "c is add");
 assert(
-  JSON.stringify(sh.__adj["b"].children) === '["a","a"]',
-  "shared add refs a twice",
+  JSON.stringify(prog1.__adj["c"].children) === '["a","b"]',
+  "c children are [a,b]",
 );
 
-// Single leaf
-const leaf = app(numLit(42));
-assert(leaf.__id === "a", "leaf root is a");
-assert(leaf.__counter === "b", "leaf counter is b");
-assert(Object.keys(leaf.__adj).length === 1, "leaf has 1 entry");
+// mul(add(3,4), 5)
+assert(prog2.__id === "e", "mul root is e");
+assert(Object.keys(prog2.__adj).length === 5, "5 entries");
+assert(prog2.__adj["d"].out === 5, "d.out is 5");
+assert(prog2.__counter === "f", "counter is f");
 
-console.log(`\n03-normalize: ${passed} passed, ${failed} failed`);
+// eq(3, 4) → num/eq
+assert(prog3.__adj["c"].kind === "num/eq", "eq(3,4) → num/eq");
+
+// eq("hello", "world") → str/eq
+assert(prog4.__adj["c"].kind === "str/eq", "eq(str,str) → str/eq");
+
+// Nested eq → bool/eq outer
+assert(prog5.__adj["g"].kind === "bool/eq", "nested eq outer is bool/eq");
+assert(prog5.__adj["c"].kind === "num/eq", "nested eq inner is num/eq");
+
+// Runtime error: add(false, "foo")
+let threwType = false;
+try {
+  app(add(false, "foo") as any);
+} catch (e: any) {
+  threwType = true;
+}
+assert(threwType, "add(false, 'foo') throws at runtime");
+
+// Runtime error: eq with mixed types
+let threwMixed = false;
+try {
+  app(eq(3, "foo") as any);
+} catch (e: any) {
+  threwMixed = e.message.includes("different types");
+}
+assert(threwMixed, "eq(3, 'foo') throws for mixed types");
+
+console.log(`\n04-normalize: ${passed} passed, ${failed} failed`);
 if (failed > 0) process.exit(1);
