@@ -1,5 +1,4 @@
-import type { Interpreter } from "@mvfm/core";
-import { definePlugin } from "@mvfm/core";
+import type { Interpreter, KindSpec } from "@mvfm/core";
 import { wrapSlackWebClient } from "./client-slack-web-api";
 import { buildSlackMethods } from "./generated/build-methods";
 import type { SlackClient } from "./generated/interpreter";
@@ -76,6 +75,23 @@ export const slackInterpreter: Interpreter = lazyInterpreter(() =>
   ),
 );
 
+// ---- Node kinds with record/array ----------------------------------------
+
+const ALL_NODE_KINDS = [...SLACK_NODE_KINDS, "slack/record", "slack/array"] as const;
+
+function buildKinds(): Record<string, KindSpec<unknown[], unknown>> {
+  const kinds: Record<string, KindSpec<unknown[], unknown>> = {};
+  for (const kind of ALL_NODE_KINDS) {
+    kinds[kind] = {
+      inputs: [] as unknown[],
+      output: undefined as unknown,
+    } as KindSpec<unknown[], unknown>;
+  }
+  return kinds;
+}
+
+// ---- Plugin factory -------------------------------------------------------
+
 /**
  * Slack plugin factory. Namespace: `slack/`.
  *
@@ -83,15 +99,16 @@ export const slackInterpreter: Interpreter = lazyInterpreter(() =>
  * resource methods for building parameterized Slack API call AST nodes.
  *
  * @param config - A {@link SlackConfig} with a token.
- * @returns A PluginDefinition for the slack plugin.
+ * @returns A unified Plugin for the slack plugin.
  */
-export function slack(config: SlackConfig) {
-  return definePlugin({
-    name: "slack",
-    nodeKinds: [...SLACK_NODE_KINDS],
-    defaultInterpreter: () => slackInterpreter,
-    build(ctx) {
-      return buildSlackMethods(ctx, config);
-    },
-  });
+export function slack(_config: SlackConfig) {
+  return {
+    name: "slack" as const,
+    ctors: buildSlackMethods(),
+    kinds: buildKinds(),
+    traits: {},
+    lifts: {},
+    nodeKinds: [...ALL_NODE_KINDS],
+    defaultInterpreter: (): Interpreter => slackInterpreter,
+  };
 }
