@@ -25,12 +25,24 @@ export type Handler = (entry: RuntimeEntry) => AsyncGenerator<number | string, u
 export type Interpreter = Record<string, Handler>;
 
 /** Unified koan plugin definition. */
-export interface Plugin {
-  readonly name: string;
-  readonly ctors: Record<string, unknown>;
-  readonly kinds: Record<string, KindSpec<readonly unknown[], unknown>>;
-  readonly traits: Record<string, TraitDef<unknown, Record<string, string>>>;
-  readonly lifts: Record<string, string>;
+export interface Plugin<
+  Name extends string = string,
+  Ctors extends Record<string, unknown> = Record<string, unknown>,
+  Kinds extends Record<string, KindSpec<readonly unknown[], unknown>> = Record<
+    string,
+    KindSpec<readonly unknown[], unknown>
+  >,
+  Traits extends Record<string, TraitDef<unknown, Record<string, string>>> = Record<
+    string,
+    TraitDef<unknown, Record<string, string>>
+  >,
+  Lifts extends Record<string, string> = Record<string, string>,
+> {
+  readonly name: Name;
+  readonly ctors: Ctors;
+  readonly kinds: Kinds;
+  readonly traits: Traits;
+  readonly lifts: Lifts;
   readonly nodeKinds: readonly string[];
   readonly defaultInterpreter?: () => Interpreter;
 }
@@ -69,8 +81,36 @@ export function buildKindInputs(plugins: readonly Plugin[]): Record<string, stri
   return m;
 }
 
-/** Compose unified plugins into a constructor surface with trait ctors. */
-export function mvfmU<const P extends readonly Plugin[]>(...plugins: P): Record<string, unknown> {
+type MergeCtors<P extends readonly Plugin[]> = P extends readonly []
+  ? {}
+  : P extends readonly [infer H extends Plugin, ...infer T extends readonly Plugin[]]
+    ? H["ctors"] & MergeCtors<T>
+    : {};
+
+type AllTraitNames<P extends readonly Plugin[]> = P extends readonly []
+  ? never
+  : P extends readonly [infer H extends Plugin, ...infer T extends readonly Plugin[]]
+    ? keyof H["traits"] | AllTraitNames<T>
+    : never;
+
+type TraitOutput<P extends readonly Plugin[], K extends string> = P extends readonly [
+  infer H extends Plugin,
+  ...infer T extends readonly Plugin[],
+]
+  ? K extends keyof H["traits"]
+    ? H["traits"][K]["output"]
+    : TraitOutput<T, K>
+  : never;
+
+type TraitCtors<P extends readonly Plugin[]> = {
+  [K in AllTraitNames<P> & string]: <A, B>(a: A, b: B) => CExpr<TraitOutput<P, K>, K, [A, B]>;
+};
+
+/** Unified koan constructor surface. */
+export type DollarSign<P extends readonly Plugin[]> = MergeCtors<P> & TraitCtors<P>;
+
+/** Compose unified plugins into a constructor surface with auto-generated trait ctors. */
+export function mvfmU<const P extends readonly Plugin[]>(...plugins: P): DollarSign<P> {
   const allCtors: Record<string, unknown> = {};
   const traitNames = new Set<string>();
   for (const p of plugins) {
@@ -84,7 +124,7 @@ export function mvfmU<const P extends readonly Plugin[]>(...plugins: P): Record<
       allCtors[t] = <A, B>(a: A, b: B): CExpr<boolean, string, [A, B]> => makeCExpr(t, [a, b]);
     }
   }
-  return allCtors;
+  return allCtors as DollarSign<P>;
 }
 
 /** Trait-level less-than constructor. */
@@ -93,7 +133,7 @@ export function lt<A, B>(a: A, b: B): CExpr<boolean, "lt", [A, B]> {
 }
 
 /** Unified number plugin. */
-export const numPluginU: Plugin = {
+export const numPluginU = {
   name: "num",
   ctors: { add, mul, sub, numLit },
   kinds: {
@@ -108,10 +148,10 @@ export const numPluginU: Plugin = {
   },
   lifts: { number: "num/literal" },
   nodeKinds: ["num/literal", "num/add", "num/mul", "num/sub", "num/eq"],
-};
+} as const satisfies Plugin;
 
 /** Unified string plugin. */
-export const strPluginU: Plugin = {
+export const strPluginU = {
   name: "str",
   ctors: { strLit },
   kinds: {
@@ -123,10 +163,10 @@ export const strPluginU: Plugin = {
   },
   lifts: { string: "str/literal" },
   nodeKinds: ["str/literal", "str/eq"],
-};
+} as const satisfies Plugin;
 
 /** Unified boolean plugin. */
-export const boolPluginU: Plugin = {
+export const boolPluginU = {
   name: "bool",
   ctors: { boolLit },
   kinds: {
@@ -138,13 +178,13 @@ export const boolPluginU: Plugin = {
   },
   lifts: { boolean: "bool/literal" },
   nodeKinds: ["bool/literal", "bool/eq"],
-};
+} as const satisfies Plugin;
 
 /** Canonical std plugin tuple for koan 03a. */
 export const stdPlugins = [numPluginU, strPluginU, boolPluginU] as const;
 
 /** Unified ord plugin proving extensibility. */
-export const ordPlugin: Plugin = {
+export const ordPlugin = {
   name: "ord",
   ctors: { lt },
   kinds: {
@@ -156,6 +196,6 @@ export const ordPlugin: Plugin = {
   },
   lifts: {},
   nodeKinds: ["num/lt", "str/lt"],
-};
+} as const satisfies Plugin;
 
 export { add, eq, mul, sub, numLit, strLit, boolLit, makeCExpr };
