@@ -5,325 +5,511 @@
 ```ts
 
 // @public
-export function array(of: SchemaType): ArraySchema;
+export type AccessorOverlay<O> = O extends readonly (infer E)[] ? {
+    readonly [k: number]: CExpr<E, "core/access">;
+} : O extends object ? {
+    readonly [K in keyof O]: CExpr<O[K], "core/access">;
+} : {};
 
 // @public
-export interface ArraySchema {
+export function add<A, B>(a: A, b: B): CExpr<number, "num/add", [A, B]>;
+
+// @public
+export function addEntry<O, R extends string, Adj, C extends string, Id extends string, E extends NodeEntry<string, string[], any>>(d: DirtyExpr<O, R, Adj, C>, id: Id, entry: E): DirtyExpr<O, R, Adj & Record<Id, E>, C>;
+
+// @public
+export type AdjOf<E> = E extends NExpr<any, any, infer A, any> ? A : never;
+
+// @public
+export function and<A extends PredBase, B extends PredBase>(left: A, right: B): AndPred<A, B>;
+
+// @public
+export interface AndPred<A extends PredBase, B extends PredBase> extends PredBase {
     // (undocumented)
-    readonly __tag: "array";
+    readonly left: A;
     // (undocumented)
-    readonly of: SchemaType;
+    readonly right: B;
+    // (undocumented)
+    readonly _tag: "and";
 }
 
 // @public
-export const boolean: PluginDefinition<BooleanMethods, {}, "boolean/and" | "boolean/or" | "boolean/not" | "boolean/eq" | "boolean/ff" | "boolean/tt" | "boolean/implies" | "boolean/show" | "boolean/top" | "boolean/bottom">;
-
-// Warning: (ae-forgotten-export) The symbol "BooleanKinds" needs to be exported by the entry point index.d.ts
-//
-// @public
-export const booleanInterpreter: Interpreter<BooleanKinds>;
+export function app<Expr extends CExpr<any, string, readonly unknown[]>, Reg = StdRegistry>(expr: Expr): AppResult<Reg, Expr>;
 
 // @public
-export type BooleanMethods = {};
+export type AppResult<Reg, Expr> = Expr extends CExpr<any, infer K extends string, infer A extends readonly unknown[]> ? NeverGuard<ElaborateExpr<Reg, K, A, {}, "a">, ElaborateExpr<Reg, K, A, {}, "a"> extends [
+infer Adj,
+infer C extends string,
+infer R extends string,
+infer O
+] ? NExpr<O, R, Adj, C> : never> : never;
 
 // @public
-export const bounded: PluginDefinition<any, {}, never>;
+export function boolLit<V extends boolean>(v: V): V;
 
 // @public
-export interface BoundedFor<_T> {
-}
-
-// @public
-export function checkCompleteness(interpreter: Interpreter, program: Program): void;
-
-// @public (undocumented)
-export function checkCompleteness(interpreter: Interpreter, root: TypedNode): void;
-
-// @public
-export const control: PluginDefinition<ControlMethods, {}, "control/each" | "control/while">;
-
-// @public
-export const controlInterpreter: Interpreter<"control/each" | "control/while">;
-
-// @public
-export interface ControlMethods {
-    each<T>(collection: Expr<T[]> | T[], body: (item: Expr<T>) => void): void;
-    while(condition: Expr<boolean>): {
-        body: (fn: () => void) => void;
+export const boolPlugin: {
+    readonly ctors: {
+        readonly boolLit: typeof boolLit;
     };
+    readonly kinds: {
+        readonly "bool/literal": KindSpec<[], boolean>;
+        readonly "bool/eq": KindSpec<[boolean, boolean], boolean>;
+    };
+    readonly traits: {
+        readonly eq: {
+            readonly boolean: "bool/eq";
+        };
+    };
+};
+
+// @public
+export const boolPluginU: {
+    readonly name: "bool";
+    readonly ctors: {
+        readonly boolLit: typeof boolLit;
+    };
+    readonly kinds: {
+        readonly "bool/literal": KindSpec<[], boolean>;
+        readonly "bool/eq": KindSpec<[boolean, boolean], boolean>;
+    };
+    readonly traits: {
+        readonly eq: TraitDef<boolean, {
+            boolean: "bool/eq";
+        }>;
+    };
+    readonly lifts: {
+        readonly boolean: "bool/literal";
+    };
+    readonly nodeKinds: readonly ["bool/literal", "bool/eq"];
+    readonly defaultInterpreter: () => Interpreter;
+};
+
+// @public
+export function buildKindInputs(plugins: readonly Plugin_2[]): Record<string, string[]>;
+
+// @public
+export function buildLiftMap(plugins: readonly Plugin_2[]): Record<string, string>;
+
+// @public
+export function buildStructuralShapes(plugins: readonly Plugin_2[]): Record<string, unknown>;
+
+// @public
+export function buildTraitMap(plugins: readonly Plugin_2[]): Record<string, Record<string, string>>;
+
+// @public
+export function byKind<K extends string>(kind: K): KindPred<K>;
+
+// @public
+export function byKindGlob<P extends string>(prefix: P): KindGlobPred<P>;
+
+// @public
+export function byName<N extends string>(name: N): NamePred<N>;
+
+// @public
+export type CArgsOf<E> = E extends CExpr<any, any, infer A> ? A : never;
+
+// @public
+export type CExpr<O, Kind extends string = string, Args extends readonly unknown[] = readonly unknown[]> = {
+    readonly [cexprBrand]: {
+        readonly o: O;
+        readonly kind: Kind;
+        readonly args: Args;
+    };
+    readonly [CREF]: true;
+    readonly __kind: Kind;
+    readonly __args: readonly unknown[];
+    readonly __out: O;
+} & AccessorOverlay<O>;
+
+// @public
+export type CKindOf<E> = E extends CExpr<any, infer K, any> ? K : never;
+
+// @public
+export type CollectReachable<Adj, Queue extends string[], Visited extends string = never> = Queue extends [infer Head extends string, ...infer Rest extends string[]] ? Head extends Visited ? CollectReachable<Adj, Rest, Visited> : Head extends keyof Adj ? Adj[Head] extends NodeEntry<any, infer C extends string[], any> ? CollectReachable<Adj, [...C, ...Rest], Visited | Head> : CollectReachable<Adj, Rest, Visited | Head> : CollectReachable<Adj, Rest, Visited | Head> : Visited;
+
+// @public
+export function collectReachable(adj: Record<string, RuntimeEntry>, rootId: string): Set<string>;
+
+// @public
+export function commit<O, R extends string, Adj, C extends string>(d: DirtyExpr<O, R, Adj, C>): NExpr<O, R, Adj, C>;
+
+// @public
+export interface CountPred<N extends number> extends PredBase {
+    // (undocumented)
+    readonly count: N;
+    // (undocumented)
+    readonly _tag: "count";
 }
 
 // @public
-export interface CoreBegin<T = unknown> extends TypedNode<T> {
-    // (undocumented)
-    kind: "core/begin";
-    // (undocumented)
-    result: TypedNode<T>;
-    // (undocumented)
-    steps: TypedNode[];
-}
+export type COutOf<E> = E extends CExpr<infer O, any, any> ? O : never;
 
 // @public
-export interface CoreCond<T = unknown> extends TypedNode<T> {
-    // (undocumented)
-    else: TypedNode<T>;
-    // (undocumented)
-    kind: "core/cond";
-    // (undocumented)
-    predicate: TypedNode<boolean>;
-    // (undocumented)
-    then: TypedNode<T>;
-}
-
-// @public
-export interface CoreInput extends TypedNode<unknown> {
-    // (undocumented)
-    __inputData?: unknown;
-    // (undocumented)
-    kind: "core/input";
-}
-
-// @public
-export const coreInterpreter: Interpreter<"core/literal" | "core/input" | "core/prop_access" | "core/record" | "core/cond" | "core/begin" | "core/program" | "core/tuple" | "core/lambda_param">;
-
-// @public
-export interface CoreLambdaParam<T = unknown> extends TypedNode<T> {
-    // (undocumented)
-    __value?: T;
-    // (undocumented)
-    kind: "core/lambda_param";
-}
-
-// @public
-export interface CoreLiteral<T = unknown> extends TypedNode<T> {
-    // (undocumented)
-    kind: "core/literal";
-    // (undocumented)
-    value: T;
-}
-
-// @public
-export interface CoreProgram extends TypedNode<unknown> {
-    // (undocumented)
-    kind: "core/program";
-    // (undocumented)
-    result: TypedNode;
-    // (undocumented)
-    statements: TypedNode[];
-}
-
-// @public
-export interface CorePropAccess<T = unknown> extends TypedNode<T> {
-    // (undocumented)
-    kind: "core/prop_access";
-    // (undocumented)
-    object: TypedNode<Record<string, unknown>>;
-    // (undocumented)
-    property: string;
-}
-
-// @public
-export interface CoreRecord extends TypedNode<Record<string, unknown>> {
-    // (undocumented)
-    fields: Record<string, TypedNode>;
-    // (undocumented)
-    kind: "core/record";
-}
-
-// @public
-export interface CoreTuple extends TypedNode<unknown[]> {
-    // (undocumented)
-    elements: TypedNode[];
-    // (undocumented)
-    kind: "core/tuple";
-}
+export function createApp<const P extends readonly Plugin_2[]>(...plugins: P): <Expr extends CExpr<any, string, readonly unknown[]>>(expr: Expr) => AppResult<RegistryOf<P>, Expr>;
 
 // @public
 export function createFoldState(): FoldState;
 
 // @public
-export function createStInterpreter(): Interpreter<"st/let" | "st/get" | "st/set" | "st/push">;
+export const CREF: unique symbol;
 
-// Warning: (ae-forgotten-export) The symbol "DefaultsArgs" needs to be exported by the entry point index.d.ts
-//
 // @public
-export function defaults<const P extends readonly PluginInput[]>(app: {
-    readonly plugins: P;
-}, ...args: DefaultsArgs<P>): Interpreter<ExtractPluginKinds<P[number]>>;
+export type CtrOf<E> = E extends NExpr<any, any, any, infer C> ? C : never;
 
+// @public
+export type DeepResolve<T> = T extends CExpr<infer O, any, any> ? O : T extends readonly [] ? [] : T extends readonly [infer H, ...infer Rest] ? [DeepResolve<H>, ...DeepResolve<Rest>] : T extends object ? {
+    [K in keyof T]: DeepResolve<T[K]>;
+} : T;
+
+// @public
+export function defaults(plugins: readonly PluginDef[], overrides?: Record<string, Interpreter>): Interpreter;
+
+// Warning: (ae-forgotten-export) The symbol "InterpreterHandlers" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "RejectAnyParam" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function defineInterpreter<K extends string>(): <T extends InterpreterHandlers<K>>(handlers: string extends K ? T : T & { [P in K]: P extends keyof T ? RejectAnyParam<P, T[P]> : never; }) => Interpreter<K>;
+export function defineInterpreter<K extends string>(): <T extends InterpreterHandlers<K>>(handlers: string extends K ? T : T & { [P in K]: P extends keyof T ? RejectAnyParam<P, T[P]> : never; }) => Interpreter;
 
 // @public
-export function definePlugin<const Kinds extends readonly string[], T, Traits extends Record<string, unknown> = {}>(def: {
+export function definePlugin<T extends {
     name: string;
-    nodeKinds: Kinds;
-    build: (ctx: PluginContext) => T;
-    defaultInterpreter?: () => Interpreter<string>;
-    traits?: PluginDefinition<any, Traits, Kinds[number]>["traits"];
-}): PluginDefinition<T, Traits, Kinds[number]>;
+    nodeKinds: string[];
+}>(def: T): T;
 
 // @public
-export const eq: PluginDefinition<any, {}, "eq/neq">;
+export function dirty<O, R extends string, Adj, C extends string>(expr: NExpr<O, R, Adj, C>): DirtyExpr<O, R, Adj, C>;
 
 // @public
-export interface EqFor<T> {
-    eq(a: Expr<T> | T, b: Expr<T> | T): Expr<boolean>;
-    neq(a: Expr<T> | T, b: Expr<T> | T): Expr<boolean>;
+export type DirtyAdjOf<D> = D extends DirtyExpr<any, any, infer A, any> ? A : never;
+
+// @public
+export type DirtyCtrOf<D> = D extends DirtyExpr<any, any, any, infer C> ? C : never;
+
+// @public
+export interface DirtyExpr<O, RootId extends string, Adj, Ctr extends string> {
+    // (undocumented)
+    readonly [dirtyBrand]: {
+        readonly o: O;
+        readonly rootId: RootId;
+        readonly adj: Adj;
+        readonly ctr: Ctr;
+    };
+    // (undocumented)
+    readonly __adj: Record<string, RuntimeEntry>;
+    // (undocumented)
+    readonly __counter: string;
+    // (undocumented)
+    readonly __id: string;
 }
 
 // @public
-export const eqInterpreter: Interpreter<"eq/neq">;
+export type DirtyIdOf<D> = D extends DirtyExpr<any, infer R, any, any> ? R : never;
 
 // @public
-export const error: PluginDefinition<ErrorMethods, {}, "error/try" | "error/fail" | "error/attempt" | "error/guard" | "error/settle">;
+export type DirtyOutOf<D> = D extends DirtyExpr<infer O, any, any, any> ? O : never;
+
+// Warning: (ae-forgotten-export) The symbol "MergeCtors" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "TraitCtors" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type DollarSign<P extends readonly Plugin_2[]> = MergeCtors<P> & TraitCtors<P>;
+
+// Warning: (ae-forgotten-export) The symbol "ElaborateChildren" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "ElaborateTraitExpr" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export type ElaborateExpr<Reg, Kind extends string, Args extends readonly unknown[], Adj, Ctr extends string> = Kind extends keyof Reg ? Reg[Kind] extends KindSpec<infer Inputs extends readonly unknown[], infer O> ? NeverGuard<ElaborateChildren<Reg, Args, Inputs, Adj, Ctr>, ElaborateChildren<Reg, Args, Inputs, Adj, Ctr> extends [
+infer A2,
+infer C2 extends string,
+infer Ch
+] ? [A2 & Record<C2, SNodeEntry<Kind, Ch, O>>, Increment<C2>, C2, O] : never> : Reg[Kind] extends TraitKindSpec<infer O, infer Mapping> ? ElaborateTraitExpr<Reg, O, Mapping, Args, Adj, Ctr> : never : never;
+
+// @public (undocumented)
+export type ElaborateLeaf<Reg, Value, Expected, Adj, Ctr extends string> = Value extends {
+    __kind: "core/access";
+    __out: infer O;
+} ? O extends Expected ? [Adj & Record<Ctr, SNodeEntry<"core/access", [], O>>, Increment<Ctr>, Ctr] : never : Value extends CExpr<any, infer K extends string, infer A extends readonly unknown[]> ? NeverGuard<ElaborateExpr<Reg, K, A, Adj, Ctr>, ElaborateExpr<Reg, K, A, Adj, Ctr> extends [
+infer A2,
+infer C2 extends string,
+infer Id extends string,
+infer O
+] ? O extends Expected ? [A2, C2, Id] : never : never> : [
+LiftKind<Expected>
+] extends [never] ? ElaborateStructural<Reg, Value, Expected, Adj, Ctr> extends [
+infer A2,
+infer C2 extends string,
+infer CR,
+any
+] ? [A2, C2, CR] : never : Value extends Expected ? [Adj & Record<Ctr, SNodeEntry<LiftKind<Expected>, [], Expected>>, Increment<Ctr>, Ctr] : DeepResolve<Value> extends Expected ? ElaborateStructural<Reg, Value, Expected, Adj, Ctr> extends [
+infer A2,
+infer C2 extends string,
+infer CR,
+any
+] ? [A2, C2, CR] : never : never;
+
+// @public (undocumented)
+export type ElaborateRecordFields<Reg, Value, Expected, Keys extends readonly string[], Adj, Ctr extends string> = Keys extends readonly [] ? [Adj, Ctr, {}] : Keys extends readonly [
+infer K extends string & keyof Expected & keyof Value,
+...infer Rest extends string[]
+] ? NeverGuard<ElaborateLeaf<Reg, Value[K], Expected[K], Adj, Ctr>, ElaborateLeaf<Reg, Value[K], Expected[K], Adj, Ctr> extends [
+infer A2,
+infer C2 extends string,
+infer CR
+] ? NeverGuard<ElaborateRecordFields<Reg, Value, Expected, Rest, A2, C2>, ElaborateRecordFields<Reg, Value, Expected, Rest, A2, C2> extends [
+infer A3,
+infer C3 extends string,
+infer RestMap
+] ? [A3, C3, Record<K, CR> & RestMap] : never> : never> : never;
+
+// @public (undocumented)
+export type ElaborateStructural<Reg, Value, Expected, Adj, Ctr extends string> = Value extends CExpr<any, infer K extends string, infer A extends readonly unknown[]> ? NeverGuard<ElaborateExpr<Reg, K, A, Adj, Ctr>, ElaborateExpr<Reg, K, A, Adj, Ctr> extends [
+infer A2,
+infer C2 extends string,
+infer Id extends string,
+infer O
+] ? [A2, C2, Id, O] : never> : Value extends readonly [] ? Expected extends readonly [] ? [Adj, Ctr, [], []] : never : Value extends readonly [infer H, ...infer Rest] ? Expected extends readonly [infer EH, ...infer ERest] ? NeverGuard<ElaborateLeaf<Reg, H, EH, Adj, Ctr>, ElaborateLeaf<Reg, H, EH, Adj, Ctr> extends [
+infer A2,
+infer C2 extends string,
+infer CR
+] ? NeverGuard<ElaborateStructural<Reg, Rest, ERest, A2, C2>, ElaborateStructural<Reg, Rest, ERest, A2, C2> extends [
+infer A3,
+infer C3 extends string,
+infer CRest extends unknown[],
+any
+] ? [A3, C3, [CR, ...CRest], Expected] : never> : never> : never : Value extends object ? Expected extends object ? NeverGuard<ElaborateRecordFields<Reg, Value, Expected, UnionToTuple<keyof Expected & string> extends infer K extends string[] ? K : [], Adj, Ctr>, ElaborateRecordFields<Reg, Value, Expected, UnionToTuple<keyof Expected & string> extends infer K extends string[] ? K : [], Adj, Ctr> extends [infer A2, infer C2 extends string, infer Map] ? [A2, C2, Map, Expected] : never> : never : Value extends number ? [
+Adj & Record<Ctr, SNodeEntry<"num/literal", [], number>>,
+Increment<Ctr>,
+Ctr,
+number
+] : Value extends string ? [
+Adj & Record<Ctr, SNodeEntry<"str/literal", [], string>>,
+Increment<Ctr>,
+Ctr,
+string
+] : Value extends boolean ? [
+Adj & Record<Ctr, SNodeEntry<"bool/literal", [], boolean>>,
+Increment<Ctr>,
+Ctr,
+boolean
+] : never;
 
 // @public
-export const errorInterpreter: Interpreter<"error/try" | "error/fail" | "error/attempt" | "error/guard" | "error/settle">;
-
-// @public
-export interface ErrorMethods {
-    attempt<T>(expr: Expr<T>): Expr<{
-        ok: T | null;
-        err: any | null;
-    }>;
-    fail(error: Expr<any> | any): Expr<never>;
-    guard(condition: Expr<boolean>, error: Expr<any> | any): Expr<void>;
-    orElse<T>(expr: Expr<T>, fallback: Expr<T> | T): Expr<T>;
-    settle(...exprs: Expr<any>[]): Expr<{
-        fulfilled: any[];
-        rejected: any[];
-    }>;
-    // Warning: (ae-forgotten-export) The symbol "TryBuilder" needs to be exported by the entry point index.d.ts
-    try<T>(expr: Expr<T>): TryBuilder<T>;
-}
+export function eq<A, B>(a: A, b: B): CExpr<boolean, "eq", [A, B]>;
 
 // @public
 export function eval_<T>(node: TypedNode<T>): AsyncGenerator<TypedNode, T, unknown>;
 
-// Warning: (ae-forgotten-export) The symbol "ExprBase" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "ExprFields" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type Expr<T> = ExprBase<T> & ExprFields<T>;
+export type EvalPred<P, Entry, ID extends string = string, Adj = Record<string, any>> = P extends KindPred<infer K> ? Entry extends NodeEntry<K, any, any> ? true : false : P extends KindGlobPred<infer Prefix> ? Entry extends NodeEntry<`${Prefix}${string}`, any, any> ? true : false : P extends LeafPred ? Entry extends NodeEntry<any, [], any> ? true : false : P extends CountPred<infer N> ? Entry extends NodeEntry<any, infer C extends string[], any> ? C["length"] extends N ? true : false : false : P extends NotPred<infer Inner> ? EvalPred<Inner, Entry, ID, Adj> extends true ? false : true : P extends AndPred<infer A, infer B> ? EvalPred<A, Entry, ID, Adj> extends true ? EvalPred<B, Entry, ID, Adj> : false : P extends OrPred<infer A, infer B> ? EvalPred<A, Entry, ID, Adj> extends true ? true : EvalPred<B, Entry, ID, Adj> : P extends NamePred<infer N> ? Adj extends Record<`@${N}`, NodeEntry<any, [infer T extends string, ...any[]], any>> ? ID extends T ? true : false : false : false;
 
 // @public
-export type ExtractPluginKinds<P> = P extends PluginDefinition<any, any, infer K> ? K : P extends (...args: any[]) => PluginDefinition<any, any, infer K> ? K : never;
+export type Expr<T = unknown> = ExprBase<T>;
 
 // @public
-export const fiber: PluginDefinition<FiberMethods, {}, "fiber/par_map" | "fiber/race" | "fiber/timeout" | "fiber/retry">;
-
-// Warning: (ae-forgotten-export) The symbol "FiberKinds" needs to be exported by the entry point index.d.ts
-//
-// @public
-export const fiberInterpreter: Interpreter<FiberKinds>;
-
-// @public
-export interface FiberMethods {
-    // Warning: (ae-forgotten-export) The symbol "ParFn" needs to be exported by the entry point index.d.ts
-    par: ParFn;
-    race(...exprs: Expr<any>[]): Expr<any>;
-    retry(expr: Expr<any>, opts: {
-        attempts: number;
-        delay?: number;
-    }): Expr<any>;
-    seq(first: Expr<any> | any, ...rest: (Expr<any> | any)[]): Expr<any>;
-    timeout(expr: Expr<any>, ms: number | Expr<number>, fallback: Expr<any> | any): Expr<any>;
+export interface ExprBase<T> {
+    // (undocumented)
+    readonly [key: string]: unknown;
+    // (undocumented)
+    readonly __node: TypedNode<T>;
+    // (undocumented)
+    readonly __type: T;
 }
 
 // @public
-export function foldAST<K extends string>(interpreter: Interpreter<K>, program: Program<K>, state?: FoldState): Promise<unknown>;
+export function extractChildIds(children: unknown): string[];
 
-// @public (undocumented)
-export function foldAST<K extends string>(interpreter: Interpreter<K>, root: TypedNode, state?: FoldState): Promise<unknown>;
+// @public
+export function fold<E extends NExpr<any, any, any, any>>(expr: E, interp: Interpreter, state?: FoldState): Promise<OutOf<E>>;
+
+// @public
+export function fold<T>(rootId: string, adj: Record<string, RuntimeEntry>, interp: Interpreter, state?: FoldState): Promise<T>;
+
+// @public
+export function foldAST<T>(_prog: Program | Record<string, unknown>, _interp: Interpreter | Record<string, unknown>): Promise<T>;
 
 // @public
 export interface FoldState {
     // (undocumented)
-    cache: WeakMap<TypedNode, unknown>;
+    memo: Record<string, unknown>;
     // (undocumented)
-    tainted: WeakSet<TypedNode>;
+    tainted: Set<string>;
 }
 
 // @public
-export type FoldYield = TypedNode | RecurseScopedEffect;
+export type FoldYield = number | string | RecurseScopedEffect;
 
 // @public
-export type Handler<N extends TypedNode<any>> = N extends TypedNode<infer T> ? (node: N) => AsyncGenerator<FoldYield, T, unknown> : never;
+function gc_2<O, R extends string, Adj, C extends string>(d: DirtyExpr<O, R, Adj, C>): DirtyExpr<O, R, LiveAdj<Adj, R>, C>;
+export { gc_2 as gc }
 
 // @public
-export const heytingAlgebra: PluginDefinition<any, {}, never>;
+export function gcPreservingAliases<O, R extends string, Adj, C extends string>(d: DirtyExpr<O, R, Adj, C>): DirtyExpr<O, R, LiveAdj<Adj, R> & PreserveAliases<Adj>, C>;
 
 // @public
-export interface HeytingAlgebraFor<T> {
-    and(a: Expr<T>, b: Expr<T>): Expr<T>;
-    not(a: Expr<T>): Expr<T>;
-    or(a: Expr<T>, b: Expr<T>): Expr<T>;
+export type Handler = (entry: RuntimeEntry) => AsyncGenerator<FoldYield, unknown, unknown>;
+
+// @public
+export function hasChildCount<N extends number>(count: N): CountPred<N>;
+
+// @public
+export type IdOf<E> = E extends NExpr<any, infer R, any, any> ? R : never;
+
+// @public
+export type Increment<S extends string> = S extends `${infer Rest}z` ? Rest extends "" ? "aa" : `${Increment<Rest>}a` : IncrementLast<S>;
+
+// @public
+export function incrementId(s: string): string;
+
+// @public
+export type IncrementLast<S extends string> = S extends `${infer R}a` ? `${R}b` : S extends `${infer R}b` ? `${R}c` : S extends `${infer R}c` ? `${R}d` : S extends `${infer R}d` ? `${R}e` : S extends `${infer R}e` ? `${R}f` : S extends `${infer R}f` ? `${R}g` : S extends `${infer R}g` ? `${R}h` : S extends `${infer R}h` ? `${R}i` : S extends `${infer R}i` ? `${R}j` : S extends `${infer R}j` ? `${R}k` : S extends `${infer R}k` ? `${R}l` : S extends `${infer R}l` ? `${R}m` : S extends `${infer R}m` ? `${R}n` : S extends `${infer R}n` ? `${R}o` : S extends `${infer R}o` ? `${R}p` : S extends `${infer R}p` ? `${R}q` : S extends `${infer R}q` ? `${R}r` : S extends `${infer R}r` ? `${R}s` : S extends `${infer R}s` ? `${R}t` : S extends `${infer R}t` ? `${R}u` : S extends `${infer R}u` ? `${R}v` : S extends `${infer R}v` ? `${R}w` : S extends `${infer R}w` ? `${R}x` : S extends `${infer R}x` ? `${R}y` : S extends `${infer R}y` ? `${R}z` : never;
+
+// @public
+export type Interpreter = Record<string, Handler>;
+
+// @public
+export function isCExpr(x: unknown): x is CExpr<unknown>;
+
+// @public
+export function isLeaf(): LeafPred;
+
+// @public
+export const KIND_INPUTS: Record<string, string[]>;
+
+// @public
+export interface KindGlobPred<P extends string> extends PredBase {
+    // (undocumented)
+    readonly prefix: P;
+    // (undocumented)
+    readonly _tag: "kindGlob";
 }
 
-// Warning: (ae-forgotten-export) The symbol "TagToType" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type InferSchema<S> = S extends SchemaTag ? TagToType<S> : S extends {
-    __tag: "array";
-    of: infer U;
-} ? InferSchema<U>[] : S extends {
-    __tag: "nullable";
-    of: infer U;
-} ? InferSchema<U> | null : S extends Record<string, unknown> ? {
-    [K in keyof S]: InferSchema<S[K]>;
-} : never;
+export interface KindPred<K extends string> extends PredBase {
+    // (undocumented)
+    readonly kind: K;
+    // (undocumented)
+    readonly _tag: "kind";
+}
 
 // @public
-export function inferType(node: any, impls: TraitImpl[], schema?: Record<string, unknown>): string | null;
+export interface KindSpec<I extends readonly unknown[], O> {
+    // (undocumented)
+    readonly inputs: I;
+    // (undocumented)
+    readonly output: O;
+}
 
 // @public
-export function injectInput(program: Program, input: Record<string, unknown>): Program;
+export interface LeafPred extends PredBase {
+    // (undocumented)
+    readonly _tag: "leaf";
+}
 
 // @public
-export function injectLambdaParam(node: any, name: string, value: unknown): void;
+export const LIFT_MAP: Record<string, string>;
 
 // @public
-export type Interpreter<K extends string = string> = InterpreterHandlers<K> & {
-    readonly [interpreterBrand]: K;
+export type LiftKind<T> = T extends number ? "num/literal" : T extends string ? "str/literal" : T extends boolean ? "bool/literal" : never;
+
+// @public
+export type LiveAdj<Adj, RootID extends string> = {
+    [K in keyof Adj as K extends CollectReachable<Adj, [RootID]> ? K : never]: Adj[K];
 };
 
-// Warning: (ae-forgotten-export) The symbol "AnyHandlerRecord" needs to be exported by the entry point index.d.ts
-//
-// @public (undocumented)
-export type InterpreterHandlers<K extends string> = string extends K ? AnyHandlerRecord : {
-    [P in K]: P extends keyof NodeTypeMap ? Handler<NodeTypeMap[P]> : never;
+// @public
+export function liveAdj(adj: Record<string, RuntimeEntry>, rootId: string): Record<string, RuntimeEntry>;
+
+// @public
+export function lt<A, B>(a: A, b: B): CExpr<boolean, "lt", [A, B]>;
+
+// @public
+export function makeCExpr<O, Kind extends string, Args extends readonly unknown[]>(kind: Kind, args: [...Args]): CExpr<O, Kind, Args>;
+
+// @public
+export function makeNExpr<O, RootId extends string, Adj, Ctr extends string>(rootId: RootId, adj: Record<string, RuntimeEntry>, counter: Ctr): NExpr<O, RootId, Adj, Ctr>;
+
+// @public
+export type MapAdj<Adj, P, NewEntry extends NodeEntry<string, string[], any>> = {
+    [K in keyof Adj]: K extends string ? EvalPred<P, Adj[K], K, Adj> extends true ? NewEntry : Adj[K] : Adj[K];
 };
 
 // @public
-export type IsAny<T> = 0 extends 1 & T ? true : false;
+export type MapOut<O, Adj, RootID extends string, P, NewEntry extends NodeEntry<string, string[], any>> = RootID extends keyof Adj ? EvalPred<P, Adj[RootID & keyof Adj], RootID, Adj> extends true ? NewEntry extends NodeEntry<any, any, infer NewO> ? NewO : O : O : O;
 
 // @public
-export function mergeInterpreters<A extends string, B extends string>(a: Interpreter<A>, b: Interpreter<B>): Interpreter<A | B>;
+export interface MapTypeError<_Msg extends string = string> {
+    // (undocumented)
+    readonly __brand: unique symbol;
+    // (undocumented)
+    readonly __mapTypeError: _Msg;
+}
 
-// Warning: (ae-internal-missing-underscore) The name "MissingTraitError" should be prefixed with an underscore because the declaration is marked as @internal
+// Warning: (ae-forgotten-export) The symbol "MapTypeSafe" needs to be exported by the entry point index.d.ts
 //
-// @internal
-export interface MissingTraitError<_TraitName extends string, Hint extends string> {
-    // @deprecated (undocumented)
-    readonly __error: Hint;
+// @public
+export function mapWhere<O, R extends string, Adj, C extends string, P extends PredBase, NewEntry extends NodeEntry<string, string[], any>>(expr: NExpr<O, R, Adj, C> | DirtyExpr<O, R, Adj, C>, pred: P, fn: (entry: MatchingEntries<Adj, P>) => NewEntry): MapTypeSafe<Adj, P, NewEntry> extends true ? DirtyExpr<MapOut<O, Adj, R, P, NewEntry>, R, MapAdj<Adj, P, NewEntry>, C> : MapTypeError<"callback output type does not match matched node output type">;
+
+// @public
+export type MatchingEntries<Adj, P> = {
+    [K in keyof Adj]: K extends string ? EvalPred<P, Adj[K], K, Adj> extends true ? Adj[K] : never : never;
+}[keyof Adj];
+
+// @public
+export function mul<A, B>(a: A, b: B): CExpr<number, "num/mul", [A, B]>;
+
+// Warning: (ae-forgotten-export) The symbol "SimpleDollarSign" needs to be exported by the entry point index.d.ts
+//
+// @public
+export function mvfm<const P extends readonly PluginShape<any, any, any>[]>(...plugins: P): SimpleDollarSign<P>;
+
+// @public
+export function mvfmU<const P extends readonly Plugin_2[]>(...plugins: P): DollarSign<P>;
+
+// Warning: (ae-forgotten-export) The symbol "TargetOut" needs to be exported by the entry point index.d.ts
+//
+// @public
+function name_2<O, R extends string, Adj, C extends string, N extends string, T extends string>(expr: NExpr<O, R, Adj, C>, n: N, targetId: T): NExpr<O, R, Adj & Record<`@${N}`, NameAlias<N, T, TargetOut<Adj, T>>>, C>;
+export { name_2 as name }
+
+// @public
+export type NameAlias<Name extends string, TargetID extends string, Out> = NodeEntry<"@alias", [
+TargetID
+], Out>;
+
+// @public
+export interface NamePred<N extends string> extends PredBase {
+    // (undocumented)
+    readonly name: N;
+    // (undocumented)
+    readonly _tag: "name";
 }
 
 // @public
-export const monoid: PluginDefinition<any, {}, never>;
+export type NeverGuard<T, Then> = [T] extends [never] ? never : Then;
 
 // @public
-export interface MonoidFor<_T> {
+export interface NExpr<O, RootId extends string, Adj, Ctr extends string> {
+    // (undocumented)
+    readonly [nexprBrand]: {
+        readonly o: O;
+        readonly rootId: RootId;
+        readonly adj: Adj;
+        readonly ctr: Ctr;
+    };
+    // (undocumented)
+    readonly __adj: Record<string, RuntimeEntry>;
+    // (undocumented)
+    readonly __counter: string;
+    // (undocumented)
+    readonly __id: string;
 }
 
 // @public
-export function mvfm<const P extends readonly PluginInput[]>(...plugins: P): {
-    <S extends SchemaShape>(schema: S, fn: ($: CoreDollar<InferSchema<S>> & MergePlugins<FlattenPluginInputs<P>>) => Expr<any> | any): Program<ExtractPluginKinds<FlattenPluginInputs<P>[number]>>;
-    <I = never>(fn: ($: CoreDollar<I> & MergePlugins<FlattenPluginInputs<P>>) => Expr<any> | any): Program<ExtractPluginKinds<FlattenPluginInputs<P>[number]>>;
-} & {
-    plugins: FlattenPluginInputs<P>;
+export type NodeEntry<Kind extends string, ChildIDs extends string[], Out> = {
+    readonly kind: Kind;
+    readonly children: ChildIDs;
+    readonly out: Out;
 };
 
 // @public
@@ -331,105 +517,194 @@ export interface NodeTypeMap {
 }
 
 // @public
-export function nullable(of: SchemaType): NullableSchema;
+export function not<P extends PredBase>(pred: P): NotPred<P>;
 
 // @public
-export interface NullableSchema {
+export interface NotPred<P extends PredBase> extends PredBase {
     // (undocumented)
-    readonly __tag: "nullable";
+    readonly pred: P;
     // (undocumented)
-    readonly of: SchemaType;
+    readonly _tag: "not";
 }
 
 // @public
-export const num: PluginDefinition<NumMethods, {}, "num/add" | "num/sub" | "num/mul" | "num/div" | "num/mod" | "num/compare" | "num/neg" | "num/abs" | "num/floor" | "num/ceil" | "num/round" | "num/min" | "num/max" | "num/eq" | "num/zero" | "num/one" | "num/show" | "num/top" | "num/bottom">;
-
-// Warning: (ae-forgotten-export) The symbol "NumKinds" needs to be exported by the entry point index.d.ts
-//
-// @public
-export const numInterpreter: Interpreter<NumKinds>;
+export function numLit<V extends number>(v: V): V;
 
 // @public
-export interface NumMethods {
-    abs(a: Expr<number> | number): Expr<number>;
-    ceil(a: Expr<number> | number): Expr<number>;
-    div(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
-    floor(a: Expr<number> | number): Expr<number>;
-    max(...values: (Expr<number> | number)[]): Expr<number>;
-    min(...values: (Expr<number> | number)[]): Expr<number>;
-    mod(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
-    neg(a: Expr<number> | number): Expr<number>;
-    round(a: Expr<number> | number): Expr<number>;
-    sub(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
+export const numPlugin: {
+    readonly ctors: {
+        readonly add: typeof add;
+        readonly mul: typeof mul;
+        readonly numLit: typeof numLit;
+    };
+    readonly kinds: {
+        readonly "num/literal": KindSpec<[], number>;
+        readonly "num/add": KindSpec<[number, number], number>;
+        readonly "num/mul": KindSpec<[number, number], number>;
+        readonly "num/eq": KindSpec<[number, number], boolean>;
+    };
+    readonly traits: {
+        readonly eq: {
+            readonly number: "num/eq";
+        };
+    };
+};
+
+// @public
+export const numPluginU: {
+    readonly name: "num";
+    readonly ctors: {
+        readonly add: typeof add;
+        readonly mul: typeof mul;
+        readonly sub: typeof sub;
+        readonly numLit: typeof numLit;
+    };
+    readonly kinds: {
+        readonly "num/literal": KindSpec<[], number>;
+        readonly "num/add": KindSpec<[number, number], number>;
+        readonly "num/mul": KindSpec<[number, number], number>;
+        readonly "num/sub": KindSpec<[number, number], number>;
+        readonly "num/eq": KindSpec<[number, number], boolean>;
+    };
+    readonly traits: {
+        readonly eq: TraitDef<boolean, {
+            number: "num/eq";
+        }>;
+    };
+    readonly lifts: {
+        readonly number: "num/literal";
+    };
+    readonly nodeKinds: readonly ["num/literal", "num/add", "num/mul", "num/sub", "num/eq"];
+    readonly defaultInterpreter: () => Interpreter;
+};
+
+// @public
+export function or<A extends PredBase, B extends PredBase>(left: A, right: B): OrPred<A, B>;
+
+// @public
+export const ordPlugin: {
+    readonly name: "ord";
+    readonly ctors: {
+        readonly lt: typeof lt;
+    };
+    readonly kinds: {
+        readonly "num/lt": KindSpec<[number, number], boolean>;
+        readonly "str/lt": KindSpec<[string, string], boolean>;
+    };
+    readonly traits: {
+        readonly lt: TraitDef<boolean, {
+            number: "num/lt";
+            string: "str/lt";
+        }>;
+    };
+    readonly lifts: {};
+    readonly nodeKinds: readonly ["num/lt", "str/lt"];
+    readonly defaultInterpreter: () => Interpreter;
+};
+
+// @public
+export interface OrPred<A extends PredBase, B extends PredBase> extends PredBase {
+    // (undocumented)
+    readonly left: A;
+    // (undocumented)
+    readonly right: B;
+    // (undocumented)
+    readonly _tag: "or";
 }
 
 // @public
-export const ord: PluginDefinition<any, {}, "ord/gt" | "ord/gte" | "ord/lt" | "ord/lte">;
+export type OutOf<E> = E extends NExpr<infer O, any, any, any> ? O : never;
 
 // @public
-export interface OrdFor<T> {
-    compare(a: Expr<T> | T, b: Expr<T> | T): Expr<number>;
-    gt(a: Expr<T> | T, b: Expr<T> | T): Expr<boolean>;
-    gte(a: Expr<T> | T, b: Expr<T> | T): Expr<boolean>;
-    lt(a: Expr<T> | T, b: Expr<T> | T): Expr<boolean>;
-    lte(a: Expr<T> | T, b: Expr<T> | T): Expr<boolean>;
+export function pipe<A extends NExpr<any, any, any, any>, B>(expr: A, f1: (a: A) => B): B;
+
+// @public
+export function pipe<A extends NExpr<any, any, any, any>, B, C>(expr: A, f1: (a: A) => B, f2: (b: B) => C): C;
+
+// @public
+export function pipe<A extends NExpr<any, any, any, any>, B, C, D>(expr: A, f1: (a: A) => B, f2: (b: B) => C, f3: (c: C) => D): D;
+
+// @public
+export function pipe<A extends NExpr<any, any, any, any>, B, C, D, E>(expr: A, f1: (a: A) => B, f2: (b: B) => C, f3: (c: C) => D, f4: (d: D) => E): E;
+
+// @public
+interface Plugin_2<Name extends string = string, Ctors extends Record<string, (...args: any[]) => any> = any, Kinds extends Record<string, KindSpec<any, any>> = any, Traits extends Record<string, TraitDef<any, any>> = any, Lifts extends Record<string, string> = any> {
+    // (undocumented)
+    readonly ctors: Ctors;
+    // (undocumented)
+    readonly defaultInterpreter?: () => Interpreter;
+    // (undocumented)
+    readonly kinds: Kinds;
+    // (undocumented)
+    readonly lifts: Lifts;
+    // (undocumented)
+    readonly name: Name;
+    // (undocumented)
+    readonly nodeKinds: readonly string[];
+    // (undocumented)
+    readonly shapes?: Record<string, unknown>;
+    // (undocumented)
+    readonly traits: Traits;
 }
-
-// @public
-export const ordInterpreter: Interpreter<"ord/gt" | "ord/gte" | "ord/lt" | "ord/lte">;
-
-// @public
-type Plugin_2<T = any, Traits extends Record<string, unknown> = {}> = PluginDefinition<T, Traits, string> | (() => PluginDefinition<T, Traits, string>);
 export { Plugin_2 as Plugin }
 
 // @public
 export interface PluginContext {
-    emit: (node: any) => void;
-    expr: <T>(node: any) => Expr<T>;
-    inputSchema?: Record<string, unknown>;
-    isExpr: (value: unknown) => value is Expr<unknown>;
-    lift: <T>(value: T | Expr<T>) => Expr<T>;
-    plugins: PluginDefinition<any, Record<string, unknown>, string>[];
-    _registry: Map<number, any>;
-    statements: any[];
+    // (undocumented)
+    emit(node: unknown): void;
+    // (undocumented)
+    expr<T>(opts: Record<string, unknown>): Expr<T>;
+    // (undocumented)
+    inputSchema: unknown;
+    // (undocumented)
+    isExpr(value: unknown): value is ExprBase<unknown>;
+    // (undocumented)
+    lift<T>(value: T | Expr<T>): ExprBase<T>;
+    // (undocumented)
+    plugins: unknown[];
+    // (undocumented)
+    _registry: Map<number, unknown>;
+    // (undocumented)
+    statements: unknown[];
 }
 
 // @public
-export interface PluginDefinition<T = any, Traits extends Record<string, unknown> = {}, K extends string = string> {
-    // @internal
-    readonly __traits?: Traits;
+export interface PluginDef {
     // (undocumented)
-    build: (ctx: PluginContext) => T;
-    defaultInterpreter?: () => Interpreter<K>;
+    defaultInterpreter?: () => Interpreter;
     // (undocumented)
     name: string;
     // (undocumented)
-    nodeKinds: readonly K[];
-    // (undocumented)
-    traits?: {
-        eq?: TraitImpl;
-        ord?: TraitImpl;
-        semiring?: TraitImpl;
-        heytingAlgebra?: TraitImpl;
-        show?: TraitImpl;
-        semigroup?: TraitImpl;
-        monoid?: TraitImpl;
-        bounded?: TraitImpl;
-    };
+    nodeKinds: readonly string[];
 }
 
 // @public
-export type PluginInput = Plugin_2 | readonly PluginInput[];
+export interface PluginShape<Ctors extends Record<string, (...args: any[]) => any>, Kinds extends Record<string, KindSpec<any, any>>, Traits extends Record<string, Record<string, string>>> {
+    // (undocumented)
+    readonly ctors: Ctors;
+    // (undocumented)
+    readonly kinds: Kinds;
+    // (undocumented)
+    readonly traits: Traits;
+}
 
 // @public
-export const prelude: readonly [PluginDefinition<NumMethods, {}, "num/add" | "num/sub" | "num/mul" | "num/div" | "num/mod" | "num/compare" | "num/neg" | "num/abs" | "num/floor" | "num/ceil" | "num/round" | "num/min" | "num/max" | "num/eq" | "num/zero" | "num/one" | "num/show" | "num/top" | "num/bottom">, PluginDefinition<StrMethods, {}, "str/template" | "str/concat" | "str/upper" | "str/lower" | "str/trim" | "str/slice" | "str/includes" | "str/startsWith" | "str/endsWith" | "str/split" | "str/join" | "str/replace" | "str/len" | "str/eq" | "str/show" | "str/append" | "str/mempty">, PluginDefinition<any, {}, never>, PluginDefinition<any, {}, "eq/neq">, PluginDefinition<any, {}, "ord/gt" | "ord/gte" | "ord/lt" | "ord/lte">, PluginDefinition<any, {}, never>, PluginDefinition<BooleanMethods, {}, "boolean/and" | "boolean/or" | "boolean/not" | "boolean/eq" | "boolean/ff" | "boolean/tt" | "boolean/implies" | "boolean/show" | "boolean/top" | "boolean/bottom">, PluginDefinition<any, {}, never>, PluginDefinition<any, {}, never>, PluginDefinition<any, {}, never>, PluginDefinition<any, {}, never>];
+export interface PredBase {
+    // (undocumented)
+    test(entry: RuntimeEntry, id: string, adj: Record<string, RuntimeEntry>): boolean;
+}
+
+// @public
+export type PreserveAliases<Adj> = {
+    [K in keyof Adj as K extends `@${string}` ? K : never]: Adj[K];
+};
 
 // @public
 export interface Program<K extends string = string> {
     // (undocumented)
     readonly __kinds?: K;
     // (undocumented)
-    ast: any;
+    ast: unknown;
     // (undocumented)
     hash: string;
     // (undocumented)
@@ -439,143 +714,319 @@ export interface Program<K extends string = string> {
 }
 
 // @public
-export function recurseScoped(child: TypedNode, bindings: ScopedBinding[]): RecurseScopedEffect;
+export function recurseScoped(childId: string, bindings: Array<{
+    paramId: string;
+    value: unknown;
+}>): RecurseScopedEffect;
 
 // @public
 export interface RecurseScopedEffect {
     // (undocumented)
-    bindings: ScopedBinding[];
+    readonly bindings: ScopedBinding[];
     // (undocumented)
-    child: TypedNode;
+    readonly childId: string;
     // (undocumented)
-    type: "recurse_scoped";
+    readonly type: "recurse_scoped";
 }
 
 // @public
-export function resolveSchemaType(node: any, schema?: Record<string, unknown>): string | null;
+export type RegistryEntry = KindSpec<any, any> | TraitKindSpec<any, any>;
+
+// Warning: (ae-forgotten-export) The symbol "MergeKinds" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "TraitEntries" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type RegistryOf<P extends readonly Plugin_2[]> = MergeKinds<P> & TraitEntries<P>;
 
 // @public
-export type SchemaShape = Record<string, SchemaType>;
+export function remapChildren(children: unknown, oldId: string, newId: string): unknown;
 
 // @public
-export type SchemaTag = "string" | "number" | "boolean" | "date" | "null";
+export function removeEntry<O, R extends string, Adj, C extends string, Id extends string>(d: DirtyExpr<O, R, Adj, C>, id: Id): DirtyExpr<O, R, {
+    [K in keyof Adj as K extends Id ? never : K]: Adj[K];
+}, C>;
 
+// Warning: (ae-forgotten-export) The symbol "ReplaceKind" needs to be exported by the entry point index.d.ts
+//
 // @public
-export type SchemaType = SchemaTag | ArraySchema | NullableSchema | {
-    readonly [key: string]: SchemaType;
+export function replaceWhere<O, R extends string, Adj, C extends string, P extends PredBase, NewKind extends string>(expr: NExpr<O, R, Adj, C> | DirtyExpr<O, R, Adj, C>, pred: P, newKind: NewKind): DirtyExpr<MapOut<O, Adj, R, P, ReplaceKind<MatchingEntries<Adj, P>, NewKind>>, R, MapAdj<Adj, P, ReplaceKind<MatchingEntries<Adj, P>, NewKind>>, C>;
+
+// Warning: (ae-forgotten-export) The symbol "RewireList" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type RewireAdj<Adj, Old extends string, New extends string> = {
+    [K in keyof Adj]: Adj[K] extends NodeEntry<infer Kind extends string, infer C extends string[], infer O> ? NodeEntry<Kind, RewireList<C, Old, New>, O> : Adj[K];
 };
+
+// Warning: (ae-forgotten-export) The symbol "RewireTypeSafe" needs to be exported by the entry point index.d.ts
+//
+// @public
+export function rewireChildren<O, R extends string, Adj, C extends string, Old extends string, New extends string>(d: DirtyExpr<O, R, Adj, C>, oldRef: Old, newRef: New): RewireTypeSafe<Adj, Old, New> extends true ? DirtyExpr<O, R, RewireAdj<Adj, Old, New>, C> : RewireTypeError<"new ref output type does not match old ref output type">;
+
+// @public
+export type RewireParents<Adj, TargetID extends string, WrapperID extends string> = RewireAdj<Adj, TargetID, WrapperID>;
+
+// @public
+export interface RewireTypeError<_Msg extends string = string> {
+    // (undocumented)
+    readonly __brand: unique symbol;
+    // (undocumented)
+    readonly __rewireTypeError: _Msg;
+}
+
+// @public
+export interface RuntimeEntry {
+    // (undocumented)
+    children: string[];
+    // (undocumented)
+    kind: string;
+    // (undocumented)
+    out: unknown;
+}
 
 // @public
 export interface ScopedBinding {
     // (undocumented)
-    paramId: number;
+    readonly paramId: string;
     // (undocumented)
-    value: unknown;
+    readonly value: unknown;
 }
 
 // @public
-export const semigroup: PluginDefinition<any, {}, never>;
+export type SelectKeys<Adj, P> = {
+    [K in keyof Adj]: K extends string ? EvalPred<P, Adj[K], K, Adj> extends true ? K : never : never;
+}[keyof Adj];
 
 // @public
-export interface SemigroupFor<T> {
-    append(a: Expr<T> | T, b: Expr<T> | T): Expr<T>;
+export function selectWhere<O, R extends string, Adj, C extends string, P extends PredBase>(expr: NExpr<O, R, Adj, C>, pred: P): Set<string & SelectKeys<Adj, P>>;
+
+// @public
+export function setRoot<O, R extends string, Adj, C extends string, NewRoot extends string>(d: DirtyExpr<O, R, Adj, C>, newRootId: NewRoot): DirtyExpr<O, NewRoot, Adj, C>;
+
+// @public
+export type SNodeEntry<Kind extends string = string, Ch = unknown, O = unknown> = {
+    readonly kind: Kind;
+    readonly children: Ch;
+    readonly out: O;
+};
+
+// Warning: (ae-forgotten-export) The symbol "SpliceAt" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type SpliceAdj<Adj, Matched extends string, I extends number = 0> = {
+    [K in keyof Adj as K extends Matched ? never : K]: Adj[K] extends NodeEntry<infer Kind extends string, infer Ch extends string[], infer O> ? NodeEntry<Kind, SpliceAt<Ch, Adj, Matched, I>, O> : Adj[K];
+};
+
+// @public
+export interface SpliceTypeError<_Msg extends string = string> {
+    // (undocumented)
+    readonly __brand: unique symbol;
+    // (undocumented)
+    readonly __spliceTypeError: _Msg;
 }
 
+// Warning: (ae-forgotten-export) The symbol "SpliceTypeSafe" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "SpliceRoot" needs to be exported by the entry point index.d.ts
+//
 // @public
-export const semiring: PluginDefinition<any, {}, never>;
+export function spliceWhere<O, R extends string, Adj, C extends string, P extends PredBase, I extends number = 0>(expr: NExpr<O, R, Adj, C>, pred: P, childIndex?: I): SpliceTypeSafe<Adj, SelectKeys<Adj, P>, I> extends true ? NExpr<O, SpliceRoot<R, Adj, SelectKeys<Adj, P>, I>, SpliceAdj<Adj, SelectKeys<Adj, P>, I>, C> : SpliceTypeError<"replacement child output type does not match spliced node output type">;
 
 // @public
-export interface SemiringFor<T> {
-    add(a: Expr<T> | T, b: Expr<T> | T): Expr<T>;
-    mul(a: Expr<T> | T, b: Expr<T> | T): Expr<T>;
-}
-
-// @public
-export const show: PluginDefinition<any, {}, never>;
-
-// @public
-export interface ShowFor<T> {
-    show(a: Expr<T> | T): Expr<string>;
-}
-
-// @public
-export const st: PluginDefinition<StMethods, {}, "st/let" | "st/get" | "st/set" | "st/push">;
-
-// @public
-export const stInterpreter: Interpreter<"st/let" | "st/get" | "st/set" | "st/push">;
-
-// @public
-export interface StMethods {
-    let<T>(initial: Expr<T> | T): {
-        get: () => Expr<T>;
-        set: (value: Expr<T> | T) => void;
-        push: (value: Expr<T>) => void;
+export const stdPlugins: readonly [{
+    readonly name: "num";
+    readonly ctors: {
+        readonly add: typeof add;
+        readonly mul: typeof mul;
+        readonly sub: typeof sub;
+        readonly numLit: typeof numLit;
     };
-}
+    readonly kinds: {
+        readonly "num/literal": KindSpec<[], number>;
+        readonly "num/add": KindSpec<[number, number], number>;
+        readonly "num/mul": KindSpec<[number, number], number>;
+        readonly "num/sub": KindSpec<[number, number], number>;
+        readonly "num/eq": KindSpec<[number, number], boolean>;
+    };
+    readonly traits: {
+        readonly eq: TraitDef<boolean, {
+            number: "num/eq";
+        }>;
+    };
+    readonly lifts: {
+        readonly number: "num/literal";
+    };
+    readonly nodeKinds: readonly ["num/literal", "num/add", "num/mul", "num/sub", "num/eq"];
+    readonly defaultInterpreter: () => Interpreter;
+}, {
+    readonly name: "str";
+    readonly ctors: {
+        readonly strLit: typeof strLit;
+    };
+    readonly kinds: {
+        readonly "str/literal": KindSpec<[], string>;
+        readonly "str/eq": KindSpec<[string, string], boolean>;
+    };
+    readonly traits: {
+        readonly eq: TraitDef<boolean, {
+            string: "str/eq";
+        }>;
+    };
+    readonly lifts: {
+        readonly string: "str/literal";
+    };
+    readonly nodeKinds: readonly ["str/literal", "str/eq"];
+    readonly defaultInterpreter: () => Interpreter;
+}, {
+    readonly name: "bool";
+    readonly ctors: {
+        readonly boolLit: typeof boolLit;
+    };
+    readonly kinds: {
+        readonly "bool/literal": KindSpec<[], boolean>;
+        readonly "bool/eq": KindSpec<[boolean, boolean], boolean>;
+    };
+    readonly traits: {
+        readonly eq: TraitDef<boolean, {
+            boolean: "bool/eq";
+        }>;
+    };
+    readonly lifts: {
+        readonly boolean: "bool/literal";
+    };
+    readonly nodeKinds: readonly ["bool/literal", "bool/eq"];
+    readonly defaultInterpreter: () => Interpreter;
+}];
 
 // @public
-export const str: PluginDefinition<StrMethods, {}, "str/template" | "str/concat" | "str/upper" | "str/lower" | "str/trim" | "str/slice" | "str/includes" | "str/startsWith" | "str/endsWith" | "str/split" | "str/join" | "str/replace" | "str/len" | "str/eq" | "str/show" | "str/append" | "str/mempty">;
+export type StdRegistry = {
+    "num/literal": KindSpec<[], number>;
+    "num/add": KindSpec<[number, number], number>;
+    "num/mul": KindSpec<[number, number], number>;
+    "num/sub": KindSpec<[number, number], number>;
+    "str/literal": KindSpec<[], string>;
+    "bool/literal": KindSpec<[], boolean>;
+    "num/eq": KindSpec<[number, number], boolean>;
+    "str/eq": KindSpec<[string, string], boolean>;
+    "bool/eq": KindSpec<[boolean, boolean], boolean>;
+    eq: TraitKindSpec<boolean, {
+        number: "num/eq";
+        string: "str/eq";
+        boolean: "bool/eq";
+    }>;
+};
 
-// Warning: (ae-forgotten-export) The symbol "StrKinds" needs to be exported by the entry point index.d.ts
+// @public
+export function strLit<V extends string>(v: V): V;
+
+// @public
+export const strPlugin: {
+    readonly ctors: {
+        readonly strLit: typeof strLit;
+    };
+    readonly kinds: {
+        readonly "str/literal": KindSpec<[], string>;
+        readonly "str/eq": KindSpec<[string, string], boolean>;
+    };
+    readonly traits: {
+        readonly eq: {
+            readonly string: "str/eq";
+        };
+    };
+};
+
+// @public
+export const strPluginU: {
+    readonly name: "str";
+    readonly ctors: {
+        readonly strLit: typeof strLit;
+    };
+    readonly kinds: {
+        readonly "str/literal": KindSpec<[], string>;
+        readonly "str/eq": KindSpec<[string, string], boolean>;
+    };
+    readonly traits: {
+        readonly eq: TraitDef<boolean, {
+            string: "str/eq";
+        }>;
+    };
+    readonly lifts: {
+        readonly string: "str/literal";
+    };
+    readonly nodeKinds: readonly ["str/literal", "str/eq"];
+    readonly defaultInterpreter: () => Interpreter;
+};
+
+// @public
+export function sub<A, B>(a: A, b: B): CExpr<number, "num/sub", [A, B]>;
+
+// Warning: (ae-forgotten-export) The symbol "SwapTypeSafe" needs to be exported by the entry point index.d.ts
 //
 // @public
-export const strInterpreter: Interpreter<StrKinds>;
+export function swapEntry<O, R extends string, Adj, C extends string, Id extends string, E extends NodeEntry<string, string[], any>>(d: DirtyExpr<O, R, Adj, C>, id: Id, entry: E): SwapTypeSafe<Adj, Id, E> extends true ? DirtyExpr<O, R, {
+    [K in keyof Adj as K extends Id ? never : K]: Adj[K];
+} & Record<Id, E>, C> : SwapTypeError<"new entry output type does not match existing entry output type">;
 
 // @public
-export interface StrMethods {
-    concat(...parts: (Expr<string> | string)[]): Expr<string>;
-    endsWith(s: Expr<string> | string, suffix: Expr<string> | string): Expr<boolean>;
-    includes(haystack: Expr<string> | string, needle: Expr<string> | string): Expr<boolean>;
-    join(arr: Expr<string[]>, separator: Expr<string> | string): Expr<string>;
-    len(s: Expr<string> | string): Expr<number>;
-    lower(s: Expr<string> | string): Expr<string>;
-    replace(s: Expr<string> | string, search: Expr<string> | string, replacement: Expr<string> | string): Expr<string>;
-    slice(s: Expr<string> | string, start: Expr<number> | number, end?: Expr<number> | number): Expr<string>;
-    split(s: Expr<string> | string, delimiter: Expr<string> | string): Expr<string[]>;
-    startsWith(s: Expr<string> | string, prefix: Expr<string> | string): Expr<boolean>;
-    str(strings: TemplateStringsArray, ...exprs: (Expr<any> | string | number)[]): Expr<string>;
-    trim(s: Expr<string> | string): Expr<string>;
-    upper(s: Expr<string> | string): Expr<string>;
+export interface SwapTypeError<_Msg extends string = string> {
+    // (undocumented)
+    readonly __brand: unique symbol;
+    // (undocumented)
+    readonly __swapTypeError: _Msg;
 }
 
 // @public
-export interface TraitImpl {
+export const TRAIT_MAP: Record<string, Record<string, string>>;
+
+// @public
+export interface TraitDef<O, Mapping extends Record<string, string>> {
     // (undocumented)
-    nodeKinds: Record<string, string>;
+    readonly mapping: Mapping;
     // (undocumented)
-    type: string;
+    readonly output: O;
 }
 
-// Warning: (ae-internal-missing-underscore) The name "TypeclassMapping" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal
-export interface TypeclassMapping<T> {
-}
-
-// Warning: (ae-internal-missing-underscore) The name "TypeclassSlot" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal
-export interface TypeclassSlot<Name extends string> {
+// @public
+export interface TraitKindSpec<O, Mapping extends Record<string, string>> {
     // (undocumented)
-    readonly __typeclassSlot: Name;
+    readonly mapping: Mapping;
+    // (undocumented)
+    readonly output: O;
+    // (undocumented)
+    readonly trait: true;
 }
 
 // @public
 export interface TypedNode<T = unknown> {
     // (undocumented)
+    readonly [key: string]: unknown;
+    // (undocumented)
     readonly __T?: T;
+    // (undocumented)
+    readonly args?: TypedNode[];
     // (undocumented)
     readonly kind: string;
 }
 
 // @public
+export type TypeKey<T> = T extends number ? "number" : T extends string ? "string" : T extends boolean ? "boolean" : never;
+
+// Warning: (ae-forgotten-export) The symbol "_LastOf" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type UnionToTuple<U, Last = _LastOf<U>> = [U] extends [never] ? [] : [...UnionToTuple<Exclude<U, Last>>, Last];
+
+// @public
 export const VOLATILE_KINDS: Set<string>;
 
-// Warnings were encountered during analysis:
+// Warning: (ae-forgotten-export) The symbol "WrapRoot" needs to be exported by the entry point index.d.ts
 //
-// dist/builder.d.ts:11:5 - (ae-forgotten-export) The symbol "CoreDollar" needs to be exported by the entry point index.d.ts
-// dist/builder.d.ts:11:5 - (ae-forgotten-export) The symbol "MergePlugins" needs to be exported by the entry point index.d.ts
-// dist/builder.d.ts:11:5 - (ae-forgotten-export) The symbol "FlattenPluginInputs" needs to be exported by the entry point index.d.ts
+// @public
+export function wrapByName<O, R extends string, Adj, C extends string, TargetID extends string, WrapperKind extends string>(expr: NExpr<O, R, Adj, C> | DirtyExpr<O, R, Adj, C>, targetId: TargetID, wrapperKind: WrapperKind): DirtyExpr<O, WrapRoot<R, TargetID, C>, WrapOneResult<Adj, TargetID, WrapperKind, C>, Increment<C>>;
+
+// Warning: (ae-forgotten-export) The symbol "TargetOut_2" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type WrapOneResult<Adj, TargetID extends string, WrapperKind extends string, WrapperID extends string> = RewireParents<Adj, TargetID, WrapperID> & Record<WrapperID, NodeEntry<WrapperKind, [TargetID], TargetOut_2<Adj, TargetID>>>;
 
 // (No @packageDocumentation comment for this package)
 

@@ -18,6 +18,9 @@
       "complexity": {
         "noBannedTypes": "off"
       },
+      "correctness": {
+        "useYield": "off"
+      },
       "style": {
         "noNonNullAssertion": "off"
       },
