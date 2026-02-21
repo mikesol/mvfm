@@ -264,26 +264,6 @@ describe("04-normalize", () => {
 });
 
 // =====================================================================
-// 04a-structural: structural elaboration is tested separately
-// =====================================================================
-describe("04a-structural", () => {
-  test.skip("structural elaboration is tested separately (not in core elaborate.ts)", () => {
-    // Records/tuples elaboration uses a separate appS function
-    // defined in the koan, not in core.
-  });
-});
-
-// =====================================================================
-// 04b-accessor: proxy-based deep access is tested separately
-// =====================================================================
-describe("04b-accessor", () => {
-  test.skip("proxy accessor elaboration is tested separately (not in core)", () => {
-    // Proxy-based CExpr deep access uses standalone CREF + Proxy
-    // defined in the koan, not in core.
-  });
-});
-
-// =====================================================================
 // 05-predicates: compile-time only — placeholder proving types exist
 // =====================================================================
 describe("05-predicates (types exist)", () => {

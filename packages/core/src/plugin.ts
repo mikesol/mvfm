@@ -67,6 +67,7 @@ export interface Plugin<
   readonly lifts: Lifts;
   readonly nodeKinds: readonly string[];
   readonly defaultInterpreter?: () => Interpreter;
+  readonly shapes?: Record<string, unknown>;
 }
 
 // ─── Type-level registry derivation ─────────────────────────────────
@@ -137,6 +138,15 @@ export function buildKindInputs(plugins: readonly Plugin[]): Record<string, stri
   return m;
 }
 
+/** Build a structural shapes map (kind to shape descriptor) from plugins. */
+export function buildStructuralShapes(plugins: readonly Plugin[]): Record<string, unknown> {
+  const m: Record<string, unknown> = {};
+  for (const p of plugins) {
+    if (p.shapes) Object.assign(m, p.shapes);
+  }
+  return m;
+}
+
 // ─── mvfmU: compose plugins into $ ─────────────────────────────────
 
 type MergeCtors<P extends readonly Plugin[]> = P extends readonly []
@@ -167,4 +177,3 @@ export function mvfmU<const P extends readonly Plugin[]>(...plugins: P): DollarS
   }
   return allCtors as DollarSign<P>;
 }
-

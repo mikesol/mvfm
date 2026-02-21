@@ -29,6 +29,15 @@ export interface RuntimeEntry {
 /** Symbol brand used to detect CExpr instances at runtime. */
 export const CREF = Symbol.for("mvfm/cref");
 
+// ─── AccessorOverlay: typed property access on CExprs ────────────────
+
+/** Overlays typed property access on CExpr for object/array output types. */
+export type AccessorOverlay<O> = O extends readonly (infer E)[]
+  ? { readonly [k: number]: CExpr<E, "core/access"> }
+  : O extends object
+    ? { readonly [K in keyof O]: CExpr<O[K], "core/access"> }
+    : {};
+
 // ─── CExpr: permissive construction-time expression ─────────────────
 // O = output type (declared by constructor, validated at app() time)
 // Kind = node kind string
@@ -36,27 +45,38 @@ export const CREF = Symbol.for("mvfm/cref");
 declare const cexprBrand: unique symbol;
 
 /** Permissive construction-time expression carrying output type, kind, and raw arguments. */
-export interface CExpr<
+export type CExpr<
   O,
   Kind extends string = string,
   Args extends readonly unknown[] = readonly unknown[],
-> {
+> = {
   readonly [cexprBrand]: { readonly o: O; readonly kind: Kind; readonly args: Args };
   readonly [CREF]: true;
   readonly __kind: Kind;
   readonly __args: readonly unknown[];
-}
+  readonly __out: O;
+} & AccessorOverlay<O>;
 
-/** Create a new CExpr with the given kind and arguments. */
+/** Create a new CExpr with the given kind and arguments (Proxy-wrapped for accessor support). */
 export function makeCExpr<O, Kind extends string, Args extends readonly unknown[]>(
   kind: Kind,
   args: [...Args],
 ): CExpr<O, Kind, Args> {
-  return {
-    [CREF]: true,
-    __kind: kind,
-    __args: args,
-  } as unknown as CExpr<O, Kind, Args>;
+  const raw = { [CREF]: true as const, __kind: kind, __args: args };
+  const proxy: any = new Proxy(raw, {
+    get(t, prop) {
+      if (
+        prop === CREF ||
+        prop === "__kind" ||
+        prop === "__args" ||
+        prop === "__out" ||
+        typeof prop === "symbol"
+      )
+        return (t as any)[prop];
+      return makeCExpr("core/access" as any, [proxy, prop] as any);
+    },
+  });
+  return proxy;
 }
 
 /** Runtime check for whether a value is a CExpr. */

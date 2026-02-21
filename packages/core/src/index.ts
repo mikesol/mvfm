@@ -6,6 +6,7 @@ export * from "./constructors";
 export * from "./dagql";
 export * from "./dirty";
 export * from "./elaborate";
+export * from "./elaborate-types";
 export * from "./expr";
 export * from "./fold";
 export * from "./gc";
