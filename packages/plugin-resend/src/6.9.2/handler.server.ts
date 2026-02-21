@@ -1,5 +1,4 @@
-import type { Interpreter, TypedNode } from "@mvfm/core";
-import { foldAST } from "@mvfm/core";
+import type { Interpreter } from "@mvfm/core";
 import { createResendInterpreter, type ResendClient } from "./interpreter";
 
 /**
@@ -10,19 +9,4 @@ import { createResendInterpreter, type ResendClient } from "./interpreter";
  */
 export function serverInterpreter(client: ResendClient): Interpreter {
   return createResendInterpreter(client);
-}
-
-/**
- * Creates a unified evaluator using the resend server interpreter.
- *
- * @param client - The {@link ResendClient} to execute against.
- * @param baseInterpreter - Base interpreter for evaluating sub-expressions.
- * @returns An async AST evaluator function.
- */
-export function serverEvaluate(
-  client: ResendClient,
-  baseInterpreter: Interpreter,
-): (root: TypedNode) => Promise<unknown> {
-  const interp = { ...baseInterpreter, ...createResendInterpreter(client) };
-  return (root: TypedNode) => foldAST(interp, root);
 }
