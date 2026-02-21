@@ -1,6 +1,5 @@
 /**
- * Koan gates (11-16): commit, wrap, splice, named, dagql, fold/bridge.
- * Imports only from ../../src/index — never from __koans__.
+ * Core API gates (11-15): commit, wrap, splice, named, dagql.
  */
 import { describe, expect, test } from "vitest";
 import {

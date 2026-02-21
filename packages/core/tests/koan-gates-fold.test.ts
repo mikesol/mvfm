@@ -1,6 +1,5 @@
 /**
- * Koan gates (16-bridge): fold, defaults, interpreters, full pipeline.
- * Imports only from ../src/index — never from __koans__.
+ * Core API gates (16): fold, defaults, interpreters, full pipeline.
  */
 import { describe, expect, test } from "vitest";
 import type { Interpreter, PluginDef, RuntimeEntry } from "../src/index";

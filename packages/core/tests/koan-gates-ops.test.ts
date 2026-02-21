@@ -1,6 +1,5 @@
 /**
- * Koan gates (06-15): prove core DAG operation exports satisfy koan contracts.
- * Imports only from ../../src/index — never from __koans__.
+ * Core API gates (06-10): select, map, replace, gc, dirty.
  */
 import { describe, expect, test } from "vitest";
 import type { RuntimeEntry } from "../src/index";

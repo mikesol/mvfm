@@ -1,6 +1,5 @@
 /**
- * Koan gates (00-05): prove core exports satisfy koan contracts.
- * Imports only from ../../src/index — never from __koans__.
+ * Core API gates (00-05): expr, increment, build, traits, composition, predicates.
  */
 import { describe, expect, test } from "vitest";
 import {
