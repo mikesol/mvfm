@@ -11,6 +11,7 @@ export {
   createFoldState,
   defineInterpreter,
   eval_,
+  fold,
   type FoldState,
   foldAST,
   type Handler,

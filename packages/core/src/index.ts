@@ -19,6 +19,7 @@ export {
   createFoldState,
   defineInterpreter,
   eval_,
+  fold,
   foldAST,
   mergeInterpreters,
   recurseScoped,

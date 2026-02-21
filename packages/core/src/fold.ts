@@ -322,3 +322,28 @@ export async function foldAST(
 
   return input;
 }
+
+/**
+ * Compatibility alias for the koan-style fold API.
+ * Currently forwards to {@link foldAST}.
+ */
+export async function fold<K extends string>(
+  interpreter: Interpreter<K>,
+  program: Program<K>,
+  state?: FoldState,
+): Promise<unknown>;
+export async function fold<K extends string>(
+  interpreter: Interpreter<K>,
+  root: TypedNode,
+  state?: FoldState,
+): Promise<unknown>;
+export async function fold(
+  interpreter: Interpreter<string>,
+  rootOrProgram: TypedNode | Program<string>,
+  state?: FoldState,
+): Promise<unknown> {
+  if ("ast" in rootOrProgram && "hash" in rootOrProgram) {
+    return await foldAST(interpreter, rootOrProgram, state);
+  }
+  return await foldAST(interpreter, rootOrProgram, state);
+}
