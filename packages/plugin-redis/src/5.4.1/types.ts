@@ -1,4 +1,4 @@
-import type { Expr } from "@mvfm/core";
+import type { CExpr } from "@mvfm/core";
 
 /**
  * Redis operations added to the DSL context by the redis plugin.
@@ -10,135 +10,141 @@ export interface RedisMethods {
   /** Redis operations, namespaced under `$.redis`. */
   redis: {
     /** Get the value of a key. */
-    get(key: Expr<string> | string): Expr<string | null>;
+    get(key: CExpr<string> | string): CExpr<string | null>;
     /**
      * Set a key to a value with optional positional flags.
      * Matches ioredis signature: `set(key, value, "EX", 60, "NX")`
      */
     set(
-      key: Expr<string> | string,
-      value: Expr<string | number> | string | number,
-      ...args: (Expr<string | number> | string | number)[]
-    ): Expr<string | null>;
+      key: CExpr<string> | string,
+      value: CExpr<string | number> | string | number,
+      ...args: (CExpr<string | number> | string | number)[]
+    ): CExpr<string | null>;
     /** Increment the integer value of a key by one. */
-    incr(key: Expr<string> | string): Expr<number>;
+    incr(key: CExpr<string> | string): CExpr<number>;
     /** Increment the integer value of a key by a given amount. */
-    incrby(key: Expr<string> | string, increment: Expr<number> | number): Expr<number>;
+    incrby(key: CExpr<string> | string, increment: CExpr<number> | number): CExpr<number>;
     /** Decrement the integer value of a key by one. */
-    decr(key: Expr<string> | string): Expr<number>;
+    decr(key: CExpr<string> | string): CExpr<number>;
     /** Decrement the integer value of a key by a given amount. */
-    decrby(key: Expr<string> | string, decrement: Expr<number> | number): Expr<number>;
+    decrby(key: CExpr<string> | string, decrement: CExpr<number> | number): CExpr<number>;
     /** Get the values of multiple keys. */
-    mget(...keys: (Expr<string> | string)[]): Expr<(string | null)[]>;
+    mget(...keys: (CExpr<string> | string)[]): CExpr<(string | null)[]>;
     /** Set multiple key-value pairs. */
     mset(
-      mapping: Expr<Record<string, string | number>> | Record<string, string | number>,
-    ): Expr<"OK">;
+      mapping: CExpr<Record<string, string | number>> | Record<string, string | number>,
+    ): CExpr<"OK">;
     /** Append a value to a key. */
     append(
-      key: Expr<string> | string,
-      value: Expr<string | number> | string | number,
-    ): Expr<number>;
+      key: CExpr<string> | string,
+      value: CExpr<string | number> | string | number,
+    ): CExpr<number>;
     /** Get a substring of the string stored at a key. */
     getrange(
-      key: Expr<string> | string,
-      start: Expr<number> | number,
-      end: Expr<number> | number,
-    ): Expr<string>;
+      key: CExpr<string> | string,
+      start: CExpr<number> | number,
+      end: CExpr<number> | number,
+    ): CExpr<string>;
     /** Overwrite part of a string at key starting at the specified offset. */
     setrange(
-      key: Expr<string> | string,
-      offset: Expr<number> | number,
-      value: Expr<string | number> | string | number,
-    ): Expr<number>;
+      key: CExpr<string> | string,
+      offset: CExpr<number> | number,
+      value: CExpr<string | number> | string | number,
+    ): CExpr<number>;
 
     /** Delete one or more keys. */
-    del(...keys: (Expr<string> | string)[]): Expr<number>;
+    del(...keys: (CExpr<string> | string)[]): CExpr<number>;
     /** Check if one or more keys exist. */
-    exists(...keys: (Expr<string> | string)[]): Expr<number>;
+    exists(...keys: (CExpr<string> | string)[]): CExpr<number>;
     /** Set a timeout on a key (seconds). */
-    expire(key: Expr<string> | string, seconds: Expr<number> | number): Expr<number>;
+    expire(key: CExpr<string> | string, seconds: CExpr<number> | number): CExpr<number>;
     /** Set a timeout on a key (milliseconds). */
-    pexpire(key: Expr<string> | string, milliseconds: Expr<number> | number): Expr<number>;
+    pexpire(key: CExpr<string> | string, milliseconds: CExpr<number> | number): CExpr<number>;
     /** Get the remaining TTL of a key (seconds). */
-    ttl(key: Expr<string> | string): Expr<number>;
+    ttl(key: CExpr<string> | string): CExpr<number>;
     /** Get the remaining TTL of a key (milliseconds). */
-    pttl(key: Expr<string> | string): Expr<number>;
+    pttl(key: CExpr<string> | string): CExpr<number>;
 
     /** Get the value of a hash field. */
-    hget(key: Expr<string> | string, field: Expr<string> | string): Expr<string | null>;
+    hget(key: CExpr<string> | string, field: CExpr<string> | string): CExpr<string | null>;
     /** Set fields in a hash. */
     hset(
-      key: Expr<string> | string,
-      mapping: Expr<Record<string, string | number>> | Record<string, string | number>,
-    ): Expr<number>;
+      key: CExpr<string> | string,
+      mapping: CExpr<Record<string, string | number>> | Record<string, string | number>,
+    ): CExpr<number>;
     /** Get the values of multiple hash fields. */
     hmget(
-      key: Expr<string> | string,
-      ...fields: (Expr<string> | string)[]
-    ): Expr<(string | null)[]>;
+      key: CExpr<string> | string,
+      ...fields: (CExpr<string> | string)[]
+    ): CExpr<(string | null)[]>;
     /** Get all fields and values in a hash as a flat key/value array. */
-    hgetall(key: Expr<string> | string): Expr<string[]>;
+    hgetall(key: CExpr<string> | string): CExpr<string[]>;
     /** Delete one or more hash fields. */
-    hdel(key: Expr<string> | string, ...fields: (Expr<string> | string)[]): Expr<number>;
+    hdel(key: CExpr<string> | string, ...fields: (CExpr<string> | string)[]): CExpr<number>;
     /** Check if a hash field exists. */
-    hexists(key: Expr<string> | string, field: Expr<string> | string): Expr<number>;
+    hexists(key: CExpr<string> | string, field: CExpr<string> | string): CExpr<number>;
     /** Get the number of fields in a hash. */
-    hlen(key: Expr<string> | string): Expr<number>;
+    hlen(key: CExpr<string> | string): CExpr<number>;
     /** Get all field names in a hash. */
-    hkeys(key: Expr<string> | string): Expr<string[]>;
+    hkeys(key: CExpr<string> | string): CExpr<string[]>;
     /** Get all values in a hash. */
-    hvals(key: Expr<string> | string): Expr<string[]>;
+    hvals(key: CExpr<string> | string): CExpr<string[]>;
     /** Increment the integer value of a hash field. */
     hincrby(
-      key: Expr<string> | string,
-      field: Expr<string> | string,
-      increment: Expr<number> | number,
-    ): Expr<number>;
+      key: CExpr<string> | string,
+      field: CExpr<string> | string,
+      increment: CExpr<number> | number,
+    ): CExpr<number>;
 
     /** Prepend elements to a list. */
     lpush(
-      key: Expr<string> | string,
-      ...elements: (Expr<string | number> | string | number)[]
-    ): Expr<number>;
+      key: CExpr<string> | string,
+      ...elements: (CExpr<string | number> | string | number)[]
+    ): CExpr<number>;
     /** Append elements to a list. */
     rpush(
-      key: Expr<string> | string,
-      ...elements: (Expr<string | number> | string | number)[]
-    ): Expr<number>;
+      key: CExpr<string> | string,
+      ...elements: (CExpr<string | number> | string | number)[]
+    ): CExpr<number>;
     /** Remove and return the first element(s) of a list. */
-    lpop(key: Expr<string> | string, count?: Expr<number> | number): Expr<string | null | string[]>;
+    lpop(
+      key: CExpr<string> | string,
+      count?: CExpr<number> | number,
+    ): CExpr<string | null | string[]>;
     /** Remove and return the last element(s) of a list. */
-    rpop(key: Expr<string> | string, count?: Expr<number> | number): Expr<string | null | string[]>;
+    rpop(
+      key: CExpr<string> | string,
+      count?: CExpr<number> | number,
+    ): CExpr<string | null | string[]>;
     /** Get the length of a list. */
-    llen(key: Expr<string> | string): Expr<number>;
+    llen(key: CExpr<string> | string): CExpr<number>;
     /** Get a range of elements from a list. */
     lrange(
-      key: Expr<string> | string,
-      start: Expr<number> | number,
-      stop: Expr<number> | number,
-    ): Expr<string[]>;
+      key: CExpr<string> | string,
+      start: CExpr<number> | number,
+      stop: CExpr<number> | number,
+    ): CExpr<string[]>;
     /** Get an element by index. */
-    lindex(key: Expr<string> | string, index: Expr<number> | number): Expr<string | null>;
+    lindex(key: CExpr<string> | string, index: CExpr<number> | number): CExpr<string | null>;
     /** Set the value of an element by index. */
     lset(
-      key: Expr<string> | string,
-      index: Expr<number> | number,
-      element: Expr<string | number> | string | number,
-    ): Expr<"OK">;
+      key: CExpr<string> | string,
+      index: CExpr<number> | number,
+      element: CExpr<string | number> | string | number,
+    ): CExpr<"OK">;
     /** Remove elements from a list. */
     lrem(
-      key: Expr<string> | string,
-      count: Expr<number> | number,
-      element: Expr<string | number> | string | number,
-    ): Expr<number>;
+      key: CExpr<string> | string,
+      count: CExpr<number> | number,
+      element: CExpr<string | number> | string | number,
+    ): CExpr<number>;
     /** Insert an element before or after a pivot element. */
     linsert(
-      key: Expr<string> | string,
+      key: CExpr<string> | string,
       position: "BEFORE" | "AFTER",
-      pivot: Expr<string | number> | string | number,
-      element: Expr<string | number> | string | number,
-    ): Expr<number>;
+      pivot: CExpr<string | number> | string | number,
+      element: CExpr<string | number> | string | number,
+    ): CExpr<number>;
   };
 }
 

@@ -1,260 +1,168 @@
-import type { Expr, PluginContext } from "@mvfm/core";
-import type { RedisConfig, RedisMethods } from "./types";
+import type { CExpr } from "@mvfm/core";
+import { isCExpr, makeCExpr } from "@mvfm/core";
+import type { RedisMethods } from "./types";
 
-type RedisValue = Expr<string | number> | string | number;
+type RedisValue = CExpr<string | number> | string | number;
 
-export function buildRedisMethods(ctx: PluginContext, resolvedConfig: RedisConfig): RedisMethods {
-  const resolveKey = (key: Expr<string> | string) =>
-    ctx.isExpr(key) ? key.__node : ctx.lift(key).__node;
-  const resolveValue = (value: Expr<unknown> | unknown) =>
-    ctx.isExpr(value) ? value.__node : ctx.lift(value).__node;
-  const resolveKeys = (...keys: (Expr<string> | string)[]) => keys.map((k) => resolveKey(k));
+/**
+ * Recursively lifts a plain value into a CExpr tree.
+ * - CExpr values are returned as-is.
+ * - Primitives are returned as-is (elaborate lifts them).
+ * - Plain objects become `redis/record` CExprs with key-value child pairs.
+ * - Arrays become `redis/array` CExprs.
+ */
+function liftArg(value: unknown): unknown {
+  if (isCExpr(value)) return value;
+  if (typeof value === "string") return value;
+  if (typeof value === "number") return value;
+  if (typeof value === "boolean") return value;
+  if (value === null || value === undefined) return value;
+  if (Array.isArray(value)) {
+    return makeCExpr("redis/array", value.map(liftArg));
+  }
+  if (typeof value === "object") {
+    const pairs: unknown[] = [];
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      pairs.push(k, liftArg(v));
+    }
+    return makeCExpr("redis/record", pairs);
+  }
+  return value;
+}
 
+/**
+ * Builds the redis constructor methods using makeCExpr + liftArg.
+ *
+ * Each method produces a CExpr node with positional children.
+ * Config is NOT stored on AST nodes — it's captured by the interpreter.
+ */
+export function buildRedisApi(): RedisMethods["redis"] {
   return {
-    redis: {
-      get(key) {
-        return ctx.expr({ kind: "redis/get", key: resolveKey(key), config: resolvedConfig });
-      },
-      set(key, value, ...args) {
-        return ctx.expr({
-          kind: "redis/set",
-          key: resolveKey(key),
-          value: resolveValue(value),
-          args: args.map((a) => resolveValue(a)),
-          config: resolvedConfig,
-        });
-      },
-      incr(key) {
-        return ctx.expr({ kind: "redis/incr", key: resolveKey(key), config: resolvedConfig });
-      },
-      incrby(key, increment) {
-        return ctx.expr({
-          kind: "redis/incrby",
-          key: resolveKey(key),
-          increment: resolveValue(increment),
-          config: resolvedConfig,
-        });
-      },
-      decr(key) {
-        return ctx.expr({ kind: "redis/decr", key: resolveKey(key), config: resolvedConfig });
-      },
-      decrby(key, decrement) {
-        return ctx.expr({
-          kind: "redis/decrby",
-          key: resolveKey(key),
-          decrement: resolveValue(decrement),
-          config: resolvedConfig,
-        });
-      },
-      mget(...keys) {
-        return ctx.expr({ kind: "redis/mget", keys: resolveKeys(...keys), config: resolvedConfig });
-      },
-      mset(mapping) {
-        return ctx.expr({
-          kind: "redis/mset",
-          mapping: resolveValue(mapping),
-          config: resolvedConfig,
-        });
-      },
-      append(key, value) {
-        return ctx.expr({
-          kind: "redis/append",
-          key: resolveKey(key),
-          value: resolveValue(value),
-          config: resolvedConfig,
-        });
-      },
-      getrange(key, start, end) {
-        return ctx.expr({
-          kind: "redis/getrange",
-          key: resolveKey(key),
-          start: resolveValue(start),
-          end: resolveValue(end),
-          config: resolvedConfig,
-        });
-      },
-      setrange(key, offset, value) {
-        return ctx.expr({
-          kind: "redis/setrange",
-          key: resolveKey(key),
-          offset: resolveValue(offset),
-          value: resolveValue(value),
-          config: resolvedConfig,
-        });
-      },
-      del(...keys) {
-        return ctx.expr({ kind: "redis/del", keys: resolveKeys(...keys), config: resolvedConfig });
-      },
-      exists(...keys) {
-        return ctx.expr({
-          kind: "redis/exists",
-          keys: resolveKeys(...keys),
-          config: resolvedConfig,
-        });
-      },
-      expire(key, seconds) {
-        return ctx.expr({
-          kind: "redis/expire",
-          key: resolveKey(key),
-          seconds: resolveValue(seconds),
-          config: resolvedConfig,
-        });
-      },
-      pexpire(key, milliseconds) {
-        return ctx.expr({
-          kind: "redis/pexpire",
-          key: resolveKey(key),
-          milliseconds: resolveValue(milliseconds),
-          config: resolvedConfig,
-        });
-      },
-      ttl(key) {
-        return ctx.expr({ kind: "redis/ttl", key: resolveKey(key), config: resolvedConfig });
-      },
-      pttl(key) {
-        return ctx.expr({ kind: "redis/pttl", key: resolveKey(key), config: resolvedConfig });
-      },
-      hget(key, field) {
-        return ctx.expr({
-          kind: "redis/hget",
-          key: resolveKey(key),
-          field: resolveKey(field),
-          config: resolvedConfig,
-        });
-      },
-      hset(key, mapping) {
-        return ctx.expr({
-          kind: "redis/hset",
-          key: resolveKey(key),
-          mapping: resolveValue(mapping),
-          config: resolvedConfig,
-        });
-      },
-      hmget(key, ...fields) {
-        return ctx.expr({
-          kind: "redis/hmget",
-          key: resolveKey(key),
-          fields: resolveKeys(...fields),
-          config: resolvedConfig,
-        });
-      },
-      hgetall(key) {
-        return ctx.expr({ kind: "redis/hgetall", key: resolveKey(key), config: resolvedConfig });
-      },
-      hdel(key, ...fields) {
-        return ctx.expr({
-          kind: "redis/hdel",
-          key: resolveKey(key),
-          fields: resolveKeys(...fields),
-          config: resolvedConfig,
-        });
-      },
-      hexists(key, field) {
-        return ctx.expr({
-          kind: "redis/hexists",
-          key: resolveKey(key),
-          field: resolveKey(field),
-          config: resolvedConfig,
-        });
-      },
-      hlen(key) {
-        return ctx.expr({ kind: "redis/hlen", key: resolveKey(key), config: resolvedConfig });
-      },
-      hkeys(key) {
-        return ctx.expr({ kind: "redis/hkeys", key: resolveKey(key), config: resolvedConfig });
-      },
-      hvals(key) {
-        return ctx.expr({ kind: "redis/hvals", key: resolveKey(key), config: resolvedConfig });
-      },
-      hincrby(key, field, increment) {
-        return ctx.expr({
-          kind: "redis/hincrby",
-          key: resolveKey(key),
-          field: resolveKey(field),
-          increment: resolveValue(increment),
-          config: resolvedConfig,
-        });
-      },
-      lpush(key, ...elements) {
-        return ctx.expr({
-          kind: "redis/lpush",
-          key: resolveKey(key),
-          elements: elements.map((e) => resolveValue(e)),
-          config: resolvedConfig,
-        });
-      },
-      rpush(key, ...elements) {
-        return ctx.expr({
-          kind: "redis/rpush",
-          key: resolveKey(key),
-          elements: elements.map((e) => resolveValue(e)),
-          config: resolvedConfig,
-        });
-      },
-      lpop(key, count?) {
-        return ctx.expr({
-          kind: "redis/lpop",
-          key: resolveKey(key),
-          count: count != null ? resolveValue(count) : null,
-          config: resolvedConfig,
-        });
-      },
-      rpop(key, count?) {
-        return ctx.expr({
-          kind: "redis/rpop",
-          key: resolveKey(key),
-          count: count != null ? resolveValue(count) : null,
-          config: resolvedConfig,
-        });
-      },
-      llen(key) {
-        return ctx.expr({ kind: "redis/llen", key: resolveKey(key), config: resolvedConfig });
-      },
-      lrange(key, start, stop) {
-        return ctx.expr({
-          kind: "redis/lrange",
-          key: resolveKey(key),
-          start: resolveValue(start),
-          stop: resolveValue(stop),
-          config: resolvedConfig,
-        });
-      },
-      lindex(key, index) {
-        return ctx.expr({
-          kind: "redis/lindex",
-          key: resolveKey(key),
-          index: resolveValue(index),
-          config: resolvedConfig,
-        });
-      },
-      lset(key, index, element) {
-        return ctx.expr({
-          kind: "redis/lset",
-          key: resolveKey(key),
-          index: resolveValue(index),
-          element: resolveValue(element),
-          config: resolvedConfig,
-        });
-      },
-      lrem(key, count, element) {
-        return ctx.expr({
-          kind: "redis/lrem",
-          key: resolveKey(key),
-          count: resolveValue(count),
-          element: resolveValue(element),
-          config: resolvedConfig,
-        });
-      },
-      linsert(key, position, pivot, element) {
-        return ctx.expr({
-          kind: "redis/linsert",
-          key: resolveKey(key),
-          position,
-          pivot: resolveValue(pivot as RedisValue),
-          element: resolveValue(element as RedisValue),
-          config: resolvedConfig,
-        });
-      },
+    get(key) {
+      return makeCExpr("redis/get", [liftArg(key)]);
+    },
+    set(key, value, ...args) {
+      return makeCExpr("redis/set", [liftArg(key), liftArg(value), ...args.map((a) => liftArg(a))]);
+    },
+    incr(key) {
+      return makeCExpr("redis/incr", [liftArg(key)]);
+    },
+    incrby(key, increment) {
+      return makeCExpr("redis/incrby", [liftArg(key), liftArg(increment)]);
+    },
+    decr(key) {
+      return makeCExpr("redis/decr", [liftArg(key)]);
+    },
+    decrby(key, decrement) {
+      return makeCExpr("redis/decrby", [liftArg(key), liftArg(decrement)]);
+    },
+    mget(...keys) {
+      return makeCExpr(
+        "redis/mget",
+        keys.map((k) => liftArg(k)),
+      );
+    },
+    mset(mapping) {
+      return makeCExpr("redis/mset", [liftArg(mapping)]);
+    },
+    append(key, value) {
+      return makeCExpr("redis/append", [liftArg(key), liftArg(value)]);
+    },
+    getrange(key, start, end) {
+      return makeCExpr("redis/getrange", [liftArg(key), liftArg(start), liftArg(end)]);
+    },
+    setrange(key, offset, value) {
+      return makeCExpr("redis/setrange", [liftArg(key), liftArg(offset), liftArg(value)]);
+    },
+    del(...keys) {
+      return makeCExpr(
+        "redis/del",
+        keys.map((k) => liftArg(k)),
+      );
+    },
+    exists(...keys) {
+      return makeCExpr(
+        "redis/exists",
+        keys.map((k) => liftArg(k)),
+      );
+    },
+    expire(key, seconds) {
+      return makeCExpr("redis/expire", [liftArg(key), liftArg(seconds)]);
+    },
+    pexpire(key, milliseconds) {
+      return makeCExpr("redis/pexpire", [liftArg(key), liftArg(milliseconds)]);
+    },
+    ttl(key) {
+      return makeCExpr("redis/ttl", [liftArg(key)]);
+    },
+    pttl(key) {
+      return makeCExpr("redis/pttl", [liftArg(key)]);
+    },
+    hget(key, field) {
+      return makeCExpr("redis/hget", [liftArg(key), liftArg(field)]);
+    },
+    hset(key, mapping) {
+      return makeCExpr("redis/hset", [liftArg(key), liftArg(mapping)]);
+    },
+    hmget(key, ...fields) {
+      return makeCExpr("redis/hmget", [liftArg(key), ...fields.map((f) => liftArg(f))]);
+    },
+    hgetall(key) {
+      return makeCExpr("redis/hgetall", [liftArg(key)]);
+    },
+    hdel(key, ...fields) {
+      return makeCExpr("redis/hdel", [liftArg(key), ...fields.map((f) => liftArg(f))]);
+    },
+    hexists(key, field) {
+      return makeCExpr("redis/hexists", [liftArg(key), liftArg(field)]);
+    },
+    hlen(key) {
+      return makeCExpr("redis/hlen", [liftArg(key)]);
+    },
+    hkeys(key) {
+      return makeCExpr("redis/hkeys", [liftArg(key)]);
+    },
+    hvals(key) {
+      return makeCExpr("redis/hvals", [liftArg(key)]);
+    },
+    hincrby(key, field, increment) {
+      return makeCExpr("redis/hincrby", [liftArg(key), liftArg(field), liftArg(increment)]);
+    },
+    lpush(key, ...elements) {
+      return makeCExpr("redis/lpush", [liftArg(key), ...elements.map((e) => liftArg(e))]);
+    },
+    rpush(key, ...elements) {
+      return makeCExpr("redis/rpush", [liftArg(key), ...elements.map((e) => liftArg(e))]);
+    },
+    lpop(key, count?) {
+      if (count != null) {
+        return makeCExpr("redis/lpop", [liftArg(key), liftArg(count)]);
+      }
+      return makeCExpr("redis/lpop", [liftArg(key)]);
+    },
+    rpop(key, count?) {
+      if (count != null) {
+        return makeCExpr("redis/rpop", [liftArg(key), liftArg(count)]);
+      }
+      return makeCExpr("redis/rpop", [liftArg(key)]);
+    },
+    llen(key) {
+      return makeCExpr("redis/llen", [liftArg(key)]);
+    },
+    lrange(key, start, stop) {
+      return makeCExpr("redis/lrange", [liftArg(key), liftArg(start), liftArg(stop)]);
+    },
+    lindex(key, index) {
+      return makeCExpr("redis/lindex", [liftArg(key), liftArg(index)]);
+    },
+    lset(key, index, element) {
+      return makeCExpr("redis/lset", [liftArg(key), liftArg(index), liftArg(element)]);
+    },
+    lrem(key, count, element) {
+      return makeCExpr("redis/lrem", [liftArg(key), liftArg(count), liftArg(element)]);
+    },
+    linsert(key, position, pivot, element) {
+      return makeCExpr("redis/linsert", [liftArg(key), position, liftArg(pivot), liftArg(element)]);
     },
   };
 }

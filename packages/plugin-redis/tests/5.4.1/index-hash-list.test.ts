@@ -1,88 +1,58 @@
 import { describe, expect, it } from "vitest";
-import { app, strip } from "./ast.shared";
+import { redis } from "../../src/5.4.1";
 
-describe("redis: key commands", () => {
-  it("produces expire/pexpire/ttl/pttl nodes", () => {
-    expect((strip(app(($) => $.redis.expire("mykey", 300)).ast) as any).result.kind).toBe(
-      "redis/expire",
-    );
-    expect((strip(app(($) => $.redis.pexpire("mykey", 5000)).ast) as any).result.kind).toBe(
-      "redis/pexpire",
-    );
-    expect((strip(app(($) => $.redis.ttl("mykey")).ast) as any).result.kind).toBe("redis/ttl");
-    expect((strip(app(($) => $.redis.pttl("mykey")).ast) as any).result.kind).toBe("redis/pttl");
+const plugin = redis({ host: "127.0.0.1", port: 6379 });
+const api = plugin.ctors.redis;
+
+describe("redis: CExpr construction (key commands)", () => {
+  it("produces key command CExprs", () => {
+    expect(api.del("mykey").__kind).toBe("redis/del");
+    expect(api.exists("mykey").__kind).toBe("redis/exists");
+    expect(api.expire("mykey", 300).__kind).toBe("redis/expire");
+    expect(api.pexpire("mykey", 5000).__kind).toBe("redis/pexpire");
+    expect(api.ttl("mykey").__kind).toBe("redis/ttl");
+    expect(api.pttl("mykey").__kind).toBe("redis/pttl");
   });
 });
 
-describe("redis: hash commands", () => {
-  it("produces h* nodes", () => {
-    expect((strip(app(($) => $.redis.hget("myhash", "field1")).ast) as any).result.kind).toBe(
-      "redis/hget",
-    );
-    expect(
-      (strip(app(($) => $.redis.hset("myhash", { field1: "val1" })).ast) as any).result.kind,
-    ).toBe("redis/hset");
-    expect((strip(app(($) => $.redis.hmget("myhash", "f1", "f2")).ast) as any).result.kind).toBe(
-      "redis/hmget",
-    );
-    expect((strip(app(($) => $.redis.hgetall("myhash")).ast) as any).result.kind).toBe(
-      "redis/hgetall",
-    );
-    expect((strip(app(($) => $.redis.hdel("myhash", "f1", "f2")).ast) as any).result.kind).toBe(
-      "redis/hdel",
-    );
-    expect((strip(app(($) => $.redis.hexists("myhash", "field1")).ast) as any).result.kind).toBe(
-      "redis/hexists",
-    );
-    expect((strip(app(($) => $.redis.hlen("myhash")).ast) as any).result.kind).toBe("redis/hlen");
-    expect((strip(app(($) => $.redis.hkeys("myhash")).ast) as any).result.kind).toBe("redis/hkeys");
-    expect((strip(app(($) => $.redis.hvals("myhash")).ast) as any).result.kind).toBe("redis/hvals");
-    expect(
-      (strip(app(($) => $.redis.hincrby("myhash", "counter", 10)).ast) as any).result.kind,
-    ).toBe("redis/hincrby");
+describe("redis: CExpr construction (hash commands)", () => {
+  it("produces hash command CExprs", () => {
+    expect(api.hget("myhash", "field1").__kind).toBe("redis/hget");
+    const hsetExpr = api.hset("myhash", { field1: "val1" });
+    expect(hsetExpr.__kind).toBe("redis/hset");
+    expect(hsetExpr.__args).toHaveLength(2);
+    const recordArg = hsetExpr.__args[1] as { __kind: string };
+    expect(recordArg.__kind).toBe("redis/record");
+    expect(api.hmget("myhash", "f1", "f2").__kind).toBe("redis/hmget");
+    expect(api.hgetall("myhash").__kind).toBe("redis/hgetall");
+    expect(api.hdel("myhash", "f1", "f2").__kind).toBe("redis/hdel");
+    expect(api.hexists("myhash", "field1").__kind).toBe("redis/hexists");
+    expect(api.hlen("myhash").__kind).toBe("redis/hlen");
+    expect(api.hkeys("myhash").__kind).toBe("redis/hkeys");
+    expect(api.hvals("myhash").__kind).toBe("redis/hvals");
+    expect(api.hincrby("myhash", "counter", 10).__kind).toBe("redis/hincrby");
   });
 });
 
-describe("redis: list commands", () => {
-  it("produces list command nodes", () => {
-    expect((strip(app(($) => $.redis.lpush("mylist", "a", "b")).ast) as any).result.kind).toBe(
-      "redis/lpush",
-    );
-    expect((strip(app(($) => $.redis.rpush("mylist", "c")).ast) as any).result.kind).toBe(
-      "redis/rpush",
-    );
-    expect((strip(app(($) => $.redis.lpop("mylist", 3)).ast) as any).result.kind).toBe(
-      "redis/lpop",
-    );
-    expect((strip(app(($) => $.redis.rpop("mylist")).ast) as any).result.kind).toBe("redis/rpop");
-    expect((strip(app(($) => $.redis.llen("mylist")).ast) as any).result.kind).toBe("redis/llen");
-    expect((strip(app(($) => $.redis.lrange("mylist", 0, -1)).ast) as any).result.kind).toBe(
-      "redis/lrange",
-    );
-    expect((strip(app(($) => $.redis.lindex("mylist", 2)).ast) as any).result.kind).toBe(
-      "redis/lindex",
-    );
-    expect((strip(app(($) => $.redis.lset("mylist", 0, "newval")).ast) as any).result.kind).toBe(
-      "redis/lset",
-    );
-    expect((strip(app(($) => $.redis.lrem("mylist", 2, "val")).ast) as any).result.kind).toBe(
-      "redis/lrem",
-    );
-    expect(
-      (strip(app(($) => $.redis.linsert("mylist", "BEFORE", "pivot", "elem")).ast) as any).result
-        .kind,
-    ).toBe("redis/linsert");
+describe("redis: CExpr construction (list commands)", () => {
+  it("produces list command CExprs", () => {
+    expect(api.lpush("mylist", "a", "b").__kind).toBe("redis/lpush");
+    expect(api.rpush("mylist", "c").__kind).toBe("redis/rpush");
+    expect(api.lpop("mylist", 3).__kind).toBe("redis/lpop");
+    expect(api.rpop("mylist").__kind).toBe("redis/rpop");
+    expect(api.llen("mylist").__kind).toBe("redis/llen");
+    expect(api.lrange("mylist", 0, -1).__kind).toBe("redis/lrange");
+    expect(api.lindex("mylist", 2).__kind).toBe("redis/lindex");
+    expect(api.lset("mylist", 0, "newval").__kind).toBe("redis/lset");
+    expect(api.lrem("mylist", 2, "val").__kind).toBe("redis/lrem");
+    expect(api.linsert("mylist", "BEFORE", "pivot", "elem").__kind).toBe("redis/linsert");
   });
 });
 
-describe("redis: cross-operation dependencies", () => {
-  it("can use result of get as input to set", () => {
-    const prog = app(($) => {
-      const val = $.redis.get("source");
-      const result = $.redis.set("dest", val);
-      return $.begin(val, result);
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/begin");
+describe("redis: defaults() without override", () => {
+  it("throws when no override provided for redis plugin", async () => {
+    const { defaults, numPluginU, strPluginU } = await import("@mvfm/core");
+    const plugins = [numPluginU, strPluginU, plugin] as const;
+    expect(() => defaults(plugins)).toThrow(/no defaultInterpreter/i);
   });
 });
