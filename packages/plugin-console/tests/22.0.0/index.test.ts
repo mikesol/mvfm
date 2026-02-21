@@ -1,12 +1,8 @@
-import { mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { consolePlugin } from "../../src/22.0.0";
 
-function strip(ast: unknown): unknown {
-  return JSON.parse(JSON.stringify(ast, (k, v) => (k === "__id" ? undefined : v)));
-}
-
-const app = mvfm(num, str, consolePlugin());
+const plugin = consolePlugin();
+const api = plugin.ctors.console;
 
 const cases: ReadonlyArray<{ method: string; args: unknown[] }> = [
   { method: "assert", args: [true, "ok"] },
@@ -30,42 +26,71 @@ const cases: ReadonlyArray<{ method: string; args: unknown[] }> = [
   { method: "warn", args: ["warn"] },
 ];
 
-describe("console plugin: full method coverage emits namespaced node kinds", () => {
+describe("console plugin: CExpr construction", () => {
   for (const c of cases) {
-    it(`$.console.${c.method}() emits console/${c.method}`, () => {
-      const prog = app(($) => ($.console as any)[c.method](...c.args));
-      const ast = strip(prog.ast) as any;
-      expect(ast.result.kind).toBe(`console/${c.method}`);
-      expect(ast.result.args).toBeDefined();
-      expect(Array.isArray(ast.result.args)).toBe(true);
+    it(`$.console.${c.method}() emits CExpr with console/${c.method}`, () => {
+      const expr = (api as any)[c.method](...c.args);
+      expect(expr.__kind).toBe(`console/${c.method}`);
+      expect(Array.isArray(expr.__args)).toBe(true);
     });
   }
 });
 
 describe("console plugin: special argument behavior", () => {
-  it("captures Expr values for assert data", () => {
-    const prog = app(($) => $.console.assert($.input.ok, "message", $.input.detail));
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("console/assert");
-    expect(ast.result.args[0].kind).toBe("core/prop_access");
-    expect(ast.result.args[2].kind).toBe("core/prop_access");
-  });
-
-  it("clear and groupEnd have zero args", () => {
-    const clearProg = app(($) => $.console.clear());
-    const clearAst = strip(clearProg.ast) as any;
-    expect(clearAst.result.args).toHaveLength(0);
-
-    const groupEndProg = app(($) => $.console.groupEnd());
-    const groupEndAst = strip(groupEndProg.ast) as any;
-    expect(groupEndAst.result.args).toHaveLength(0);
+  it("clear and groupEnd produce zero-arg CExprs", () => {
+    expect(api.clear().__args).toHaveLength(0);
+    expect(api.groupEnd().__args).toHaveLength(0);
   });
 
   it("dir captures optional second parameter", () => {
-    const prog = app(($) => $.console.dir($.input.obj, { depth: 2 }));
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("console/dir");
-    expect(ast.result.args).toHaveLength(2);
-    expect(ast.result.args[0].kind).toBe("core/prop_access");
+    const expr = api.dir("item", { depth: 2 });
+    expect(expr.__kind).toBe("console/dir");
+    expect(expr.__args).toHaveLength(2);
+  });
+
+  it("dir with no args produces zero-arg CExpr", () => {
+    const expr = api.dir();
+    expect(expr.__args).toHaveLength(0);
+  });
+
+  it("timeLog captures label plus extra args", () => {
+    const expr = api.timeLog("timer", "extra1", "extra2");
+    expect(expr.__kind).toBe("console/timeLog");
+    expect(expr.__args).toHaveLength(3);
+  });
+});
+
+describe("console plugin: unified Plugin shape", () => {
+  it("has correct name", () => {
+    expect(plugin.name).toBe("console");
+  });
+
+  it("has 19 node kinds", () => {
+    expect(plugin.nodeKinds).toHaveLength(19);
+  });
+
+  it("nodeKinds are all namespaced", () => {
+    for (const kind of plugin.nodeKinds) {
+      expect(kind).toMatch(/^console\//);
+    }
+  });
+
+  it("kinds map has entries for all node kinds", () => {
+    for (const kind of plugin.nodeKinds) {
+      expect(plugin.kinds[kind]).toBeDefined();
+    }
+  });
+
+  it("has empty traits and lifts", () => {
+    expect(plugin.traits).toEqual({});
+    expect(plugin.lifts).toEqual({});
+  });
+
+  it("has a defaultInterpreter factory", () => {
+    expect(typeof plugin.defaultInterpreter).toBe("function");
+    const interp = plugin.defaultInterpreter();
+    for (const kind of plugin.nodeKinds) {
+      expect(typeof interp[kind]).toBe("function");
+    }
   });
 });
