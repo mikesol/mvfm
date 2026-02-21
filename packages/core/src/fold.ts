@@ -2,6 +2,7 @@
 // Stack-safe async fold with memoization and taint tracking
 // ============================================================
 
+/* biome-ignore lint/nursery/noExcessiveLinesPerFile: fold engine is intentionally centralized */
 import type { Program } from "./types";
 
 /**
@@ -325,7 +326,7 @@ export async function foldAST(
 
 /**
  * Compatibility alias for the koan-style fold API.
- * Currently forwards to {@link foldAST}.
+ * Currently forwards to foldAST.
  */
 export async function fold<K extends string>(
   interpreter: Interpreter<K>,

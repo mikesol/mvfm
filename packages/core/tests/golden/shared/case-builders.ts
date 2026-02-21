@@ -1,4 +1,4 @@
-import { mvfm, num, semiring, str, eq } from "../../../src/index";
+import { eq, mvfm, num, semiring, str } from "../../../src/index";
 
 export function buildMathApp() {
   return mvfm(num, semiring);

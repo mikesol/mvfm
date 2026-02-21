@@ -117,7 +117,7 @@ export type RewireAdj<Adj, Old extends string, New extends string> = {
     : Adj[K];
 };
 
-/** Rewire every child reference oldRef->newRef across the graph. */
+/** Rewire every child reference from oldRef to newRef across the graph. */
 export function rewireChildren<
   O,
   R extends string,

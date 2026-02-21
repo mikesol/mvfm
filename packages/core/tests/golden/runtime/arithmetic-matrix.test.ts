@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
-
-import { runWithDefaults } from "../shared/case-runner";
 import { buildMathApp } from "../shared/case-builders";
+import { runWithDefaults } from "../shared/case-runner";
 
 type NumCase = {
   name: string;
-  build: (d: ReturnType<typeof buildMathApp> extends (fn: infer F) => any ? Parameters<F>[0] : never) => unknown;
+  build: (
+    d: ReturnType<typeof buildMathApp> extends (fn: infer F) => any ? Parameters<F>[0] : never,
+  ) => unknown;
   expected: number;
 };
 

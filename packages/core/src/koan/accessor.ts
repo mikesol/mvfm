@@ -1,11 +1,17 @@
-import { CREF, type CExpr } from "./expr";
+import { type CExpr, CREF } from "./expr";
 
 /** Accessor overlay that projects deep property/tuple paths as CExpr values. */
 export type AccessorOverlay<O> = O extends readonly (infer E)[]
-  ? { readonly [k: number]: CExpr<E, "core/access", [CExpr<O, string, readonly unknown[]>, number]> }
+  ? {
+      readonly [k: number]: CExpr<E, "core/access", [CExpr<O, string, readonly unknown[]>, number]>;
+    }
   : O extends object
     ? {
-        readonly [K in keyof O]: CExpr<O[K], "core/access", [CExpr<O, string, readonly unknown[]>, K]>;
+        readonly [K in keyof O]: CExpr<
+          O[K],
+          "core/access",
+          [CExpr<O, string, readonly unknown[]>, K]
+        >;
       }
     : {};
 

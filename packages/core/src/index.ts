@@ -1,9 +1,7 @@
 // Public API
 
 export { injectInput, injectLambdaParam, mvfm } from "./core";
-export { koan } from "./koan";
 export { defaults } from "./defaults";
-
 export type {
   FoldState,
   FoldYield,
@@ -38,6 +36,7 @@ export type {
   CoreTuple,
 } from "./interpreters/core";
 export { coreInterpreter } from "./interpreters/core";
+export { koan } from "./koan";
 export type { BooleanMethods } from "./plugins/boolean";
 export { boolean } from "./plugins/boolean";
 export { booleanInterpreter } from "./plugins/boolean/interpreter";

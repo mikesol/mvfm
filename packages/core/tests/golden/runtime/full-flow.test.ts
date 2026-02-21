@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import { defaults, fold } from "../../../src/index";
-import { runWithDefaults } from "../shared/case-runner";
 import { buildMathApp } from "../shared/case-builders";
+import { runWithDefaults } from "../shared/case-runner";
 
 describe("golden runtime: full flow", () => {
   it("evaluates composed arithmetic end-to-end", async () => {

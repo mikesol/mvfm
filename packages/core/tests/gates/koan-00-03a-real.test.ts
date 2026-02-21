@@ -35,7 +35,12 @@ describe("real gate 00-03a: koan core model via @mvfm/core", () => {
   });
 
   it("constructs NExpr with explicit root/adj/counter", () => {
-    const n = koan.makeNExpr<number, "a", { a: { kind: "num/literal"; children: []; out: number } }, "b">(
+    const n = koan.makeNExpr<
+      number,
+      "a",
+      { a: { kind: "num/literal"; children: []; out: number } },
+      "b"
+    >(
       "a",
       {
         a: { kind: "num/literal", children: [], out: 1 },

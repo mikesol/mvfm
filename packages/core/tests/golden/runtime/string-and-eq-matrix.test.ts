@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { defaults, foldAST, mvfm, boolean, eq, num, str } from "../../../src/index";
+import { boolean, defaults, eq, foldAST, mvfm, num, str } from "../../../src/index";
 
 type Case = {
   name: string;

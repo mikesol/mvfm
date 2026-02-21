@@ -1,7 +1,6 @@
-import { add, makeCExpr, type CExpr } from "./expr";
+import { type Plugin, stdPlugins } from "./composition";
+import { add, type CExpr, type KindSpec, makeCExpr } from "./expr";
 import { createApp } from "./normalize";
-import { type KindSpec } from "./expr";
-import { stdPlugins, type Plugin } from "./composition";
 
 /** Point constructor for koan 04a structural elaboration. */
 export function point<A extends { x: unknown; y: unknown }>(
@@ -11,14 +10,18 @@ export function point<A extends { x: unknown; y: unknown }>(
 }
 
 /** Line constructor (structural nested records). */
-export function line<A extends { start: { x: unknown; y: unknown }; end: { x: unknown; y: unknown } }>(
+export function line<
+  A extends { start: { x: unknown; y: unknown }; end: { x: unknown; y: unknown } },
+>(
   a: A,
 ): CExpr<{ start: { x: number; y: number }; end: { x: number; y: number } }, "geom/line", [A]> {
   return makeCExpr("geom/line", [a]);
 }
 
 /** Pair constructor (structural tuple). */
-export function pair<A extends [unknown, unknown]>(a: A): CExpr<[number, number], "data/pair", [A]> {
+export function pair<A extends [unknown, unknown]>(
+  a: A,
+): CExpr<[number, number], "data/pair", [A]> {
   return makeCExpr("data/pair", [a]);
 }
 
@@ -37,7 +40,10 @@ const structuralPlugin = {
       [{ start: { x: number; y: number }; end: { x: number; y: number } }],
       { start: { x: number; y: number }; end: { x: number; y: number } }
     >,
-    "data/pair": { inputs: [[0, 0]], output: [0, 0] } as KindSpec<[[number, number]], [number, number]>,
+    "data/pair": { inputs: [[0, 0]], output: [0, 0] } as KindSpec<
+      [[number, number]],
+      [number, number]
+    >,
   },
   traits: {},
   lifts: {},

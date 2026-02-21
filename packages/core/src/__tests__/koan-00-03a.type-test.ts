@@ -2,9 +2,9 @@
  * Compile-time koan 00-03a gate checks against @mvfm/core koan namespace.
  */
 
+import type { RegistryOf, StdRegistry } from "../koan";
 import { koan } from "../koan";
 import type { CKindOf, COutOf } from "../koan/expr";
-import type { RegistryOf, StdRegistry } from "../koan";
 
 const e = koan.add(1, 2);
 

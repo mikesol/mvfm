@@ -3750,6 +3750,454 @@
         },
         {
           "kind": "Function",
+          "canonicalReference": "@mvfm/core!fold:function(1)",
+          "docComment": "/**\n * Compatibility alias for the koan-style fold API. Currently forwards to foldAST.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function fold<K extends "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ">(interpreter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<K>"
+            },
+            {
+              "kind": "Content",
+              "text": ", program: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Program",
+              "canonicalReference": "@mvfm/core!Program:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<K>"
+            },
+            {
+              "kind": "Content",
+              "text": ", state?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "FoldState",
+              "canonicalReference": "@mvfm/core!FoldState:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/fold.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 11,
+            "endIndex": 13
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "interpreter",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 5
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "program",
+              "parameterTypeTokenRange": {
+                "startIndex": 6,
+                "endIndex": 8
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "state",
+              "parameterTypeTokenRange": {
+                "startIndex": 9,
+                "endIndex": 10
+              },
+              "isOptional": true
+            }
+          ],
+          "typeParameters": [
+            {
+              "typeParameterName": "K",
+              "constraintTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "name": "fold"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@mvfm/core!fold:function(2)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function fold<K extends "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ">(interpreter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<K>"
+            },
+            {
+              "kind": "Content",
+              "text": ", root: "
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", state?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "FoldState",
+              "canonicalReference": "@mvfm/core!FoldState:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/fold.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 10,
+            "endIndex": 12
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 2,
+          "parameters": [
+            {
+              "parameterName": "interpreter",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 5
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "root",
+              "parameterTypeTokenRange": {
+                "startIndex": 6,
+                "endIndex": 7
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "state",
+              "parameterTypeTokenRange": {
+                "startIndex": 8,
+                "endIndex": 9
+              },
+              "isOptional": true
+            }
+          ],
+          "typeParameters": [
+            {
+              "typeParameterName": "K",
+              "constraintTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "name": "fold"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@mvfm/core!fold:function(3)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function fold<K extends "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ">(program: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Program",
+              "canonicalReference": "@mvfm/core!Program:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<K>"
+            },
+            {
+              "kind": "Content",
+              "text": ", interpreter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<K>"
+            },
+            {
+              "kind": "Content",
+              "text": ", state?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "FoldState",
+              "canonicalReference": "@mvfm/core!FoldState:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/fold.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 11,
+            "endIndex": 13
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 3,
+          "parameters": [
+            {
+              "parameterName": "program",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 5
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "interpreter",
+              "parameterTypeTokenRange": {
+                "startIndex": 6,
+                "endIndex": 8
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "state",
+              "parameterTypeTokenRange": {
+                "startIndex": 9,
+                "endIndex": 10
+              },
+              "isOptional": true
+            }
+          ],
+          "typeParameters": [
+            {
+              "typeParameterName": "K",
+              "constraintTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "name": "fold"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@mvfm/core!fold:function(4)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function fold<K extends "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ">(root: "
+            },
+            {
+              "kind": "Reference",
+              "text": "TypedNode",
+              "canonicalReference": "@mvfm/core!TypedNode:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", interpreter: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<K>"
+            },
+            {
+              "kind": "Content",
+              "text": ", state?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "FoldState",
+              "canonicalReference": "@mvfm/core!FoldState:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/fold.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 10,
+            "endIndex": 12
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 4,
+          "parameters": [
+            {
+              "parameterName": "root",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "interpreter",
+              "parameterTypeTokenRange": {
+                "startIndex": 5,
+                "endIndex": 7
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "state",
+              "parameterTypeTokenRange": {
+                "startIndex": 8,
+                "endIndex": 9
+              },
+              "isOptional": true
+            }
+          ],
+          "typeParameters": [
+            {
+              "typeParameterName": "K",
+              "constraintTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
+            }
+          ],
+          "name": "fold"
+        },
+        {
+          "kind": "Function",
           "canonicalReference": "@mvfm/core!foldAST:function(1)",
           "docComment": "/**\n * Stack-safe async fold with memoization and taint tracking.\n */\n",
           "excerptTokens": [
@@ -4971,6 +5419,1262 @@
           "typeTokenRange": {
             "startIndex": 1,
             "endIndex": 2
+          }
+        },
+        {
+          "kind": "Variable",
+          "canonicalReference": "@mvfm/core!koan:var",
+          "docComment": "/**\n * Koan-model API namespace (00-03a compatibility surface).\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "koan: "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    add: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "add",
+              "canonicalReference": "@mvfm/core!~add:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    boolLit: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "boolLit",
+              "canonicalReference": "@mvfm/core!~boolLit:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    buildKindInputs: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "buildKindInputs",
+              "canonicalReference": "@mvfm/core!~buildKindInputs:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    buildLiftMap: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "buildLiftMap",
+              "canonicalReference": "@mvfm/core!~buildLiftMap:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    buildTraitMap: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "buildTraitMap",
+              "canonicalReference": "@mvfm/core!~buildTraitMap:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    createApp: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "createApp",
+              "canonicalReference": "@mvfm/core!~createApp:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    app: <Expr extends import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/core!~CExpr:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>>(expr: Expr) => import(\"./normalize-types\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "AppResult",
+              "canonicalReference": "@mvfm/core!~AppResult:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"./composition\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RegistryOf",
+              "canonicalReference": "@mvfm/core!~RegistryOf:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<readonly [{\n        readonly name: \"num\";\n        readonly ctors: {\n            readonly add: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "add",
+              "canonicalReference": "@mvfm/core!~add:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n            readonly mul: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "mul",
+              "canonicalReference": "@mvfm/core!~mul:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n            readonly sub: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "sub",
+              "canonicalReference": "@mvfm/core!~sub:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n            readonly numLit: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "numLit",
+              "canonicalReference": "@mvfm/core!~numLit:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        };\n        readonly kinds: {\n            readonly \"num/literal\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], number>;\n            readonly \"num/add\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], number>;\n            readonly \"num/mul\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], number>;\n            readonly \"num/sub\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], number>;\n            readonly \"num/eq\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], boolean>;\n        };\n        readonly traits: {\n            readonly eq: {\n                readonly output: boolean;\n                readonly mapping: {\n                    readonly number: \"num/eq\";\n                };\n            };\n        };\n        readonly lifts: {\n            readonly number: \"num/literal\";\n        };\n        readonly nodeKinds: readonly [\"num/literal\", \"num/add\", \"num/mul\", \"num/sub\", \"num/eq\"];\n        readonly defaultInterpreter: () => import(\"./composition\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!~Interpreter_2:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    }, {\n        readonly name: \"str\";\n        readonly ctors: {\n            readonly strLit: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "strLit",
+              "canonicalReference": "@mvfm/core!~strLit:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        };\n        readonly kinds: {\n            readonly \"str/literal\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], string>;\n            readonly \"str/eq\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string], boolean>;\n        };\n        readonly traits: {\n            readonly eq: {\n                readonly output: boolean;\n                readonly mapping: {\n                    readonly string: \"str/eq\";\n                };\n            };\n        };\n        readonly lifts: {\n            readonly string: \"str/literal\";\n        };\n        readonly nodeKinds: readonly [\"str/literal\", \"str/eq\"];\n        readonly defaultInterpreter: () => import(\"./composition\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!~Interpreter_2:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    }, {\n        readonly name: \"bool\";\n        readonly ctors: {\n            readonly boolLit: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "boolLit",
+              "canonicalReference": "@mvfm/core!~boolLit:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        };\n        readonly kinds: {\n            readonly \"bool/literal\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], boolean>;\n            readonly \"bool/eq\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[boolean, boolean], boolean>;\n        };\n        readonly traits: {\n            readonly eq: {\n                readonly output: boolean;\n                readonly mapping: {\n                    readonly boolean: \"bool/eq\";\n                };\n            };\n        };\n        readonly lifts: {\n            readonly boolean: \"bool/literal\";\n        };\n        readonly nodeKinds: readonly [\"bool/literal\", \"bool/eq\"];\n        readonly defaultInterpreter: () => import(\"./composition\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!~Interpreter_2:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    }]>, Expr>;\n    appS: <Expr extends import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/core!~CExpr:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>>(expr: Expr) => import(\"./normalize-types\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "AppResult",
+              "canonicalReference": "@mvfm/core!~AppResult:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<import(\"./composition\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "RegistryOf",
+              "canonicalReference": "@mvfm/core!~RegistryOf:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<readonly [{\n        readonly name: \"num\";\n        readonly ctors: {\n            readonly add: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "add",
+              "canonicalReference": "@mvfm/core!~add:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n            readonly mul: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "mul",
+              "canonicalReference": "@mvfm/core!~mul:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n            readonly sub: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "sub",
+              "canonicalReference": "@mvfm/core!~sub:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n            readonly numLit: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "numLit",
+              "canonicalReference": "@mvfm/core!~numLit:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        };\n        readonly kinds: {\n            readonly \"num/literal\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], number>;\n            readonly \"num/add\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], number>;\n            readonly \"num/mul\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], number>;\n            readonly \"num/sub\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], number>;\n            readonly \"num/eq\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], boolean>;\n        };\n        readonly traits: {\n            readonly eq: {\n                readonly output: boolean;\n                readonly mapping: {\n                    readonly number: \"num/eq\";\n                };\n            };\n        };\n        readonly lifts: {\n            readonly number: \"num/literal\";\n        };\n        readonly nodeKinds: readonly [\"num/literal\", \"num/add\", \"num/mul\", \"num/sub\", \"num/eq\"];\n        readonly defaultInterpreter: () => import(\"./composition\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!~Interpreter_2:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    }, {\n        readonly name: \"str\";\n        readonly ctors: {\n            readonly strLit: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "strLit",
+              "canonicalReference": "@mvfm/core!~strLit:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        };\n        readonly kinds: {\n            readonly \"str/literal\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], string>;\n            readonly \"str/eq\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string], boolean>;\n        };\n        readonly traits: {\n            readonly eq: {\n                readonly output: boolean;\n                readonly mapping: {\n                    readonly string: \"str/eq\";\n                };\n            };\n        };\n        readonly lifts: {\n            readonly string: \"str/literal\";\n        };\n        readonly nodeKinds: readonly [\"str/literal\", \"str/eq\"];\n        readonly defaultInterpreter: () => import(\"./composition\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!~Interpreter_2:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    }, {\n        readonly name: \"bool\";\n        readonly ctors: {\n            readonly boolLit: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "boolLit",
+              "canonicalReference": "@mvfm/core!~boolLit:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        };\n        readonly kinds: {\n            readonly \"bool/literal\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], boolean>;\n            readonly \"bool/eq\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[boolean, boolean], boolean>;\n        };\n        readonly traits: {\n            readonly eq: {\n                readonly output: boolean;\n                readonly mapping: {\n                    readonly boolean: \"bool/eq\";\n                };\n            };\n        };\n        readonly lifts: {\n            readonly boolean: \"bool/literal\";\n        };\n        readonly nodeKinds: readonly [\"bool/literal\", \"bool/eq\"];\n        readonly defaultInterpreter: () => import(\"./composition\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!~Interpreter_2:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    }, {\n        readonly name: \"structural\";\n        readonly ctors: {\n            readonly point: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "point",
+              "canonicalReference": "@mvfm/core!~point:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n            readonly line: typeof import(\"./structural\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "line",
+              "canonicalReference": "@mvfm/core!~line"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n            readonly pair: typeof import(\"./structural\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "pair",
+              "canonicalReference": "@mvfm/core!~pair"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n            readonly add: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "add",
+              "canonicalReference": "@mvfm/core!~add:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        };\n        readonly kinds: {\n            readonly \"geom/point\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[{\n                x: number;\n                y: number;\n            }], {\n                x: number;\n                y: number;\n            }>;\n            readonly \"geom/line\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[{\n                start: {\n                    x: number;\n                    y: number;\n                };\n                end: {\n                    x: number;\n                    y: number;\n                };\n            }], {\n                start: {\n                    x: number;\n                    y: number;\n                };\n                end: {\n                    x: number;\n                    y: number;\n                };\n            }>;\n            readonly \"data/pair\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[[number, number]], [number, number]>;\n        };\n        readonly traits: {};\n        readonly lifts: {};\n        readonly nodeKinds: readonly [\"geom/point\", \"geom/line\", \"data/pair\"];\n    }]>, Expr>;\n    point: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "point",
+              "canonicalReference": "@mvfm/core!~point:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    deepThing: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "deepThing",
+              "canonicalReference": "@mvfm/core!~deepThing:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    fold: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "fold",
+              "canonicalReference": "@mvfm/core!~fold_2:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    VOLATILE_KINDS: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Set",
+              "canonicalReference": "!Set:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<string>;\n    defaults: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "defaults",
+              "canonicalReference": "@mvfm/core!~defaults_2:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    commit: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "commit",
+              "canonicalReference": "@mvfm/core!~commit:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    gc: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "gc",
+              "canonicalReference": "@mvfm/core!~gc_2:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    gcPreservingAliases: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "gcPreservingAliases",
+              "canonicalReference": "@mvfm/core!~gcPreservingAliases:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    name: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "name",
+              "canonicalReference": "@mvfm/core!~name_2:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    pipe: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "pipe",
+              "canonicalReference": "@mvfm/core!~pipe:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    eq: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "eq",
+              "canonicalReference": "@mvfm/core!~eq_2:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    collectReachable: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "collectReachable",
+              "canonicalReference": "@mvfm/core!~collectReachable:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    liveAdj: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "liveAdj",
+              "canonicalReference": "@mvfm/core!~liveAdj:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    incrementId: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "incrementId",
+              "canonicalReference": "@mvfm/core!~incrementId:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    isCExpr: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "isCExpr",
+              "canonicalReference": "@mvfm/core!~isCExpr:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    lt: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "lt",
+              "canonicalReference": "@mvfm/core!~lt:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    mapWhere: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "mapWhere",
+              "canonicalReference": "@mvfm/core!~mapWhere:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    replaceWhere: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "replaceWhere",
+              "canonicalReference": "@mvfm/core!~replaceWhere:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    wrapByName: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "wrapByName",
+              "canonicalReference": "@mvfm/core!~wrapByName:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    spliceWhere: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "spliceWhere",
+              "canonicalReference": "@mvfm/core!~spliceWhere:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    dirty: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "dirty",
+              "canonicalReference": "@mvfm/core!~dirty:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    addEntry: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "addEntry",
+              "canonicalReference": "@mvfm/core!~addEntry:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    removeEntry: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "removeEntry",
+              "canonicalReference": "@mvfm/core!~removeEntry:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    swapEntry: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "swapEntry",
+              "canonicalReference": "@mvfm/core!~swapEntry:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    rewireChildren: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "rewireChildren",
+              "canonicalReference": "@mvfm/core!~rewireChildren:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    setRoot: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "setRoot",
+              "canonicalReference": "@mvfm/core!~setRoot:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    makeCExpr: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "makeCExpr",
+              "canonicalReference": "@mvfm/core!~makeCExpr:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    makeNExpr: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "makeNExpr",
+              "canonicalReference": "@mvfm/core!~makeNExpr:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    mul: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "mul",
+              "canonicalReference": "@mvfm/core!~mul:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    mvfmU: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "mvfmU",
+              "canonicalReference": "@mvfm/core!~mvfmU:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    not: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "not",
+              "canonicalReference": "@mvfm/core!~not:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    numLit: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "numLit",
+              "canonicalReference": "@mvfm/core!~numLit:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    strLit: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "strLit",
+              "canonicalReference": "@mvfm/core!~strLit:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    selectWhere: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "selectWhere",
+              "canonicalReference": "@mvfm/core!~selectWhere:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    sub: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "sub",
+              "canonicalReference": "@mvfm/core!~sub:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    byKind: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "byKind",
+              "canonicalReference": "@mvfm/core!~byKind:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    byKindGlob: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "byKindGlob",
+              "canonicalReference": "@mvfm/core!~byKindGlob:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    byName: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "byName",
+              "canonicalReference": "@mvfm/core!~byName:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    hasChildCount: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "hasChildCount",
+              "canonicalReference": "@mvfm/core!~hasChildCount:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    isLeaf: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "isLeaf",
+              "canonicalReference": "@mvfm/core!~isLeaf:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    and: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "and",
+              "canonicalReference": "@mvfm/core!~and:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    or: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "or",
+              "canonicalReference": "@mvfm/core!~or:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    boolPluginU: {\n        readonly name: \"bool\";\n        readonly ctors: {\n            readonly boolLit: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "boolLit",
+              "canonicalReference": "@mvfm/core!~boolLit:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        };\n        readonly kinds: {\n            readonly \"bool/literal\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], boolean>;\n            readonly \"bool/eq\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[boolean, boolean], boolean>;\n        };\n        readonly traits: {\n            readonly eq: {\n                readonly output: boolean;\n                readonly mapping: {\n                    readonly boolean: \"bool/eq\";\n                };\n            };\n        };\n        readonly lifts: {\n            readonly boolean: \"bool/literal\";\n        };\n        readonly nodeKinds: readonly [\"bool/literal\", \"bool/eq\"];\n        readonly defaultInterpreter: () => import(\"./composition\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!~Interpreter_2:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    };\n    numPluginU: {\n        readonly name: \"num\";\n        readonly ctors: {\n            readonly add: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "add",
+              "canonicalReference": "@mvfm/core!~add:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n            readonly mul: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "mul",
+              "canonicalReference": "@mvfm/core!~mul:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n            readonly sub: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "sub",
+              "canonicalReference": "@mvfm/core!~sub:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n            readonly numLit: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "numLit",
+              "canonicalReference": "@mvfm/core!~numLit:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        };\n        readonly kinds: {\n            readonly \"num/literal\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], number>;\n            readonly \"num/add\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], number>;\n            readonly \"num/mul\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], number>;\n            readonly \"num/sub\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], number>;\n            readonly \"num/eq\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], boolean>;\n        };\n        readonly traits: {\n            readonly eq: {\n                readonly output: boolean;\n                readonly mapping: {\n                    readonly number: \"num/eq\";\n                };\n            };\n        };\n        readonly lifts: {\n            readonly number: \"num/literal\";\n        };\n        readonly nodeKinds: readonly [\"num/literal\", \"num/add\", \"num/mul\", \"num/sub\", \"num/eq\"];\n        readonly defaultInterpreter: () => import(\"./composition\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!~Interpreter_2:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    };\n    ordPlugin: {\n        readonly name: \"ord\";\n        readonly ctors: {\n            readonly lt: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "lt",
+              "canonicalReference": "@mvfm/core!~lt:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        };\n        readonly kinds: {\n            readonly \"num/lt\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], boolean>;\n            readonly \"str/lt\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string], boolean>;\n        };\n        readonly traits: {\n            readonly lt: {\n                readonly output: boolean;\n                readonly mapping: {\n                    readonly number: \"num/lt\";\n                    readonly string: \"str/lt\";\n                };\n            };\n        };\n        readonly lifts: {};\n        readonly nodeKinds: readonly [\"num/lt\", \"str/lt\"];\n        readonly defaultInterpreter: () => import(\"./composition\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!~Interpreter_2:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    };\n    stdPlugins: readonly [{\n        readonly name: \"num\";\n        readonly ctors: {\n            readonly add: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "add",
+              "canonicalReference": "@mvfm/core!~add:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n            readonly mul: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "mul",
+              "canonicalReference": "@mvfm/core!~mul:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n            readonly sub: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "sub",
+              "canonicalReference": "@mvfm/core!~sub:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n            readonly numLit: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "numLit",
+              "canonicalReference": "@mvfm/core!~numLit:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        };\n        readonly kinds: {\n            readonly \"num/literal\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], number>;\n            readonly \"num/add\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], number>;\n            readonly \"num/mul\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], number>;\n            readonly \"num/sub\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], number>;\n            readonly \"num/eq\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], boolean>;\n        };\n        readonly traits: {\n            readonly eq: {\n                readonly output: boolean;\n                readonly mapping: {\n                    readonly number: \"num/eq\";\n                };\n            };\n        };\n        readonly lifts: {\n            readonly number: \"num/literal\";\n        };\n        readonly nodeKinds: readonly [\"num/literal\", \"num/add\", \"num/mul\", \"num/sub\", \"num/eq\"];\n        readonly defaultInterpreter: () => import(\"./composition\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!~Interpreter_2:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    }, {\n        readonly name: \"str\";\n        readonly ctors: {\n            readonly strLit: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "strLit",
+              "canonicalReference": "@mvfm/core!~strLit:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        };\n        readonly kinds: {\n            readonly \"str/literal\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], string>;\n            readonly \"str/eq\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string], boolean>;\n        };\n        readonly traits: {\n            readonly eq: {\n                readonly output: boolean;\n                readonly mapping: {\n                    readonly string: \"str/eq\";\n                };\n            };\n        };\n        readonly lifts: {\n            readonly string: \"str/literal\";\n        };\n        readonly nodeKinds: readonly [\"str/literal\", \"str/eq\"];\n        readonly defaultInterpreter: () => import(\"./composition\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!~Interpreter_2:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    }, {\n        readonly name: \"bool\";\n        readonly ctors: {\n            readonly boolLit: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "boolLit",
+              "canonicalReference": "@mvfm/core!~boolLit:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        };\n        readonly kinds: {\n            readonly \"bool/literal\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], boolean>;\n            readonly \"bool/eq\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[boolean, boolean], boolean>;\n        };\n        readonly traits: {\n            readonly eq: {\n                readonly output: boolean;\n                readonly mapping: {\n                    readonly boolean: \"bool/eq\";\n                };\n            };\n        };\n        readonly lifts: {\n            readonly boolean: \"bool/literal\";\n        };\n        readonly nodeKinds: readonly [\"bool/literal\", \"bool/eq\"];\n        readonly defaultInterpreter: () => import(\"./composition\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!~Interpreter_2:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    }];\n    strPluginU: {\n        readonly name: \"str\";\n        readonly ctors: {\n            readonly strLit: typeof "
+            },
+            {
+              "kind": "Reference",
+              "text": "strLit",
+              "canonicalReference": "@mvfm/core!~strLit:function"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        };\n        readonly kinds: {\n            readonly \"str/literal\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], string>;\n            readonly \"str/eq\": import(\"./expr\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string], boolean>;\n        };\n        readonly traits: {\n            readonly eq: {\n                readonly output: boolean;\n                readonly mapping: {\n                    readonly string: \"str/eq\";\n                };\n            };\n        };\n        readonly lifts: {\n            readonly string: \"str/literal\";\n        };\n        readonly nodeKinds: readonly [\"str/literal\", \"str/eq\"];\n        readonly defaultInterpreter: () => import(\"./composition\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!~Interpreter_2:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    };\n}"
+            }
+          ],
+          "fileUrlPath": "dist/koan/index.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "koan",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 276
           }
         },
         {

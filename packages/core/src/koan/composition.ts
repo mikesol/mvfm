@@ -1,16 +1,16 @@
 import {
   add,
   boolLit,
+  type CExpr,
   eq,
+  type KindSpec,
   makeCExpr,
   mul,
   numLit,
-  strLit,
-  sub,
-  type CExpr,
-  type KindSpec,
   type RuntimeEntry,
   type StdRegistry,
+  strLit,
+  sub,
   type TraitKindSpec,
 } from "./expr";
 
@@ -181,11 +181,22 @@ export const numPluginU = {
   lifts: { number: "num/literal" },
   nodeKinds: ["num/literal", "num/add", "num/mul", "num/sub", "num/eq"],
   defaultInterpreter: (): Interpreter => ({
-    "num/literal": async function* (e) { return e.out as number; },
-    "num/add": async function* () { return ((yield 0) as number) + ((yield 1) as number); },
-    "num/mul": async function* () { return ((yield 0) as number) * ((yield 1) as number); },
-    "num/sub": async function* () { return ((yield 0) as number) - ((yield 1) as number); },
-    "num/eq": async function* () { return ((yield 0) as number) === ((yield 1) as number); },
+    "num/literal": async function* (e) {
+      yield* [];
+      return e.out as number;
+    },
+    "num/add": async function* () {
+      return ((yield 0) as number) + ((yield 1) as number);
+    },
+    "num/mul": async function* () {
+      return ((yield 0) as number) * ((yield 1) as number);
+    },
+    "num/sub": async function* () {
+      return ((yield 0) as number) - ((yield 1) as number);
+    },
+    "num/eq": async function* () {
+      return ((yield 0) as number) === ((yield 1) as number);
+    },
   }),
 } as const satisfies Plugin;
 
@@ -203,8 +214,13 @@ export const strPluginU = {
   lifts: { string: "str/literal" },
   nodeKinds: ["str/literal", "str/eq"],
   defaultInterpreter: (): Interpreter => ({
-    "str/literal": async function* (e) { return e.out as string; },
-    "str/eq": async function* () { return ((yield 0) as string) === ((yield 1) as string); },
+    "str/literal": async function* (e) {
+      yield* [];
+      return e.out as string;
+    },
+    "str/eq": async function* () {
+      return ((yield 0) as string) === ((yield 1) as string);
+    },
   }),
 } as const satisfies Plugin;
 
@@ -214,7 +230,10 @@ export const boolPluginU = {
   ctors: { boolLit },
   kinds: {
     "bool/literal": { inputs: [], output: false as boolean } as KindSpec<[], boolean>,
-    "bool/eq": { inputs: [false, false], output: false as boolean } as KindSpec<[boolean, boolean], boolean>,
+    "bool/eq": { inputs: [false, false], output: false as boolean } as KindSpec<
+      [boolean, boolean],
+      boolean
+    >,
   },
   traits: {
     eq: { output: false as boolean, mapping: { boolean: "bool/eq" } },
@@ -222,8 +241,13 @@ export const boolPluginU = {
   lifts: { boolean: "bool/literal" },
   nodeKinds: ["bool/literal", "bool/eq"],
   defaultInterpreter: (): Interpreter => ({
-    "bool/literal": async function* (e) { return e.out as boolean; },
-    "bool/eq": async function* () { return ((yield 0) as boolean) === ((yield 1) as boolean); },
+    "bool/literal": async function* (e) {
+      yield* [];
+      return e.out as boolean;
+    },
+    "bool/eq": async function* () {
+      return ((yield 0) as boolean) === ((yield 1) as boolean);
+    },
   }),
 } as const satisfies Plugin;
 
@@ -244,8 +268,12 @@ export const ordPlugin = {
   lifts: {},
   nodeKinds: ["num/lt", "str/lt"],
   defaultInterpreter: (): Interpreter => ({
-    "num/lt": async function* () { return ((yield 0) as number) < ((yield 1) as number); },
-    "str/lt": async function* () { return ((yield 0) as string) < ((yield 1) as string); },
+    "num/lt": async function* () {
+      return ((yield 0) as number) < ((yield 1) as number);
+    },
+    "str/lt": async function* () {
+      return ((yield 0) as string) < ((yield 1) as string);
+    },
   }),
 } as const satisfies Plugin;
 

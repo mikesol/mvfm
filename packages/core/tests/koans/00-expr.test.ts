@@ -8,11 +8,12 @@ test("koan gate 00-expr: CExpr/NExpr primitives via core API", () => {
   expect(koan.isCExpr(c)).toBe(true);
   expect(koan.isCExpr({})).toBe(false);
 
-  const n = koan.makeNExpr<number, "a", { a: { kind: "num/literal"; children: []; out: number } }, "b">(
+  const n = koan.makeNExpr<
+    number,
     "a",
-    { a: { kind: "num/literal", children: [], out: 1 } },
-    "b",
-  );
+    { a: { kind: "num/literal"; children: []; out: number } },
+    "b"
+  >("a", { a: { kind: "num/literal", children: [], out: 1 } }, "b");
 
   expect(n.__id).toBe("a");
   expect(n.__counter).toBe("b");
