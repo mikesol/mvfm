@@ -107,10 +107,24 @@ export async function* eval_<T>(node: TypedNode<T>): AsyncGenerator<TypedNode, T
 
 // ─── foldAST: old program fold ──────────────────────────────────────
 
-/** Old-API fold that takes a Program. Placeholder — not yet connected to runtime. */
+/**
+ * Old-API fold that evaluates a Program with an interpreter.
+ *
+ * DEFERRED: External plugins using foldAST need migration to the new
+ * fold(rootId, adj, interp) API. The old Program type carried a
+ * proxy-generated AST incompatible with the new CExpr/NExpr model.
+ * Bridging would require defining a new Program.ast shape, which is
+ * premature — each external plugin should be migrated individually.
+ *
+ * This shim exists so external plugins compile. It will throw at
+ * runtime until the plugin is migrated to use fold() directly.
+ */
 export async function foldAST<T>(
   _prog: Program | Record<string, unknown>,
   _interp: Interpreter | Record<string, unknown>,
 ): Promise<T> {
-  throw new Error("foldAST: not yet implemented in rebuilt core — use fold() directly");
+  throw new Error(
+    "foldAST is not available in the rebuilt core. " +
+      "Migrate to fold(rootId, adj, interp) — see packages/core/src/fold.ts",
+  );
 }
