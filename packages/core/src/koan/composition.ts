@@ -10,6 +10,8 @@ import {
   type CExpr,
   type KindSpec,
   type RuntimeEntry,
+  type StdRegistry,
+  type TraitKindSpec,
 } from "./expr";
 
 /** Trait declaration shape used by unified plugins. */
@@ -23,6 +25,17 @@ export type Handler = (entry: RuntimeEntry) => AsyncGenerator<number | string, u
 
 /** Koan interpreter map. */
 export type Interpreter = Record<string, Handler>;
+
+/** 03-traits compatibility plugin shape. */
+export interface PluginShape<
+  Ctors extends Record<string, unknown>,
+  Kinds extends Record<string, KindSpec<readonly unknown[], unknown>>,
+  Traits extends Record<string, Record<string, string>>,
+> {
+  readonly ctors: Ctors;
+  readonly kinds: Kinds;
+  readonly traits: Traits;
+}
 
 /** Unified koan plugin definition. */
 export interface Plugin<
@@ -46,6 +59,40 @@ export interface Plugin<
   readonly nodeKinds: readonly string[];
   readonly defaultInterpreter?: () => Interpreter;
 }
+
+type MergeKinds<P extends readonly Plugin[]> = P extends readonly []
+  ? {}
+  : P extends readonly [infer H extends Plugin, ...infer T extends readonly Plugin[]]
+    ? H["kinds"] & MergeKinds<T>
+    : {};
+
+type AllTraitNames<P extends readonly Plugin[]> = P extends readonly []
+  ? never
+  : P extends readonly [infer H extends Plugin, ...infer T extends readonly Plugin[]]
+    ? keyof H["traits"] | AllTraitNames<T>
+    : never;
+
+type MergeTraitMappings<P extends readonly Plugin[], K extends string> = P extends readonly []
+  ? {}
+  : P extends readonly [infer H extends Plugin, ...infer T extends readonly Plugin[]]
+    ? (K extends keyof H["traits"] ? H["traits"][K]["mapping"] : {}) & MergeTraitMappings<T, K>
+    : {};
+
+type TraitOutput<P extends readonly Plugin[], K extends string> = P extends readonly [
+  infer H extends Plugin,
+  ...infer T extends readonly Plugin[],
+]
+  ? K extends keyof H["traits"]
+    ? H["traits"][K]["output"]
+    : TraitOutput<T, K>
+  : never;
+
+type TraitEntries<P extends readonly Plugin[]> = {
+  [K in AllTraitNames<P> & string]: TraitKindSpec<TraitOutput<P, K>, MergeTraitMappings<P, K>>;
+};
+
+/** 03a canonical type-level registry derivation. */
+export type RegistryOf<P extends readonly Plugin[]> = MergeKinds<P> & TraitEntries<P>;
 
 /** Build literal lift map from plugin tuple. */
 export function buildLiftMap(plugins: readonly Plugin[]): Record<string, string> {
@@ -87,21 +134,6 @@ type MergeCtors<P extends readonly Plugin[]> = P extends readonly []
     ? H["ctors"] & MergeCtors<T>
     : {};
 
-type AllTraitNames<P extends readonly Plugin[]> = P extends readonly []
-  ? never
-  : P extends readonly [infer H extends Plugin, ...infer T extends readonly Plugin[]]
-    ? keyof H["traits"] | AllTraitNames<T>
-    : never;
-
-type TraitOutput<P extends readonly Plugin[], K extends string> = P extends readonly [
-  infer H extends Plugin,
-  ...infer T extends readonly Plugin[],
-]
-  ? K extends keyof H["traits"]
-    ? H["traits"][K]["output"]
-    : TraitOutput<T, K>
-  : never;
-
 type TraitCtors<P extends readonly Plugin[]> = {
   [K in AllTraitNames<P> & string]: <A, B>(a: A, b: B) => CExpr<TraitOutput<P, K>, K, [A, B]>;
 };
@@ -137,17 +169,24 @@ export const numPluginU = {
   name: "num",
   ctors: { add, mul, sub, numLit },
   kinds: {
-    "num/literal": { inputs: [], output: 0 },
-    "num/add": { inputs: [0, 0], output: 0 },
-    "num/mul": { inputs: [0, 0], output: 0 },
-    "num/sub": { inputs: [0, 0], output: 0 },
-    "num/eq": { inputs: [0, 0], output: false },
+    "num/literal": { inputs: [], output: 0 as number } as KindSpec<[], number>,
+    "num/add": { inputs: [0, 0], output: 0 as number } as KindSpec<[number, number], number>,
+    "num/mul": { inputs: [0, 0], output: 0 as number } as KindSpec<[number, number], number>,
+    "num/sub": { inputs: [0, 0], output: 0 as number } as KindSpec<[number, number], number>,
+    "num/eq": { inputs: [0, 0], output: false as boolean } as KindSpec<[number, number], boolean>,
   },
   traits: {
-    eq: { output: false, mapping: { number: "num/eq" } },
+    eq: { output: false as boolean, mapping: { number: "num/eq" } },
   },
   lifts: { number: "num/literal" },
   nodeKinds: ["num/literal", "num/add", "num/mul", "num/sub", "num/eq"],
+  defaultInterpreter: (): Interpreter => ({
+    "num/literal": async function* (e) { return e.out as number; },
+    "num/add": async function* () { return ((yield 0) as number) + ((yield 1) as number); },
+    "num/mul": async function* () { return ((yield 0) as number) * ((yield 1) as number); },
+    "num/sub": async function* () { return ((yield 0) as number) - ((yield 1) as number); },
+    "num/eq": async function* () { return ((yield 0) as number) === ((yield 1) as number); },
+  }),
 } as const satisfies Plugin;
 
 /** Unified string plugin. */
@@ -155,14 +194,18 @@ export const strPluginU = {
   name: "str",
   ctors: { strLit },
   kinds: {
-    "str/literal": { inputs: [], output: "" },
-    "str/eq": { inputs: ["", ""], output: false },
+    "str/literal": { inputs: [], output: "" as string } as KindSpec<[], string>,
+    "str/eq": { inputs: ["", ""], output: false as boolean } as KindSpec<[string, string], boolean>,
   },
   traits: {
-    eq: { output: false, mapping: { string: "str/eq" } },
+    eq: { output: false as boolean, mapping: { string: "str/eq" } },
   },
   lifts: { string: "str/literal" },
   nodeKinds: ["str/literal", "str/eq"],
+  defaultInterpreter: (): Interpreter => ({
+    "str/literal": async function* (e) { return e.out as string; },
+    "str/eq": async function* () { return ((yield 0) as string) === ((yield 1) as string); },
+  }),
 } as const satisfies Plugin;
 
 /** Unified boolean plugin. */
@@ -170,14 +213,18 @@ export const boolPluginU = {
   name: "bool",
   ctors: { boolLit },
   kinds: {
-    "bool/literal": { inputs: [], output: false },
-    "bool/eq": { inputs: [false, false], output: false },
+    "bool/literal": { inputs: [], output: false as boolean } as KindSpec<[], boolean>,
+    "bool/eq": { inputs: [false, false], output: false as boolean } as KindSpec<[boolean, boolean], boolean>,
   },
   traits: {
-    eq: { output: false, mapping: { boolean: "bool/eq" } },
+    eq: { output: false as boolean, mapping: { boolean: "bool/eq" } },
   },
   lifts: { boolean: "bool/literal" },
   nodeKinds: ["bool/literal", "bool/eq"],
+  defaultInterpreter: (): Interpreter => ({
+    "bool/literal": async function* (e) { return e.out as boolean; },
+    "bool/eq": async function* () { return ((yield 0) as boolean) === ((yield 1) as boolean); },
+  }),
 } as const satisfies Plugin;
 
 /** Canonical std plugin tuple for koan 03a. */
@@ -188,14 +235,19 @@ export const ordPlugin = {
   name: "ord",
   ctors: { lt },
   kinds: {
-    "num/lt": { inputs: [0, 0], output: false },
-    "str/lt": { inputs: ["", ""], output: false },
+    "num/lt": { inputs: [0, 0], output: false as boolean } as KindSpec<[number, number], boolean>,
+    "str/lt": { inputs: ["", ""], output: false as boolean } as KindSpec<[string, string], boolean>,
   },
   traits: {
-    lt: { output: false, mapping: { number: "num/lt", string: "str/lt" } },
+    lt: { output: false as boolean, mapping: { number: "num/lt", string: "str/lt" } },
   },
   lifts: {},
   nodeKinds: ["num/lt", "str/lt"],
+  defaultInterpreter: (): Interpreter => ({
+    "num/lt": async function* () { return ((yield 0) as number) < ((yield 1) as number); },
+    "str/lt": async function* () { return ((yield 0) as string) < ((yield 1) as string); },
+  }),
 } as const satisfies Plugin;
 
-export { add, eq, mul, sub, numLit, strLit, boolLit, makeCExpr };
+export type KoanStdRegistry = StdRegistry;
+export { add, boolLit, eq, makeCExpr, mul, numLit, strLit, sub };

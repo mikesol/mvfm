@@ -20,6 +20,17 @@ Target state per issue #293:
 3. Type-check and runtime-check against core exports.
 4. Failures require core fixes, never koan edits (unless `spec-change`).
 
+## Convergence plan
+
+`koan.*` is a staging namespace, not the final public shape.
+
+Planned convergence:
+
+1. Finish real gate migration for all koans (`00`-`16`).
+2. Swap downstream internals to use koan-model core primitives.
+3. Promote stabilized koan-model exports to the main `@mvfm/core` surface.
+4. Remove duplicate legacy paths once all gates and existing behavior checks are green.
+
 ## Progress checklist
 
 - [x] 00-expr wrapper imports from core API

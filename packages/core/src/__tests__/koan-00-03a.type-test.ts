@@ -4,6 +4,7 @@
 
 import { koan } from "../koan";
 import type { CKindOf, COutOf } from "../koan/expr";
+import type { RegistryOf, StdRegistry } from "../koan";
 
 const e = koan.add(1, 2);
 
@@ -22,3 +23,7 @@ const kLt = $.lt(1, 2);
 
 const _eqKind: CKindOf<typeof kEq> = "eq";
 const _ltKind: CKindOf<typeof kLt> = "lt";
+
+type DerivedReg = RegistryOf<typeof koan.stdPlugins>;
+const _derivedToStd: DerivedReg extends StdRegistry ? true : never = true;
+const _stdToDerived: StdRegistry extends DerivedReg ? true : never = true;

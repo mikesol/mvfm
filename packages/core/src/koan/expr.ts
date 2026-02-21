@@ -77,6 +77,15 @@ export interface NExpr<O, RootId extends string, Adj, Ctr extends string> {
   readonly __counter: string;
 }
 
+/** Extract normalized root id type. */
+export type IdOf<E> = E extends NExpr<unknown, infer R, unknown, string> ? R : never;
+/** Extract normalized adjacency type. */
+export type AdjOf<E> = E extends NExpr<unknown, string, infer A, string> ? A : never;
+/** Extract normalized counter type. */
+export type CtrOf<E> = E extends NExpr<unknown, string, unknown, infer C> ? C : never;
+/** Extract normalized output type. */
+export type OutOf<E> = E extends NExpr<infer O, string, unknown, string> ? O : never;
+
 /** Build a normalized expression value. */
 export function makeNExpr<O, RootId extends string, Adj, Ctr extends string>(
   rootId: RootId,
@@ -101,6 +110,50 @@ export interface TraitKindSpec<O, Mapping extends Record<string, string>> {
   readonly output: O;
   readonly mapping: Mapping;
 }
+
+/** Registry entry union. */
+export type RegistryEntry =
+  | KindSpec<readonly unknown[], unknown>
+  | TraitKindSpec<unknown, Record<string, string>>;
+
+/** Type-to-literal-kind mapping for std lifts. */
+export type LiftKind<T> = T extends number
+  ? "num/literal"
+  : T extends string
+    ? "str/literal"
+    : T extends boolean
+      ? "bool/literal"
+      : never;
+
+/** Runtime typeof key for a literal type. */
+export type TypeKey<T> = T extends number
+  ? "number"
+  : T extends string
+    ? "string"
+    : T extends boolean
+      ? "boolean"
+      : never;
+
+/** Canonical std registry used by koan 02/03 types. */
+export type StdRegistry = {
+  "num/literal": KindSpec<[], number>;
+  "str/literal": KindSpec<[], string>;
+  "bool/literal": KindSpec<[], boolean>;
+  "num/add": KindSpec<[number, number], number>;
+  "num/mul": KindSpec<[number, number], number>;
+  "num/sub": KindSpec<[number, number], number>;
+  "num/eq": KindSpec<[number, number], boolean>;
+  "str/eq": KindSpec<[string, string], boolean>;
+  "bool/eq": KindSpec<[boolean, boolean], boolean>;
+  eq: TraitKindSpec<
+    boolean,
+    {
+      number: "num/eq";
+      string: "str/eq";
+      boolean: "bool/eq";
+    }
+  >;
+};
 
 /** Numeric add constructor. */
 export function add<A, B>(a: A, b: B): CExpr<number, "num/add", [A, B]> {

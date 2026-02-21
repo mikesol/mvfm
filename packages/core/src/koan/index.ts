@@ -29,5 +29,20 @@ export const koan = {
   strPluginU,
 };
 
-export type { CExpr, KindSpec, NExpr, RuntimeEntry, TraitKindSpec } from "./expr";
-export type { Plugin, TraitDef } from "./composition";
+export type {
+  AdjOf,
+  CExpr,
+  CtrOf,
+  IdOf,
+  KindSpec,
+  LiftKind,
+  NExpr,
+  OutOf,
+  RuntimeEntry,
+  StdRegistry,
+  TraitKindSpec,
+  TypeKey,
+} from "./expr";
+export type { Plugin, PluginShape, RegistryOf, TraitDef } from "./composition";
+export type { Increment, IncrementLast } from "./increment";
+export type { NeverGuard } from "./normalize-types";
