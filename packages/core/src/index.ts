@@ -12,3 +12,8 @@ export * from "./map";
 export * from "./replace";
 export * from "./gc";
 export * from "./dirty";
+export * from "./commit";
+export * from "./wrap";
+export * from "./splice";
+export * from "./named";
+export * from "./dagql";
