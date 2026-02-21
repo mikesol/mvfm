@@ -1,177 +1,128 @@
-import { mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
-import { cloudflareKv } from "../../src/4.20260213.0";
+import { cloudflareKv, cloudflareKvPlugin } from "../../src/4.20260213.0";
 
-function strip(ast: unknown): unknown {
-  return JSON.parse(
-    JSON.stringify(ast, (k, v) => (k === "__id" || k === "config" ? undefined : v)),
-  );
-}
-
-const app = mvfm(num, str, cloudflareKv({ namespaceId: "MY_KV" }));
+const plugin = cloudflareKv({ namespaceId: "MY_KV" });
+const api = plugin.ctors.kv;
 
 // ============================================================
-// get (text)
+// CExpr construction tests
 // ============================================================
 
 describe("cloudflare-kv: get", () => {
-  it("produces cloudflare-kv/get node with literal key", () => {
-    const prog = app(($) => {
-      return $.kv.get("my-key");
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("cloudflare-kv/get");
-    expect(ast.result.key.kind).toBe("core/literal");
-    expect(ast.result.key.value).toBe("my-key");
+  it("produces cloudflare-kv/get CExpr with literal key", () => {
+    const expr = api.get("my-key");
+    expect(expr.__kind).toBe("cloudflare-kv/get");
+    expect(expr.__args).toHaveLength(1);
+    expect(expr.__args[0]).toBe("my-key");
   });
 
-  it("produces cloudflare-kv/get node with explicit 'text' type", () => {
-    const prog = app(($) => {
-      return $.kv.get("my-key", "text");
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("cloudflare-kv/get");
-    expect(ast.result.key.kind).toBe("core/literal");
-    expect(ast.result.key.value).toBe("my-key");
+  it("produces cloudflare-kv/get CExpr with explicit 'text' type", () => {
+    const expr = api.get("my-key", "text");
+    expect(expr.__kind).toBe("cloudflare-kv/get");
+    expect(expr.__args).toHaveLength(1);
   });
 
-  it("accepts Expr<string> key", () => {
-    const prog = app(($) => {
-      return $.kv.get($.input.cacheKey);
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("cloudflare-kv/get");
-    expect(ast.result.key.kind).toBe("core/prop_access");
+  it("accepts CExpr key (proxy chained value)", () => {
+    const listResult = api.list();
+    const expr = api.get(listResult.keys[0].name);
+    expect(expr.__kind).toBe("cloudflare-kv/get");
+    expect(expr.__args).toHaveLength(1);
   });
 });
-
-// ============================================================
-// get (json)
-// ============================================================
 
 describe("cloudflare-kv: get with json type", () => {
-  it("produces cloudflare-kv/get_json node with literal key", () => {
-    const prog = app(($) => {
-      return $.kv.get("config-key", "json");
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("cloudflare-kv/get_json");
-    expect(ast.result.key.kind).toBe("core/literal");
-    expect(ast.result.key.value).toBe("config-key");
-  });
-
-  it("accepts Expr<string> key with json type", () => {
-    const prog = app(($) => {
-      return $.kv.get($.input.configKey, "json");
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("cloudflare-kv/get_json");
-    expect(ast.result.key.kind).toBe("core/prop_access");
+  it("produces cloudflare-kv/get_json CExpr with literal key", () => {
+    const expr = api.get("config-key", "json");
+    expect(expr.__kind).toBe("cloudflare-kv/get_json");
+    expect(expr.__args).toHaveLength(1);
+    expect(expr.__args[0]).toBe("config-key");
   });
 });
-
-// ============================================================
-// put
-// ============================================================
 
 describe("cloudflare-kv: put", () => {
-  it("produces cloudflare-kv/put node with key and value", () => {
-    const prog = app(($) => {
-      return $.kv.put("my-key", "my-value");
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("cloudflare-kv/put");
-    expect(ast.result.key.kind).toBe("core/literal");
-    expect(ast.result.key.value).toBe("my-key");
-    expect(ast.result.value.kind).toBe("core/literal");
-    expect(ast.result.value.value).toBe("my-value");
-    expect(ast.result.options).toBeNull();
+  it("produces cloudflare-kv/put CExpr with key and value", () => {
+    const expr = api.put("my-key", "my-value");
+    expect(expr.__kind).toBe("cloudflare-kv/put");
+    expect(expr.__args).toHaveLength(2);
+    expect(expr.__args[0]).toBe("my-key");
+    expect(expr.__args[1]).toBe("my-value");
   });
 
-  it("accepts options with expirationTtl", () => {
-    const prog = app(($) => {
-      return $.kv.put("key", "val", { expirationTtl: 3600 });
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("cloudflare-kv/put");
-    expect(ast.result.options.kind).toBe("core/record");
-    expect(ast.result.options.fields.expirationTtl.kind).toBe("core/literal");
-    expect(ast.result.options.fields.expirationTtl.value).toBe(3600);
-  });
-
-  it("accepts Expr key and value", () => {
-    const prog = app(($) => {
-      return $.kv.put($.input.key, $.input.value);
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.key.kind).toBe("core/prop_access");
-    expect(ast.result.value.kind).toBe("core/prop_access");
+  it("produces cloudflare-kv/put CExpr with options", () => {
+    const expr = api.put("key", "val", { expirationTtl: 3600 });
+    expect(expr.__kind).toBe("cloudflare-kv/put");
+    expect(expr.__args).toHaveLength(3);
+    const optionsArg = expr.__args[2] as { __kind: string };
+    expect(optionsArg.__kind).toBe("cloudflare-kv/record");
   });
 });
-
-// ============================================================
-// delete
-// ============================================================
 
 describe("cloudflare-kv: delete", () => {
-  it("produces cloudflare-kv/delete node with literal key", () => {
-    const prog = app(($) => {
-      return $.kv.delete("old-key");
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("cloudflare-kv/delete");
-    expect(ast.result.key.kind).toBe("core/literal");
-    expect(ast.result.key.value).toBe("old-key");
-  });
-
-  it("accepts Expr<string> key", () => {
-    const prog = app(($) => {
-      return $.kv.delete($.input.keyToDelete);
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("cloudflare-kv/delete");
-    expect(ast.result.key.kind).toBe("core/prop_access");
+  it("produces cloudflare-kv/delete CExpr with literal key", () => {
+    const expr = api.delete("old-key");
+    expect(expr.__kind).toBe("cloudflare-kv/delete");
+    expect(expr.__args).toHaveLength(1);
+    expect(expr.__args[0]).toBe("old-key");
   });
 });
-
-// ============================================================
-// list
-// ============================================================
 
 describe("cloudflare-kv: list", () => {
-  it("produces cloudflare-kv/list node with options", () => {
-    const prog = app(($) => {
-      return $.kv.list({ prefix: "user:", limit: 100 });
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("cloudflare-kv/list");
-    expect(ast.result.options.kind).toBe("core/record");
-    expect(ast.result.options.fields.prefix.value).toBe("user:");
-    expect(ast.result.options.fields.limit.value).toBe(100);
+  it("produces cloudflare-kv/list CExpr with options", () => {
+    const expr = api.list({ prefix: "user:", limit: 100 });
+    expect(expr.__kind).toBe("cloudflare-kv/list");
+    expect(expr.__args).toHaveLength(1);
+    const optionsArg = expr.__args[0] as { __kind: string };
+    expect(optionsArg.__kind).toBe("cloudflare-kv/record");
   });
 
-  it("optional options are null when omitted", () => {
-    const prog = app(($) => {
-      return $.kv.list();
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("cloudflare-kv/list");
-    expect(ast.result.options).toBeNull();
+  it("produces cloudflare-kv/list CExpr with no children when options omitted", () => {
+    const expr = api.list();
+    expect(expr.__kind).toBe("cloudflare-kv/list");
+    expect(expr.__args).toHaveLength(0);
   });
 });
 
 // ============================================================
-// cross-operation dependencies
+// Unified Plugin shape
 // ============================================================
 
-describe("cloudflare-kv: cross-operation dependencies", () => {
-  it("can use result of get as input to put", () => {
-    const prog = app(($) => {
-      const cached = $.kv.get("source-key");
-      const stored = $.kv.put("dest-key", cached);
-      return $.begin(cached, stored);
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/begin");
+describe("cloudflare-kv plugin: unified Plugin shape", () => {
+  it("has correct name", () => {
+    expect(plugin.name).toBe("cloudflare-kv");
+  });
+
+  it("has 7 node kinds (5 core + record + array)", () => {
+    expect(plugin.nodeKinds).toHaveLength(7);
+  });
+
+  it("nodeKinds are all namespaced", () => {
+    for (const kind of plugin.nodeKinds) {
+      expect(kind).toMatch(/^cloudflare-kv\//);
+    }
+  });
+
+  it("kinds map has entries for all node kinds", () => {
+    for (const kind of plugin.nodeKinds) {
+      expect(plugin.kinds[kind]).toBeDefined();
+    }
+  });
+
+  it("has empty traits and lifts", () => {
+    expect(plugin.traits).toEqual({});
+    expect(plugin.lifts).toEqual({});
+  });
+
+  it("has NO defaultInterpreter", () => {
+    expect(plugin.defaultInterpreter).toBeUndefined();
+  });
+});
+
+// ============================================================
+// Factory aliases
+// ============================================================
+
+describe("cloudflare-kv plugin: factory aliases", () => {
+  it("cloudflareKv and cloudflareKvPlugin are the same function", () => {
+    expect(cloudflareKv).toBe(cloudflareKvPlugin);
   });
 });

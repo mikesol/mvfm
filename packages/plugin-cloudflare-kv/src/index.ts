@@ -6,7 +6,7 @@ export type {
   KvListResult,
   KvPutOptions,
 } from "./4.20260213.0";
-export { cloudflareKv } from "./4.20260213.0";
+export { cloudflareKv, cloudflareKvPlugin } from "./4.20260213.0";
 export type { KVNamespaceLike } from "./4.20260213.0/client-cf-kv";
 export { wrapKVNamespace } from "./4.20260213.0/client-cf-kv";
 export type { ClientHandlerOptions } from "./4.20260213.0/handler.client";

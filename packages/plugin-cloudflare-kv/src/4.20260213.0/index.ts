@@ -2,8 +2,11 @@
 // MVFM PLUGIN: cloudflare-kv (@cloudflare/workers-types KVNamespace)
 // ============================================================
 //
+// Ported to the unified Plugin type with makeCExpr and
+// index-based fold handlers. Config captured in interpreter
+// closure, not stored on AST nodes.
+//
 // Implementation status: COMPLETE (modulo known limitations)
-// Plugin size: SMALL — fully implemented modulo known limitations
 //
 // Known limitations (deliberate omissions):
 //   - No arrayBuffer/stream return types (binary/streaming)
@@ -11,54 +14,57 @@
 //   - No getWithMetadata (deferred to pass 2)
 //   - No cacheTtl option on get
 //
-// Goal: An LLM that knows the Cloudflare Workers KV API should
-// be able to write Mvfm programs with near-zero learning curve.
-// The API mirrors the real KVNamespace 1:1 for supported ops.
-//
-// Real KVNamespace API (@cloudflare/workers-types 4.20260213.0):
-//   const value = await KV.get("key")
-//   const json = await KV.get("key", "json")
-//   await KV.put("key", "value", { expirationTtl: 3600 })
-//   await KV.delete("key")
-//   const list = await KV.list({ prefix: "user:" })
-//
-// Mvfm API (1:1 match):
-//   const value = $.kv.get("key")
-//   const json = $.kv.get("key", "json")
-//   $.kv.put("key", "value", { expirationTtl: 3600 })
-//   $.kv.delete("key")
-//   const list = $.kv.list({ prefix: "user:" })
-//
-// No deviations from the real API for supported operations.
-// The "type" parameter on get() is a build-time literal string,
-// so it maps cleanly to distinct AST node kinds internally.
-//
-// Based on source-level analysis of @cloudflare/workers-types
-// v4.20260213.0 — the KVNamespace interface (latest/index.ts
-// lines 2159-2272).
-//
+// NO defaultInterpreter — requires createCloudflareKvInterpreter(client).
 // ============================================================
 
-import type { Expr, PluginContext, TypedNode } from "@mvfm/core";
-import { definePlugin } from "@mvfm/core";
+import type { CExpr, KindSpec } from "@mvfm/core";
+import { isCExpr, makeCExpr } from "@mvfm/core";
+
+// ---- liftArg: recursive plain-value -> CExpr lifting --------
+
+/**
+ * Recursively lifts a plain value into a CExpr tree.
+ * - CExpr values are returned as-is.
+ * - Primitives are returned as-is (elaborate lifts them).
+ * - Plain objects become `cloudflare-kv/record` CExprs with key-value child pairs.
+ * - Arrays become `cloudflare-kv/array` CExprs.
+ */
+function liftArg(value: unknown): unknown {
+  if (isCExpr(value)) return value;
+  if (typeof value === "string") return value;
+  if (typeof value === "number") return value;
+  if (typeof value === "boolean") return value;
+  if (value === null || value === undefined) return value;
+  if (Array.isArray(value)) {
+    return makeCExpr("cloudflare-kv/array", value.map(liftArg));
+  }
+  if (typeof value === "object") {
+    const pairs: unknown[] = [];
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      pairs.push(k, liftArg(v));
+    }
+    return makeCExpr("cloudflare-kv/record", pairs);
+  }
+  return value;
+}
 
 // ---- What the plugin adds to $ ----------------------------
 
 /** Return type of `kv.get()` — text or JSON depending on the type parameter. */
 export interface KvGet {
   /** Get a text value by key. Returns null if key does not exist. */
-  (key: Expr<string> | string): Expr<string | null>;
+  (key: CExpr<string> | string): CExpr<string | null>;
   /** Get a text value by key (explicit "text" type). */
-  (key: Expr<string> | string, type: "text"): Expr<string | null>;
+  (key: CExpr<string> | string, type: "text"): CExpr<string | null>;
   /** Get a JSON-parsed value by key. Returns null if key does not exist. */
-  <T = unknown>(key: Expr<string> | string, type: "json"): Expr<T | null>;
+  <T = unknown>(key: CExpr<string> | string, type: "json"): CExpr<T | null>;
 }
 
 /**
  * Cloudflare KV operations added to the DSL context.
  *
  * Mirrors the KVNamespace API: get, put, delete, list.
- * Each method produces a namespaced AST node.
+ * Each method produces a namespaced CExpr node.
  */
 export interface CloudflareKvMethods {
   /** Cloudflare KV operations, namespaced under `$.kv`. */
@@ -67,14 +73,14 @@ export interface CloudflareKvMethods {
     get: KvGet;
     /** Store a string value at key with optional expiration settings. */
     put(
-      key: Expr<string> | string,
-      value: Expr<string> | string,
-      options?: Expr<KvPutOptions> | KvPutOptions,
-    ): Expr<void>;
+      key: CExpr<string> | string,
+      value: CExpr<string> | string,
+      options?: CExpr<KvPutOptions> | KvPutOptions,
+    ): CExpr<void>;
     /** Delete a key. */
-    delete(key: Expr<string> | string): Expr<void>;
+    delete(key: CExpr<string> | string): CExpr<void>;
     /** List keys with optional prefix filter and pagination cursor. */
-    list(options?: Expr<KvListOptions> | KvListOptions): Expr<KvListResult>;
+    list(options?: CExpr<KvListOptions> | KvListOptions): CExpr<KvListResult>;
   };
 }
 
@@ -122,144 +128,97 @@ export interface CloudflareKvConfig {
   namespaceId: string;
 }
 
-// ---- Plugin implementation --------------------------------
+// ---- Node kinds -------------------------------------------
 
-/**
- * Cloudflare KV plugin factory. Namespace: `cloudflare-kv/`.
- *
- * Creates a plugin that exposes get, put, delete, and list
- * methods for building Cloudflare KV AST nodes.
- *
- * @param config - A {@link CloudflareKvConfig} with namespaceId.
- * @returns A PluginDefinition for the cloudflare-kv plugin.
- */
-export function cloudflareKv(config: CloudflareKvConfig) {
-  return definePlugin({
-    name: "cloudflare-kv",
-    nodeKinds: [
-      "cloudflare-kv/get",
-      "cloudflare-kv/get_json",
-      "cloudflare-kv/put",
-      "cloudflare-kv/delete",
-      "cloudflare-kv/list",
-    ],
+const NODE_KINDS = [
+  "cloudflare-kv/get",
+  "cloudflare-kv/get_json",
+  "cloudflare-kv/put",
+  "cloudflare-kv/delete",
+  "cloudflare-kv/list",
+  "cloudflare-kv/record",
+  "cloudflare-kv/array",
+] as const;
 
-    build(ctx: PluginContext): CloudflareKvMethods {
-      function resolveKey(key: Expr<string> | string): TypedNode {
-        return ctx.isExpr(key) ? key.__node : ctx.lift(key).__node;
-      }
-
-      return {
-        kv: {
-          get: ((key: Expr<string> | string, type?: "text" | "json") => {
-            if (type === "json") {
-              return ctx.expr<unknown>({
-                kind: "cloudflare-kv/get_json",
-                key: resolveKey(key),
-                config,
-              });
-            }
-            return ctx.expr<string | null>({
-              kind: "cloudflare-kv/get",
-              key: resolveKey(key),
-              config,
-            });
-          }) as KvGet,
-
-          put(key, value, options?) {
-            return ctx.expr({
-              kind: "cloudflare-kv/put",
-              key: resolveKey(key),
-              value: ctx.isExpr(value) ? value.__node : ctx.lift(value).__node,
-              options: options != null ? ctx.lift(options).__node : null,
-              config,
-            });
-          },
-
-          delete(key) {
-            return ctx.expr({
-              kind: "cloudflare-kv/delete",
-              key: resolveKey(key),
-              config,
-            });
-          },
-
-          list(options?) {
-            return ctx.expr({
-              kind: "cloudflare-kv/list",
-              options: options != null ? ctx.lift(options).__node : null,
-              config,
-            });
-          },
-        },
-      };
-    },
-  });
+function buildKinds(): Record<string, KindSpec<unknown[], unknown>> {
+  const kinds: Record<string, KindSpec<unknown[], unknown>> = {};
+  for (const kind of NODE_KINDS) {
+    kinds[kind] = {
+      inputs: [] as unknown[],
+      output: undefined as unknown,
+    } as KindSpec<unknown[], unknown>;
+  }
+  return kinds;
 }
 
-// ============================================================
-// HONEST ASSESSMENT: What works, what's hard, what breaks
-// ============================================================
-//
-// WORKS GREAT:
-//
-// 1. Basic get/put/delete:
-//    Real:  const val = await KV.get("key")
-//    Mvfm:   const val = $.kv.get("key")
-//    Nearly identical. Only difference is $ prefix and no await.
-//
-// 2. JSON values:
-//    Real:  const data = await KV.get("key", "json")
-//    Mvfm:   const data = $.kv.get("key", "json")
-//    1:1 mapping. Same call signature.
-//
-// 3. Put with expiration:
-//    Real:  await KV.put("key", "val", { expirationTtl: 3600 })
-//    Mvfm:   $.kv.put("key", "val", { expirationTtl: 3600 })
-//    1:1 mapping.
-//
-// 4. List with prefix/cursor:
-//    Real:  const result = await KV.list({ prefix: "user:" })
-//    Mvfm:   const result = $.kv.list({ prefix: "user:" })
-//    1:1 mapping. Pagination via cursor works naturally.
-//
-// 5. Parameterized keys:
-//    const val = $.kv.get($.input.cacheKey)
-//    Proxy chains capture key dependencies perfectly.
-//
-// DOESN'T WORK / NOT MODELED:
-//
-// 6. Binary/streaming:
-//    Real:  KV.get("key", "arrayBuffer") / KV.get("key", "stream")
-//    Mvfm:   Not modeled. Binary data and streams don't fit a
-//           finite, inspectable AST.
-//
-// 7. getWithMetadata:
-//    Real:  KV.getWithMetadata("key")
-//    Mvfm:   Not yet modeled. Returns {value, metadata, cacheStatus}.
-//           Could be added as cloudflare-kv/get_with_metadata.
-//
-// 8. Batch get:
-//    Real:  KV.get(["key1", "key2"])
-//    Mvfm:   Not yet modeled. Multi-key fetch returns a Map.
-//           Could be added as cloudflare-kv/get_batch.
-//
-// 9. Metadata on put:
-//    Real:  KV.put("key", "val", { metadata: { foo: "bar" } })
-//    Mvfm:   Partially modeled — the options type includes metadata
-//           but the handler ignores it for now.
-//
-// ============================================================
-// SUMMARY:
-// Based on source-level analysis of @cloudflare/workers-types
-// v4.20260213.0 (KVNamespace interface, latest/index.ts).
-//
-// For the core use case of "store and retrieve string/JSON
-// values by key with optional expiration" — this is a 1:1
-// match with the real KVNamespace API. No deviations for
-// supported operations.
-//
-// Not supported: binary data (arrayBuffer), streaming,
-// getWithMetadata, batch get. These could be added
-// incrementally in future passes.
-// ============================================================
+// ---- Constructor builder ----------------------------------
+
+function buildKvApi(): CloudflareKvMethods["kv"] {
+  return {
+    get: ((key: CExpr<string> | string, type?: "text" | "json") => {
+      if (type === "json") {
+        return makeCExpr("cloudflare-kv/get_json", [liftArg(key)]);
+      }
+      return makeCExpr("cloudflare-kv/get", [liftArg(key)]);
+    }) as KvGet,
+
+    put(key, value, options?) {
+      const children: unknown[] = [liftArg(key), liftArg(value)];
+      if (options != null) {
+        children.push(liftArg(options));
+      }
+      return makeCExpr("cloudflare-kv/put", children);
+    },
+
+    delete(key) {
+      return makeCExpr("cloudflare-kv/delete", [liftArg(key)]);
+    },
+
+    list(options?) {
+      if (options != null) {
+        return makeCExpr("cloudflare-kv/list", [liftArg(options)]);
+      }
+      return makeCExpr("cloudflare-kv/list", []);
+    },
+  };
+}
+
+// ---- Plugin factory ---------------------------------------
+
+/**
+ * Creates the cloudflare-kv plugin definition (unified Plugin type).
+ *
+ * This plugin has NO defaultInterpreter. You must provide one
+ * via `defaults(plugins, { "cloudflare-kv": createCloudflareKvInterpreter(client) })`.
+ *
+ * @param _config - A {@link CloudflareKvConfig} with namespaceId.
+ *   Config is captured by the interpreter, not stored on AST nodes.
+ * @returns A unified Plugin that contributes `$.kv`.
+ *
+ * @example
+ * ```ts
+ * const plugin = cloudflareKv({ namespaceId: "MY_KV" });
+ * const $ = mvfmU(numPluginU, strPluginU, plugin);
+ * const expr = $.kv.get("my-key");
+ * const nexpr = app(expr);
+ * const interp = defaults([numPluginU, strPluginU, plugin], {
+ *   "cloudflare-kv": createCloudflareKvInterpreter(myClient),
+ * });
+ * const result = await fold(nexpr, interp);
+ * ```
+ */
+export function cloudflareKv(_config: CloudflareKvConfig) {
+  return {
+    name: "cloudflare-kv" as const,
+    ctors: { kv: buildKvApi() },
+    kinds: buildKinds(),
+    traits: {},
+    lifts: {},
+    nodeKinds: [...NODE_KINDS],
+  };
+}
+
+/**
+ * Alias for {@link cloudflareKv}, kept for readability at call sites.
+ */
+export const cloudflareKvPlugin = cloudflareKv;
