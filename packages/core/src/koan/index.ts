@@ -1,4 +1,5 @@
 import { deepThing } from "./accessor";
+import { defaults, fold } from "./bridge";
 import { commit, gc } from "./commit";
 import {
   boolPluginU,
@@ -12,11 +13,13 @@ import {
   stdPlugins,
   strPluginU,
 } from "./composition";
+import { pipe } from "./dagql";
 import { addEntry, dirty, removeEntry, rewireChildren, setRoot, swapEntry } from "./dirty";
 import { add, boolLit, eq, isCExpr, makeCExpr, makeNExpr, mul, numLit, strLit, sub } from "./expr";
 import { collectReachable, liveAdj } from "./gc";
 import { incrementId } from "./increment";
 import { mapWhere } from "./map";
+import { gcPreservingAliases, name } from "./named";
 import { app, createApp } from "./normalize";
 import { and, byKind, byKindGlob, byName, hasChildCount, isLeaf, not, or } from "./predicates";
 import { replaceWhere } from "./replace";
@@ -39,8 +42,13 @@ export const koan = {
   appS,
   point,
   deepThing,
+  fold,
+  defaults,
   commit,
   gc,
+  gcPreservingAliases,
+  name,
+  pipe,
   eq,
   collectReachable,
   liveAdj,
@@ -80,6 +88,7 @@ export const koan = {
   strPluginU,
 };
 
+export type { Handler, Interpreter, PluginDef } from "./bridge";
 export type { Plugin, PluginShape, RegistryOf, TraitDef } from "./composition";
 export type { DirtyAdjOf, DirtyCtrOf, DirtyExpr, DirtyIdOf, DirtyOutOf, RewireAdj } from "./dirty";
 export type {
@@ -99,6 +108,7 @@ export type {
 export type { CollectReachable, LiveAdj } from "./gc";
 export type { Increment, IncrementLast } from "./increment";
 export type { MapAdj, MapOut, MatchingEntries } from "./map";
+export type { NameAlias, PreserveAliases } from "./named";
 export type { NeverGuard } from "./normalize-types";
 export type {
   AndPred,

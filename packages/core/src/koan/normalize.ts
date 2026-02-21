@@ -6,173 +6,11 @@ import {
   type RegistryOf,
   stdPlugins,
 } from "./composition";
-import {
-  type CExpr,
-  isCExpr,
-  type KindSpec,
-  type LiftKind,
-  makeNExpr,
-  type NExpr,
-  type NodeEntry,
-  type RuntimeEntry,
-  type TraitKindSpec,
-  type TypeKey,
-} from "./expr";
-import type { Increment } from "./increment";
+import { type CExpr, isCExpr, makeNExpr, type NExpr, type RuntimeEntry } from "./expr";
 import { incrementId } from "./increment";
+import type { AppResult } from "./normalize-types";
 
-/** Replace `never` with `never`-preserving branching in recursive conditionals. */
-export type NeverGuard<T, Then> = [T] extends [never] ? never : Then;
-
-// AppResult type-level elaboration (koan 04 core)
-
-type ElaborateArg<Reg, Arg, Expected, Adj, Ctr extends string> =
-  Arg extends CExpr<unknown, infer K extends string, infer A extends readonly unknown[]>
-    ? NeverGuard<
-        ElaborateExpr<Reg, K, A, Adj, Ctr>,
-        ElaborateExpr<Reg, K, A, Adj, Ctr> extends [
-          infer A2,
-          infer C2 extends string,
-          infer Id extends string,
-          infer O,
-        ]
-          ? O extends Expected
-            ? [A2, C2, Id, O]
-            : never
-          : never
-      >
-    : Arg extends Expected
-      ? LiftKind<Expected> extends infer LK extends string
-        ? [Adj & Record<Ctr, NodeEntry<LK, [], Expected>>, Increment<Ctr>, Ctr, Expected]
-        : never
-      : never;
-
-type ElaborateChildren<
-  Reg,
-  Args extends readonly unknown[],
-  Expected extends readonly unknown[],
-  Adj,
-  Ctr extends string,
-> = Args extends readonly []
-  ? Expected extends readonly []
-    ? [Adj, Ctr, []]
-    : never
-  : Args extends readonly [infer AH, ...infer AT extends readonly unknown[]]
-    ? Expected extends readonly [infer EH, ...infer ET extends readonly unknown[]]
-      ? NeverGuard<
-          ElaborateArg<Reg, AH, EH, Adj, Ctr>,
-          ElaborateArg<Reg, AH, EH, Adj, Ctr> extends [
-            infer A2,
-            infer C2 extends string,
-            infer Id extends string,
-            unknown,
-          ]
-            ? NeverGuard<
-                ElaborateChildren<Reg, AT, ET, A2, C2>,
-                ElaborateChildren<Reg, AT, ET, A2, C2> extends [
-                  infer A3,
-                  infer C3 extends string,
-                  infer Ids extends string[],
-                ]
-                  ? [A3, C3, [Id, ...Ids]]
-                  : never
-              >
-            : never
-        >
-      : never
-    : never;
-
-type ElaborateArgInfer<Reg, Arg, Adj, Ctr extends string> =
-  Arg extends CExpr<unknown, infer K extends string, infer A extends readonly unknown[]>
-    ? ElaborateExpr<Reg, K, A, Adj, Ctr>
-    : Arg extends number
-      ? [Adj & Record<Ctr, NodeEntry<"num/literal", [], number>>, Increment<Ctr>, Ctr, number]
-      : Arg extends string
-        ? [Adj & Record<Ctr, NodeEntry<"str/literal", [], string>>, Increment<Ctr>, Ctr, string]
-        : Arg extends boolean
-          ? [
-              Adj & Record<Ctr, NodeEntry<"bool/literal", [], boolean>>,
-              Increment<Ctr>,
-              Ctr,
-              boolean,
-            ]
-          : never;
-
-type ElaborateTraitExpr<
-  Reg,
-  O,
-  Mapping,
-  Args extends readonly unknown[],
-  Adj,
-  Ctr extends string,
-> = Args extends readonly [infer A, infer B]
-  ? NeverGuard<
-      ElaborateArgInfer<Reg, A, Adj, Ctr>,
-      ElaborateArgInfer<Reg, A, Adj, Ctr> extends [
-        infer A2,
-        infer C2 extends string,
-        infer Id1 extends string,
-        infer T1,
-      ]
-        ? NeverGuard<
-            ElaborateArg<Reg, B, T1, A2, C2>,
-            ElaborateArg<Reg, B, T1, A2, C2> extends [
-              infer A3,
-              infer C3 extends string,
-              infer Id2 extends string,
-              unknown,
-            ]
-              ? TypeKey<T1> extends infer TK extends string
-                ? TK extends keyof Mapping
-                  ? Mapping[TK] extends infer RK extends string
-                    ? [A3 & Record<C3, NodeEntry<RK, [Id1, Id2], O>>, Increment<C3>, C3, O]
-                    : never
-                  : never
-                : never
-              : never
-          >
-        : never
-    >
-  : never;
-
-type ElaborateExpr<
-  Reg,
-  Kind extends string,
-  Args extends readonly unknown[],
-  Adj,
-  Ctr extends string,
-> = Kind extends keyof Reg
-  ? Reg[Kind] extends KindSpec<infer Inputs extends readonly unknown[], infer O>
-    ? NeverGuard<
-        ElaborateChildren<Reg, Args, Inputs, Adj, Ctr>,
-        ElaborateChildren<Reg, Args, Inputs, Adj, Ctr> extends [
-          infer A2,
-          infer C2 extends string,
-          infer Ids extends string[],
-        ]
-          ? [A2 & Record<C2, NodeEntry<Kind, Ids, O>>, Increment<C2>, C2, O]
-          : never
-      >
-    : Reg[Kind] extends TraitKindSpec<infer O, infer Mapping>
-      ? ElaborateTraitExpr<Reg, O, Mapping, Args, Adj, Ctr>
-      : never
-  : never;
-
-/** Type-level result of elaborating a permissive CExpr. */
-export type AppResult<Reg, Expr> =
-  Expr extends CExpr<unknown, infer K extends string, infer A extends readonly unknown[]>
-    ? NeverGuard<
-        ElaborateExpr<Reg, K, A, {}, "a">,
-        ElaborateExpr<Reg, K, A, {}, "a"> extends [
-          infer Adj,
-          infer C extends string,
-          infer R extends string,
-          infer O,
-        ]
-          ? NExpr<O, R, Adj, C>
-          : never
-      >
-    : never;
+export type { AppResult } from "./normalize-types";
 
 function buildKindOutputs(plugins: readonly Plugin[]): Record<string, string> {
   const outputs: Record<string, string> = {};
@@ -255,7 +93,12 @@ function elaborate(
   }
 
   const root = visitExpr(expr);
-  return makeNExpr(root.id, entries, counter);
+  return makeNExpr(root.id, entries, counter) as NExpr<
+    unknown,
+    string,
+    Record<string, RuntimeEntry>,
+    string
+  >;
 }
 
 /** Create a normalize app from a plugin tuple. */
@@ -266,7 +109,7 @@ export function createApp<const P extends readonly Plugin[]>(...plugins: P) {
   const kindOutputs = buildKindOutputs(plugins);
 
   return function app<Expr extends CExpr<unknown>>(expr: Expr): AppResult<RegistryOf<P>, Expr> {
-    return elaborate(expr, liftMap, traitMap, kindInputs, kindOutputs) as AppResult<
+    return elaborate(expr, liftMap, traitMap, kindInputs, kindOutputs) as unknown as AppResult<
       RegistryOf<P>,
       Expr
     >;
