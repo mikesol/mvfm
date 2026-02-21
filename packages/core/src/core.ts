@@ -12,6 +12,7 @@ export {
   defineInterpreter,
   eval_,
   type FoldState,
+  fold,
   foldAST,
   type Handler,
   type Interpreter,

@@ -2,6 +2,7 @@
 // Stack-safe async fold with memoization and taint tracking
 // ============================================================
 
+/* biome-ignore lint/nursery/noExcessiveLinesPerFile: fold engine is intentionally centralized */
 import type { Program } from "./types";
 
 /**
@@ -321,4 +322,48 @@ export async function foldAST(
   }
 
   return input;
+}
+
+/**
+ * Compatibility alias for the koan-style fold API.
+ * Currently forwards to foldAST.
+ */
+export async function fold<K extends string>(
+  interpreter: Interpreter<K>,
+  program: Program<K>,
+  state?: FoldState,
+): Promise<unknown>;
+export async function fold<K extends string>(
+  interpreter: Interpreter<K>,
+  root: TypedNode,
+  state?: FoldState,
+): Promise<unknown>;
+export async function fold<K extends string>(
+  program: Program<K>,
+  interpreter: Interpreter<K>,
+  state?: FoldState,
+): Promise<unknown>;
+export async function fold<K extends string>(
+  root: TypedNode,
+  interpreter: Interpreter<K>,
+  state?: FoldState,
+): Promise<unknown>;
+export async function fold(
+  a: Interpreter<string> | TypedNode | Program<string>,
+  b: Interpreter<string> | TypedNode | Program<string>,
+  state?: FoldState,
+): Promise<unknown> {
+  const aIsProgram = typeof a === "object" && a !== null && "ast" in a && "hash" in a;
+  const aIsNode = typeof a === "object" && a !== null && "kind" in a;
+  if (aIsProgram || aIsNode) {
+    if (aIsProgram) {
+      return await foldAST(b as Interpreter<string>, a as Program<string>, state);
+    }
+    return await foldAST(b as Interpreter<string>, a as TypedNode, state);
+  }
+  const bIsProgram = typeof b === "object" && b !== null && "ast" in b && "hash" in b;
+  if (bIsProgram) {
+    return await foldAST(a as Interpreter<string>, b as Program<string>, state);
+  }
+  return await foldAST(a as Interpreter<string>, b as TypedNode, state);
 }

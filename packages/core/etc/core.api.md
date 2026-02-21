@@ -234,6 +234,18 @@ export interface FiberMethods {
 }
 
 // @public
+export function fold<K extends string>(interpreter: Interpreter<K>, program: Program<K>, state?: FoldState): Promise<unknown>;
+
+// @public (undocumented)
+export function fold<K extends string>(interpreter: Interpreter<K>, root: TypedNode, state?: FoldState): Promise<unknown>;
+
+// @public (undocumented)
+export function fold<K extends string>(program: Program<K>, interpreter: Interpreter<K>, state?: FoldState): Promise<unknown>;
+
+// @public (undocumented)
+export function fold<K extends string>(root: TypedNode, interpreter: Interpreter<K>, state?: FoldState): Promise<unknown>;
+
+// @public
 export function foldAST<K extends string>(interpreter: Interpreter<K>, program: Program<K>, state?: FoldState): Promise<unknown>;
 
 // @public (undocumented)
@@ -299,6 +311,414 @@ export type InterpreterHandlers<K extends string> = string extends K ? AnyHandle
 
 // @public
 export type IsAny<T> = 0 extends 1 & T ? true : false;
+
+// @public
+export const koan: {
+    add: typeof add;
+    boolLit: typeof boolLit;
+    buildKindInputs: typeof buildKindInputs;
+    buildLiftMap: typeof buildLiftMap;
+    buildTraitMap: typeof buildTraitMap;
+    createApp: typeof createApp;
+    app: <Expr extends CExpr<unknown>>(expr: Expr) => AppResult<RegistryOf<readonly [{
+    readonly name: "num";
+    readonly ctors: {
+    readonly add: typeof add;
+    readonly mul: typeof mul;
+    readonly sub: typeof sub;
+    readonly numLit: typeof numLit;
+    };
+    readonly kinds: {
+    readonly "num/literal": KindSpec<[], number>;
+    readonly "num/add": KindSpec<[number, number], number>;
+    readonly "num/mul": KindSpec<[number, number], number>;
+    readonly "num/sub": KindSpec<[number, number], number>;
+    readonly "num/eq": KindSpec<[number, number], boolean>;
+    };
+    readonly traits: {
+    readonly eq: {
+    readonly output: boolean;
+    readonly mapping: {
+    readonly number: "num/eq";
+    };
+    };
+    };
+    readonly lifts: {
+    readonly number: "num/literal";
+    };
+    readonly nodeKinds: readonly ["num/literal", "num/add", "num/mul", "num/sub", "num/eq"];
+    readonly defaultInterpreter: () => Interpreter_2;
+    }, {
+    readonly name: "str";
+    readonly ctors: {
+    readonly strLit: typeof strLit;
+    };
+    readonly kinds: {
+    readonly "str/literal": KindSpec<[], string>;
+    readonly "str/eq": KindSpec<[string, string], boolean>;
+    };
+    readonly traits: {
+    readonly eq: {
+    readonly output: boolean;
+    readonly mapping: {
+    readonly string: "str/eq";
+    };
+    };
+    };
+    readonly lifts: {
+    readonly string: "str/literal";
+    };
+    readonly nodeKinds: readonly ["str/literal", "str/eq"];
+    readonly defaultInterpreter: () => Interpreter_2;
+    }, {
+    readonly name: "bool";
+    readonly ctors: {
+    readonly boolLit: typeof boolLit;
+    };
+    readonly kinds: {
+    readonly "bool/literal": KindSpec<[], boolean>;
+    readonly "bool/eq": KindSpec<[boolean, boolean], boolean>;
+    };
+    readonly traits: {
+    readonly eq: {
+    readonly output: boolean;
+    readonly mapping: {
+    readonly boolean: "bool/eq";
+    };
+    };
+    };
+    readonly lifts: {
+    readonly boolean: "bool/literal";
+    };
+    readonly nodeKinds: readonly ["bool/literal", "bool/eq"];
+    readonly defaultInterpreter: () => Interpreter_2;
+    }]>, Expr>;
+    appS: <Expr extends CExpr<unknown>>(expr: Expr) => AppResult<RegistryOf<readonly [{
+    readonly name: "num";
+    readonly ctors: {
+    readonly add: typeof add;
+    readonly mul: typeof mul;
+    readonly sub: typeof sub;
+    readonly numLit: typeof numLit;
+    };
+    readonly kinds: {
+    readonly "num/literal": KindSpec<[], number>;
+    readonly "num/add": KindSpec<[number, number], number>;
+    readonly "num/mul": KindSpec<[number, number], number>;
+    readonly "num/sub": KindSpec<[number, number], number>;
+    readonly "num/eq": KindSpec<[number, number], boolean>;
+    };
+    readonly traits: {
+    readonly eq: {
+    readonly output: boolean;
+    readonly mapping: {
+    readonly number: "num/eq";
+    };
+    };
+    };
+    readonly lifts: {
+    readonly number: "num/literal";
+    };
+    readonly nodeKinds: readonly ["num/literal", "num/add", "num/mul", "num/sub", "num/eq"];
+    readonly defaultInterpreter: () => Interpreter_2;
+    }, {
+    readonly name: "str";
+    readonly ctors: {
+    readonly strLit: typeof strLit;
+    };
+    readonly kinds: {
+    readonly "str/literal": KindSpec<[], string>;
+    readonly "str/eq": KindSpec<[string, string], boolean>;
+    };
+    readonly traits: {
+    readonly eq: {
+    readonly output: boolean;
+    readonly mapping: {
+    readonly string: "str/eq";
+    };
+    };
+    };
+    readonly lifts: {
+    readonly string: "str/literal";
+    };
+    readonly nodeKinds: readonly ["str/literal", "str/eq"];
+    readonly defaultInterpreter: () => Interpreter_2;
+    }, {
+    readonly name: "bool";
+    readonly ctors: {
+    readonly boolLit: typeof boolLit;
+    };
+    readonly kinds: {
+    readonly "bool/literal": KindSpec<[], boolean>;
+    readonly "bool/eq": KindSpec<[boolean, boolean], boolean>;
+    };
+    readonly traits: {
+    readonly eq: {
+    readonly output: boolean;
+    readonly mapping: {
+    readonly boolean: "bool/eq";
+    };
+    };
+    };
+    readonly lifts: {
+    readonly boolean: "bool/literal";
+    };
+    readonly nodeKinds: readonly ["bool/literal", "bool/eq"];
+    readonly defaultInterpreter: () => Interpreter_2;
+    }, {
+    readonly name: "structural";
+    readonly ctors: {
+    readonly point: typeof point;
+    readonly line: line;
+    readonly pair: pair;
+    readonly add: typeof add;
+    };
+    readonly kinds: {
+    readonly "geom/point": KindSpec<[{
+    x: number;
+    y: number;
+    }], {
+    x: number;
+    y: number;
+    }>;
+    readonly "geom/line": KindSpec<[{
+    start: {
+    x: number;
+    y: number;
+    };
+    end: {
+    x: number;
+    y: number;
+    };
+    }], {
+    start: {
+    x: number;
+    y: number;
+    };
+    end: {
+    x: number;
+    y: number;
+    };
+    }>;
+    readonly "data/pair": KindSpec<[[number, number]], [number, number]>;
+    };
+    readonly traits: {};
+    readonly lifts: {};
+    readonly nodeKinds: readonly ["geom/point", "geom/line", "data/pair"];
+    }]>, Expr>;
+    point: typeof point;
+    deepThing: typeof deepThing;
+    fold: typeof fold_2;
+    VOLATILE_KINDS: Set<string>;
+    defaults: typeof defaults_2;
+    commit: typeof commit;
+    gc: typeof gc_2;
+    gcPreservingAliases: typeof gcPreservingAliases;
+    name: typeof name_2;
+    pipe: typeof pipe;
+    eq: typeof eq_2;
+    collectReachable: typeof collectReachable;
+    liveAdj: typeof liveAdj;
+    incrementId: typeof incrementId;
+    isCExpr: typeof isCExpr;
+    lt: typeof lt;
+    mapWhere: typeof mapWhere;
+    replaceWhere: typeof replaceWhere;
+    wrapByName: typeof wrapByName;
+    spliceWhere: typeof spliceWhere;
+    dirty: typeof dirty;
+    addEntry: typeof addEntry;
+    removeEntry: typeof removeEntry;
+    swapEntry: typeof swapEntry;
+    rewireChildren: typeof rewireChildren;
+    setRoot: typeof setRoot;
+    makeCExpr: typeof makeCExpr;
+    makeNExpr: typeof makeNExpr;
+    mul: typeof mul;
+    mvfmU: typeof mvfmU;
+    not: typeof not;
+    numLit: typeof numLit;
+    strLit: typeof strLit;
+    selectWhere: typeof selectWhere;
+    sub: typeof sub;
+    byKind: typeof byKind;
+    byKindGlob: typeof byKindGlob;
+    byName: typeof byName;
+    hasChildCount: typeof hasChildCount;
+    isLeaf: typeof isLeaf;
+    and: typeof and;
+    or: typeof or;
+    boolPluginU: {
+        readonly name: "bool";
+        readonly ctors: {
+            readonly boolLit: typeof boolLit;
+        };
+        readonly kinds: {
+            readonly "bool/literal": KindSpec<[], boolean>;
+            readonly "bool/eq": KindSpec<[boolean, boolean], boolean>;
+        };
+        readonly traits: {
+            readonly eq: {
+                readonly output: boolean;
+                readonly mapping: {
+                    readonly boolean: "bool/eq";
+                };
+            };
+        };
+        readonly lifts: {
+            readonly boolean: "bool/literal";
+        };
+        readonly nodeKinds: readonly ["bool/literal", "bool/eq"];
+        readonly defaultInterpreter: () => Interpreter_2;
+    };
+    numPluginU: {
+        readonly name: "num";
+        readonly ctors: {
+            readonly add: typeof add;
+            readonly mul: typeof mul;
+            readonly sub: typeof sub;
+            readonly numLit: typeof numLit;
+        };
+        readonly kinds: {
+            readonly "num/literal": KindSpec<[], number>;
+            readonly "num/add": KindSpec<[number, number], number>;
+            readonly "num/mul": KindSpec<[number, number], number>;
+            readonly "num/sub": KindSpec<[number, number], number>;
+            readonly "num/eq": KindSpec<[number, number], boolean>;
+        };
+        readonly traits: {
+            readonly eq: {
+                readonly output: boolean;
+                readonly mapping: {
+                    readonly number: "num/eq";
+                };
+            };
+        };
+        readonly lifts: {
+            readonly number: "num/literal";
+        };
+        readonly nodeKinds: readonly ["num/literal", "num/add", "num/mul", "num/sub", "num/eq"];
+        readonly defaultInterpreter: () => Interpreter_2;
+    };
+    ordPlugin: {
+        readonly name: "ord";
+        readonly ctors: {
+            readonly lt: typeof lt;
+        };
+        readonly kinds: {
+            readonly "num/lt": KindSpec<[number, number], boolean>;
+            readonly "str/lt": KindSpec<[string, string], boolean>;
+        };
+        readonly traits: {
+            readonly lt: {
+                readonly output: boolean;
+                readonly mapping: {
+                    readonly number: "num/lt";
+                    readonly string: "str/lt";
+                };
+            };
+        };
+        readonly lifts: {};
+        readonly nodeKinds: readonly ["num/lt", "str/lt"];
+        readonly defaultInterpreter: () => Interpreter_2;
+    };
+    stdPlugins: readonly [{
+        readonly name: "num";
+        readonly ctors: {
+            readonly add: typeof add;
+            readonly mul: typeof mul;
+            readonly sub: typeof sub;
+            readonly numLit: typeof numLit;
+        };
+        readonly kinds: {
+            readonly "num/literal": KindSpec<[], number>;
+            readonly "num/add": KindSpec<[number, number], number>;
+            readonly "num/mul": KindSpec<[number, number], number>;
+            readonly "num/sub": KindSpec<[number, number], number>;
+            readonly "num/eq": KindSpec<[number, number], boolean>;
+        };
+        readonly traits: {
+            readonly eq: {
+                readonly output: boolean;
+                readonly mapping: {
+                    readonly number: "num/eq";
+                };
+            };
+        };
+        readonly lifts: {
+            readonly number: "num/literal";
+        };
+        readonly nodeKinds: readonly ["num/literal", "num/add", "num/mul", "num/sub", "num/eq"];
+        readonly defaultInterpreter: () => Interpreter_2;
+    }, {
+        readonly name: "str";
+        readonly ctors: {
+            readonly strLit: typeof strLit;
+        };
+        readonly kinds: {
+            readonly "str/literal": KindSpec<[], string>;
+            readonly "str/eq": KindSpec<[string, string], boolean>;
+        };
+        readonly traits: {
+            readonly eq: {
+                readonly output: boolean;
+                readonly mapping: {
+                    readonly string: "str/eq";
+                };
+            };
+        };
+        readonly lifts: {
+            readonly string: "str/literal";
+        };
+        readonly nodeKinds: readonly ["str/literal", "str/eq"];
+        readonly defaultInterpreter: () => Interpreter_2;
+    }, {
+        readonly name: "bool";
+        readonly ctors: {
+            readonly boolLit: typeof boolLit;
+        };
+        readonly kinds: {
+            readonly "bool/literal": KindSpec<[], boolean>;
+            readonly "bool/eq": KindSpec<[boolean, boolean], boolean>;
+        };
+        readonly traits: {
+            readonly eq: {
+                readonly output: boolean;
+                readonly mapping: {
+                    readonly boolean: "bool/eq";
+                };
+            };
+        };
+        readonly lifts: {
+            readonly boolean: "bool/literal";
+        };
+        readonly nodeKinds: readonly ["bool/literal", "bool/eq"];
+        readonly defaultInterpreter: () => Interpreter_2;
+    }];
+    strPluginU: {
+        readonly name: "str";
+        readonly ctors: {
+            readonly strLit: typeof strLit;
+        };
+        readonly kinds: {
+            readonly "str/literal": KindSpec<[], string>;
+            readonly "str/eq": KindSpec<[string, string], boolean>;
+        };
+        readonly traits: {
+            readonly eq: {
+                readonly output: boolean;
+                readonly mapping: {
+                    readonly string: "str/eq";
+                };
+            };
+        };
+        readonly lifts: {
+            readonly string: "str/literal";
+        };
+        readonly nodeKinds: readonly ["str/literal", "str/eq"];
+        readonly defaultInterpreter: () => Interpreter_2;
+    };
+};
 
 // @public
 export function mergeInterpreters<A extends string, B extends string>(a: Interpreter<A>, b: Interpreter<B>): Interpreter<A | B>;
@@ -576,6 +996,60 @@ export const VOLATILE_KINDS: Set<string>;
 // dist/builder.d.ts:11:5 - (ae-forgotten-export) The symbol "CoreDollar" needs to be exported by the entry point index.d.ts
 // dist/builder.d.ts:11:5 - (ae-forgotten-export) The symbol "MergePlugins" needs to be exported by the entry point index.d.ts
 // dist/builder.d.ts:11:5 - (ae-forgotten-export) The symbol "FlattenPluginInputs" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:23:5 - (ae-forgotten-export) The symbol "add" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:24:5 - (ae-forgotten-export) The symbol "boolLit" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:25:5 - (ae-forgotten-export) The symbol "buildKindInputs" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:26:5 - (ae-forgotten-export) The symbol "buildLiftMap" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:27:5 - (ae-forgotten-export) The symbol "buildTraitMap" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:28:5 - (ae-forgotten-export) The symbol "createApp" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:29:5 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:29:5 - (ae-forgotten-export) The symbol "AppResult" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:29:5 - (ae-forgotten-export) The symbol "RegistryOf" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:33:13 - (ae-forgotten-export) The symbol "mul" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:34:13 - (ae-forgotten-export) The symbol "sub" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:35:13 - (ae-forgotten-export) The symbol "numLit" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:38:13 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:56:9 - (ae-forgotten-export) The symbol "Interpreter_2" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:60:13 - (ae-forgotten-export) The symbol "strLit" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:177:13 - (ae-forgotten-export) The symbol "point" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:178:13 - (ae-forgotten-export) The symbol "line" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:179:13 - (ae-forgotten-export) The symbol "pair" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:216:5 - (ae-forgotten-export) The symbol "deepThing" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:217:5 - (ae-forgotten-export) The symbol "fold_2" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:219:5 - (ae-forgotten-export) The symbol "defaults_2" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:220:5 - (ae-forgotten-export) The symbol "commit" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:221:5 - (ae-forgotten-export) The symbol "gc_2" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:222:5 - (ae-forgotten-export) The symbol "gcPreservingAliases" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:223:5 - (ae-forgotten-export) The symbol "name_2" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:224:5 - (ae-forgotten-export) The symbol "pipe" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:225:5 - (ae-forgotten-export) The symbol "eq_2" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:226:5 - (ae-forgotten-export) The symbol "collectReachable" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:227:5 - (ae-forgotten-export) The symbol "liveAdj" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:228:5 - (ae-forgotten-export) The symbol "incrementId" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:229:5 - (ae-forgotten-export) The symbol "isCExpr" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:230:5 - (ae-forgotten-export) The symbol "lt" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:231:5 - (ae-forgotten-export) The symbol "mapWhere" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:232:5 - (ae-forgotten-export) The symbol "replaceWhere" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:233:5 - (ae-forgotten-export) The symbol "wrapByName" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:234:5 - (ae-forgotten-export) The symbol "spliceWhere" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:235:5 - (ae-forgotten-export) The symbol "dirty" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:236:5 - (ae-forgotten-export) The symbol "addEntry" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:237:5 - (ae-forgotten-export) The symbol "removeEntry" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:238:5 - (ae-forgotten-export) The symbol "swapEntry" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:239:5 - (ae-forgotten-export) The symbol "rewireChildren" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:240:5 - (ae-forgotten-export) The symbol "setRoot" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:241:5 - (ae-forgotten-export) The symbol "makeCExpr" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:242:5 - (ae-forgotten-export) The symbol "makeNExpr" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:244:5 - (ae-forgotten-export) The symbol "mvfmU" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:245:5 - (ae-forgotten-export) The symbol "not" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:248:5 - (ae-forgotten-export) The symbol "selectWhere" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:250:5 - (ae-forgotten-export) The symbol "byKind" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:251:5 - (ae-forgotten-export) The symbol "byKindGlob" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:252:5 - (ae-forgotten-export) The symbol "byName" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:253:5 - (ae-forgotten-export) The symbol "hasChildCount" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:254:5 - (ae-forgotten-export) The symbol "isLeaf" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:255:5 - (ae-forgotten-export) The symbol "and" needs to be exported by the entry point index.d.ts
+// dist/koan/index.d.ts:256:5 - (ae-forgotten-export) The symbol "or" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 
