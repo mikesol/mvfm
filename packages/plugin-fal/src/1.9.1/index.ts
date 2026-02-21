@@ -1,9 +1,10 @@
 // ============================================================
-// MVFM PLUGIN: fal (@fal-ai/client)
+// MVFM PLUGIN: fal (@fal-ai/client) — unified Plugin
 // ============================================================
 //
-// Implementation status: PARTIAL (6 of ~10 modelable operations)
-// Plugin size: SMALL — fully implemented modulo known limitations
+// Ported to the unified Plugin type with makeCExpr and
+// index-based fold handlers. Config captured in interpreter
+// closure, not stored on AST nodes.
 //
 // Implemented:
 //   - run: direct synchronous endpoint execution
@@ -12,66 +13,43 @@
 //   - queue.status: check queue request status
 //   - queue.result: retrieve queue request result
 //   - queue.cancel: cancel queued request
-//
-// Not doable (fundamental mismatch with AST model):
-//   - stream: SSE push-based streaming (returns FalStream with
-//     async iterator). No finite AST shape.
-//   - realtime.connect: WebSocket bidirectional connection with
-//     state machine. Fundamentally incompatible with request-response AST.
-//   - storage.transformInput: recursive Blob-to-URL transformation
-//     of arbitrary input. Runtime concern.
-//
-// Deferred (modelable but not in scope):
-//   - storage.upload: Blob upload returning URL. Could be added
-//     as a 7th node kind for image-to-image workflows.
-//
-// ============================================================
-//
-// Goal: An LLM that knows @fal-ai/client should be able to write
-// Mvfm programs with near-zero learning curve. The API should
-// look like the real fal client as closely as possible.
-//
-// Real @fal-ai/client API (v1.9.1):
-//   const fal = createFalClient({ credentials: "key_..." });
-//   const result = await fal.run("fal-ai/flux/dev", { input: { prompt: "a cat" } });
-//   const result = await fal.subscribe("fal-ai/flux/dev", { input: { prompt: "a cat" } });
-//   const { request_id } = await fal.queue.submit("fal-ai/flux/dev", { input: { prompt: "a cat" } });
-//   const status = await fal.queue.status("fal-ai/flux/dev", { requestId: "req_123" });
-//   const result = await fal.queue.result("fal-ai/flux/dev", { requestId: "req_123" });
-//   await fal.queue.cancel("fal-ai/flux/dev", { requestId: "req_123" });
-//
-// Based on source-level analysis of @fal-ai/client
-// (github.com/fal-ai/fal-js, libs/client/src/).
-// The SDK uses createFalClient() returning a FalClient with
-// run/subscribe/queue/stream/realtime/storage subsystems.
-// run() dispatches via dispatchRequest() to https://fal.run/{endpoint}.
-// subscribe() wraps queue.submit + queue.subscribeToStatus + queue.result.
-// queue operations use the "queue" subdomain.
-//
 // ============================================================
 
 import type { FalClient as FalSdkClient, QueueClient as FalSdkQueueClient } from "@fal-ai/client";
-import type { Expr, PluginContext } from "@mvfm/core";
-import { definePlugin } from "@mvfm/core";
-import { falInterpreter } from "./interpreter";
+import type { CExpr, Interpreter, KindSpec } from "@mvfm/core";
+import { isCExpr, makeCExpr } from "@mvfm/core";
+import { wrapFalSdk } from "./client-fal-sdk";
+import { createFalInterpreter, type FalClient } from "./interpreter";
 
-// ---- What the plugin adds to $ ----------------------------
+// ---- liftArg: recursive plain-value → CExpr lifting --------
 
 /**
- * Fal operations added to the DSL context by the fal plugin.
- *
- * Mirrors the \@fal-ai/client API: run, subscribe, and queue
- * operations for AI media generation endpoints.
+ * Recursively lifts a plain value into a CExpr tree.
+ * - CExpr values are returned as-is.
+ * - Primitives are returned as-is (elaborate lifts them).
+ * - Plain objects become `fal/record` CExprs with key-value child pairs.
+ * - Arrays become `fal/array` CExprs.
  */
-type Primitive = string | number | boolean | null | undefined;
+function liftArg(value: unknown): unknown {
+  if (isCExpr(value)) return value;
+  if (typeof value === "string") return value;
+  if (typeof value === "number") return value;
+  if (typeof value === "boolean") return value;
+  if (value === null || value === undefined) return value;
+  if (Array.isArray(value)) {
+    return makeCExpr("fal/array", value.map(liftArg));
+  }
+  if (typeof value === "object") {
+    const pairs: unknown[] = [];
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      pairs.push(k, liftArg(v));
+    }
+    return makeCExpr("fal/record", pairs);
+  }
+  return value;
+}
 
-type Exprify<T> = T extends Primitive
-  ? T | Expr<T>
-  : T extends Array<infer U>
-    ? Array<Exprify<U>> | Expr<T>
-    : T extends object
-      ? { [K in keyof T]: Exprify<T[K]> } | Expr<T>
-      : T | Expr<T>;
+// ---- What the plugin adds to $ ----------------------------
 
 type UnsupportedOptionKeys = "abortSignal";
 
@@ -92,49 +70,55 @@ type QueueCancelOptionsShape = Omit<
 >;
 
 /** SDK-aligned run options, excluding unsupported runtime-only fields. */
-export type FalRunOptions = Exprify<RunOptionsShape>;
+export type FalRunOptions = RunOptionsShape | CExpr<RunOptionsShape>;
 /** SDK-aligned subscribe options, excluding unsupported runtime-only fields. */
-export type FalSubscribeOptions = Exprify<SubscribeOptionsShape>;
+export type FalSubscribeOptions = SubscribeOptionsShape | CExpr<SubscribeOptionsShape>;
 /** SDK-aligned queue.submit options, excluding unsupported runtime-only fields. */
-export type FalSubmitOptions = Exprify<SubmitOptionsShape>;
+export type FalSubmitOptions = SubmitOptionsShape | CExpr<SubmitOptionsShape>;
 /** SDK-aligned queue.status options, excluding unsupported runtime-only fields. */
-export type FalQueueStatusOptions = Exprify<QueueStatusOptionsShape>;
+export type FalQueueStatusOptions = QueueStatusOptionsShape | CExpr<QueueStatusOptionsShape>;
 /** SDK-aligned queue.result options, excluding unsupported runtime-only fields. */
-export type FalQueueResultOptions = Exprify<QueueResultOptionsShape>;
+export type FalQueueResultOptions = QueueResultOptionsShape | CExpr<QueueResultOptionsShape>;
 /** SDK-aligned queue.cancel options, excluding unsupported runtime-only fields. */
-export type FalQueueCancelOptions = Exprify<QueueCancelOptionsShape>;
+export type FalQueueCancelOptions = QueueCancelOptionsShape | CExpr<QueueCancelOptionsShape>;
 
+/**
+ * Fal operations added to the DSL context by the fal plugin.
+ *
+ * Mirrors the \@fal-ai/client API: run, subscribe, and queue
+ * operations for AI media generation endpoints.
+ */
 export interface FalMethods {
   /** Fal API operations, namespaced under `$.fal`. */
   fal: {
     /** Run an endpoint synchronously. Mirrors `fal.run(endpointId, { input })`. */
     run(
-      endpointId: Expr<string> | string,
+      endpointId: string | CExpr<string>,
       options?: FalRunOptions,
-    ): Expr<Awaited<ReturnType<FalSdkClient["run"]>>>;
-    /** Subscribe to an endpoint (queue submit + poll + result). Mirrors `fal.subscribe(endpointId, { input })`. */
+    ): CExpr<Awaited<ReturnType<FalSdkClient["run"]>>>;
+    /** Subscribe to an endpoint (queue submit + poll + result). */
     subscribe(
-      endpointId: Expr<string> | string,
+      endpointId: string | CExpr<string>,
       options?: FalSubscribeOptions,
-    ): Expr<Awaited<ReturnType<FalSdkClient["subscribe"]>>>;
+    ): CExpr<Awaited<ReturnType<FalSdkClient["subscribe"]>>>;
     queue: {
-      /** Submit a request to the queue. Mirrors `fal.queue.submit(endpointId, { input })`. */
+      /** Submit a request to the queue. */
       submit(
-        endpointId: Expr<string> | string,
+        endpointId: string | CExpr<string>,
         options: FalSubmitOptions,
-      ): Expr<Awaited<ReturnType<FalSdkQueueClient["submit"]>>>;
-      /** Check the status of a queued request. Mirrors `fal.queue.status(endpointId, { requestId })`. */
+      ): CExpr<Awaited<ReturnType<FalSdkQueueClient["submit"]>>>;
+      /** Check the status of a queued request. */
       status(
-        endpointId: Expr<string> | string,
+        endpointId: string | CExpr<string>,
         options: FalQueueStatusOptions,
-      ): Expr<Awaited<ReturnType<FalSdkQueueClient["status"]>>>;
-      /** Retrieve the result of a completed queued request. Mirrors `fal.queue.result(endpointId, { requestId })`. */
+      ): CExpr<Awaited<ReturnType<FalSdkQueueClient["status"]>>>;
+      /** Retrieve the result of a completed queued request. */
       result(
-        endpointId: Expr<string> | string,
+        endpointId: string | CExpr<string>,
         options: FalQueueResultOptions,
-      ): Expr<Awaited<ReturnType<FalSdkQueueClient["result"]>>>;
-      /** Cancel a queued request. Mirrors `fal.queue.cancel(endpointId, { requestId })`. */
-      cancel(endpointId: Expr<string> | string, options: FalQueueCancelOptions): Expr<void>;
+      ): CExpr<Awaited<ReturnType<FalSdkQueueClient["result"]>>>;
+      /** Cancel a queued request. */
+      cancel(endpointId: string | CExpr<string>, options: FalQueueCancelOptions): CExpr<void>;
     };
   };
 }
@@ -152,160 +136,138 @@ export interface FalConfig {
   credentials: string;
 }
 
-// ---- Plugin implementation --------------------------------
+// ---- Node kinds -------------------------------------------
 
-/**
- * Fal plugin factory. Namespace: `fal/`.
- *
- * Creates a plugin that exposes run, subscribe, and queue
- * methods for building parameterized fal API call AST nodes.
- *
- * @param config - A {@link FalConfig} with credentials.
- * @returns A PluginDefinition for the fal plugin.
- */
-export function fal(config: FalConfig) {
-  return definePlugin({
-    name: "fal",
-    nodeKinds: [
-      "fal/run",
-      "fal/subscribe",
-      "fal/queue_submit",
-      "fal/queue_status",
-      "fal/queue_result",
-      "fal/queue_cancel",
-    ],
-    defaultInterpreter: () => falInterpreter,
+const NODE_KINDS = [
+  "fal/run",
+  "fal/subscribe",
+  "fal/queue_submit",
+  "fal/queue_status",
+  "fal/queue_result",
+  "fal/queue_cancel",
+  "fal/record",
+  "fal/array",
+] as const;
 
-    build(ctx: PluginContext): FalMethods {
-      function resolveEndpointId(endpointId: Expr<string> | string) {
-        return ctx.isExpr(endpointId) ? endpointId.__node : ctx.lift(endpointId).__node;
-      }
-
-      function resolveOptions(options?: unknown) {
-        return options != null ? ctx.lift(options as any).__node : null;
-      }
-
-      return {
-        fal: {
-          run(endpointId: Expr<string> | string, options?: FalRunOptions) {
-            return ctx.expr<Awaited<ReturnType<FalSdkClient["run"]>>>({
-              kind: "fal/run",
-              endpointId: resolveEndpointId(endpointId),
-              options: resolveOptions(options),
-              config,
-            });
-          },
-
-          subscribe(endpointId: Expr<string> | string, options?: FalSubscribeOptions) {
-            return ctx.expr<Awaited<ReturnType<FalSdkClient["subscribe"]>>>({
-              kind: "fal/subscribe",
-              endpointId: resolveEndpointId(endpointId),
-              options: resolveOptions(options),
-              config,
-            });
-          },
-
-          queue: {
-            submit(endpointId: Expr<string> | string, options: FalSubmitOptions) {
-              return ctx.expr<Awaited<ReturnType<FalSdkQueueClient["submit"]>>>({
-                kind: "fal/queue_submit",
-                endpointId: resolveEndpointId(endpointId),
-                options: resolveOptions(options),
-                config,
-              });
-            },
-
-            status(endpointId: Expr<string> | string, options: FalQueueStatusOptions) {
-              return ctx.expr<Awaited<ReturnType<FalSdkQueueClient["status"]>>>({
-                kind: "fal/queue_status",
-                endpointId: resolveEndpointId(endpointId),
-                options: resolveOptions(options),
-                config,
-              });
-            },
-
-            result(endpointId: Expr<string> | string, options: FalQueueResultOptions) {
-              return ctx.expr<Awaited<ReturnType<FalSdkQueueClient["result"]>>>({
-                kind: "fal/queue_result",
-                endpointId: resolveEndpointId(endpointId),
-                options: resolveOptions(options),
-                config,
-              });
-            },
-
-            cancel(endpointId: Expr<string> | string, options: FalQueueCancelOptions) {
-              return ctx.expr<void>({
-                kind: "fal/queue_cancel",
-                endpointId: resolveEndpointId(endpointId),
-                options: resolveOptions(options),
-                config,
-              });
-            },
-          },
-        },
-      };
-    },
-  });
+function buildKinds(): Record<string, KindSpec<unknown[], unknown>> {
+  const kinds: Record<string, KindSpec<unknown[], unknown>> = {};
+  for (const kind of NODE_KINDS) {
+    kinds[kind] = {
+      inputs: [] as unknown[],
+      output: undefined as unknown,
+    } as KindSpec<unknown[], unknown>;
+  }
+  return kinds;
 }
 
-// ============================================================
-// HONEST ASSESSMENT: What works, what's hard, what breaks
-// ============================================================
-//
-// WORKS GREAT:
-//
-// 1. Direct execution (1:1 signature):
-//    Real:  await fal.run("fal-ai/flux/dev", { input: { prompt: "a cat" } })
-//    Mvfm:   $.fal.run("fal-ai/flux/dev", { input: { prompt: "a cat" } })
-//    Identical. Only difference is $ prefix and no await.
-//
-// 2. Subscribe (1:1 signature):
-//    Real:  await fal.subscribe("fal-ai/flux/dev", { input: { prompt: "a cat" } })
-//    Mvfm:   $.fal.subscribe("fal-ai/flux/dev", { input: { prompt: "a cat" } })
-//    Identical.
-//
-// 3. Queue control with proxy chains (1:1 signatures):
-//    const queued = $.fal.queue.submit("fal-ai/flux/dev", { input: { prompt: "a cat" } })
-//    const result = $.fal.queue.result("fal-ai/flux/dev", { requestId: queued.request_id })
-//    Proxy chains capture the dependency graph perfectly.
-//
-// WORKS BUT DIFFERENT:
-//
-// 4. Most implemented-method options are preserved:
-//    Real:  fal.run(id, { input: {...}, method: "post", startTimeout: 30 })
-//    Mvfm:   $.fal.run(id, { input: {...}, method: "post", startTimeout: 30 })
-//    For run/subscribe/queue.submit/status/result/cancel, options are
-//    carried through AST -> interpreter -> handler.
-//
-// 5. Runtime-only abort signals are excluded:
-//    Real:  fal.run(id, { abortSignal: controller.signal })
-//    Mvfm:   Not supported in AST. Signals are runtime handles and are
-//    intentionally excluded from public option types.
-//
-// 6. Return types:
-//    Real @fal-ai/client uses generic Result<OutputType<Id>> with
-//    per-endpoint typed responses.
-//    Mvfm uses SDK Result/queue status shapes, but does not currently
-//    preserve endpoint-specific OutputType<Id> inference.
-//
-// 7. Subscribe callbacks:
-//    Real:  fal.subscribe(id, { onQueueUpdate: (status) => ... })
-//    Mvfm:   Not modelable. Callbacks are runtime concerns.
-//
-// DOESN'T WORK / NOT MODELED:
-//
-// 8. Streaming (fal.stream):
-//    Real:  const stream = await fal.stream(id, { input })
-//           for await (const chunk of stream) { ... }
-//    Mvfm:   Can't model. SSE push-based, no finite AST shape.
-//
-// 9. Realtime (fal.realtime.connect):
-//    Real:  const conn = fal.realtime.connect(app, { onResult, onError })
-//           conn.send(input)
-//    Mvfm:   Can't model. WebSocket bidirectional, stateful.
-//
-// 10. Storage upload:
-//    Real:  const url = await fal.storage.upload(file)
-//    Mvfm:   Deferred. Could be added as fal/storage_upload node kind.
-//
-// ============================================================
+// ---- Constructor builder ----------------------------------
+
+function buildFalApi(): FalMethods["fal"] {
+  return {
+    run(endpointId, options?) {
+      const children: unknown[] = [endpointId];
+      if (options != null) children.push(liftArg(options));
+      return makeCExpr("fal/run", children);
+    },
+
+    subscribe(endpointId, options?) {
+      const children: unknown[] = [endpointId];
+      if (options != null) children.push(liftArg(options));
+      return makeCExpr("fal/subscribe", children);
+    },
+
+    queue: {
+      submit(endpointId, options) {
+        return makeCExpr("fal/queue_submit", [endpointId, liftArg(options)]);
+      },
+
+      status(endpointId, options) {
+        return makeCExpr("fal/queue_status", [endpointId, liftArg(options)]);
+      },
+
+      result(endpointId, options) {
+        return makeCExpr("fal/queue_result", [endpointId, liftArg(options)]);
+      },
+
+      cancel(endpointId, options) {
+        return makeCExpr("fal/queue_cancel", [endpointId, liftArg(options)]);
+      },
+    },
+  };
+}
+
+// ---- Default interpreter wiring ---------------------------
+
+const dynamicImport = new Function("m", "return import(m)") as (
+  moduleName: string,
+) => Promise<Record<string, unknown>>;
+
+function createDefaultInterpreter(config: FalConfig): Interpreter {
+  let clientPromise: Promise<FalClient> | undefined;
+  const getClient = async (): Promise<FalClient> => {
+    if (!clientPromise) {
+      clientPromise = dynamicImport("@fal-ai/client").then((moduleValue) => {
+        const falClient = moduleValue.fal as FalSdkClient;
+        (falClient as unknown as { config: (o: { credentials: string }) => void }).config({
+          credentials: config.credentials,
+        });
+        return wrapFalSdk(falClient);
+      });
+    }
+    return clientPromise;
+  };
+
+  const lazyClient: FalClient = {
+    async run(endpointId, options) {
+      const client = await getClient();
+      return client.run(endpointId, options);
+    },
+    async subscribe(endpointId, options) {
+      const client = await getClient();
+      return client.subscribe(endpointId, options);
+    },
+    async queueSubmit(endpointId, options) {
+      const client = await getClient();
+      return client.queueSubmit(endpointId, options);
+    },
+    async queueStatus(endpointId, options) {
+      const client = await getClient();
+      return client.queueStatus(endpointId, options);
+    },
+    async queueResult(endpointId, options) {
+      const client = await getClient();
+      return client.queueResult(endpointId, options);
+    },
+    async queueCancel(endpointId, options) {
+      const client = await getClient();
+      return client.queueCancel(endpointId, options);
+    },
+  };
+
+  return createFalInterpreter(lazyClient);
+}
+
+// ---- Plugin factory ---------------------------------------
+
+/**
+ * Creates the fal plugin definition (unified Plugin type).
+ *
+ * @param config - A {@link FalConfig} with credentials.
+ * @returns A unified Plugin that contributes `$.fal`.
+ */
+export function fal(config: FalConfig) {
+  return {
+    name: "fal" as const,
+    ctors: { fal: buildFalApi() },
+    kinds: buildKinds(),
+    traits: {},
+    lifts: {},
+    nodeKinds: [...NODE_KINDS],
+    defaultInterpreter: (): Interpreter => createDefaultInterpreter(config),
+  };
+}
+
+/**
+ * Alias for {@link fal}, kept for readability at call sites.
+ */
+export const falPlugin = fal;
