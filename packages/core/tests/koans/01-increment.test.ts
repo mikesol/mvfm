@@ -1,5 +1,11 @@
-import { test } from "vitest";
+import { expect, test } from "vitest";
 
-test("placeholder koan gate: 01-increment fixture self-consistency only", async () => {
-  await import("../../src/__koans__/01-increment");
+import { koan } from "../../src/index";
+
+test("koan gate 01-increment: base26 id increment via core API", () => {
+  expect(koan.incrementId("a")).toBe("b");
+  expect(koan.incrementId("y")).toBe("z");
+  expect(koan.incrementId("z")).toBe("aa");
+  expect(koan.incrementId("az")).toBe("ba");
+  expect(koan.incrementId("zz")).toBe("aaa");
 });

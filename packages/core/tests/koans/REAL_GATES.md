@@ -22,11 +22,11 @@ Target state per issue #293:
 
 ## Progress checklist
 
-- [ ] 00-expr wrapper imports from core API
-- [ ] 01-increment wrapper imports from core API
-- [ ] 02-build wrapper imports from core API
-- [ ] 03-traits wrapper imports from core API
-- [ ] 03a-composition wrapper imports from core API
+- [x] 00-expr wrapper imports from core API
+- [x] 01-increment wrapper imports from core API
+- [x] 02-build wrapper imports from core API
+- [x] 03-traits wrapper imports from core API
+- [x] 03a-composition wrapper imports from core API
 - [ ] 04-normalize wrapper imports from core API
 - [ ] 04a-structural wrapper imports from core API
 - [ ] 04b-accessor wrapper imports from core API
