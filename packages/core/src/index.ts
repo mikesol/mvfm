@@ -6,3 +6,4 @@ export * from "./constructors";
 export * from "./plugin-simple";
 export * from "./plugin";
 export * from "./elaborate";
+export * from "./predicates";
