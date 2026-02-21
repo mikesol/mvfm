@@ -3,3 +3,5 @@ export * from "./expr";
 export * from "./increment";
 export * from "./registry";
 export * from "./constructors";
+export * from "./plugin-simple";
+export * from "./plugin";
