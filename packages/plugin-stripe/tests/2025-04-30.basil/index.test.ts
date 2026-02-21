@@ -1,245 +1,181 @@
-import { mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
-import { stripe } from "../../src/2025-04-30.basil";
+import { stripe, stripePlugin } from "../../src/2025-04-30.basil";
 
-function strip(ast: unknown): unknown {
-  return JSON.parse(
-    JSON.stringify(ast, (k, v) => (k === "__id" || k === "config" ? undefined : v)),
-  );
-}
-
-const app = mvfm(num, str, stripe({ apiKey: "sk_test_123" }));
+const plugin = stripe({ apiKey: "sk_test_123" });
+const api = plugin.ctors.stripe;
 
 // ============================================================
-// Parity tests: Stripe plugin AST builder
+// CExpr construction tests
 // ============================================================
 
 describe("stripe: paymentIntents.create", () => {
-  it("produces stripe/create_payment_intent node", () => {
-    const prog = app(($) => {
-      return $.stripe.paymentIntents.create({ amount: 2000, currency: "usd" });
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("stripe/create_payment_intent");
-    expect(ast.result.params.kind).toBe("core/record");
-    expect(ast.result.params.fields.amount.kind).toBe("core/literal");
-    expect(ast.result.params.fields.amount.value).toBe(2000);
-    expect(ast.result.params.fields.currency.kind).toBe("core/literal");
-    expect(ast.result.params.fields.currency.value).toBe("usd");
-  });
-
-  it("accepts Expr params and captures proxy dependencies", () => {
-    const prog = app(($) => {
-      return $.stripe.paymentIntents.create({
-        amount: $.input.amount,
-        currency: $.input.currency,
-      });
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("stripe/create_payment_intent");
-    expect(ast.result.params.fields.amount.kind).toBe("core/prop_access");
-    expect(ast.result.params.fields.currency.kind).toBe("core/prop_access");
+  it("produces stripe/create_payment_intent CExpr", () => {
+    const expr = api.paymentIntents.create({ amount: 2000, currency: "usd" });
+    expect(expr.__kind).toBe("stripe/create_payment_intent");
+    expect(expr.__args).toHaveLength(1);
+    const paramsArg = expr.__args[0] as { __kind: string };
+    expect(paramsArg.__kind).toBe("stripe/record");
   });
 });
 
 describe("stripe: paymentIntents.retrieve", () => {
-  it("produces stripe/retrieve_payment_intent node with literal id", () => {
-    const prog = app(($) => {
-      return $.stripe.paymentIntents.retrieve("pi_123");
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("stripe/retrieve_payment_intent");
-    expect(ast.result.id.kind).toBe("core/literal");
-    expect(ast.result.id.value).toBe("pi_123");
+  it("produces stripe/retrieve_payment_intent CExpr with string id", () => {
+    const expr = api.paymentIntents.retrieve("pi_123");
+    expect(expr.__kind).toBe("stripe/retrieve_payment_intent");
+    expect(expr.__args).toHaveLength(1);
+    expect(expr.__args[0]).toBe("pi_123");
   });
 
-  it("accepts Expr<string> id", () => {
-    const prog = app(($) => {
-      return $.stripe.paymentIntents.retrieve($.input.paymentIntentId);
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("stripe/retrieve_payment_intent");
-    expect(ast.result.id.kind).toBe("core/prop_access");
+  it("accepts CExpr id (proxy chained value)", () => {
+    const pi = api.paymentIntents.retrieve("pi_123");
+    const expr = api.paymentIntents.retrieve(pi.id);
+    expect(expr.__kind).toBe("stripe/retrieve_payment_intent");
+    expect(expr.__args).toHaveLength(1);
+    const idArg = expr.__args[0] as { __kind: string };
+    expect(idArg.__kind).toBe("core/access");
   });
 });
 
 describe("stripe: paymentIntents.confirm", () => {
-  it("produces stripe/confirm_payment_intent node with params", () => {
-    const prog = app(($) => {
-      return $.stripe.paymentIntents.confirm("pi_123", { payment_method: "pm_abc" });
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("stripe/confirm_payment_intent");
-    expect(ast.result.id.kind).toBe("core/literal");
-    expect(ast.result.id.value).toBe("pi_123");
-    expect(ast.result.params.kind).toBe("core/record");
+  it("produces stripe/confirm_payment_intent CExpr with params", () => {
+    const expr = api.paymentIntents.confirm("pi_123", { payment_method: "pm_abc" });
+    expect(expr.__kind).toBe("stripe/confirm_payment_intent");
+    expect(expr.__args).toHaveLength(2);
+    expect(expr.__args[0]).toBe("pi_123");
+    const paramsArg = expr.__args[1] as { __kind: string };
+    expect(paramsArg.__kind).toBe("stripe/record");
   });
 
-  it("optional params are null when omitted", () => {
-    const prog = app(($) => {
-      return $.stripe.paymentIntents.confirm("pi_123");
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("stripe/confirm_payment_intent");
-    expect(ast.result.params).toBeNull();
+  it("produces CExpr with 1 arg when params omitted", () => {
+    const expr = api.paymentIntents.confirm("pi_123");
+    expect(expr.__kind).toBe("stripe/confirm_payment_intent");
+    expect(expr.__args).toHaveLength(1);
+    expect(expr.__args[0]).toBe("pi_123");
   });
 });
 
 describe("stripe: customers.create", () => {
-  it("produces stripe/create_customer node", () => {
-    const prog = app(($) => {
-      return $.stripe.customers.create({ email: "test@example.com", name: "Test User" });
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("stripe/create_customer");
-    expect(ast.result.params.kind).toBe("core/record");
-    expect(ast.result.params.fields.email.value).toBe("test@example.com");
+  it("produces stripe/create_customer CExpr", () => {
+    const expr = api.customers.create({ email: "test@example.com" });
+    expect(expr.__kind).toBe("stripe/create_customer");
+    expect(expr.__args).toHaveLength(1);
+    const paramsArg = expr.__args[0] as { __kind: string };
+    expect(paramsArg.__kind).toBe("stripe/record");
   });
 });
 
 describe("stripe: customers.retrieve", () => {
-  it("produces stripe/retrieve_customer node", () => {
-    const prog = app(($) => {
-      return $.stripe.customers.retrieve("cus_123");
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("stripe/retrieve_customer");
-    expect(ast.result.id.kind).toBe("core/literal");
-    expect(ast.result.id.value).toBe("cus_123");
+  it("produces stripe/retrieve_customer CExpr", () => {
+    const expr = api.customers.retrieve("cus_123");
+    expect(expr.__kind).toBe("stripe/retrieve_customer");
+    expect(expr.__args).toHaveLength(1);
+    expect(expr.__args[0]).toBe("cus_123");
   });
 });
 
 describe("stripe: customers.update", () => {
-  it("produces stripe/update_customer node", () => {
-    const prog = app(($) => {
-      return $.stripe.customers.update("cus_123", { name: "Updated Name" });
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("stripe/update_customer");
-    expect(ast.result.id.kind).toBe("core/literal");
-    expect(ast.result.id.value).toBe("cus_123");
-    expect(ast.result.params.kind).toBe("core/record");
-    expect(ast.result.params.fields.name.value).toBe("Updated Name");
-  });
-
-  it("accepts Expr params", () => {
-    const prog = app(($) => {
-      return $.stripe.customers.update($.input.customerId, {
-        name: $.input.newName,
-      });
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.id.kind).toBe("core/prop_access");
-    expect(ast.result.params.fields.name.kind).toBe("core/prop_access");
+  it("produces stripe/update_customer CExpr", () => {
+    const expr = api.customers.update("cus_123", { name: "Updated Name" });
+    expect(expr.__kind).toBe("stripe/update_customer");
+    expect(expr.__args).toHaveLength(2);
+    expect(expr.__args[0]).toBe("cus_123");
+    const paramsArg = expr.__args[1] as { __kind: string };
+    expect(paramsArg.__kind).toBe("stripe/record");
   });
 });
 
 describe("stripe: customers.list", () => {
-  it("produces stripe/list_customers node with params", () => {
-    const prog = app(($) => {
-      return $.stripe.customers.list({ limit: 10 });
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("stripe/list_customers");
-    expect(ast.result.params.kind).toBe("core/record");
-    expect(ast.result.params.fields.limit.value).toBe(10);
+  it("produces stripe/list_customers CExpr with params", () => {
+    const expr = api.customers.list({ limit: 10 });
+    expect(expr.__kind).toBe("stripe/list_customers");
+    expect(expr.__args).toHaveLength(1);
+    const paramsArg = expr.__args[0] as { __kind: string };
+    expect(paramsArg.__kind).toBe("stripe/record");
   });
 
-  it("optional params are null when omitted", () => {
-    const prog = app(($) => {
-      return $.stripe.customers.list();
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("stripe/list_customers");
-    expect(ast.result.params).toBeNull();
+  it("produces CExpr with no args when omitted", () => {
+    const expr = api.customers.list();
+    expect(expr.__kind).toBe("stripe/list_customers");
+    expect(expr.__args).toHaveLength(0);
   });
 });
 
 describe("stripe: charges.create", () => {
-  it("produces stripe/create_charge node", () => {
-    const prog = app(($) => {
-      return $.stripe.charges.create({ amount: 5000, currency: "usd", source: "tok_visa" });
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("stripe/create_charge");
-    expect(ast.result.params.kind).toBe("core/record");
+  it("produces stripe/create_charge CExpr", () => {
+    const expr = api.charges.create({ amount: 5000, currency: "usd", source: "tok_visa" });
+    expect(expr.__kind).toBe("stripe/create_charge");
+    expect(expr.__args).toHaveLength(1);
+    const paramsArg = expr.__args[0] as { __kind: string };
+    expect(paramsArg.__kind).toBe("stripe/record");
   });
 });
 
 describe("stripe: charges.retrieve", () => {
-  it("produces stripe/retrieve_charge node", () => {
-    const prog = app(($) => {
-      return $.stripe.charges.retrieve("ch_123");
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("stripe/retrieve_charge");
-    expect(ast.result.id.kind).toBe("core/literal");
-    expect(ast.result.id.value).toBe("ch_123");
+  it("produces stripe/retrieve_charge CExpr", () => {
+    const expr = api.charges.retrieve("ch_123");
+    expect(expr.__kind).toBe("stripe/retrieve_charge");
+    expect(expr.__args).toHaveLength(1);
+    expect(expr.__args[0]).toBe("ch_123");
   });
 });
 
 describe("stripe: charges.list", () => {
-  it("produces stripe/list_charges node with params", () => {
-    const prog = app(($) => {
-      return $.stripe.charges.list({ limit: 25 });
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("stripe/list_charges");
-    expect(ast.result.params.kind).toBe("core/record");
-    expect(ast.result.params.fields.limit.value).toBe(25);
+  it("produces stripe/list_charges CExpr with params", () => {
+    const expr = api.charges.list({ limit: 25 });
+    expect(expr.__kind).toBe("stripe/list_charges");
+    expect(expr.__args).toHaveLength(1);
+    const paramsArg = expr.__args[0] as { __kind: string };
+    expect(paramsArg.__kind).toBe("stripe/record");
   });
 
-  it("optional params are null when omitted", () => {
-    const prog = app(($) => {
-      return $.stripe.charges.list();
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("stripe/list_charges");
-    expect(ast.result.params).toBeNull();
+  it("produces CExpr with no args when omitted", () => {
+    const expr = api.charges.list();
+    expect(expr.__kind).toBe("stripe/list_charges");
+    expect(expr.__args).toHaveLength(0);
   });
 });
 
-describe("stripe: integration with $.begin()", () => {
-  it("side-effecting operations wrapped in $.begin() are reachable", () => {
-    expect(() => {
-      app(($) => {
-        const customer = $.stripe.customers.create({ email: "test@example.com" });
-        const charge = $.stripe.charges.create({
-          amount: 1000,
-          currency: "usd",
-          customer: customer.id,
-        });
-        return $.begin(customer, charge);
-      });
-    }).not.toThrow();
+// ============================================================
+// Unified Plugin shape
+// ============================================================
+
+describe("stripe plugin: unified Plugin shape", () => {
+  it("has correct name", () => {
+    expect(plugin.name).toBe("stripe");
   });
 
-  it("orphaned operations are rejected", () => {
-    expect(() => {
-      app(($) => {
-        const customer = $.stripe.customers.retrieve("cus_123");
-        $.stripe.charges.create({ amount: 1000, currency: "usd" }); // orphan!
-        return customer;
-      });
-    }).toThrow(/unreachable node/i);
+  it("has 12 node kinds (10 core + record + array)", () => {
+    expect(plugin.nodeKinds).toHaveLength(12);
+  });
+
+  it("nodeKinds are all namespaced", () => {
+    for (const kind of plugin.nodeKinds) {
+      expect(kind).toMatch(/^stripe\//);
+    }
+  });
+
+  it("kinds map has entries for all node kinds", () => {
+    for (const kind of plugin.nodeKinds) {
+      expect(plugin.kinds[kind]).toBeDefined();
+    }
+  });
+
+  it("has empty traits and lifts", () => {
+    expect(plugin.traits).toEqual({});
+    expect(plugin.lifts).toEqual({});
+  });
+
+  it("has a defaultInterpreter factory", () => {
+    expect(typeof plugin.defaultInterpreter).toBe("function");
   });
 });
 
-describe("stripe: cross-operation dependencies", () => {
-  it("can use result of one operation as input to another", () => {
-    const prog = app(($) => {
-      const customer = $.stripe.customers.create({ email: "test@example.com" });
-      const paymentIntent = $.stripe.paymentIntents.create({
-        amount: 2000,
-        currency: "usd",
-        customer: customer.id,
-      });
-      return $.begin(customer, paymentIntent);
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/begin");
-    // The payment intent params should reference the customer via prop_access
-    const piParams = ast.result.result.params;
-    expect(piParams.fields.customer.kind).toBe("core/prop_access");
+// ============================================================
+// Factory aliases
+// ============================================================
+
+describe("stripe plugin: factory aliases", () => {
+  it("stripe and stripePlugin are the same function", () => {
+    expect(stripe).toBe(stripePlugin);
   });
 });
