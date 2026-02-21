@@ -17,3 +17,4 @@ export * from "./wrap";
 export * from "./splice";
 export * from "./named";
 export * from "./dagql";
+export * from "./fold";
