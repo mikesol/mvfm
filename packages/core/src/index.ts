@@ -7,3 +7,8 @@ export * from "./plugin-simple";
 export * from "./plugin";
 export * from "./elaborate";
 export * from "./predicates";
+export * from "./select";
+export * from "./map";
+export * from "./replace";
+export * from "./gc";
+export * from "./dirty";
