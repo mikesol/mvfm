@@ -44,7 +44,7 @@ describe("kitchen sink: fold extensions + negative", () => {
         child: bodyId,
         bindings: [{ paramId, value: 5 }],
       } as unknown as number;
-      return [(r1 as number), (r2 as number)];
+      return [r1 as number, r2 as number];
     };
     const result = await koan.fold("root", adj, interp);
     expect(result).toEqual([6, 10]); // 3+3, 5+5

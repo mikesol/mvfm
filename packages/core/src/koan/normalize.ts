@@ -75,6 +75,14 @@ function elaborate(
     const kind = node.__kind;
     const args = node.__args;
 
+    if (kind === "core/access") {
+      const parent = visitValue(args[0]);
+      const key = args[1];
+      const id = alloc();
+      entries[id] = { kind, children: [parent.id], out: key };
+      return { id, outType: expectedTag ?? "unknown" };
+    }
+
     if (kind in traitMap) {
       const left = visitValue(args[0]);
       const right = visitValue(args[1], left.outType);

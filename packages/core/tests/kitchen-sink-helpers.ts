@@ -3,8 +3,9 @@
  * Provides custom plugins and a composite interpreter covering
  * ST, error, lambda, sleep, structural, and accessor node kinds.
  */
-import { koan } from "../src/koan";
+
 import type { Handler, Interpreter, ScopedEffect } from "../src/koan";
+import { koan } from "../src/koan";
 
 // ─── Custom plugins for ST + error + lambda + sleep ──────────────────
 
@@ -64,10 +65,12 @@ export function createTestInterp(): { interp: Interpreter; state: Record<string,
     ...koan.defaults([...koan.stdPlugins, koan.ordPlugin]),
     "st/cell": async function* (e) {
       state[e.children[0] ?? "default"] = (e.out as number) ?? 0;
+      yield* [];
       return e.out as number;
     } as Handler,
     "st/get": async function* (e) {
       const ref = (e.out as string) ?? "default";
+      yield* [];
       return state[ref] ?? 0;
     } as Handler,
     "st/set": async function* () {
@@ -84,17 +87,18 @@ export function createTestInterp(): { interp: Interpreter; state: Record<string,
       }
     } as Handler,
     "error/fail": async function* (e) {
+      yield* [];
       throw new Error((e.out as string) ?? "fail");
     } as Handler,
     "core/lambda_param": async function* () {
+      yield* [];
       throw new Error("lambda_param: should be resolved from scope");
     } as Handler,
     "lambda/apply": async function* (e) {
       const argVal = yield 0;
       const bodyId = e.children[1];
-      const paramId = Object.values(
-        (e as unknown as { out: Record<string, string> }).out ?? {},
-      )[0] ?? bodyId;
+      const paramId =
+        Object.values((e as unknown as { out: Record<string, string> }).out ?? {})[0] ?? bodyId;
       const effect: ScopedEffect = {
         type: "recurse_scoped",
         child: bodyId,

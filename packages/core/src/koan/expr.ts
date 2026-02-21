@@ -51,7 +51,16 @@ export type AccessorOverlay<O> = O extends readonly (infer E)[]
 type AccessExpr<O, Kind extends string, Args extends readonly unknown[]> = CExpr<O, Kind, Args> &
   AccessorOverlay<O>;
 
-const RESERVED = new Set<PropertyKey>([CREF, "__kind", "__args", "then"]);
+const RESERVED = new Set<PropertyKey>([
+  CREF,
+  "__kind",
+  "__args",
+  "then",
+  "toString",
+  "valueOf",
+  "toJSON",
+  Symbol.toPrimitive,
+]);
 
 function makeCExprProxy<O, Kind extends string, Args extends readonly unknown[]>(
   kind: Kind,
