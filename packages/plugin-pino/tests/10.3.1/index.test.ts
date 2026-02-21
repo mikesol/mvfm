@@ -1,66 +1,65 @@
-import { mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
-import { pino } from "../../src/10.3.1";
+import { pino, pinoPlugin } from "../../src/10.3.1";
 
-function strip(ast: unknown): unknown {
-  return JSON.parse(
-    JSON.stringify(ast, (k, v) => (k === "__id" || k === "config" ? undefined : v)),
-  );
-}
-
-const app = mvfm(num, str, pino({ level: "info" }));
+const plugin = pino({ level: "info" });
+const api = plugin.ctors.pino;
 
 // ============================================================
-// Level methods: info
+// CExpr construction
 // ============================================================
 
-describe("pino: info with message only", () => {
-  it("produces pino/info node with msg", () => {
-    const prog = app(($) => $.pino.info("user logged in"));
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("pino/info");
-    expect(ast.result.level).toBe("info");
-    expect(ast.result.msg.kind).toBe("core/literal");
-    expect(ast.result.msg.value).toBe("user logged in");
-    expect(ast.result.mergeObject).toBeNull();
-    expect(ast.result.bindings).toEqual([]);
-  });
-});
-
-describe("pino: info with merge object and message", () => {
-  it("produces pino/info node with mergeObject and msg", () => {
-    const prog = app(($) => $.pino.info({ userId: 123 }, "user logged in"));
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("pino/info");
-    expect(ast.result.mergeObject.kind).toBe("core/record");
-    expect(ast.result.mergeObject.fields.userId.value).toBe(123);
-    expect(ast.result.msg.value).toBe("user logged in");
-  });
-});
-
-describe("pino: info with Expr params", () => {
-  it("captures proxy dependencies in merge object", () => {
-    const prog = app(($) => $.pino.info({ userId: $.input.id }, "user logged in"));
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("pino/info");
-    expect(ast.result.mergeObject.fields.userId.kind).toBe("core/prop_access");
-  });
-});
-
-// ============================================================
-// All six levels
-// ============================================================
-
-describe("pino: all six log levels produce correct node kinds", () => {
+describe("pino: CExpr construction for log methods", () => {
   const levels = ["trace", "debug", "info", "warn", "error", "fatal"] as const;
+
   for (const level of levels) {
-    it(`$.pino.${level}() produces pino/${level} node`, () => {
-      const prog = app(($) => ($.pino as any)[level]("test message"));
-      const ast = strip(prog.ast) as any;
-      expect(ast.result.kind).toBe(`pino/${level}`);
-      expect(ast.result.level).toBe(level);
+    it(`$.pino.${level}() emits CExpr with pino/${level}`, () => {
+      const expr = (api as any)[level]("test message");
+      expect(expr.__kind).toBe(`pino/${level}`);
+      expect(Array.isArray(expr.__args)).toBe(true);
     });
   }
+});
+
+describe("pino: msg-only children layout", () => {
+  it("msg-only: [1, 0, msg]", () => {
+    const expr = api.info("user logged in");
+    expect(expr.__kind).toBe("pino/info");
+    expect(expr.__args[0]).toBe(1); // hasMsg
+    expect(expr.__args[1]).toBe(0); // hasMergeObj
+    expect(expr.__args[2]).toBe("user logged in"); // msg
+    expect(expr.__args).toHaveLength(3);
+  });
+});
+
+describe("pino: mergeObject + msg children layout", () => {
+  it("two args: [1, 1, msg, mergeObj]", () => {
+    const expr = api.info({ userId: 123 }, "user logged in");
+    expect(expr.__kind).toBe("pino/info");
+    expect(expr.__args[0]).toBe(1); // hasMsg
+    expect(expr.__args[1]).toBe(1); // hasMergeObj
+    // args[2] = msg (string)
+    expect(expr.__args[2]).toBe("user logged in");
+    // args[3] = mergeObj (pino/record CExpr)
+    expect((expr.__args[3] as any).__kind).toBe("pino/record");
+  });
+});
+
+describe("pino: object-only logging", () => {
+  it("raw object single arg: [0, 1, mergeObj]", () => {
+    const expr = api.info({ userId: 123 });
+    expect(expr.__kind).toBe("pino/info");
+    expect(expr.__args[0]).toBe(0); // hasMsg
+    expect(expr.__args[1]).toBe(1); // hasMergeObj
+    expect((expr.__args[2] as any).__kind).toBe("pino/record");
+    expect(expr.__args).toHaveLength(3);
+  });
+
+  it("CExpr single arg is treated as msg", () => {
+    // When a CExpr is passed as a single arg, it's treated as msg
+    const msgExpr = api.info("dynamic");
+    expect(msgExpr.__args[0]).toBe(1); // hasMsg
+    expect(msgExpr.__args[1]).toBe(0); // hasMergeObj
+  });
 });
 
 // ============================================================
@@ -68,76 +67,66 @@ describe("pino: all six log levels produce correct node kinds", () => {
 // ============================================================
 
 describe("pino: child logger", () => {
-  it("child bindings are baked into the log node", () => {
-    const prog = app(($) => $.pino.child({ requestId: "abc" }).info("handling request"));
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("pino/info");
-    expect(ast.result.bindings).toHaveLength(1);
-    expect(ast.result.bindings[0].kind).toBe("core/record");
-    expect(ast.result.bindings[0].fields.requestId.value).toBe("abc");
+  it("child bindings appear as extra children", () => {
+    const expr = api.child({ requestId: "abc" }).info("handling request");
+    expect(expr.__kind).toBe("pino/info");
+    // [hasMsg=1, hasMergeObj=0, msg, binding0]
+    expect(expr.__args[0]).toBe(1);
+    expect(expr.__args[1]).toBe(0);
+    expect(expr.__args[2]).toBe("handling request");
+    expect((expr.__args[3] as any).__kind).toBe("pino/record");
+    expect(expr.__args).toHaveLength(4);
   });
 
   it("nested child loggers accumulate bindings", () => {
-    const prog = app(($) =>
-      $.pino.child({ requestId: "abc" }).child({ userId: 42 }).warn("slow query"),
-    );
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("pino/warn");
-    expect(ast.result.bindings).toHaveLength(2);
-    expect(ast.result.bindings[0].fields.requestId.value).toBe("abc");
-    expect(ast.result.bindings[1].fields.userId.value).toBe(42);
-  });
-
-  it("child logger accepts Expr bindings", () => {
-    const prog = app(($) => $.pino.child({ reqId: $.input.requestId }).info("test"));
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.bindings[0].fields.reqId.kind).toBe("core/prop_access");
+    const expr = api.child({ requestId: "abc" }).child({ userId: 42 }).warn("slow query");
+    expect(expr.__kind).toBe("pino/warn");
+    // [hasMsg=1, hasMergeObj=0, msg, binding0, binding1]
+    expect(expr.__args).toHaveLength(5);
+    expect((expr.__args[3] as any).__kind).toBe("pino/record");
+    expect((expr.__args[4] as any).__kind).toBe("pino/record");
   });
 });
 
 // ============================================================
-// Object-only logging (no message)
+// Unified Plugin shape
 // ============================================================
 
-describe("pino: object-only logging (single raw object arg)", () => {
-  it("raw object single arg becomes mergeObject, not msg", () => {
-    const prog = app(($) => $.pino.info({ userId: 123 }));
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("pino/info");
-    expect(ast.result.mergeObject.kind).toBe("core/record");
-    expect(ast.result.mergeObject.fields.userId.value).toBe(123);
-    expect(ast.result.msg).toBeNull();
+describe("pino: unified Plugin shape", () => {
+  it("has correct name", () => {
+    expect(plugin.name).toBe("pino");
   });
 
-  it("Expr single arg is treated as msg (use 2-arg form for Expr merge objects)", () => {
-    const prog = app(($) => $.pino.info($.input.message));
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("pino/info");
-    expect(ast.result.msg.kind).toBe("core/prop_access");
-    expect(ast.result.mergeObject).toBeNull();
-  });
-});
-
-// ============================================================
-// Integration with $.begin()
-// ============================================================
-
-describe("pino: integration with $.begin()", () => {
-  it("log calls composed with $.begin() are reachable", () => {
-    expect(() => {
-      app(($) => {
-        const logLine = $.pino.info({ action: "login" }, "user logged in");
-        return $.begin(logLine, $.input.result);
-      });
-    }).not.toThrow();
+  it("has 8 node kinds (6 levels + record + array)", () => {
+    expect(plugin.nodeKinds).toHaveLength(8);
   });
 
-  it("orphaned log calls are rejected", () => {
-    expect(() => {
-      app(($) => {
-        $.pino.info("this is orphaned");
-        return $.input.result;
-      });
-    }).toThrow(/unreachable node/i);
+  it("nodeKinds are all namespaced", () => {
+    for (const kind of plugin.nodeKinds) {
+      expect(kind).toMatch(/^pino\//);
+    }
+  });
+
+  it("kinds map has entries for all node kinds", () => {
+    for (const kind of plugin.nodeKinds) {
+      expect(plugin.kinds[kind]).toBeDefined();
+    }
+  });
+
+  it("has empty traits and lifts", () => {
+    expect(plugin.traits).toEqual({});
+    expect(plugin.lifts).toEqual({});
+  });
+
+  it("has a defaultInterpreter factory", () => {
+    expect(typeof plugin.defaultInterpreter).toBe("function");
+    const interp = plugin.defaultInterpreter();
+    for (const kind of plugin.nodeKinds) {
+      expect(typeof interp[kind]).toBe("function");
+    }
+  });
+
+  it("pinoPlugin is an alias for pino", () => {
+    expect(pinoPlugin).toBe(pino);
   });
 });

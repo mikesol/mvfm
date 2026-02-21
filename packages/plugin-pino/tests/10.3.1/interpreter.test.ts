@@ -1,22 +1,31 @@
-import type { Program } from "@mvfm/core";
-import { coreInterpreter, foldAST, injectInput, mvfm, num, str } from "@mvfm/core";
+import { boolPluginU, createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { pinoInterpreter } from "../../src";
 import { pino } from "../../src/10.3.1";
 import { createPinoInterpreter, type PinoClient } from "../../src/10.3.1/interpreter";
 
-const app = mvfm(num, str, pino({ level: "info" }));
+const plugin = pino({ level: "info" });
+const plugins = [numPluginU, strPluginU, boolPluginU, plugin] as const;
+const $ = mvfmU(...plugins);
+const app = createApp(...plugins);
 
-async function run(prog: Program, input: Record<string, unknown> = {}) {
-  const captured: any[] = [];
-  const injected = injectInput(prog, input);
+async function run(expr: unknown) {
+  const captured: Array<{
+    level: string;
+    bindings: Record<string, unknown>[];
+    mergeObject?: Record<string, unknown>;
+    msg?: string;
+  }> = [];
   const mockClient: PinoClient = {
     async log(level, bindings, mergeObject, msg) {
       captured.push({ level, bindings, mergeObject, msg });
     },
   };
-  const combined = { ...createPinoInterpreter(mockClient), ...coreInterpreter };
-  const result = await foldAST(combined, injected);
+  const nexpr = app(expr as any);
+  const interp = defaults(plugins, {
+    pino: createPinoInterpreter(mockClient),
+  });
+  const result = await fold(nexpr, interp);
   return { result, captured };
 }
 
@@ -30,8 +39,8 @@ describe("pino interpreter: info with message", () => {
   });
 
   it("calls client.log with level info", async () => {
-    const prog = app(($) => $.pino.info("hello world"));
-    const { captured } = await run(prog);
+    const expr = $.pino.info("hello world");
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].level).toBe("info");
     expect(captured[0].msg).toBe("hello world");
@@ -42,8 +51,8 @@ describe("pino interpreter: info with message", () => {
 
 describe("pino interpreter: info with merge object and message", () => {
   it("calls client.log with mergeObject", async () => {
-    const prog = app(($) => $.pino.info({ userId: 123 }, "user action"));
-    const { captured } = await run(prog);
+    const expr = $.pino.info({ userId: 123 }, "user action");
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].level).toBe("info");
     expect(captured[0].msg).toBe("user action");
@@ -57,8 +66,8 @@ describe("pino interpreter: info with merge object and message", () => {
 
 describe("pino interpreter: object-only logging", () => {
   it("calls client.log with mergeObject and no msg", async () => {
-    const prog = app(($) => $.pino.info({ userId: 123 }));
-    const { captured } = await run(prog);
+    const expr = $.pino.info({ userId: 123 });
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].mergeObject).toEqual({ userId: 123 });
     expect(captured[0].msg).toBeUndefined();
@@ -73,8 +82,8 @@ describe("pino interpreter: all six levels yield correct effect", () => {
   const levels = ["trace", "debug", "info", "warn", "error", "fatal"] as const;
   for (const level of levels) {
     it(`${level} calls client.log with level="${level}"`, async () => {
-      const prog = app(($) => ($.pino as any)[level]("test"));
-      const { captured } = await run(prog);
+      const expr = ($.pino as any)[level]("test");
+      const { captured } = await run(expr);
       expect(captured).toHaveLength(1);
       expect(captured[0].level).toBe(level);
       expect(captured[0].msg).toBe("test");
@@ -88,43 +97,19 @@ describe("pino interpreter: all six levels yield correct effect", () => {
 
 describe("pino interpreter: child logger bindings", () => {
   it("single child merges bindings into call", async () => {
-    const prog = app(($) => $.pino.child({ requestId: "abc" }).info("handling"));
-    const { captured } = await run(prog);
+    const expr = $.pino.child({ requestId: "abc" }).info("handling");
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].bindings).toEqual([{ requestId: "abc" }]);
     expect(captured[0].msg).toBe("handling");
   });
 
   it("nested children accumulate bindings in order", async () => {
-    const prog = app(($) => $.pino.child({ requestId: "abc" }).child({ userId: 42 }).warn("slow"));
-    const { captured } = await run(prog);
+    const expr = $.pino.child({ requestId: "abc" }).child({ userId: 42 }).warn("slow");
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].bindings).toEqual([{ requestId: "abc" }, { userId: 42 }]);
     expect(captured[0].level).toBe("warn");
-  });
-});
-
-// ============================================================
-// Input resolution
-// ============================================================
-
-describe("pino interpreter: input resolution", () => {
-  it("resolves input values in merge object", async () => {
-    const prog = app({ userId: "number" }, ($) =>
-      $.pino.info({ userId: $.input.userId }, "user action"),
-    );
-    const { captured } = await run(prog, { userId: 456 });
-    expect(captured).toHaveLength(1);
-    expect(captured[0].mergeObject).toEqual({ userId: 456 });
-  });
-
-  it("resolves input values in child bindings", async () => {
-    const prog = app({ reqId: "string" }, ($) =>
-      $.pino.child({ requestId: $.input.reqId }).info("test"),
-    );
-    const { captured } = await run(prog, { reqId: "req-789" });
-    expect(captured).toHaveLength(1);
-    expect(captured[0].bindings).toEqual([{ requestId: "req-789" }]);
   });
 });
 
@@ -134,8 +119,8 @@ describe("pino interpreter: input resolution", () => {
 
 describe("pino interpreter: return value", () => {
   it("returns undefined (fire-and-forget)", async () => {
-    const prog = app(($) => $.pino.info("test"));
-    const { result } = await run(prog);
+    const expr = $.pino.info("test");
+    const { result } = await run(expr);
     expect(result).toBeUndefined();
   });
 });

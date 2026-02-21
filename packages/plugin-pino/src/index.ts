@@ -1,5 +1,5 @@
-export type { PinoConfig, PinoLogger, PinoMethods } from "./10.3.1";
-export { pino } from "./10.3.1";
+export type { PinoConfig, PinoLevel, PinoLogger, PinoMethods } from "./10.3.1";
+export { pino, pinoPlugin } from "./10.3.1";
 export type { PinoInstance } from "./10.3.1/client-pino";
 export { wrapPino } from "./10.3.1/client-pino";
 export type { ClientHandlerOptions } from "./10.3.1/handler.client";
