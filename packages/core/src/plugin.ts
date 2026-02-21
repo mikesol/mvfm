@@ -24,10 +24,28 @@ export interface TraitDef<O, Mapping extends Record<string, string>> {
   readonly mapping: Mapping;
 }
 
+// ─── Scoped evaluation types ────────────────────────────────────────
+
+/** Runtime binding for scoped lambda evaluation. */
+export interface ScopedBinding {
+  readonly paramId: string;
+  readonly value: unknown;
+}
+
+/** Control effect: evaluate a child under temporary lexical bindings. */
+export interface RecurseScopedEffect {
+  readonly type: "recurse_scoped";
+  readonly childId: string;
+  readonly bindings: ScopedBinding[];
+}
+
+/** Values handlers can yield to the fold trampoline. */
+export type FoldYield = number | string | RecurseScopedEffect;
+
 // ─── Handler / Interpreter (canonical definition) ──────────────────
 
-/** A handler yields child indices (number) or node IDs (string) to resolve dependencies. */
-export type Handler = (entry: RuntimeEntry) => AsyncGenerator<number | string, unknown, unknown>;
+/** A handler yields child indices (number), node IDs (string), or scoped effects to the fold. */
+export type Handler = (entry: RuntimeEntry) => AsyncGenerator<FoldYield, unknown, unknown>;
 
 /** Maps node kind strings to their handlers. */
 export type Interpreter = Record<string, Handler>;
