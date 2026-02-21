@@ -1,9 +1,23 @@
-import { buildKindInputs, buildLiftMap, buildTraitMap, boolPluginU, lt, mvfmU, numPluginU, ordPlugin, stdPlugins, strPluginU } from "./composition";
+import { deepThing } from "./accessor";
+import {
+  boolPluginU,
+  buildKindInputs,
+  buildLiftMap,
+  buildTraitMap,
+  lt,
+  mvfmU,
+  numPluginU,
+  ordPlugin,
+  stdPlugins,
+  strPluginU,
+} from "./composition";
 import { add, boolLit, eq, isCExpr, makeCExpr, makeNExpr, mul, numLit, strLit, sub } from "./expr";
 import { incrementId } from "./increment";
+import { mapWhere } from "./map";
 import { app, createApp } from "./normalize";
+import { and, byKind, byKindGlob, byName, hasChildCount, isLeaf, not, or } from "./predicates";
+import { selectWhere } from "./select";
 import { appS, point } from "./structural";
-import { deepThing } from "./accessor";
 
 /**
  * Koan-model API namespace (00-03a compatibility surface).
@@ -23,13 +37,23 @@ export const koan = {
   incrementId,
   isCExpr,
   lt,
+  mapWhere,
   makeCExpr,
   makeNExpr,
   mul,
   mvfmU,
+  not,
   numLit,
   strLit,
+  selectWhere,
   sub,
+  byKind,
+  byKindGlob,
+  byName,
+  hasChildCount,
+  isLeaf,
+  and,
+  or,
   boolPluginU,
   numPluginU,
   ordPlugin,
@@ -37,6 +61,7 @@ export const koan = {
   strPluginU,
 };
 
+export type { Plugin, PluginShape, RegistryOf, TraitDef } from "./composition";
 export type {
   AdjOf,
   CExpr,
@@ -51,6 +76,19 @@ export type {
   TraitKindSpec,
   TypeKey,
 } from "./expr";
-export type { Plugin, PluginShape, RegistryOf, TraitDef } from "./composition";
 export type { Increment, IncrementLast } from "./increment";
+export type { MapAdj, MapOut, MatchingEntries } from "./map";
 export type { NeverGuard } from "./normalize-types";
+export type {
+  AndPred,
+  CountPred,
+  EvalPred,
+  KindGlobPred,
+  KindPred,
+  LeafPred,
+  NamePred,
+  NotPred,
+  OrPred,
+  PredBase,
+  SelectKeys,
+} from "./predicates";
