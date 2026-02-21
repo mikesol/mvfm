@@ -19,4 +19,5 @@ export * from "./registry";
 export * from "./replace";
 export * from "./select";
 export * from "./splice";
+export * from "./std-plugins";
 export * from "./wrap";

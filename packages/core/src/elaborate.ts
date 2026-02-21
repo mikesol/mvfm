@@ -5,7 +5,8 @@ import { isCExpr, makeNExpr } from "./expr";
 import type { Increment } from "./increment";
 import { incrementId } from "./increment";
 import type { Plugin, RegistryOf } from "./plugin";
-import { buildKindInputs, buildLiftMap, buildTraitMap, stdPlugins } from "./plugin";
+import { buildKindInputs, buildLiftMap, buildTraitMap } from "./plugin";
+import { stdPlugins } from "./std-plugins";
 import type { KindSpec, LiftKind, StdRegistry, TraitKindSpec, TypeKey } from "./registry";
 
 /** Guards against `never` propagation in conditional types. */
