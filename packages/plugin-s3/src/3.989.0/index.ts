@@ -19,15 +19,10 @@
 // ============================================================
 
 import type {
-  DeleteObjectCommandInput,
   DeleteObjectCommandOutput,
-  GetObjectCommandInput,
   GetObjectCommandOutput,
-  HeadObjectCommandInput,
   HeadObjectCommandOutput,
-  ListObjectsV2CommandInput,
   ListObjectsV2CommandOutput,
-  PutObjectCommandInput,
   PutObjectCommandOutput,
 } from "@aws-sdk/client-s3";
 import type { CExpr, KindSpec, Plugin } from "@mvfm/core";
@@ -67,19 +62,6 @@ const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]
   kind: Kind,
   args: readonly unknown[],
 ) => CExpr<O, Kind, Args>;
-
-// ---- What the plugin adds to $ ----------------------------
-
-type PutObjectInput = PutObjectCommandInput;
-type PutObjectResult = PutObjectCommandOutput;
-type GetObjectInput = GetObjectCommandInput;
-type GetObjectResult = GetObjectCommandOutput;
-type DeleteObjectInput = DeleteObjectCommandInput;
-type DeleteObjectResult = DeleteObjectCommandOutput;
-type HeadObjectInput = HeadObjectCommandInput;
-type HeadObjectResult = HeadObjectCommandOutput;
-type ListObjectsV2Input = ListObjectsV2CommandInput;
-type ListObjectsV2Result = ListObjectsV2CommandOutput;
 
 // ---- Configuration ----------------------------------------
 
@@ -135,23 +117,23 @@ export function s3(_config: S3Config) {
     ctors: {
       s3: {
         /** Upload an object to S3. */
-        putObject<A>(input: A): CExpr<PutObjectResult, "s3/put_object", [A]> {
+        putObject<A>(input: A): CExpr<PutObjectCommandOutput, "s3/put_object", [A]> {
           return mk("s3/put_object", [liftArg(input)]);
         },
         /** Download an object from S3. */
-        getObject<A>(input: A): CExpr<GetObjectResult, "s3/get_object", [A]> {
+        getObject<A>(input: A): CExpr<GetObjectCommandOutput, "s3/get_object", [A]> {
           return mk("s3/get_object", [liftArg(input)]);
         },
         /** Delete an object from S3. */
-        deleteObject<A>(input: A): CExpr<DeleteObjectResult, "s3/delete_object", [A]> {
+        deleteObject<A>(input: A): CExpr<DeleteObjectCommandOutput, "s3/delete_object", [A]> {
           return mk("s3/delete_object", [liftArg(input)]);
         },
         /** Check existence and retrieve metadata for an object. */
-        headObject<A>(input: A): CExpr<HeadObjectResult, "s3/head_object", [A]> {
+        headObject<A>(input: A): CExpr<HeadObjectCommandOutput, "s3/head_object", [A]> {
           return mk("s3/head_object", [liftArg(input)]);
         },
         /** List objects in a bucket (v2). */
-        listObjectsV2<A>(input: A): CExpr<ListObjectsV2Result, "s3/list_objects_v2", [A]> {
+        listObjectsV2<A>(input: A): CExpr<ListObjectsV2CommandOutput, "s3/list_objects_v2", [A]> {
           return mk("s3/list_objects_v2", [liftArg(input)]);
         },
       },

@@ -32,6 +32,7 @@ export type { CExpr, NExpr, RuntimeEntry } from "./expr";
 export type { FoldState, PluginDef } from "./fold";
 export type {
   DollarSign,
+  ExtractKinds,
   FoldYield,
   Handler,
   Interpreter,
@@ -39,6 +40,7 @@ export type {
   RecurseScopedEffect,
   ScopedBinding,
   TraitDef,
+  ValidateCtors,
 } from "./plugin";
 export type {
   KindSpec,

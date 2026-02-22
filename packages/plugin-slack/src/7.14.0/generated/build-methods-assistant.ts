@@ -36,7 +36,8 @@ export function buildSlackAssistant(): SlackMethodsAssistant {
         return mk("slack/assistant_threads_setStatus", []);
       },
       setSuggestedPrompts(params) {
-        if (params != null) return mk("slack/assistant_threads_setSuggestedPrompts", [liftArg(params)]);
+        if (params != null)
+          return mk("slack/assistant_threads_setSuggestedPrompts", [liftArg(params)]);
         return mk("slack/assistant_threads_setSuggestedPrompts", []);
       },
       setTitle(params) {

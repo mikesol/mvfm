@@ -155,7 +155,10 @@ function buildStripeApi() {
       list<A extends readonly unknown[]>(
         ...params: A
       ): CExpr<Record<string, unknown>, "stripe/list_customers", A> {
-        return mk("stripe/list_customers", params.map((p) => liftArg(p)));
+        return mk(
+          "stripe/list_customers",
+          params.map((p) => liftArg(p)),
+        );
       },
     },
     charges: {
@@ -171,7 +174,10 @@ function buildStripeApi() {
       list<A extends readonly unknown[]>(
         ...params: A
       ): CExpr<Record<string, unknown>, "stripe/list_charges", A> {
-        return mk("stripe/list_charges", params.map((p) => liftArg(p)));
+        return mk(
+          "stripe/list_charges",
+          params.map((p) => liftArg(p)),
+        );
       },
     },
   };

@@ -5,18 +5,13 @@
 ```ts
 
 import type Anthropic from '@anthropic-ai/sdk';
-import type { BatchCreateParams } from '@anthropic-ai/sdk/resources/messages/batches';
-import type { BatchListParams } from '@anthropic-ai/sdk/resources/messages/batches';
 import type { DeletedMessageBatch } from '@anthropic-ai/sdk/resources/messages/batches';
 import type { Message } from '@anthropic-ai/sdk/resources/messages/messages';
 import type { MessageBatch } from '@anthropic-ai/sdk/resources/messages/batches';
 import type { MessageBatchesPage } from '@anthropic-ai/sdk/resources/messages/batches';
-import type { MessageCountTokensParams } from '@anthropic-ai/sdk/resources/messages/messages';
-import type { MessageCreateParamsNonStreaming } from '@anthropic-ai/sdk/resources/messages/messages';
 import type { MessageTokensCount } from '@anthropic-ai/sdk/resources/messages/messages';
 import type { ModelInfo } from '@anthropic-ai/sdk/resources/models';
 import type { ModelInfosPage } from '@anthropic-ai/sdk/resources/models';
-import type { ModelListParams } from '@anthropic-ai/sdk/resources/models';
 
 // @public
 export function anthropic(config: AnthropicConfig): {
@@ -24,23 +19,35 @@ export function anthropic(config: AnthropicConfig): {
     ctors: {
         anthropic: {
             messages: {
-                create(params: MessageCreateParamsNonStreaming | CExpr<MessageCreateParamsNonStreaming>): CExpr<Message>;
-                countTokens(params: MessageCountTokensParams | CExpr<MessageCountTokensParams>): CExpr<MessageTokensCount>;
+                create<A>(params: A): CExpr<Message, "anthropic/create_message", [A]>;
+                countTokens<A>(params: A): CExpr<MessageTokensCount, "anthropic/count_tokens", [A]>;
                 batches: {
-                    create(params: BatchCreateParams | CExpr<BatchCreateParams>): CExpr<MessageBatch>;
-                    retrieve(id: string | CExpr<string>): CExpr<MessageBatch>;
-                    list(params?: BatchListParams | CExpr<BatchListParams>): CExpr<MessageBatchesPage>;
-                    delete(id: string | CExpr<string>): CExpr<DeletedMessageBatch>;
-                    cancel(id: string | CExpr<string>): CExpr<MessageBatch>;
+                    create<A>(params: A): CExpr<MessageBatch, "anthropic/create_message_batch", [A]>;
+                    retrieve<A>(id: A): CExpr<MessageBatch, "anthropic/retrieve_message_batch", [A]>;
+                    list<A extends readonly unknown[]>(...params: A): CExpr<MessageBatchesPage, "anthropic/list_message_batches", A>;
+                    delete<A>(id: A): CExpr<DeletedMessageBatch, "anthropic/delete_message_batch", [A]>;
+                    cancel<A>(id: A): CExpr<MessageBatch, "anthropic/cancel_message_batch", [A]>;
                 };
             };
             models: {
-                retrieve(id: string | CExpr<string>): CExpr<ModelInfo>;
-                list(params?: ModelListParams | CExpr<ModelListParams>): CExpr<ModelInfosPage>;
+                retrieve<A>(id: A): CExpr<ModelInfo, "anthropic/retrieve_model", [A]>;
+                list<A extends readonly unknown[]>(...params: A): CExpr<ModelInfosPage, "anthropic/list_models", A>;
             };
         };
     };
-    kinds: Record<string, KindSpec<any, any>>;
+    kinds: {
+        "anthropic/create_message": KindSpec<[unknown], unknown>;
+        "anthropic/count_tokens": KindSpec<[unknown], unknown>;
+        "anthropic/create_message_batch": KindSpec<[unknown], unknown>;
+        "anthropic/retrieve_message_batch": KindSpec<[unknown], unknown>;
+        "anthropic/list_message_batches": KindSpec<unknown[], unknown>;
+        "anthropic/delete_message_batch": KindSpec<[unknown], unknown>;
+        "anthropic/cancel_message_batch": KindSpec<[unknown], unknown>;
+        "anthropic/retrieve_model": KindSpec<[unknown], unknown>;
+        "anthropic/list_models": KindSpec<unknown[], unknown>;
+        "anthropic/record": KindSpec<unknown[], Record<string, unknown>>;
+        "anthropic/array": KindSpec<unknown[], unknown[]>;
+    };
     traits: {};
     lifts: {};
     defaultInterpreter: () => Interpreter;
@@ -61,27 +68,6 @@ export interface AnthropicConfig {
 export const anthropicInterpreter: Interpreter;
 
 // @public
-export interface AnthropicMethods {
-    anthropic: {
-        messages: {
-            create(params: MessageCreateParamsNonStreaming | CExpr<MessageCreateParamsNonStreaming>): CExpr<Message>;
-            countTokens(params: MessageCountTokensParams | CExpr<MessageCountTokensParams>): CExpr<MessageTokensCount>;
-            batches: {
-                create(params: BatchCreateParams | CExpr<BatchCreateParams>): CExpr<MessageBatch>;
-                retrieve(id: string | CExpr<string>): CExpr<MessageBatch>;
-                list(params?: BatchListParams | CExpr<BatchListParams>): CExpr<MessageBatchesPage>;
-                delete(id: string | CExpr<string>): CExpr<DeletedMessageBatch>;
-                cancel(id: string | CExpr<string>): CExpr<MessageBatch>;
-            };
-        };
-        models: {
-            retrieve(id: string | CExpr<string>): CExpr<ModelInfo>;
-            list(params?: ModelListParams | CExpr<ModelListParams>): CExpr<ModelInfosPage>;
-        };
-    };
-}
-
-// @public
 export const anthropicPlugin: typeof anthropic;
 
 // @public
@@ -92,9 +78,9 @@ export function wrapAnthropicSdk(client: Anthropic): AnthropicClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/0.74.0/index.d.ts:66:17 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-// dist/0.74.0/index.d.ts:90:5 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
-// dist/0.74.0/index.d.ts:93:5 - (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
+// dist/0.74.0/index.d.ts:29:17 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/0.74.0/index.d.ts:54:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/0.74.0/index.d.ts:68:5 - (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

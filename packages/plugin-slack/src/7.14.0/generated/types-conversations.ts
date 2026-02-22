@@ -34,37 +34,85 @@ import type {
 
 export interface SlackMethodsConversations {
   canvases: {
-    create<A>(params: A): CExpr<ConversationsCanvasesCreateResponse, "slack/conversations_canvases_create", [A]>;
+    create<A>(
+      params: A,
+    ): CExpr<ConversationsCanvasesCreateResponse, "slack/conversations_canvases_create", [A]>;
   };
   externalInvitePermissions: {
-    set<A>(params: A): CExpr<ConversationsExternalInvitePermissionsSetResponse, "slack/conversations_externalInvitePermissions_set", [A]>;
+    set<A>(
+      params: A,
+    ): CExpr<
+      ConversationsExternalInvitePermissionsSetResponse,
+      "slack/conversations_externalInvitePermissions_set",
+      [A]
+    >;
   };
   requestSharedInvite: {
-    approve<A>(params: A): CExpr<ConversationsRequestSharedInviteApproveResponse, "slack/conversations_requestSharedInvite_approve", [A]>;
-    deny<A>(params: A): CExpr<ConversationsRequestSharedInviteDenyResponse, "slack/conversations_requestSharedInvite_deny", [A]>;
-    list<A = void>(params?: A): CExpr<ConversationsRequestSharedInviteListResponse, "slack/conversations_requestSharedInvite_list", [A]>;
+    approve<A>(
+      params: A,
+    ): CExpr<
+      ConversationsRequestSharedInviteApproveResponse,
+      "slack/conversations_requestSharedInvite_approve",
+      [A]
+    >;
+    deny<A>(
+      params: A,
+    ): CExpr<
+      ConversationsRequestSharedInviteDenyResponse,
+      "slack/conversations_requestSharedInvite_deny",
+      [A]
+    >;
+    list<A = void>(
+      params?: A,
+    ): CExpr<
+      ConversationsRequestSharedInviteListResponse,
+      "slack/conversations_requestSharedInvite_list",
+      [A]
+    >;
   };
-  acceptSharedInvite<A>(params: A): CExpr<ConversationsAcceptSharedInviteResponse, "slack/conversations_acceptSharedInvite", [A]>;
-  approveSharedInvite<A>(params: A): CExpr<ConversationsApproveSharedInviteResponse, "slack/conversations_approveSharedInvite", [A]>;
+  acceptSharedInvite<A>(
+    params: A,
+  ): CExpr<ConversationsAcceptSharedInviteResponse, "slack/conversations_acceptSharedInvite", [A]>;
+  approveSharedInvite<A>(
+    params: A,
+  ): CExpr<
+    ConversationsApproveSharedInviteResponse,
+    "slack/conversations_approveSharedInvite",
+    [A]
+  >;
   archive<A>(params: A): CExpr<ConversationsArchiveResponse, "slack/conversations_archive", [A]>;
   close<A>(params: A): CExpr<ConversationsCloseResponse, "slack/conversations_close", [A]>;
   create<A>(params: A): CExpr<ConversationsCreateResponse, "slack/conversations_create", [A]>;
-  declineSharedInvite<A>(params: A): CExpr<ConversationsDeclineSharedInviteResponse, "slack/conversations_declineSharedInvite", [A]>;
+  declineSharedInvite<A>(
+    params: A,
+  ): CExpr<
+    ConversationsDeclineSharedInviteResponse,
+    "slack/conversations_declineSharedInvite",
+    [A]
+  >;
   history<A>(params: A): CExpr<ConversationsHistoryResponse, "slack/conversations_history", [A]>;
   info<A>(params: A): CExpr<ConversationsInfoResponse, "slack/conversations_info", [A]>;
   invite<A>(params: A): CExpr<ConversationsInviteResponse, "slack/conversations_invite", [A]>;
-  inviteShared<A>(params: A): CExpr<ConversationsInviteSharedResponse, "slack/conversations_inviteShared", [A]>;
+  inviteShared<A>(
+    params: A,
+  ): CExpr<ConversationsInviteSharedResponse, "slack/conversations_inviteShared", [A]>;
   join<A>(params: A): CExpr<ConversationsJoinResponse, "slack/conversations_join", [A]>;
   kick<A>(params: A): CExpr<ConversationsKickResponse, "slack/conversations_kick", [A]>;
   leave<A>(params: A): CExpr<ConversationsLeaveResponse, "slack/conversations_leave", [A]>;
   list<A = void>(params?: A): CExpr<ConversationsListResponse, "slack/conversations_list", [A]>;
-  listConnectInvites<A = void>(params?: A): CExpr<ConversationsListConnectInvitesResponse, "slack/conversations_listConnectInvites", [A]>;
+  listConnectInvites<A = void>(
+    params?: A,
+  ): CExpr<ConversationsListConnectInvitesResponse, "slack/conversations_listConnectInvites", [A]>;
   mark<A>(params: A): CExpr<ConversationsMarkResponse, "slack/conversations_mark", [A]>;
   members<A>(params: A): CExpr<ConversationsMembersResponse, "slack/conversations_members", [A]>;
   open<A>(params: A): CExpr<ConversationsOpenResponse, "slack/conversations_open", [A]>;
   rename<A>(params: A): CExpr<ConversationsRenameResponse, "slack/conversations_rename", [A]>;
   replies<A>(params: A): CExpr<ConversationsRepliesResponse, "slack/conversations_replies", [A]>;
-  setPurpose<A>(params: A): CExpr<ConversationsSetPurposeResponse, "slack/conversations_setPurpose", [A]>;
+  setPurpose<A>(
+    params: A,
+  ): CExpr<ConversationsSetPurposeResponse, "slack/conversations_setPurpose", [A]>;
   setTopic<A>(params: A): CExpr<ConversationsSetTopicResponse, "slack/conversations_setTopic", [A]>;
-  unarchive<A>(params: A): CExpr<ConversationsUnarchiveResponse, "slack/conversations_unarchive", [A]>;
+  unarchive<A>(
+    params: A,
+  ): CExpr<ConversationsUnarchiveResponse, "slack/conversations_unarchive", [A]>;
 }

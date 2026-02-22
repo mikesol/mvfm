@@ -31,12 +31,20 @@ export interface SlackMethodsFiles {
     share<A>(params: A): CExpr<FilesRemoteShareResponse, "slack/files_remote_share", [A]>;
     update<A>(params: A): CExpr<FilesRemoteUpdateResponse, "slack/files_remote_update", [A]>;
   };
-  completeUploadExternal<A>(params: A): CExpr<FilesCompleteUploadExternalResponse, "slack/files_completeUploadExternal", [A]>;
+  completeUploadExternal<A>(
+    params: A,
+  ): CExpr<FilesCompleteUploadExternalResponse, "slack/files_completeUploadExternal", [A]>;
   delete<A>(params: A): CExpr<FilesDeleteResponse, "slack/files_delete", [A]>;
-  getUploadURLExternal<A>(params: A): CExpr<FilesGetUploadURLExternalResponse, "slack/files_getUploadURLExternal", [A]>;
+  getUploadURLExternal<A>(
+    params: A,
+  ): CExpr<FilesGetUploadURLExternalResponse, "slack/files_getUploadURLExternal", [A]>;
   info<A>(params: A): CExpr<FilesInfoResponse, "slack/files_info", [A]>;
   list<A>(params: A): CExpr<FilesListResponse, "slack/files_list", [A]>;
-  revokePublicURL<A>(params: A): CExpr<FilesRevokePublicURLResponse, "slack/files_revokePublicURL", [A]>;
-  sharedPublicURL<A>(params: A): CExpr<FilesSharedPublicURLResponse, "slack/files_sharedPublicURL", [A]>;
+  revokePublicURL<A>(
+    params: A,
+  ): CExpr<FilesRevokePublicURLResponse, "slack/files_revokePublicURL", [A]>;
+  sharedPublicURL<A>(
+    params: A,
+  ): CExpr<FilesSharedPublicURLResponse, "slack/files_sharedPublicURL", [A]>;
   upload<A>(params: A): CExpr<FilesUploadResponse, "slack/files_upload", [A]>;
 }

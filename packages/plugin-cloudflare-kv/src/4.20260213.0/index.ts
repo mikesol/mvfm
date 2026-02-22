@@ -149,10 +149,11 @@ function buildKvApi() {
     },
 
     /** List keys with optional prefix filter and pagination cursor. */
-    list<A extends readonly unknown[]>(
-      ...args: A
-    ): CExpr<KvListResult, "cloudflare-kv/list", A> {
-      return mk("cloudflare-kv/list", args.map((a) => liftArg(a)));
+    list<A extends readonly unknown[]>(...args: A): CExpr<KvListResult, "cloudflare-kv/list", A> {
+      return mk(
+        "cloudflare-kv/list",
+        args.map((a) => liftArg(a)),
+      );
     },
   };
 }

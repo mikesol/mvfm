@@ -32,21 +32,27 @@ export function buildSlackAdminConversations(): SlackMethodsAdminConversations {
   return {
     ekm: {
       listOriginalConnectedChannelInfo(params?) {
-        if (params != null) return mk("slack/admin_conversations_ekm_listOriginalConnectedChannelInfo", [liftArg(params)]);
+        if (params != null)
+          return mk("slack/admin_conversations_ekm_listOriginalConnectedChannelInfo", [
+            liftArg(params),
+          ]);
         return mk("slack/admin_conversations_ekm_listOriginalConnectedChannelInfo", []);
       },
     },
     restrictAccess: {
       addGroup(params) {
-        if (params != null) return mk("slack/admin_conversations_restrictAccess_addGroup", [liftArg(params)]);
+        if (params != null)
+          return mk("slack/admin_conversations_restrictAccess_addGroup", [liftArg(params)]);
         return mk("slack/admin_conversations_restrictAccess_addGroup", []);
       },
       listGroups(params) {
-        if (params != null) return mk("slack/admin_conversations_restrictAccess_listGroups", [liftArg(params)]);
+        if (params != null)
+          return mk("slack/admin_conversations_restrictAccess_listGroups", [liftArg(params)]);
         return mk("slack/admin_conversations_restrictAccess_listGroups", []);
       },
       removeGroup(params) {
-        if (params != null) return mk("slack/admin_conversations_restrictAccess_removeGroup", [liftArg(params)]);
+        if (params != null)
+          return mk("slack/admin_conversations_restrictAccess_removeGroup", [liftArg(params)]);
         return mk("slack/admin_conversations_restrictAccess_removeGroup", []);
       },
     },
@@ -67,7 +73,8 @@ export function buildSlackAdminConversations(): SlackMethodsAdminConversations {
       return mk("slack/admin_conversations_bulkMove", []);
     },
     convertToPrivate(params) {
-      if (params != null) return mk("slack/admin_conversations_convertToPrivate", [liftArg(params)]);
+      if (params != null)
+        return mk("slack/admin_conversations_convertToPrivate", [liftArg(params)]);
       return mk("slack/admin_conversations_convertToPrivate", []);
     },
     convertToPublic(params) {
@@ -83,15 +90,18 @@ export function buildSlackAdminConversations(): SlackMethodsAdminConversations {
       return mk("slack/admin_conversations_delete", []);
     },
     disconnectShared(params) {
-      if (params != null) return mk("slack/admin_conversations_disconnectShared", [liftArg(params)]);
+      if (params != null)
+        return mk("slack/admin_conversations_disconnectShared", [liftArg(params)]);
       return mk("slack/admin_conversations_disconnectShared", []);
     },
     getConversationPrefs(params) {
-      if (params != null) return mk("slack/admin_conversations_getConversationPrefs", [liftArg(params)]);
+      if (params != null)
+        return mk("slack/admin_conversations_getConversationPrefs", [liftArg(params)]);
       return mk("slack/admin_conversations_getConversationPrefs", []);
     },
     getCustomRetention(params) {
-      if (params != null) return mk("slack/admin_conversations_getCustomRetention", [liftArg(params)]);
+      if (params != null)
+        return mk("slack/admin_conversations_getCustomRetention", [liftArg(params)]);
       return mk("slack/admin_conversations_getCustomRetention", []);
     },
     getTeams(params) {
@@ -107,7 +117,8 @@ export function buildSlackAdminConversations(): SlackMethodsAdminConversations {
       return mk("slack/admin_conversations_lookup", []);
     },
     removeCustomRetention(params) {
-      if (params != null) return mk("slack/admin_conversations_removeCustomRetention", [liftArg(params)]);
+      if (params != null)
+        return mk("slack/admin_conversations_removeCustomRetention", [liftArg(params)]);
       return mk("slack/admin_conversations_removeCustomRetention", []);
     },
     rename(params) {
@@ -119,11 +130,13 @@ export function buildSlackAdminConversations(): SlackMethodsAdminConversations {
       return mk("slack/admin_conversations_search", []);
     },
     setConversationPrefs(params) {
-      if (params != null) return mk("slack/admin_conversations_setConversationPrefs", [liftArg(params)]);
+      if (params != null)
+        return mk("slack/admin_conversations_setConversationPrefs", [liftArg(params)]);
       return mk("slack/admin_conversations_setConversationPrefs", []);
     },
     setCustomRetention(params) {
-      if (params != null) return mk("slack/admin_conversations_setCustomRetention", [liftArg(params)]);
+      if (params != null)
+        return mk("slack/admin_conversations_setCustomRetention", [liftArg(params)]);
       return mk("slack/admin_conversations_setCustomRetention", []);
     },
     setTeams(params) {

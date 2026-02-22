@@ -9,8 +9,18 @@ import type {
 
 export interface SlackMethodsAssistant {
   threads: {
-    setStatus<A>(params: A): CExpr<AssistantThreadsSetStatusResponse, "slack/assistant_threads_setStatus", [A]>;
-    setSuggestedPrompts<A>(params: A): CExpr<AssistantThreadsSetSuggestedPromptsResponse, "slack/assistant_threads_setSuggestedPrompts", [A]>;
-    setTitle<A>(params: A): CExpr<AssistantThreadsSetTitleResponse, "slack/assistant_threads_setTitle", [A]>;
+    setStatus<A>(
+      params: A,
+    ): CExpr<AssistantThreadsSetStatusResponse, "slack/assistant_threads_setStatus", [A]>;
+    setSuggestedPrompts<A>(
+      params: A,
+    ): CExpr<
+      AssistantThreadsSetSuggestedPromptsResponse,
+      "slack/assistant_threads_setSuggestedPrompts",
+      [A]
+    >;
+    setTitle<A>(
+      params: A,
+    ): CExpr<AssistantThreadsSetTitleResponse, "slack/assistant_threads_setTitle", [A]>;
   };
 }

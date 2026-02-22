@@ -255,34 +255,7 @@
             },
             {
               "kind": "Content",
-              "text": "{\n    name: \"openai\";\n    ctors: {\n        openai: {\n            chat: {\n                completions: {\n                    create(params: "
-            },
-            {
-              "kind": "Reference",
-              "text": "ChatCompletionCreateParamsNonStreaming",
-              "canonicalReference": "openai!ChatCompletionCreateParamsNonStreaming:interface"
-            },
-            {
-              "kind": "Content",
-              "text": " | "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "ChatCompletionCreateParamsNonStreaming",
-              "canonicalReference": "openai!ChatCompletionCreateParamsNonStreaming:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ">): "
+              "text": "{\n    name: \"openai\";\n    ctors: {\n        openai: {\n            chat: {\n                completions: {\n                    create<A>(params: A): "
             },
             {
               "kind": "Reference",
@@ -300,16 +273,7 @@
             },
             {
               "kind": "Content",
-              "text": ">;\n                    retrieve(id: string | "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string>): "
+              "text": ", \"openai/create_chat_completion\", [A]>;\n                    retrieve<A>(id: A): "
             },
             {
               "kind": "Reference",
@@ -327,34 +291,7 @@
             },
             {
               "kind": "Content",
-              "text": ">;\n                    list(params?: "
-            },
-            {
-              "kind": "Reference",
-              "text": "ChatCompletionListParams",
-              "canonicalReference": "openai!ChatCompletionListParams:interface"
-            },
-            {
-              "kind": "Content",
-              "text": " | "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "ChatCompletionListParams",
-              "canonicalReference": "openai!ChatCompletionListParams:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ">): "
+              "text": ", \"openai/retrieve_chat_completion\", [A]>;\n                    list<A extends readonly unknown[]>(...params: A): "
             },
             {
               "kind": "Reference",
@@ -372,43 +309,7 @@
             },
             {
               "kind": "Content",
-              "text": ">;\n                    update(id: string | "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string>, params: "
-            },
-            {
-              "kind": "Reference",
-              "text": "ChatCompletionUpdateParams",
-              "canonicalReference": "openai!ChatCompletionUpdateParams:interface"
-            },
-            {
-              "kind": "Content",
-              "text": " | "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "ChatCompletionUpdateParams",
-              "canonicalReference": "openai!ChatCompletionUpdateParams:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ">): "
+              "text": ", \"openai/list_chat_completions\", A>;\n                    update<A, B>(id: A, params: B): "
             },
             {
               "kind": "Reference",
@@ -426,16 +327,7 @@
             },
             {
               "kind": "Content",
-              "text": ">;\n                    delete(id: string | "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string>): "
+              "text": ", \"openai/update_chat_completion\", [A, B]>;\n                    delete<A>(id: A): "
             },
             {
               "kind": "Reference",
@@ -453,34 +345,7 @@
             },
             {
               "kind": "Content",
-              "text": ">;\n                };\n            };\n            embeddings: {\n                create(params: "
-            },
-            {
-              "kind": "Reference",
-              "text": "EmbeddingCreateParams",
-              "canonicalReference": "openai!EmbeddingCreateParams:interface"
-            },
-            {
-              "kind": "Content",
-              "text": " | "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "EmbeddingCreateParams",
-              "canonicalReference": "openai!EmbeddingCreateParams:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ">): "
+              "text": ", \"openai/delete_chat_completion\", [A]>;\n                };\n            };\n            embeddings: {\n                create<A>(params: A): "
             },
             {
               "kind": "Reference",
@@ -498,34 +363,7 @@
             },
             {
               "kind": "Content",
-              "text": ">;\n            };\n            moderations: {\n                create(params: "
-            },
-            {
-              "kind": "Reference",
-              "text": "ModerationCreateParams",
-              "canonicalReference": "openai!ModerationCreateParams:interface"
-            },
-            {
-              "kind": "Content",
-              "text": " | "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "ModerationCreateParams",
-              "canonicalReference": "openai!ModerationCreateParams:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ">): "
+              "text": ", \"openai/create_embedding\", [A]>;\n            };\n            moderations: {\n                create<A>(params: A): "
             },
             {
               "kind": "Reference",
@@ -543,34 +381,7 @@
             },
             {
               "kind": "Content",
-              "text": ">;\n            };\n            completions: {\n                create(params: "
-            },
-            {
-              "kind": "Reference",
-              "text": "CompletionCreateParamsNonStreaming",
-              "canonicalReference": "openai!CompletionCreateParamsNonStreaming:interface"
-            },
-            {
-              "kind": "Content",
-              "text": " | "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "CompletionCreateParamsNonStreaming",
-              "canonicalReference": "openai!CompletionCreateParamsNonStreaming:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ">): "
+              "text": ", \"openai/create_moderation\", [A]>;\n            };\n            completions: {\n                create<A>(params: A): "
             },
             {
               "kind": "Reference",
@@ -588,16 +399,7 @@
             },
             {
               "kind": "Content",
-              "text": ">;\n            };\n        };\n    };\n    kinds: "
-            },
-            {
-              "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string, "
+              "text": ", \"openai/create_completion\", [A]>;\n            };\n        };\n    };\n    kinds: {\n        \"openai/create_chat_completion\": "
             },
             {
               "kind": "Reference",
@@ -606,7 +408,97 @@
             },
             {
               "kind": "Content",
-              "text": "<any, any>>;\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
+              "text": "<[unknown], unknown>;\n        \"openai/retrieve_chat_completion\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-openai!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"openai/list_chat_completions\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-openai!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown>;\n        \"openai/update_chat_completion\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-openai!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown, unknown], unknown>;\n        \"openai/delete_chat_completion\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-openai!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"openai/create_embedding\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-openai!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"openai/create_moderation\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-openai!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"openai/create_completion\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-openai!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"openai/record\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-openai!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], "
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, unknown>>;\n        \"openai/array\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-openai!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown[]>;\n    };\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
             },
             {
               "kind": "Reference",
@@ -625,7 +517,7 @@
           "fileUrlPath": "dist/6.21.0/index.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 3,
-            "endIndex": 84
+            "endIndex": 60
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
@@ -868,384 +760,6 @@
             "startIndex": 1,
             "endIndex": 2
           }
-        },
-        {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/plugin-openai!OpenAIMethods:interface",
-          "docComment": "/**\n * OpenAI operations added to the DSL context by the openai plugin.\n *\n * Mirrors the openai-node SDK resource API: chat completions, embeddings, moderations, and legacy completions. Each resource exposes methods that produce CExpr nodes.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export interface OpenAIMethods "
-            }
-          ],
-          "fileUrlPath": "dist/6.21.0/index.d.ts",
-          "releaseTag": "Public",
-          "name": "OpenAIMethods",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-openai!OpenAIMethods#openai:member",
-              "docComment": "/**\n * OpenAI API operations, namespaced under `$.openai`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "openai: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "{\n        chat: {\n            completions: {\n                create(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ChatCompletionCreateParamsNonStreaming",
-                  "canonicalReference": "openai!ChatCompletionCreateParamsNonStreaming:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": " | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ChatCompletionCreateParamsNonStreaming",
-                  "canonicalReference": "openai!ChatCompletionCreateParamsNonStreaming:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ChatCompletion",
-                  "canonicalReference": "openai!ChatCompletion:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n                retrieve(id: string | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ChatCompletion",
-                  "canonicalReference": "openai!ChatCompletion:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n                list(params?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ChatCompletionListParams",
-                  "canonicalReference": "openai!ChatCompletionListParams:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": " | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ChatCompletionListParams",
-                  "canonicalReference": "openai!ChatCompletionListParams:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ChatCompletionsPage",
-                  "canonicalReference": "openai!ChatCompletionsPage:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n                update(id: string | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string>, params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ChatCompletionUpdateParams",
-                  "canonicalReference": "openai!ChatCompletionUpdateParams:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": " | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ChatCompletionUpdateParams",
-                  "canonicalReference": "openai!ChatCompletionUpdateParams:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ChatCompletion",
-                  "canonicalReference": "openai!ChatCompletion:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n                delete(id: string | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ChatCompletionDeleted",
-                  "canonicalReference": "openai!ChatCompletionDeleted:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n            };\n        };\n        embeddings: {\n            create(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "EmbeddingCreateParams",
-                  "canonicalReference": "openai!EmbeddingCreateParams:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": " | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "EmbeddingCreateParams",
-                  "canonicalReference": "openai!EmbeddingCreateParams:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CreateEmbeddingResponse",
-                  "canonicalReference": "openai!CreateEmbeddingResponse:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n        };\n        moderations: {\n            create(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ModerationCreateParams",
-                  "canonicalReference": "openai!ModerationCreateParams:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": " | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ModerationCreateParams",
-                  "canonicalReference": "openai!ModerationCreateParams:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ModerationCreateResponse",
-                  "canonicalReference": "openai!ModerationCreateResponse:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n        };\n        completions: {\n            create(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CompletionCreateParamsNonStreaming",
-                  "canonicalReference": "openai!CompletionCreateParamsNonStreaming:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": " | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CompletionCreateParamsNonStreaming",
-                  "canonicalReference": "openai!CompletionCreateParamsNonStreaming:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-openai!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Completion",
-                  "canonicalReference": "openai!Completion:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n        };\n    }"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "openai",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 76
-              }
-            }
-          ],
-          "extendsTokenRanges": []
         },
         {
           "kind": "Variable",

@@ -27,8 +27,11 @@ const _textExpr: CExpr<string, "fetch/text", [typeof _fetchExpr]> =
   plugin.ctors.fetch.text(_fetchExpr);
 const _statusExpr: CExpr<number, "fetch/status", [typeof _fetchExpr]> =
   plugin.ctors.fetch.status(_fetchExpr);
-const _headersExpr: CExpr<Record<string, string>, "fetch/headers", [typeof _fetchExpr]> =
-  plugin.ctors.fetch.headers(_fetchExpr);
+const _headersExpr: CExpr<
+  Record<string, string>,
+  "fetch/headers",
+  [typeof _fetchExpr]
+> = plugin.ctors.fetch.headers(_fetchExpr);
 
 // Suppress unused variable warnings
 void _name;

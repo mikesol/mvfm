@@ -18,7 +18,13 @@ import type {
 
 export interface SlackMethodsUsers {
   discoverableContacts: {
-    lookup<A>(params: A): CExpr<UsersDiscoverableContactsLookupResponse, "slack/users_discoverableContacts_lookup", [A]>;
+    lookup<A>(
+      params: A,
+    ): CExpr<
+      UsersDiscoverableContactsLookupResponse,
+      "slack/users_discoverableContacts_lookup",
+      [A]
+    >;
   };
   profile: {
     get<A>(params: A): CExpr<UsersProfileGetResponse, "slack/users_profile_get", [A]>;

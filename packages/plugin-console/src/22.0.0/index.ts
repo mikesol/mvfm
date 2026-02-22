@@ -6,9 +6,8 @@
 // derive all console/* kinds from the ctor return types.
 // ============================================================
 
-import type { CExpr, KindSpec, Plugin } from "@mvfm/core";
+import type { CExpr, Interpreter, KindSpec, Plugin } from "@mvfm/core";
 import { isCExpr, makeCExpr } from "@mvfm/core";
-import type { Interpreter } from "@mvfm/core";
 import { createConsoleInterpreter } from "./interpreter";
 
 /** Lift plain objects/arrays to structural CExpr nodes so elaborate can process them. */
@@ -92,7 +91,9 @@ function buildConsoleApi() {
       return mk("console/debug", data);
     },
     /** Calls `console.dir(item, options?)`. */
-    dir<A, B>(...args: [item: A, options: B] | [item: A] | []): CExpr<void, "console/dir", unknown[]> {
+    dir<A, B>(
+      ...args: [item: A, options: B] | [item: A] | []
+    ): CExpr<void, "console/dir", unknown[]> {
       const lifted: unknown[] = [];
       if (args.length > 0) lifted.push(liftConsoleArg(args[0]));
       if (args.length > 1) lifted.push(liftConsoleArg(args[1]));

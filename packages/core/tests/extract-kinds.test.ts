@@ -3,15 +3,15 @@
  */
 import { describe, it } from "vitest";
 import type { CExpr } from "../src/expr";
-import type { KindSpec } from "../src/registry";
 import type { Plugin } from "../src/plugin";
+import type { KindSpec } from "../src/registry";
 
 describe("ExtractKinds enforcement", () => {
   it("plugin with matching ctors and kinds compiles", () => {
     const good = {
       name: "test" as const,
       ctors: {
-        add: <A, B>(a: A, b: B): CExpr<number, "test/add", [A, B]> =>
+        add: <A, B>(_a: A, _b: B): CExpr<number, "test/add", [A, B]> =>
           null! as CExpr<number, "test/add", [A, B]>,
       },
       kinds: {
@@ -30,9 +30,9 @@ describe("ExtractKinds enforcement", () => {
     const bad = {
       name: "test" as const,
       ctors: {
-        add: <A, B>(a: A, b: B): CExpr<number, "test/add", [A, B]> =>
+        add: <A, B>(_a: A, _b: B): CExpr<number, "test/add", [A, B]> =>
           null! as CExpr<number, "test/add", [A, B]>,
-        sub: <A, B>(a: A, b: B): CExpr<number, "test/sub", [A, B]> =>
+        sub: <A, B>(_a: A, _b: B): CExpr<number, "test/sub", [A, B]> =>
           null! as CExpr<number, "test/sub", [A, B]>,
       },
       kinds: {
@@ -53,12 +53,11 @@ describe("ExtractKinds enforcement", () => {
     const coreRef = {
       name: "myplug" as const,
       ctors: {
-        each: (items: unknown[], fn: (i: unknown) => unknown) => {
+        each: (_items: unknown[], _fn: (i: unknown) => unknown) => {
           return null! as CExpr<unknown, "core/begin", unknown[]>;
         },
-        loop: (cond: unknown) => ({
-          body: (fn: () => unknown) =>
-            null! as CExpr<unknown, "myplug/while", [unknown, unknown]>,
+        loop: (_cond: unknown) => ({
+          body: (_fn: () => unknown) => null! as CExpr<unknown, "myplug/while", [unknown, unknown]>,
         }),
       },
       kinds: {
@@ -78,9 +77,9 @@ describe("ExtractKinds enforcement", () => {
       name: "ns" as const,
       ctors: {
         ns: {
-          get: <A>(key: A): CExpr<string | null, "ns/get", [A]> =>
+          get: <A>(_key: A): CExpr<string | null, "ns/get", [A]> =>
             null! as CExpr<string | null, "ns/get", [A]>,
-          set: <A, B>(key: A, val: B): CExpr<string, "ns/set", [A, B]> =>
+          set: <A, B>(_key: A, _val: B): CExpr<string, "ns/set", [A, B]> =>
             null! as CExpr<string, "ns/set", [A, B]>,
         },
       },

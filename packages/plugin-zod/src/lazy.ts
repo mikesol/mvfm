@@ -67,7 +67,6 @@ export class ZodLazyBuilder<T> extends ZodSchemaBuilder<T> {
   }
 }
 
-
 type LazyRegistry = Map<string, () => ZodSchemaBuilder<unknown>>;
 
 function resolveLazySchemaNode(

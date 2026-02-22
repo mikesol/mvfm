@@ -17,24 +17,37 @@ export function stripe(config: StripeConfig): {
     ctors: {
         stripe: {
             paymentIntents: {
-                create(params: Record<string, unknown> | CExpr<Record<string, unknown>>): CExpr<Record<string, unknown>>;
-                retrieve(id: string | CExpr<string>): CExpr<Record<string, unknown>>;
-                confirm(id: string | CExpr<string>, params?: Record<string, unknown> | CExpr<Record<string, unknown>>): CExpr<Record<string, unknown>>;
+                create<A>(params: A): CExpr<Record<string, unknown>, "stripe/create_payment_intent", [A]>;
+                retrieve<A>(id: A): CExpr<Record<string, unknown>, "stripe/retrieve_payment_intent", [A]>;
+                confirm<A, B extends readonly unknown[]>(id: A, ...params: B): CExpr<Record<string, unknown>, "stripe/confirm_payment_intent", [A, ...B]>;
             };
             customers: {
-                create(params: Record<string, unknown> | CExpr<Record<string, unknown>>): CExpr<Record<string, unknown>>;
-                retrieve(id: string | CExpr<string>): CExpr<Record<string, unknown>>;
-                update(id: string | CExpr<string>, params: Record<string, unknown> | CExpr<Record<string, unknown>>): CExpr<Record<string, unknown>>;
-                list(params?: Record<string, unknown> | CExpr<Record<string, unknown>>): CExpr<Record<string, unknown>>;
+                create<A>(params: A): CExpr<Record<string, unknown>, "stripe/create_customer", [A]>;
+                retrieve<A>(id: A): CExpr<Record<string, unknown>, "stripe/retrieve_customer", [A]>;
+                update<A, B>(id: A, params: B): CExpr<Record<string, unknown>, "stripe/update_customer", [A, B]>;
+                list<A extends readonly unknown[]>(...params: A): CExpr<Record<string, unknown>, "stripe/list_customers", A>;
             };
             charges: {
-                create(params: Record<string, unknown> | CExpr<Record<string, unknown>>): CExpr<Record<string, unknown>>;
-                retrieve(id: string | CExpr<string>): CExpr<Record<string, unknown>>;
-                list(params?: Record<string, unknown> | CExpr<Record<string, unknown>>): CExpr<Record<string, unknown>>;
+                create<A>(params: A): CExpr<Record<string, unknown>, "stripe/create_charge", [A]>;
+                retrieve<A>(id: A): CExpr<Record<string, unknown>, "stripe/retrieve_charge", [A]>;
+                list<A extends readonly unknown[]>(...params: A): CExpr<Record<string, unknown>, "stripe/list_charges", A>;
             };
         };
     };
-    kinds: Record<string, KindSpec<any, any>>;
+    kinds: {
+        "stripe/create_payment_intent": KindSpec<[unknown], unknown>;
+        "stripe/retrieve_payment_intent": KindSpec<[unknown], unknown>;
+        "stripe/confirm_payment_intent": KindSpec<[unknown], unknown>;
+        "stripe/create_customer": KindSpec<[unknown], unknown>;
+        "stripe/retrieve_customer": KindSpec<[unknown], unknown>;
+        "stripe/update_customer": KindSpec<[unknown, unknown], unknown>;
+        "stripe/list_customers": KindSpec<unknown[], unknown>;
+        "stripe/create_charge": KindSpec<[unknown], unknown>;
+        "stripe/retrieve_charge": KindSpec<[unknown], unknown>;
+        "stripe/list_charges": KindSpec<unknown[], unknown>;
+        "stripe/record": KindSpec<unknown[], Record<string, unknown>>;
+        "stripe/array": KindSpec<unknown[], unknown[]>;
+    };
     traits: {};
     lifts: {};
     defaultInterpreter: () => Interpreter;
@@ -55,28 +68,6 @@ export interface StripeConfig {
 export const stripeInterpreter: Interpreter;
 
 // @public
-export interface StripeMethods {
-    stripe: {
-        paymentIntents: {
-            create(params: Record<string, unknown> | CExpr<Record<string, unknown>>): CExpr<Record<string, unknown>>;
-            retrieve(id: string | CExpr<string>): CExpr<Record<string, unknown>>;
-            confirm(id: string | CExpr<string>, params?: Record<string, unknown> | CExpr<Record<string, unknown>>): CExpr<Record<string, unknown>>;
-        };
-        customers: {
-            create(params: Record<string, unknown> | CExpr<Record<string, unknown>>): CExpr<Record<string, unknown>>;
-            retrieve(id: string | CExpr<string>): CExpr<Record<string, unknown>>;
-            update(id: string | CExpr<string>, params: Record<string, unknown> | CExpr<Record<string, unknown>>): CExpr<Record<string, unknown>>;
-            list(params?: Record<string, unknown> | CExpr<Record<string, unknown>>): CExpr<Record<string, unknown>>;
-        };
-        charges: {
-            create(params: Record<string, unknown> | CExpr<Record<string, unknown>>): CExpr<Record<string, unknown>>;
-            retrieve(id: string | CExpr<string>): CExpr<Record<string, unknown>>;
-            list(params?: Record<string, unknown> | CExpr<Record<string, unknown>>): CExpr<Record<string, unknown>>;
-        };
-    };
-}
-
-// @public
 export const stripePlugin: typeof stripe;
 
 // @public
@@ -84,8 +75,8 @@ export function wrapStripeSdk(stripe: Stripe): StripeClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/2025-04-30.basil/index.d.ts:64:17 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-// dist/2025-04-30.basil/index.d.ts:90:5 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/2025-04-30.basil/index.d.ts:26:17 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/2025-04-30.basil/index.d.ts:53:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

@@ -4,18 +4,6 @@
 
 ```ts
 
-import type { CreateBatchOptions } from 'resend';
-import type { CreateBatchSuccessResponse } from 'resend';
-import type { CreateContactOptions } from 'resend';
-import type { CreateContactResponseSuccess } from 'resend';
-import type { CreateEmailOptions } from 'resend';
-import type { CreateEmailResponseSuccess } from 'resend';
-import type { GetContactResponseSuccess } from 'resend';
-import type { GetEmailResponseSuccess } from 'resend';
-import type { LegacyCreateContactOptions } from 'resend';
-import type { ListContactsResponseSuccess } from 'resend';
-import type { RemoveContactsResponseSuccess } from 'resend';
-
 // @public
 export interface ClientHandlerOptions {
     baseUrl: string;
@@ -38,21 +26,31 @@ export function resend(config: ResendConfig): {
     ctors: {
         resend: {
             emails: {
-                send(params: CreateEmailOptions | CExpr<CreateEmailOptions>): CExpr<CreateEmailResponseSuccess>;
-                get(id: string | CExpr<string>): CExpr<GetEmailResponseSuccess>;
+                send<A>(params: A): CExpr<unknown, "resend/send_email", [A]>;
+                get<A>(id: A): CExpr<unknown, "resend/get_email", [A]>;
             };
             batch: {
-                send(emails: CreateBatchOptions | CExpr<CreateBatchOptions>): CExpr<CreateBatchSuccessResponse>;
+                send<A>(emails: A): CExpr<unknown, "resend/send_batch", [A]>;
             };
             contacts: {
-                create(params: CreateContactOptions | LegacyCreateContactOptions | CExpr<CreateContactOptions | LegacyCreateContactOptions>): CExpr<CreateContactResponseSuccess>;
-                get(id: string | CExpr<string>): CExpr<GetContactResponseSuccess>;
-                list(): CExpr<ListContactsResponseSuccess>;
-                remove(id: string | CExpr<string>): CExpr<RemoveContactsResponseSuccess>;
+                create<A>(params: A): CExpr<unknown, "resend/create_contact", [A]>;
+                get<A>(id: A): CExpr<unknown, "resend/get_contact", [A]>;
+                list(): CExpr<unknown, "resend/list_contacts", []>;
+                remove<A>(id: A): CExpr<unknown, "resend/remove_contact", [A]>;
             };
         };
     };
-    kinds: Record<string, KindSpec<any, any>>;
+    kinds: {
+        "resend/send_email": KindSpec<[unknown], unknown>;
+        "resend/get_email": KindSpec<[unknown], unknown>;
+        "resend/send_batch": KindSpec<[unknown], unknown>;
+        "resend/create_contact": KindSpec<[unknown], unknown>;
+        "resend/get_contact": KindSpec<[unknown], unknown>;
+        "resend/list_contacts": KindSpec<[], unknown>;
+        "resend/remove_contact": KindSpec<[unknown], unknown>;
+        "resend/record": KindSpec<unknown[], Record<string, unknown>>;
+        "resend/array": KindSpec<unknown[], unknown[]>;
+    };
     traits: {};
     lifts: {};
     defaultInterpreter: () => Interpreter;
@@ -72,25 +70,6 @@ export interface ResendConfig {
 export const resendInterpreter: Interpreter;
 
 // @public
-export interface ResendMethods {
-    resend: {
-        emails: {
-            send(params: CreateEmailOptions | CExpr<CreateEmailOptions>): CExpr<CreateEmailResponseSuccess>;
-            get(id: string | CExpr<string>): CExpr<GetEmailResponseSuccess>;
-        };
-        batch: {
-            send(emails: CreateBatchOptions | CExpr<CreateBatchOptions>): CExpr<CreateBatchSuccessResponse>;
-        };
-        contacts: {
-            create(params: CreateContactOptions | LegacyCreateContactOptions | CExpr<CreateContactOptions | LegacyCreateContactOptions>): CExpr<CreateContactResponseSuccess>;
-            get(id: string | CExpr<string>): CExpr<GetContactResponseSuccess>;
-            list(): CExpr<ListContactsResponseSuccess>;
-            remove(id: string | CExpr<string>): CExpr<RemoveContactsResponseSuccess>;
-        };
-    };
-}
-
-// @public
 export const resendPlugin: typeof resend;
 
 // @public
@@ -103,8 +82,8 @@ export function wrapResendSdk(resend: ResendSdk): ResendClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/6.9.2/index.d.ts:56:17 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-// dist/6.9.2/index.d.ts:76:5 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/6.9.2/index.d.ts:24:17 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/6.9.2/index.d.ts:45:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

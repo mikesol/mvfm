@@ -15,9 +15,11 @@
 
 import type { CExpr, Interpreter, KindSpec, Plugin } from "@mvfm/core";
 import { isCExpr, makeCExpr } from "@mvfm/core";
-import type { ChatCompletion } from "openai/resources/chat/completions/completions";
-import type { ChatCompletionDeleted } from "openai/resources/chat/completions/completions";
-import type { ChatCompletionsPage } from "openai/resources/chat/completions/completions";
+import type {
+  ChatCompletion,
+  ChatCompletionDeleted,
+  ChatCompletionsPage,
+} from "openai/resources/chat/completions/completions";
 import type { Completion } from "openai/resources/completions";
 import type { CreateEmbeddingResponse } from "openai/resources/embeddings";
 import type { ModerationCreateResponse } from "openai/resources/moderations";
@@ -100,7 +102,10 @@ function buildOpenAIApi() {
         list<A extends readonly unknown[]>(
           ...params: A
         ): CExpr<ChatCompletionsPage, "openai/list_chat_completions", A> {
-          return mk("openai/list_chat_completions", params.map((p) => liftArg(p)));
+          return mk(
+            "openai/list_chat_completions",
+            params.map((p) => liftArg(p)),
+          );
         },
         /** Update a chat completion by ID. */
         update<A, B>(

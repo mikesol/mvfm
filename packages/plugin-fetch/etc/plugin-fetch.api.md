@@ -24,14 +24,23 @@ export function createFetchInterpreter(client?: FetchClient, config?: FetchConfi
 function fetch_2(config?: FetchConfig): {
     name: "fetch";
     ctors: {
-        fetch: (<A, B>(url: A, init?: B) => CExpr<unknown>) & {
-            json<A>(response: A): CExpr<unknown>;
-            text<A>(response: A): CExpr<string>;
-            status<A>(response: A): CExpr<number>;
-            headers<A>(response: A): CExpr<Record<string, string>>;
+        fetch: {
+            <A, B extends readonly unknown[]>(url: A, ...init: B): CExpr<unknown, "fetch/request", [A, ...B]>;
+            json<A>(response: A): CExpr<unknown, "fetch/json", [A]>;
+            text<A>(response: A): CExpr<string, "fetch/text", [A]>;
+            status<A>(response: A): CExpr<number, "fetch/status", [A]>;
+            headers<A>(response: A): CExpr<Record<string, string>, "fetch/headers", [A]>;
         };
     };
-    kinds: Record<string, KindSpec<any, any>>;
+    kinds: {
+        "fetch/request": KindSpec<[string, ...unknown[]], unknown>;
+        "fetch/json": KindSpec<[unknown], unknown>;
+        "fetch/text": KindSpec<[unknown], string>;
+        "fetch/status": KindSpec<[unknown], number>;
+        "fetch/headers": KindSpec<[unknown], Record<string, string>>;
+        "fetch/record": KindSpec<unknown[], Record<string, unknown>>;
+        "fetch/array": KindSpec<unknown[], unknown[]>;
+    };
     traits: {};
     lifts: {};
     defaultInterpreter: () => Interpreter;
@@ -51,16 +60,6 @@ export interface FetchConfig {
 
 // @public
 export const fetchInterpreter: Interpreter;
-
-// @public
-export interface FetchMethods {
-    fetch: (<A, B>(url: A, init?: B) => CExpr<unknown>) & {
-        json<A>(response: A): CExpr<unknown>;
-        text<A>(response: A): CExpr<string>;
-        status<A>(response: A): CExpr<number>;
-        headers<A>(response: A): CExpr<Record<string, string>>;
-    };
-}
 
 // @public
 export interface FetchRequestInit {
@@ -101,8 +100,8 @@ export function wrapFetch(fetchFn?: typeof globalThis.fetch): FetchClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/whatwg/index.d.ts:63:9 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-// dist/whatwg/index.d.ts:74:5 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/whatwg/index.d.ts:42:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/whatwg/index.d.ts:50:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

@@ -458,7 +458,7 @@
             },
             {
               "kind": "Content",
-              "text": "{\n    name: \"redis\";\n    ctors: {\n        redis: {\n            get(key: import(\"@mvfm/core\")."
+              "text": "{\n    name: \"redis\";\n    ctors: {\n        redis: {\n            get<A>(key: A): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -467,7 +467,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string> | string): import(\"@mvfm/core\")."
+              "text": "<string | null, \"redis/get\", [A]>;\n            set<A, B, C extends readonly unknown[]>(key: A, value: B, ...args: C): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -476,7 +476,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string | null>;\n            set(key: import(\"@mvfm/core\")."
+              "text": "<string | null, \"redis/set\", [A, B, ...C]>;\n            incr<A>(key: A): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -485,7 +485,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string> | string, value: import(\"@mvfm/core\")."
+              "text": "<number, \"redis/incr\", [A]>;\n            incrby<A, B>(key: A, increment: B): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -494,7 +494,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string | number> | string | number, ...args: (import(\"@mvfm/core\")."
+              "text": "<number, \"redis/incrby\", [A, B]>;\n            decr<A>(key: A): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -503,7 +503,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string | number> | string | number)[]): import(\"@mvfm/core\")."
+              "text": "<number, \"redis/decr\", [A]>;\n            decrby<A, B>(key: A, decrement: B): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -512,7 +512,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string | null>;\n            incr(key: import(\"@mvfm/core\")."
+              "text": "<number, \"redis/decrby\", [A, B]>;\n            mget<A extends readonly unknown[]>(...keys: A): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -521,7 +521,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string> | string): import(\"@mvfm/core\")."
+              "text": "<(string | null)[], \"redis/mget\", A>;\n            mset<A>(mapping: A): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -530,7 +530,7 @@
             },
             {
               "kind": "Content",
-              "text": "<number>;\n            incrby(key: import(\"@mvfm/core\")."
+              "text": "<\"OK\", \"redis/mset\", [A]>;\n            append<A, B>(key: A, value: B): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -539,7 +539,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string> | string, increment: import(\"@mvfm/core\")."
+              "text": "<number, \"redis/append\", [A, B]>;\n            getrange<A, B, C>(key: A, start: B, end: C): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -548,7 +548,7 @@
             },
             {
               "kind": "Content",
-              "text": "<number> | number): import(\"@mvfm/core\")."
+              "text": "<string, \"redis/getrange\", [A, B, C]>;\n            setrange<A, B, C>(key: A, offset: B, value: C): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -557,7 +557,7 @@
             },
             {
               "kind": "Content",
-              "text": "<number>;\n            decr(key: import(\"@mvfm/core\")."
+              "text": "<number, \"redis/setrange\", [A, B, C]>;\n            del<A extends readonly unknown[]>(...keys: A): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -566,7 +566,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string> | string): import(\"@mvfm/core\")."
+              "text": "<number, \"redis/del\", A>;\n            exists<A extends readonly unknown[]>(...keys: A): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -575,7 +575,7 @@
             },
             {
               "kind": "Content",
-              "text": "<number>;\n            decrby(key: import(\"@mvfm/core\")."
+              "text": "<number, \"redis/exists\", A>;\n            expire<A, B>(key: A, seconds: B): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -584,7 +584,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string> | string, decrement: import(\"@mvfm/core\")."
+              "text": "<number, \"redis/expire\", [A, B]>;\n            pexpire<A, B>(key: A, milliseconds: B): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -593,7 +593,7 @@
             },
             {
               "kind": "Content",
-              "text": "<number> | number): import(\"@mvfm/core\")."
+              "text": "<number, \"redis/pexpire\", [A, B]>;\n            ttl<A>(key: A): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -602,7 +602,7 @@
             },
             {
               "kind": "Content",
-              "text": "<number>;\n            mget(...keys: (import(\"@mvfm/core\")."
+              "text": "<number, \"redis/ttl\", [A]>;\n            pttl<A>(key: A): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -611,7 +611,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string> | string)[]): import(\"@mvfm/core\")."
+              "text": "<number, \"redis/pttl\", [A]>;\n            hget<A, B>(key: A, field: B): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -620,7 +620,7 @@
             },
             {
               "kind": "Content",
-              "text": "<(string | null)[]>;\n            mset(mapping: import(\"@mvfm/core\")."
+              "text": "<string | null, \"redis/hget\", [A, B]>;\n            hset<A, B>(key: A, mapping: B): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -629,664 +629,16 @@
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<number, \"redis/hset\", [A, B]>;\n            hmget<A, B extends readonly unknown[]>(key: A, ...fields: B): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string, string | number>> | "
-            },
-            {
-              "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string, string | number>): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<\"OK\">;\n            append(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string, value: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string | number> | string | number): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number>;\n            getrange(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string, start: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number> | number, end: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number> | number): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string>;\n            setrange(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string, offset: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number> | number, value: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string | number> | string | number): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number>;\n            del(...keys: (import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string)[]): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number>;\n            exists(...keys: (import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string)[]): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number>;\n            expire(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string, seconds: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number> | number): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number>;\n            pexpire(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string, milliseconds: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number> | number): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number>;\n            ttl(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number>;\n            pttl(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number>;\n            hget(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string, field: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string | null>;\n            hset(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string, mapping: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string, string | number>> | "
-            },
-            {
-              "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string, string | number>): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number>;\n            hmget(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string, ...fields: (import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string)[]): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<(string | null)[]>;\n            hgetall(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string[]>;\n            hdel(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string, ...fields: (import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string)[]): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number>;\n            hexists(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string, field: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number>;\n            hlen(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number>;\n            hkeys(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string[]>;\n            hvals(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string[]>;\n            hincrby(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string, field: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string, increment: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number> | number): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number>;\n            lpush(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string, ...elements: (import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string | number> | string | number)[]): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number>;\n            rpush(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string, ...elements: (import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string | number> | string | number)[]): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number>;\n            lpop(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string, count?: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number> | number): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string | null | string[]>;\n            rpop(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string, count?: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number> | number): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string | null | string[]>;\n            llen(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string): import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number>;\n            lrange(key: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string, start: import(\"@mvfm/core\")."
-            },
-            {
-              "kind": "Reference",
               "text": "CExpr",
               "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
             },
             {
               "kind": "Content",
-              "text": "<number> | number, stop: import(\"@mvfm/core\")."
+              "text": "<(string | null)[], \"redis/hmget\", [A, ...B]>;\n            hgetall<A>(key: A): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1295,7 +647,7 @@
             },
             {
               "kind": "Content",
-              "text": "<number> | number): import(\"@mvfm/core\")."
+              "text": "<string[], \"redis/hgetall\", [A]>;\n            hdel<A, B extends readonly unknown[]>(key: A, ...fields: B): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1304,7 +656,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string[]>;\n            lindex(key: import(\"@mvfm/core\")."
+              "text": "<number, \"redis/hdel\", [A, ...B]>;\n            hexists<A, B>(key: A, field: B): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1313,7 +665,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string> | string, index: import(\"@mvfm/core\")."
+              "text": "<number, \"redis/hexists\", [A, B]>;\n            hlen<A>(key: A): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1322,7 +674,7 @@
             },
             {
               "kind": "Content",
-              "text": "<number> | number): import(\"@mvfm/core\")."
+              "text": "<number, \"redis/hlen\", [A]>;\n            hkeys<A>(key: A): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1331,7 +683,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string | null>;\n            lset(key: import(\"@mvfm/core\")."
+              "text": "<string[], \"redis/hkeys\", [A]>;\n            hvals<A>(key: A): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1340,7 +692,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string> | string, index: import(\"@mvfm/core\")."
+              "text": "<string[], \"redis/hvals\", [A]>;\n            hincrby<A, B, C>(key: A, field: B, increment: C): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1349,7 +701,7 @@
             },
             {
               "kind": "Content",
-              "text": "<number> | number, element: import(\"@mvfm/core\")."
+              "text": "<number, \"redis/hincrby\", [A, B, C]>;\n            lpush<A, B extends readonly unknown[]>(key: A, ...elements: B): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1358,7 +710,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string | number> | string | number): import(\"@mvfm/core\")."
+              "text": "<number, \"redis/lpush\", [A, ...B]>;\n            rpush<A, B extends readonly unknown[]>(key: A, ...elements: B): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1367,7 +719,7 @@
             },
             {
               "kind": "Content",
-              "text": "<\"OK\">;\n            lrem(key: import(\"@mvfm/core\")."
+              "text": "<number, \"redis/rpush\", [A, ...B]>;\n            lpop<A>(key: A, count?: unknown): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1376,7 +728,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string> | string, count: import(\"@mvfm/core\")."
+              "text": "<string | null | string[], \"redis/lpop\", [A, ...unknown[]]>;\n            rpop<A>(key: A, count?: unknown): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1385,7 +737,7 @@
             },
             {
               "kind": "Content",
-              "text": "<number> | number, element: import(\"@mvfm/core\")."
+              "text": "<string | null | string[], \"redis/rpop\", [A, ...unknown[]]>;\n            llen<A>(key: A): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1394,7 +746,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string | number> | string | number): import(\"@mvfm/core\")."
+              "text": "<number, \"redis/llen\", [A]>;\n            lrange<A, B, C>(key: A, start: B, stop: C): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1403,7 +755,7 @@
             },
             {
               "kind": "Content",
-              "text": "<number>;\n            linsert(key: import(\"@mvfm/core\")."
+              "text": "<string[], \"redis/lrange\", [A, B, C]>;\n            lindex<A, B>(key: A, index: B): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1412,7 +764,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string> | string, position: \"BEFORE\" | \"AFTER\", pivot: import(\"@mvfm/core\")."
+              "text": "<string | null, \"redis/lindex\", [A, B]>;\n            lset<A, B, C>(key: A, index: B, element: C): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1421,7 +773,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string | number> | string | number, element: import(\"@mvfm/core\")."
+              "text": "<\"OK\", \"redis/lset\", [A, B, C]>;\n            lrem<A, B, C>(key: A, count: B, element: C): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
@@ -1430,25 +782,16 @@
             },
             {
               "kind": "Content",
-              "text": "<string | number> | string | number): import(\"@mvfm/core\")."
+              "text": "<number, \"redis/lrem\", [A, B, C]>;\n            linsert<A, B, C>(key: A, position: \"BEFORE\" | \"AFTER\", pivot: B, element: C): import(\"@mvfm/core\")."
             },
             {
               "kind": "Reference",
               "text": "CExpr",
               "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<number>;\n        };\n    };\n    kinds: "
-            },
-            {
-              "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
             },
             {
               "kind": "Content",
-              "text": "<string, "
+              "text": "<number, \"redis/linsert\", [A, string, B, C]>;\n        };\n    };\n    kinds: {\n        \"redis/get\": "
             },
             {
               "kind": "Reference",
@@ -1457,7 +800,367 @@
             },
             {
               "kind": "Content",
-              "text": "<any, any>>;\n    traits: {};\n    lifts: {};\n}"
+              "text": "<[string], string | null>;\n        \"redis/set\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string], string>;\n        \"redis/incr\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string], number>;\n        \"redis/incrby\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, number], number>;\n        \"redis/decr\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string], number>;\n        \"redis/decrby\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, number], number>;\n        \"redis/mget\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<string[], (string | null)[]>;\n        \"redis/mset\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<string[], string>;\n        \"redis/append\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string], number>;\n        \"redis/getrange\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, number, number], string>;\n        \"redis/setrange\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, number, string], number>;\n        \"redis/del\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<string[], number>;\n        \"redis/exists\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<string[], number>;\n        \"redis/expire\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, number], number>;\n        \"redis/pexpire\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, number], number>;\n        \"redis/ttl\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string], number>;\n        \"redis/pttl\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string], number>;\n        \"redis/hget\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string], string | null>;\n        \"redis/hset\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string, ...string[]], number>;\n        \"redis/hmget\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, ...string[]], (string | null)[]>;\n        \"redis/hgetall\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string], "
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, string>>;\n        \"redis/hdel\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, ...string[]], number>;\n        \"redis/hexists\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string], number>;\n        \"redis/hlen\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string], number>;\n        \"redis/hkeys\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string], string[]>;\n        \"redis/hvals\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string], string[]>;\n        \"redis/hincrby\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string, number], number>;\n        \"redis/lpush\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, ...string[]], number>;\n        \"redis/rpush\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, ...string[]], number>;\n        \"redis/lpop\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string], string | null>;\n        \"redis/rpop\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string], string | null>;\n        \"redis/llen\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string], number>;\n        \"redis/lrange\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, number, number], string[]>;\n        \"redis/lindex\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, number], string | null>;\n        \"redis/lset\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, number, string], string>;\n        \"redis/lrem\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, number, string], number>;\n        \"redis/linsert\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string, string, string], number>;\n        \"redis/record\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], "
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, unknown>>;\n        \"redis/array\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown[]>;\n    };\n    traits: {};\n    lifts: {};\n}"
             },
             {
               "kind": "Content",
@@ -1467,7 +1170,7 @@
           "fileUrlPath": "dist/5.4.1/index.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 4,
-            "endIndex": 227
+            "endIndex": 161
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
@@ -1769,1032 +1472,6 @@
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
-              }
-            }
-          ],
-          "extendsTokenRanges": []
-        },
-        {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/plugin-redis!RedisMethods:interface",
-          "docComment": "/**\n * Redis operations added to the DSL context by the redis plugin.\n *\n * Mirrors ioredis 5.4.1 command methods for strings, keys, hashes, and lists. Each method produces a namespaced AST node.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export interface RedisMethods "
-            }
-          ],
-          "fileUrlPath": "dist/5.4.1/types.d.ts",
-          "releaseTag": "Public",
-          "name": "RedisMethods",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-redis!RedisMethods#redis:member",
-              "docComment": "/**\n * Redis operations, namespaced under `$.redis`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "redis: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "{\n        get(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string | null>;\n        set(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, value: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string | number> | string | number, ...args: ("
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string | number> | string | number)[]): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string | null>;\n        incr(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        incrby(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, increment: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number> | number): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        decr(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        decrby(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, decrement: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number> | number): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        mget(...keys: ("
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string)[]): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<(string | null)[]>;\n        mset(mapping: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, string | number>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, string | number>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<\"OK\">;\n        append(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, value: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string | number> | string | number): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        getrange(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, start: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number> | number, end: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number> | number): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string>;\n        setrange(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, offset: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number> | number, value: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string | number> | string | number): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        del(...keys: ("
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string)[]): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        exists(...keys: ("
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string)[]): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        expire(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, seconds: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number> | number): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        pexpire(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, milliseconds: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number> | number): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        ttl(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        pttl(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        hget(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, field: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string | null>;\n        hset(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, mapping: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, string | number>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, string | number>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        hmget(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, ...fields: ("
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string)[]): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<(string | null)[]>;\n        hgetall(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string[]>;\n        hdel(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, ...fields: ("
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string)[]): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        hexists(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, field: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        hlen(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        hkeys(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string[]>;\n        hvals(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string[]>;\n        hincrby(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, field: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, increment: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number> | number): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        lpush(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, ...elements: ("
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string | number> | string | number)[]): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        rpush(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, ...elements: ("
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string | number> | string | number)[]): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        lpop(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, count?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number> | number): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string | null | string[]>;\n        rpop(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, count?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number> | number): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string | null | string[]>;\n        llen(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        lrange(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, start: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number> | number, stop: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number> | number): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string[]>;\n        lindex(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, index: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number> | number): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string | null>;\n        lset(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, index: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number> | number, element: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string | number> | string | number): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<\"OK\">;\n        lrem(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, count: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number> | number, element: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string | number> | string | number): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        linsert(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, position: \"BEFORE\" | \"AFTER\", pivot: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string | number> | string | number, element: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string | number> | string | number): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-redis!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n    }"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "redis",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 220
               }
             }
           ],

@@ -32,7 +32,8 @@ export function buildSlackAdminInviteRequests(): SlackMethodsAdminInviteRequests
   return {
     approved: {
       list(params) {
-        if (params != null) return mk("slack/admin_inviteRequests_approved_list", [liftArg(params)]);
+        if (params != null)
+          return mk("slack/admin_inviteRequests_approved_list", [liftArg(params)]);
         return mk("slack/admin_inviteRequests_approved_list", []);
       },
     },

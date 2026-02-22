@@ -83,7 +83,6 @@ export interface ZodStringFormatsNamespace {
   iso: ZodIsoNamespace;
 }
 
-
 /** Create a string builder with a format descriptor in extra. */
 function formatBuilder(
   format: Record<string, unknown>,

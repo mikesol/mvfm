@@ -7,6 +7,10 @@ import type {
 } from "@slack/web-api";
 
 export interface SlackMethodsFunctions {
-  completeError<A>(params: A): CExpr<FunctionsCompleteErrorResponse, "slack/functions_completeError", [A]>;
-  completeSuccess<A>(params: A): CExpr<FunctionsCompleteSuccessResponse, "slack/functions_completeSuccess", [A]>;
+  completeError<A>(
+    params: A,
+  ): CExpr<FunctionsCompleteErrorResponse, "slack/functions_completeError", [A]>;
+  completeSuccess<A>(
+    params: A,
+  ): CExpr<FunctionsCompleteSuccessResponse, "slack/functions_completeSuccess", [A]>;
 }

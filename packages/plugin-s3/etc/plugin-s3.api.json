@@ -454,7 +454,7 @@
             },
             {
               "kind": "Content",
-              "text": "{\n    name: \"s3\";\n    ctors: {\n        s3: {\n            putObject(input: "
+              "text": "{\n    name: \"s3\";\n    ctors: {\n        s3: {\n            putObject<A>(input: A): "
             },
             {
               "kind": "Reference",
@@ -467,21 +467,12 @@
             },
             {
               "kind": "Reference",
-              "text": "PutObjectInput",
-              "canonicalReference": "@mvfm/plugin-s3!~PutObjectInput:type"
+              "text": "PutObjectCommandOutput",
+              "canonicalReference": "@aws-sdk/client-s3!PutObjectCommandOutput:interface"
             },
             {
               "kind": "Content",
-              "text": "> | "
-            },
-            {
-              "kind": "Reference",
-              "text": "PutObjectInput",
-              "canonicalReference": "@mvfm/plugin-s3!~PutObjectInput:type"
-            },
-            {
-              "kind": "Content",
-              "text": "): "
+              "text": ", \"s3/put_object\", [A]>;\n            getObject<A>(input: A): "
             },
             {
               "kind": "Reference",
@@ -494,12 +485,12 @@
             },
             {
               "kind": "Reference",
-              "text": "PutObjectResult",
-              "canonicalReference": "@mvfm/plugin-s3!~PutObjectResult:type"
+              "text": "GetObjectCommandOutput",
+              "canonicalReference": "@aws-sdk/client-s3!GetObjectCommandOutput:interface"
             },
             {
               "kind": "Content",
-              "text": ">;\n            getObject(input: "
+              "text": ", \"s3/get_object\", [A]>;\n            deleteObject<A>(input: A): "
             },
             {
               "kind": "Reference",
@@ -512,21 +503,12 @@
             },
             {
               "kind": "Reference",
-              "text": "GetObjectInput",
-              "canonicalReference": "@mvfm/plugin-s3!~GetObjectInput:type"
+              "text": "DeleteObjectCommandOutput",
+              "canonicalReference": "@aws-sdk/client-s3!DeleteObjectCommandOutput:interface"
             },
             {
               "kind": "Content",
-              "text": "> | "
-            },
-            {
-              "kind": "Reference",
-              "text": "GetObjectInput",
-              "canonicalReference": "@mvfm/plugin-s3!~GetObjectInput:type"
-            },
-            {
-              "kind": "Content",
-              "text": "): "
+              "text": ", \"s3/delete_object\", [A]>;\n            headObject<A>(input: A): "
             },
             {
               "kind": "Reference",
@@ -539,12 +521,12 @@
             },
             {
               "kind": "Reference",
-              "text": "GetObjectResult",
-              "canonicalReference": "@mvfm/plugin-s3!~GetObjectResult:type"
+              "text": "HeadObjectCommandOutput",
+              "canonicalReference": "@aws-sdk/client-s3!HeadObjectCommandOutput:interface"
             },
             {
               "kind": "Content",
-              "text": ">;\n            deleteObject(input: "
+              "text": ", \"s3/head_object\", [A]>;\n            listObjectsV2<A>(input: A): "
             },
             {
               "kind": "Reference",
@@ -557,138 +539,12 @@
             },
             {
               "kind": "Reference",
-              "text": "DeleteObjectInput",
-              "canonicalReference": "@mvfm/plugin-s3!~DeleteObjectInput:type"
+              "text": "ListObjectsV2CommandOutput",
+              "canonicalReference": "@aws-sdk/client-s3!ListObjectsV2CommandOutput:interface"
             },
             {
               "kind": "Content",
-              "text": "> | "
-            },
-            {
-              "kind": "Reference",
-              "text": "DeleteObjectInput",
-              "canonicalReference": "@mvfm/plugin-s3!~DeleteObjectInput:type"
-            },
-            {
-              "kind": "Content",
-              "text": "): "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-s3!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "DeleteObjectResult",
-              "canonicalReference": "@mvfm/plugin-s3!~DeleteObjectResult:type"
-            },
-            {
-              "kind": "Content",
-              "text": ">;\n            headObject(input: "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-s3!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "HeadObjectInput",
-              "canonicalReference": "@mvfm/plugin-s3!~HeadObjectInput:type"
-            },
-            {
-              "kind": "Content",
-              "text": "> | "
-            },
-            {
-              "kind": "Reference",
-              "text": "HeadObjectInput",
-              "canonicalReference": "@mvfm/plugin-s3!~HeadObjectInput:type"
-            },
-            {
-              "kind": "Content",
-              "text": "): "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-s3!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "HeadObjectResult",
-              "canonicalReference": "@mvfm/plugin-s3!~HeadObjectResult:type"
-            },
-            {
-              "kind": "Content",
-              "text": ">;\n            listObjectsV2(input: "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-s3!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "ListObjectsV2Input",
-              "canonicalReference": "@mvfm/plugin-s3!~ListObjectsV2Input:type"
-            },
-            {
-              "kind": "Content",
-              "text": "> | "
-            },
-            {
-              "kind": "Reference",
-              "text": "ListObjectsV2Input",
-              "canonicalReference": "@mvfm/plugin-s3!~ListObjectsV2Input:type"
-            },
-            {
-              "kind": "Content",
-              "text": "): "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-s3!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "ListObjectsV2Result",
-              "canonicalReference": "@mvfm/plugin-s3!~ListObjectsV2Result:type"
-            },
-            {
-              "kind": "Content",
-              "text": ">;\n        };\n    };\n    kinds: "
-            },
-            {
-              "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string, "
+              "text": ", \"s3/list_objects_v2\", [A]>;\n        };\n    };\n    kinds: {\n        \"s3/put_object\": "
             },
             {
               "kind": "Reference",
@@ -697,7 +553,70 @@
             },
             {
               "kind": "Content",
-              "text": "<any, any>>;\n    traits: {};\n    lifts: {};\n}"
+              "text": "<[unknown], unknown>;\n        \"s3/get_object\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-s3!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"s3/delete_object\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-s3!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"s3/head_object\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-s3!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"s3/list_objects_v2\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-s3!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"s3/record\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-s3!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], "
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, unknown>>;\n        \"s3/array\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-s3!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown[]>;\n    };\n    traits: {};\n    lifts: {};\n}"
             },
             {
               "kind": "Content",
@@ -707,7 +626,7 @@
           "fileUrlPath": "dist/3.989.0/index.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 3,
-            "endIndex": 58
+            "endIndex": 40
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
@@ -933,276 +852,6 @@
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
-              }
-            }
-          ],
-          "extendsTokenRanges": []
-        },
-        {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/plugin-s3!S3Methods:interface",
-          "docComment": "/**\n * S3 operations added to the DSL context by the s3 plugin.\n *\n * Mirrors the high-level `S3` aggregated client from `@aws-sdk/client-s3` v3.989.0: putObject, getObject, deleteObject, headObject, listObjectsV2.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export interface S3Methods "
-            }
-          ],
-          "fileUrlPath": "dist/3.989.0/index.d.ts",
-          "releaseTag": "Public",
-          "name": "S3Methods",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-s3!S3Methods#s3:member",
-              "docComment": "/**\n * S3 operations, namespaced under `$.s3`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "s3: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "{\n        putObject(input: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-s3!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "PutObjectInput",
-                  "canonicalReference": "@mvfm/plugin-s3!~PutObjectInput:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "PutObjectInput",
-                  "canonicalReference": "@mvfm/plugin-s3!~PutObjectInput:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-s3!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "PutObjectResult",
-                  "canonicalReference": "@mvfm/plugin-s3!~PutObjectResult:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n        getObject(input: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-s3!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "GetObjectInput",
-                  "canonicalReference": "@mvfm/plugin-s3!~GetObjectInput:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "GetObjectInput",
-                  "canonicalReference": "@mvfm/plugin-s3!~GetObjectInput:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-s3!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "GetObjectResult",
-                  "canonicalReference": "@mvfm/plugin-s3!~GetObjectResult:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n        deleteObject(input: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-s3!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "DeleteObjectInput",
-                  "canonicalReference": "@mvfm/plugin-s3!~DeleteObjectInput:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "DeleteObjectInput",
-                  "canonicalReference": "@mvfm/plugin-s3!~DeleteObjectInput:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-s3!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "DeleteObjectResult",
-                  "canonicalReference": "@mvfm/plugin-s3!~DeleteObjectResult:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n        headObject(input: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-s3!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "HeadObjectInput",
-                  "canonicalReference": "@mvfm/plugin-s3!~HeadObjectInput:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "HeadObjectInput",
-                  "canonicalReference": "@mvfm/plugin-s3!~HeadObjectInput:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-s3!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "HeadObjectResult",
-                  "canonicalReference": "@mvfm/plugin-s3!~HeadObjectResult:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n        listObjectsV2(input: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-s3!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ListObjectsV2Input",
-                  "canonicalReference": "@mvfm/plugin-s3!~ListObjectsV2Input:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ListObjectsV2Input",
-                  "canonicalReference": "@mvfm/plugin-s3!~ListObjectsV2Input:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-s3!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ListObjectsV2Result",
-                  "canonicalReference": "@mvfm/plugin-s3!~ListObjectsV2Result:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n    }"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "s3",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 52
               }
             }
           ],

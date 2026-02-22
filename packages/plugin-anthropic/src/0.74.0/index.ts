@@ -17,10 +17,7 @@ import type {
   MessageBatch,
   MessageBatchesPage,
 } from "@anthropic-ai/sdk/resources/messages/batches";
-import type {
-  Message,
-  MessageTokensCount,
-} from "@anthropic-ai/sdk/resources/messages/messages";
+import type { Message, MessageTokensCount } from "@anthropic-ai/sdk/resources/messages/messages";
 import type { ModelInfo, ModelInfosPage } from "@anthropic-ai/sdk/resources/models";
 import type { CExpr, Interpreter, KindSpec, Plugin } from "@mvfm/core";
 import { isCExpr, makeCExpr } from "@mvfm/core";
@@ -109,7 +106,10 @@ function buildAnthropicApi() {
         list<A extends readonly unknown[]>(
           ...params: A
         ): CExpr<MessageBatchesPage, "anthropic/list_message_batches", A> {
-          return mk("anthropic/list_message_batches", params.map((p) => liftArg(p)));
+          return mk(
+            "anthropic/list_message_batches",
+            params.map((p) => liftArg(p)),
+          );
         },
         /** Delete a message batch by ID. */
         delete<A>(id: A): CExpr<DeletedMessageBatch, "anthropic/delete_message_batch", [A]> {
@@ -130,7 +130,10 @@ function buildAnthropicApi() {
       list<A extends readonly unknown[]>(
         ...params: A
       ): CExpr<ModelInfosPage, "anthropic/list_models", A> {
-        return mk("anthropic/list_models", params.map((p) => liftArg(p)));
+        return mk(
+          "anthropic/list_models",
+          params.map((p) => liftArg(p)),
+        );
       },
     },
   };

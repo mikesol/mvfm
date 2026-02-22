@@ -550,16 +550,7 @@
             },
             {
               "kind": "Content",
-              "text": "{\n    name: \"postgres\";\n    ctors: {\n        sql: "
-            },
-            {
-              "kind": "Reference",
-              "text": "PostgresSql",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresSql:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ";\n    };\n    kinds: "
+              "text": "{\n    name: \"postgres\";\n    ctors: {\n        sql: (<T = "
             },
             {
               "kind": "Reference",
@@ -568,7 +559,34 @@
             },
             {
               "kind": "Content",
-              "text": "<string, "
+              "text": "<string, unknown>>(strings: "
+            },
+            {
+              "kind": "Reference",
+              "text": "TemplateStringsArray",
+              "canonicalReference": "!TemplateStringsArray:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", ...values: unknown[]) => import(\"@mvfm/core\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-postgres!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<T[], \"postgres/query\", unknown[]>) & "
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, unknown>;\n    };\n    kinds: {\n        \"postgres/query\": "
             },
             {
               "kind": "Reference",
@@ -577,7 +595,97 @@
             },
             {
               "kind": "Content",
-              "text": "<any, any>>;\n    traits: {};\n    lifts: {};\n}"
+              "text": "<[number, ...unknown[]], unknown[]>;\n        \"postgres/identifier\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-postgres!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"postgres/insert_helper\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-postgres!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown, string], unknown>;\n        \"postgres/set_helper\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-postgres!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown, string], unknown>;\n        \"postgres/begin\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-postgres!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, ...unknown[]], unknown>;\n        \"postgres/savepoint\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-postgres!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, ...unknown[]], unknown>;\n        \"postgres/cursor\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-postgres!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown, unknown, unknown], void>;\n        \"postgres/cursor_batch\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-postgres!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], unknown[]>;\n        \"postgres/record\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-postgres!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], "
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, unknown>>;\n        \"postgres/array\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-postgres!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown[]>;\n    };\n    traits: {};\n    lifts: {};\n}"
             },
             {
               "kind": "Content",
@@ -587,7 +695,7 @@
           "fileUrlPath": "dist/3.4.8/index.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 4,
-            "endIndex": 11
+            "endIndex": 35
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
@@ -1218,52 +1326,6 @@
           "extendsTokenRanges": []
         },
         {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/plugin-postgres!PostgresMethods:interface",
-          "docComment": "/**\n * Database operations added to the DSL context by the postgres plugin.\n *\n * Mirrors the postgres.js (porsager/postgres) v3.4.x API as closely as possible: tagged template queries, dynamic identifiers, insert/set helpers, transactions, savepoints, and cursors.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export interface PostgresMethods "
-            }
-          ],
-          "fileUrlPath": "dist/3.4.8/index.d.ts",
-          "releaseTag": "Public",
-          "name": "PostgresMethods",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresMethods#sql:member",
-              "docComment": "/**\n * Tagged template query and helper methods.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "sql: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "PostgresSql",
-                  "canonicalReference": "@mvfm/plugin-postgres!PostgresSql:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "sql",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            }
-          ],
-          "extendsTokenRanges": []
-        },
-        {
           "kind": "Variable",
           "canonicalReference": "@mvfm/plugin-postgres!postgresPlugin:var",
           "docComment": "/**\n * Alias for {@link postgres}, kept for readability at call sites.\n */\n",
@@ -1290,976 +1352,6 @@
             "startIndex": 1,
             "endIndex": 3
           }
-        },
-        {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/plugin-postgres!PostgresSql:interface",
-          "docComment": "/**\n * Tagged template + helpers for the postgres plugin.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export interface PostgresSql "
-            }
-          ],
-          "fileUrlPath": "dist/3.4.8/index.d.ts",
-          "releaseTag": "Public",
-          "name": "PostgresSql",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "CallSignature",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresSql:call(1)",
-              "docComment": "/**\n * Tagged template query.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "<T = "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">(strings: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "TemplateStringsArray",
-                  "canonicalReference": "!TemplateStringsArray:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", ...values: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "unknown[]"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-postgres!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<T[]>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "returnTypeTokenRange": {
-                "startIndex": 8,
-                "endIndex": 10
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "strings",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 4,
-                    "endIndex": 5
-                  },
-                  "isOptional": false
-                },
-                {
-                  "parameterName": "values",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 6,
-                    "endIndex": 7
-                  },
-                  "isOptional": false
-                }
-              ],
-              "typeParameters": [
-                {
-                  "typeParameterName": "T",
-                  "constraintTokenRange": {
-                    "startIndex": 0,
-                    "endIndex": 0
-                  },
-                  "defaultTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 3
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresSql#begin:member(1)",
-              "docComment": "/**\n * Transaction block.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "begin<T>(fn: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(sql: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "PostgresTxSql",
-                  "canonicalReference": "@mvfm/plugin-postgres!PostgresTxSql:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => unknown"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-postgres!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<T>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 5,
-                "endIndex": 7
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "fn",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 4
-                  },
-                  "isOptional": false
-                }
-              ],
-              "typeParameters": [
-                {
-                  "typeParameterName": "T",
-                  "constraintTokenRange": {
-                    "startIndex": 0,
-                    "endIndex": 0
-                  },
-                  "defaultTypeTokenRange": {
-                    "startIndex": 0,
-                    "endIndex": 0
-                  }
-                }
-              ],
-              "name": "begin"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresSql#cursor:member(1)",
-              "docComment": "/**\n * Cursor iteration.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "cursor<T = "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">(query: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-postgres!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<T[]>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", batchSize: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "unknown"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", fn: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(batch: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-postgres!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<T[]>) => unknown"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-postgres!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 13,
-                "endIndex": 15
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "query",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 4,
-                    "endIndex": 6
-                  },
-                  "isOptional": false
-                },
-                {
-                  "parameterName": "batchSize",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 7,
-                    "endIndex": 8
-                  },
-                  "isOptional": false
-                },
-                {
-                  "parameterName": "fn",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 9,
-                    "endIndex": 12
-                  },
-                  "isOptional": false
-                }
-              ],
-              "typeParameters": [
-                {
-                  "typeParameterName": "T",
-                  "constraintTokenRange": {
-                    "startIndex": 0,
-                    "endIndex": 0
-                  },
-                  "defaultTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 3
-                  }
-                }
-              ],
-              "name": "cursor"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresSql#id:member(1)",
-              "docComment": "/**\n * Dynamic identifier escaping.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "id(name: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "unknown"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-postgres!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<unknown>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 5
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "name",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  },
-                  "isOptional": false
-                }
-              ],
-              "name": "id"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresSql#insert:member(1)",
-              "docComment": "/**\n * Dynamic INSERT helper.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "insert(data: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "unknown"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", columns?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string[]"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-postgres!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<unknown>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 5,
-                "endIndex": 7
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "data",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  },
-                  "isOptional": false
-                },
-                {
-                  "parameterName": "columns",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 3,
-                    "endIndex": 4
-                  },
-                  "isOptional": true
-                }
-              ],
-              "name": "insert"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresSql#set:member(1)",
-              "docComment": "/**\n * Dynamic SET helper.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "set(data: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "unknown"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", columns?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string[]"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-postgres!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<unknown>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 5,
-                "endIndex": 7
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "data",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  },
-                  "isOptional": false
-                },
-                {
-                  "parameterName": "columns",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 3,
-                    "endIndex": 4
-                  },
-                  "isOptional": true
-                }
-              ],
-              "name": "set"
-            }
-          ],
-          "extendsTokenRanges": []
-        },
-        {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/plugin-postgres!PostgresTxSql:interface",
-          "docComment": "/**\n * Scoped sql inside a transaction (has savepoint, no begin).\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export interface PostgresTxSql "
-            }
-          ],
-          "fileUrlPath": "dist/3.4.8/index.d.ts",
-          "releaseTag": "Public",
-          "name": "PostgresTxSql",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "CallSignature",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresTxSql:call(1)",
-              "docComment": "/**\n * Tagged template query.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "<T = "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">(strings: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "TemplateStringsArray",
-                  "canonicalReference": "!TemplateStringsArray:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", ...values: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "unknown[]"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-postgres!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<T[]>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "returnTypeTokenRange": {
-                "startIndex": 8,
-                "endIndex": 10
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "strings",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 4,
-                    "endIndex": 5
-                  },
-                  "isOptional": false
-                },
-                {
-                  "parameterName": "values",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 6,
-                    "endIndex": 7
-                  },
-                  "isOptional": false
-                }
-              ],
-              "typeParameters": [
-                {
-                  "typeParameterName": "T",
-                  "constraintTokenRange": {
-                    "startIndex": 0,
-                    "endIndex": 0
-                  },
-                  "defaultTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 3
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresTxSql#cursor:member(1)",
-              "docComment": "/**\n * Cursor iteration.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "cursor<T = "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">(query: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-postgres!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<T[]>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", batchSize: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "unknown"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", fn: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(batch: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-postgres!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<T[]>) => unknown"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-postgres!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 13,
-                "endIndex": 15
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "query",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 4,
-                    "endIndex": 6
-                  },
-                  "isOptional": false
-                },
-                {
-                  "parameterName": "batchSize",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 7,
-                    "endIndex": 8
-                  },
-                  "isOptional": false
-                },
-                {
-                  "parameterName": "fn",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 9,
-                    "endIndex": 12
-                  },
-                  "isOptional": false
-                }
-              ],
-              "typeParameters": [
-                {
-                  "typeParameterName": "T",
-                  "constraintTokenRange": {
-                    "startIndex": 0,
-                    "endIndex": 0
-                  },
-                  "defaultTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 3
-                  }
-                }
-              ],
-              "name": "cursor"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresTxSql#id:member(1)",
-              "docComment": "/**\n * Dynamic identifier escaping.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "id(name: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "unknown"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-postgres!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<unknown>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 5
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "name",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  },
-                  "isOptional": false
-                }
-              ],
-              "name": "id"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresTxSql#insert:member(1)",
-              "docComment": "/**\n * Dynamic INSERT helper.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "insert(data: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "unknown"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", columns?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string[]"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-postgres!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<unknown>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 5,
-                "endIndex": 7
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "data",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  },
-                  "isOptional": false
-                },
-                {
-                  "parameterName": "columns",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 3,
-                    "endIndex": 4
-                  },
-                  "isOptional": true
-                }
-              ],
-              "name": "insert"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresTxSql#savepoint:member(1)",
-              "docComment": "/**\n * Savepoint block.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "savepoint<T>(fn: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(sql: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "PostgresTxSql",
-                  "canonicalReference": "@mvfm/plugin-postgres!PostgresTxSql:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ") => unknown"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-postgres!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<T>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 5,
-                "endIndex": 7
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "fn",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 4
-                  },
-                  "isOptional": false
-                }
-              ],
-              "typeParameters": [
-                {
-                  "typeParameterName": "T",
-                  "constraintTokenRange": {
-                    "startIndex": 0,
-                    "endIndex": 0
-                  },
-                  "defaultTypeTokenRange": {
-                    "startIndex": 0,
-                    "endIndex": 0
-                  }
-                }
-              ],
-              "name": "savepoint"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresTxSql#set:member(1)",
-              "docComment": "/**\n * Dynamic SET helper.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "set(data: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "unknown"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", columns?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string[]"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-postgres!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<unknown>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 5,
-                "endIndex": 7
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "data",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  },
-                  "isOptional": false
-                },
-                {
-                  "parameterName": "columns",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 3,
-                    "endIndex": 4
-                  },
-                  "isOptional": true
-                }
-              ],
-              "name": "set"
-            }
-          ],
-          "extendsTokenRanges": []
         },
         {
           "kind": "Function",

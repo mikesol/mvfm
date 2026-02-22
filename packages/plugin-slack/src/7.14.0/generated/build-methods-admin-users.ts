@@ -62,7 +62,8 @@ export function buildSlackAdminUsers(): SlackMethodsAdminUsers {
     },
     unsupportedVersions: {
       export(params) {
-        if (params != null) return mk("slack/admin_users_unsupportedVersions_export", [liftArg(params)]);
+        if (params != null)
+          return mk("slack/admin_users_unsupportedVersions_export", [liftArg(params)]);
         return mk("slack/admin_users_unsupportedVersions_export", []);
       },
     },

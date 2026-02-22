@@ -89,10 +89,7 @@ export function redis(config?: RedisConfig | string) {
       } as KindSpec<[string, number, string], number>,
       // Key commands
       "redis/del": { inputs: [] as string[], output: 0 as number } as KindSpec<string[], number>,
-      "redis/exists": { inputs: [] as string[], output: 0 as number } as KindSpec<
-        string[],
-        number
-      >,
+      "redis/exists": { inputs: [] as string[], output: 0 as number } as KindSpec<string[], number>,
       "redis/expire": { inputs: ["", 0] as [string, number], output: 0 as number } as KindSpec<
         [string, number],
         number
@@ -101,14 +98,8 @@ export function redis(config?: RedisConfig | string) {
         [string, number],
         number
       >,
-      "redis/ttl": { inputs: [""] as [string], output: 0 as number } as KindSpec<
-        [string],
-        number
-      >,
-      "redis/pttl": { inputs: [""] as [string], output: 0 as number } as KindSpec<
-        [string],
-        number
-      >,
+      "redis/ttl": { inputs: [""] as [string], output: 0 as number } as KindSpec<[string], number>,
+      "redis/pttl": { inputs: [""] as [string], output: 0 as number } as KindSpec<[string], number>,
       // Hash commands
       "redis/hget": {
         inputs: ["", ""] as [string, string],
@@ -134,10 +125,7 @@ export function redis(config?: RedisConfig | string) {
         [string, string],
         number
       >,
-      "redis/hlen": { inputs: [""] as [string], output: 0 as number } as KindSpec<
-        [string],
-        number
-      >,
+      "redis/hlen": { inputs: [""] as [string], output: 0 as number } as KindSpec<[string], number>,
       "redis/hkeys": { inputs: [""] as [string], output: [] as string[] } as KindSpec<
         [string],
         string[]
@@ -167,10 +155,7 @@ export function redis(config?: RedisConfig | string) {
         [string],
         string | null
       >,
-      "redis/llen": { inputs: [""] as [string], output: 0 as number } as KindSpec<
-        [string],
-        number
-      >,
+      "redis/llen": { inputs: [""] as [string], output: 0 as number } as KindSpec<[string], number>,
       "redis/lrange": {
         inputs: ["", 0, 0] as [string, number, number],
         output: [] as string[],

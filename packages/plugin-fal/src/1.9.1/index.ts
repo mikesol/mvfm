@@ -195,11 +195,7 @@ export function fal(config: FalConfig) {
           submit<A, B>(
             endpointId: A,
             options: B,
-          ): CExpr<
-            Awaited<ReturnType<FalSdkQueueClient["submit"]>>,
-            "fal/queue_submit",
-            [A, B]
-          > {
+          ): CExpr<Awaited<ReturnType<FalSdkQueueClient["submit"]>>, "fal/queue_submit", [A, B]> {
             return mk("fal/queue_submit", [endpointId, liftArg(options)]);
           },
 
@@ -207,11 +203,7 @@ export function fal(config: FalConfig) {
           status<A, B>(
             endpointId: A,
             options: B,
-          ): CExpr<
-            Awaited<ReturnType<FalSdkQueueClient["status"]>>,
-            "fal/queue_status",
-            [A, B]
-          > {
+          ): CExpr<Awaited<ReturnType<FalSdkQueueClient["status"]>>, "fal/queue_status", [A, B]> {
             return mk("fal/queue_status", [endpointId, liftArg(options)]);
           },
 
@@ -219,19 +211,12 @@ export function fal(config: FalConfig) {
           result<A, B>(
             endpointId: A,
             options: B,
-          ): CExpr<
-            Awaited<ReturnType<FalSdkQueueClient["result"]>>,
-            "fal/queue_result",
-            [A, B]
-          > {
+          ): CExpr<Awaited<ReturnType<FalSdkQueueClient["result"]>>, "fal/queue_result", [A, B]> {
             return mk("fal/queue_result", [endpointId, liftArg(options)]);
           },
 
           /** Cancel a queued request. */
-          cancel<A, B>(
-            endpointId: A,
-            options: B,
-          ): CExpr<void, "fal/queue_cancel", [A, B]> {
+          cancel<A, B>(endpointId: A, options: B): CExpr<void, "fal/queue_cancel", [A, B]> {
             return mk("fal/queue_cancel", [endpointId, liftArg(options)]);
           },
         },

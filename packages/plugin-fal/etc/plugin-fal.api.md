@@ -19,17 +19,26 @@ export function fal(config: FalConfig): {
     name: "fal";
     ctors: {
         fal: {
-            run(endpointId: string | CExpr<string>, options?: FalRunOptions): CExpr<Awaited<ReturnType<FalClient_2["run"]>>>;
-            subscribe(endpointId: string | CExpr<string>, options?: FalSubscribeOptions): CExpr<Awaited<ReturnType<FalClient_2["subscribe"]>>>;
+            run<A, B>(endpointId: A, options?: B): CExpr<Awaited<ReturnType<FalClient_2["run"]>>, "fal/run", [A, ...unknown[]]>;
+            subscribe<A, B>(endpointId: A, options?: B): CExpr<Awaited<ReturnType<FalClient_2["subscribe"]>>, "fal/subscribe", [A, ...unknown[]]>;
             queue: {
-                submit(endpointId: string | CExpr<string>, options: FalSubmitOptions): CExpr<Awaited<ReturnType<QueueClient["submit"]>>>;
-                status(endpointId: string | CExpr<string>, options: FalQueueStatusOptions): CExpr<Awaited<ReturnType<QueueClient["status"]>>>;
-                result(endpointId: string | CExpr<string>, options: FalQueueResultOptions): CExpr<Awaited<ReturnType<QueueClient["result"]>>>;
-                cancel(endpointId: string | CExpr<string>, options: FalQueueCancelOptions): CExpr<void>;
+                submit<A, B>(endpointId: A, options: B): CExpr<Awaited<ReturnType<QueueClient["submit"]>>, "fal/queue_submit", [A, B]>;
+                status<A, B>(endpointId: A, options: B): CExpr<Awaited<ReturnType<QueueClient["status"]>>, "fal/queue_status", [A, B]>;
+                result<A, B>(endpointId: A, options: B): CExpr<Awaited<ReturnType<QueueClient["result"]>>, "fal/queue_result", [A, B]>;
+                cancel<A, B>(endpointId: A, options: B): CExpr<void, "fal/queue_cancel", [A, B]>;
             };
         };
     };
-    kinds: Record<string, KindSpec<any, any>>;
+    kinds: {
+        "fal/run": KindSpec<[unknown], unknown>;
+        "fal/subscribe": KindSpec<[unknown], unknown>;
+        "fal/queue_submit": KindSpec<[unknown, unknown], unknown>;
+        "fal/queue_status": KindSpec<[unknown, unknown], unknown>;
+        "fal/queue_result": KindSpec<[unknown, unknown], unknown>;
+        "fal/queue_cancel": KindSpec<[unknown, unknown], void>;
+        "fal/record": KindSpec<unknown[], Record<string, unknown>>;
+        "fal/array": KindSpec<unknown[], unknown[]>;
+    };
     traits: {};
     lifts: {};
     defaultInterpreter: () => Interpreter;
@@ -52,20 +61,6 @@ export interface FalConfig {
 
 // @public
 export const falInterpreter: Interpreter;
-
-// @public
-export interface FalMethods {
-    fal: {
-        run(endpointId: string | CExpr<string>, options?: FalRunOptions): CExpr<Awaited<ReturnType<FalClient_2["run"]>>>;
-        subscribe(endpointId: string | CExpr<string>, options?: FalSubscribeOptions): CExpr<Awaited<ReturnType<FalClient_2["subscribe"]>>>;
-        queue: {
-            submit(endpointId: string | CExpr<string>, options: FalSubmitOptions): CExpr<Awaited<ReturnType<QueueClient["submit"]>>>;
-            status(endpointId: string | CExpr<string>, options: FalQueueStatusOptions): CExpr<Awaited<ReturnType<QueueClient["status"]>>>;
-            result(endpointId: string | CExpr<string>, options: FalQueueResultOptions): CExpr<Awaited<ReturnType<QueueClient["result"]>>>;
-            cancel(endpointId: string | CExpr<string>, options: FalQueueCancelOptions): CExpr<void>;
-        };
-    };
-}
 
 // @public
 export const falPlugin: typeof fal;
@@ -105,8 +100,8 @@ export function wrapFalSdk(client: FalClient_2): FalClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/1.9.1/index.d.ts:68:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-// dist/1.9.1/index.d.ts:83:5 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/1.9.1/index.d.ts:43:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/1.9.1/index.d.ts:59:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

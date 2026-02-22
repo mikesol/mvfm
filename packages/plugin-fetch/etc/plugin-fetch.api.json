@@ -471,7 +471,7 @@
             },
             {
               "kind": "Content",
-              "text": "{\n    name: \"fetch\";\n    ctors: {\n        fetch: (<A, B>(url: A, init?: B) => "
+              "text": "{\n    name: \"fetch\";\n    ctors: {\n        fetch: {\n            <A, B extends readonly unknown[]>(url: A, ...init: B): "
             },
             {
               "kind": "Reference",
@@ -480,7 +480,7 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown>) & {\n            json<A>(response: A): "
+              "text": "<unknown, \"fetch/request\", [A, ...B]>;\n            json<A>(response: A): "
             },
             {
               "kind": "Reference",
@@ -489,7 +489,7 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown>;\n            text<A>(response: A): "
+              "text": "<unknown, \"fetch/json\", [A]>;\n            text<A>(response: A): "
             },
             {
               "kind": "Reference",
@@ -498,7 +498,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string>;\n            status<A>(response: A): "
+              "text": "<string, \"fetch/text\", [A]>;\n            status<A>(response: A): "
             },
             {
               "kind": "Reference",
@@ -507,7 +507,7 @@
             },
             {
               "kind": "Content",
-              "text": "<number>;\n            headers<A>(response: A): "
+              "text": "<number, \"fetch/status\", [A]>;\n            headers<A>(response: A): "
             },
             {
               "kind": "Reference",
@@ -525,16 +525,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string, string>>;\n        };\n    };\n    kinds: "
-            },
-            {
-              "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string, "
+              "text": "<string, string>, \"fetch/headers\", [A]>;\n        };\n    };\n    kinds: {\n        \"fetch/request\": "
             },
             {
               "kind": "Reference",
@@ -543,7 +534,79 @@
             },
             {
               "kind": "Content",
-              "text": "<any, any>>;\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
+              "text": "<[string, ...unknown[]], unknown>;\n        \"fetch/json\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-fetch!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"fetch/text\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-fetch!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], string>;\n        \"fetch/status\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-fetch!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], number>;\n        \"fetch/headers\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-fetch!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], "
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, string>>;\n        \"fetch/record\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-fetch!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], "
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, unknown>>;\n        \"fetch/array\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-fetch!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown[]>;\n    };\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
             },
             {
               "kind": "Reference",
@@ -562,7 +625,7 @@
           "fileUrlPath": "dist/whatwg/index.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 3,
-            "endIndex": 22
+            "endIndex": 36
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
@@ -772,105 +835,6 @@
             "startIndex": 1,
             "endIndex": 2
           }
-        },
-        {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/plugin-fetch!FetchMethods:interface",
-          "docComment": "/**\n * Fetch operations added to the DSL context by the fetch plugin.\n *\n * `$.fetch(url, init?)` makes an HTTP request (mirrors `globalThis.fetch`). `$.fetch.json(response)`, `$.fetch.text(response)`, etc. read the response.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export interface FetchMethods "
-            }
-          ],
-          "fileUrlPath": "dist/whatwg/index.d.ts",
-          "releaseTag": "Public",
-          "name": "FetchMethods",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-fetch!FetchMethods#fetch:member",
-              "docComment": "/**\n * Callable: `$.fetch(url, init?)` makes an HTTP request. Also has properties for response reading: `.json()`, `.text()`, `.status()`, `.headers()`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "fetch: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "(<A, B>(url: A, init?: B) => "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-fetch!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<unknown>) & {\n        json<A>(response: A): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-fetch!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<unknown>;\n        text<A>(response: A): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-fetch!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string>;\n        status<A>(response: A): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-fetch!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<number>;\n        headers<A>(response: A): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-fetch!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, string>>;\n    }"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "fetch",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 14
-              }
-            }
-          ],
-          "extendsTokenRanges": []
         },
         {
           "kind": "Interface",

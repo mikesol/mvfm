@@ -14,28 +14,34 @@ export function twilio(config: TwilioConfig): {
     name: "twilio";
     ctors: {
         twilio: {
-            messages: TwilioMessagesResource;
-            calls: TwilioCallsResource;
+            messages: (<A>(sid: A) => {
+                fetch(): CExpr<Record<string, unknown>, "twilio/fetch_message", [A]>;
+            }) & {
+                create<A>(params: A): CExpr<Record<string, unknown>, "twilio/create_message", [A]>;
+                list<A>(params?: A): CExpr<Record<string, unknown>, "twilio/list_messages", [A]>;
+            };
+            calls: (<A>(sid: A) => {
+                fetch(): CExpr<Record<string, unknown>, "twilio/fetch_call", [A]>;
+            }) & {
+                create<A>(params: A): CExpr<Record<string, unknown>, "twilio/create_call", [A]>;
+                list<A>(params?: A): CExpr<Record<string, unknown>, "twilio/list_calls", [A]>;
+            };
         };
     };
-    kinds: Record<string, KindSpec<any, any>>;
+    kinds: {
+        "twilio/create_message": KindSpec<[unknown], unknown>;
+        "twilio/fetch_message": KindSpec<[unknown], unknown>;
+        "twilio/list_messages": KindSpec<unknown[], unknown>;
+        "twilio/create_call": KindSpec<[unknown], unknown>;
+        "twilio/fetch_call": KindSpec<[unknown], unknown>;
+        "twilio/list_calls": KindSpec<unknown[], unknown>;
+        "twilio/record": KindSpec<unknown[], Record<string, unknown>>;
+        "twilio/array": KindSpec<unknown[], unknown[]>;
+    };
     traits: {};
     lifts: {};
     defaultInterpreter: () => Interpreter;
 };
-
-// @public
-export interface TwilioCallContext {
-    // Warning: (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-    fetch(): CExpr<Record<string, unknown>>;
-}
-
-// @public
-export interface TwilioCallsResource {
-    (sid: string | CExpr<string>): TwilioCallContext;
-    create(params: Record<string, unknown> | CExpr<Record<string, unknown>>): CExpr<Record<string, unknown>>;
-    list(params?: Record<string, unknown> | CExpr<Record<string, unknown>>): CExpr<Record<string, unknown>>;
-}
 
 // @public
 export interface TwilioClient {
@@ -52,26 +58,6 @@ export interface TwilioConfig {
 export const twilioInterpreter: Interpreter;
 
 // @public
-export interface TwilioMessageContext {
-    fetch(): CExpr<Record<string, unknown>>;
-}
-
-// @public
-export interface TwilioMessagesResource {
-    (sid: string | CExpr<string>): TwilioMessageContext;
-    create(params: Record<string, unknown> | CExpr<Record<string, unknown>>): CExpr<Record<string, unknown>>;
-    list(params?: Record<string, unknown> | CExpr<Record<string, unknown>>): CExpr<Record<string, unknown>>;
-}
-
-// @public
-export interface TwilioMethods {
-    twilio: {
-        messages: TwilioMessagesResource;
-        calls: TwilioCallsResource;
-    };
-}
-
-// @public
 export const twilioPlugin: typeof twilio;
 
 // Warning: (ae-forgotten-export) The symbol "TwilioSdkClient" needs to be exported by the entry point index.d.ts
@@ -81,7 +67,8 @@ export function wrapTwilioSdk(client: TwilioSdkClient): TwilioClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/5.5.1/index.d.ts:80:5 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/5.5.1/index.d.ts:26:17 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/5.5.1/index.d.ts:45:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

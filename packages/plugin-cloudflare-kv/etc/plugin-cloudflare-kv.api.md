@@ -22,13 +22,21 @@ export function cloudflareKv(_config: CloudflareKvConfig): {
     name: "cloudflare-kv";
     ctors: {
         kv: {
-            get: KvGet;
-            put(key: CExpr<string> | string, value: CExpr<string> | string, options?: CExpr<KvPutOptions> | KvPutOptions): CExpr<void>;
-            delete(key: CExpr<string> | string): CExpr<void>;
-            list(options?: CExpr<KvListOptions> | KvListOptions): CExpr<KvListResult>;
+            get: typeof kvGet;
+            put<A, B, C extends readonly unknown[]>(key: A, value: B, ...args: C): CExpr<void, "cloudflare-kv/put", [A, B, ...C]>;
+            delete<A>(key: A): CExpr<void, "cloudflare-kv/delete", [A]>;
+            list<A extends readonly unknown[]>(...args: A): CExpr<KvListResult, "cloudflare-kv/list", A>;
         };
     };
-    kinds: Record<string, KindSpec<any, any>>;
+    kinds: {
+        "cloudflare-kv/get": KindSpec<[string], string | null>;
+        "cloudflare-kv/get_json": KindSpec<[string], unknown>;
+        "cloudflare-kv/put": KindSpec<[string, string], void>;
+        "cloudflare-kv/delete": KindSpec<[string], void>;
+        "cloudflare-kv/list": KindSpec<[unknown], unknown>;
+        "cloudflare-kv/record": KindSpec<unknown[], Record<string, unknown>>;
+        "cloudflare-kv/array": KindSpec<unknown[], unknown[]>;
+    };
     traits: {};
     lifts: {};
 };
@@ -63,27 +71,10 @@ export interface CloudflareKvConfig {
 }
 
 // @public
-export interface CloudflareKvMethods {
-    kv: {
-        get: KvGet;
-        put(key: CExpr<string> | string, value: CExpr<string> | string, options?: CExpr<KvPutOptions> | KvPutOptions): CExpr<void>;
-        delete(key: CExpr<string> | string): CExpr<void>;
-        list(options?: CExpr<KvListOptions> | KvListOptions): CExpr<KvListResult>;
-    };
-}
-
-// @public
 export const cloudflareKvPlugin: typeof cloudflareKv;
 
 // @public
 export function createCloudflareKvInterpreter(client: CloudflareKvClient): Interpreter;
-
-// @public
-export interface KvGet {
-    (key: CExpr<string> | string): CExpr<string | null>;
-    (key: CExpr<string> | string, type: "text"): CExpr<string | null>;
-    <T = unknown>(key: CExpr<string> | string, type: "json"): CExpr<T | null>;
-}
 
 // @public
 export interface KvListOptions {
@@ -151,8 +142,9 @@ export function wrapKVNamespace(kv: KVNamespaceLike): CloudflareKvClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/4.20260213.0/index.d.ts:98:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-// dist/4.20260213.0/index.d.ts:105:5 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/4.20260213.0/index.d.ts:74:13 - (ae-forgotten-export) The symbol "kvGet" needs to be exported by the entry point index.d.ts
+// dist/4.20260213.0/index.d.ts:76:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/4.20260213.0/index.d.ts:84:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

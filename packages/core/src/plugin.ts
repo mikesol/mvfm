@@ -66,9 +66,11 @@ export type ExtractKinds<T> =
 type NonCoreKinds<K> = K extends `core/${string}` ? never : K;
 
 /** Validates that all non-core kinds produced by Ctors are declared in Kinds. */
-type ValidateCtors<Ctors, Kinds> =
-  0 extends (1 & Ctors) ? Ctors
-  : [NonCoreKinds<ExtractKinds<Ctors>>] extends [keyof Kinds] ? Ctors : never;
+export type ValidateCtors<Ctors, Kinds> = 0 extends 1 & Ctors
+  ? Ctors
+  : [NonCoreKinds<ExtractKinds<Ctors>>] extends [keyof Kinds]
+    ? Ctors
+    : never;
 
 // ─── Plugin: unified type info + runtime ───────────────────────────
 

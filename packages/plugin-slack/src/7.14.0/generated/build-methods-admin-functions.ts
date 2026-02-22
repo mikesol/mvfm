@@ -32,7 +32,8 @@ export function buildSlackAdminFunctions(): SlackMethodsAdminFunctions {
   return {
     permissions: {
       lookup(params) {
-        if (params != null) return mk("slack/admin_functions_permissions_lookup", [liftArg(params)]);
+        if (params != null)
+          return mk("slack/admin_functions_permissions_lookup", [liftArg(params)]);
         return mk("slack/admin_functions_permissions_lookup", []);
       },
       set(params) {

@@ -458,6 +458,11 @@ export interface ExprBase<T> {
 export function extractChildIds(children: unknown): string[];
 
 // @public
+export type ExtractKinds<T> = T extends CExpr<any, infer K extends string, any> ? K : T extends (...args: any[]) => infer R ? ExtractKinds<R> : T extends Record<string, unknown> ? {
+    [P in keyof T]: ExtractKinds<T[P]>;
+}[keyof T] : never;
+
+// @public
 export const fiber: {
     name: string;
     ctors: {
@@ -968,9 +973,9 @@ export function pipe<A extends NExpr<any, any, any, any>, B, C, D>(expr: A, f1: 
 export function pipe<A extends NExpr<any, any, any, any>, B, C, D, E>(expr: A, f1: (a: A) => B, f2: (b: B) => C, f3: (c: C) => D, f4: (d: D) => E): E;
 
 // @public
-interface Plugin_2<Name extends string = string, Ctors extends Record<string, (...args: any[]) => any> = any, Kinds extends Record<string, KindSpec<any, any>> = any, Traits extends Record<string, TraitDef<any, any>> = any, Lifts extends Record<string, string> = any> {
+interface Plugin_2<Name extends string = string, Ctors = any, Kinds extends Record<string, KindSpec<any, any>> = any, Traits extends Record<string, TraitDef<any, any>> = any, Lifts extends Record<string, string> = any> {
     // (undocumented)
-    readonly ctors: Ctors;
+    readonly ctors: ValidateCtors<Ctors, Kinds>;
     // (undocumented)
     readonly defaultInterpreter?: () => Interpreter;
     // (undocumented)
@@ -1782,6 +1787,11 @@ export type UnionToTuple<U, Last = _LastOf<U>> = [U] extends [never] ? [] : [...
 
 // @public
 export function upper<A>(a: A): CExpr<string, "str/upper", [A]>;
+
+// Warning: (ae-forgotten-export) The symbol "NonCoreKinds" needs to be exported by the entry point index.d.ts
+//
+// @public
+export type ValidateCtors<Ctors, Kinds> = 0 extends 1 & Ctors ? Ctors : [NonCoreKinds<ExtractKinds<Ctors>>] extends [keyof Kinds] ? Ctors : never;
 
 // @public
 export const VOLATILE_KINDS: Set<string>;

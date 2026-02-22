@@ -48,15 +48,18 @@ export function buildSlackAdminTeams(): SlackMethodsAdminTeams {
         return mk("slack/admin_teams_settings_info", []);
       },
       setDefaultChannels(params) {
-        if (params != null) return mk("slack/admin_teams_settings_setDefaultChannels", [liftArg(params)]);
+        if (params != null)
+          return mk("slack/admin_teams_settings_setDefaultChannels", [liftArg(params)]);
         return mk("slack/admin_teams_settings_setDefaultChannels", []);
       },
       setDescription(params) {
-        if (params != null) return mk("slack/admin_teams_settings_setDescription", [liftArg(params)]);
+        if (params != null)
+          return mk("slack/admin_teams_settings_setDescription", [liftArg(params)]);
         return mk("slack/admin_teams_settings_setDescription", []);
       },
       setDiscoverability(params) {
-        if (params != null) return mk("slack/admin_teams_settings_setDiscoverability", [liftArg(params)]);
+        if (params != null)
+          return mk("slack/admin_teams_settings_setDiscoverability", [liftArg(params)]);
         return mk("slack/admin_teams_settings_setDiscoverability", []);
       },
       setIcon(params) {

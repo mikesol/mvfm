@@ -18,20 +18,32 @@ import type {
 
 export interface SlackMethodsSlackLists {
   access: {
-    delete<A>(params: A): CExpr<SlackListsAccessDeleteResponse, "slack/slackLists_access_delete", [A]>;
+    delete<A>(
+      params: A,
+    ): CExpr<SlackListsAccessDeleteResponse, "slack/slackLists_access_delete", [A]>;
     set<A>(params: A): CExpr<SlackListsAccessSetResponse, "slack/slackLists_access_set", [A]>;
   };
   download: {
     get<A>(params: A): CExpr<SlackListsDownloadGetResponse, "slack/slackLists_download_get", [A]>;
-    start<A>(params: A): CExpr<SlackListsDownloadStartResponse, "slack/slackLists_download_start", [A]>;
+    start<A>(
+      params: A,
+    ): CExpr<SlackListsDownloadStartResponse, "slack/slackLists_download_start", [A]>;
   };
   items: {
-    create<A>(params: A): CExpr<SlackListsItemsCreateResponse, "slack/slackLists_items_create", [A]>;
-    delete<A>(params: A): CExpr<SlackListsItemsDeleteResponse, "slack/slackLists_items_delete", [A]>;
-    deleteMultiple<A>(params: A): CExpr<SlackListsItemsDeleteMultipleResponse, "slack/slackLists_items_deleteMultiple", [A]>;
+    create<A>(
+      params: A,
+    ): CExpr<SlackListsItemsCreateResponse, "slack/slackLists_items_create", [A]>;
+    delete<A>(
+      params: A,
+    ): CExpr<SlackListsItemsDeleteResponse, "slack/slackLists_items_delete", [A]>;
+    deleteMultiple<A>(
+      params: A,
+    ): CExpr<SlackListsItemsDeleteMultipleResponse, "slack/slackLists_items_deleteMultiple", [A]>;
     info<A>(params: A): CExpr<SlackListsItemsInfoResponse, "slack/slackLists_items_info", [A]>;
     list<A>(params: A): CExpr<SlackListsItemsListResponse, "slack/slackLists_items_list", [A]>;
-    update<A>(params: A): CExpr<SlackListsItemsUpdateResponse, "slack/slackLists_items_update", [A]>;
+    update<A>(
+      params: A,
+    ): CExpr<SlackListsItemsUpdateResponse, "slack/slackLists_items_update", [A]>;
   };
   create<A>(params: A): CExpr<SlackListsCreateResponse, "slack/slackLists_create", [A]>;
   update<A>(params: A): CExpr<SlackListsUpdateResponse, "slack/slackLists_update", [A]>;

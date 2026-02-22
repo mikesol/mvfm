@@ -5,16 +5,10 @@
 ```ts
 
 import type { ChatCompletion } from 'openai/resources/chat/completions/completions';
-import type { ChatCompletionCreateParamsNonStreaming } from 'openai/resources/chat/completions/completions';
 import type { ChatCompletionDeleted } from 'openai/resources/chat/completions/completions';
-import type { ChatCompletionListParams } from 'openai/resources/chat/completions/completions';
 import type { ChatCompletionsPage } from 'openai/resources/chat/completions/completions';
-import type { ChatCompletionUpdateParams } from 'openai/resources/chat/completions/completions';
 import type { Completion } from 'openai/resources/completions';
-import type { CompletionCreateParamsNonStreaming } from 'openai/resources/completions';
 import type { CreateEmbeddingResponse } from 'openai/resources/embeddings';
-import type { EmbeddingCreateParams } from 'openai/resources/embeddings';
-import type { ModerationCreateParams } from 'openai/resources/moderations';
 import type { ModerationCreateResponse } from 'openai/resources/moderations';
 import type OpenAI from 'openai';
 
@@ -30,25 +24,36 @@ export function openai(config: OpenAIConfig): {
         openai: {
             chat: {
                 completions: {
-                    create(params: ChatCompletionCreateParamsNonStreaming | CExpr<ChatCompletionCreateParamsNonStreaming>): CExpr<ChatCompletion>;
-                    retrieve(id: string | CExpr<string>): CExpr<ChatCompletion>;
-                    list(params?: ChatCompletionListParams | CExpr<ChatCompletionListParams>): CExpr<ChatCompletionsPage>;
-                    update(id: string | CExpr<string>, params: ChatCompletionUpdateParams | CExpr<ChatCompletionUpdateParams>): CExpr<ChatCompletion>;
-                    delete(id: string | CExpr<string>): CExpr<ChatCompletionDeleted>;
+                    create<A>(params: A): CExpr<ChatCompletion, "openai/create_chat_completion", [A]>;
+                    retrieve<A>(id: A): CExpr<ChatCompletion, "openai/retrieve_chat_completion", [A]>;
+                    list<A extends readonly unknown[]>(...params: A): CExpr<ChatCompletionsPage, "openai/list_chat_completions", A>;
+                    update<A, B>(id: A, params: B): CExpr<ChatCompletion, "openai/update_chat_completion", [A, B]>;
+                    delete<A>(id: A): CExpr<ChatCompletionDeleted, "openai/delete_chat_completion", [A]>;
                 };
             };
             embeddings: {
-                create(params: EmbeddingCreateParams | CExpr<EmbeddingCreateParams>): CExpr<CreateEmbeddingResponse>;
+                create<A>(params: A): CExpr<CreateEmbeddingResponse, "openai/create_embedding", [A]>;
             };
             moderations: {
-                create(params: ModerationCreateParams | CExpr<ModerationCreateParams>): CExpr<ModerationCreateResponse>;
+                create<A>(params: A): CExpr<ModerationCreateResponse, "openai/create_moderation", [A]>;
             };
             completions: {
-                create(params: CompletionCreateParamsNonStreaming | CExpr<CompletionCreateParamsNonStreaming>): CExpr<Completion>;
+                create<A>(params: A): CExpr<Completion, "openai/create_completion", [A]>;
             };
         };
     };
-    kinds: Record<string, KindSpec<any, any>>;
+    kinds: {
+        "openai/create_chat_completion": KindSpec<[unknown], unknown>;
+        "openai/retrieve_chat_completion": KindSpec<[unknown], unknown>;
+        "openai/list_chat_completions": KindSpec<unknown[], unknown>;
+        "openai/update_chat_completion": KindSpec<[unknown, unknown], unknown>;
+        "openai/delete_chat_completion": KindSpec<[unknown], unknown>;
+        "openai/create_embedding": KindSpec<[unknown], unknown>;
+        "openai/create_moderation": KindSpec<[unknown], unknown>;
+        "openai/create_completion": KindSpec<[unknown], unknown>;
+        "openai/record": KindSpec<unknown[], Record<string, unknown>>;
+        "openai/array": KindSpec<unknown[], unknown[]>;
+    };
     traits: {};
     lifts: {};
     defaultInterpreter: () => Interpreter;
@@ -70,30 +75,6 @@ export interface OpenAIConfig {
 export const openaiInterpreter: Interpreter;
 
 // @public
-export interface OpenAIMethods {
-    openai: {
-        chat: {
-            completions: {
-                create(params: ChatCompletionCreateParamsNonStreaming | CExpr<ChatCompletionCreateParamsNonStreaming>): CExpr<ChatCompletion>;
-                retrieve(id: string | CExpr<string>): CExpr<ChatCompletion>;
-                list(params?: ChatCompletionListParams | CExpr<ChatCompletionListParams>): CExpr<ChatCompletionsPage>;
-                update(id: string | CExpr<string>, params: ChatCompletionUpdateParams | CExpr<ChatCompletionUpdateParams>): CExpr<ChatCompletion>;
-                delete(id: string | CExpr<string>): CExpr<ChatCompletionDeleted>;
-            };
-        };
-        embeddings: {
-            create(params: EmbeddingCreateParams | CExpr<EmbeddingCreateParams>): CExpr<CreateEmbeddingResponse>;
-        };
-        moderations: {
-            create(params: ModerationCreateParams | CExpr<ModerationCreateParams>): CExpr<ModerationCreateResponse>;
-        };
-        completions: {
-            create(params: CompletionCreateParamsNonStreaming | CExpr<CompletionCreateParamsNonStreaming>): CExpr<Completion>;
-        };
-    };
-}
-
-// @public
 export const openaiPlugin: typeof openai;
 
 // @public
@@ -101,8 +82,8 @@ export function wrapOpenAISdk(client: OpenAI): OpenAIClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/6.21.0/index.d.ts:71:21 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-// dist/6.21.0/index.d.ts:96:5 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/6.21.0/index.d.ts:33:21 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/6.21.0/index.d.ts:59:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

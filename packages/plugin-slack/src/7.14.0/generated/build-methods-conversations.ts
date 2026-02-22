@@ -38,21 +38,25 @@ export function buildSlackConversations(): SlackMethodsConversations {
     },
     externalInvitePermissions: {
       set(params) {
-        if (params != null) return mk("slack/conversations_externalInvitePermissions_set", [liftArg(params)]);
+        if (params != null)
+          return mk("slack/conversations_externalInvitePermissions_set", [liftArg(params)]);
         return mk("slack/conversations_externalInvitePermissions_set", []);
       },
     },
     requestSharedInvite: {
       approve(params) {
-        if (params != null) return mk("slack/conversations_requestSharedInvite_approve", [liftArg(params)]);
+        if (params != null)
+          return mk("slack/conversations_requestSharedInvite_approve", [liftArg(params)]);
         return mk("slack/conversations_requestSharedInvite_approve", []);
       },
       deny(params) {
-        if (params != null) return mk("slack/conversations_requestSharedInvite_deny", [liftArg(params)]);
+        if (params != null)
+          return mk("slack/conversations_requestSharedInvite_deny", [liftArg(params)]);
         return mk("slack/conversations_requestSharedInvite_deny", []);
       },
       list(params?) {
-        if (params != null) return mk("slack/conversations_requestSharedInvite_list", [liftArg(params)]);
+        if (params != null)
+          return mk("slack/conversations_requestSharedInvite_list", [liftArg(params)]);
         return mk("slack/conversations_requestSharedInvite_list", []);
       },
     },

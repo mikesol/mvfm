@@ -407,25 +407,16 @@
             },
             {
               "kind": "Content",
-              "text": "{\n    name: \"cloudflare-kv\";\n    ctors: {\n        kv: {\n            get: "
+              "text": "{\n    name: \"cloudflare-kv\";\n    ctors: {\n        kv: {\n            get: typeof "
             },
             {
               "kind": "Reference",
-              "text": "KvGet",
-              "canonicalReference": "@mvfm/plugin-cloudflare-kv!KvGet:interface"
+              "text": "kvGet",
+              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~kvGet:function"
             },
             {
               "kind": "Content",
-              "text": ";\n            put(key: "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string, value: "
+              "text": ";\n            put<A, B, C extends readonly unknown[]>(key: A, value: B, ...args: C): "
             },
             {
               "kind": "Reference",
@@ -434,7 +425,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string> | string, options?: "
+              "text": "<void, \"cloudflare-kv/put\", [A, B, ...C]>;\n            delete<A>(key: A): "
             },
             {
               "kind": "Reference",
@@ -443,79 +434,7 @@
             },
             {
               "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "KvPutOptions",
-              "canonicalReference": "@mvfm/plugin-cloudflare-kv!KvPutOptions:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "> | "
-            },
-            {
-              "kind": "Reference",
-              "text": "KvPutOptions",
-              "canonicalReference": "@mvfm/plugin-cloudflare-kv!KvPutOptions:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "): "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<void>;\n            delete(key: "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string> | string): "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<void>;\n            list(options?: "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "KvListOptions",
-              "canonicalReference": "@mvfm/plugin-cloudflare-kv!KvListOptions:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "> | "
-            },
-            {
-              "kind": "Reference",
-              "text": "KvListOptions",
-              "canonicalReference": "@mvfm/plugin-cloudflare-kv!KvListOptions:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "): "
+              "text": "<void, \"cloudflare-kv/delete\", [A]>;\n            list<A extends readonly unknown[]>(...args: A): "
             },
             {
               "kind": "Reference",
@@ -533,16 +452,7 @@
             },
             {
               "kind": "Content",
-              "text": ">;\n        };\n    };\n    kinds: "
-            },
-            {
-              "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string, "
+              "text": ", \"cloudflare-kv/list\", A>;\n        };\n    };\n    kinds: {\n        \"cloudflare-kv/get\": "
             },
             {
               "kind": "Reference",
@@ -551,7 +461,70 @@
             },
             {
               "kind": "Content",
-              "text": "<any, any>>;\n    traits: {};\n    lifts: {};\n}"
+              "text": "<[string], string | null>;\n        \"cloudflare-kv/get_json\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string], unknown>;\n        \"cloudflare-kv/put\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string], void>;\n        \"cloudflare-kv/delete\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string], void>;\n        \"cloudflare-kv/list\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"cloudflare-kv/record\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], "
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, unknown>>;\n        \"cloudflare-kv/array\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-cloudflare-kv!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown[]>;\n    };\n    traits: {};\n    lifts: {};\n}"
             },
             {
               "kind": "Content",
@@ -561,7 +534,7 @@
           "fileUrlPath": "dist/4.20260213.0/index.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 3,
-            "endIndex": 36
+            "endIndex": 30
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
@@ -953,177 +926,6 @@
           "extendsTokenRanges": []
         },
         {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/plugin-cloudflare-kv!CloudflareKvMethods:interface",
-          "docComment": "/**\n * Cloudflare KV operations added to the DSL context.\n *\n * Mirrors the KVNamespace API: get, put, delete, list. Each method produces a namespaced CExpr node.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export interface CloudflareKvMethods "
-            }
-          ],
-          "fileUrlPath": "dist/4.20260213.0/index.d.ts",
-          "releaseTag": "Public",
-          "name": "CloudflareKvMethods",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-cloudflare-kv!CloudflareKvMethods#kv:member",
-              "docComment": "/**\n * Cloudflare KV operations, namespaced under `$.kv`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "kv: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "{\n        get: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "KvGet",
-                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!KvGet:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";\n        put(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, value: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string, options?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "KvPutOptions",
-                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!KvPutOptions:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "KvPutOptions",
-                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!KvPutOptions:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>;\n        delete(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>;\n        list(options?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "KvListOptions",
-                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!KvListOptions:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "KvListOptions",
-                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!KvListOptions:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "KvListResult",
-                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!KvListResult:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n    }"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "kv",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 30
-              }
-            }
-          ],
-          "extendsTokenRanges": []
-        },
-        {
           "kind": "Variable",
           "canonicalReference": "@mvfm/plugin-cloudflare-kv!cloudflareKvPlugin:var",
           "docComment": "/**\n * Alias for {@link cloudflareKv}, kept for readability at call sites.\n */\n",
@@ -1197,236 +999,6 @@
             }
           ],
           "name": "createCloudflareKvInterpreter"
-        },
-        {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/plugin-cloudflare-kv!KvGet:interface",
-          "docComment": "/**\n * Return type of `kv.get()` — text or JSON depending on the type parameter.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export interface KvGet "
-            }
-          ],
-          "fileUrlPath": "dist/4.20260213.0/index.d.ts",
-          "releaseTag": "Public",
-          "name": "KvGet",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "CallSignature",
-              "canonicalReference": "@mvfm/plugin-cloudflare-kv!KvGet:call(1)",
-              "docComment": "/**\n * Get a text value by key. Returns null if key does not exist.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string | null>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "returnTypeTokenRange": {
-                "startIndex": 4,
-                "endIndex": 6
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "key",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 3
-                  },
-                  "isOptional": false
-                }
-              ]
-            },
-            {
-              "kind": "CallSignature",
-              "canonicalReference": "@mvfm/plugin-cloudflare-kv!KvGet:call(2)",
-              "docComment": "/**\n * Get a text value by key (explicit \"text\" type).\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", type: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "\"text\""
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string | null>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "returnTypeTokenRange": {
-                "startIndex": 6,
-                "endIndex": 8
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 2,
-              "parameters": [
-                {
-                  "parameterName": "key",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 3
-                  },
-                  "isOptional": false
-                },
-                {
-                  "parameterName": "type",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 4,
-                    "endIndex": 5
-                  },
-                  "isOptional": false
-                }
-              ]
-            },
-            {
-              "kind": "CallSignature",
-              "canonicalReference": "@mvfm/plugin-cloudflare-kv!KvGet:call(3)",
-              "docComment": "/**\n * Get a JSON-parsed value by key. Returns null if key does not exist.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "<T = "
-                },
-                {
-                  "kind": "Content",
-                  "text": "unknown"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">(key: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string> | string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", type: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "\"json\""
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-cloudflare-kv!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<T | null>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "returnTypeTokenRange": {
-                "startIndex": 8,
-                "endIndex": 10
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 3,
-              "parameters": [
-                {
-                  "parameterName": "key",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 3,
-                    "endIndex": 5
-                  },
-                  "isOptional": false
-                },
-                {
-                  "parameterName": "type",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 6,
-                    "endIndex": 7
-                  },
-                  "isOptional": false
-                }
-              ],
-              "typeParameters": [
-                {
-                  "typeParameterName": "T",
-                  "constraintTokenRange": {
-                    "startIndex": 0,
-                    "endIndex": 0
-                  },
-                  "defaultTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  }
-                }
-              ]
-            }
-          ],
-          "extendsTokenRanges": []
         },
         {
           "kind": "Interface",

@@ -70,7 +70,10 @@ export function buildPostgresApi() {
       },
 
       /** Dynamic INSERT helper. */
-      insert<A>(data: A, columns?: string[]): CExpr<unknown, "postgres/insert_helper", [A, string]> {
+      insert<A>(
+        data: A,
+        columns?: string[],
+      ): CExpr<unknown, "postgres/insert_helper", [A, string]> {
         return mk("postgres/insert_helper", [liftArg(data), JSON.stringify(columns ?? null)]);
       },
 
@@ -92,7 +95,9 @@ export function buildPostgresApi() {
 
     if (scope === "top") {
       /** Transaction block. */
-      props.begin = <T>(fn: (sql: ReturnType<typeof makeSql>) => unknown): CExpr<T, "postgres/begin", [string, ...unknown[]]> => {
+      props.begin = <T>(
+        fn: (sql: ReturnType<typeof makeSql>) => unknown,
+      ): CExpr<T, "postgres/begin", [string, ...unknown[]]> => {
         const txSql = makeSql("transaction");
         const result = fn(txSql);
         if (Array.isArray(result)) {
@@ -104,7 +109,9 @@ export function buildPostgresApi() {
 
     if (scope === "transaction" || scope === "savepoint") {
       /** Savepoint block. */
-      props.savepoint = <T>(fn: (sql: ReturnType<typeof makeSql>) => unknown): CExpr<T, "postgres/savepoint", [string, ...unknown[]]> => {
+      props.savepoint = <T>(
+        fn: (sql: ReturnType<typeof makeSql>) => unknown,
+      ): CExpr<T, "postgres/savepoint", [string, ...unknown[]]> => {
         const spSql = makeSql("savepoint");
         const result = fn(spSql);
         if (Array.isArray(result)) {

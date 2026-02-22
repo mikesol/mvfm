@@ -26,7 +26,16 @@ export function pino(config?: PinoConfig): {
     ctors: {
         pino: PinoLogger;
     };
-    kinds: Record<string, KindSpec<any, any>>;
+    kinds: {
+        "pino/trace": KindSpec<[unknown, ...unknown[]], void>;
+        "pino/debug": KindSpec<[unknown, ...unknown[]], void>;
+        "pino/info": KindSpec<[unknown, ...unknown[]], void>;
+        "pino/warn": KindSpec<[unknown, ...unknown[]], void>;
+        "pino/error": KindSpec<[unknown, ...unknown[]], void>;
+        "pino/fatal": KindSpec<[unknown, ...unknown[]], void>;
+        "pino/record": KindSpec<unknown[], Record<string, unknown>>;
+        "pino/array": KindSpec<unknown[], unknown[]>;
+    };
     traits: {};
     lifts: {};
     defaultInterpreter: () => Interpreter;
@@ -84,25 +93,25 @@ export type PinoLevel = (typeof LEVELS)[number];
 // @public
 export interface PinoLogger {
     child(bindings: CExpr<Record<string, unknown>> | Record<string, unknown>): PinoLogger;
-    debug(msg: CExpr<string> | string): CExpr<void>;
+    debug<A>(msg: A): CExpr<void, "pino/debug", [number, number, A]>;
     // (undocumented)
-    debug(mergeObject: CExpr<Record<string, unknown>> | Record<string, unknown>, msg: CExpr<string> | string): CExpr<void>;
-    error(msg: CExpr<string> | string): CExpr<void>;
+    debug<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/debug", [number, number, B, A]>;
+    error<A>(msg: A): CExpr<void, "pino/error", [number, number, A]>;
     // (undocumented)
-    error(mergeObject: CExpr<Record<string, unknown>> | Record<string, unknown>, msg: CExpr<string> | string): CExpr<void>;
-    fatal(msg: CExpr<string> | string): CExpr<void>;
+    error<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/error", [number, number, B, A]>;
+    fatal<A>(msg: A): CExpr<void, "pino/fatal", [number, number, A]>;
     // (undocumented)
-    fatal(mergeObject: CExpr<Record<string, unknown>> | Record<string, unknown>, msg: CExpr<string> | string): CExpr<void>;
-    info(msg: CExpr<string> | string): CExpr<void>;
+    fatal<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/fatal", [number, number, B, A]>;
+    info<A>(msg: A): CExpr<void, "pino/info", [number, number, A]>;
     // (undocumented)
-    info(mergeObject: CExpr<Record<string, unknown>> | Record<string, unknown>, msg: CExpr<string> | string): CExpr<void>;
+    info<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/info", [number, number, B, A]>;
     // Warning: (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-    trace(msg: CExpr<string> | string): CExpr<void>;
+    trace<A>(msg: A): CExpr<void, "pino/trace", [number, number, A]>;
     // (undocumented)
-    trace(mergeObject: CExpr<Record<string, unknown>> | Record<string, unknown>, msg: CExpr<string> | string): CExpr<void>;
-    warn(msg: CExpr<string> | string): CExpr<void>;
+    trace<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/trace", [number, number, B, A]>;
+    warn<A>(msg: A): CExpr<void, "pino/warn", [number, number, A]>;
     // (undocumented)
-    warn(mergeObject: CExpr<Record<string, unknown>> | Record<string, unknown>, msg: CExpr<string> | string): CExpr<void>;
+    warn<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/warn", [number, number, B, A]>;
 }
 
 // @public
@@ -126,7 +135,7 @@ export function wrapPino(logger: PinoInstance): PinoClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/10.3.1/index.d.ts:65:5 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/10.3.1/index.d.ts:66:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

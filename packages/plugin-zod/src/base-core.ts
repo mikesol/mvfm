@@ -104,30 +104,22 @@ export abstract class ZodSchemaBuilderCore<T> {
     ) as CExpr<{ success: boolean; data: T; error: unknown }, "zod/safe_parse">;
   }
 
-  parseAsync(
-    input: unknown,
-    opts?: { error?: ErrorConfig },
-  ): CExpr<Promise<T>, "zod/parse_async"> {
-    return this._buildValidationCExpr<Promise<T>>(
-      "zod/parse_async",
-      input,
-      opts,
-    ) as CExpr<Promise<T>, "zod/parse_async">;
+  parseAsync(input: unknown, opts?: { error?: ErrorConfig }): CExpr<Promise<T>, "zod/parse_async"> {
+    return this._buildValidationCExpr<Promise<T>>("zod/parse_async", input, opts) as CExpr<
+      Promise<T>,
+      "zod/parse_async"
+    >;
   }
 
   safeParseAsync(
     input: unknown,
     opts?: { error?: ErrorConfig },
-  ): CExpr<
-    Promise<{ success: boolean; data: T; error: unknown }>,
-    "zod/safe_parse_async"
-  > {
-    return this._buildValidationCExpr<
-      Promise<{ success: boolean; data: T; error: unknown }>
-    >("zod/safe_parse_async", input, opts) as CExpr<
-      Promise<{ success: boolean; data: T; error: unknown }>,
-      "zod/safe_parse_async"
-    >;
+  ): CExpr<Promise<{ success: boolean; data: T; error: unknown }>, "zod/safe_parse_async"> {
+    return this._buildValidationCExpr<Promise<{ success: boolean; data: T; error: unknown }>>(
+      "zod/safe_parse_async",
+      input,
+      opts,
+    ) as CExpr<Promise<{ success: boolean; data: T; error: unknown }>, "zod/safe_parse_async">;
   }
 
   private _buildRefinement(

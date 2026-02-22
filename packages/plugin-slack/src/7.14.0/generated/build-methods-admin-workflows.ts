@@ -36,13 +36,15 @@ export function buildSlackAdminWorkflows(): SlackMethodsAdminWorkflows {
         return mk("slack/admin_workflows_collaborators_add", []);
       },
       remove(params) {
-        if (params != null) return mk("slack/admin_workflows_collaborators_remove", [liftArg(params)]);
+        if (params != null)
+          return mk("slack/admin_workflows_collaborators_remove", [liftArg(params)]);
         return mk("slack/admin_workflows_collaborators_remove", []);
       },
     },
     permissions: {
       lookup(params) {
-        if (params != null) return mk("slack/admin_workflows_permissions_lookup", [liftArg(params)]);
+        if (params != null)
+          return mk("slack/admin_workflows_permissions_lookup", [liftArg(params)]);
         return mk("slack/admin_workflows_permissions_lookup", []);
       },
     },

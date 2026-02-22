@@ -208,34 +208,7 @@
             },
             {
               "kind": "Content",
-              "text": "{\n    name: \"anthropic\";\n    ctors: {\n        anthropic: {\n            messages: {\n                create(params: "
-            },
-            {
-              "kind": "Reference",
-              "text": "MessageCreateParamsNonStreaming",
-              "canonicalReference": "@anthropic-ai/sdk!MessageCreateParamsNonStreaming:interface"
-            },
-            {
-              "kind": "Content",
-              "text": " | "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "MessageCreateParamsNonStreaming",
-              "canonicalReference": "@anthropic-ai/sdk!MessageCreateParamsNonStreaming:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ">): "
+              "text": "{\n    name: \"anthropic\";\n    ctors: {\n        anthropic: {\n            messages: {\n                create<A>(params: A): "
             },
             {
               "kind": "Reference",
@@ -253,34 +226,7 @@
             },
             {
               "kind": "Content",
-              "text": ">;\n                countTokens(params: "
-            },
-            {
-              "kind": "Reference",
-              "text": "MessageCountTokensParams",
-              "canonicalReference": "@anthropic-ai/sdk!MessageCountTokensParams:interface"
-            },
-            {
-              "kind": "Content",
-              "text": " | "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "MessageCountTokensParams",
-              "canonicalReference": "@anthropic-ai/sdk!MessageCountTokensParams:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ">): "
+              "text": ", \"anthropic/create_message\", [A]>;\n                countTokens<A>(params: A): "
             },
             {
               "kind": "Reference",
@@ -298,34 +244,7 @@
             },
             {
               "kind": "Content",
-              "text": ">;\n                batches: {\n                    create(params: "
-            },
-            {
-              "kind": "Reference",
-              "text": "BatchCreateParams",
-              "canonicalReference": "@anthropic-ai/sdk!BatchCreateParams:interface"
-            },
-            {
-              "kind": "Content",
-              "text": " | "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "BatchCreateParams",
-              "canonicalReference": "@anthropic-ai/sdk!BatchCreateParams:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ">): "
+              "text": ", \"anthropic/count_tokens\", [A]>;\n                batches: {\n                    create<A>(params: A): "
             },
             {
               "kind": "Reference",
@@ -343,16 +262,7 @@
             },
             {
               "kind": "Content",
-              "text": ">;\n                    retrieve(id: string | "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string>): "
+              "text": ", \"anthropic/create_message_batch\", [A]>;\n                    retrieve<A>(id: A): "
             },
             {
               "kind": "Reference",
@@ -370,34 +280,7 @@
             },
             {
               "kind": "Content",
-              "text": ">;\n                    list(params?: "
-            },
-            {
-              "kind": "Reference",
-              "text": "BatchListParams",
-              "canonicalReference": "@anthropic-ai/sdk!BatchListParams:interface"
-            },
-            {
-              "kind": "Content",
-              "text": " | "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "BatchListParams",
-              "canonicalReference": "@anthropic-ai/sdk!BatchListParams:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ">): "
+              "text": ", \"anthropic/retrieve_message_batch\", [A]>;\n                    list<A extends readonly unknown[]>(...params: A): "
             },
             {
               "kind": "Reference",
@@ -415,16 +298,7 @@
             },
             {
               "kind": "Content",
-              "text": ">;\n                    delete(id: string | "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string>): "
+              "text": ", \"anthropic/list_message_batches\", A>;\n                    delete<A>(id: A): "
             },
             {
               "kind": "Reference",
@@ -442,16 +316,7 @@
             },
             {
               "kind": "Content",
-              "text": ">;\n                    cancel(id: string | "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string>): "
+              "text": ", \"anthropic/delete_message_batch\", [A]>;\n                    cancel<A>(id: A): "
             },
             {
               "kind": "Reference",
@@ -469,16 +334,7 @@
             },
             {
               "kind": "Content",
-              "text": ">;\n                };\n            };\n            models: {\n                retrieve(id: string | "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string>): "
+              "text": ", \"anthropic/cancel_message_batch\", [A]>;\n                };\n            };\n            models: {\n                retrieve<A>(id: A): "
             },
             {
               "kind": "Reference",
@@ -496,34 +352,7 @@
             },
             {
               "kind": "Content",
-              "text": ">;\n                list(params?: "
-            },
-            {
-              "kind": "Reference",
-              "text": "ModelListParams",
-              "canonicalReference": "@anthropic-ai/sdk!ModelListParams:interface"
-            },
-            {
-              "kind": "Content",
-              "text": " | "
-            },
-            {
-              "kind": "Reference",
-              "text": "CExpr",
-              "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<"
-            },
-            {
-              "kind": "Reference",
-              "text": "ModelListParams",
-              "canonicalReference": "@anthropic-ai/sdk!ModelListParams:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ">): "
+              "text": ", \"anthropic/retrieve_model\", [A]>;\n                list<A extends readonly unknown[]>(...params: A): "
             },
             {
               "kind": "Reference",
@@ -541,16 +370,7 @@
             },
             {
               "kind": "Content",
-              "text": ">;\n            };\n        };\n    };\n    kinds: "
-            },
-            {
-              "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string, "
+              "text": ", \"anthropic/list_models\", A>;\n            };\n        };\n    };\n    kinds: {\n        \"anthropic/create_message\": "
             },
             {
               "kind": "Reference",
@@ -559,7 +379,106 @@
             },
             {
               "kind": "Content",
-              "text": "<any, any>>;\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
+              "text": "<[unknown], unknown>;\n        \"anthropic/count_tokens\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-anthropic!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"anthropic/create_message_batch\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-anthropic!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"anthropic/retrieve_message_batch\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-anthropic!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"anthropic/list_message_batches\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-anthropic!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown>;\n        \"anthropic/delete_message_batch\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-anthropic!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"anthropic/cancel_message_batch\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-anthropic!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"anthropic/retrieve_model\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-anthropic!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"anthropic/list_models\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-anthropic!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown>;\n        \"anthropic/record\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-anthropic!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], "
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, unknown>>;\n        \"anthropic/array\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-anthropic!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown[]>;\n    };\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
             },
             {
               "kind": "Reference",
@@ -578,7 +497,7 @@
           "fileUrlPath": "dist/0.74.0/index.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 3,
-            "endIndex": 84
+            "endIndex": 66
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
@@ -794,384 +713,6 @@
             "startIndex": 1,
             "endIndex": 2
           }
-        },
-        {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/plugin-anthropic!AnthropicMethods:interface",
-          "docComment": "/**\n * Anthropic operations added to the DSL context by the anthropic plugin.\n *\n * Mirrors the \\@anthropic-ai/sdk resource API: messages (create, countTokens), message batches (create, retrieve, list, delete, cancel), and models (retrieve, list). Each resource exposes methods that produce CExpr nodes.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export interface AnthropicMethods "
-            }
-          ],
-          "fileUrlPath": "dist/0.74.0/index.d.ts",
-          "releaseTag": "Public",
-          "name": "AnthropicMethods",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-anthropic!AnthropicMethods#anthropic:member",
-              "docComment": "/**\n * Anthropic API operations, namespaced under `$.anthropic`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "anthropic: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "{\n        messages: {\n            create(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "MessageCreateParamsNonStreaming",
-                  "canonicalReference": "@anthropic-ai/sdk!MessageCreateParamsNonStreaming:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": " | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "MessageCreateParamsNonStreaming",
-                  "canonicalReference": "@anthropic-ai/sdk!MessageCreateParamsNonStreaming:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Message",
-                  "canonicalReference": "@anthropic-ai/sdk!Message:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n            countTokens(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "MessageCountTokensParams",
-                  "canonicalReference": "@anthropic-ai/sdk!MessageCountTokensParams:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": " | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "MessageCountTokensParams",
-                  "canonicalReference": "@anthropic-ai/sdk!MessageCountTokensParams:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "MessageTokensCount",
-                  "canonicalReference": "@anthropic-ai/sdk!MessageTokensCount:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n            batches: {\n                create(params: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "BatchCreateParams",
-                  "canonicalReference": "@anthropic-ai/sdk!BatchCreateParams:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": " | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "BatchCreateParams",
-                  "canonicalReference": "@anthropic-ai/sdk!BatchCreateParams:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "MessageBatch",
-                  "canonicalReference": "@anthropic-ai/sdk!MessageBatch:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n                retrieve(id: string | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "MessageBatch",
-                  "canonicalReference": "@anthropic-ai/sdk!MessageBatch:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n                list(params?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "BatchListParams",
-                  "canonicalReference": "@anthropic-ai/sdk!BatchListParams:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": " | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "BatchListParams",
-                  "canonicalReference": "@anthropic-ai/sdk!BatchListParams:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "MessageBatchesPage",
-                  "canonicalReference": "@anthropic-ai/sdk!MessageBatchesPage:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n                delete(id: string | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "DeletedMessageBatch",
-                  "canonicalReference": "@anthropic-ai/sdk!DeletedMessageBatch:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n                cancel(id: string | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "MessageBatch",
-                  "canonicalReference": "@anthropic-ai/sdk!MessageBatch:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n            };\n        };\n        models: {\n            retrieve(id: string | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string>): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ModelInfo",
-                  "canonicalReference": "@anthropic-ai/sdk!ModelInfo:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n            list(params?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ModelListParams",
-                  "canonicalReference": "@anthropic-ai/sdk!ModelListParams:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": " | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ModelListParams",
-                  "canonicalReference": "@anthropic-ai/sdk!ModelListParams:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-anthropic!~CExpr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<"
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ModelInfosPage",
-                  "canonicalReference": "@anthropic-ai/sdk!ModelInfosPage:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ">;\n        };\n    }"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "anthropic",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 76
-              }
-            }
-          ],
-          "extendsTokenRanges": []
         },
         {
           "kind": "Variable",

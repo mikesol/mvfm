@@ -101,26 +101,22 @@ function buildFetchApi() {
     url: A,
     ...init: B
   ): CExpr<unknown, "fetch/request", [A, ...B]> =>
-    init.length > 0
-      ? mk("fetch/request", [url, liftArg(init[0])])
-      : mk("fetch/request", [url]);
+    init.length > 0 ? mk("fetch/request", [url, liftArg(init[0])]) : mk("fetch/request", [url]);
 
   /** Parse the response body as JSON. Mirrors `response.json()`. */
   fetchFn.json = <A>(response: A): CExpr<unknown, "fetch/json", [A]> =>
     mk("fetch/json", [response]);
 
   /** Read the response body as text. Mirrors `response.text()`. */
-  fetchFn.text = <A>(response: A): CExpr<string, "fetch/text", [A]> =>
-    mk("fetch/text", [response]);
+  fetchFn.text = <A>(response: A): CExpr<string, "fetch/text", [A]> => mk("fetch/text", [response]);
 
   /** Get the HTTP status code. Mirrors `response.status`. */
   fetchFn.status = <A>(response: A): CExpr<number, "fetch/status", [A]> =>
     mk("fetch/status", [response]);
 
   /** Get the response headers as a record. Mirrors `response.headers`. */
-  fetchFn.headers = <A>(
-    response: A,
-  ): CExpr<Record<string, string>, "fetch/headers", [A]> => mk("fetch/headers", [response]);
+  fetchFn.headers = <A>(response: A): CExpr<Record<string, string>, "fetch/headers", [A]> =>
+    mk("fetch/headers", [response]);
 
   return fetchFn;
 }

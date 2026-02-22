@@ -77,10 +77,11 @@ export function buildRedisApi() {
       return mk("redis/decrby", [liftArg(key), liftArg(decrement)]);
     },
     /** Get the values of multiple keys. */
-    mget<A extends readonly unknown[]>(
-      ...keys: A
-    ): CExpr<(string | null)[], "redis/mget", A> {
-      return mk("redis/mget", keys.map((k) => liftArg(k)));
+    mget<A extends readonly unknown[]>(...keys: A): CExpr<(string | null)[], "redis/mget", A> {
+      return mk(
+        "redis/mget",
+        keys.map((k) => liftArg(k)),
+      );
     },
     /** Set multiple key-value pairs. */
     mset<A>(mapping: A): CExpr<"OK", "redis/mset", [A]> {
@@ -91,32 +92,26 @@ export function buildRedisApi() {
       return mk("redis/append", [liftArg(key), liftArg(value)]);
     },
     /** Get a substring of the string stored at a key. */
-    getrange<A, B, C>(
-      key: A,
-      start: B,
-      end: C,
-    ): CExpr<string, "redis/getrange", [A, B, C]> {
+    getrange<A, B, C>(key: A, start: B, end: C): CExpr<string, "redis/getrange", [A, B, C]> {
       return mk("redis/getrange", [liftArg(key), liftArg(start), liftArg(end)]);
     },
     /** Overwrite part of a string at key starting at the specified offset. */
-    setrange<A, B, C>(
-      key: A,
-      offset: B,
-      value: C,
-    ): CExpr<number, "redis/setrange", [A, B, C]> {
+    setrange<A, B, C>(key: A, offset: B, value: C): CExpr<number, "redis/setrange", [A, B, C]> {
       return mk("redis/setrange", [liftArg(key), liftArg(offset), liftArg(value)]);
     },
     /** Delete one or more keys. */
-    del<A extends readonly unknown[]>(
-      ...keys: A
-    ): CExpr<number, "redis/del", A> {
-      return mk("redis/del", keys.map((k) => liftArg(k)));
+    del<A extends readonly unknown[]>(...keys: A): CExpr<number, "redis/del", A> {
+      return mk(
+        "redis/del",
+        keys.map((k) => liftArg(k)),
+      );
     },
     /** Check if one or more keys exist. */
-    exists<A extends readonly unknown[]>(
-      ...keys: A
-    ): CExpr<number, "redis/exists", A> {
-      return mk("redis/exists", keys.map((k) => liftArg(k)));
+    exists<A extends readonly unknown[]>(...keys: A): CExpr<number, "redis/exists", A> {
+      return mk(
+        "redis/exists",
+        keys.map((k) => liftArg(k)),
+      );
     },
     /** Set a timeout on a key (seconds). */
     expire<A, B>(key: A, seconds: B): CExpr<number, "redis/expire", [A, B]> {
@@ -177,11 +172,7 @@ export function buildRedisApi() {
       return mk("redis/hvals", [liftArg(key)]);
     },
     /** Increment the integer value of a hash field. */
-    hincrby<A, B, C>(
-      key: A,
-      field: B,
-      increment: C,
-    ): CExpr<number, "redis/hincrby", [A, B, C]> {
+    hincrby<A, B, C>(key: A, field: B, increment: C): CExpr<number, "redis/hincrby", [A, B, C]> {
       return mk("redis/hincrby", [liftArg(key), liftArg(field), liftArg(increment)]);
     },
     /** Prepend elements to a list. */
@@ -223,11 +214,7 @@ export function buildRedisApi() {
       return mk("redis/llen", [liftArg(key)]);
     },
     /** Get a range of elements from a list. */
-    lrange<A, B, C>(
-      key: A,
-      start: B,
-      stop: C,
-    ): CExpr<string[], "redis/lrange", [A, B, C]> {
+    lrange<A, B, C>(key: A, start: B, stop: C): CExpr<string[], "redis/lrange", [A, B, C]> {
       return mk("redis/lrange", [liftArg(key), liftArg(start), liftArg(stop)]);
     },
     /** Get an element by index. */
@@ -235,19 +222,11 @@ export function buildRedisApi() {
       return mk("redis/lindex", [liftArg(key), liftArg(index)]);
     },
     /** Set the value of an element by index. */
-    lset<A, B, C>(
-      key: A,
-      index: B,
-      element: C,
-    ): CExpr<"OK", "redis/lset", [A, B, C]> {
+    lset<A, B, C>(key: A, index: B, element: C): CExpr<"OK", "redis/lset", [A, B, C]> {
       return mk("redis/lset", [liftArg(key), liftArg(index), liftArg(element)]);
     },
     /** Remove elements from a list. */
-    lrem<A, B, C>(
-      key: A,
-      count: B,
-      element: C,
-    ): CExpr<number, "redis/lrem", [A, B, C]> {
+    lrem<A, B, C>(key: A, count: B, element: C): CExpr<number, "redis/lrem", [A, B, C]> {
       return mk("redis/lrem", [liftArg(key), liftArg(count), liftArg(element)]);
     },
     /** Insert an element before or after a pivot element. */
