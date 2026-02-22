@@ -196,13 +196,66 @@ export function commit<O, R extends string, Adj, C extends string>(d: DirtyExpr<
 export function concat<A extends readonly unknown[]>(...args: A): CExpr<string, "str/concat", A>;
 
 // @public
-export const control: Plugin_2;
+export const control: {
+    name: string;
+    ctors: {
+        each: (items: unknown[], fn: (item: unknown) => unknown) => {
+            readonly __kind: "core/begin";
+            readonly __args: readonly unknown[];
+            readonly __out: unknown;
+            readonly [cexprBrand]: {
+                readonly o: unknown;
+                readonly kind: "core/begin";
+                readonly args: unknown[];
+            };
+            readonly [CREF]: true;
+        };
+        while: (cond: unknown) => {
+            body: (fn: () => unknown) => {
+                readonly __kind: "control/while";
+                readonly __args: readonly unknown[];
+                readonly __out: unknown;
+                readonly [cexprBrand]: {
+                    readonly o: unknown;
+                    readonly kind: "control/while";
+                    readonly args: [unknown, unknown];
+                };
+                readonly [CREF]: true;
+            };
+        };
+    };
+    kinds: {
+        "control/while": KindSpec<unknown[], unknown>;
+    };
+    traits: {};
+    lifts: {};
+    defaultInterpreter: () => Interpreter;
+};
 
 // @public
 export const coreInterpreter: Interpreter;
 
 // @public
-export const corePlugin: Plugin_2;
+export const corePlugin: {
+    name: string;
+    ctors: {};
+    kinds: {
+        "core/literal": KindSpec<[], unknown>;
+        "core/input": KindSpec<[], unknown>;
+        "core/access": KindSpec<[unknown], unknown>;
+        "core/begin": KindSpec<unknown[], unknown>;
+        "core/cond": KindSpec<[boolean, unknown, unknown], unknown>;
+        "core/record": KindSpec<unknown[], unknown>;
+        "core/tuple": KindSpec<unknown[], unknown[]>;
+    };
+    traits: {};
+    lifts: {};
+    shapes: {
+        "core/record": string;
+        "core/tuple": string;
+    };
+    defaultInterpreter: () => Interpreter;
+};
 
 // @public
 export interface CountPred<N extends number> extends PredBase {
@@ -233,7 +286,10 @@ export type DeepResolve<T> = T extends CExpr<infer O, any, any> ? O : T extends 
 } : T;
 
 // @public
-export function defaults(appOrPlugins: any, overrides?: Record<string, Interpreter>): Interpreter;
+export function defaults(appOrPlugins: readonly Plugin_2[] | {
+    plugins?: readonly Plugin_2[];
+    __plugins?: readonly Plugin_2[];
+}, overrides?: Record<string, Interpreter>): Interpreter;
 
 // Warning: (ae-forgotten-export) The symbol "InterpreterHandlers" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "RejectAnyParam" needs to be exported by the entry point index.d.ts
@@ -305,7 +361,79 @@ export function endsWith<A, B>(s: A, suffix: B): CExpr<boolean, "str/endsWith", 
 export function eq<A, B>(a: A, b: B): CExpr<boolean, "eq", [A, B]>;
 
 // @public
-export const error: Plugin_2;
+export const error: {
+    name: string;
+    ctors: {
+        try: (expr: unknown) => {
+            catch: (fn: (err: unknown) => unknown) => {
+                readonly __kind: "error/try";
+                readonly __args: readonly unknown[];
+                readonly __out: unknown;
+                readonly [cexprBrand]: {
+                    readonly o: unknown;
+                    readonly kind: "error/try";
+                    readonly args: [unknown, unknown];
+                };
+                readonly [CREF]: true;
+            };
+        };
+        fail: (msg: unknown) => {
+            readonly __kind: "error/fail";
+            readonly __args: readonly unknown[];
+            readonly __out: unknown;
+            readonly [cexprBrand]: {
+                readonly o: unknown;
+                readonly kind: "error/fail";
+                readonly args: [unknown];
+            };
+            readonly [CREF]: true;
+        };
+        guard: (cond: unknown, msg: unknown) => {
+            readonly __kind: "error/guard";
+            readonly __args: readonly unknown[];
+            readonly __out: unknown;
+            readonly [cexprBrand]: {
+                readonly o: unknown;
+                readonly kind: "error/guard";
+                readonly args: [unknown, unknown];
+            };
+            readonly [CREF]: true;
+        };
+        attempt: (expr: unknown) => {
+            readonly __kind: "error/attempt";
+            readonly __args: readonly unknown[];
+            readonly __out: unknown;
+            readonly [cexprBrand]: {
+                readonly o: unknown;
+                readonly kind: "error/attempt";
+                readonly args: [unknown];
+            };
+            readonly [CREF]: true;
+        };
+        settle: (...exprs: unknown[]) => {
+            readonly __kind: "error/settle";
+            readonly __args: readonly unknown[];
+            readonly __out: unknown;
+            readonly [cexprBrand]: {
+                readonly o: unknown;
+                readonly kind: "error/settle";
+                readonly args: unknown[];
+            };
+            readonly [CREF]: true;
+        };
+    };
+    kinds: {
+        "error/try": KindSpec<unknown[], unknown>;
+        "error/fail": KindSpec<unknown[], unknown>;
+        "error/guard": KindSpec<unknown[], unknown>;
+        "error/caught": KindSpec<unknown[], string>;
+        "error/attempt": KindSpec<unknown[], unknown>;
+        "error/settle": KindSpec<unknown[], unknown>;
+    };
+    traits: {};
+    lifts: {};
+    defaultInterpreter: () => Interpreter;
+};
 
 // @public @deprecated (undocumented)
 export function eval_<T>(node: TypedNode<T>): AsyncGenerator<TypedNode, T, unknown>;
@@ -330,13 +458,90 @@ export interface ExprBase<T> {
 export function extractChildIds(children: unknown): string[];
 
 // @public
-export const fiber: Plugin_2;
+export const fiber: {
+    name: string;
+    ctors: {
+        par: (...args: unknown[]) => {
+            readonly __kind: "core/tuple";
+            readonly __args: readonly unknown[];
+            readonly __out: unknown;
+            readonly [cexprBrand]: {
+                readonly o: unknown;
+                readonly kind: "core/tuple";
+                readonly args: [unknown[]];
+            };
+            readonly [CREF]: true;
+        } | {
+            readonly __kind: "fiber/par_map";
+            readonly __args: readonly unknown[];
+            readonly __out: unknown;
+            readonly [cexprBrand]: {
+                readonly o: unknown;
+                readonly kind: "fiber/par_map";
+                readonly args: [unknown, number, unknown];
+            };
+            readonly [CREF]: true;
+        };
+        race: (...exprs: unknown[]) => {
+            readonly __kind: "fiber/race";
+            readonly __args: readonly unknown[];
+            readonly __out: unknown;
+            readonly [cexprBrand]: {
+                readonly o: unknown;
+                readonly kind: "fiber/race";
+                readonly args: unknown[];
+            };
+            readonly [CREF]: true;
+        };
+        timeout: (expr: unknown, ms: unknown, fallback: unknown) => {
+            readonly __kind: "fiber/timeout";
+            readonly __args: readonly unknown[];
+            readonly __out: unknown;
+            readonly [cexprBrand]: {
+                readonly o: unknown;
+                readonly kind: "fiber/timeout";
+                readonly args: [unknown, unknown, unknown];
+            };
+            readonly [CREF]: true;
+        };
+        retry: (expr: unknown, opts: {
+            attempts: number;
+            delay?: number;
+        }) => {
+            readonly __kind: "fiber/retry";
+            readonly __args: readonly unknown[];
+            readonly __out: unknown;
+            readonly [cexprBrand]: {
+                readonly o: unknown;
+                readonly kind: "fiber/retry";
+                readonly args: [unknown, number, number];
+            };
+            readonly [CREF]: true;
+        };
+    };
+    kinds: {
+        "fiber/par_map": KindSpec<unknown[], unknown[]>;
+        "fiber/par_item": KindSpec<unknown[], unknown>;
+        "fiber/race": KindSpec<unknown[], unknown>;
+        "fiber/timeout": KindSpec<unknown[], unknown>;
+        "fiber/retry": KindSpec<unknown[], unknown>;
+    };
+    traits: {};
+    lifts: {};
+    defaultInterpreter: () => Interpreter;
+};
 
 // @public
 export function floor<A>(a: A): CExpr<number, "num/floor", [A]>;
 
 // @public
-export function fold(first: any, second: any, third?: any, fourth?: any): Promise<unknown>;
+export function fold(interp: Interpreter, prog: Program): Promise<unknown>;
+
+// @public (undocumented)
+export function fold(nexpr: NExpr<unknown, string, unknown, string>, interp: Interpreter, state?: FoldState): Promise<unknown>;
+
+// @public (undocumented)
+export function fold(rootId: string, adj: Record<string, RuntimeEntry>, interp: Interpreter, state?: FoldState): Promise<unknown>;
 
 // @public @deprecated
 export function foldAST<T>(interpOrProg: Interpreter | Record<string, unknown>, progOrInterp: unknown): Promise<T>;
@@ -394,9 +599,6 @@ export function isLeaf(): LeafPred;
 
 // @public
 export function join<A, B>(arr: A, sep: B): CExpr<string, "str/join", [A, B]>;
-
-// @public
-export const KIND_INPUTS: Record<string, string[]>;
 
 // @public
 export interface KindGlobPred<P extends string> extends PredBase {
@@ -495,9 +697,13 @@ export function mod<A, B>(a: A, b: B): CExpr<number, "num/mod", [A, B]>;
 // @public
 export function mul<A, B>(a: A, b: B): CExpr<number, "num/mul", [A, B]>;
 
+// Warning: (ae-forgotten-export) The symbol "PluginInput" needs to be exported by the entry point index.d.ts
+//
 // @public
-export function mvfm(...pluginInputs: (Plugin_2 | readonly Plugin_2[])[]): {
-    (schemaOrFn: any, maybeFn?: any): Program;
+export function mvfm<const P extends readonly PluginInput[]>(...pluginInputs: P): {
+    (fn: ($: MvfmDollar<P>) => unknown): Program;
+    (schema: Record<string, string>, fn: ($: MvfmDollar<P>) => unknown): Program;
+} & {
     plugins: Plugin_2<string, any, any, any, any>[];
 };
 
@@ -817,7 +1023,196 @@ export interface PredBase {
 }
 
 // @public
-export const prelude: readonly Plugin_2[];
+export const prelude: readonly [{
+    readonly name: "num";
+    readonly ctors: {
+        readonly add: add;
+        readonly mul: mul;
+        readonly sub: sub;
+        readonly div: div;
+        readonly mod: mod;
+        readonly min: min;
+        readonly max: max;
+        readonly neg: neg;
+        readonly abs: abs;
+        readonly floor: floor;
+        readonly ceil: ceil;
+        readonly round: round;
+        readonly numLit: numLit;
+    };
+    readonly kinds: {
+        readonly "num/literal": KindSpec<[], number>;
+        readonly "num/add": KindSpec<[number, number], number>;
+        readonly "num/mul": KindSpec<[number, number], number>;
+        readonly "num/sub": KindSpec<[number, number], number>;
+        readonly "num/div": KindSpec<[number, number], number>;
+        readonly "num/mod": KindSpec<[number, number], number>;
+        readonly "num/neg": KindSpec<[number], number>;
+        readonly "num/abs": KindSpec<[number], number>;
+        readonly "num/floor": KindSpec<[number], number>;
+        readonly "num/ceil": KindSpec<[number], number>;
+        readonly "num/round": KindSpec<[number], number>;
+        readonly "num/min": KindSpec<[number, number], number>;
+        readonly "num/max": KindSpec<[number, number], number>;
+        readonly "num/show": KindSpec<[number], string>;
+        readonly "num/compare": KindSpec<[number, number], number>;
+        readonly "num/eq": KindSpec<[number, number], boolean>;
+        readonly "num/neq": KindSpec<[number, number], boolean>;
+        readonly "num/zero": KindSpec<[], number>;
+        readonly "num/one": KindSpec<[], number>;
+        readonly "num/top": KindSpec<[], number>;
+        readonly "num/bottom": KindSpec<[], number>;
+    };
+    readonly traits: {
+        readonly eq: TraitDef<boolean, {
+        number: "num/eq";
+        }>;
+        readonly neq: TraitDef<boolean, {
+        number: "num/neq";
+        }>;
+        readonly show: TraitDef<string, {
+        number: "num/show";
+        }>;
+    };
+    readonly lifts: {
+        readonly number: "num/literal";
+    };
+    readonly defaultInterpreter: () => Interpreter;
+}, {
+    readonly name: "str";
+    readonly ctors: {
+        readonly strLit: strLit;
+        readonly str: str;
+        readonly concat: concat;
+        readonly upper: upper;
+        readonly lower: lower;
+        readonly trim: trim;
+        readonly slice: slice;
+        readonly includes: includes;
+        readonly startsWith: startsWith;
+        readonly endsWith: endsWith;
+        readonly split: split;
+        readonly join: join;
+        readonly replace: replace;
+        readonly len: len;
+        readonly strShow: strShow;
+        readonly strAppend: strAppend;
+    };
+    readonly kinds: {
+        readonly "str/literal": KindSpec<[], string>;
+        readonly "str/concat": KindSpec<string[], string>;
+        readonly "str/upper": KindSpec<[string], string>;
+        readonly "str/lower": KindSpec<[string], string>;
+        readonly "str/trim": KindSpec<[string], string>;
+        readonly "str/slice": KindSpec<[string, number, number], string>;
+        readonly "str/includes": KindSpec<[string, string], boolean>;
+        readonly "str/startsWith": KindSpec<[string, string], boolean>;
+        readonly "str/endsWith": KindSpec<[string, string], boolean>;
+        readonly "str/split": KindSpec<[string, string], string[]>;
+        readonly "str/join": KindSpec<[string[], string], string>;
+        readonly "str/replace": KindSpec<[string, string, string], string>;
+        readonly "str/len": KindSpec<[string], number>;
+        readonly "str/show": KindSpec<[string], string>;
+        readonly "str/append": KindSpec<[string, string], string>;
+        readonly "str/mempty": KindSpec<[], string>;
+        readonly "str/eq": KindSpec<[string, string], boolean>;
+        readonly "str/neq": KindSpec<[string, string], boolean>;
+    };
+    readonly traits: {
+        readonly eq: TraitDef<boolean, {
+        string: "str/eq";
+        }>;
+        readonly neq: TraitDef<boolean, {
+        string: "str/neq";
+        }>;
+        readonly show: TraitDef<string, {
+        string: "str/show";
+        }>;
+        readonly append: TraitDef<string, {
+        string: "str/append";
+        }>;
+    };
+    readonly lifts: {
+        readonly string: "str/literal";
+    };
+    readonly defaultInterpreter: () => Interpreter;
+}, {
+    readonly name: "bool";
+    readonly ctors: {
+        readonly boolLit: boolLit;
+        readonly and: boolAnd;
+        readonly or: boolOr;
+        readonly not: boolNot;
+    };
+    readonly kinds: {
+        readonly "bool/literal": KindSpec<[], boolean>;
+        readonly "bool/eq": KindSpec<[boolean, boolean], boolean>;
+        readonly "bool/neq": KindSpec<[boolean, boolean], boolean>;
+        readonly "bool/and": KindSpec<[boolean, boolean], boolean>;
+        readonly "bool/or": KindSpec<[boolean, boolean], boolean>;
+        readonly "bool/not": KindSpec<[boolean], boolean>;
+        readonly "bool/implies": KindSpec<[boolean, boolean], boolean>;
+        readonly "bool/show": KindSpec<[boolean], string>;
+        readonly "bool/tt": KindSpec<[], boolean>;
+        readonly "bool/ff": KindSpec<[], boolean>;
+    };
+    readonly traits: {
+        readonly eq: TraitDef<boolean, {
+        boolean: "bool/eq";
+        }>;
+        readonly neq: TraitDef<boolean, {
+        boolean: "bool/neq";
+        }>;
+        readonly show: TraitDef<string, {
+        boolean: "bool/show";
+        }>;
+    };
+    readonly lifts: {
+        readonly boolean: "bool/literal";
+    };
+    readonly defaultInterpreter: () => Interpreter;
+}, {
+    readonly name: "ord";
+    readonly ctors: {
+        readonly lt: lt;
+    };
+    readonly kinds: {
+        readonly "num/lt": KindSpec<[number, number], boolean>;
+        readonly "num/gt": KindSpec<[number, number], boolean>;
+        readonly "num/gte": KindSpec<[number, number], boolean>;
+        readonly "num/lte": KindSpec<[number, number], boolean>;
+        readonly "str/lt": KindSpec<[string, string], boolean>;
+        readonly "str/gt": KindSpec<[string, string], boolean>;
+        readonly "str/gte": KindSpec<[string, string], boolean>;
+        readonly "str/lte": KindSpec<[string, string], boolean>;
+        readonly "str/compare": KindSpec<[string, string], number>;
+        readonly "num/compare": KindSpec<[number, number], number>;
+    };
+    readonly traits: {
+        readonly lt: TraitDef<boolean, {
+        number: "num/lt";
+        string: "str/lt";
+        }>;
+        readonly gt: TraitDef<boolean, {
+        number: "num/gt";
+        string: "str/gt";
+        }>;
+        readonly gte: TraitDef<boolean, {
+        number: "num/gte";
+        string: "str/gte";
+        }>;
+        readonly lte: TraitDef<boolean, {
+        number: "num/lte";
+        string: "str/lte";
+        }>;
+        readonly compare: TraitDef<number, {
+        number: "num/compare";
+        string: "str/compare";
+        }>;
+    };
+    readonly lifts: {};
+    readonly defaultInterpreter: () => Interpreter;
+}];
 
 // @public
 export type PreserveAliases<Adj> = {
@@ -829,7 +1224,7 @@ export interface Program {
     // (undocumented)
     readonly __inputSchema?: Record<string, string>;
     // (undocumented)
-    readonly __nexpr: NExpr<any, any, any, any>;
+    readonly __nexpr: NExpr<unknown, string, unknown, string>;
     // (undocumented)
     readonly __plugins: readonly Plugin_2[];
 }
@@ -965,7 +1360,55 @@ export function spliceWhere<O, R extends string, Adj, C extends string, P extend
 export function split<A, B>(s: A, sep: B): CExpr<string[], "str/split", [A, B]>;
 
 // @public
-export const st: Plugin_2;
+export const st: {
+    name: string;
+    ctors: {
+        let: (initial: unknown) => {
+            get: () => {
+                readonly __kind: "st/get";
+                readonly __args: readonly unknown[];
+                readonly __out: unknown;
+                readonly [cexprBrand]: {
+                    readonly o: unknown;
+                    readonly kind: "st/get";
+                    readonly args: [string];
+                };
+                readonly [CREF]: true;
+            };
+            set: (val: unknown) => {
+                readonly __kind: "st/set";
+                readonly __args: readonly unknown[];
+                readonly __out: unknown;
+                readonly [cexprBrand]: {
+                    readonly o: unknown;
+                    readonly kind: "st/set";
+                    readonly args: [string, unknown];
+                };
+                readonly [CREF]: true;
+            };
+            push: (val: unknown) => {
+                readonly __kind: "st/push";
+                readonly __args: readonly unknown[];
+                readonly __out: unknown;
+                readonly [cexprBrand]: {
+                    readonly o: unknown;
+                    readonly kind: "st/push";
+                    readonly args: [string, unknown];
+                };
+                readonly [CREF]: true;
+            };
+        };
+    };
+    kinds: {
+        "st/let": KindSpec<unknown[], unknown>;
+        "st/get": KindSpec<unknown[], unknown>;
+        "st/set": KindSpec<unknown[], unknown>;
+        "st/push": KindSpec<unknown[], unknown>;
+    };
+    traits: {};
+    lifts: {};
+    defaultInterpreter: () => Interpreter;
+};
 
 // @public
 export function startsWith<A, B>(s: A, prefix: B): CExpr<boolean, "str/startsWith", [A, B]>;
@@ -1352,6 +1795,10 @@ export function wrapByName<O, R extends string, Adj, C extends string, TargetID 
 //
 // @public
 export type WrapOneResult<Adj, TargetID extends string, WrapperKind extends string, WrapperID extends string> = RewireParents<Adj, TargetID, WrapperID> & Record<WrapperID, NodeEntry<WrapperKind, [TargetID], TargetOut_2<Adj, TargetID>>>;
+
+// Warnings were encountered during analysis:
+//
+// dist/api.d.ts:244:5 - (ae-forgotten-export) The symbol "MvfmDollar" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

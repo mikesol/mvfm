@@ -8,9 +8,10 @@
  *   - redis/hgetall outputs `Record<string, string>`
  *   - redis/hkeys outputs `string[]`
  */
-import { describe, it } from "vitest";
+
 import type { DirtyExpr, NodeEntry } from "@mvfm/core";
 import { rewireChildren, swapEntry } from "@mvfm/core";
+import { describe, it } from "vitest";
 
 // ─── Known adj shape for type-level tests ────────────────────────
 

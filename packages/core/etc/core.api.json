@@ -2978,9 +2978,62 @@
               "text": "control: "
             },
             {
+              "kind": "Content",
+              "text": "{\n    name: string;\n    ctors: {\n        each: (items: unknown[], fn: (item: unknown) => unknown) => {\n            readonly __kind: \"core/begin\";\n            readonly __args: readonly unknown[];\n            readonly __out: unknown;\n            readonly ["
+            },
+            {
               "kind": "Reference",
-              "text": "Plugin",
-              "canonicalReference": "@mvfm/core!Plugin_2:interface"
+              "text": "cexprBrand",
+              "canonicalReference": "@mvfm/core!~cexprBrand:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: {\n                readonly o: unknown;\n                readonly kind: \"core/begin\";\n                readonly args: unknown[];\n            };\n            readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "CREF",
+              "canonicalReference": "@mvfm/core!CREF:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: true;\n        };\n        while: (cond: unknown) => {\n            body: (fn: () => unknown) => {\n                readonly __kind: \"control/while\";\n                readonly __args: readonly unknown[];\n                readonly __out: unknown;\n                readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "cexprBrand",
+              "canonicalReference": "@mvfm/core!~cexprBrand:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: {\n                    readonly o: unknown;\n                    readonly kind: \"control/while\";\n                    readonly args: [unknown, unknown];\n                };\n                readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "CREF",
+              "canonicalReference": "@mvfm/core!CREF:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: true;\n            };\n        };\n    };\n    kinds: {\n        \"control/while\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown>;\n    };\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
             }
           ],
           "fileUrlPath": "dist/control.d.ts",
@@ -2989,7 +3042,7 @@
           "name": "control",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 2
+            "endIndex": 14
           }
         },
         {
@@ -3026,9 +3079,80 @@
               "text": "corePlugin: "
             },
             {
+              "kind": "Content",
+              "text": "{\n    name: string;\n    ctors: {};\n    kinds: {\n        \"core/literal\": "
+            },
+            {
               "kind": "Reference",
-              "text": "Plugin",
-              "canonicalReference": "@mvfm/core!Plugin_2:interface"
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], unknown>;\n        \"core/input\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], unknown>;\n        \"core/access\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"core/begin\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown>;\n        \"core/cond\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[boolean, unknown, unknown], unknown>;\n        \"core/record\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown>;\n        \"core/tuple\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown[]>;\n    };\n    traits: {};\n    lifts: {};\n    shapes: {\n        \"core/record\": string;\n        \"core/tuple\": string;\n    };\n    defaultInterpreter: () => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
             }
           ],
           "fileUrlPath": "dist/core-plugin.d.ts",
@@ -3037,7 +3161,7 @@
           "name": "corePlugin",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 2
+            "endIndex": 18
           }
         },
         {
@@ -3483,7 +3607,34 @@
             },
             {
               "kind": "Content",
-              "text": "any"
+              "text": "readonly "
+            },
+            {
+              "kind": "Reference",
+              "text": "Plugin",
+              "canonicalReference": "@mvfm/core!Plugin_2:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "[] | {\n    plugins?: readonly "
+            },
+            {
+              "kind": "Reference",
+              "text": "Plugin",
+              "canonicalReference": "@mvfm/core!Plugin_2:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "[];\n    __plugins?: readonly "
+            },
+            {
+              "kind": "Reference",
+              "text": "Plugin",
+              "canonicalReference": "@mvfm/core!Plugin_2:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "[];\n}"
             },
             {
               "kind": "Content",
@@ -3523,8 +3674,8 @@
           ],
           "fileUrlPath": "dist/api.d.ts",
           "returnTypeTokenRange": {
-            "startIndex": 8,
-            "endIndex": 9
+            "startIndex": 14,
+            "endIndex": 15
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
@@ -3533,15 +3684,15 @@
               "parameterName": "appOrPlugins",
               "parameterTypeTokenRange": {
                 "startIndex": 1,
-                "endIndex": 2
+                "endIndex": 8
               },
               "isOptional": false
             },
             {
               "parameterName": "overrides",
               "parameterTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 7
+                "startIndex": 9,
+                "endIndex": 13
               },
               "isOptional": true
             }
@@ -4753,9 +4904,161 @@
               "text": "error: "
             },
             {
+              "kind": "Content",
+              "text": "{\n    name: string;\n    ctors: {\n        try: (expr: unknown) => {\n            catch: (fn: (err: unknown) => unknown) => {\n                readonly __kind: \"error/try\";\n                readonly __args: readonly unknown[];\n                readonly __out: unknown;\n                readonly ["
+            },
+            {
               "kind": "Reference",
-              "text": "Plugin",
-              "canonicalReference": "@mvfm/core!Plugin_2:interface"
+              "text": "cexprBrand",
+              "canonicalReference": "@mvfm/core!~cexprBrand:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: {\n                    readonly o: unknown;\n                    readonly kind: \"error/try\";\n                    readonly args: [unknown, unknown];\n                };\n                readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "CREF",
+              "canonicalReference": "@mvfm/core!CREF:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: true;\n            };\n        };\n        fail: (msg: unknown) => {\n            readonly __kind: \"error/fail\";\n            readonly __args: readonly unknown[];\n            readonly __out: unknown;\n            readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "cexprBrand",
+              "canonicalReference": "@mvfm/core!~cexprBrand:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: {\n                readonly o: unknown;\n                readonly kind: \"error/fail\";\n                readonly args: [unknown];\n            };\n            readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "CREF",
+              "canonicalReference": "@mvfm/core!CREF:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: true;\n        };\n        guard: (cond: unknown, msg: unknown) => {\n            readonly __kind: \"error/guard\";\n            readonly __args: readonly unknown[];\n            readonly __out: unknown;\n            readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "cexprBrand",
+              "canonicalReference": "@mvfm/core!~cexprBrand:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: {\n                readonly o: unknown;\n                readonly kind: \"error/guard\";\n                readonly args: [unknown, unknown];\n            };\n            readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "CREF",
+              "canonicalReference": "@mvfm/core!CREF:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: true;\n        };\n        attempt: (expr: unknown) => {\n            readonly __kind: \"error/attempt\";\n            readonly __args: readonly unknown[];\n            readonly __out: unknown;\n            readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "cexprBrand",
+              "canonicalReference": "@mvfm/core!~cexprBrand:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: {\n                readonly o: unknown;\n                readonly kind: \"error/attempt\";\n                readonly args: [unknown];\n            };\n            readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "CREF",
+              "canonicalReference": "@mvfm/core!CREF:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: true;\n        };\n        settle: (...exprs: unknown[]) => {\n            readonly __kind: \"error/settle\";\n            readonly __args: readonly unknown[];\n            readonly __out: unknown;\n            readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "cexprBrand",
+              "canonicalReference": "@mvfm/core!~cexprBrand:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: {\n                readonly o: unknown;\n                readonly kind: \"error/settle\";\n                readonly args: unknown[];\n            };\n            readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "CREF",
+              "canonicalReference": "@mvfm/core!CREF:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: true;\n        };\n    };\n    kinds: {\n        \"error/try\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown>;\n        \"error/fail\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown>;\n        \"error/guard\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown>;\n        \"error/caught\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], string>;\n        \"error/attempt\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown>;\n        \"error/settle\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown>;\n    };\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
             }
           ],
           "fileUrlPath": "dist/error.d.ts",
@@ -4764,7 +5067,7 @@
           "name": "error",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 2
+            "endIndex": 36
           }
         },
         {
@@ -5357,9 +5660,152 @@
               "text": "fiber: "
             },
             {
+              "kind": "Content",
+              "text": "{\n    name: string;\n    ctors: {\n        par: (...args: unknown[]) => {\n            readonly __kind: \"core/tuple\";\n            readonly __args: readonly unknown[];\n            readonly __out: unknown;\n            readonly ["
+            },
+            {
               "kind": "Reference",
-              "text": "Plugin",
-              "canonicalReference": "@mvfm/core!Plugin_2:interface"
+              "text": "cexprBrand",
+              "canonicalReference": "@mvfm/core!~cexprBrand:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: {\n                readonly o: unknown;\n                readonly kind: \"core/tuple\";\n                readonly args: [unknown[]];\n            };\n            readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "CREF",
+              "canonicalReference": "@mvfm/core!CREF:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: true;\n        } | {\n            readonly __kind: \"fiber/par_map\";\n            readonly __args: readonly unknown[];\n            readonly __out: unknown;\n            readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "cexprBrand",
+              "canonicalReference": "@mvfm/core!~cexprBrand:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: {\n                readonly o: unknown;\n                readonly kind: \"fiber/par_map\";\n                readonly args: [unknown, number, unknown];\n            };\n            readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "CREF",
+              "canonicalReference": "@mvfm/core!CREF:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: true;\n        };\n        race: (...exprs: unknown[]) => {\n            readonly __kind: \"fiber/race\";\n            readonly __args: readonly unknown[];\n            readonly __out: unknown;\n            readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "cexprBrand",
+              "canonicalReference": "@mvfm/core!~cexprBrand:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: {\n                readonly o: unknown;\n                readonly kind: \"fiber/race\";\n                readonly args: unknown[];\n            };\n            readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "CREF",
+              "canonicalReference": "@mvfm/core!CREF:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: true;\n        };\n        timeout: (expr: unknown, ms: unknown, fallback: unknown) => {\n            readonly __kind: \"fiber/timeout\";\n            readonly __args: readonly unknown[];\n            readonly __out: unknown;\n            readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "cexprBrand",
+              "canonicalReference": "@mvfm/core!~cexprBrand:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: {\n                readonly o: unknown;\n                readonly kind: \"fiber/timeout\";\n                readonly args: [unknown, unknown, unknown];\n            };\n            readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "CREF",
+              "canonicalReference": "@mvfm/core!CREF:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: true;\n        };\n        retry: (expr: unknown, opts: {\n            attempts: number;\n            delay?: number;\n        }) => {\n            readonly __kind: \"fiber/retry\";\n            readonly __args: readonly unknown[];\n            readonly __out: unknown;\n            readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "cexprBrand",
+              "canonicalReference": "@mvfm/core!~cexprBrand:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: {\n                readonly o: unknown;\n                readonly kind: \"fiber/retry\";\n                readonly args: [unknown, number, number];\n            };\n            readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "CREF",
+              "canonicalReference": "@mvfm/core!CREF:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: true;\n        };\n    };\n    kinds: {\n        \"fiber/par_map\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown[]>;\n        \"fiber/par_item\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown>;\n        \"fiber/race\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown>;\n        \"fiber/timeout\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown>;\n        \"fiber/retry\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown>;\n    };\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
             }
           ],
           "fileUrlPath": "dist/fiber.d.ts",
@@ -5368,7 +5814,7 @@
           "name": "fiber",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 2
+            "endIndex": 34
           }
         },
         {
@@ -5437,39 +5883,25 @@
         {
           "kind": "Function",
           "canonicalReference": "@mvfm/core!fold:function(1)",
-          "docComment": "/**\n * Evaluate a program/NExpr. Supports fold(interp, prog) and fold(nexpr, interp).\n */\n",
+          "docComment": "/**\n * Evaluate a program/NExpr. Supports fold(interp, prog), fold(nexpr, interp), and fold(rootId, adj, interp).\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare function fold(first: "
+              "text": "export declare function fold(interp: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
             },
             {
               "kind": "Content",
-              "text": "any"
+              "text": ", prog: "
             },
             {
-              "kind": "Content",
-              "text": ", second: "
-            },
-            {
-              "kind": "Content",
-              "text": "any"
-            },
-            {
-              "kind": "Content",
-              "text": ", third?: "
-            },
-            {
-              "kind": "Content",
-              "text": "any"
-            },
-            {
-              "kind": "Content",
-              "text": ", fourth?: "
-            },
-            {
-              "kind": "Content",
-              "text": "any"
+              "kind": "Reference",
+              "text": "Program",
+              "canonicalReference": "@mvfm/core!Program:interface"
             },
             {
               "kind": "Content",
@@ -5491,14 +5923,14 @@
           ],
           "fileUrlPath": "dist/api.d.ts",
           "returnTypeTokenRange": {
-            "startIndex": 9,
-            "endIndex": 11
+            "startIndex": 5,
+            "endIndex": 7
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "first",
+              "parameterName": "interp",
               "parameterTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
@@ -5506,26 +5938,213 @@
               "isOptional": false
             },
             {
-              "parameterName": "second",
+              "parameterName": "prog",
               "parameterTypeTokenRange": {
                 "startIndex": 3,
                 "endIndex": 4
               },
               "isOptional": false
+            }
+          ],
+          "name": "fold"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@mvfm/core!fold:function(2)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function fold(nexpr: "
             },
             {
-              "parameterName": "third",
+              "kind": "Reference",
+              "text": "NExpr",
+              "canonicalReference": "@mvfm/core!NExpr:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown, string, unknown, string>"
+            },
+            {
+              "kind": "Content",
+              "text": ", interp: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
+            },
+            {
+              "kind": "Content",
+              "text": ", state?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "FoldState",
+              "canonicalReference": "@mvfm/core!FoldState:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/api.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 8,
+            "endIndex": 10
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 2,
+          "parameters": [
+            {
+              "parameterName": "nexpr",
               "parameterTypeTokenRange": {
-                "startIndex": 5,
-                "endIndex": 6
+                "startIndex": 1,
+                "endIndex": 3
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "interp",
+              "parameterTypeTokenRange": {
+                "startIndex": 4,
+                "endIndex": 5
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "state",
+              "parameterTypeTokenRange": {
+                "startIndex": 6,
+                "endIndex": 7
               },
               "isOptional": true
+            }
+          ],
+          "name": "fold"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@mvfm/core!fold:function(3)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function fold(rootId: "
             },
             {
-              "parameterName": "fourth",
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ", adj: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, "
+            },
+            {
+              "kind": "Reference",
+              "text": "RuntimeEntry",
+              "canonicalReference": "@mvfm/core!RuntimeEntry:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">"
+            },
+            {
+              "kind": "Content",
+              "text": ", interp: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
+            },
+            {
+              "kind": "Content",
+              "text": ", state?: "
+            },
+            {
+              "kind": "Reference",
+              "text": "FoldState",
+              "canonicalReference": "@mvfm/core!FoldState:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Promise",
+              "canonicalReference": "!Promise:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown>"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/api.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 12,
+            "endIndex": 14
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 3,
+          "parameters": [
+            {
+              "parameterName": "rootId",
               "parameterTypeTokenRange": {
-                "startIndex": 7,
-                "endIndex": 8
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "adj",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 7
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "interp",
+              "parameterTypeTokenRange": {
+                "startIndex": 8,
+                "endIndex": 9
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "state",
+              "parameterTypeTokenRange": {
+                "startIndex": 10,
+                "endIndex": 11
               },
               "isOptional": true
             }
@@ -6703,34 +7322,6 @@
             }
           ],
           "name": "join"
-        },
-        {
-          "kind": "Variable",
-          "canonicalReference": "@mvfm/core!KIND_INPUTS:var",
-          "docComment": "/**\n * Kind-inputs map from stdPlugins: maps kind names to input type arrays.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "KIND_INPUTS: "
-            },
-            {
-              "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string, string[]>"
-            }
-          ],
-          "fileUrlPath": "dist/elaborate.d.ts",
-          "isReadonly": true,
-          "releaseTag": "Public",
-          "name": "KIND_INPUTS",
-          "variableTypeTokenRange": {
-            "startIndex": 1,
-            "endIndex": 3
-          }
         },
         {
           "kind": "Interface",
@@ -8802,29 +9393,28 @@
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare function mvfm(...pluginInputs: "
+              "text": "export declare function mvfm<const P extends "
             },
             {
               "kind": "Content",
-              "text": "("
+              "text": "readonly "
             },
             {
               "kind": "Reference",
-              "text": "Plugin",
-              "canonicalReference": "@mvfm/core!Plugin_2:interface"
+              "text": "PluginInput",
+              "canonicalReference": "@mvfm/core!~PluginInput:type"
             },
             {
               "kind": "Content",
-              "text": " | readonly "
-            },
-            {
-              "kind": "Reference",
-              "text": "Plugin",
-              "canonicalReference": "@mvfm/core!Plugin_2:interface"
+              "text": "[]"
             },
             {
               "kind": "Content",
-              "text": "[])[]"
+              "text": ">(...pluginInputs: "
+            },
+            {
+              "kind": "Content",
+              "text": "P"
             },
             {
               "kind": "Content",
@@ -8832,7 +9422,16 @@
             },
             {
               "kind": "Content",
-              "text": "{\n    (schemaOrFn: any, maybeFn?: any): "
+              "text": "{\n    (fn: ($: "
+            },
+            {
+              "kind": "Reference",
+              "text": "MvfmDollar",
+              "canonicalReference": "@mvfm/core!~MvfmDollar:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<P>) => unknown): "
             },
             {
               "kind": "Reference",
@@ -8841,7 +9440,34 @@
             },
             {
               "kind": "Content",
-              "text": ";\n    plugins: "
+              "text": ";\n    (schema: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, string>, fn: ($: "
+            },
+            {
+              "kind": "Reference",
+              "text": "MvfmDollar",
+              "canonicalReference": "@mvfm/core!~MvfmDollar:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<P>) => unknown): "
+            },
+            {
+              "kind": "Reference",
+              "text": "Program",
+              "canonicalReference": "@mvfm/core!Program:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n} & {\n    plugins: "
             },
             {
               "kind": "Reference",
@@ -8860,7 +9486,7 @@
           "fileUrlPath": "dist/api.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 7,
-            "endIndex": 12
+            "endIndex": 20
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
@@ -8868,10 +9494,23 @@
             {
               "parameterName": "pluginInputs",
               "parameterTypeTokenRange": {
-                "startIndex": 1,
+                "startIndex": 5,
                 "endIndex": 6
               },
               "isOptional": false
+            }
+          ],
+          "typeParameters": [
+            {
+              "typeParameterName": "P",
+              "constraintTokenRange": {
+                "startIndex": 1,
+                "endIndex": 4
+              },
+              "defaultTypeTokenRange": {
+                "startIndex": 0,
+                "endIndex": 0
+              }
             }
           ],
           "name": "mvfm"
@@ -12791,16 +13430,1015 @@
             },
             {
               "kind": "Content",
-              "text": "readonly "
+              "text": "readonly [{\n    readonly name: \"num\";\n    readonly ctors: {\n        readonly add: typeof import(\"./constructors\")."
             },
             {
               "kind": "Reference",
-              "text": "Plugin",
-              "canonicalReference": "@mvfm/core!Plugin_2:interface"
+              "text": "add",
+              "canonicalReference": "@mvfm/core!add"
             },
             {
               "kind": "Content",
-              "text": "[]"
+              "text": ";\n        readonly mul: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "mul",
+              "canonicalReference": "@mvfm/core!mul"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly sub: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "sub",
+              "canonicalReference": "@mvfm/core!sub"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly div: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "div",
+              "canonicalReference": "@mvfm/core!div"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly mod: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "mod",
+              "canonicalReference": "@mvfm/core!mod"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly min: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "min",
+              "canonicalReference": "@mvfm/core!min"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly max: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "max",
+              "canonicalReference": "@mvfm/core!max"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly neg: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "neg",
+              "canonicalReference": "@mvfm/core!neg"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly abs: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "abs",
+              "canonicalReference": "@mvfm/core!abs"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly floor: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "floor",
+              "canonicalReference": "@mvfm/core!floor"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly ceil: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "ceil",
+              "canonicalReference": "@mvfm/core!ceil"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly round: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "round",
+              "canonicalReference": "@mvfm/core!round"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly numLit: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "numLit",
+              "canonicalReference": "@mvfm/core!numLit"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    };\n    readonly kinds: {\n        readonly \"num/literal\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], number>;\n        readonly \"num/add\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], number>;\n        readonly \"num/mul\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], number>;\n        readonly \"num/sub\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], number>;\n        readonly \"num/div\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], number>;\n        readonly \"num/mod\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], number>;\n        readonly \"num/neg\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number], number>;\n        readonly \"num/abs\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number], number>;\n        readonly \"num/floor\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number], number>;\n        readonly \"num/ceil\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number], number>;\n        readonly \"num/round\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number], number>;\n        readonly \"num/min\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], number>;\n        readonly \"num/max\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], number>;\n        readonly \"num/show\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number], string>;\n        readonly \"num/compare\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], number>;\n        readonly \"num/eq\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], boolean>;\n        readonly \"num/neq\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], boolean>;\n        readonly \"num/zero\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], number>;\n        readonly \"num/one\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], number>;\n        readonly \"num/top\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], number>;\n        readonly \"num/bottom\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], number>;\n    };\n    readonly traits: {\n        readonly eq: import(\"./plugin\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TraitDef",
+              "canonicalReference": "@mvfm/core!TraitDef:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<boolean, {\n            number: \"num/eq\";\n        }>;\n        readonly neq: import(\"./plugin\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TraitDef",
+              "canonicalReference": "@mvfm/core!TraitDef:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<boolean, {\n            number: \"num/neq\";\n        }>;\n        readonly show: import(\"./plugin\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TraitDef",
+              "canonicalReference": "@mvfm/core!TraitDef:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, {\n            number: \"num/show\";\n        }>;\n    };\n    readonly lifts: {\n        readonly number: \"num/literal\";\n    };\n    readonly defaultInterpreter: () => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}, {\n    readonly name: \"str\";\n    readonly ctors: {\n        readonly strLit: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "strLit",
+              "canonicalReference": "@mvfm/core!strLit"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly str: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "str",
+              "canonicalReference": "@mvfm/core!str"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly concat: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "concat",
+              "canonicalReference": "@mvfm/core!concat"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly upper: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "upper",
+              "canonicalReference": "@mvfm/core!upper"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly lower: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "lower",
+              "canonicalReference": "@mvfm/core!lower"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly trim: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "trim",
+              "canonicalReference": "@mvfm/core!trim"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly slice: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "slice",
+              "canonicalReference": "@mvfm/core!slice"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly includes: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "includes",
+              "canonicalReference": "@mvfm/core!includes"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly startsWith: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "startsWith",
+              "canonicalReference": "@mvfm/core!startsWith"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly endsWith: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "endsWith",
+              "canonicalReference": "@mvfm/core!endsWith"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly split: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "split",
+              "canonicalReference": "@mvfm/core!split"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly join: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "join",
+              "canonicalReference": "@mvfm/core!join"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly replace: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "replace",
+              "canonicalReference": "@mvfm/core!replace"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly len: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "len",
+              "canonicalReference": "@mvfm/core!len"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly strShow: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "strShow",
+              "canonicalReference": "@mvfm/core!strShow"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly strAppend: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "strAppend",
+              "canonicalReference": "@mvfm/core!strAppend"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    };\n    readonly kinds: {\n        readonly \"str/literal\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], string>;\n        readonly \"str/concat\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<string[], string>;\n        readonly \"str/upper\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string], string>;\n        readonly \"str/lower\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string], string>;\n        readonly \"str/trim\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string], string>;\n        readonly \"str/slice\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, number, number], string>;\n        readonly \"str/includes\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string], boolean>;\n        readonly \"str/startsWith\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string], boolean>;\n        readonly \"str/endsWith\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string], boolean>;\n        readonly \"str/split\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string], string[]>;\n        readonly \"str/join\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string[], string], string>;\n        readonly \"str/replace\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string, string], string>;\n        readonly \"str/len\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string], number>;\n        readonly \"str/show\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string], string>;\n        readonly \"str/append\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string], string>;\n        readonly \"str/mempty\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], string>;\n        readonly \"str/eq\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string], boolean>;\n        readonly \"str/neq\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string], boolean>;\n    };\n    readonly traits: {\n        readonly eq: import(\"./plugin\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TraitDef",
+              "canonicalReference": "@mvfm/core!TraitDef:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<boolean, {\n            string: \"str/eq\";\n        }>;\n        readonly neq: import(\"./plugin\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TraitDef",
+              "canonicalReference": "@mvfm/core!TraitDef:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<boolean, {\n            string: \"str/neq\";\n        }>;\n        readonly show: import(\"./plugin\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TraitDef",
+              "canonicalReference": "@mvfm/core!TraitDef:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, {\n            string: \"str/show\";\n        }>;\n        readonly append: import(\"./plugin\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TraitDef",
+              "canonicalReference": "@mvfm/core!TraitDef:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, {\n            string: \"str/append\";\n        }>;\n    };\n    readonly lifts: {\n        readonly string: \"str/literal\";\n    };\n    readonly defaultInterpreter: () => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}, {\n    readonly name: \"bool\";\n    readonly ctors: {\n        readonly boolLit: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "boolLit",
+              "canonicalReference": "@mvfm/core!boolLit"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly and: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "boolAnd",
+              "canonicalReference": "@mvfm/core!boolAnd"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly or: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "boolOr",
+              "canonicalReference": "@mvfm/core!boolOr"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n        readonly not: typeof import(\"./constructors\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "boolNot",
+              "canonicalReference": "@mvfm/core!boolNot"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    };\n    readonly kinds: {\n        readonly \"bool/literal\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], boolean>;\n        readonly \"bool/eq\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[boolean, boolean], boolean>;\n        readonly \"bool/neq\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[boolean, boolean], boolean>;\n        readonly \"bool/and\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[boolean, boolean], boolean>;\n        readonly \"bool/or\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[boolean, boolean], boolean>;\n        readonly \"bool/not\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[boolean], boolean>;\n        readonly \"bool/implies\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[boolean, boolean], boolean>;\n        readonly \"bool/show\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[boolean], string>;\n        readonly \"bool/tt\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], boolean>;\n        readonly \"bool/ff\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[], boolean>;\n    };\n    readonly traits: {\n        readonly eq: import(\"./plugin\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TraitDef",
+              "canonicalReference": "@mvfm/core!TraitDef:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<boolean, {\n            boolean: \"bool/eq\";\n        }>;\n        readonly neq: import(\"./plugin\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TraitDef",
+              "canonicalReference": "@mvfm/core!TraitDef:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<boolean, {\n            boolean: \"bool/neq\";\n        }>;\n        readonly show: import(\"./plugin\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TraitDef",
+              "canonicalReference": "@mvfm/core!TraitDef:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, {\n            boolean: \"bool/show\";\n        }>;\n    };\n    readonly lifts: {\n        readonly boolean: \"bool/literal\";\n    };\n    readonly defaultInterpreter: () => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}, {\n    readonly name: \"ord\";\n    readonly ctors: {\n        readonly lt: typeof import(\"./std-plugins-ord\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "lt",
+              "canonicalReference": "@mvfm/core!lt"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    };\n    readonly kinds: {\n        readonly \"num/lt\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], boolean>;\n        readonly \"num/gt\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], boolean>;\n        readonly \"num/gte\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], boolean>;\n        readonly \"num/lte\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], boolean>;\n        readonly \"str/lt\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string], boolean>;\n        readonly \"str/gt\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string], boolean>;\n        readonly \"str/gte\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string], boolean>;\n        readonly \"str/lte\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string], boolean>;\n        readonly \"str/compare\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[string, string], number>;\n        readonly \"num/compare\": import(\"./registry\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[number, number], number>;\n    };\n    readonly traits: {\n        readonly lt: import(\"./plugin\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TraitDef",
+              "canonicalReference": "@mvfm/core!TraitDef:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<boolean, {\n            number: \"num/lt\";\n            string: \"str/lt\";\n        }>;\n        readonly gt: import(\"./plugin\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TraitDef",
+              "canonicalReference": "@mvfm/core!TraitDef:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<boolean, {\n            number: \"num/gt\";\n            string: \"str/gt\";\n        }>;\n        readonly gte: import(\"./plugin\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TraitDef",
+              "canonicalReference": "@mvfm/core!TraitDef:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<boolean, {\n            number: \"num/gte\";\n            string: \"str/gte\";\n        }>;\n        readonly lte: import(\"./plugin\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TraitDef",
+              "canonicalReference": "@mvfm/core!TraitDef:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<boolean, {\n            number: \"num/lte\";\n            string: \"str/lte\";\n        }>;\n        readonly compare: import(\"./plugin\")."
+            },
+            {
+              "kind": "Reference",
+              "text": "TraitDef",
+              "canonicalReference": "@mvfm/core!TraitDef:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<number, {\n            number: \"num/compare\";\n            string: \"str/compare\";\n        }>;\n    };\n    readonly lifts: {};\n    readonly defaultInterpreter: () => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}]"
             }
           ],
           "fileUrlPath": "dist/api.d.ts",
@@ -12809,7 +14447,7 @@
           "name": "prelude",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 4
+            "endIndex": 226
           }
         },
         {
@@ -12914,7 +14552,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<any, any, any, any>"
+                  "text": "<unknown, string, unknown, string>"
                 },
                 {
                   "kind": "Content",
@@ -15737,9 +17375,107 @@
               "text": "st: "
             },
             {
+              "kind": "Content",
+              "text": "{\n    name: string;\n    ctors: {\n        let: (initial: unknown) => {\n            get: () => {\n                readonly __kind: \"st/get\";\n                readonly __args: readonly unknown[];\n                readonly __out: unknown;\n                readonly ["
+            },
+            {
               "kind": "Reference",
-              "text": "Plugin",
-              "canonicalReference": "@mvfm/core!Plugin_2:interface"
+              "text": "cexprBrand",
+              "canonicalReference": "@mvfm/core!~cexprBrand:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: {\n                    readonly o: unknown;\n                    readonly kind: \"st/get\";\n                    readonly args: [string];\n                };\n                readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "CREF",
+              "canonicalReference": "@mvfm/core!CREF:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: true;\n            };\n            set: (val: unknown) => {\n                readonly __kind: \"st/set\";\n                readonly __args: readonly unknown[];\n                readonly __out: unknown;\n                readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "cexprBrand",
+              "canonicalReference": "@mvfm/core!~cexprBrand:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: {\n                    readonly o: unknown;\n                    readonly kind: \"st/set\";\n                    readonly args: [string, unknown];\n                };\n                readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "CREF",
+              "canonicalReference": "@mvfm/core!CREF:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: true;\n            };\n            push: (val: unknown) => {\n                readonly __kind: \"st/push\";\n                readonly __args: readonly unknown[];\n                readonly __out: unknown;\n                readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "cexprBrand",
+              "canonicalReference": "@mvfm/core!~cexprBrand:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: {\n                    readonly o: unknown;\n                    readonly kind: \"st/push\";\n                    readonly args: [string, unknown];\n                };\n                readonly ["
+            },
+            {
+              "kind": "Reference",
+              "text": "CREF",
+              "canonicalReference": "@mvfm/core!CREF:var"
+            },
+            {
+              "kind": "Content",
+              "text": "]: true;\n            };\n        };\n    };\n    kinds: {\n        \"st/let\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown>;\n        \"st/get\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown>;\n        \"st/set\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown>;\n        \"st/push\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/core!KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown>;\n    };\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/core!Interpreter:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
             }
           ],
           "fileUrlPath": "dist/st.d.ts",
@@ -15748,7 +17484,7 @@
           "name": "st",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 2
+            "endIndex": 24
           }
         },
         {

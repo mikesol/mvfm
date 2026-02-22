@@ -5,7 +5,8 @@
  * can access the current error value without recurseScoped.
  */
 
-import { CREF, makeCExpr, type cexprBrand } from "./expr";
+// biome-ignore lint/correctness/noUnusedImports: needed for declaration emit
+import { CREF, type cexprBrand, makeCExpr } from "./expr";
 import type { Interpreter, Plugin } from "./plugin";
 import type { KindSpec } from "./registry";
 
@@ -28,11 +29,26 @@ export const error = {
     settle: (...exprs: unknown[]) => makeCExpr("error/settle", exprs),
   },
   kinds: {
-    "error/try": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
-    "error/fail": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
-    "error/guard": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
-    "error/caught": { inputs: [] as unknown[], output: "" as string } as KindSpec<unknown[], string>,
-    "error/attempt": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
+    "error/try": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<
+      unknown[],
+      unknown
+    >,
+    "error/fail": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<
+      unknown[],
+      unknown
+    >,
+    "error/guard": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<
+      unknown[],
+      unknown
+    >,
+    "error/caught": { inputs: [] as unknown[], output: "" as string } as KindSpec<
+      unknown[],
+      string
+    >,
+    "error/attempt": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<
+      unknown[],
+      unknown
+    >,
     "error/settle": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<
       unknown[],
       unknown

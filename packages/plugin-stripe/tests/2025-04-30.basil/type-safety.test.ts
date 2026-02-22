@@ -7,9 +7,10 @@
  * and also use `num/literal` (output: number) as an external
  * contrasting type.
  */
-import { describe, it } from "vitest";
+
 import type { DirtyExpr, NodeEntry } from "@mvfm/core";
 import { rewireChildren, swapEntry } from "@mvfm/core";
+import { describe, it } from "vitest";
 
 // ─── Known adj shape for type-level tests ────────────────────────
 

@@ -112,7 +112,7 @@ describe("twilio plugin: unified Plugin shape", () => {
     expect(Object.keys(plugin.kinds)).toHaveLength(8);
   });
 
-  it("nodeKinds are all namespaced", () => {
+  it("kinds are all namespaced", () => {
     for (const kind of Object.keys(plugin.kinds)) {
       expect(kind).toMatch(/^twilio\//);
     }

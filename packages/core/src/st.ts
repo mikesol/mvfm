@@ -8,7 +8,8 @@
  * This avoids the CExpr deduplication problem in elaborate.
  */
 
-import { CREF, makeCExpr, type cexprBrand } from "./expr";
+// biome-ignore lint/correctness/noUnusedImports: needed for declaration emit
+import { CREF, type cexprBrand, makeCExpr } from "./expr";
 import type { Interpreter, Plugin } from "./plugin";
 import type { KindSpec } from "./registry";
 
@@ -29,10 +30,22 @@ export const st = {
     },
   },
   kinds: {
-    "st/let": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
-    "st/get": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
-    "st/set": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
-    "st/push": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
+    "st/let": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<
+      unknown[],
+      unknown
+    >,
+    "st/get": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<
+      unknown[],
+      unknown
+    >,
+    "st/set": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<
+      unknown[],
+      unknown
+    >,
+    "st/push": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<
+      unknown[],
+      unknown
+    >,
   },
   traits: {},
   lifts: {},

@@ -5,7 +5,8 @@
  * while() creates a control/while node evaluated by the fold engine.
  */
 
-import { CREF, makeCExpr, type cexprBrand } from "./expr";
+// biome-ignore lint/correctness/noUnusedImports: needed for declaration emit
+import { CREF, type cexprBrand, makeCExpr } from "./expr";
 import type { Interpreter, Plugin } from "./plugin";
 import type { KindSpec } from "./registry";
 
@@ -27,7 +28,10 @@ export const control = {
     }),
   },
   kinds: {
-    "control/while": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
+    "control/while": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<
+      unknown[],
+      unknown
+    >,
   },
   traits: {},
   lifts: {},

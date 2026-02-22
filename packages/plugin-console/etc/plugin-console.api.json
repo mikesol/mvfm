@@ -327,7 +327,7 @@
         {
           "kind": "Function",
           "canonicalReference": "@mvfm/plugin-console!clientInterpreter:function(1)",
-          "docComment": "/**\n * Creates a client-side interpreter that proxies all operations to a server.\n *\n * Each handler resolves its RuntimeEntry children via positional yield, then sends the resolved data to `{baseUrl}/mvfm/execute` as a JSON POST.\n *\n * @param options - Handler options.\n *\n * @param nodeKinds - Node kinds to create handlers for.\n *\n * @returns An Interpreter that proxies all operations to the server.\n */\n",
+          "docComment": "/**\n * Creates a client-side interpreter that proxies all operations to a server.\n *\n * Each handler resolves its RuntimeEntry children via positional yield, then sends the resolved data to `{baseUrl}/mvfm/execute` as a JSON POST.\n *\n * @param options - Handler options.\n *\n * @param kinds - Kind strings to create handlers for (use Object.keys(plugin.kinds)).\n *\n * @returns An Interpreter that proxies all operations to the server.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -340,7 +340,7 @@
             },
             {
               "kind": "Content",
-              "text": ", nodeKinds: "
+              "text": ", kinds: "
             },
             {
               "kind": "Content",
@@ -377,7 +377,7 @@
               "isOptional": false
             },
             {
-              "parameterName": "nodeKinds",
+              "parameterName": "kinds",
               "parameterTypeTokenRange": {
                 "startIndex": 3,
                 "endIndex": 4

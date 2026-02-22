@@ -8,9 +8,10 @@
  *   - postgres/identifier outputs `unknown`
  *   - num/literal outputs `number`
  */
-import { describe, it } from "vitest";
+
 import type { DirtyExpr, NodeEntry } from "@mvfm/core";
 import { rewireChildren, swapEntry } from "@mvfm/core";
+import { describe, it } from "vitest";
 
 // ─── Known adj shape for type-level tests ────────────────────────
 
@@ -63,7 +64,7 @@ describe("postgres plugin type safety", () => {
     const swapped = swapEntry(makeFakeDirty(), "c1", {
       kind: "postgres/cursor" as const,
       children: [] as [],
-      out: undefined as void,
+      out: undefined as undefined,
     });
     const _check: DirtyExpr<any, any, any, any> = swapped;
     void _check;

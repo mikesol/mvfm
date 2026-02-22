@@ -146,7 +146,7 @@ describe("postgres: cursor", () => {
 });
 
 describe("postgres: plugin structure", () => {
-  it("has correct name and nodeKinds", () => {
+  it("has correct name and kinds", () => {
     expect(plugin.name).toBe("postgres");
     expect(Object.keys(plugin.kinds)).toContain("postgres/query");
     expect(Object.keys(plugin.kinds)).toContain("postgres/begin");

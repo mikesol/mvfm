@@ -5,7 +5,8 @@
  * can access the current iteration value during par_map evaluation.
  */
 
-import { CREF, isCExpr, makeCExpr, type cexprBrand } from "./expr";
+// biome-ignore lint/correctness/noUnusedImports: needed for declaration emit
+import { CREF, type cexprBrand, isCExpr, makeCExpr } from "./expr";
 import type { Interpreter, Plugin } from "./plugin";
 import type { KindSpec } from "./registry";
 
@@ -48,13 +49,22 @@ export const fiber = {
       unknown[],
       unknown[]
     >,
-    "fiber/par_item": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
+    "fiber/par_item": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<
+      unknown[],
+      unknown
+    >,
     "fiber/race": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<
       unknown[],
       unknown
     >,
-    "fiber/timeout": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
-    "fiber/retry": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
+    "fiber/timeout": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<
+      unknown[],
+      unknown
+    >,
+    "fiber/retry": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<
+      unknown[],
+      unknown
+    >,
   },
   traits: {},
   lifts: {},
