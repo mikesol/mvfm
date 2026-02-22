@@ -62,18 +62,6 @@ export const boolPlugin = {
     >,
   },
   lifts: { boolean: "bool/literal" },
-  nodeKinds: [
-    "bool/literal",
-    "bool/eq",
-    "bool/neq",
-    "bool/and",
-    "bool/or",
-    "bool/not",
-    "bool/implies",
-    "bool/show",
-    "bool/tt",
-    "bool/ff",
-  ],
   defaultInterpreter: (): Interpreter => ({
     "bool/literal": async function* (e) {
       return e.out as boolean;

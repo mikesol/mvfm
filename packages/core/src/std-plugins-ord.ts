@@ -87,18 +87,6 @@ export const ordPlugin = {
     } as TraitDef<number, { number: "num/compare"; string: "str/compare" }>,
   },
   lifts: {},
-  nodeKinds: [
-    "num/lt",
-    "num/gt",
-    "num/gte",
-    "num/lte",
-    "str/lt",
-    "str/gt",
-    "str/gte",
-    "str/lte",
-    "str/compare",
-    "num/compare",
-  ],
   defaultInterpreter: (): Interpreter => ({
     "num/lt": async function* () {
       return ((yield 0) as number) < ((yield 1) as number);

@@ -115,26 +115,6 @@ export const strPlugin = {
     >,
   },
   lifts: { string: "str/literal" },
-  nodeKinds: [
-    "str/literal",
-    "str/concat",
-    "str/upper",
-    "str/lower",
-    "str/trim",
-    "str/slice",
-    "str/includes",
-    "str/startsWith",
-    "str/endsWith",
-    "str/split",
-    "str/join",
-    "str/replace",
-    "str/len",
-    "str/show",
-    "str/append",
-    "str/mempty",
-    "str/eq",
-    "str/neq",
-  ],
   defaultInterpreter: (): Interpreter => ({
     "str/literal": async function* (e) {
       return e.out as string;
