@@ -67,16 +67,6 @@ export {
   type TypedNode,
 } from "./compat";
 
-// U-suffixed aliases — deprecated, kept for external plugins not yet migrated.
-import { numPlugin } from "./std-plugins";
-import { boolPlugin } from "./std-plugins-bool";
-import { strPlugin } from "./std-plugins-str";
-/** @deprecated Use numPlugin instead. */
-export const numPluginU = numPlugin;
-/** @deprecated Use strPlugin instead. */
-export const strPluginU = strPlugin;
-/** @deprecated Use boolPlugin instead. */
-export const boolPluginU = boolPlugin;
 
 // ─── 5. Advanced / internal escape hatch ────────────────────────────
 // DAG construction, elaboration, predicates, expression helpers.
