@@ -2,6 +2,7 @@ import {
   createCrystalBallAnthropicClient,
   createCrystalBallFalClient,
   createCrystalBallOpenAIClient,
+  createCrystalBallResendClient,
   createCrystalBallStripeClient,
 } from "./crystal-ball-clients";
 
@@ -53,6 +54,8 @@ export async function createPlaygroundScope(
   };
   const fakePinoInterpreter = pluginPino.createPinoInterpreter(fakePinoClient);
 
+  const pluginSlack = await import("@mvfm/plugin-slack");
+
   const pluginOpenAI = await import("@mvfm/plugin-openai");
   const crystalBallOpenAIInterpreter = pluginOpenAI.createOpenAIInterpreter(
     createCrystalBallOpenAIClient(),
@@ -69,6 +72,24 @@ export async function createPlaygroundScope(
   const pluginStripe = await import("@mvfm/plugin-stripe");
   const crystalBallStripeInterpreter = pluginStripe.createStripeInterpreter(
     createCrystalBallStripeClient(),
+  );
+
+  const pluginTwilio = await import("@mvfm/plugin-twilio");
+  const crystalBallTwilioInterpreter = pluginTwilio.createTwilioInterpreter({
+    async request(method: string, path: string, params?: Record<string, unknown>) {
+      return {
+        method,
+        path,
+        params: params ?? null,
+        sid: "TWILIO_CRYSTAL_BALL",
+        status: "queued",
+      };
+    },
+  });
+
+  const pluginResend = await import("@mvfm/plugin-resend");
+  const crystalBallResendInterpreter = pluginResend.createResendInterpreter(
+    createCrystalBallResendClient(),
   );
 
   const injected: Record<string, unknown> = {
@@ -91,6 +112,12 @@ export async function createPlaygroundScope(
 
     stripe_: pluginStripe.stripe({ apiKey: "sk_test_crystal_ball" }),
     crystalBallStripeInterpreter,
+    twilio_: pluginTwilio.twilio,
+    crystalBallTwilioInterpreter,
+    slack_: pluginSlack.slack({ token: "xoxb-mock-token" }),
+
+    resend_: pluginResend.resend({ apiKey: "re_crystal_ball" }),
+    crystalBallResendInterpreter,
   };
 
   // Wire PGLite-backed postgres when a db instance is provided

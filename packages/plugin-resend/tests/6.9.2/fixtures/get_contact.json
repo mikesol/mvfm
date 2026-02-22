@@ -1,0 +1,11 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/contacts/contact_xyz"
+  },
+  "response": {
+    "id": "contact_xyz",
+    "object": "contact",
+    "email": "user@example.com"
+  }
+}

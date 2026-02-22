@@ -1,0 +1,11 @@
+{
+  "request": {
+    "method": "DELETE",
+    "path": "/contacts/contact_del"
+  },
+  "response": {
+    "object": "contact",
+    "id": "contact_mock_001",
+    "deleted": true
+  }
+}

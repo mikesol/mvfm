@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "path": "/contacts",
+    "params": {
+      "email": "user@example.com"
+    }
+  },
+  "response": {
+    "id": "contact_mock_001",
+    "object": "contact"
+  }
+}

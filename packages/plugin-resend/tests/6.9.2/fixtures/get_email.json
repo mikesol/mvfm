@@ -1,0 +1,14 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/emails/email_abc"
+  },
+  "response": {
+    "id": "email_abc",
+    "object": "email",
+    "from": "sender@example.com",
+    "to": ["recipient@example.com"],
+    "subject": "Test",
+    "created_at": "2026-01-01T00:00:00Z"
+  }
+}

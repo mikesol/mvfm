@@ -16,7 +16,8 @@
     "build": "tsc -p tsconfig.json",
     "check": "biome check --error-on-warnings src tests && tsc -p tsconfig.json && api-extractor run --local",
     "test": "vitest run",
-    "size": "size-limit"
+    "size": "size-limit",
+    "record:fixtures": "npx tsx scripts/record-fixtures.ts"
   },
   "files": ["dist", "etc"],
   "peerDependencies": {

@@ -1,0 +1,12 @@
+{
+  "request": {
+    "method": "GET",
+    "path": "/contacts"
+  },
+  "response": {
+    "object": "list",
+    "data": [
+      { "id": "contact_1", "email": "a@example.com" }
+    ]
+  }
+}

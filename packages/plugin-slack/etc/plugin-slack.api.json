@@ -435,6 +435,34 @@
           "name": "createSlackInterpreter"
         },
         {
+          "kind": "Variable",
+          "canonicalReference": "@mvfm/plugin-slack!NODE_TO_METHOD:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "NODE_TO_METHOD: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, string>"
+            }
+          ],
+          "fileUrlPath": "dist/7.14.0/generated/interpreter.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "NODE_TO_METHOD",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          }
+        },
+        {
           "kind": "Function",
           "canonicalReference": "@mvfm/plugin-slack!serverEvaluate:function(1)",
           "docComment": "/**\n * Creates a unified evaluator using the slack server interpreter.\n *\n * @param client - The {@link SlackClient} to execute against.\n *\n * @param baseInterpreter - Base interpreter for evaluating sub-expressions.\n *\n * @returns An async AST evaluator function.\n */\n",

@@ -563,6 +563,9 @@ export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: stri
 // @public (undocumented)
 export function createSlackInterpreter(client: SlackClient): Interpreter;
 
+// @public (undocumented)
+export const NODE_TO_METHOD: Record<string, string>;
+
 // Warning: (ae-forgotten-export) The symbol "TypedNode" needs to be exported by the entry point index.d.ts
 //
 // @public
