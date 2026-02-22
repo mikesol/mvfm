@@ -2,12 +2,13 @@
 // MVFM PLUGIN: console (Node.js console API) — unified Plugin
 // ============================================================
 //
-// Ported to the unified Plugin type with makeCExpr and
-// index-based fold handlers. All 20 console methods supported.
+// Permissive constructors with kind strings so ExtractKinds can
+// derive all console/* kinds from the ctor return types.
 // ============================================================
 
-import type { CExpr, Interpreter, KindSpec } from "@mvfm/core";
+import type { CExpr, KindSpec, Plugin } from "@mvfm/core";
 import { isCExpr, makeCExpr } from "@mvfm/core";
+import type { Interpreter } from "@mvfm/core";
 import { createConsoleInterpreter } from "./interpreter";
 
 /** Lift plain objects/arrays to structural CExpr nodes so elaborate can process them. */
@@ -18,6 +19,13 @@ function liftConsoleArg(value: unknown): unknown {
   if (Array.isArray(value)) return makeCExpr("core/tuple", [value]);
   return makeCExpr("core/record", [value]);
 }
+
+// liftConsoleArg erases generic type info at runtime (returns unknown).
+// Cast helper restores the declared CExpr Args types for ExtractKinds.
+const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]>(
+  kind: Kind,
+  args: readonly unknown[],
+) => CExpr<O, Kind, Args>;
 
 /**
  * Full set of Node.js console methods covered by this plugin.
@@ -43,28 +51,6 @@ export type ConsoleMethodName =
   | "trace"
   | "warn";
 
-const METHOD_NAMES: ReadonlyArray<ConsoleMethodName> = [
-  "assert",
-  "clear",
-  "count",
-  "countReset",
-  "debug",
-  "dir",
-  "dirxml",
-  "error",
-  "group",
-  "groupCollapsed",
-  "groupEnd",
-  "info",
-  "log",
-  "table",
-  "time",
-  "timeEnd",
-  "timeLog",
-  "trace",
-  "warn",
-];
-
 /**
  * Configuration for the console plugin.
  */
@@ -79,103 +65,100 @@ const variadicVoidKind: KindSpec<unknown[], void> = {
   output: undefined as unknown as undefined,
 };
 
-function buildKinds(): Record<string, KindSpec<unknown[], void>> {
-  const kinds: Record<string, KindSpec<unknown[], void>> = {};
-  for (const m of METHOD_NAMES) {
-    kinds[`console/${m}`] = variadicVoidKind;
-  }
-  return kinds;
-}
-
-/** Console API exposed on `$.console`. */
-export interface ConsoleApi {
-  /** Calls `console.assert(condition, ...data)`. */
-  assert(condition: unknown, ...data: unknown[]): CExpr<void>;
-  /** Calls `console.clear()`. */
-  clear(): CExpr<void>;
-  /** Calls `console.count(label?)`. */
-  count(label?: unknown): CExpr<void>;
-  /** Calls `console.countReset(label?)`. */
-  countReset(label?: unknown): CExpr<void>;
-  /** Calls `console.debug(...data)`. */
-  debug(...data: unknown[]): CExpr<void>;
-  /** Calls `console.dir(item, options?)`. */
-  dir(item?: unknown, options?: unknown): CExpr<void>;
-  /** Calls `console.dirxml(...data)`. */
-  dirxml(...data: unknown[]): CExpr<void>;
-  /** Calls `console.error(...data)`. */
-  error(...data: unknown[]): CExpr<void>;
-  /** Calls `console.group(...data)`. */
-  group(...data: unknown[]): CExpr<void>;
-  /** Calls `console.groupCollapsed(...data)`. */
-  groupCollapsed(...data: unknown[]): CExpr<void>;
-  /** Calls `console.groupEnd()`. */
-  groupEnd(): CExpr<void>;
-  /** Calls `console.info(...data)`. */
-  info(...data: unknown[]): CExpr<void>;
-  /** Calls `console.log(...data)`. */
-  log(...data: unknown[]): CExpr<void>;
-  /** Calls `console.table(tabularData, properties?)`. */
-  table(tabularData?: unknown, properties?: unknown): CExpr<void>;
-  /** Calls `console.time(label?)`. */
-  time(label?: unknown): CExpr<void>;
-  /** Calls `console.timeEnd(label?)`. */
-  timeEnd(label?: unknown): CExpr<void>;
-  /** Calls `console.timeLog(label?, ...data)`. */
-  timeLog(label?: unknown, ...data: unknown[]): CExpr<void>;
-  /** Calls `console.trace(...data)`. */
-  trace(...data: unknown[]): CExpr<void>;
-  /** Calls `console.warn(...data)`. */
-  warn(...data: unknown[]): CExpr<void>;
-}
-
-/**
- * Console operations contributed to the DSL context.
- */
-export interface ConsoleMethods {
-  /** Console API namespace. */
-  console: ConsoleApi;
-}
-
-function buildConsoleApi(): ConsoleApi {
-  function call(method: ConsoleMethodName, args: unknown[]): CExpr<void> {
-    return makeCExpr<void, `console/${typeof method}`, unknown[]>(`console/${method}`, args);
-  }
-
+/** Builds the console constructor methods with permissive generics and kind strings. */
+function buildConsoleApi() {
   return {
-    assert: (condition, ...data) => call("assert", [condition, ...data]),
-    clear: () => call("clear", []),
-    count: (label?) => call("count", label === undefined ? [] : [label]),
-    countReset: (label?) => call("countReset", label === undefined ? [] : [label]),
-    debug: (...data) => call("debug", data),
-    dir: (item?, options?) => {
-      const args: unknown[] = [];
-      if (item !== undefined) args.push(liftConsoleArg(item));
-      if (options !== undefined) args.push(liftConsoleArg(options));
-      return call("dir", args);
+    /** Calls `console.assert(condition, ...data)`. */
+    assert<A, B extends readonly unknown[]>(
+      condition: A,
+      ...data: B
+    ): CExpr<void, "console/assert", [A, ...B]> {
+      return mk("console/assert", [condition, ...data]);
     },
-    dirxml: (...data) => call("dirxml", data.map(liftConsoleArg)),
-    error: (...data) => call("error", data),
-    group: (...data) => call("group", data),
-    groupCollapsed: (...data) => call("groupCollapsed", data),
-    groupEnd: () => call("groupEnd", []),
-    info: (...data) => call("info", data),
-    log: (...data) => call("log", data),
-    table: (tabularData?, properties?) => {
-      const args: unknown[] = [];
-      if (tabularData !== undefined) args.push(liftConsoleArg(tabularData));
-      if (properties !== undefined) args.push(liftConsoleArg(properties));
-      return call("table", args);
+    /** Calls `console.clear()`. */
+    clear(): CExpr<void, "console/clear", []> {
+      return mk("console/clear", []);
     },
-    time: (label?) => call("time", label === undefined ? [] : [label]),
-    timeEnd: (label?) => call("timeEnd", label === undefined ? [] : [label]),
-    timeLog: (label?, ...data) => {
-      const args: unknown[] = [];
-      if (label !== undefined) args.push(label);
-      return call("timeLog", [...args, ...data]);
+    /** Calls `console.count(label?)`. */
+    count<A>(...args: [label: A] | []): CExpr<void, "console/count", unknown[]> {
+      return mk("console/count", args);
     },
-    trace: (...data) => call("trace", data),
-    warn: (...data) => call("warn", data),
+    /** Calls `console.countReset(label?)`. */
+    countReset<A>(...args: [label: A] | []): CExpr<void, "console/countReset", unknown[]> {
+      return mk("console/countReset", args);
+    },
+    /** Calls `console.debug(...data)`. */
+    debug<A extends readonly unknown[]>(...data: A): CExpr<void, "console/debug", A> {
+      return mk("console/debug", data);
+    },
+    /** Calls `console.dir(item, options?)`. */
+    dir<A, B>(...args: [item: A, options: B] | [item: A] | []): CExpr<void, "console/dir", unknown[]> {
+      const lifted: unknown[] = [];
+      if (args.length > 0) lifted.push(liftConsoleArg(args[0]));
+      if (args.length > 1) lifted.push(liftConsoleArg(args[1]));
+      return mk("console/dir", lifted);
+    },
+    /** Calls `console.dirxml(...data)`. */
+    dirxml<A extends readonly unknown[]>(...data: A): CExpr<void, "console/dirxml", A> {
+      return mk("console/dirxml", data.map(liftConsoleArg));
+    },
+    /** Calls `console.error(...data)`. */
+    error<A extends readonly unknown[]>(...data: A): CExpr<void, "console/error", A> {
+      return mk("console/error", data);
+    },
+    /** Calls `console.group(...data)`. */
+    group<A extends readonly unknown[]>(...data: A): CExpr<void, "console/group", A> {
+      return mk("console/group", data);
+    },
+    /** Calls `console.groupCollapsed(...data)`. */
+    groupCollapsed<A extends readonly unknown[]>(
+      ...data: A
+    ): CExpr<void, "console/groupCollapsed", A> {
+      return mk("console/groupCollapsed", data);
+    },
+    /** Calls `console.groupEnd()`. */
+    groupEnd(): CExpr<void, "console/groupEnd", []> {
+      return mk("console/groupEnd", []);
+    },
+    /** Calls `console.info(...data)`. */
+    info<A extends readonly unknown[]>(...data: A): CExpr<void, "console/info", A> {
+      return mk("console/info", data);
+    },
+    /** Calls `console.log(...data)`. */
+    log<A extends readonly unknown[]>(...data: A): CExpr<void, "console/log", A> {
+      return mk("console/log", data);
+    },
+    /** Calls `console.table(tabularData, properties?)`. */
+    table<A, B>(
+      ...args: [tabularData: A, properties: B] | [tabularData: A] | []
+    ): CExpr<void, "console/table", unknown[]> {
+      const lifted: unknown[] = [];
+      if (args.length > 0) lifted.push(liftConsoleArg(args[0]));
+      if (args.length > 1) lifted.push(liftConsoleArg(args[1]));
+      return mk("console/table", lifted);
+    },
+    /** Calls `console.time(label?)`. */
+    time<A>(...args: [label: A] | []): CExpr<void, "console/time", unknown[]> {
+      return mk("console/time", args);
+    },
+    /** Calls `console.timeEnd(label?)`. */
+    timeEnd<A>(...args: [label: A] | []): CExpr<void, "console/timeEnd", unknown[]> {
+      return mk("console/timeEnd", args);
+    },
+    /** Calls `console.timeLog(label?, ...data)`. */
+    timeLog<A, B extends readonly unknown[]>(
+      ...args: [label: A, ...data: B] | []
+    ): CExpr<void, "console/timeLog", unknown[]> {
+      return mk("console/timeLog", [...args]);
+    },
+    /** Calls `console.trace(...data)`. */
+    trace<A extends readonly unknown[]>(...data: A): CExpr<void, "console/trace", A> {
+      return mk("console/trace", data);
+    },
+    /** Calls `console.warn(...data)`. */
+    warn<A extends readonly unknown[]>(...data: A): CExpr<void, "console/warn", A> {
+      return mk("console/warn", data);
+    },
   };
 }
 
@@ -189,11 +172,31 @@ export function console(_config: ConsoleConfig = {}) {
   return {
     name: "console" as const,
     ctors: { console: buildConsoleApi() },
-    kinds: buildKinds(),
+    kinds: {
+      "console/assert": variadicVoidKind,
+      "console/clear": variadicVoidKind,
+      "console/count": variadicVoidKind,
+      "console/countReset": variadicVoidKind,
+      "console/debug": variadicVoidKind,
+      "console/dir": variadicVoidKind,
+      "console/dirxml": variadicVoidKind,
+      "console/error": variadicVoidKind,
+      "console/group": variadicVoidKind,
+      "console/groupCollapsed": variadicVoidKind,
+      "console/groupEnd": variadicVoidKind,
+      "console/info": variadicVoidKind,
+      "console/log": variadicVoidKind,
+      "console/table": variadicVoidKind,
+      "console/time": variadicVoidKind,
+      "console/timeEnd": variadicVoidKind,
+      "console/timeLog": variadicVoidKind,
+      "console/trace": variadicVoidKind,
+      "console/warn": variadicVoidKind,
+    },
     traits: {},
     lifts: {},
     defaultInterpreter: (): Interpreter => createConsoleInterpreter(),
-  };
+  } satisfies Plugin;
 }
 
 /**
