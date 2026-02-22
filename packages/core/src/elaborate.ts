@@ -50,6 +50,7 @@ function elaborate(
 ): { rootId: string; entries: Record<string, RuntimeEntry>; counter: string } {
   const entries: Record<string, RuntimeEntry> = {};
   let counter = "a";
+  const visitCache = new Map<unknown, [string, string]>();
 
   function visitAccess(arg: any): string {
     if (arg.__kind === "core/access") {
@@ -113,12 +114,19 @@ function elaborate(
 
   function visit(arg: unknown, expected?: string): [string, string] {
     if (isCExpr(arg)) {
+      const cached = visitCache.get(arg);
+      if (cached) return cached;
       const cexpr = arg as CExpr<unknown>;
       let kind = cexpr.__kind;
       const args = cexpr.__args;
 
+      const cache = (result: [string, string]) => {
+        visitCache.set(arg, result);
+        return result;
+      };
+
       if (kind === "core/access") {
-        return [visitAccess(cexpr), expected ?? "object"];
+        return cache([visitAccess(cexpr), expected ?? "object"]);
       }
 
       if (kind in traitMap) {
@@ -156,7 +164,7 @@ function elaborate(
           );
         }
         entries[nodeId] = { kind, children: childIds, out: undefined };
-        return [nodeId, kindOutputs[kind] ?? "unknown"];
+        return cache([nodeId, kindOutputs[kind] ?? "unknown"]);
       }
 
       // Structural kind — walk args with shape descriptor
@@ -165,7 +173,7 @@ function elaborate(
         const nodeId = counter;
         counter = incrementId(counter);
         entries[nodeId] = { kind, children: [childRef] as any, out: undefined };
-        return [nodeId, kindOutputs[kind] ?? "object"];
+        return cache([nodeId, kindOutputs[kind] ?? "object"]);
       }
 
       const expectedInputs = kindInputs[kind];
@@ -181,7 +189,7 @@ function elaborate(
       const nodeId = counter;
       counter = incrementId(counter);
       entries[nodeId] = { kind, children: childIds, out: undefined };
-      return [nodeId, kindOutputs[kind] ?? "unknown"];
+      return cache([nodeId, kindOutputs[kind] ?? "unknown"]);
     }
 
     const typeTag = typeof arg;

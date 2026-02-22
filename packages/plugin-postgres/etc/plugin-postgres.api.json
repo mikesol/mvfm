@@ -437,7 +437,7 @@
         {
           "kind": "Function",
           "canonicalReference": "@mvfm/plugin-postgres!createPostgresServerInterpreter:function(1)",
-          "docComment": "/**\n * Creates a full server-side interpreter for `postgres/*` node kinds, including transaction, savepoint, and cursor support.\n *\n * Unlike `createPostgresInterpreter`, this handles `begin`, `savepoint`, and `cursor` nodes by spawning nested `fold()` evaluations with fresh or modified interpreters.\n *\n * @param client - The {@link PostgresClient} to execute against.\n *\n * @param adj - The adjacency map from the normalized expression.\n *\n * @param baseInterp - Base interpreter for all non-postgres node kinds.\n *\n * @returns An Interpreter for all postgres node kinds.\n */\n",
+          "docComment": "/**\n * Creates a full server-side interpreter for `postgres/*` node kinds, including transaction, savepoint, and cursor support.\n *\n * Uses a closure-scoped client stack so that queries inside transactions automatically use the transaction client. No adjacency map or base interpreter required — all child evaluation uses generator yields.\n *\n * @param client - The {@link PostgresClient} to execute against.\n *\n * @returns An Interpreter for all postgres node kinds.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -447,37 +447,6 @@
               "kind": "Reference",
               "text": "PostgresClient",
               "canonicalReference": "@mvfm/plugin-postgres!PostgresClient:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ", adj: "
-            },
-            {
-              "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string, "
-            },
-            {
-              "kind": "Reference",
-              "text": "RuntimeEntry",
-              "canonicalReference": "@mvfm/plugin-postgres!~RuntimeEntry:interface"
-            },
-            {
-              "kind": "Content",
-              "text": ">"
-            },
-            {
-              "kind": "Content",
-              "text": ", baseInterp: "
-            },
-            {
-              "kind": "Reference",
-              "text": "Interpreter",
-              "canonicalReference": "@mvfm/plugin-postgres!~Interpreter:type"
             },
             {
               "kind": "Content",
@@ -495,8 +464,8 @@
           ],
           "fileUrlPath": "dist/3.4.8/handler.server.d.ts",
           "returnTypeTokenRange": {
-            "startIndex": 10,
-            "endIndex": 11
+            "startIndex": 3,
+            "endIndex": 4
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
@@ -506,22 +475,6 @@
               "parameterTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
-              },
-              "isOptional": false
-            },
-            {
-              "parameterName": "adj",
-              "parameterTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 7
-              },
-              "isOptional": false
-            },
-            {
-              "parameterName": "baseInterp",
-              "parameterTypeTokenRange": {
-                "startIndex": 8,
-                "endIndex": 9
               },
               "isOptional": false
             }

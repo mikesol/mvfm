@@ -22,10 +22,8 @@ export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: stri
 // @public
 export function createPostgresInterpreter(client: PostgresClient): Interpreter;
 
-// Warning: (ae-forgotten-export) The symbol "RuntimeEntry" needs to be exported by the entry point index.d.ts
-//
 // @public
-export function createPostgresServerInterpreter(client: PostgresClient, adj: Record<string, RuntimeEntry>, baseInterp: Interpreter): Interpreter;
+export function createPostgresServerInterpreter(client: PostgresClient): Interpreter;
 
 // @public
 export function escapeIdentifier(name: string): string;

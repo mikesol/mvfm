@@ -1,5 +1,4 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
-import { createFoldState, fold } from "@mvfm/core";
 import { createPostgresInterpreter, type PostgresClient } from "./interpreter";
 
 /** Marker for SQL fragment results from identifier/insert/set helpers. */
@@ -39,124 +38,199 @@ function buildQuerySQL(
 }
 
 /**
+ * Evaluate a postgres/query node's children and build SQL.
+ * Used by both the query override and the cursor handler.
+ */
+async function* evalQueryChildren(
+  entry: RuntimeEntry,
+): AsyncGenerator<number, { sql: string; params: unknown[] }, unknown> {
+  const numStrings = (yield 0) as number;
+  const strings: string[] = [];
+  for (let i = 0; i < numStrings; i++) {
+    strings.push((yield 1 + i) as string);
+  }
+  const paramValues: unknown[] = [];
+  for (let i = 1 + numStrings; i < entry.children.length; i++) {
+    paramValues.push(yield i);
+  }
+  return buildQuerySQL(strings, paramValues);
+}
+
+/**
  * Creates a full server-side interpreter for `postgres/*` node kinds,
  * including transaction, savepoint, and cursor support.
  *
- * Unlike `createPostgresInterpreter`, this handles `begin`, `savepoint`,
- * and `cursor` nodes by spawning nested `fold()` evaluations with fresh
- * or modified interpreters.
+ * Uses a closure-scoped client stack so that queries inside transactions
+ * automatically use the transaction client. No adjacency map or base
+ * interpreter required — all child evaluation uses generator yields.
  *
  * @param client - The {@link PostgresClient} to execute against.
- * @param adj - The adjacency map from the normalized expression.
- * @param baseInterp - Base interpreter for all non-postgres node kinds.
  * @returns An Interpreter for all postgres node kinds.
  */
-export function createPostgresServerInterpreter(
-  client: PostgresClient,
-  adj: Record<string, RuntimeEntry>,
-  baseInterp: Interpreter,
-): Interpreter {
+export function createPostgresServerInterpreter(client: PostgresClient): Interpreter {
   const base = createPostgresInterpreter(client);
-
-  function makeFullInterp(txClient: PostgresClient): Interpreter {
-    return {
-      ...baseInterp,
-      ...createPostgresServerInterpreter(txClient, adj, baseInterp),
-    };
-  }
+  const clientStack: PostgresClient[] = [client];
+  const currentClient = () => clientStack[clientStack.length - 1];
+  const batchCell: { current: unknown[] } = { current: [] };
 
   return {
     ...base,
 
+    // Override query to use clientStack instead of the fixed client
+    "postgres/query": async function* (entry: RuntimeEntry) {
+      const gen = evalQueryChildren(entry);
+      let result = await gen.next();
+      while (!result.done) {
+        const childValue: unknown = yield result.value;
+        result = await gen.next(childValue);
+      }
+      const { sql, params } = result.value;
+      return await currentClient().query(sql, params);
+    },
+
     "postgres/begin": async function* (entry: RuntimeEntry) {
       const mode = (yield 0) as string;
 
-      return await client.begin(async (tx) => {
-        const txInterp = makeFullInterp(tx);
+      let resolveTx!: (tx: PostgresClient) => void;
+      let resolveResult!: (result: unknown) => void;
+      const txReady = new Promise<PostgresClient>((r) => {
+        resolveTx = r;
+      });
+      const resultReady = new Promise<unknown>((r) => {
+        resolveResult = r;
+      });
+
+      const txDone = currentClient().begin(async (tx) => {
+        resolveTx(tx);
+        return await resultReady;
+      });
+
+      const tx = await txReady;
+      clientStack.push(tx);
+      try {
         if (mode === "pipeline") {
           const results: unknown[] = [];
           for (let i = 1; i < entry.children.length; i++) {
-            results.push(await fold(entry.children[i], adj, txInterp));
+            results.push(yield i);
           }
-          return results;
+          resolveResult(results);
+        } else {
+          resolveResult(yield 1);
         }
-        return await fold(entry.children[1], adj, txInterp);
-      });
+        return await txDone;
+      } finally {
+        clientStack.pop();
+      }
     },
 
     "postgres/savepoint": async function* (entry: RuntimeEntry) {
       const mode = (yield 0) as string;
 
-      return await client.savepoint(async (tx) => {
-        const txInterp = makeFullInterp(tx);
+      let resolveTx!: (tx: PostgresClient) => void;
+      let resolveResult!: (result: unknown) => void;
+      const txReady = new Promise<PostgresClient>((r) => {
+        resolveTx = r;
+      });
+      const resultReady = new Promise<unknown>((r) => {
+        resolveResult = r;
+      });
+
+      const txDone = currentClient().savepoint(async (tx) => {
+        resolveTx(tx);
+        return await resultReady;
+      });
+
+      const tx = await txReady;
+      clientStack.push(tx);
+      try {
         if (mode === "pipeline") {
           const results: unknown[] = [];
           for (let i = 1; i < entry.children.length; i++) {
-            results.push(await fold(entry.children[i], adj, txInterp));
+            results.push(yield i);
           }
-          return results;
+          resolveResult(results);
+        } else {
+          resolveResult(yield 1);
         }
-        return await fold(entry.children[1], adj, txInterp);
-      });
+        return await txDone;
+      } finally {
+        clientStack.pop();
+      }
     },
 
-    "postgres/cursor": async function* (entry: RuntimeEntry) {
-      // Children: [queryExpr, batchSizeExpr, bodyExpr]
-      // Evaluate query inline to get SQL
-      const queryEntry = adj[entry.children[0]];
-      const _numStrings = queryEntry.out as number | undefined;
+    "postgres/cursor": async function* (_entry: RuntimeEntry) {
+      // Step 1: Capture SQL from query without executing it.
+      // Push a mock client that records SQL instead of running it.
+      let capturedSQL = "";
+      let capturedParams: unknown[] = [];
+      const captureClient: PostgresClient = {
+        async query(sql, params) {
+          capturedSQL = sql;
+          capturedParams = params;
+          return [];
+        },
+        async begin(fn) {
+          return fn(captureClient);
+        },
+        async savepoint(fn) {
+          return fn(captureClient);
+        },
+        async cursor() {},
+      };
+      clientStack.push(captureClient);
+      yield 0; // evaluate query — captures SQL via mock client
+      clientStack.pop();
 
-      // We need to evaluate the query's children to build SQL.
-      // But we can't yield into the query's subtree directly —
-      // we fold it and extract SQL from the result.
-      //
-      // Actually, the simplest approach: yield child 0 to evaluate
-      // the query normally (which executes it!). But for cursors,
-      // we need the raw SQL, not the executed result.
-      //
-      // Solution: Build SQL by folding the query's string/param children
-      // directly, then use cursor API with the raw SQL.
-
-      // Evaluate batchSize
+      // Step 2: Get batch size
       const batchSize = (yield 1) as number;
 
-      // Build SQL from query children. The query node's children are:
-      // [numStrings, ...stringParts, ...paramExprs]
-      const qChildren = queryEntry.children;
-      const fullInterp = makeFullInterp(client);
+      // Step 3: Producer-consumer bridge for cursor iteration.
+      // The cursor API is callback-based (push); the generator is pull-based.
+      type BatchMsg = { rows: unknown[]; done: () => void } | null;
+      const queue: BatchMsg[] = [];
+      let waiter: ((msg: BatchMsg) => void) | null = null;
 
-      // Evaluate numStrings
-      const qNumStrings = (await fold(qChildren[0], adj, fullInterp)) as number;
-      const strings: string[] = [];
-      for (let i = 0; i < qNumStrings; i++) {
-        strings.push((await fold(qChildren[1 + i], adj, fullInterp)) as string);
+      function pushMsg(msg: BatchMsg) {
+        if (waiter) {
+          const w = waiter;
+          waiter = null;
+          w(msg);
+        } else {
+          queue.push(msg);
+        }
       }
-      const paramValues: unknown[] = [];
-      for (let i = 1 + qNumStrings; i < qChildren.length; i++) {
-        paramValues.push(await fold(qChildren[i], adj, fullInterp));
+
+      function pullMsg(): Promise<BatchMsg> {
+        if (queue.length > 0) return Promise.resolve(queue.shift()!);
+        return new Promise((r) => {
+          waiter = r;
+        });
       }
-      const { sql, params } = buildQuerySQL(strings, paramValues);
 
-      // Set up cursor iteration with fresh state per batch
-      const batchCell: { current: unknown[] } = { current: [] };
+      // Start cursor iteration in background
+      const cursorDone = currentClient()
+        .cursor(capturedSQL, capturedParams, batchSize, async (rows) => {
+          return new Promise<undefined>((resolve) => {
+            pushMsg({ rows, done: () => resolve(undefined) });
+          });
+        })
+        .then(() => pushMsg(null));
 
-      const cursorInterp: Interpreter = {
-        ...fullInterp,
-        "postgres/cursor_batch": async function* () {
-          return batchCell.current;
-        },
-      };
+      // Pull batches and evaluate body
+      while (true) {
+        const msg = await pullMsg();
+        if (msg === null) break;
+        batchCell.current = msg.rows;
+        yield 2; // evaluate body with current batch
+        msg.done(); // signal cursor callback to continue
+      }
 
-      const bodyId = entry.children[2];
-
-      await client.cursor(sql, params, batchSize, async (rows) => {
-        batchCell.current = rows;
-        // Fresh state per iteration so body is re-evaluated with new batch
-        await fold(bodyId, adj, cursorInterp, createFoldState());
-        return undefined;
-      });
-
+      await cursorDone;
       return undefined;
+    },
+
+    "postgres/cursor_batch": async function* () {
+      return batchCell.current;
     },
   };
 }

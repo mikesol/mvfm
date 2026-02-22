@@ -48,6 +48,9 @@ infer O
 ] ? NExpr<O, R, Adj, C> : never> : never;
 
 // @public
+export function array(type: string): string;
+
+// @public
 export function boolAnd<A, B>(a: A, b: B): CExpr<boolean, "bool/and", [A, B]>;
 
 // @public
@@ -327,6 +330,9 @@ export interface ExprBase<T> {
 
 // @public
 export function extractChildIds(children: unknown): string[];
+
+// @public
+export const fiber: Plugin_2;
 
 // @public
 export function floor<A>(a: A): CExpr<number, "num/floor", [A]>;
@@ -704,6 +710,7 @@ const ordPlugin: {
         readonly "str/gte": KindSpec<[string, string], boolean>;
         readonly "str/lte": KindSpec<[string, string], boolean>;
         readonly "str/compare": KindSpec<[string, string], number>;
+        readonly "num/compare": KindSpec<[number, number], number>;
     };
     readonly traits: {
         readonly lt: TraitDef<boolean, {
@@ -722,9 +729,13 @@ const ordPlugin: {
             number: "num/lte";
             string: "str/lte";
         }>;
+        readonly compare: TraitDef<number, {
+            number: "num/compare";
+            string: "str/compare";
+        }>;
     };
     readonly lifts: {};
-    readonly nodeKinds: readonly ["num/lt", "num/gt", "num/gte", "num/lte", "str/lt", "str/gt", "str/gte", "str/lte", "str/compare"];
+    readonly nodeKinds: readonly ["num/lt", "num/gt", "num/gte", "num/lte", "str/lt", "str/gt", "str/gte", "str/lte", "str/compare", "num/compare"];
     readonly defaultInterpreter: () => Interpreter;
 };
 export { ordPlugin as _ordPluginDef }
@@ -1027,6 +1038,7 @@ export const stdPlugins: readonly [{
     readonly name: "str";
     readonly ctors: {
         readonly strLit: strLit;
+        readonly str: str;
         readonly concat: concat;
         readonly upper: upper;
         readonly lower: lower;
@@ -1071,6 +1083,9 @@ export const stdPlugins: readonly [{
         }>;
         readonly show: TraitDef<string, {
             string: "str/show";
+        }>;
+        readonly append: TraitDef<string, {
+            string: "str/append";
         }>;
     };
     readonly lifts: {
@@ -1135,6 +1150,9 @@ export type StdRegistry = {
 };
 
 // @public
+export function str(strings: TemplateStringsArray, ...exprs: unknown[]): CExpr<string, "str/concat", unknown[]>;
+
+// @public
 export function strAppend<A, B>(a: A, b: B): CExpr<string, "str/append", [A, B]>;
 
 // @public
@@ -1145,6 +1163,7 @@ const strPlugin: {
     readonly name: "str";
     readonly ctors: {
         readonly strLit: typeof strLit;
+        readonly str: typeof str;
         readonly concat: typeof concat;
         readonly upper: typeof upper;
         readonly lower: typeof lower;
@@ -1190,6 +1209,9 @@ const strPlugin: {
         readonly show: TraitDef<string, {
             string: "str/show";
         }>;
+        readonly append: TraitDef<string, {
+            string: "str/append";
+        }>;
     };
     readonly lifts: {
         readonly string: "str/literal";
@@ -1205,6 +1227,7 @@ export const strPluginU: {
     readonly name: "str";
     readonly ctors: {
         readonly strLit: strLit;
+        readonly str: str;
         readonly concat: concat;
         readonly upper: upper;
         readonly lower: lower;
@@ -1249,6 +1272,9 @@ export const strPluginU: {
         }>;
         readonly show: TraitDef<string, {
         string: "str/show";
+        }>;
+        readonly append: TraitDef<string, {
+        string: "str/append";
         }>;
     };
     readonly lifts: {

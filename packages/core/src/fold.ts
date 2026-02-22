@@ -29,6 +29,7 @@ export const VOLATILE_KINDS = new Set<string>([
   "error/caught",
   "control/while",
   "fiber/par_item",
+  "postgres/cursor_batch",
 ]);
 
 // ─── FoldState: externalized cache for sharing across fold calls ────
