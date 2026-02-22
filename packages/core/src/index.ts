@@ -50,6 +50,7 @@ export type {
   TraitKindSpec,
   TypeKey,
 } from "./registry";
+export type { SchemaToData, SchemaToType } from "./schema-types";
 
 // ─── 4. Compat shims ───────────────────────────────────────────────
 // Legacy API bridge — kept for external plugins not yet migrated (zod, openai, anthropic).
