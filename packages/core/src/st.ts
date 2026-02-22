@@ -10,6 +10,7 @@
 
 import { makeCExpr } from "./expr";
 import type { Interpreter, Plugin } from "./plugin";
+import type { KindSpec } from "./registry";
 
 let cellCounter = 0;
 
@@ -27,10 +28,14 @@ export const st: Plugin = {
       };
     },
   },
-  kinds: {},
+  kinds: {
+    "st/let": { inputs: [undefined, ""] as [unknown, string], output: undefined as unknown } as KindSpec<[unknown, string], unknown>,
+    "st/get": { inputs: [""] as [string], output: undefined as unknown } as KindSpec<[string], unknown>,
+    "st/set": { inputs: ["", undefined] as [string, unknown], output: undefined as unknown } as KindSpec<[string, unknown], unknown>,
+    "st/push": { inputs: ["", undefined] as [string, unknown], output: undefined as unknown } as KindSpec<[string, unknown], unknown>,
+  },
   traits: {},
   lifts: {},
-  nodeKinds: ["st/let", "st/get", "st/set", "st/push"],
   defaultInterpreter: (): Interpreter => {
     const cells = new Map<string, unknown>();
     return {

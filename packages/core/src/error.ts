@@ -7,6 +7,7 @@
 
 import { makeCExpr } from "./expr";
 import type { Interpreter, Plugin } from "./plugin";
+import type { KindSpec } from "./registry";
 
 // ─── error plugin ───────────────────────────────────────────────────
 
@@ -26,17 +27,16 @@ export const error: Plugin = {
     attempt: (expr: unknown) => makeCExpr("error/attempt", [expr]),
     settle: (...exprs: unknown[]) => makeCExpr("error/settle", exprs),
   },
-  kinds: {},
+  kinds: {
+    "error/try": { inputs: [undefined] as [unknown], output: undefined as unknown } as KindSpec<[unknown], unknown>,
+    "error/fail": { inputs: [""] as [string], output: undefined as unknown } as KindSpec<[string], unknown>,
+    "error/guard": { inputs: [false, ""] as [boolean, string], output: undefined as unknown } as KindSpec<[boolean, string], unknown>,
+    "error/caught": { inputs: [undefined] as [unknown], output: "" as string } as KindSpec<[unknown], string>,
+    "error/attempt": { inputs: [undefined] as [unknown], output: undefined as unknown } as KindSpec<[unknown], unknown>,
+    "error/settle": { inputs: [undefined] as [unknown], output: undefined as unknown } as KindSpec<[unknown], unknown>,
+  },
   traits: {},
   lifts: {},
-  nodeKinds: [
-    "error/try",
-    "error/fail",
-    "error/guard",
-    "error/caught",
-    "error/attempt",
-    "error/settle",
-  ],
   defaultInterpreter: (): Interpreter => {
     const errorStack: unknown[] = [];
     return {

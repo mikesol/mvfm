@@ -7,6 +7,7 @@
 
 import { isCExpr, makeCExpr } from "./expr";
 import type { Interpreter, Plugin } from "./plugin";
+import type { KindSpec } from "./registry";
 
 // ─── fiber plugin ──────────────────────────────────────────────────
 
@@ -42,10 +43,15 @@ export const fiber: Plugin = {
     retry: (expr: unknown, opts: { attempts: number; delay?: number }) =>
       makeCExpr("fiber/retry", [expr, opts.attempts, opts.delay ?? 0]),
   },
-  kinds: {},
+  kinds: {
+    "fiber/par_map": { inputs: [] as unknown[], output: [] as unknown[] } as KindSpec<unknown[], unknown[]>,
+    "fiber/par_item": { inputs: [undefined] as [unknown], output: undefined as unknown } as KindSpec<[unknown], unknown>,
+    "fiber/race": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
+    "fiber/timeout": { inputs: [undefined, 0] as [unknown, number], output: undefined as unknown } as KindSpec<[unknown, number], unknown>,
+    "fiber/retry": { inputs: [undefined, 0, 0] as [unknown, number, number], output: undefined as unknown } as KindSpec<[unknown, number, number], unknown>,
+  },
   traits: {},
   lifts: {},
-  nodeKinds: ["fiber/par_map", "fiber/par_item", "fiber/race", "fiber/timeout", "fiber/retry"],
   defaultInterpreter: (): Interpreter => {
     const itemStack: unknown[] = [];
     return {

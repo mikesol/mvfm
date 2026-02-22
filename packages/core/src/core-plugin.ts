@@ -6,6 +6,7 @@
  */
 
 import type { Interpreter, Plugin } from "./plugin";
+import type { KindSpec } from "./registry";
 
 // ─── coreInterpreter ────────────────────────────────────────────────
 
@@ -55,22 +56,16 @@ export const corePlugin: Plugin = {
   name: "core",
   ctors: {},
   kinds: {
-    "core/literal": { inputs: [], output: 0 },
-    "core/input": { inputs: [], output: 0 },
-    "core/access": { inputs: [0], output: 0 },
-    "core/begin": { inputs: [], output: 0 },
+    "core/literal": { inputs: [] as [], output: undefined as unknown } as KindSpec<[], unknown>,
+    "core/input": { inputs: [] as [], output: undefined as unknown } as KindSpec<[], unknown>,
+    "core/access": { inputs: [undefined] as [unknown], output: undefined as unknown } as KindSpec<[unknown], unknown>,
+    "core/begin": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
+    "core/cond": { inputs: [false, undefined, undefined] as [boolean, unknown, unknown], output: undefined as unknown } as KindSpec<[boolean, unknown, unknown], unknown>,
+    "core/record": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
+    "core/tuple": { inputs: [] as unknown[], output: [] as unknown[] } as KindSpec<unknown[], unknown[]>,
   },
   traits: {},
   lifts: {},
-  nodeKinds: [
-    "core/literal",
-    "core/input",
-    "core/access",
-    "core/begin",
-    "core/cond",
-    "core/record",
-    "core/tuple",
-  ],
   shapes: { "core/record": "*", "core/tuple": "*" },
   defaultInterpreter: () => coreInterpreter,
 };

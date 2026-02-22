@@ -7,6 +7,7 @@
 
 import { makeCExpr } from "./expr";
 import type { Interpreter, Plugin } from "./plugin";
+import type { KindSpec } from "./registry";
 
 // ─── control plugin ─────────────────────────────────────────────────
 
@@ -25,10 +26,11 @@ export const control: Plugin = {
       },
     }),
   },
-  kinds: {},
+  kinds: {
+    "control/while": { inputs: [false, undefined] as [boolean, unknown], output: undefined as unknown } as KindSpec<[boolean, unknown], unknown>,
+  },
   traits: {},
   lifts: {},
-  nodeKinds: ["control/while"],
   defaultInterpreter: (): Interpreter => ({
     "control/while": async function* () {
       while (true) {
