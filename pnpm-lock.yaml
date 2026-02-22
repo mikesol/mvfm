@@ -94,6 +94,9 @@ importers:
       '@mvfm/plugin-zod':
         specifier: workspace:*
         version: link:../plugin-zod
+      '@slack/web-api':
+        specifier: ^7.14.1
+        version: 7.14.1
       astro:
         specifier: ^5.9.4
         version: 5.17.2(@types/node@25.2.3)(ioredis@5.9.3)(jiti@2.6.1)(lightningcss@1.30.2)(rollup@4.57.1)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
