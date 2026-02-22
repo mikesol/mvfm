@@ -92,4 +92,4 @@ await fold(defaults(app, { resend: crystalBallResendInterpreter }), prog);`,
   },
 };
 
-export default examples;
+export { examples };

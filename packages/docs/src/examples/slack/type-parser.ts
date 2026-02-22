@@ -98,9 +98,7 @@ export function parseResponseFile(filePath: string): TypeModel {
       const keyType = keyParam?.type
         ? resolveTypeRef(keyParam.type)
         : ({ kind: "string" } as const);
-      const valueType = indexSig.type
-        ? resolveTypeRef(indexSig.type)
-        : ({ kind: "any" } as const);
+      const valueType = indexSig.type ? resolveTypeRef(indexSig.type) : ({ kind: "any" } as const);
       return { kind: "record", keyType, valueType };
     }
     const fields: FieldModel[] = [];

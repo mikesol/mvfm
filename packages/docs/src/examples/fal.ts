@@ -82,4 +82,4 @@ await fold(defaults(app, { fal: crystalBallFalInterpreter }), prog);`,
   },
 };
 
-export default examples;
+export { examples };

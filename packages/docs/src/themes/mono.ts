@@ -16,7 +16,10 @@ export const MONO_THEME = {
     { scope: ["punctuation", "meta.brace"], settings: { foreground: "#525252" } },
     { scope: ["constant.language"], settings: { foreground: "#d4d4d4" } },
     { scope: ["entity.name.tag"], settings: { foreground: "#737373" } },
-    { scope: ["support.class", "entity.other.inherited-class"], settings: { foreground: "#a3a3a3" } },
+    {
+      scope: ["support.class", "entity.other.inherited-class"],
+      settings: { foreground: "#a3a3a3" },
+    },
     { scope: ["meta.property-name", "entity.name.property"], settings: { foreground: "#d4d4d4" } },
     { scope: ["variable.other.property"], settings: { foreground: "#d4d4d4" } },
     { scope: ["keyword.operator"], settings: { foreground: "#737373" } },

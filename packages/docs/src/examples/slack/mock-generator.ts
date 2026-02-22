@@ -5,8 +5,8 @@
  * Walks a TypeModel and produces maximalist mock data using field heuristics.
  */
 import { faker } from "@faker-js/faker";
-import { fakeString, fakeNumber, singularize } from "./field-heuristics.js";
-import type { TypeModel, TypeRef, FieldModel, InterfaceModel } from "./type-parser.js";
+import { fakeNumber, fakeString, singularize } from "./field-heuristics.js";
+import type { FieldModel, InterfaceModel, TypeModel, TypeRef } from "./type-parser.js";
 
 const MAX_DEPTH = 5;
 
@@ -72,9 +72,7 @@ function generate(
     }
 
     case "union": {
-      const nonNull = typeRef.members.filter(
-        (m) => m.kind !== "null" && m.kind !== "undefined",
-      );
+      const nonNull = typeRef.members.filter((m) => m.kind !== "null" && m.kind !== "undefined");
       if (nonNull.length === 0) return null;
       // Pick the first non-null member (deterministic, and usually the most interesting)
       return generate(nonNull[0], model, visited, depth, fieldName);
@@ -141,10 +139,7 @@ function generateInterface(
  * @param responseName - The name of the response type (e.g. "ChatPostMessageResponse")
  * @param model - The parsed TypeModel from the corresponding .d.ts file
  */
-export function generateResponse(
-  responseName: string,
-  model: TypeModel,
-): unknown {
+export function generateResponse(responseName: string, model: TypeModel): unknown {
   const alias = model.typeAliases.get(responseName);
   if (alias) {
     return generate(alias, model, new Set(), 0);

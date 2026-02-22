@@ -256,4 +256,4 @@ await fold(
   },
 };
 
-export default indexes;
+export { indexes };

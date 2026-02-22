@@ -68,7 +68,7 @@ const WELL_KNOWN_ARGS: Record<string, string> = {
  */
 export function generateCodeString(
   accessor: string,
-  nodeKind: string,
+  _nodeKind: string,
   isOptional: boolean,
 ): string {
   const args = getArgsString(accessor, isOptional);

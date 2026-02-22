@@ -1,26 +1,22 @@
 import type { FoldState, Interpreter, NExpr, PluginDef, RuntimeEntry } from "@mvfm/core";
 import * as core from "@mvfm/core";
+import * as pluginAnthropic from "@mvfm/plugin-anthropic";
+import * as pluginCfKv from "@mvfm/plugin-cloudflare-kv";
 import type { ConsoleInstance } from "@mvfm/plugin-console";
 import * as pluginConsole from "@mvfm/plugin-console";
-import * as pluginZod from "@mvfm/plugin-zod";
+import * as pluginFal from "@mvfm/plugin-fal";
 import * as pluginFetch from "@mvfm/plugin-fetch";
+import * as pluginOpenAI from "@mvfm/plugin-openai";
 import type { PinoClient } from "@mvfm/plugin-pino";
 import * as pluginPino from "@mvfm/plugin-pino";
-import * as pluginSlack from "@mvfm/plugin-slack";
-import * as pluginOpenAI from "@mvfm/plugin-openai";
-import * as pluginAnthropic from "@mvfm/plugin-anthropic";
-import * as pluginFal from "@mvfm/plugin-fal";
-import * as pluginStripe from "@mvfm/plugin-stripe";
-import * as pluginTwilio from "@mvfm/plugin-twilio";
-import * as pluginResend from "@mvfm/plugin-resend";
 import * as pluginPostgres from "@mvfm/plugin-postgres";
 import * as pluginRedis from "@mvfm/plugin-redis";
-import * as pluginCfKv from "@mvfm/plugin-cloudflare-kv";
+import * as pluginResend from "@mvfm/plugin-resend";
 import * as pluginS3 from "@mvfm/plugin-s3";
-import { wrapPgLite, type PgLiteQueryable } from "./pglite-adapter";
-import { MemoryRedisClient } from "./memory-redis-client";
-import { MemoryCloudflareKvClient } from "./memory-cloudflare-kv-client";
-import { MemoryS3Client } from "./memory-s3-client";
+import * as pluginSlack from "@mvfm/plugin-slack";
+import * as pluginStripe from "@mvfm/plugin-stripe";
+import * as pluginTwilio from "@mvfm/plugin-twilio";
+import * as pluginZod from "@mvfm/plugin-zod";
 import {
   createCrystalBallAnthropicClient,
   createCrystalBallFalClient,
@@ -28,8 +24,16 @@ import {
   createCrystalBallResendClient,
   createCrystalBallStripeClient,
 } from "./crystal-ball-clients";
+import { MemoryCloudflareKvClient } from "./memory-cloudflare-kv-client";
+import { MemoryRedisClient } from "./memory-redis-client";
+import { MemoryS3Client } from "./memory-s3-client";
+import { type PgLiteQueryable, wrapPgLite } from "./pglite-adapter";
 
-const { console: _drop, consoleInterpreter: _defaultInterp, ...consoleRest } = {
+const {
+  console: _drop,
+  consoleInterpreter: _defaultInterp,
+  ...consoleRest
+} = {
   ...pluginConsole,
 };
 
@@ -143,14 +147,20 @@ export function createPlaygroundScope(
     injected.pg = pg;
     injected.wasmPgInterpreter = pluginPostgres.createPostgresServerInterpreter(client);
 
-    injected.defaults = (plugins: readonly PluginDef[], overrides?: Record<string, Interpreter>) => {
+    injected.defaults = (
+      plugins: readonly PluginDef[],
+      overrides?: Record<string, Interpreter>,
+    ) => {
       const merged = { ...mockOverrides, ...overrides };
       const interp = core.defaults(plugins, merged);
       Object.assign(interp, fakeConsoleInterpreter, fakePinoInterpreter);
       return interp;
     };
   } else {
-    injected.defaults = (plugins: readonly PluginDef[], overrides?: Record<string, Interpreter>) => {
+    injected.defaults = (
+      plugins: readonly PluginDef[],
+      overrides?: Record<string, Interpreter>,
+    ) => {
       const merged = { ...mockOverrides, ...overrides };
       const interp = core.defaults(plugins, merged);
       Object.assign(interp, fakeConsoleInterpreter, fakePinoInterpreter);
@@ -191,9 +201,7 @@ export function createPlaygroundScope(
     ]
   ) => Promise<unknown>;
   injected.fold = async (...args: unknown[]) => {
-    const result = await foldImpl(
-      ...(args as Parameters<typeof foldImpl>),
-    );
+    const result = await foldImpl(...(args as Parameters<typeof foldImpl>));
     lastFoldResult = result;
     return result;
   };

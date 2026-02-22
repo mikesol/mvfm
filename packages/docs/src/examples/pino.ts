@@ -82,4 +82,4 @@ await fold(defaults(app), injectInput(prog, { reason: "out of memory" }));`,
   },
 };
 
-export default examples;
+export { examples };

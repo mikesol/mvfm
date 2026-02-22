@@ -47,7 +47,7 @@ export { ZodObjectBuilder } from "./object";
 export { ZodPrimitiveBuilder } from "./primitives";
 export { ZodRecordBuilder } from "./record";
 export { ZodSimpleBuilder } from "./special";
-export { ZodStringBuilder } from "./string";
+export { ZodStringBuilder } from "./string-builder";
 export type { ZodIsoNamespace, ZodStringFormatsNamespace } from "./string-formats";
 export { buildStringFormat } from "./string-formats";
 export { ZodStringboolBuilder } from "./stringbool";

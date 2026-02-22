@@ -10,6 +10,23 @@ This guide is the single source of truth for building mvfm plugins. Every plugin
 
 The distinction matters because external-service plugins have additional requirements: version directories, SDK adapters, server/client handlers, integration tests, and the source-level analysis described in Step 0.
 
+## Biome guardrails for plugin code
+
+The repository enforces these Biome guardrails for `packages/*/src/**/*.ts` and `packages/*/tests/**/*.ts`:
+
+- `complexity.noExcessiveLinesPerFunction` (`maxLines: 80`)
+- `complexity.noExcessiveCognitiveComplexity` (`maxAllowedComplexity: 15`)
+- `nursery.noImportCycles`
+- `style.noDefaultExport`
+- `style.noNestedTernary`
+- `style.noRestrictedImports` (disallow imports from other packages' `src`/`tests` internals)
+- `style.useFilenamingConvention` (`kebab-case`, ASCII)
+- test hygiene: `suspicious.noFocusedTests`, `suspicious.noSkippedTests`, `suspicious.noDuplicateTestHooks`
+
+Rationale: these rules reduce patch blast radius, keep symbol lookup deterministic, prevent architecture drift, and catch common validation mistakes in agent-generated code.
+
+If a pre-existing file cannot be brought into compliance immediately, use a targeted `biome.json` path override and keep it narrow to the exact legacy files. Do not disable these rules broadly for new plugin code.
+
 ---
 
 ## Step 0: Source-Level Analysis (external-service plugins only)

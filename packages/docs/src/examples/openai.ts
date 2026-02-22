@@ -107,4 +107,4 @@ await fold(defaults(app, { openai: crystalBallOpenAIInterpreter }), prog);`,
   },
 };
 
-export default examples;
+export { examples };

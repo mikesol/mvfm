@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ZodStringBuilder } from "./string";
+import { ZodStringBuilder } from "./string-builder";
 
 /**
  * ISO date/time format namespace within the Zod plugin.
