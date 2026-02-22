@@ -30,7 +30,7 @@ import type {
   PutObjectCommandInput,
   PutObjectCommandOutput,
 } from "@aws-sdk/client-s3";
-import type { CExpr, KindSpec } from "@mvfm/core";
+import type { CExpr, KindSpec, Plugin } from "@mvfm/core";
 import { isCExpr, makeCExpr } from "@mvfm/core";
 
 // ---- liftArg: recursive plain-value -> CExpr lifting --------
@@ -61,6 +61,13 @@ function liftArg(value: unknown): unknown {
   return value;
 }
 
+// liftArg erases generic type info at runtime (returns unknown).
+// Cast helpers restore the declared CExpr Args types for ExtractKinds.
+const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]>(
+  kind: Kind,
+  args: readonly unknown[],
+) => CExpr<O, Kind, Args>;
+
 // ---- What the plugin adds to $ ----------------------------
 
 type PutObjectInput = PutObjectCommandInput;
@@ -73,31 +80,6 @@ type HeadObjectInput = HeadObjectCommandInput;
 type HeadObjectResult = HeadObjectCommandOutput;
 type ListObjectsV2Input = ListObjectsV2CommandInput;
 type ListObjectsV2Result = ListObjectsV2CommandOutput;
-
-/**
- * S3 operations added to the DSL context by the s3 plugin.
- *
- * Mirrors the high-level `S3` aggregated client from
- * `@aws-sdk/client-s3` v3.989.0: putObject, getObject,
- * deleteObject, headObject, listObjectsV2.
- */
-export interface S3Methods {
-  /** S3 operations, namespaced under `$.s3`. */
-  s3: {
-    /** Upload an object to S3. */
-    putObject(input: CExpr<PutObjectInput> | PutObjectInput): CExpr<PutObjectResult>;
-    /** Download an object from S3. */
-    getObject(input: CExpr<GetObjectInput> | GetObjectInput): CExpr<GetObjectResult>;
-    /** Delete an object from S3. */
-    deleteObject(input: CExpr<DeleteObjectInput> | DeleteObjectInput): CExpr<DeleteObjectResult>;
-    /** Check existence and retrieve metadata for an object. */
-    headObject(input: CExpr<HeadObjectInput> | HeadObjectInput): CExpr<HeadObjectResult>;
-    /** List objects in a bucket (v2). */
-    listObjectsV2(
-      input: CExpr<ListObjectsV2Input> | ListObjectsV2Input,
-    ): CExpr<ListObjectsV2Result>;
-  };
-}
 
 // ---- Configuration ----------------------------------------
 
@@ -121,63 +103,6 @@ export interface S3Config {
   endpoint?: string;
   /** Use path-style addressing (required for LocalStack/MinIO). */
   forcePathStyle?: boolean;
-}
-
-// ---- Node kinds -------------------------------------------
-
-function buildKinds(): Record<string, KindSpec<any, any>> {
-  return {
-    "s3/put_object": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "s3/get_object": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "s3/delete_object": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "s3/head_object": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "s3/list_objects_v2": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "s3/record": {
-      inputs: [] as unknown[],
-      output: {} as Record<string, unknown>,
-    } as KindSpec<unknown[], Record<string, unknown>>,
-    "s3/array": {
-      inputs: [] as unknown[],
-      output: [] as unknown[],
-    } as KindSpec<unknown[], unknown[]>,
-  };
-}
-
-// ---- Constructor builder ----------------------------------
-
-function buildS3Api(): S3Methods["s3"] {
-  return {
-    putObject(input) {
-      return makeCExpr("s3/put_object", [liftArg(input)]);
-    },
-    getObject(input) {
-      return makeCExpr("s3/get_object", [liftArg(input)]);
-    },
-    deleteObject(input) {
-      return makeCExpr("s3/delete_object", [liftArg(input)]);
-    },
-    headObject(input) {
-      return makeCExpr("s3/head_object", [liftArg(input)]);
-    },
-    listObjectsV2(input) {
-      return makeCExpr("s3/list_objects_v2", [liftArg(input)]);
-    },
-  };
 }
 
 // ---- Plugin factory ---------------------------------------
@@ -207,11 +132,63 @@ function buildS3Api(): S3Methods["s3"] {
 export function s3(_config: S3Config) {
   return {
     name: "s3" as const,
-    ctors: { s3: buildS3Api() },
-    kinds: buildKinds(),
+    ctors: {
+      s3: {
+        /** Upload an object to S3. */
+        putObject<A>(input: A): CExpr<PutObjectResult, "s3/put_object", [A]> {
+          return mk("s3/put_object", [liftArg(input)]);
+        },
+        /** Download an object from S3. */
+        getObject<A>(input: A): CExpr<GetObjectResult, "s3/get_object", [A]> {
+          return mk("s3/get_object", [liftArg(input)]);
+        },
+        /** Delete an object from S3. */
+        deleteObject<A>(input: A): CExpr<DeleteObjectResult, "s3/delete_object", [A]> {
+          return mk("s3/delete_object", [liftArg(input)]);
+        },
+        /** Check existence and retrieve metadata for an object. */
+        headObject<A>(input: A): CExpr<HeadObjectResult, "s3/head_object", [A]> {
+          return mk("s3/head_object", [liftArg(input)]);
+        },
+        /** List objects in a bucket (v2). */
+        listObjectsV2<A>(input: A): CExpr<ListObjectsV2Result, "s3/list_objects_v2", [A]> {
+          return mk("s3/list_objects_v2", [liftArg(input)]);
+        },
+      },
+    },
+    kinds: {
+      "s3/put_object": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "s3/get_object": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "s3/delete_object": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "s3/head_object": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "s3/list_objects_v2": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "s3/record": {
+        inputs: [] as unknown[],
+        output: {} as Record<string, unknown>,
+      } as KindSpec<unknown[], Record<string, unknown>>,
+      "s3/array": {
+        inputs: [] as unknown[],
+        output: [] as unknown[],
+      } as KindSpec<unknown[], unknown[]>,
+    },
     traits: {},
     lifts: {},
-  };
+  } satisfies Plugin;
 }
 
 /**
