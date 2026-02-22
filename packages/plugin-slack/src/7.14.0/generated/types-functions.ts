@@ -2,18 +2,11 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  FunctionsCompleteErrorArguments,
   FunctionsCompleteErrorResponse,
-  FunctionsCompleteSuccessArguments,
   FunctionsCompleteSuccessResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsFunctions {
-  completeError(
-    params: SlackParams<FunctionsCompleteErrorArguments>,
-  ): CExpr<FunctionsCompleteErrorResponse>;
-  completeSuccess(
-    params: SlackParams<FunctionsCompleteSuccessArguments>,
-  ): CExpr<FunctionsCompleteSuccessResponse>;
+  completeError<A>(params: A): CExpr<FunctionsCompleteErrorResponse, "slack/functions_completeError", [A]>;
+  completeSuccess<A>(params: A): CExpr<FunctionsCompleteSuccessResponse, "slack/functions_completeSuccess", [A]>;
 }

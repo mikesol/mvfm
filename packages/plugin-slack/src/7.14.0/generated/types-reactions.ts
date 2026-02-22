@@ -2,20 +2,15 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  ReactionsAddArguments,
   ReactionsAddResponse,
-  ReactionsGetArguments,
   ReactionsGetResponse,
-  ReactionsListArguments,
   ReactionsListResponse,
-  ReactionsRemoveArguments,
   ReactionsRemoveResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsReactions {
-  add(params: SlackParams<ReactionsAddArguments>): CExpr<ReactionsAddResponse>;
-  get(params: SlackParams<ReactionsGetArguments>): CExpr<ReactionsGetResponse>;
-  list(params?: SlackParams<ReactionsListArguments>): CExpr<ReactionsListResponse>;
-  remove(params: SlackParams<ReactionsRemoveArguments>): CExpr<ReactionsRemoveResponse>;
+  add<A>(params: A): CExpr<ReactionsAddResponse, "slack/reactions_add", [A]>;
+  get<A>(params: A): CExpr<ReactionsGetResponse, "slack/reactions_get", [A]>;
+  list<A = void>(params?: A): CExpr<ReactionsListResponse, "slack/reactions_list", [A]>;
+  remove<A>(params: A): CExpr<ReactionsRemoveResponse, "slack/reactions_remove", [A]>;
 }

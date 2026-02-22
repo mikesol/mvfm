@@ -2,14 +2,11 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  RTMConnectArguments,
-  RTMStartArguments,
   RtmConnectResponse,
   RtmStartResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsRtm {
-  connect(params?: SlackParams<RTMConnectArguments>): CExpr<RtmConnectResponse>;
-  start(params?: SlackParams<RTMStartArguments>): CExpr<RtmStartResponse>;
+  connect<A = void>(params?: A): CExpr<RtmConnectResponse, "slack/rtm_connect", [A]>;
+  start<A = void>(params?: A): CExpr<RtmStartResponse, "slack/rtm_start", [A]>;
 }

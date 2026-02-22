@@ -2,23 +2,17 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  AdminEmojiAddAliasArguments,
   AdminEmojiAddAliasResponse,
-  AdminEmojiAddArguments,
   AdminEmojiAddResponse,
-  AdminEmojiListArguments,
   AdminEmojiListResponse,
-  AdminEmojiRemoveArguments,
   AdminEmojiRemoveResponse,
-  AdminEmojiRenameArguments,
   AdminEmojiRenameResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsAdminEmoji {
-  add(params: SlackParams<AdminEmojiAddArguments>): CExpr<AdminEmojiAddResponse>;
-  addAlias(params: SlackParams<AdminEmojiAddAliasArguments>): CExpr<AdminEmojiAddAliasResponse>;
-  list(params?: SlackParams<AdminEmojiListArguments>): CExpr<AdminEmojiListResponse>;
-  remove(params: SlackParams<AdminEmojiRemoveArguments>): CExpr<AdminEmojiRemoveResponse>;
-  rename(params: SlackParams<AdminEmojiRenameArguments>): CExpr<AdminEmojiRenameResponse>;
+  add<A>(params: A): CExpr<AdminEmojiAddResponse, "slack/admin_emoji_add", [A]>;
+  addAlias<A>(params: A): CExpr<AdminEmojiAddAliasResponse, "slack/admin_emoji_addAlias", [A]>;
+  list<A = void>(params?: A): CExpr<AdminEmojiListResponse, "slack/admin_emoji_list", [A]>;
+  remove<A>(params: A): CExpr<AdminEmojiRemoveResponse, "slack/admin_emoji_remove", [A]>;
+  rename<A>(params: A): CExpr<AdminEmojiRenameResponse, "slack/admin_emoji_rename", [A]>;
 }

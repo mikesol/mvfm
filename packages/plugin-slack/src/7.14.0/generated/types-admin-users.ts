@@ -2,80 +2,43 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  AdminUsersAssignArguments,
   AdminUsersAssignResponse,
-  AdminUsersInviteArguments,
   AdminUsersInviteResponse,
-  AdminUsersListArguments,
   AdminUsersListResponse,
-  AdminUsersRemoveArguments,
   AdminUsersRemoveResponse,
-  AdminUsersSessionClearSettingsArguments,
   AdminUsersSessionClearSettingsResponse,
-  AdminUsersSessionGetSettingsArguments,
   AdminUsersSessionGetSettingsResponse,
-  AdminUsersSessionInvalidateArguments,
   AdminUsersSessionInvalidateResponse,
-  AdminUsersSessionListArguments,
   AdminUsersSessionListResponse,
-  AdminUsersSessionResetArguments,
-  AdminUsersSessionResetBulkArguments,
   AdminUsersSessionResetBulkResponse,
   AdminUsersSessionResetResponse,
-  AdminUsersSessionSetSettingsArguments,
   AdminUsersSessionSetSettingsResponse,
-  AdminUsersSetAdminArguments,
   AdminUsersSetAdminResponse,
-  AdminUsersSetExpirationArguments,
   AdminUsersSetExpirationResponse,
-  AdminUsersSetOwnerArguments,
   AdminUsersSetOwnerResponse,
-  AdminUsersSetRegularArguments,
   AdminUsersSetRegularResponse,
-  AdminUsersUnsupportedVersionsExportArguments,
   AdminUsersUnsupportedVersionsExportResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsAdminUsers {
   session: {
-    clearSettings(
-      params: SlackParams<AdminUsersSessionClearSettingsArguments>,
-    ): CExpr<AdminUsersSessionClearSettingsResponse>;
-    getSettings(
-      params: SlackParams<AdminUsersSessionGetSettingsArguments>,
-    ): CExpr<AdminUsersSessionGetSettingsResponse>;
-    invalidate(
-      params: SlackParams<AdminUsersSessionInvalidateArguments>,
-    ): CExpr<AdminUsersSessionInvalidateResponse>;
-    list(
-      params?: SlackParams<AdminUsersSessionListArguments>,
-    ): CExpr<AdminUsersSessionListResponse>;
-    reset(
-      params: SlackParams<AdminUsersSessionResetArguments>,
-    ): CExpr<AdminUsersSessionResetResponse>;
-    resetBulk(
-      params: SlackParams<AdminUsersSessionResetBulkArguments>,
-    ): CExpr<AdminUsersSessionResetBulkResponse>;
-    setSettings(
-      params: SlackParams<AdminUsersSessionSetSettingsArguments>,
-    ): CExpr<AdminUsersSessionSetSettingsResponse>;
+    clearSettings<A>(params: A): CExpr<AdminUsersSessionClearSettingsResponse, "slack/admin_users_session_clearSettings", [A]>;
+    getSettings<A>(params: A): CExpr<AdminUsersSessionGetSettingsResponse, "slack/admin_users_session_getSettings", [A]>;
+    invalidate<A>(params: A): CExpr<AdminUsersSessionInvalidateResponse, "slack/admin_users_session_invalidate", [A]>;
+    list<A = void>(params?: A): CExpr<AdminUsersSessionListResponse, "slack/admin_users_session_list", [A]>;
+    reset<A>(params: A): CExpr<AdminUsersSessionResetResponse, "slack/admin_users_session_reset", [A]>;
+    resetBulk<A>(params: A): CExpr<AdminUsersSessionResetBulkResponse, "slack/admin_users_session_resetBulk", [A]>;
+    setSettings<A>(params: A): CExpr<AdminUsersSessionSetSettingsResponse, "slack/admin_users_session_setSettings", [A]>;
   };
   unsupportedVersions: {
-    export(
-      params: SlackParams<AdminUsersUnsupportedVersionsExportArguments>,
-    ): CExpr<AdminUsersUnsupportedVersionsExportResponse>;
+    export<A>(params: A): CExpr<AdminUsersUnsupportedVersionsExportResponse, "slack/admin_users_unsupportedVersions_export", [A]>;
   };
-  assign(params: SlackParams<AdminUsersAssignArguments>): CExpr<AdminUsersAssignResponse>;
-  invite(params: SlackParams<AdminUsersInviteArguments>): CExpr<AdminUsersInviteResponse>;
-  list(params?: SlackParams<AdminUsersListArguments>): CExpr<AdminUsersListResponse>;
-  remove(params: SlackParams<AdminUsersRemoveArguments>): CExpr<AdminUsersRemoveResponse>;
-  setAdmin(params: SlackParams<AdminUsersSetAdminArguments>): CExpr<AdminUsersSetAdminResponse>;
-  setExpiration(
-    params: SlackParams<AdminUsersSetExpirationArguments>,
-  ): CExpr<AdminUsersSetExpirationResponse>;
-  setOwner(params: SlackParams<AdminUsersSetOwnerArguments>): CExpr<AdminUsersSetOwnerResponse>;
-  setRegular(
-    params: SlackParams<AdminUsersSetRegularArguments>,
-  ): CExpr<AdminUsersSetRegularResponse>;
+  assign<A>(params: A): CExpr<AdminUsersAssignResponse, "slack/admin_users_assign", [A]>;
+  invite<A>(params: A): CExpr<AdminUsersInviteResponse, "slack/admin_users_invite", [A]>;
+  list<A = void>(params?: A): CExpr<AdminUsersListResponse, "slack/admin_users_list", [A]>;
+  remove<A>(params: A): CExpr<AdminUsersRemoveResponse, "slack/admin_users_remove", [A]>;
+  setAdmin<A>(params: A): CExpr<AdminUsersSetAdminResponse, "slack/admin_users_setAdmin", [A]>;
+  setExpiration<A>(params: A): CExpr<AdminUsersSetExpirationResponse, "slack/admin_users_setExpiration", [A]>;
+  setOwner<A>(params: A): CExpr<AdminUsersSetOwnerResponse, "slack/admin_users_setOwner", [A]>;
+  setRegular<A>(params: A): CExpr<AdminUsersSetRegularResponse, "slack/admin_users_setRegular", [A]>;
 }

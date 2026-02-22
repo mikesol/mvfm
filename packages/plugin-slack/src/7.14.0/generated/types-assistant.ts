@@ -2,25 +2,15 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  AssistantThreadsSetStatusArguments,
   AssistantThreadsSetStatusResponse,
-  AssistantThreadsSetSuggestedPromptsArguments,
   AssistantThreadsSetSuggestedPromptsResponse,
-  AssistantThreadsSetTitleArguments,
   AssistantThreadsSetTitleResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsAssistant {
   threads: {
-    setStatus(
-      params: SlackParams<AssistantThreadsSetStatusArguments>,
-    ): CExpr<AssistantThreadsSetStatusResponse>;
-    setSuggestedPrompts(
-      params: SlackParams<AssistantThreadsSetSuggestedPromptsArguments>,
-    ): CExpr<AssistantThreadsSetSuggestedPromptsResponse>;
-    setTitle(
-      params: SlackParams<AssistantThreadsSetTitleArguments>,
-    ): CExpr<AssistantThreadsSetTitleResponse>;
+    setStatus<A>(params: A): CExpr<AssistantThreadsSetStatusResponse, "slack/assistant_threads_setStatus", [A]>;
+    setSuggestedPrompts<A>(params: A): CExpr<AssistantThreadsSetSuggestedPromptsResponse, "slack/assistant_threads_setSuggestedPrompts", [A]>;
+    setTitle<A>(params: A): CExpr<AssistantThreadsSetTitleResponse, "slack/assistant_threads_setTitle", [A]>;
   };
 }

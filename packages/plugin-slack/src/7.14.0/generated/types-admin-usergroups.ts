@@ -2,28 +2,15 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  AdminUsergroupsAddChannelsArguments,
   AdminUsergroupsAddChannelsResponse,
-  AdminUsergroupsAddTeamsArguments,
   AdminUsergroupsAddTeamsResponse,
-  AdminUsergroupsListChannelsArguments,
   AdminUsergroupsListChannelsResponse,
-  AdminUsergroupsRemoveChannelsArguments,
   AdminUsergroupsRemoveChannelsResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsAdminUsergroups {
-  addChannels(
-    params: SlackParams<AdminUsergroupsAddChannelsArguments>,
-  ): CExpr<AdminUsergroupsAddChannelsResponse>;
-  addTeams(
-    params: SlackParams<AdminUsergroupsAddTeamsArguments>,
-  ): CExpr<AdminUsergroupsAddTeamsResponse>;
-  listChannels(
-    params: SlackParams<AdminUsergroupsListChannelsArguments>,
-  ): CExpr<AdminUsergroupsListChannelsResponse>;
-  removeChannels(
-    params: SlackParams<AdminUsergroupsRemoveChannelsArguments>,
-  ): CExpr<AdminUsergroupsRemoveChannelsResponse>;
+  addChannels<A>(params: A): CExpr<AdminUsergroupsAddChannelsResponse, "slack/admin_usergroups_addChannels", [A]>;
+  addTeams<A>(params: A): CExpr<AdminUsergroupsAddTeamsResponse, "slack/admin_usergroups_addTeams", [A]>;
+  listChannels<A>(params: A): CExpr<AdminUsergroupsListChannelsResponse, "slack/admin_usergroups_listChannels", [A]>;
+  removeChannels<A>(params: A): CExpr<AdminUsergroupsRemoveChannelsResponse, "slack/admin_usergroups_removeChannels", [A]>;
 }

@@ -246,20 +246,19 @@ function generateNodeKindsIndex(groups: GroupData[]): string {
 
 function generateTypesGroup(group: GroupData): string {
   const lines: string[] = [HEADER];
-  const argTypes = new Set<string>();
   const respTypes = new Set<string>();
   for (const m of group.methods) {
-    argTypes.add(m.argsType);
     respTypes.add(m.responseType);
   }
 
   lines.push(`import type { CExpr } from "@mvfm/core";`);
-  lines.push(`import type {`);
-  for (const t of [...argTypes, ...respTypes].sort()) {
-    lines.push(`  ${t},`);
+  if (respTypes.size > 0) {
+    lines.push(`import type {`);
+    for (const t of [...respTypes].sort()) {
+      lines.push(`  ${t},`);
+    }
+    lines.push(`} from "@slack/web-api";`);
   }
-  lines.push(`} from "@slack/web-api";`);
-  lines.push(`import type { SlackParams } from "./types";`);
   lines.push("");
 
   const pascal = slugToPascal(group.fileSlug);
@@ -278,9 +277,9 @@ function generateTypesGroup(group: GroupData): string {
     }
     for (const m of node.methods) {
       const methodName = m.path[m.path.length - 1];
-      const optMark = m.optional ? "?" : "";
+      const optSig = m.optional ? "<A = void>(params?: A)" : "<A>(params: A)";
       lines.push(
-        `${indent}${methodName}(params${optMark}: SlackParams<${m.argsType}>): CExpr<${m.responseType}>;`,
+        `${indent}${methodName}${optSig}: CExpr<${m.responseType}, "${m.nodeKind}", [A]>;`,
       );
     }
   }
@@ -293,20 +292,6 @@ function generateTypesGroup(group: GroupData): string {
 
 function generateTypesIndex(groups: GroupData[]): string {
   const lines: string[] = [HEADER];
-  lines.push(`import type { CExpr } from "@mvfm/core";`);
-  lines.push("");
-  lines.push("type Primitive = string | number | boolean | null | undefined;");
-  lines.push("");
-  lines.push("export type Exprify<T> = T extends Primitive");
-  lines.push("  ? T | CExpr<T>");
-  lines.push("  : T extends Array<infer U>");
-  lines.push("    ? Array<Exprify<U>> | CExpr<T>");
-  lines.push("    : T extends object");
-  lines.push('      ? { [K in keyof T]: Exprify<T[K]> } | CExpr<T>');
-  lines.push("      : T | CExpr<T>;");
-  lines.push("");
-  lines.push('export type SlackParams<T> = Exprify<Omit<T, "token">>;');
-  lines.push("");
 
   for (const g of groups) {
     const pascal = slugToPascal(g.fileSlug);
@@ -379,6 +364,7 @@ function generateTypesIndex(groups: GroupData[]): string {
 
 function generateBuildMethodsGroup(group: GroupData): string {
   const lines: string[] = [HEADER];
+  lines.push(`import type { CExpr } from "@mvfm/core";`);
   lines.push(`import { isCExpr, makeCExpr } from "@mvfm/core";`);
 
   const pascal = slugToPascal(group.fileSlug);
@@ -406,6 +392,13 @@ function generateBuildMethodsGroup(group: GroupData): string {
   lines.push("}");
   lines.push("");
 
+  // mk cast helper — restores CExpr generic type info erased by liftArg
+  lines.push("const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]>(");
+  lines.push("  kind: Kind,");
+  lines.push("  args: readonly unknown[],");
+  lines.push(") => CExpr<O, Kind, Args>;");
+  lines.push("");
+
   lines.push(
     `export function buildSlack${pascal}(): SlackMethods${pascal} {`,
   );
@@ -426,8 +419,8 @@ function generateBuildMethodsGroup(group: GroupData): string {
       const methodName = m.path[m.path.length - 1];
       const paramSig = m.optional ? "params?" : "params";
       lines.push(`${indent}${methodName}(${paramSig}) {`);
-      lines.push(`${indent}  if (params != null) return makeCExpr("${m.nodeKind}", [liftArg(params)]);`);
-      lines.push(`${indent}  return makeCExpr("${m.nodeKind}", []);`);
+      lines.push(`${indent}  if (params != null) return mk("${m.nodeKind}", [liftArg(params)]);`);
+      lines.push(`${indent}  return mk("${m.nodeKind}", []);`);
       lines.push(`${indent}},`);
     }
   }

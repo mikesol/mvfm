@@ -2,20 +2,15 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  ViewsOpenArguments,
   ViewsOpenResponse,
-  ViewsPublishArguments,
   ViewsPublishResponse,
-  ViewsPushArguments,
   ViewsPushResponse,
-  ViewsUpdateArguments,
   ViewsUpdateResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsViews {
-  open(params: SlackParams<ViewsOpenArguments>): CExpr<ViewsOpenResponse>;
-  publish(params: SlackParams<ViewsPublishArguments>): CExpr<ViewsPublishResponse>;
-  push(params: SlackParams<ViewsPushArguments>): CExpr<ViewsPushResponse>;
-  update(params: SlackParams<ViewsUpdateArguments>): CExpr<ViewsUpdateResponse>;
+  open<A>(params: A): CExpr<ViewsOpenResponse, "slack/views_open", [A]>;
+  publish<A>(params: A): CExpr<ViewsPublishResponse, "slack/views_publish", [A]>;
+  push<A>(params: A): CExpr<ViewsPushResponse, "slack/views_push", [A]>;
+  update<A>(params: A): CExpr<ViewsUpdateResponse, "slack/views_update", [A]>;
 }

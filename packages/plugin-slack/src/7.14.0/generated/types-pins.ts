@@ -2,17 +2,13 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  PinsAddArguments,
   PinsAddResponse,
-  PinsListArguments,
   PinsListResponse,
-  PinsRemoveArguments,
   PinsRemoveResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsPins {
-  add(params: SlackParams<PinsAddArguments>): CExpr<PinsAddResponse>;
-  list(params: SlackParams<PinsListArguments>): CExpr<PinsListResponse>;
-  remove(params: SlackParams<PinsRemoveArguments>): CExpr<PinsRemoveResponse>;
+  add<A>(params: A): CExpr<PinsAddResponse, "slack/pins_add", [A]>;
+  list<A>(params: A): CExpr<PinsListResponse, "slack/pins_list", [A]>;
+  remove<A>(params: A): CExpr<PinsRemoveResponse, "slack/pins_remove", [A]>;
 }

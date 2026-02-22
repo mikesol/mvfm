@@ -2,33 +2,23 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  UsergroupsCreateArguments,
   UsergroupsCreateResponse,
-  UsergroupsDisableArguments,
   UsergroupsDisableResponse,
-  UsergroupsEnableArguments,
   UsergroupsEnableResponse,
-  UsergroupsListArguments,
   UsergroupsListResponse,
-  UsergroupsUpdateArguments,
   UsergroupsUpdateResponse,
-  UsergroupsUsersListArguments,
   UsergroupsUsersListResponse,
-  UsergroupsUsersUpdateArguments,
   UsergroupsUsersUpdateResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsUsergroups {
   users: {
-    list(params: SlackParams<UsergroupsUsersListArguments>): CExpr<UsergroupsUsersListResponse>;
-    update(
-      params: SlackParams<UsergroupsUsersUpdateArguments>,
-    ): CExpr<UsergroupsUsersUpdateResponse>;
+    list<A>(params: A): CExpr<UsergroupsUsersListResponse, "slack/usergroups_users_list", [A]>;
+    update<A>(params: A): CExpr<UsergroupsUsersUpdateResponse, "slack/usergroups_users_update", [A]>;
   };
-  create(params: SlackParams<UsergroupsCreateArguments>): CExpr<UsergroupsCreateResponse>;
-  disable(params: SlackParams<UsergroupsDisableArguments>): CExpr<UsergroupsDisableResponse>;
-  enable(params: SlackParams<UsergroupsEnableArguments>): CExpr<UsergroupsEnableResponse>;
-  list(params?: SlackParams<UsergroupsListArguments>): CExpr<UsergroupsListResponse>;
-  update(params: SlackParams<UsergroupsUpdateArguments>): CExpr<UsergroupsUpdateResponse>;
+  create<A>(params: A): CExpr<UsergroupsCreateResponse, "slack/usergroups_create", [A]>;
+  disable<A>(params: A): CExpr<UsergroupsDisableResponse, "slack/usergroups_disable", [A]>;
+  enable<A>(params: A): CExpr<UsergroupsEnableResponse, "slack/usergroups_enable", [A]>;
+  list<A = void>(params?: A): CExpr<UsergroupsListResponse, "slack/usergroups_list", [A]>;
+  update<A>(params: A): CExpr<UsergroupsUpdateResponse, "slack/usergroups_update", [A]>;
 }

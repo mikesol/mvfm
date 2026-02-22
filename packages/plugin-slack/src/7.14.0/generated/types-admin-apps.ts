@@ -2,61 +2,39 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  AdminAppsActivitiesListArguments,
   AdminAppsActivitiesListResponse,
-  AdminAppsApproveArguments,
-  AdminAppsApprovedListArguments,
-  AdminAppsApprovedListResponse,
   AdminAppsApproveResponse,
-  AdminAppsClearResolutionArguments,
+  AdminAppsApprovedListResponse,
   AdminAppsClearResolutionResponse,
-  AdminAppsConfigLookupArguments,
   AdminAppsConfigLookupResponse,
-  AdminAppsConfigSetArguments,
   AdminAppsConfigSetResponse,
-  AdminAppsRequestsCancelArguments,
   AdminAppsRequestsCancelResponse,
-  AdminAppsRequestsListArguments,
   AdminAppsRequestsListResponse,
-  AdminAppsRestrictArguments,
-  AdminAppsRestrictedListArguments,
-  AdminAppsRestrictedListResponse,
   AdminAppsRestrictResponse,
-  AdminAppsUninstallArguments,
+  AdminAppsRestrictedListResponse,
   AdminAppsUninstallResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsAdminApps {
   activities: {
-    list(
-      params?: SlackParams<AdminAppsActivitiesListArguments>,
-    ): CExpr<AdminAppsActivitiesListResponse>;
+    list<A = void>(params?: A): CExpr<AdminAppsActivitiesListResponse, "slack/admin_apps_activities_list", [A]>;
   };
   approved: {
-    list(params: SlackParams<AdminAppsApprovedListArguments>): CExpr<AdminAppsApprovedListResponse>;
+    list<A>(params: A): CExpr<AdminAppsApprovedListResponse, "slack/admin_apps_approved_list", [A]>;
   };
   config: {
-    lookup(
-      params: SlackParams<AdminAppsConfigLookupArguments>,
-    ): CExpr<AdminAppsConfigLookupResponse>;
-    set(params: SlackParams<AdminAppsConfigSetArguments>): CExpr<AdminAppsConfigSetResponse>;
+    lookup<A>(params: A): CExpr<AdminAppsConfigLookupResponse, "slack/admin_apps_config_lookup", [A]>;
+    set<A>(params: A): CExpr<AdminAppsConfigSetResponse, "slack/admin_apps_config_set", [A]>;
   };
   requests: {
-    cancel(
-      params: SlackParams<AdminAppsRequestsCancelArguments>,
-    ): CExpr<AdminAppsRequestsCancelResponse>;
-    list(params: SlackParams<AdminAppsRequestsListArguments>): CExpr<AdminAppsRequestsListResponse>;
+    cancel<A>(params: A): CExpr<AdminAppsRequestsCancelResponse, "slack/admin_apps_requests_cancel", [A]>;
+    list<A>(params: A): CExpr<AdminAppsRequestsListResponse, "slack/admin_apps_requests_list", [A]>;
   };
   restricted: {
-    list(
-      params: SlackParams<AdminAppsRestrictedListArguments>,
-    ): CExpr<AdminAppsRestrictedListResponse>;
+    list<A>(params: A): CExpr<AdminAppsRestrictedListResponse, "slack/admin_apps_restricted_list", [A]>;
   };
-  approve(params: SlackParams<AdminAppsApproveArguments>): CExpr<AdminAppsApproveResponse>;
-  clearResolution(
-    params: SlackParams<AdminAppsClearResolutionArguments>,
-  ): CExpr<AdminAppsClearResolutionResponse>;
-  restrict(params: SlackParams<AdminAppsRestrictArguments>): CExpr<AdminAppsRestrictResponse>;
-  uninstall(params: SlackParams<AdminAppsUninstallArguments>): CExpr<AdminAppsUninstallResponse>;
+  approve<A>(params: A): CExpr<AdminAppsApproveResponse, "slack/admin_apps_approve", [A]>;
+  clearResolution<A>(params: A): CExpr<AdminAppsClearResolutionResponse, "slack/admin_apps_clearResolution", [A]>;
+  restrict<A>(params: A): CExpr<AdminAppsRestrictResponse, "slack/admin_apps_restrict", [A]>;
+  uninstall<A>(params: A): CExpr<AdminAppsUninstallResponse, "slack/admin_apps_uninstall", [A]>;
 }

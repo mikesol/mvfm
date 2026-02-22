@@ -2,23 +2,13 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  AdminRolesAddAssignmentsArguments,
   AdminRolesAddAssignmentsResponse,
-  AdminRolesListAssignmentsArguments,
   AdminRolesListAssignmentsResponse,
-  AdminRolesRemoveAssignmentsArguments,
   AdminRolesRemoveAssignmentsResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsAdminRoles {
-  addAssignments(
-    params: SlackParams<AdminRolesAddAssignmentsArguments>,
-  ): CExpr<AdminRolesAddAssignmentsResponse>;
-  listAssignments(
-    params?: SlackParams<AdminRolesListAssignmentsArguments>,
-  ): CExpr<AdminRolesListAssignmentsResponse>;
-  removeAssignments(
-    params: SlackParams<AdminRolesRemoveAssignmentsArguments>,
-  ): CExpr<AdminRolesRemoveAssignmentsResponse>;
+  addAssignments<A>(params: A): CExpr<AdminRolesAddAssignmentsResponse, "slack/admin_roles_addAssignments", [A]>;
+  listAssignments<A = void>(params?: A): CExpr<AdminRolesListAssignmentsResponse, "slack/admin_roles_listAssignments", [A]>;
+  removeAssignments<A>(params: A): CExpr<AdminRolesRemoveAssignmentsResponse, "slack/admin_roles_removeAssignments", [A]>;
 }

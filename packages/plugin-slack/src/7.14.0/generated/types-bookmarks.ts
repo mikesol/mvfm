@@ -2,20 +2,15 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  BookmarksAddArguments,
   BookmarksAddResponse,
-  BookmarksEditArguments,
   BookmarksEditResponse,
-  BookmarksListArguments,
   BookmarksListResponse,
-  BookmarksRemoveArguments,
   BookmarksRemoveResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsBookmarks {
-  add(params: SlackParams<BookmarksAddArguments>): CExpr<BookmarksAddResponse>;
-  edit(params: SlackParams<BookmarksEditArguments>): CExpr<BookmarksEditResponse>;
-  list(params: SlackParams<BookmarksListArguments>): CExpr<BookmarksListResponse>;
-  remove(params: SlackParams<BookmarksRemoveArguments>): CExpr<BookmarksRemoveResponse>;
+  add<A>(params: A): CExpr<BookmarksAddResponse, "slack/bookmarks_add", [A]>;
+  edit<A>(params: A): CExpr<BookmarksEditResponse, "slack/bookmarks_edit", [A]>;
+  list<A>(params: A): CExpr<BookmarksListResponse, "slack/bookmarks_list", [A]>;
+  remove<A>(params: A): CExpr<BookmarksRemoveResponse, "slack/bookmarks_remove", [A]>;
 }

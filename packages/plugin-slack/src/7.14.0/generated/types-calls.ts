@@ -2,30 +2,21 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  CallsAddArguments,
   CallsAddResponse,
-  CallsEndArguments,
   CallsEndResponse,
-  CallsInfoArguments,
   CallsInfoResponse,
-  CallsParticipantsAddArguments,
   CallsParticipantsAddResponse,
-  CallsParticipantsRemoveArguments,
   CallsParticipantsRemoveResponse,
-  CallsUpdateArguments,
   CallsUpdateResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsCalls {
   participants: {
-    add(params: SlackParams<CallsParticipantsAddArguments>): CExpr<CallsParticipantsAddResponse>;
-    remove(
-      params: SlackParams<CallsParticipantsRemoveArguments>,
-    ): CExpr<CallsParticipantsRemoveResponse>;
+    add<A>(params: A): CExpr<CallsParticipantsAddResponse, "slack/calls_participants_add", [A]>;
+    remove<A>(params: A): CExpr<CallsParticipantsRemoveResponse, "slack/calls_participants_remove", [A]>;
   };
-  add(params: SlackParams<CallsAddArguments>): CExpr<CallsAddResponse>;
-  end(params: SlackParams<CallsEndArguments>): CExpr<CallsEndResponse>;
-  info(params: SlackParams<CallsInfoArguments>): CExpr<CallsInfoResponse>;
-  update(params: SlackParams<CallsUpdateArguments>): CExpr<CallsUpdateResponse>;
+  add<A>(params: A): CExpr<CallsAddResponse, "slack/calls_add", [A]>;
+  end<A>(params: A): CExpr<CallsEndResponse, "slack/calls_end", [A]>;
+  info<A>(params: A): CExpr<CallsInfoResponse, "slack/calls_info", [A]>;
+  update<A>(params: A): CExpr<CallsUpdateResponse, "slack/calls_update", [A]>;
 }

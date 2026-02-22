@@ -2,35 +2,21 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  AdminWorkflowsCollaboratorsAddArguments,
   AdminWorkflowsCollaboratorsAddResponse,
-  AdminWorkflowsCollaboratorsRemoveArguments,
   AdminWorkflowsCollaboratorsRemoveResponse,
-  AdminWorkflowsPermissionsLookupArguments,
   AdminWorkflowsPermissionsLookupResponse,
-  AdminWorkflowsSearchArguments,
   AdminWorkflowsSearchResponse,
-  AdminWorkflowsUnpublishArguments,
   AdminWorkflowsUnpublishResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsAdminWorkflows {
   collaborators: {
-    add(
-      params: SlackParams<AdminWorkflowsCollaboratorsAddArguments>,
-    ): CExpr<AdminWorkflowsCollaboratorsAddResponse>;
-    remove(
-      params: SlackParams<AdminWorkflowsCollaboratorsRemoveArguments>,
-    ): CExpr<AdminWorkflowsCollaboratorsRemoveResponse>;
+    add<A>(params: A): CExpr<AdminWorkflowsCollaboratorsAddResponse, "slack/admin_workflows_collaborators_add", [A]>;
+    remove<A>(params: A): CExpr<AdminWorkflowsCollaboratorsRemoveResponse, "slack/admin_workflows_collaborators_remove", [A]>;
   };
   permissions: {
-    lookup(
-      params: SlackParams<AdminWorkflowsPermissionsLookupArguments>,
-    ): CExpr<AdminWorkflowsPermissionsLookupResponse>;
+    lookup<A>(params: A): CExpr<AdminWorkflowsPermissionsLookupResponse, "slack/admin_workflows_permissions_lookup", [A]>;
   };
-  search(params?: SlackParams<AdminWorkflowsSearchArguments>): CExpr<AdminWorkflowsSearchResponse>;
-  unpublish(
-    params: SlackParams<AdminWorkflowsUnpublishArguments>,
-  ): CExpr<AdminWorkflowsUnpublishResponse>;
+  search<A = void>(params?: A): CExpr<AdminWorkflowsSearchResponse, "slack/admin_workflows_search", [A]>;
+  unpublish<A>(params: A): CExpr<AdminWorkflowsUnpublishResponse, "slack/admin_workflows_unpublish", [A]>;
 }

@@ -2,17 +2,13 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  SearchAllArguments,
   SearchAllResponse,
-  SearchFilesArguments,
   SearchFilesResponse,
-  SearchMessagesArguments,
   SearchMessagesResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsSearch {
-  all(params: SlackParams<SearchAllArguments>): CExpr<SearchAllResponse>;
-  files(params: SlackParams<SearchFilesArguments>): CExpr<SearchFilesResponse>;
-  messages(params: SlackParams<SearchMessagesArguments>): CExpr<SearchMessagesResponse>;
+  all<A>(params: A): CExpr<SearchAllResponse, "slack/search_all", [A]>;
+  files<A>(params: A): CExpr<SearchFilesResponse, "slack/search_files", [A]>;
+  messages<A>(params: A): CExpr<SearchMessagesResponse, "slack/search_messages", [A]>;
 }

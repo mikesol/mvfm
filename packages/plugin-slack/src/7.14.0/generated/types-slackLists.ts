@@ -2,62 +2,37 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  SlackListsAccessDeleteArguments,
   SlackListsAccessDeleteResponse,
-  SlackListsAccessSetArguments,
   SlackListsAccessSetResponse,
-  SlackListsCreateArguments,
   SlackListsCreateResponse,
-  SlackListsDownloadGetArguments,
   SlackListsDownloadGetResponse,
-  SlackListsDownloadStartArguments,
   SlackListsDownloadStartResponse,
-  SlackListsItemsCreateArguments,
   SlackListsItemsCreateResponse,
-  SlackListsItemsDeleteArguments,
-  SlackListsItemsDeleteMultipleArguments,
   SlackListsItemsDeleteMultipleResponse,
   SlackListsItemsDeleteResponse,
-  SlackListsItemsInfoArguments,
   SlackListsItemsInfoResponse,
-  SlackListsItemsListArguments,
   SlackListsItemsListResponse,
-  SlackListsItemsUpdateArguments,
   SlackListsItemsUpdateResponse,
-  SlackListsUpdateArguments,
   SlackListsUpdateResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsSlackLists {
   access: {
-    delete(
-      params: SlackParams<SlackListsAccessDeleteArguments>,
-    ): CExpr<SlackListsAccessDeleteResponse>;
-    set(params: SlackParams<SlackListsAccessSetArguments>): CExpr<SlackListsAccessSetResponse>;
+    delete<A>(params: A): CExpr<SlackListsAccessDeleteResponse, "slack/slackLists_access_delete", [A]>;
+    set<A>(params: A): CExpr<SlackListsAccessSetResponse, "slack/slackLists_access_set", [A]>;
   };
   download: {
-    get(params: SlackParams<SlackListsDownloadGetArguments>): CExpr<SlackListsDownloadGetResponse>;
-    start(
-      params: SlackParams<SlackListsDownloadStartArguments>,
-    ): CExpr<SlackListsDownloadStartResponse>;
+    get<A>(params: A): CExpr<SlackListsDownloadGetResponse, "slack/slackLists_download_get", [A]>;
+    start<A>(params: A): CExpr<SlackListsDownloadStartResponse, "slack/slackLists_download_start", [A]>;
   };
   items: {
-    create(
-      params: SlackParams<SlackListsItemsCreateArguments>,
-    ): CExpr<SlackListsItemsCreateResponse>;
-    delete(
-      params: SlackParams<SlackListsItemsDeleteArguments>,
-    ): CExpr<SlackListsItemsDeleteResponse>;
-    deleteMultiple(
-      params: SlackParams<SlackListsItemsDeleteMultipleArguments>,
-    ): CExpr<SlackListsItemsDeleteMultipleResponse>;
-    info(params: SlackParams<SlackListsItemsInfoArguments>): CExpr<SlackListsItemsInfoResponse>;
-    list(params: SlackParams<SlackListsItemsListArguments>): CExpr<SlackListsItemsListResponse>;
-    update(
-      params: SlackParams<SlackListsItemsUpdateArguments>,
-    ): CExpr<SlackListsItemsUpdateResponse>;
+    create<A>(params: A): CExpr<SlackListsItemsCreateResponse, "slack/slackLists_items_create", [A]>;
+    delete<A>(params: A): CExpr<SlackListsItemsDeleteResponse, "slack/slackLists_items_delete", [A]>;
+    deleteMultiple<A>(params: A): CExpr<SlackListsItemsDeleteMultipleResponse, "slack/slackLists_items_deleteMultiple", [A]>;
+    info<A>(params: A): CExpr<SlackListsItemsInfoResponse, "slack/slackLists_items_info", [A]>;
+    list<A>(params: A): CExpr<SlackListsItemsListResponse, "slack/slackLists_items_list", [A]>;
+    update<A>(params: A): CExpr<SlackListsItemsUpdateResponse, "slack/slackLists_items_update", [A]>;
   };
-  create(params: SlackParams<SlackListsCreateArguments>): CExpr<SlackListsCreateResponse>;
-  update(params: SlackParams<SlackListsUpdateArguments>): CExpr<SlackListsUpdateResponse>;
+  create<A>(params: A): CExpr<SlackListsCreateResponse, "slack/slackLists_create", [A]>;
+  update<A>(params: A): CExpr<SlackListsUpdateResponse, "slack/slackLists_update", [A]>;
 }

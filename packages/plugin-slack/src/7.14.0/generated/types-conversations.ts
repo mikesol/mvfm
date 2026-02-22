@@ -2,124 +2,69 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  ConversationsAcceptSharedInviteArguments,
   ConversationsAcceptSharedInviteResponse,
-  ConversationsApproveSharedInviteArguments,
   ConversationsApproveSharedInviteResponse,
-  ConversationsArchiveArguments,
   ConversationsArchiveResponse,
-  ConversationsCanvasesCreateArguments,
   ConversationsCanvasesCreateResponse,
-  ConversationsCloseArguments,
   ConversationsCloseResponse,
-  ConversationsCreateArguments,
   ConversationsCreateResponse,
-  ConversationsDeclineSharedInviteArguments,
   ConversationsDeclineSharedInviteResponse,
-  ConversationsExternalInvitePermissionsSetArguments,
   ConversationsExternalInvitePermissionsSetResponse,
-  ConversationsHistoryArguments,
   ConversationsHistoryResponse,
-  ConversationsInfoArguments,
   ConversationsInfoResponse,
-  ConversationsInviteArguments,
   ConversationsInviteResponse,
-  ConversationsInviteSharedArguments,
   ConversationsInviteSharedResponse,
-  ConversationsJoinArguments,
   ConversationsJoinResponse,
-  ConversationsKickArguments,
   ConversationsKickResponse,
-  ConversationsLeaveArguments,
   ConversationsLeaveResponse,
-  ConversationsListArguments,
-  ConversationsListConnectInvitesArguments,
   ConversationsListConnectInvitesResponse,
   ConversationsListResponse,
-  ConversationsMarkArguments,
   ConversationsMarkResponse,
-  ConversationsMembersArguments,
   ConversationsMembersResponse,
-  ConversationsOpenArguments,
   ConversationsOpenResponse,
-  ConversationsRenameArguments,
   ConversationsRenameResponse,
-  ConversationsRepliesArguments,
   ConversationsRepliesResponse,
-  ConversationsRequestSharedInviteApproveArguments,
   ConversationsRequestSharedInviteApproveResponse,
-  ConversationsRequestSharedInviteDenyArguments,
   ConversationsRequestSharedInviteDenyResponse,
-  ConversationsRequestSharedInviteListArguments,
   ConversationsRequestSharedInviteListResponse,
-  ConversationsSetPurposeArguments,
   ConversationsSetPurposeResponse,
-  ConversationsSetTopicArguments,
   ConversationsSetTopicResponse,
-  ConversationsUnarchiveArguments,
   ConversationsUnarchiveResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsConversations {
   canvases: {
-    create(
-      params: SlackParams<ConversationsCanvasesCreateArguments>,
-    ): CExpr<ConversationsCanvasesCreateResponse>;
+    create<A>(params: A): CExpr<ConversationsCanvasesCreateResponse, "slack/conversations_canvases_create", [A]>;
   };
   externalInvitePermissions: {
-    set(
-      params: SlackParams<ConversationsExternalInvitePermissionsSetArguments>,
-    ): CExpr<ConversationsExternalInvitePermissionsSetResponse>;
+    set<A>(params: A): CExpr<ConversationsExternalInvitePermissionsSetResponse, "slack/conversations_externalInvitePermissions_set", [A]>;
   };
   requestSharedInvite: {
-    approve(
-      params: SlackParams<ConversationsRequestSharedInviteApproveArguments>,
-    ): CExpr<ConversationsRequestSharedInviteApproveResponse>;
-    deny(
-      params: SlackParams<ConversationsRequestSharedInviteDenyArguments>,
-    ): CExpr<ConversationsRequestSharedInviteDenyResponse>;
-    list(
-      params?: SlackParams<ConversationsRequestSharedInviteListArguments>,
-    ): CExpr<ConversationsRequestSharedInviteListResponse>;
+    approve<A>(params: A): CExpr<ConversationsRequestSharedInviteApproveResponse, "slack/conversations_requestSharedInvite_approve", [A]>;
+    deny<A>(params: A): CExpr<ConversationsRequestSharedInviteDenyResponse, "slack/conversations_requestSharedInvite_deny", [A]>;
+    list<A = void>(params?: A): CExpr<ConversationsRequestSharedInviteListResponse, "slack/conversations_requestSharedInvite_list", [A]>;
   };
-  acceptSharedInvite(
-    params: SlackParams<ConversationsAcceptSharedInviteArguments>,
-  ): CExpr<ConversationsAcceptSharedInviteResponse>;
-  approveSharedInvite(
-    params: SlackParams<ConversationsApproveSharedInviteArguments>,
-  ): CExpr<ConversationsApproveSharedInviteResponse>;
-  archive(params: SlackParams<ConversationsArchiveArguments>): CExpr<ConversationsArchiveResponse>;
-  close(params: SlackParams<ConversationsCloseArguments>): CExpr<ConversationsCloseResponse>;
-  create(params: SlackParams<ConversationsCreateArguments>): CExpr<ConversationsCreateResponse>;
-  declineSharedInvite(
-    params: SlackParams<ConversationsDeclineSharedInviteArguments>,
-  ): CExpr<ConversationsDeclineSharedInviteResponse>;
-  history(params: SlackParams<ConversationsHistoryArguments>): CExpr<ConversationsHistoryResponse>;
-  info(params: SlackParams<ConversationsInfoArguments>): CExpr<ConversationsInfoResponse>;
-  invite(params: SlackParams<ConversationsInviteArguments>): CExpr<ConversationsInviteResponse>;
-  inviteShared(
-    params: SlackParams<ConversationsInviteSharedArguments>,
-  ): CExpr<ConversationsInviteSharedResponse>;
-  join(params: SlackParams<ConversationsJoinArguments>): CExpr<ConversationsJoinResponse>;
-  kick(params: SlackParams<ConversationsKickArguments>): CExpr<ConversationsKickResponse>;
-  leave(params: SlackParams<ConversationsLeaveArguments>): CExpr<ConversationsLeaveResponse>;
-  list(params?: SlackParams<ConversationsListArguments>): CExpr<ConversationsListResponse>;
-  listConnectInvites(
-    params?: SlackParams<ConversationsListConnectInvitesArguments>,
-  ): CExpr<ConversationsListConnectInvitesResponse>;
-  mark(params: SlackParams<ConversationsMarkArguments>): CExpr<ConversationsMarkResponse>;
-  members(params: SlackParams<ConversationsMembersArguments>): CExpr<ConversationsMembersResponse>;
-  open(params: SlackParams<ConversationsOpenArguments>): CExpr<ConversationsOpenResponse>;
-  rename(params: SlackParams<ConversationsRenameArguments>): CExpr<ConversationsRenameResponse>;
-  replies(params: SlackParams<ConversationsRepliesArguments>): CExpr<ConversationsRepliesResponse>;
-  setPurpose(
-    params: SlackParams<ConversationsSetPurposeArguments>,
-  ): CExpr<ConversationsSetPurposeResponse>;
-  setTopic(
-    params: SlackParams<ConversationsSetTopicArguments>,
-  ): CExpr<ConversationsSetTopicResponse>;
-  unarchive(
-    params: SlackParams<ConversationsUnarchiveArguments>,
-  ): CExpr<ConversationsUnarchiveResponse>;
+  acceptSharedInvite<A>(params: A): CExpr<ConversationsAcceptSharedInviteResponse, "slack/conversations_acceptSharedInvite", [A]>;
+  approveSharedInvite<A>(params: A): CExpr<ConversationsApproveSharedInviteResponse, "slack/conversations_approveSharedInvite", [A]>;
+  archive<A>(params: A): CExpr<ConversationsArchiveResponse, "slack/conversations_archive", [A]>;
+  close<A>(params: A): CExpr<ConversationsCloseResponse, "slack/conversations_close", [A]>;
+  create<A>(params: A): CExpr<ConversationsCreateResponse, "slack/conversations_create", [A]>;
+  declineSharedInvite<A>(params: A): CExpr<ConversationsDeclineSharedInviteResponse, "slack/conversations_declineSharedInvite", [A]>;
+  history<A>(params: A): CExpr<ConversationsHistoryResponse, "slack/conversations_history", [A]>;
+  info<A>(params: A): CExpr<ConversationsInfoResponse, "slack/conversations_info", [A]>;
+  invite<A>(params: A): CExpr<ConversationsInviteResponse, "slack/conversations_invite", [A]>;
+  inviteShared<A>(params: A): CExpr<ConversationsInviteSharedResponse, "slack/conversations_inviteShared", [A]>;
+  join<A>(params: A): CExpr<ConversationsJoinResponse, "slack/conversations_join", [A]>;
+  kick<A>(params: A): CExpr<ConversationsKickResponse, "slack/conversations_kick", [A]>;
+  leave<A>(params: A): CExpr<ConversationsLeaveResponse, "slack/conversations_leave", [A]>;
+  list<A = void>(params?: A): CExpr<ConversationsListResponse, "slack/conversations_list", [A]>;
+  listConnectInvites<A = void>(params?: A): CExpr<ConversationsListConnectInvitesResponse, "slack/conversations_listConnectInvites", [A]>;
+  mark<A>(params: A): CExpr<ConversationsMarkResponse, "slack/conversations_mark", [A]>;
+  members<A>(params: A): CExpr<ConversationsMembersResponse, "slack/conversations_members", [A]>;
+  open<A>(params: A): CExpr<ConversationsOpenResponse, "slack/conversations_open", [A]>;
+  rename<A>(params: A): CExpr<ConversationsRenameResponse, "slack/conversations_rename", [A]>;
+  replies<A>(params: A): CExpr<ConversationsRepliesResponse, "slack/conversations_replies", [A]>;
+  setPurpose<A>(params: A): CExpr<ConversationsSetPurposeResponse, "slack/conversations_setPurpose", [A]>;
+  setTopic<A>(params: A): CExpr<ConversationsSetTopicResponse, "slack/conversations_setTopic", [A]>;
+  unarchive<A>(params: A): CExpr<ConversationsUnarchiveResponse, "slack/conversations_unarchive", [A]>;
 }

@@ -2,23 +2,15 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  AdminFunctionsListArguments,
   AdminFunctionsListResponse,
-  AdminFunctionsPermissionsLookupArguments,
   AdminFunctionsPermissionsLookupResponse,
-  AdminFunctionsPermissionsSetArguments,
   AdminFunctionsPermissionsSetResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsAdminFunctions {
   permissions: {
-    lookup(
-      params: SlackParams<AdminFunctionsPermissionsLookupArguments>,
-    ): CExpr<AdminFunctionsPermissionsLookupResponse>;
-    set(
-      params: SlackParams<AdminFunctionsPermissionsSetArguments>,
-    ): CExpr<AdminFunctionsPermissionsSetResponse>;
+    lookup<A>(params: A): CExpr<AdminFunctionsPermissionsLookupResponse, "slack/admin_functions_permissions_lookup", [A]>;
+    set<A>(params: A): CExpr<AdminFunctionsPermissionsSetResponse, "slack/admin_functions_permissions_set", [A]>;
   };
-  list(params: SlackParams<AdminFunctionsListArguments>): CExpr<AdminFunctionsListResponse>;
+  list<A>(params: A): CExpr<AdminFunctionsListResponse, "slack/admin_functions_list", [A]>;
 }

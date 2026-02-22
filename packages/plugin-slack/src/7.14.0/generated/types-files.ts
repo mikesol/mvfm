@@ -2,65 +2,41 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  FilesCommentsDeleteArguments,
   FilesCommentsDeleteResponse,
-  FilesCompleteUploadExternalArguments,
   FilesCompleteUploadExternalResponse,
-  FilesDeleteArguments,
   FilesDeleteResponse,
-  FilesGetUploadURLExternalArguments,
   FilesGetUploadURLExternalResponse,
-  FilesInfoArguments,
   FilesInfoResponse,
-  FilesListArguments,
   FilesListResponse,
-  FilesRemoteAddArguments,
   FilesRemoteAddResponse,
-  FilesRemoteInfoArguments,
   FilesRemoteInfoResponse,
-  FilesRemoteListArguments,
   FilesRemoteListResponse,
-  FilesRemoteRemoveArguments,
   FilesRemoteRemoveResponse,
-  FilesRemoteShareArguments,
   FilesRemoteShareResponse,
-  FilesRemoteUpdateArguments,
   FilesRemoteUpdateResponse,
-  FilesRevokePublicURLArguments,
   FilesRevokePublicURLResponse,
-  FilesSharedPublicURLArguments,
   FilesSharedPublicURLResponse,
-  FilesUploadArguments,
   FilesUploadResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsFiles {
   comments: {
-    delete(params: SlackParams<FilesCommentsDeleteArguments>): CExpr<FilesCommentsDeleteResponse>;
+    delete<A>(params: A): CExpr<FilesCommentsDeleteResponse, "slack/files_comments_delete", [A]>;
   };
   remote: {
-    add(params: SlackParams<FilesRemoteAddArguments>): CExpr<FilesRemoteAddResponse>;
-    info(params: SlackParams<FilesRemoteInfoArguments>): CExpr<FilesRemoteInfoResponse>;
-    list(params: SlackParams<FilesRemoteListArguments>): CExpr<FilesRemoteListResponse>;
-    remove(params: SlackParams<FilesRemoteRemoveArguments>): CExpr<FilesRemoteRemoveResponse>;
-    share(params: SlackParams<FilesRemoteShareArguments>): CExpr<FilesRemoteShareResponse>;
-    update(params: SlackParams<FilesRemoteUpdateArguments>): CExpr<FilesRemoteUpdateResponse>;
+    add<A>(params: A): CExpr<FilesRemoteAddResponse, "slack/files_remote_add", [A]>;
+    info<A>(params: A): CExpr<FilesRemoteInfoResponse, "slack/files_remote_info", [A]>;
+    list<A>(params: A): CExpr<FilesRemoteListResponse, "slack/files_remote_list", [A]>;
+    remove<A>(params: A): CExpr<FilesRemoteRemoveResponse, "slack/files_remote_remove", [A]>;
+    share<A>(params: A): CExpr<FilesRemoteShareResponse, "slack/files_remote_share", [A]>;
+    update<A>(params: A): CExpr<FilesRemoteUpdateResponse, "slack/files_remote_update", [A]>;
   };
-  completeUploadExternal(
-    params: SlackParams<FilesCompleteUploadExternalArguments>,
-  ): CExpr<FilesCompleteUploadExternalResponse>;
-  delete(params: SlackParams<FilesDeleteArguments>): CExpr<FilesDeleteResponse>;
-  getUploadURLExternal(
-    params: SlackParams<FilesGetUploadURLExternalArguments>,
-  ): CExpr<FilesGetUploadURLExternalResponse>;
-  info(params: SlackParams<FilesInfoArguments>): CExpr<FilesInfoResponse>;
-  list(params: SlackParams<FilesListArguments>): CExpr<FilesListResponse>;
-  revokePublicURL(
-    params: SlackParams<FilesRevokePublicURLArguments>,
-  ): CExpr<FilesRevokePublicURLResponse>;
-  sharedPublicURL(
-    params: SlackParams<FilesSharedPublicURLArguments>,
-  ): CExpr<FilesSharedPublicURLResponse>;
-  upload(params: SlackParams<FilesUploadArguments>): CExpr<FilesUploadResponse>;
+  completeUploadExternal<A>(params: A): CExpr<FilesCompleteUploadExternalResponse, "slack/files_completeUploadExternal", [A]>;
+  delete<A>(params: A): CExpr<FilesDeleteResponse, "slack/files_delete", [A]>;
+  getUploadURLExternal<A>(params: A): CExpr<FilesGetUploadURLExternalResponse, "slack/files_getUploadURLExternal", [A]>;
+  info<A>(params: A): CExpr<FilesInfoResponse, "slack/files_info", [A]>;
+  list<A>(params: A): CExpr<FilesListResponse, "slack/files_list", [A]>;
+  revokePublicURL<A>(params: A): CExpr<FilesRevokePublicURLResponse, "slack/files_revokePublicURL", [A]>;
+  sharedPublicURL<A>(params: A): CExpr<FilesSharedPublicURLResponse, "slack/files_sharedPublicURL", [A]>;
+  upload<A>(params: A): CExpr<FilesUploadResponse, "slack/files_upload", [A]>;
 }

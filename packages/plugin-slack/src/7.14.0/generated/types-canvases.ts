@@ -2,32 +2,23 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  CanvasesAccessDeleteArguments,
   CanvasesAccessDeleteResponse,
-  CanvasesAccessSetArguments,
   CanvasesAccessSetResponse,
-  CanvasesCreateArguments,
   CanvasesCreateResponse,
-  CanvasesDeleteArguments,
   CanvasesDeleteResponse,
-  CanvasesEditArguments,
   CanvasesEditResponse,
-  CanvasesSectionsLookupArguments,
   CanvasesSectionsLookupResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsCanvases {
   access: {
-    delete(params: SlackParams<CanvasesAccessDeleteArguments>): CExpr<CanvasesAccessDeleteResponse>;
-    set(params: SlackParams<CanvasesAccessSetArguments>): CExpr<CanvasesAccessSetResponse>;
+    delete<A>(params: A): CExpr<CanvasesAccessDeleteResponse, "slack/canvases_access_delete", [A]>;
+    set<A>(params: A): CExpr<CanvasesAccessSetResponse, "slack/canvases_access_set", [A]>;
   };
   sections: {
-    lookup(
-      params: SlackParams<CanvasesSectionsLookupArguments>,
-    ): CExpr<CanvasesSectionsLookupResponse>;
+    lookup<A>(params: A): CExpr<CanvasesSectionsLookupResponse, "slack/canvases_sections_lookup", [A]>;
   };
-  create(params?: SlackParams<CanvasesCreateArguments>): CExpr<CanvasesCreateResponse>;
-  delete(params: SlackParams<CanvasesDeleteArguments>): CExpr<CanvasesDeleteResponse>;
-  edit(params: SlackParams<CanvasesEditArguments>): CExpr<CanvasesEditResponse>;
+  create<A = void>(params?: A): CExpr<CanvasesCreateResponse, "slack/canvases_create", [A]>;
+  delete<A>(params: A): CExpr<CanvasesDeleteResponse, "slack/canvases_delete", [A]>;
+  edit<A>(params: A): CExpr<CanvasesEditResponse, "slack/canvases_edit", [A]>;
 }

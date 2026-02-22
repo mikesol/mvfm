@@ -2,18 +2,13 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  OpenIDConnectTokenArguments,
   OpenIDConnectTokenResponse,
-  OpenIDConnectUserInfoArguments,
   OpenIDConnectUserInfoResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsOpenid {
   connect: {
-    token(params: SlackParams<OpenIDConnectTokenArguments>): CExpr<OpenIDConnectTokenResponse>;
-    userInfo(
-      params?: SlackParams<OpenIDConnectUserInfoArguments>,
-    ): CExpr<OpenIDConnectUserInfoResponse>;
+    token<A>(params: A): CExpr<OpenIDConnectTokenResponse, "slack/openid_connect_token", [A]>;
+    userInfo<A = void>(params?: A): CExpr<OpenIDConnectUserInfoResponse, "slack/openid_connect_userInfo", [A]>;
   };
 }

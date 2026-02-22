@@ -2,56 +2,33 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  AdminTeamsAdminsListArguments,
   AdminTeamsAdminsListResponse,
-  AdminTeamsCreateArguments,
   AdminTeamsCreateResponse,
-  AdminTeamsListArguments,
   AdminTeamsListResponse,
-  AdminTeamsOwnersListArguments,
   AdminTeamsOwnersListResponse,
-  AdminTeamsSettingsInfoArguments,
   AdminTeamsSettingsInfoResponse,
-  AdminTeamsSettingsSetDefaultChannelsArguments,
   AdminTeamsSettingsSetDefaultChannelsResponse,
-  AdminTeamsSettingsSetDescriptionArguments,
   AdminTeamsSettingsSetDescriptionResponse,
-  AdminTeamsSettingsSetDiscoverabilityArguments,
   AdminTeamsSettingsSetDiscoverabilityResponse,
-  AdminTeamsSettingsSetIconArguments,
   AdminTeamsSettingsSetIconResponse,
-  AdminTeamsSettingsSetNameArguments,
   AdminTeamsSettingsSetNameResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsAdminTeams {
   admins: {
-    list(params: SlackParams<AdminTeamsAdminsListArguments>): CExpr<AdminTeamsAdminsListResponse>;
+    list<A>(params: A): CExpr<AdminTeamsAdminsListResponse, "slack/admin_teams_admins_list", [A]>;
   };
   owners: {
-    list(params: SlackParams<AdminTeamsOwnersListArguments>): CExpr<AdminTeamsOwnersListResponse>;
+    list<A>(params: A): CExpr<AdminTeamsOwnersListResponse, "slack/admin_teams_owners_list", [A]>;
   };
   settings: {
-    info(
-      params: SlackParams<AdminTeamsSettingsInfoArguments>,
-    ): CExpr<AdminTeamsSettingsInfoResponse>;
-    setDefaultChannels(
-      params: SlackParams<AdminTeamsSettingsSetDefaultChannelsArguments>,
-    ): CExpr<AdminTeamsSettingsSetDefaultChannelsResponse>;
-    setDescription(
-      params: SlackParams<AdminTeamsSettingsSetDescriptionArguments>,
-    ): CExpr<AdminTeamsSettingsSetDescriptionResponse>;
-    setDiscoverability(
-      params: SlackParams<AdminTeamsSettingsSetDiscoverabilityArguments>,
-    ): CExpr<AdminTeamsSettingsSetDiscoverabilityResponse>;
-    setIcon(
-      params: SlackParams<AdminTeamsSettingsSetIconArguments>,
-    ): CExpr<AdminTeamsSettingsSetIconResponse>;
-    setName(
-      params: SlackParams<AdminTeamsSettingsSetNameArguments>,
-    ): CExpr<AdminTeamsSettingsSetNameResponse>;
+    info<A>(params: A): CExpr<AdminTeamsSettingsInfoResponse, "slack/admin_teams_settings_info", [A]>;
+    setDefaultChannels<A>(params: A): CExpr<AdminTeamsSettingsSetDefaultChannelsResponse, "slack/admin_teams_settings_setDefaultChannels", [A]>;
+    setDescription<A>(params: A): CExpr<AdminTeamsSettingsSetDescriptionResponse, "slack/admin_teams_settings_setDescription", [A]>;
+    setDiscoverability<A>(params: A): CExpr<AdminTeamsSettingsSetDiscoverabilityResponse, "slack/admin_teams_settings_setDiscoverability", [A]>;
+    setIcon<A>(params: A): CExpr<AdminTeamsSettingsSetIconResponse, "slack/admin_teams_settings_setIcon", [A]>;
+    setName<A>(params: A): CExpr<AdminTeamsSettingsSetNameResponse, "slack/admin_teams_settings_setName", [A]>;
   };
-  create(params: SlackParams<AdminTeamsCreateArguments>): CExpr<AdminTeamsCreateResponse>;
-  list(params?: SlackParams<AdminTeamsListArguments>): CExpr<AdminTeamsListResponse>;
+  create<A>(params: A): CExpr<AdminTeamsCreateResponse, "slack/admin_teams_create", [A]>;
+  list<A = void>(params?: A): CExpr<AdminTeamsListResponse, "slack/admin_teams_list", [A]>;
 }

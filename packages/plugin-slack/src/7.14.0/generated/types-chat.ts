@@ -2,55 +2,35 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  ChatAppendStreamArguments,
   ChatAppendStreamResponse,
-  ChatDeleteArguments,
   ChatDeleteResponse,
-  ChatDeleteScheduledMessageArguments,
   ChatDeleteScheduledMessageResponse,
-  ChatGetPermalinkArguments,
   ChatGetPermalinkResponse,
-  ChatMeMessageArguments,
   ChatMeMessageResponse,
-  ChatPostEphemeralArguments,
   ChatPostEphemeralResponse,
-  ChatPostMessageArguments,
   ChatPostMessageResponse,
-  ChatScheduledMessagesListArguments,
-  ChatScheduledMessagesListResponse,
-  ChatScheduleMessageArguments,
   ChatScheduleMessageResponse,
-  ChatStartStreamArguments,
+  ChatScheduledMessagesListResponse,
   ChatStartStreamResponse,
-  ChatStopStreamArguments,
   ChatStopStreamResponse,
-  ChatUnfurlArguments,
   ChatUnfurlResponse,
-  ChatUpdateArguments,
   ChatUpdateResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsChat {
   scheduledMessages: {
-    list(
-      params?: SlackParams<ChatScheduledMessagesListArguments>,
-    ): CExpr<ChatScheduledMessagesListResponse>;
+    list<A = void>(params?: A): CExpr<ChatScheduledMessagesListResponse, "slack/chat_scheduledMessages_list", [A]>;
   };
-  appendStream(params: SlackParams<ChatAppendStreamArguments>): CExpr<ChatAppendStreamResponse>;
-  delete(params: SlackParams<ChatDeleteArguments>): CExpr<ChatDeleteResponse>;
-  deleteScheduledMessage(
-    params: SlackParams<ChatDeleteScheduledMessageArguments>,
-  ): CExpr<ChatDeleteScheduledMessageResponse>;
-  getPermalink(params: SlackParams<ChatGetPermalinkArguments>): CExpr<ChatGetPermalinkResponse>;
-  meMessage(params: SlackParams<ChatMeMessageArguments>): CExpr<ChatMeMessageResponse>;
-  postEphemeral(params: SlackParams<ChatPostEphemeralArguments>): CExpr<ChatPostEphemeralResponse>;
-  postMessage(params: SlackParams<ChatPostMessageArguments>): CExpr<ChatPostMessageResponse>;
-  scheduleMessage(
-    params: SlackParams<ChatScheduleMessageArguments>,
-  ): CExpr<ChatScheduleMessageResponse>;
-  startStream(params: SlackParams<ChatStartStreamArguments>): CExpr<ChatStartStreamResponse>;
-  stopStream(params: SlackParams<ChatStopStreamArguments>): CExpr<ChatStopStreamResponse>;
-  unfurl(params: SlackParams<ChatUnfurlArguments>): CExpr<ChatUnfurlResponse>;
-  update(params: SlackParams<ChatUpdateArguments>): CExpr<ChatUpdateResponse>;
+  appendStream<A>(params: A): CExpr<ChatAppendStreamResponse, "slack/chat_appendStream", [A]>;
+  delete<A>(params: A): CExpr<ChatDeleteResponse, "slack/chat_delete", [A]>;
+  deleteScheduledMessage<A>(params: A): CExpr<ChatDeleteScheduledMessageResponse, "slack/chat_deleteScheduledMessage", [A]>;
+  getPermalink<A>(params: A): CExpr<ChatGetPermalinkResponse, "slack/chat_getPermalink", [A]>;
+  meMessage<A>(params: A): CExpr<ChatMeMessageResponse, "slack/chat_meMessage", [A]>;
+  postEphemeral<A>(params: A): CExpr<ChatPostEphemeralResponse, "slack/chat_postEphemeral", [A]>;
+  postMessage<A>(params: A): CExpr<ChatPostMessageResponse, "slack/chat_postMessage", [A]>;
+  scheduleMessage<A>(params: A): CExpr<ChatScheduleMessageResponse, "slack/chat_scheduleMessage", [A]>;
+  startStream<A>(params: A): CExpr<ChatStartStreamResponse, "slack/chat_startStream", [A]>;
+  stopStream<A>(params: A): CExpr<ChatStopStreamResponse, "slack/chat_stopStream", [A]>;
+  unfurl<A>(params: A): CExpr<ChatUnfurlResponse, "slack/chat_unfurl", [A]>;
+  update<A>(params: A): CExpr<ChatUpdateResponse, "slack/chat_update", [A]>;
 }

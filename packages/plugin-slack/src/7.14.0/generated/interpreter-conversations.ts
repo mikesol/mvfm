@@ -10,8 +10,7 @@ export const NODE_TO_METHOD_CONVERSATIONS: Record<string, string> = {
   "slack/conversations_close": "conversations.close",
   "slack/conversations_create": "conversations.create",
   "slack/conversations_declineSharedInvite": "conversations.declineSharedInvite",
-  "slack/conversations_externalInvitePermissions_set":
-    "conversations.externalInvitePermissions.set",
+  "slack/conversations_externalInvitePermissions_set": "conversations.externalInvitePermissions.set",
   "slack/conversations_history": "conversations.history",
   "slack/conversations_info": "conversations.info",
   "slack/conversations_invite": "conversations.invite",

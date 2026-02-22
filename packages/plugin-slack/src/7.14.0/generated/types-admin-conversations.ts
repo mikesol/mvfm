@@ -2,137 +2,61 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  AdminConversationsArchiveArguments,
   AdminConversationsArchiveResponse,
-  AdminConversationsBulkArchiveArguments,
   AdminConversationsBulkArchiveResponse,
-  AdminConversationsBulkDeleteArguments,
   AdminConversationsBulkDeleteResponse,
-  AdminConversationsBulkMoveArguments,
   AdminConversationsBulkMoveResponse,
-  AdminConversationsConvertToPrivateArguments,
   AdminConversationsConvertToPrivateResponse,
-  AdminConversationsConvertToPublicArguments,
   AdminConversationsConvertToPublicResponse,
-  AdminConversationsCreateArguments,
   AdminConversationsCreateResponse,
-  AdminConversationsDeleteArguments,
   AdminConversationsDeleteResponse,
-  AdminConversationsDisconnectSharedArguments,
   AdminConversationsDisconnectSharedResponse,
-  AdminConversationsEKMListOriginalConnectedChannelInfoArguments,
   AdminConversationsEkmListOriginalConnectedChannelInfoResponse,
-  AdminConversationsGetConversationPrefsArguments,
   AdminConversationsGetConversationPrefsResponse,
-  AdminConversationsGetCustomRetentionArguments,
   AdminConversationsGetCustomRetentionResponse,
-  AdminConversationsGetTeamsArguments,
   AdminConversationsGetTeamsResponse,
-  AdminConversationsInviteArguments,
   AdminConversationsInviteResponse,
-  AdminConversationsLookupArguments,
   AdminConversationsLookupResponse,
-  AdminConversationsRemoveCustomRetentionArguments,
   AdminConversationsRemoveCustomRetentionResponse,
-  AdminConversationsRenameArguments,
   AdminConversationsRenameResponse,
-  AdminConversationsRestrictAccessAddGroupArguments,
   AdminConversationsRestrictAccessAddGroupResponse,
-  AdminConversationsRestrictAccessListGroupsArguments,
   AdminConversationsRestrictAccessListGroupsResponse,
-  AdminConversationsRestrictAccessRemoveGroupArguments,
   AdminConversationsRestrictAccessRemoveGroupResponse,
-  AdminConversationsSearchArguments,
   AdminConversationsSearchResponse,
-  AdminConversationsSetConversationPrefsArguments,
   AdminConversationsSetConversationPrefsResponse,
-  AdminConversationsSetCustomRetentionArguments,
   AdminConversationsSetCustomRetentionResponse,
-  AdminConversationsSetTeamsArguments,
   AdminConversationsSetTeamsResponse,
-  AdminConversationsUnarchiveArguments,
   AdminConversationsUnarchiveResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsAdminConversations {
   ekm: {
-    listOriginalConnectedChannelInfo(
-      params?: SlackParams<AdminConversationsEKMListOriginalConnectedChannelInfoArguments>,
-    ): CExpr<AdminConversationsEkmListOriginalConnectedChannelInfoResponse>;
+    listOriginalConnectedChannelInfo<A = void>(params?: A): CExpr<AdminConversationsEkmListOriginalConnectedChannelInfoResponse, "slack/admin_conversations_ekm_listOriginalConnectedChannelInfo", [A]>;
   };
   restrictAccess: {
-    addGroup(
-      params: SlackParams<AdminConversationsRestrictAccessAddGroupArguments>,
-    ): CExpr<AdminConversationsRestrictAccessAddGroupResponse>;
-    listGroups(
-      params: SlackParams<AdminConversationsRestrictAccessListGroupsArguments>,
-    ): CExpr<AdminConversationsRestrictAccessListGroupsResponse>;
-    removeGroup(
-      params: SlackParams<AdminConversationsRestrictAccessRemoveGroupArguments>,
-    ): CExpr<AdminConversationsRestrictAccessRemoveGroupResponse>;
+    addGroup<A>(params: A): CExpr<AdminConversationsRestrictAccessAddGroupResponse, "slack/admin_conversations_restrictAccess_addGroup", [A]>;
+    listGroups<A>(params: A): CExpr<AdminConversationsRestrictAccessListGroupsResponse, "slack/admin_conversations_restrictAccess_listGroups", [A]>;
+    removeGroup<A>(params: A): CExpr<AdminConversationsRestrictAccessRemoveGroupResponse, "slack/admin_conversations_restrictAccess_removeGroup", [A]>;
   };
-  archive(
-    params: SlackParams<AdminConversationsArchiveArguments>,
-  ): CExpr<AdminConversationsArchiveResponse>;
-  bulkArchive(
-    params: SlackParams<AdminConversationsBulkArchiveArguments>,
-  ): CExpr<AdminConversationsBulkArchiveResponse>;
-  bulkDelete(
-    params: SlackParams<AdminConversationsBulkDeleteArguments>,
-  ): CExpr<AdminConversationsBulkDeleteResponse>;
-  bulkMove(
-    params: SlackParams<AdminConversationsBulkMoveArguments>,
-  ): CExpr<AdminConversationsBulkMoveResponse>;
-  convertToPrivate(
-    params: SlackParams<AdminConversationsConvertToPrivateArguments>,
-  ): CExpr<AdminConversationsConvertToPrivateResponse>;
-  convertToPublic(
-    params: SlackParams<AdminConversationsConvertToPublicArguments>,
-  ): CExpr<AdminConversationsConvertToPublicResponse>;
-  create(
-    params: SlackParams<AdminConversationsCreateArguments>,
-  ): CExpr<AdminConversationsCreateResponse>;
-  delete(
-    params: SlackParams<AdminConversationsDeleteArguments>,
-  ): CExpr<AdminConversationsDeleteResponse>;
-  disconnectShared(
-    params: SlackParams<AdminConversationsDisconnectSharedArguments>,
-  ): CExpr<AdminConversationsDisconnectSharedResponse>;
-  getConversationPrefs(
-    params: SlackParams<AdminConversationsGetConversationPrefsArguments>,
-  ): CExpr<AdminConversationsGetConversationPrefsResponse>;
-  getCustomRetention(
-    params: SlackParams<AdminConversationsGetCustomRetentionArguments>,
-  ): CExpr<AdminConversationsGetCustomRetentionResponse>;
-  getTeams(
-    params: SlackParams<AdminConversationsGetTeamsArguments>,
-  ): CExpr<AdminConversationsGetTeamsResponse>;
-  invite(
-    params: SlackParams<AdminConversationsInviteArguments>,
-  ): CExpr<AdminConversationsInviteResponse>;
-  lookup(
-    params: SlackParams<AdminConversationsLookupArguments>,
-  ): CExpr<AdminConversationsLookupResponse>;
-  removeCustomRetention(
-    params: SlackParams<AdminConversationsRemoveCustomRetentionArguments>,
-  ): CExpr<AdminConversationsRemoveCustomRetentionResponse>;
-  rename(
-    params: SlackParams<AdminConversationsRenameArguments>,
-  ): CExpr<AdminConversationsRenameResponse>;
-  search(
-    params?: SlackParams<AdminConversationsSearchArguments>,
-  ): CExpr<AdminConversationsSearchResponse>;
-  setConversationPrefs(
-    params: SlackParams<AdminConversationsSetConversationPrefsArguments>,
-  ): CExpr<AdminConversationsSetConversationPrefsResponse>;
-  setCustomRetention(
-    params: SlackParams<AdminConversationsSetCustomRetentionArguments>,
-  ): CExpr<AdminConversationsSetCustomRetentionResponse>;
-  setTeams(
-    params: SlackParams<AdminConversationsSetTeamsArguments>,
-  ): CExpr<AdminConversationsSetTeamsResponse>;
-  unarchive(
-    params: SlackParams<AdminConversationsUnarchiveArguments>,
-  ): CExpr<AdminConversationsUnarchiveResponse>;
+  archive<A>(params: A): CExpr<AdminConversationsArchiveResponse, "slack/admin_conversations_archive", [A]>;
+  bulkArchive<A>(params: A): CExpr<AdminConversationsBulkArchiveResponse, "slack/admin_conversations_bulkArchive", [A]>;
+  bulkDelete<A>(params: A): CExpr<AdminConversationsBulkDeleteResponse, "slack/admin_conversations_bulkDelete", [A]>;
+  bulkMove<A>(params: A): CExpr<AdminConversationsBulkMoveResponse, "slack/admin_conversations_bulkMove", [A]>;
+  convertToPrivate<A>(params: A): CExpr<AdminConversationsConvertToPrivateResponse, "slack/admin_conversations_convertToPrivate", [A]>;
+  convertToPublic<A>(params: A): CExpr<AdminConversationsConvertToPublicResponse, "slack/admin_conversations_convertToPublic", [A]>;
+  create<A>(params: A): CExpr<AdminConversationsCreateResponse, "slack/admin_conversations_create", [A]>;
+  delete<A>(params: A): CExpr<AdminConversationsDeleteResponse, "slack/admin_conversations_delete", [A]>;
+  disconnectShared<A>(params: A): CExpr<AdminConversationsDisconnectSharedResponse, "slack/admin_conversations_disconnectShared", [A]>;
+  getConversationPrefs<A>(params: A): CExpr<AdminConversationsGetConversationPrefsResponse, "slack/admin_conversations_getConversationPrefs", [A]>;
+  getCustomRetention<A>(params: A): CExpr<AdminConversationsGetCustomRetentionResponse, "slack/admin_conversations_getCustomRetention", [A]>;
+  getTeams<A>(params: A): CExpr<AdminConversationsGetTeamsResponse, "slack/admin_conversations_getTeams", [A]>;
+  invite<A>(params: A): CExpr<AdminConversationsInviteResponse, "slack/admin_conversations_invite", [A]>;
+  lookup<A>(params: A): CExpr<AdminConversationsLookupResponse, "slack/admin_conversations_lookup", [A]>;
+  removeCustomRetention<A>(params: A): CExpr<AdminConversationsRemoveCustomRetentionResponse, "slack/admin_conversations_removeCustomRetention", [A]>;
+  rename<A>(params: A): CExpr<AdminConversationsRenameResponse, "slack/admin_conversations_rename", [A]>;
+  search<A = void>(params?: A): CExpr<AdminConversationsSearchResponse, "slack/admin_conversations_search", [A]>;
+  setConversationPrefs<A>(params: A): CExpr<AdminConversationsSetConversationPrefsResponse, "slack/admin_conversations_setConversationPrefs", [A]>;
+  setCustomRetention<A>(params: A): CExpr<AdminConversationsSetCustomRetentionResponse, "slack/admin_conversations_setCustomRetention", [A]>;
+  setTeams<A>(params: A): CExpr<AdminConversationsSetTeamsResponse, "slack/admin_conversations_setTeams", [A]>;
+  unarchive<A>(params: A): CExpr<AdminConversationsUnarchiveResponse, "slack/admin_conversations_unarchive", [A]>;
 }

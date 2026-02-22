@@ -2,19 +2,15 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  AuthRevokeArguments,
   AuthRevokeResponse,
-  AuthTeamsListArguments,
   AuthTeamsListResponse,
-  AuthTestArguments,
   AuthTestResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsAuth {
   teams: {
-    list(params?: SlackParams<AuthTeamsListArguments>): CExpr<AuthTeamsListResponse>;
+    list<A = void>(params?: A): CExpr<AuthTeamsListResponse, "slack/auth_teams_list", [A]>;
   };
-  revoke(params?: SlackParams<AuthRevokeArguments>): CExpr<AuthRevokeResponse>;
-  test(params?: SlackParams<AuthTestArguments>): CExpr<AuthTestResponse>;
+  revoke<A = void>(params?: A): CExpr<AuthRevokeResponse, "slack/auth_revoke", [A]>;
+  test<A = void>(params?: A): CExpr<AuthTestResponse, "slack/auth_test", [A]>;
 }

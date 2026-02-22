@@ -1,4 +1,4 @@
-import type { Interpreter, KindSpec } from "@mvfm/core";
+import type { Interpreter, KindSpec, Plugin } from "@mvfm/core";
 import { wrapSlackWebClient } from "./client-slack-web-api";
 import { buildSlackMethods } from "./generated/build-methods";
 import type { SlackClient } from "./generated/interpreter";
@@ -75,7 +75,7 @@ export const slackInterpreter: Interpreter = lazyInterpreter(() =>
   ),
 );
 
-// ---- Node kinds with record/array ----------------------------------------
+// ---- Node kinds (built once, reused) --------------------------------------
 
 /** KindSpec for slack API methods: single params input, unknown output. */
 const slackMethodKind: KindSpec<[unknown], unknown> = {
@@ -83,21 +83,23 @@ const slackMethodKind: KindSpec<[unknown], unknown> = {
   output: undefined as unknown,
 };
 
-function buildKinds(): Record<string, KindSpec<any, any>> {
-  const kinds: Record<string, KindSpec<any, any>> = {};
-  for (const kind of SLACK_NODE_KINDS) {
-    kinds[kind] = slackMethodKind;
-  }
-  kinds["slack/record"] = {
-    inputs: [] as unknown[],
-    output: {} as Record<string, unknown>,
-  } as KindSpec<unknown[], Record<string, unknown>>;
-  kinds["slack/array"] = {
-    inputs: [] as unknown[],
-    output: [] as unknown[],
-  } as KindSpec<unknown[], unknown[]>;
-  return kinds;
-}
+const slackKinds = Object.fromEntries([
+  ...SLACK_NODE_KINDS.map((k) => [k, slackMethodKind] as const),
+  [
+    "slack/record",
+    {
+      inputs: [] as unknown[],
+      output: {} as Record<string, unknown>,
+    } as KindSpec<unknown[], Record<string, unknown>>,
+  ],
+  [
+    "slack/array",
+    {
+      inputs: [] as unknown[],
+      output: [] as unknown[],
+    } as KindSpec<unknown[], unknown[]>,
+  ],
+]) as Record<string, KindSpec<any, any>>;
 
 // ---- Plugin factory -------------------------------------------------------
 
@@ -114,9 +116,9 @@ export function slack(_config: SlackConfig) {
   return {
     name: "slack" as const,
     ctors: buildSlackMethods(),
-    kinds: buildKinds(),
+    kinds: slackKinds,
     traits: {},
     lifts: {},
     defaultInterpreter: (): Interpreter => slackInterpreter,
-  };
+  } satisfies Plugin;
 }

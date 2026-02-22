@@ -2,20 +2,15 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  AdminBarriersCreateArguments,
   AdminBarriersCreateResponse,
-  AdminBarriersDeleteArguments,
   AdminBarriersDeleteResponse,
-  AdminBarriersListArguments,
   AdminBarriersListResponse,
-  AdminBarriersUpdateArguments,
   AdminBarriersUpdateResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsAdminBarriers {
-  create(params: SlackParams<AdminBarriersCreateArguments>): CExpr<AdminBarriersCreateResponse>;
-  delete(params: SlackParams<AdminBarriersDeleteArguments>): CExpr<AdminBarriersDeleteResponse>;
-  list(params?: SlackParams<AdminBarriersListArguments>): CExpr<AdminBarriersListResponse>;
-  update(params: SlackParams<AdminBarriersUpdateArguments>): CExpr<AdminBarriersUpdateResponse>;
+  create<A>(params: A): CExpr<AdminBarriersCreateResponse, "slack/admin_barriers_create", [A]>;
+  delete<A>(params: A): CExpr<AdminBarriersDeleteResponse, "slack/admin_barriers_delete", [A]>;
+  list<A = void>(params?: A): CExpr<AdminBarriersListResponse, "slack/admin_barriers_list", [A]>;
+  update<A>(params: A): CExpr<AdminBarriersUpdateResponse, "slack/admin_barriers_update", [A]>;
 }

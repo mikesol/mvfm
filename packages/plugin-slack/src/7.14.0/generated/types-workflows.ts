@@ -2,35 +2,23 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  WorkflowsFeaturedAddArguments,
   WorkflowsFeaturedAddResponse,
-  WorkflowsFeaturedListArguments,
   WorkflowsFeaturedListResponse,
-  WorkflowsFeaturedRemoveArguments,
   WorkflowsFeaturedRemoveResponse,
-  WorkflowsFeaturedSetArguments,
   WorkflowsFeaturedSetResponse,
-  WorkflowsStepCompletedArguments,
   WorkflowsStepCompletedResponse,
-  WorkflowsStepFailedArguments,
   WorkflowsStepFailedResponse,
-  WorkflowsUpdateStepArguments,
   WorkflowsUpdateStepResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsWorkflows {
   featured: {
-    add(params: SlackParams<WorkflowsFeaturedAddArguments>): CExpr<WorkflowsFeaturedAddResponse>;
-    list(params: SlackParams<WorkflowsFeaturedListArguments>): CExpr<WorkflowsFeaturedListResponse>;
-    remove(
-      params: SlackParams<WorkflowsFeaturedRemoveArguments>,
-    ): CExpr<WorkflowsFeaturedRemoveResponse>;
-    set(params: SlackParams<WorkflowsFeaturedSetArguments>): CExpr<WorkflowsFeaturedSetResponse>;
+    add<A>(params: A): CExpr<WorkflowsFeaturedAddResponse, "slack/workflows_featured_add", [A]>;
+    list<A>(params: A): CExpr<WorkflowsFeaturedListResponse, "slack/workflows_featured_list", [A]>;
+    remove<A>(params: A): CExpr<WorkflowsFeaturedRemoveResponse, "slack/workflows_featured_remove", [A]>;
+    set<A>(params: A): CExpr<WorkflowsFeaturedSetResponse, "slack/workflows_featured_set", [A]>;
   };
-  stepCompleted(
-    params: SlackParams<WorkflowsStepCompletedArguments>,
-  ): CExpr<WorkflowsStepCompletedResponse>;
-  stepFailed(params: SlackParams<WorkflowsStepFailedArguments>): CExpr<WorkflowsStepFailedResponse>;
-  updateStep(params: SlackParams<WorkflowsUpdateStepArguments>): CExpr<WorkflowsUpdateStepResponse>;
+  stepCompleted<A>(params: A): CExpr<WorkflowsStepCompletedResponse, "slack/workflows_stepCompleted", [A]>;
+  stepFailed<A>(params: A): CExpr<WorkflowsStepFailedResponse, "slack/workflows_stepFailed", [A]>;
+  updateStep<A>(params: A): CExpr<WorkflowsUpdateStepResponse, "slack/workflows_updateStep", [A]>;
 }

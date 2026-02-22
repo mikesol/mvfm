@@ -2,25 +2,15 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  AdminAuthPolicyAssignEntitiesArguments,
   AdminAuthPolicyAssignEntitiesResponse,
-  AdminAuthPolicyGetEntitiesArguments,
   AdminAuthPolicyGetEntitiesResponse,
-  AdminAuthPolicyRemoveEntitiesArguments,
   AdminAuthPolicyRemoveEntitiesResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsAdminAuth {
   policy: {
-    assignEntities(
-      params: SlackParams<AdminAuthPolicyAssignEntitiesArguments>,
-    ): CExpr<AdminAuthPolicyAssignEntitiesResponse>;
-    getEntities(
-      params: SlackParams<AdminAuthPolicyGetEntitiesArguments>,
-    ): CExpr<AdminAuthPolicyGetEntitiesResponse>;
-    removeEntities(
-      params: SlackParams<AdminAuthPolicyRemoveEntitiesArguments>,
-    ): CExpr<AdminAuthPolicyRemoveEntitiesResponse>;
+    assignEntities<A>(params: A): CExpr<AdminAuthPolicyAssignEntitiesResponse, "slack/admin_auth_policy_assignEntities", [A]>;
+    getEntities<A>(params: A): CExpr<AdminAuthPolicyGetEntitiesResponse, "slack/admin_auth_policy_getEntities", [A]>;
+    removeEntities<A>(params: A): CExpr<AdminAuthPolicyRemoveEntitiesResponse, "slack/admin_auth_policy_removeEntities", [A]>;
   };
 }

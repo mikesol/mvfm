@@ -2,23 +2,17 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  DndEndDndArguments,
   DndEndDndResponse,
-  DndEndSnoozeArguments,
   DndEndSnoozeResponse,
-  DndInfoArguments,
   DndInfoResponse,
-  DndSetSnoozeArguments,
   DndSetSnoozeResponse,
-  DndTeamInfoArguments,
   DndTeamInfoResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsDnd {
-  endDnd(params?: SlackParams<DndEndDndArguments>): CExpr<DndEndDndResponse>;
-  endSnooze(params?: SlackParams<DndEndSnoozeArguments>): CExpr<DndEndSnoozeResponse>;
-  info(params?: SlackParams<DndInfoArguments>): CExpr<DndInfoResponse>;
-  setSnooze(params: SlackParams<DndSetSnoozeArguments>): CExpr<DndSetSnoozeResponse>;
-  teamInfo(params: SlackParams<DndTeamInfoArguments>): CExpr<DndTeamInfoResponse>;
+  endDnd<A = void>(params?: A): CExpr<DndEndDndResponse, "slack/dnd_endDnd", [A]>;
+  endSnooze<A = void>(params?: A): CExpr<DndEndSnoozeResponse, "slack/dnd_endSnooze", [A]>;
+  info<A = void>(params?: A): CExpr<DndInfoResponse, "slack/dnd_info", [A]>;
+  setSnooze<A>(params: A): CExpr<DndSetSnoozeResponse, "slack/dnd_setSnooze", [A]>;
+  teamInfo<A>(params: A): CExpr<DndTeamInfoResponse, "slack/dnd_teamInfo", [A]>;
 }

@@ -2,47 +2,33 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  TeamAccessLogsArguments,
   TeamAccessLogsResponse,
-  TeamBillableInfoArguments,
   TeamBillableInfoResponse,
-  TeamBillingInfoArguments,
   TeamBillingInfoResponse,
-  TeamExternalTeamsDisconnectArguments,
   TeamExternalTeamsDisconnectResponse,
-  TeamExternalTeamsListArguments,
   TeamExternalTeamsListResponse,
-  TeamInfoArguments,
   TeamInfoResponse,
-  TeamIntegrationLogsArguments,
   TeamIntegrationLogsResponse,
-  TeamPreferencesListArguments,
   TeamPreferencesListResponse,
-  TeamProfileGetArguments,
   TeamProfileGetResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsTeam {
   billing: {
-    info(params: SlackParams<TeamBillingInfoArguments>): CExpr<TeamBillingInfoResponse>;
+    info<A>(params: A): CExpr<TeamBillingInfoResponse, "slack/team_billing_info", [A]>;
   };
   externalTeams: {
-    disconnect(
-      params: SlackParams<TeamExternalTeamsDisconnectArguments>,
-    ): CExpr<TeamExternalTeamsDisconnectResponse>;
-    list(params: SlackParams<TeamExternalTeamsListArguments>): CExpr<TeamExternalTeamsListResponse>;
+    disconnect<A>(params: A): CExpr<TeamExternalTeamsDisconnectResponse, "slack/team_externalTeams_disconnect", [A]>;
+    list<A>(params: A): CExpr<TeamExternalTeamsListResponse, "slack/team_externalTeams_list", [A]>;
   };
   preferences: {
-    list(params?: SlackParams<TeamPreferencesListArguments>): CExpr<TeamPreferencesListResponse>;
+    list<A = void>(params?: A): CExpr<TeamPreferencesListResponse, "slack/team_preferences_list", [A]>;
   };
   profile: {
-    get(params?: SlackParams<TeamProfileGetArguments>): CExpr<TeamProfileGetResponse>;
+    get<A = void>(params?: A): CExpr<TeamProfileGetResponse, "slack/team_profile_get", [A]>;
   };
-  accessLogs(params?: SlackParams<TeamAccessLogsArguments>): CExpr<TeamAccessLogsResponse>;
-  billableInfo(params?: SlackParams<TeamBillableInfoArguments>): CExpr<TeamBillableInfoResponse>;
-  info(params?: SlackParams<TeamInfoArguments>): CExpr<TeamInfoResponse>;
-  integrationLogs(
-    params?: SlackParams<TeamIntegrationLogsArguments>,
-  ): CExpr<TeamIntegrationLogsResponse>;
+  accessLogs<A = void>(params?: A): CExpr<TeamAccessLogsResponse, "slack/team_accessLogs", [A]>;
+  billableInfo<A = void>(params?: A): CExpr<TeamBillableInfoResponse, "slack/team_billableInfo", [A]>;
+  info<A = void>(params?: A): CExpr<TeamInfoResponse, "slack/team_info", [A]>;
+  integrationLogs<A = void>(params?: A): CExpr<TeamIntegrationLogsResponse, "slack/team_integrationLogs", [A]>;
 }

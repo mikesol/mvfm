@@ -2,37 +2,21 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  AdminInviteRequestsApproveArguments,
-  AdminInviteRequestsApprovedListArguments,
-  AdminInviteRequestsApprovedListResponse,
   AdminInviteRequestsApproveResponse,
-  AdminInviteRequestsDeniedListArguments,
+  AdminInviteRequestsApprovedListResponse,
   AdminInviteRequestsDeniedListResponse,
-  AdminInviteRequestsDenyArguments,
   AdminInviteRequestsDenyResponse,
-  AdminInviteRequestsListArguments,
   AdminInviteRequestsListResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsAdminInviteRequests {
   approved: {
-    list(
-      params: SlackParams<AdminInviteRequestsApprovedListArguments>,
-    ): CExpr<AdminInviteRequestsApprovedListResponse>;
+    list<A>(params: A): CExpr<AdminInviteRequestsApprovedListResponse, "slack/admin_inviteRequests_approved_list", [A]>;
   };
   denied: {
-    list(
-      params: SlackParams<AdminInviteRequestsDeniedListArguments>,
-    ): CExpr<AdminInviteRequestsDeniedListResponse>;
+    list<A>(params: A): CExpr<AdminInviteRequestsDeniedListResponse, "slack/admin_inviteRequests_denied_list", [A]>;
   };
-  approve(
-    params: SlackParams<AdminInviteRequestsApproveArguments>,
-  ): CExpr<AdminInviteRequestsApproveResponse>;
-  deny(
-    params: SlackParams<AdminInviteRequestsDenyArguments>,
-  ): CExpr<AdminInviteRequestsDenyResponse>;
-  list(
-    params: SlackParams<AdminInviteRequestsListArguments>,
-  ): CExpr<AdminInviteRequestsListResponse>;
+  approve<A>(params: A): CExpr<AdminInviteRequestsApproveResponse, "slack/admin_inviteRequests_approve", [A]>;
+  deny<A>(params: A): CExpr<AdminInviteRequestsDenyResponse, "slack/admin_inviteRequests_deny", [A]>;
+  list<A>(params: A): CExpr<AdminInviteRequestsListResponse, "slack/admin_inviteRequests_list", [A]>;
 }

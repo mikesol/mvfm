@@ -2,23 +2,17 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  RemindersAddArguments,
   RemindersAddResponse,
-  RemindersCompleteArguments,
   RemindersCompleteResponse,
-  RemindersDeleteArguments,
   RemindersDeleteResponse,
-  RemindersInfoArguments,
   RemindersInfoResponse,
-  RemindersListArguments,
   RemindersListResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsReminders {
-  add(params: SlackParams<RemindersAddArguments>): CExpr<RemindersAddResponse>;
-  complete(params: SlackParams<RemindersCompleteArguments>): CExpr<RemindersCompleteResponse>;
-  delete(params: SlackParams<RemindersDeleteArguments>): CExpr<RemindersDeleteResponse>;
-  info(params: SlackParams<RemindersInfoArguments>): CExpr<RemindersInfoResponse>;
-  list(params?: SlackParams<RemindersListArguments>): CExpr<RemindersListResponse>;
+  add<A>(params: A): CExpr<RemindersAddResponse, "slack/reminders_add", [A]>;
+  complete<A>(params: A): CExpr<RemindersCompleteResponse, "slack/reminders_complete", [A]>;
+  delete<A>(params: A): CExpr<RemindersDeleteResponse, "slack/reminders_delete", [A]>;
+  info<A>(params: A): CExpr<RemindersInfoResponse, "slack/reminders_info", [A]>;
+  list<A = void>(params?: A): CExpr<RemindersListResponse, "slack/reminders_list", [A]>;
 }

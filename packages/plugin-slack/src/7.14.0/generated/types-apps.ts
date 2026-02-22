@@ -2,44 +2,31 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  AppsConnectionsOpenArguments,
   AppsConnectionsOpenResponse,
-  AppsEventAuthorizationsListArguments,
   AppsEventAuthorizationsListResponse,
-  AppsManifestCreateArguments,
   AppsManifestCreateResponse,
-  AppsManifestDeleteArguments,
   AppsManifestDeleteResponse,
-  AppsManifestExportArguments,
   AppsManifestExportResponse,
-  AppsManifestUpdateArguments,
   AppsManifestUpdateResponse,
-  AppsManifestValidateArguments,
   AppsManifestValidateResponse,
-  AppsUninstallArguments,
   AppsUninstallResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsApps {
   connections: {
-    open(params?: SlackParams<AppsConnectionsOpenArguments>): CExpr<AppsConnectionsOpenResponse>;
+    open<A = void>(params?: A): CExpr<AppsConnectionsOpenResponse, "slack/apps_connections_open", [A]>;
   };
   event: {
     authorizations: {
-      list(
-        params: SlackParams<AppsEventAuthorizationsListArguments>,
-      ): CExpr<AppsEventAuthorizationsListResponse>;
+      list<A>(params: A): CExpr<AppsEventAuthorizationsListResponse, "slack/apps_event_authorizations_list", [A]>;
     };
   };
   manifest: {
-    create(params: SlackParams<AppsManifestCreateArguments>): CExpr<AppsManifestCreateResponse>;
-    delete(params: SlackParams<AppsManifestDeleteArguments>): CExpr<AppsManifestDeleteResponse>;
-    export(params: SlackParams<AppsManifestExportArguments>): CExpr<AppsManifestExportResponse>;
-    update(params: SlackParams<AppsManifestUpdateArguments>): CExpr<AppsManifestUpdateResponse>;
-    validate(
-      params: SlackParams<AppsManifestValidateArguments>,
-    ): CExpr<AppsManifestValidateResponse>;
+    create<A>(params: A): CExpr<AppsManifestCreateResponse, "slack/apps_manifest_create", [A]>;
+    delete<A>(params: A): CExpr<AppsManifestDeleteResponse, "slack/apps_manifest_delete", [A]>;
+    export<A>(params: A): CExpr<AppsManifestExportResponse, "slack/apps_manifest_export", [A]>;
+    update<A>(params: A): CExpr<AppsManifestUpdateResponse, "slack/apps_manifest_update", [A]>;
+    validate<A>(params: A): CExpr<AppsManifestValidateResponse, "slack/apps_manifest_validate", [A]>;
   };
-  uninstall(params: SlackParams<AppsUninstallArguments>): CExpr<AppsUninstallResponse>;
+  uninstall<A>(params: A): CExpr<AppsUninstallResponse, "slack/apps_uninstall", [A]>;
 }

@@ -2,16 +2,13 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  StarsAddRemoveArguments,
   StarsAddResponse,
-  StarsListArguments,
   StarsListResponse,
   StarsRemoveResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsStars {
-  add(params: SlackParams<StarsAddRemoveArguments>): CExpr<StarsAddResponse>;
-  list(params: SlackParams<StarsListArguments>): CExpr<StarsListResponse>;
-  remove(params: SlackParams<StarsAddRemoveArguments>): CExpr<StarsRemoveResponse>;
+  add<A>(params: A): CExpr<StarsAddResponse, "slack/stars_add", [A]>;
+  list<A>(params: A): CExpr<StarsListResponse, "slack/stars_list", [A]>;
+  remove<A>(params: A): CExpr<StarsRemoveResponse, "slack/stars_remove", [A]>;
 }

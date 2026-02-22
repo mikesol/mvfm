@@ -2,19 +2,15 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  OAuthAccessArguments,
-  OAuthV2AccessArguments,
-  OAuthV2ExchangeArguments,
   OauthAccessResponse,
   OauthV2AccessResponse,
   OauthV2ExchangeResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsOauth {
   v2: {
-    access(params: SlackParams<OAuthV2AccessArguments>): CExpr<OauthV2AccessResponse>;
-    exchange(params: SlackParams<OAuthV2ExchangeArguments>): CExpr<OauthV2ExchangeResponse>;
+    access<A>(params: A): CExpr<OauthV2AccessResponse, "slack/oauth_v2_access", [A]>;
+    exchange<A>(params: A): CExpr<OauthV2ExchangeResponse, "slack/oauth_v2_exchange", [A]>;
   };
-  access(params: SlackParams<OAuthAccessArguments>): CExpr<OauthAccessResponse>;
+  access<A>(params: A): CExpr<OauthAccessResponse, "slack/oauth_access", [A]>;
 }

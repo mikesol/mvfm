@@ -2,54 +2,35 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  UsersConversationsArguments,
   UsersConversationsResponse,
-  UsersDeletePhotoArguments,
   UsersDeletePhotoResponse,
-  UsersDiscoverableContactsLookupArguments,
   UsersDiscoverableContactsLookupResponse,
-  UsersGetPresenceArguments,
   UsersGetPresenceResponse,
-  UsersIdentityArguments,
   UsersIdentityResponse,
-  UsersInfoArguments,
   UsersInfoResponse,
-  UsersListArguments,
   UsersListResponse,
-  UsersLookupByEmailArguments,
   UsersLookupByEmailResponse,
-  UsersProfileGetArguments,
   UsersProfileGetResponse,
-  UsersProfileSetArguments,
   UsersProfileSetResponse,
-  UsersSetPhotoArguments,
   UsersSetPhotoResponse,
-  UsersSetPresenceArguments,
   UsersSetPresenceResponse,
 } from "@slack/web-api";
-import type { SlackParams } from "./types";
 
 export interface SlackMethodsUsers {
   discoverableContacts: {
-    lookup(
-      params: SlackParams<UsersDiscoverableContactsLookupArguments>,
-    ): CExpr<UsersDiscoverableContactsLookupResponse>;
+    lookup<A>(params: A): CExpr<UsersDiscoverableContactsLookupResponse, "slack/users_discoverableContacts_lookup", [A]>;
   };
   profile: {
-    get(params: SlackParams<UsersProfileGetArguments>): CExpr<UsersProfileGetResponse>;
-    set(params: SlackParams<UsersProfileSetArguments>): CExpr<UsersProfileSetResponse>;
+    get<A>(params: A): CExpr<UsersProfileGetResponse, "slack/users_profile_get", [A]>;
+    set<A>(params: A): CExpr<UsersProfileSetResponse, "slack/users_profile_set", [A]>;
   };
-  conversations(
-    params: SlackParams<UsersConversationsArguments>,
-  ): CExpr<UsersConversationsResponse>;
-  deletePhoto(params: SlackParams<UsersDeletePhotoArguments>): CExpr<UsersDeletePhotoResponse>;
-  getPresence(params: SlackParams<UsersGetPresenceArguments>): CExpr<UsersGetPresenceResponse>;
-  identity(params: SlackParams<UsersIdentityArguments>): CExpr<UsersIdentityResponse>;
-  info(params: SlackParams<UsersInfoArguments>): CExpr<UsersInfoResponse>;
-  list(params: SlackParams<UsersListArguments>): CExpr<UsersListResponse>;
-  lookupByEmail(
-    params: SlackParams<UsersLookupByEmailArguments>,
-  ): CExpr<UsersLookupByEmailResponse>;
-  setPhoto(params: SlackParams<UsersSetPhotoArguments>): CExpr<UsersSetPhotoResponse>;
-  setPresence(params: SlackParams<UsersSetPresenceArguments>): CExpr<UsersSetPresenceResponse>;
+  conversations<A>(params: A): CExpr<UsersConversationsResponse, "slack/users_conversations", [A]>;
+  deletePhoto<A>(params: A): CExpr<UsersDeletePhotoResponse, "slack/users_deletePhoto", [A]>;
+  getPresence<A>(params: A): CExpr<UsersGetPresenceResponse, "slack/users_getPresence", [A]>;
+  identity<A>(params: A): CExpr<UsersIdentityResponse, "slack/users_identity", [A]>;
+  info<A>(params: A): CExpr<UsersInfoResponse, "slack/users_info", [A]>;
+  list<A>(params: A): CExpr<UsersListResponse, "slack/users_list", [A]>;
+  lookupByEmail<A>(params: A): CExpr<UsersLookupByEmailResponse, "slack/users_lookupByEmail", [A]>;
+  setPhoto<A>(params: A): CExpr<UsersSetPhotoResponse, "slack/users_setPhoto", [A]>;
+  setPresence<A>(params: A): CExpr<UsersSetPresenceResponse, "slack/users_setPresence", [A]>;
 }
