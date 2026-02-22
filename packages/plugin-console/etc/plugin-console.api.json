@@ -327,7 +327,7 @@
         {
           "kind": "Function",
           "canonicalReference": "@mvfm/plugin-console!clientInterpreter:function(1)",
-          "docComment": "/**\n * Creates a client-side interpreter that proxies all operations to a server.\n *\n * Each handler resolves its TypedNode children via `eval_()`, then sends the resolved data to `{baseUrl}/mvfm/execute` as a JSON POST.\n *\n * @param options - Handler options.\n *\n * @param nodeKinds - Node kinds to create handlers for.\n *\n * @returns An Interpreter that proxies all operations to the server.\n */\n",
+          "docComment": "/**\n * Creates a client-side interpreter that proxies all operations to a server.\n *\n * Each handler resolves its RuntimeEntry children via positional yield, then sends the resolved data to `{baseUrl}/mvfm/execute` as a JSON POST.\n *\n * @param options - Handler options.\n *\n * @param kinds - Kind strings to create handlers for (use Object.keys(plugin.kinds)).\n *\n * @returns An Interpreter that proxies all operations to the server.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -340,7 +340,7 @@
             },
             {
               "kind": "Content",
-              "text": ", nodeKinds: "
+              "text": ", kinds: "
             },
             {
               "kind": "Content",
@@ -377,7 +377,7 @@
               "isOptional": false
             },
             {
-              "parameterName": "nodeKinds",
+              "parameterName": "kinds",
               "parameterTypeTokenRange": {
                 "startIndex": 3,
                 "endIndex": 4
@@ -390,11 +390,11 @@
         {
           "kind": "Function",
           "canonicalReference": "@mvfm/plugin-console!console_2:function(1)",
-          "docComment": "/**\n * Creates the console plugin definition.\n *\n * @param config - Optional plugin configuration.\n *\n * @returns A plugin definition that contributes `$.console`.\n */\n",
+          "docComment": "/**\n * Creates the console plugin definition (unified Plugin type).\n *\n * @param _config - Optional plugin configuration.\n *\n * @returns A unified Plugin that contributes `$.console`.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare function console(config?: "
+              "text": "export declare function console(_config?: "
             },
             {
               "kind": "Reference",
@@ -407,25 +407,358 @@
             },
             {
               "kind": "Content",
-              "text": "import(\"@mvfm/core\")."
+              "text": "{\n    name: \"console\";\n    ctors: {\n        console: {\n            assert<A, B extends readonly unknown[]>(condition: A, ...data: B): "
             },
             {
               "kind": "Reference",
-              "text": "PluginDefinition",
-              "canonicalReference": "@mvfm/plugin-console!~PluginDefinition:interface"
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
             },
             {
               "kind": "Content",
-              "text": "<"
+              "text": "<void, \"console/assert\", [A, ...B]>;\n            clear(): "
             },
             {
               "kind": "Reference",
-              "text": "ConsoleMethods",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleMethods:interface"
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
             },
             {
               "kind": "Content",
-              "text": ", {}, string>"
+              "text": "<void, \"console/clear\", []>;\n            count<A>(...args: [label: A] | []): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/count\", unknown[]>;\n            countReset<A>(...args: [label: A] | []): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/countReset\", unknown[]>;\n            debug<A extends readonly unknown[]>(...data: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/debug\", A>;\n            dir<A, B>(...args: [item: A, options: B] | [item: A] | []): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/dir\", unknown[]>;\n            dirxml<A extends readonly unknown[]>(...data: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/dirxml\", A>;\n            error<A extends readonly unknown[]>(...data: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/error\", A>;\n            group<A extends readonly unknown[]>(...data: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/group\", A>;\n            groupCollapsed<A extends readonly unknown[]>(...data: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/groupCollapsed\", A>;\n            groupEnd(): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/groupEnd\", []>;\n            info<A extends readonly unknown[]>(...data: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/info\", A>;\n            log<A extends readonly unknown[]>(...data: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/log\", A>;\n            table<A, B>(...args: [tabularData: A, properties: B] | [tabularData: A] | []): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/table\", unknown[]>;\n            time<A>(...args: [label: A] | []): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/time\", unknown[]>;\n            timeEnd<A>(...args: [label: A] | []): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/timeEnd\", unknown[]>;\n            timeLog<A, B extends readonly unknown[]>(...args: [label: A, ...data: B] | []): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/timeLog\", unknown[]>;\n            trace<A extends readonly unknown[]>(...data: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/trace\", A>;\n            warn<A extends readonly unknown[]>(...data: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/warn\", A>;\n        };\n    };\n    kinds: {\n        \"console/assert\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/clear\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/count\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/countReset\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/debug\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/dir\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/dirxml\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/error\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/group\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/groupCollapsed\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/groupEnd\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/info\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/log\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/table\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/time\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/timeEnd\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/timeLog\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/trace\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/warn\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n    };\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/plugin-console!~Interpreter:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
             },
             {
               "kind": "Content",
@@ -435,13 +768,13 @@
           "fileUrlPath": "dist/22.0.0/index.d.ts",
           "returnTypeTokenRange": {
             "startIndex": 3,
-            "endIndex": 8
+            "endIndex": 82
           },
           "releaseTag": "Public",
           "overloadIndex": 1,
           "parameters": [
             {
-              "parameterName": "config",
+              "parameterName": "_config",
               "parameterTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 2
@@ -450,1069 +783,6 @@
             }
           ],
           "name": "console_2"
-        },
-        {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/plugin-console!ConsoleApi:interface",
-          "docComment": "/**\n * Console API exposed on `$.console`.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export interface ConsoleApi "
-            }
-          ],
-          "fileUrlPath": "dist/22.0.0/index.d.ts",
-          "releaseTag": "Public",
-          "name": "ConsoleApi",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleApi#assert:member(1)",
-              "docComment": "/**\n * Calls `console.assert(condition, ...data)`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "assert(condition: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConsoleArg",
-                  "canonicalReference": "@mvfm/plugin-console!~ConsoleArg:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", ...data: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConsoleArg",
-                  "canonicalReference": "@mvfm/plugin-console!~ConsoleArg:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "[]"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-console!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 6,
-                "endIndex": 8
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "condition",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  },
-                  "isOptional": false
-                },
-                {
-                  "parameterName": "data",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 3,
-                    "endIndex": 5
-                  },
-                  "isOptional": false
-                }
-              ],
-              "name": "assert"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleApi#clear:member(1)",
-              "docComment": "/**\n * Calls `console.clear()`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "clear(): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-console!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 3
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [],
-              "name": "clear"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleApi#count:member(1)",
-              "docComment": "/**\n * Calls `console.count(label?)`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "count(label?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConsoleArg",
-                  "canonicalReference": "@mvfm/plugin-console!~ConsoleArg:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-console!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 5
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "label",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  },
-                  "isOptional": true
-                }
-              ],
-              "name": "count"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleApi#countReset:member(1)",
-              "docComment": "/**\n * Calls `console.countReset(label?)`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "countReset(label?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConsoleArg",
-                  "canonicalReference": "@mvfm/plugin-console!~ConsoleArg:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-console!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 5
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "label",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  },
-                  "isOptional": true
-                }
-              ],
-              "name": "countReset"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleApi#debug:member(1)",
-              "docComment": "/**\n * Calls `console.debug(...data)`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "debug(...data: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConsoleArg",
-                  "canonicalReference": "@mvfm/plugin-console!~ConsoleArg:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "[]"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-console!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 4,
-                "endIndex": 6
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "data",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 3
-                  },
-                  "isOptional": false
-                }
-              ],
-              "name": "debug"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleApi#dir:member(1)",
-              "docComment": "/**\n * Calls `console.dir(item, options?)`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "dir(item?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConsoleArg",
-                  "canonicalReference": "@mvfm/plugin-console!~ConsoleArg:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", options?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConsoleArg",
-                  "canonicalReference": "@mvfm/plugin-console!~ConsoleArg:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-console!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 5,
-                "endIndex": 7
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "item",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  },
-                  "isOptional": true
-                },
-                {
-                  "parameterName": "options",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 3,
-                    "endIndex": 4
-                  },
-                  "isOptional": true
-                }
-              ],
-              "name": "dir"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleApi#dirxml:member(1)",
-              "docComment": "/**\n * Calls `console.dirxml(...data)`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "dirxml(...data: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConsoleArg",
-                  "canonicalReference": "@mvfm/plugin-console!~ConsoleArg:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "[]"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-console!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 4,
-                "endIndex": 6
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "data",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 3
-                  },
-                  "isOptional": false
-                }
-              ],
-              "name": "dirxml"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleApi#error:member(1)",
-              "docComment": "/**\n * Calls `console.error(...data)`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "error(...data: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConsoleArg",
-                  "canonicalReference": "@mvfm/plugin-console!~ConsoleArg:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "[]"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-console!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 4,
-                "endIndex": 6
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "data",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 3
-                  },
-                  "isOptional": false
-                }
-              ],
-              "name": "error"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleApi#group:member(1)",
-              "docComment": "/**\n * Calls `console.group(...data)`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "group(...data: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConsoleArg",
-                  "canonicalReference": "@mvfm/plugin-console!~ConsoleArg:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "[]"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-console!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 4,
-                "endIndex": 6
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "data",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 3
-                  },
-                  "isOptional": false
-                }
-              ],
-              "name": "group"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleApi#groupCollapsed:member(1)",
-              "docComment": "/**\n * Calls `console.groupCollapsed(...data)`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "groupCollapsed(...data: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConsoleArg",
-                  "canonicalReference": "@mvfm/plugin-console!~ConsoleArg:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "[]"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-console!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 4,
-                "endIndex": 6
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "data",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 3
-                  },
-                  "isOptional": false
-                }
-              ],
-              "name": "groupCollapsed"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleApi#groupEnd:member(1)",
-              "docComment": "/**\n * Calls `console.groupEnd()`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "groupEnd(): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-console!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 3
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [],
-              "name": "groupEnd"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleApi#info:member(1)",
-              "docComment": "/**\n * Calls `console.info(...data)`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "info(...data: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConsoleArg",
-                  "canonicalReference": "@mvfm/plugin-console!~ConsoleArg:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "[]"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-console!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 4,
-                "endIndex": 6
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "data",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 3
-                  },
-                  "isOptional": false
-                }
-              ],
-              "name": "info"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleApi#log:member(1)",
-              "docComment": "/**\n * Calls `console.log(...data)`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "log(...data: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConsoleArg",
-                  "canonicalReference": "@mvfm/plugin-console!~ConsoleArg:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "[]"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-console!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 4,
-                "endIndex": 6
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "data",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 3
-                  },
-                  "isOptional": false
-                }
-              ],
-              "name": "log"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleApi#table:member(1)",
-              "docComment": "/**\n * Calls `console.table(tabularData, properties?)`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "table(tabularData?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConsoleArg",
-                  "canonicalReference": "@mvfm/plugin-console!~ConsoleArg:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", properties?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConsoleArg",
-                  "canonicalReference": "@mvfm/plugin-console!~ConsoleArg:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-console!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 5,
-                "endIndex": 7
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "tabularData",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  },
-                  "isOptional": true
-                },
-                {
-                  "parameterName": "properties",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 3,
-                    "endIndex": 4
-                  },
-                  "isOptional": true
-                }
-              ],
-              "name": "table"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleApi#time:member(1)",
-              "docComment": "/**\n * Calls `console.time(label?)`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "time(label?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConsoleArg",
-                  "canonicalReference": "@mvfm/plugin-console!~ConsoleArg:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-console!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 5
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "label",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  },
-                  "isOptional": true
-                }
-              ],
-              "name": "time"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleApi#timeEnd:member(1)",
-              "docComment": "/**\n * Calls `console.timeEnd(label?)`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "timeEnd(label?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConsoleArg",
-                  "canonicalReference": "@mvfm/plugin-console!~ConsoleArg:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-console!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 3,
-                "endIndex": 5
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "label",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  },
-                  "isOptional": true
-                }
-              ],
-              "name": "timeEnd"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleApi#timeLog:member(1)",
-              "docComment": "/**\n * Calls `console.timeLog(label?, ...data)`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "timeLog(label?: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConsoleArg",
-                  "canonicalReference": "@mvfm/plugin-console!~ConsoleArg:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": ", ...data: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConsoleArg",
-                  "canonicalReference": "@mvfm/plugin-console!~ConsoleArg:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "[]"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-console!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 6,
-                "endIndex": 8
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "label",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 2
-                  },
-                  "isOptional": true
-                },
-                {
-                  "parameterName": "data",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 3,
-                    "endIndex": 5
-                  },
-                  "isOptional": false
-                }
-              ],
-              "name": "timeLog"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleApi#trace:member(1)",
-              "docComment": "/**\n * Calls `console.trace(...data)`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "trace(...data: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConsoleArg",
-                  "canonicalReference": "@mvfm/plugin-console!~ConsoleArg:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "[]"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-console!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 4,
-                "endIndex": 6
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "data",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 3
-                  },
-                  "isOptional": false
-                }
-              ],
-              "name": "trace"
-            },
-            {
-              "kind": "MethodSignature",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleApi#warn:member(1)",
-              "docComment": "/**\n * Calls `console.warn(...data)`.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "warn(...data: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConsoleArg",
-                  "canonicalReference": "@mvfm/plugin-console!~ConsoleArg:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "[]"
-                },
-                {
-                  "kind": "Content",
-                  "text": "): "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Expr",
-                  "canonicalReference": "@mvfm/plugin-console!~Expr:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<void>"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isOptional": false,
-              "returnTypeTokenRange": {
-                "startIndex": 4,
-                "endIndex": 6
-              },
-              "releaseTag": "Public",
-              "overloadIndex": 1,
-              "parameters": [
-                {
-                  "parameterName": "data",
-                  "parameterTypeTokenRange": {
-                    "startIndex": 1,
-                    "endIndex": 3
-                  },
-                  "isOptional": false
-                }
-              ],
-              "name": "warn"
-            }
-          ],
-          "extendsTokenRanges": []
         },
         {
           "kind": "Interface",
@@ -2226,52 +1496,6 @@
           }
         },
         {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/plugin-console!ConsoleMethods:interface",
-          "docComment": "/**\n * Console operations contributed to the DSL context.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export interface ConsoleMethods "
-            }
-          ],
-          "fileUrlPath": "dist/22.0.0/index.d.ts",
-          "releaseTag": "Public",
-          "name": "ConsoleMethods",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleMethods#console:member",
-              "docComment": "/**\n * Console API namespace.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "console: "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "ConsoleApi",
-                  "canonicalReference": "@mvfm/plugin-console!ConsoleApi:interface"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "console",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            }
-          ],
-          "extendsTokenRanges": []
-        },
-        {
           "kind": "Variable",
           "canonicalReference": "@mvfm/plugin-console!consolePlugin:var",
           "docComment": "/**\n * Alias for {@link console}, kept for readability at call sites.\n */\n",
@@ -2302,11 +1526,11 @@
         {
           "kind": "Function",
           "canonicalReference": "@mvfm/plugin-console!createConsoleInterpreter:function(1)",
-          "docComment": "/**\n * Creates an interpreter for `console/*` node kinds.\n *\n * @param client - Console effect execution client.\n *\n * @returns An Interpreter handling all console node kinds.\n */\n",
+          "docComment": "/**\n * Creates an interpreter for `console/*` node kinds using the new RuntimeEntry + positional yield pattern.\n *\n * @param client - Console effect execution client (defaults to globalThis.console).\n *\n * @returns An Interpreter handling all console node kinds.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare function createConsoleInterpreter(client: "
+              "text": "export declare function createConsoleInterpreter(client?: "
             },
             {
               "kind": "Reference",
@@ -2341,7 +1565,7 @@
                 "startIndex": 1,
                 "endIndex": 2
               },
-              "isOptional": false
+              "isOptional": true
             }
           ],
           "name": "createConsoleInterpreter"
@@ -2349,7 +1573,7 @@
         {
           "kind": "Function",
           "canonicalReference": "@mvfm/plugin-console!serverEvaluate:function(1)",
-          "docComment": "/**\n * Creates a unified evaluator using the console server interpreter.\n *\n * @param client - Console effect execution client.\n *\n * @param baseInterpreter - Base interpreter for evaluating sub-expressions.\n *\n * @returns An async AST evaluator function.\n */\n",
+          "docComment": "/**\n * Creates a unified evaluator using the console server interpreter.\n *\n * @param client - Console effect execution client.\n *\n * @param baseInterpreter - Base interpreter for evaluating sub-expressions.\n *\n * @returns An async evaluator function for NExpr.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -2375,16 +1599,16 @@
             },
             {
               "kind": "Content",
-              "text": "(root: "
+              "text": "(expr: "
             },
             {
               "kind": "Reference",
-              "text": "TypedNode",
-              "canonicalReference": "@mvfm/plugin-console!~TypedNode:interface"
+              "text": "NExpr",
+              "canonicalReference": "@mvfm/plugin-console!~NExpr:interface"
             },
             {
               "kind": "Content",
-              "text": ") => "
+              "text": "<unknown, string, unknown, string>) => "
             },
             {
               "kind": "Reference",

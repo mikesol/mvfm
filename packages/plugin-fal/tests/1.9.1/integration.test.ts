@@ -1,15 +1,19 @@
 import { join } from "node:path";
-import { coreInterpreter, injectInput, mvfm, num, str } from "@mvfm/core";
+import { boolPluginU, createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { fal as falPlugin } from "../../src/1.9.1";
 import { wrapFalSdk } from "../../src/1.9.1/client-fal-sdk";
-import { serverEvaluate } from "../../src/1.9.1/handler.server";
+import { createFalInterpreter } from "../../src/1.9.1/interpreter";
 import { createRecordingClient, createReplayClient, type FixtureClient } from "./fixture-client";
 
 const FIXTURE_PATH = join(__dirname, "fixtures/integration.json");
 const isRecording = !!process.env.FAL_RECORD;
 
 let client: FixtureClient;
+
+const plugin = falPlugin({ credentials: "fixture" });
+const plugins = [numPluginU, strPluginU, boolPluginU, plugin] as const;
+const app = createApp(...plugins);
 
 beforeAll(async () => {
   if (isRecording) {
@@ -27,53 +31,55 @@ afterAll(async () => {
   await client.save();
 }, 10_000);
 
-function evaluate(root: unknown) {
-  return serverEvaluate(client, coreInterpreter)(root as any);
+function evaluate(expr: unknown) {
+  const _$ = mvfmU(...plugins);
+  const nexpr = app(expr as Parameters<typeof app>[0]);
+  const interp = defaults(plugins, {
+    fal: createFalInterpreter(client),
+  });
+  return fold(nexpr, interp);
 }
 
 describe("fal integration: real API fixtures", () => {
   it("run returns image data", async () => {
-    const app = mvfm(num, str, falPlugin({ credentials: "fixture" }));
-    const prog = app(($) =>
-      $.fal.run("fal-ai/fast-sdxl", {
-        input: { prompt: "a cat sitting on a windowsill" },
-      }),
-    );
-    const result = (await evaluate(injectInput(prog, {}).ast.result)) as any;
+    const $ = mvfmU(...plugins);
+    const expr = $.fal.run("fal-ai/fast-sdxl", {
+      input: { prompt: "a cat sitting on a windowsill" },
+    });
+    const result = (await evaluate(expr)) as Record<string, unknown>;
 
     expect(result).toHaveProperty("requestId");
-    expect(result.data.images).toBeInstanceOf(Array);
-    expect(result.data.images.length).toBeGreaterThan(0);
-    expect(result.data.images[0]).toHaveProperty("url");
-    expect(result.data.images[0]).toHaveProperty("width");
-    expect(result.data.images[0]).toHaveProperty("height");
-    expect(result.data.seed).toEqual(expect.any(Number));
+    const data = result.data as Record<string, unknown>;
+    expect((data.images as unknown[]).length).toBeGreaterThan(0);
+    const img = (data.images as Record<string, unknown>[])[0];
+    expect(img).toHaveProperty("url");
+    expect(img).toHaveProperty("width");
+    expect(img).toHaveProperty("height");
+    expect(data.seed).toEqual(expect.any(Number));
   }, 30_000);
 
   it("subscribe returns image data", async () => {
-    const app = mvfm(num, str, falPlugin({ credentials: "fixture" }));
-    const prog = app(($) =>
-      $.fal.subscribe("fal-ai/fast-sdxl", {
-        input: { prompt: "a dog in a park" },
-        mode: "polling" as const,
-        pollInterval: 1000,
-      }),
-    );
-    const result = (await evaluate(injectInput(prog, {}).ast.result)) as any;
+    const $ = mvfmU(...plugins);
+    const expr = $.fal.subscribe("fal-ai/fast-sdxl", {
+      input: { prompt: "a dog in a park" },
+      mode: "polling" as const,
+      pollInterval: 1000,
+    });
+    const result = (await evaluate(expr)) as Record<string, unknown>;
 
     expect(result).toHaveProperty("requestId");
-    expect(result.data.images.length).toBeGreaterThan(0);
-    expect(result.data.images[0].url).toEqual(expect.any(String));
+    const data = result.data as Record<string, unknown>;
+    expect((data.images as unknown[]).length).toBeGreaterThan(0);
+    const img = (data.images as Record<string, unknown>[])[0];
+    expect(img.url).toEqual(expect.any(String));
   }, 60_000);
 
   it("queue submit returns queue status", async () => {
-    const app = mvfm(num, str, falPlugin({ credentials: "fixture" }));
-    const prog = app(($) =>
-      $.fal.queue.submit("fal-ai/fast-sdxl", {
-        input: { prompt: "a mountain landscape" },
-      }),
-    );
-    const result = (await evaluate(injectInput(prog, {}).ast.result)) as any;
+    const $ = mvfmU(...plugins);
+    const expr = $.fal.queue.submit("fal-ai/fast-sdxl", {
+      input: { prompt: "a mountain landscape" },
+    });
+    const result = (await evaluate(expr)) as Record<string, unknown>;
 
     expect(result).toHaveProperty("request_id");
     expect(result).toHaveProperty("status", "IN_QUEUE");
@@ -83,29 +89,28 @@ describe("fal integration: real API fixtures", () => {
   }, 30_000);
 
   it("queue status returns status info", async () => {
-    // Uses a known requestId from the recorded submit fixture.
-    // In record mode, we first submit to get a real requestId.
     let requestId: string;
     if (isRecording) {
       const submitted = await client.queueSubmit("fal-ai/fast-sdxl", {
         input: { prompt: "status check target" },
-      } as any);
-      requestId = (submitted as any).request_id;
-      // Wait for completion so status is meaningful
+      } as Parameters<typeof client.queueSubmit>[1]);
+      requestId = (submitted as Record<string, string>).request_id;
       await new Promise((r) => setTimeout(r, 5000));
     } else {
-      // Read the requestId from the recorded queueSubmit fixture for "status check target"
       const { readFileSync } = await import("node:fs");
       const fixtures = JSON.parse(readFileSync(FIXTURE_PATH, "utf-8"));
       const submitEntry = fixtures.find(
-        (e: any) => e.method === "queueSubmit" && e.input?.input?.prompt === "status check target",
+        (e: Record<string, unknown>) =>
+          e.method === "queueSubmit" &&
+          (e.input as Record<string, Record<string, string>>)?.input?.prompt ===
+            "status check target",
       );
-      requestId = submitEntry.response.request_id;
+      requestId = (submitEntry.response as Record<string, string>).request_id;
     }
 
-    const app = mvfm(num, str, falPlugin({ credentials: "fixture" }));
-    const prog = app(($) => $.fal.queue.status("fal-ai/fast-sdxl", { requestId, logs: true }));
-    const result = (await evaluate(injectInput(prog, {}).ast.result)) as any;
+    const $ = mvfmU(...plugins);
+    const expr = $.fal.queue.status("fal-ai/fast-sdxl", { requestId, logs: true });
+    const result = (await evaluate(expr)) as Record<string, unknown>;
 
     expect(["IN_QUEUE", "IN_PROGRESS", "COMPLETED"]).toContain(result.status);
     expect(result).toHaveProperty("request_id");
@@ -116,25 +121,27 @@ describe("fal integration: real API fixtures", () => {
     if (isRecording) {
       const submitted = await client.queueSubmit("fal-ai/fast-sdxl", {
         input: { prompt: "result target" },
-      } as any);
-      requestId = (submitted as any).request_id;
-      // Wait for completion
+      } as Parameters<typeof client.queueSubmit>[1]);
+      requestId = (submitted as Record<string, string>).request_id;
       await new Promise((r) => setTimeout(r, 8000));
     } else {
       const { readFileSync } = await import("node:fs");
       const fixtures = JSON.parse(readFileSync(FIXTURE_PATH, "utf-8"));
       const submitEntry = fixtures.find(
-        (e: any) => e.method === "queueSubmit" && e.input?.input?.prompt === "result target",
+        (e: Record<string, unknown>) =>
+          e.method === "queueSubmit" &&
+          (e.input as Record<string, Record<string, string>>)?.input?.prompt === "result target",
       );
-      requestId = submitEntry.response.request_id;
+      requestId = (submitEntry.response as Record<string, string>).request_id;
     }
 
-    const app = mvfm(num, str, falPlugin({ credentials: "fixture" }));
-    const prog = app(($) => $.fal.queue.result("fal-ai/fast-sdxl", { requestId }));
-    const result = (await evaluate(injectInput(prog, {}).ast.result)) as any;
+    const $ = mvfmU(...plugins);
+    const expr = $.fal.queue.result("fal-ai/fast-sdxl", { requestId });
+    const result = (await evaluate(expr)) as Record<string, unknown>;
 
     expect(result).toHaveProperty("requestId");
-    expect(result.data.images.length).toBeGreaterThan(0);
+    const data = result.data as Record<string, unknown>;
+    expect((data.images as unknown[]).length).toBeGreaterThan(0);
   }, 30_000);
 
   it("queue cancel returns undefined", async () => {
@@ -142,20 +149,22 @@ describe("fal integration: real API fixtures", () => {
     if (isRecording) {
       const submitted = await client.queueSubmit("fal-ai/fast-sdxl", {
         input: { prompt: "cancel me" },
-      } as any);
-      requestId = (submitted as any).request_id;
+      } as Parameters<typeof client.queueSubmit>[1]);
+      requestId = (submitted as Record<string, string>).request_id;
     } else {
       const { readFileSync } = await import("node:fs");
       const fixtures = JSON.parse(readFileSync(FIXTURE_PATH, "utf-8"));
       const submitEntry = fixtures.find(
-        (e: any) => e.method === "queueSubmit" && e.input?.input?.prompt === "cancel me",
+        (e: Record<string, unknown>) =>
+          e.method === "queueSubmit" &&
+          (e.input as Record<string, Record<string, string>>)?.input?.prompt === "cancel me",
       );
-      requestId = submitEntry.response.request_id;
+      requestId = (submitEntry.response as Record<string, string>).request_id;
     }
 
-    const app = mvfm(num, str, falPlugin({ credentials: "fixture" }));
-    const prog = app(($) => $.fal.queue.cancel("fal-ai/fast-sdxl", { requestId }));
-    const cancelResult = await evaluate(injectInput(prog, {}).ast.result);
+    const $ = mvfmU(...plugins);
+    const expr = $.fal.queue.cancel("fal-ai/fast-sdxl", { requestId });
+    const cancelResult = await evaluate(expr);
     expect(cancelResult).toBeUndefined();
   }, 30_000);
 });

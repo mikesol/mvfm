@@ -1,133 +1,67 @@
-import type { Program } from "@mvfm/core";
-import {
-  coreInterpreter,
-  eq,
-  eqInterpreter,
-  error,
-  errorInterpreter,
-  fiber,
-  fiberInterpreter,
-  injectInput,
-  mvfm,
-  num,
-  numInterpreter,
-  ord,
-  ordInterpreter,
-  semiring,
-  str,
-  strInterpreter,
-} from "@mvfm/core";
+import type { Interpreter, RuntimeEntry } from "@mvfm/core";
+import { createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testcontainers/postgresql";
-import postgres from "postgres";
+import pg from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { postgres as pgPlugin } from "../../src/3.4.8";
+import { postgres } from "../../src/3.4.8";
 import { wrapPostgresJs } from "../../src/3.4.8/client-postgres-js";
-import { serverEvaluate } from "../../src/3.4.8/handler.server";
-import { createPostgresInterpreter } from "../../src/3.4.8/interpreter";
+import { createPostgresServerInterpreter } from "../../src/3.4.8/handler.server";
 
 let container: StartedPostgreSqlContainer;
-let sql: ReturnType<typeof postgres>;
+let sqlClient: ReturnType<typeof pg>;
 
-const app = mvfm(num, str, semiring, eq, ord, pgPlugin("postgres://test"), fiber, error);
+const plugin = postgres("postgres://test");
+const plugins = [numPluginU, strPluginU, plugin] as const;
+const $ = mvfmU(...plugins);
+const app = createApp(...plugins);
 
-async function run(prog: Program, input: Record<string, unknown> = {}) {
-  const injected = injectInput(prog, input);
-  const client = wrapPostgresJs(sql);
-  const baseInterpreter = {
-    ...createPostgresInterpreter(client),
-    ...errorInterpreter,
-    ...fiberInterpreter,
-    ...coreInterpreter,
-    ...numInterpreter,
-    ...ordInterpreter,
-    ...eqInterpreter,
-    ...strInterpreter,
-  };
-  const evaluate = serverEvaluate(client, baseInterpreter);
-  return await evaluate(injected.ast.result);
+const coreAccessInterpreter: Interpreter = {
+  "core/access": async function* (e: RuntimeEntry) {
+    const parent = yield 0;
+    const key = e.out as string | number;
+    return (parent as Record<string | number, unknown>)[key];
+  },
+};
+
+async function run(nexpr: ReturnType<typeof app>): Promise<unknown> {
+  const client = wrapPostgresJs(sqlClient);
+  const adj = nexpr.__adj;
+  const baseInterp = { ...defaults([numPluginU, strPluginU]), ...coreAccessInterpreter };
+  const pgInterp = createPostgresServerInterpreter(client, adj, baseInterp);
+  const fullInterp = { ...baseInterp, ...pgInterp };
+  return await fold(nexpr, fullInterp);
 }
 
 beforeAll(async () => {
   container = await new PostgreSqlContainer("postgres:16-alpine").start();
-  sql = postgres(container.getConnectionUri());
-  await sql`CREATE TABLE products (id SERIAL PRIMARY KEY, name TEXT NOT NULL, price INT)`;
-  await sql`INSERT INTO products (name, price) VALUES ('Widget', 100), ('Gadget', 200), ('Doohickey', 50)`;
-  await sql`CREATE TABLE orders (id SERIAL PRIMARY KEY, product_id INT, quantity INT)`;
+  sqlClient = pg(container.getConnectionUri());
+  await sqlClient`CREATE TABLE products (id SERIAL PRIMARY KEY, name TEXT NOT NULL, price INT)`;
+  await sqlClient`INSERT INTO products (name, price) VALUES ('Widget', 100), ('Gadget', 200), ('Doohickey', 50)`;
+  await sqlClient`CREATE TABLE orders (id SERIAL PRIMARY KEY, product_id INT, quantity INT)`;
 }, 60000);
 
 afterAll(async () => {
-  await sql.end();
+  await sqlClient.end();
   await container.stop();
 });
 
 describe("async composition: query chaining", () => {
   it("result of one query used as parameter to another", async () => {
-    const prog = app(($) => {
+    const expr = (() => {
       const product = $.sql`SELECT * FROM products WHERE name = ${"Widget"}`;
       return $.sql`SELECT * FROM products WHERE price > ${product[0].price} ORDER BY price`;
-    });
-    const result = (await run(prog)) as any[];
+    })();
+    const result = (await run(app(expr))) as Record<string, unknown>[];
     expect(result).toHaveLength(1);
     expect(result[0].name).toBe("Gadget");
   });
 
   it("chained prop access on query result", async () => {
-    const prog = app(($) => {
+    const expr = (() => {
       const product = $.sql`SELECT * FROM products WHERE name = ${"Widget"}`;
       return product[0].name;
-    });
-    const result = await run(prog);
+    })();
+    const result = await run(app(expr));
     expect(result).toBe("Widget");
-  });
-});
-
-describe("async composition: core/do with mixed async steps", () => {
-  it("$.do sequences async operations", async () => {
-    const prog = app(($) => {
-      return $.begin(
-        $.sql`INSERT INTO orders (product_id, quantity) VALUES (1, 5)`,
-        $.sql`INSERT INTO orders (product_id, quantity) VALUES (2, 3)`,
-        $.sql`SELECT count(*)::int as c FROM orders`,
-      );
-    });
-    const result = (await run(prog)) as any[];
-    expect(result[0].c).toBeGreaterThanOrEqual(2);
-  });
-});
-
-describe("async composition: core/record with async fields", () => {
-  it("record with async field values runs in parallel", async () => {
-    const prog = app(($) => ({
-      products: $.sql`SELECT count(*)::int as c FROM products`,
-      orders: $.sql`SELECT count(*)::int as c FROM orders`,
-    }));
-    const result = (await run(prog)) as any;
-    expect(result.products[0].c).toBe(3);
-    expect(result.orders[0].c).toBeGreaterThanOrEqual(0);
-  });
-});
-
-describe("async composition: core/tuple with async elements", () => {
-  it("tuple with async elements runs in parallel via Promise.all", async () => {
-    const prog = app(($) =>
-      $.par(
-        $.sql`SELECT count(*)::int as c FROM products`,
-        $.sql`SELECT count(*)::int as c FROM orders`,
-      ),
-    );
-    const result = (await run(prog)) as any[];
-    expect(result).toHaveLength(2);
-    expect(result[0][0].c).toBe(3);
-  });
-});
-
-describe("async composition: core/cond with async predicate", () => {
-  it("conditional with async predicate evaluates correct branch", async () => {
-    const prog = app(($) => {
-      const count = $.sql`SELECT count(*)::int as c FROM products`;
-      return $.cond($.gt(count[0].c, 0)).t("has products").f("empty");
-    });
-    const result = await run(prog);
-    expect(result).toBe("has products");
   });
 });

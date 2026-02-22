@@ -1,9 +1,10 @@
 // ============================================================
-// MVFM PLUGIN: fetch (WHATWG Fetch Standard)
+// MVFM PLUGIN: fetch (WHATWG Fetch Standard) — unified Plugin
 // ============================================================
 //
-// Implementation status: COMPLETE (5 of 5 core operations)
-// Plugin size: SMALL — fully implemented modulo known limitations
+// Ported to the unified Plugin type with makeCExpr and
+// index-based fold handlers. Config captured in interpreter
+// closure, not stored on AST nodes.
 //
 // Implemented:
 //   - fetch/request: fetch(url, init?) — the HTTP request
@@ -11,61 +12,46 @@
 //   - fetch/text: response.text() — parse response as text
 //   - fetch/status: response.status — get HTTP status code
 //   - fetch/headers: response.headers — get response headers
-//
-// Not doable (fundamental mismatch with AST model):
-//   - Streaming (response.body ReadableStream) — push-based,
-//     no request-response shape
-//   - AbortController/signal — runtime lifecycle management,
-//     not representable in static AST
-//   - Method syntax on response (response.json()) — mvfm uses
-//     $.fetch.json(response) because AST proxies can't model
-//     method calls on opaque handler-returned values
-//
-// Deferred (easy to add later, same pattern):
-//   - response.blob()
-//   - response.arrayBuffer()
-//   - response.formData()
-//   - response.ok (derivable from status)
-//   - response.url
-//   - response.redirected
-//   - response.type
-//
-// ============================================================
-//
-// Goal: An LLM that knows the Fetch API should be able to
-// write Mvfm programs with near-zero learning curve. The API
-// mirrors globalThis.fetch() as closely as possible.
-//
-// Real Fetch API:
-//   const response = await fetch('https://api.example.com/data')
-//   const data = await response.json()
-//   const text = await response.text()
-//   const status = response.status
-//   const headers = response.headers
-//
-// Mvfm fetch plugin:
-//   const response = $.fetch('https://api.example.com/data')
-//   const data = $.fetch.json(response)
-//   const text = $.fetch.text(response)
-//   const status = $.fetch.status(response)
-//   const headers = $.fetch.headers(response)
-//
-// Based on the WHATWG Fetch Standard:
-// https://fetch.spec.whatwg.org/
-//
-// The standard defines fetch() as a single function that takes
-// a Request or URL string + optional RequestInit, returns a
-// Promise<Response>. Response has body-reading methods (.json(),
-// .text(), .arrayBuffer(), .blob(), .formData()) and metadata
-// properties (.status, .headers, .ok, .url, .type, .redirected).
-//
 // ============================================================
 
-import type { Expr, PluginContext } from "@mvfm/core";
-import { definePlugin } from "@mvfm/core";
-import { fetchInterpreter } from "./interpreter";
+import type { CExpr, Interpreter, KindSpec, Plugin } from "@mvfm/core";
+import { isCExpr, makeCExpr } from "@mvfm/core";
+import { wrapFetch } from "./client-fetch";
+import { createFetchInterpreter } from "./interpreter";
 
-// ---- What the plugin adds to $ ----------------------------
+/**
+ * Recursively lifts a plain value into a CExpr tree.
+ * - CExpr values are returned as-is.
+ * - Primitives (string, number, boolean) become literal CExprs via makeCExpr.
+ * - Plain objects become `fetch/record` CExprs with key-value child pairs.
+ * - Arrays become `fetch/array` CExprs.
+ */
+function liftArg(value: unknown): unknown {
+  if (isCExpr(value)) return value;
+  if (typeof value === "string") return value; // elaborate lifts strings via str/literal
+  if (typeof value === "number") return value; // elaborate lifts numbers via num/literal
+  if (typeof value === "boolean") return value; // elaborate lifts booleans via bool/literal
+  if (value === null || value === undefined) return value;
+  if (Array.isArray(value)) {
+    return makeCExpr("fetch/array", value.map(liftArg));
+  }
+  if (typeof value === "object") {
+    // Convert {key: val, ...} → makeCExpr("fetch/record", [key1, val1, key2, val2, ...])
+    const pairs: unknown[] = [];
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      pairs.push(k, liftArg(v));
+    }
+    return makeCExpr("fetch/record", pairs);
+  }
+  return value;
+}
+
+// liftArg erases generic type info at runtime (returns unknown).
+// Cast helpers restore the declared CExpr Args types for ExtractKinds.
+const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]>(
+  kind: Kind,
+  args: readonly unknown[],
+) => CExpr<O, Kind, Args>;
 
 /**
  * Request initialization options, mirroring the WHATWG RequestInit interface.
@@ -86,32 +72,6 @@ export interface FetchRequestInit {
   keepalive?: boolean;
 }
 
-/**
- * Fetch operations added to the DSL context by the fetch plugin.
- *
- * `$.fetch(url, init?)` makes an HTTP request (mirrors `globalThis.fetch`).
- * `$.fetch.json(response)`, `$.fetch.text(response)`, etc. read the response.
- */
-export interface FetchMethods {
-  /**
-   * Callable: `$.fetch(url, init?)` makes an HTTP request.
-   * Also has properties for response reading: `.json()`, `.text()`, `.status()`, `.headers()`.
-   */
-  fetch: ((
-    url: Expr<string> | string,
-    init?: Expr<FetchRequestInit> | FetchRequestInit,
-  ) => Expr<unknown>) & {
-    /** Parse the response body as JSON. Mirrors `response.json()`. */
-    json(response: Expr<unknown>): Expr<unknown>;
-    /** Read the response body as text. Mirrors `response.text()`. */
-    text(response: Expr<unknown>): Expr<string>;
-    /** Get the HTTP status code. Mirrors `response.status`. */
-    status(response: Expr<unknown>): Expr<number>;
-    /** Get the response headers as a record. Mirrors `response.headers`. */
-    headers(response: Expr<unknown>): Expr<Record<string, string>>;
-  };
-}
-
 // ---- Configuration ----------------------------------------
 
 /**
@@ -127,173 +87,90 @@ export interface FetchConfig {
   defaultHeaders?: Record<string, string>;
 }
 
-// ---- Plugin implementation --------------------------------
+// ---- Plugin factory ---------------------------------------
 
 /**
- * Fetch plugin factory. Namespace: `fetch/`.
+ * Builds the callable fetch constructor with permissive generics.
  *
- * Creates a plugin that exposes `$.fetch(url, init?)` for HTTP requests
- * and response-reading methods `.json()`, `.text()`, `.status()`, `.headers()`.
+ * The returned function is callable (`fetch(url, init?)`) and also
+ * has `.json()`, `.text()`, `.status()`, `.headers()` methods.
+ * All return types include kind strings for ExtractKinds.
+ */
+function buildFetchApi() {
+  const fetchFn = <A, B extends readonly unknown[]>(
+    url: A,
+    ...init: B
+  ): CExpr<unknown, "fetch/request", [A, ...B]> =>
+    init.length > 0 ? mk("fetch/request", [url, liftArg(init[0])]) : mk("fetch/request", [url]);
+
+  /** Parse the response body as JSON. Mirrors `response.json()`. */
+  fetchFn.json = <A>(response: A): CExpr<unknown, "fetch/json", [A]> =>
+    mk("fetch/json", [response]);
+
+  /** Read the response body as text. Mirrors `response.text()`. */
+  fetchFn.text = <A>(response: A): CExpr<string, "fetch/text", [A]> => mk("fetch/text", [response]);
+
+  /** Get the HTTP status code. Mirrors `response.status`. */
+  fetchFn.status = <A>(response: A): CExpr<number, "fetch/status", [A]> =>
+    mk("fetch/status", [response]);
+
+  /** Get the response headers as a record. Mirrors `response.headers`. */
+  fetchFn.headers = <A>(response: A): CExpr<Record<string, string>, "fetch/headers", [A]> =>
+    mk("fetch/headers", [response]);
+
+  return fetchFn;
+}
+
+/**
+ * Creates the fetch plugin definition (unified Plugin type).
  *
  * @param config - Optional {@link FetchConfig} with baseUrl and defaultHeaders.
- * @returns A PluginDefinition for the fetch plugin.
+ * @returns A unified Plugin that contributes `$.fetch`.
  */
 export function fetch(config?: FetchConfig) {
   const resolvedConfig = config ?? {};
 
-  return definePlugin({
-    name: "fetch",
-    nodeKinds: ["fetch/request", "fetch/json", "fetch/text", "fetch/status", "fetch/headers"],
-    defaultInterpreter: () => fetchInterpreter,
-
-    build(ctx: PluginContext): FetchMethods {
-      function resolveUrl(url: Expr<string> | string) {
-        return ctx.isExpr(url) ? url.__node : ctx.lift(url).__node;
-      }
-
-      function resolveInit(init: Expr<FetchRequestInit> | FetchRequestInit) {
-        return ctx.lift(init).__node;
-      }
-
-      function resolveResponse(response: Expr<unknown>) {
-        return response.__node;
-      }
-
-      // $.fetch(url, init?) — callable function
-      const fetchFn = (
-        url: Expr<string> | string,
-        init?: Expr<FetchRequestInit> | FetchRequestInit,
-      ): Expr<unknown> => {
-        return ctx.expr({
-          kind: "fetch/request",
-          url: resolveUrl(url),
-          init: init != null ? resolveInit(init) : null,
-          config: resolvedConfig,
-        });
-      };
-
-      // Attach response-reading methods as properties on the function
-      fetchFn.json = (response: Expr<unknown>): Expr<unknown> => {
-        return ctx.expr({
-          kind: "fetch/json",
-          response: resolveResponse(response),
-        });
-      };
-
-      fetchFn.text = (response: Expr<unknown>): Expr<string> => {
-        return ctx.expr<string>({
-          kind: "fetch/text",
-          response: resolveResponse(response),
-        });
-      };
-
-      fetchFn.status = (response: Expr<unknown>): Expr<number> => {
-        return ctx.expr<number>({
-          kind: "fetch/status",
-          response: resolveResponse(response),
-        });
-      };
-
-      fetchFn.headers = (response: Expr<unknown>): Expr<Record<string, string>> => {
-        return ctx.expr<Record<string, string>>({
-          kind: "fetch/headers",
-          response: resolveResponse(response),
-        });
-      };
-
-      return {
-        fetch: fetchFn,
-      };
+  return {
+    name: "fetch" as const,
+    ctors: { fetch: buildFetchApi() },
+    kinds: {
+      "fetch/request": {
+        inputs: ["", undefined] as [string, ...unknown[]],
+        output: undefined as unknown,
+      } as KindSpec<[string, ...unknown[]], unknown>,
+      "fetch/json": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "fetch/text": {
+        inputs: [undefined] as [unknown],
+        output: "" as string,
+      } as KindSpec<[unknown], string>,
+      "fetch/status": {
+        inputs: [undefined] as [unknown],
+        output: 0 as number,
+      } as KindSpec<[unknown], number>,
+      "fetch/headers": {
+        inputs: [undefined] as [unknown],
+        output: {} as Record<string, string>,
+      } as KindSpec<[unknown], Record<string, string>>,
+      "fetch/record": {
+        inputs: [] as unknown[],
+        output: {} as Record<string, unknown>,
+      } as KindSpec<unknown[], Record<string, unknown>>,
+      "fetch/array": {
+        inputs: [] as unknown[],
+        output: [] as unknown[],
+      } as KindSpec<unknown[], unknown[]>,
     },
-  });
+    traits: {},
+    lifts: {},
+    defaultInterpreter: (): Interpreter =>
+      createFetchInterpreter(wrapFetch(globalThis.fetch), resolvedConfig),
+  } satisfies Plugin;
 }
 
-// ============================================================
-// HONEST ASSESSMENT: What works, what's hard, what breaks
-// ============================================================
-//
-// WORKS GREAT:
-//
-// 1. Basic GET request:
-//    Real:  const response = await fetch('https://api.example.com/data')
-//    Mvfm:   const response = $.fetch('https://api.example.com/data')
-//    Nearly identical. Only difference is $ prefix and no await.
-//
-// 2. POST with body:
-//    Real:  const response = await fetch(url, { method: 'POST', body: JSON.stringify(data) })
-//    Mvfm:   const response = $.fetch(url, { method: 'POST', body: JSON.stringify(data) })
-//    Same pattern, same options object.
-//
-// 3. Custom headers:
-//    Real:  await fetch(url, { headers: { 'Authorization': 'Bearer ...' } })
-//    Mvfm:   $.fetch(url, { headers: { 'Authorization': 'Bearer ...' } })
-//    1:1 mapping.
-//
-// 4. Response parsing:
-//    Real:  const data = await response.json()
-//    Mvfm:   const data = $.fetch.json(response)
-//    Different syntax (method on $.fetch vs method on response)
-//    but semantically identical.
-//
-// 5. Parameterized with proxy values:
-//    const response = $.fetch($.input.apiUrl, {
-//      method: 'POST',
-//      body: $.input.payload,
-//    })
-//    Proxy chains capture the dependency graph.
-//
-// WORKS BUT DIFFERENT:
-//
-// 6. Response method syntax:
-//    Real:  response.json()
-//    Mvfm:   $.fetch.json(response)
-//    Necessary deviation — mvfm proxies can't add methods to
-//    opaque handler-returned values. The response object in mvfm
-//    is an Expr wrapping the fetch/request AST node, not the
-//    real Response object.
-//
-// 7. Response metadata:
-//    Real:  response.status (property access)
-//    Mvfm:   $.fetch.status(response) (function call)
-//    Same deviation — mvfm models this as a function call that
-//    produces a new AST node, not property access on the response.
-//
-// DOESN'T WORK / NOT MODELED:
-//
-// 8. Streaming (response.body):
-//    Real:  const reader = response.body.getReader()
-//    Mvfm:   Not modeled. ReadableStream is push-based with no
-//           request-response shape. Would need a cursor-like
-//           pattern (see postgres cursor) to model.
-//
-// 9. AbortController:
-//    Real:  const controller = new AbortController()
-//           fetch(url, { signal: controller.signal })
-//           controller.abort()
-//    Mvfm:   Not modeled. Runtime lifecycle management (start,
-//           cancel) is not representable in a static AST.
-//
-// 10. Error handling:
-//    Real:  try { await fetch(url) } catch (e) { ... }
-//    Mvfm:   $.attempt($.fetch(url)) via the error plugin.
-//           Network errors become { ok: null, err: ... }.
-//           HTTP error statuses (404, 500) do NOT throw in real
-//           fetch — they return a Response with ok=false. Same
-//           behavior here: the handler returns the response
-//           regardless of status code.
-//
-// ============================================================
-// SUMMARY:
-// Based on the WHATWG Fetch Standard (https://fetch.spec.whatwg.org/).
-//
-// For the core 90% use case of "make an HTTP request, parse the
-// response" — this is nearly identical to real fetch(). The main
-// gap is response method syntax: $.fetch.json(response) instead
-// of response.json(). This is a fundamental constraint of the
-// AST proxy model, not a design choice.
-//
-// Not supported: streaming, AbortController, blob/arrayBuffer/
-// formData body parsing (deferred, easy to add). These are
-// either runtime concerns (streaming, abort) or mechanical
-// additions (more body parsing modes).
-// ============================================================
+/**
+ * Alias for {@link fetch}, kept for readability at call sites.
+ */
+export const fetchPlugin = fetch;

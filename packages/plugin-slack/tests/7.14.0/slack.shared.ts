@@ -1,10 +1,7 @@
-import { mvfm, num, str } from "@mvfm/core";
+import { boolPluginU, createApp, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
 import { slack } from "../../src/7.14.0";
 
-export function strip(ast: unknown): unknown {
-  return JSON.parse(
-    JSON.stringify(ast, (k, v) => (k === "__id" || k === "config" ? undefined : v)),
-  );
-}
-
-export const app = mvfm(num, str, slack({ token: "xoxb-test-token" }));
+const plugin = slack({ token: "xoxb-test-token" });
+export const plugins = [numPluginU, strPluginU, boolPluginU, plugin] as const;
+export const $ = mvfmU(...plugins);
+export const app = createApp(...plugins);

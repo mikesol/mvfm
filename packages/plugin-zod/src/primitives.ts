@@ -1,4 +1,3 @@
-import type { PluginContext, TypedNode } from "@mvfm/core";
 import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
@@ -10,55 +9,27 @@ import type {
   ZodSchemaNodeBase,
 } from "./types";
 
-interface ZodBooleanNode extends ZodSchemaNodeBase {
-  kind: "zod/boolean";
-}
-
-interface ZodNullNode extends ZodSchemaNodeBase {
-  kind: "zod/null";
-}
-
-interface ZodUndefinedNode extends ZodSchemaNodeBase {
-  kind: "zod/undefined";
-}
-
-interface ZodVoidNode extends ZodSchemaNodeBase {
-  kind: "zod/void";
-}
-
-interface ZodSymbolNode extends ZodSchemaNodeBase {
-  kind: "zod/symbol";
-}
-
 /**
  * Builder for simple Zod primitive schemas with no type-specific methods.
- *
- * Used for `boolean`, `null`, `undefined`, `void`, and `symbol` schemas.
- * These schemas have no additional check methods -- only the
- * inherited base methods (parse, safeParse, refine, optional, etc.).
- *
- * @typeParam T - The output type this schema validates to
  */
 export class ZodPrimitiveBuilder<T> extends ZodSchemaBuilder<T> {
   constructor(
-    ctx: PluginContext,
     kind: string,
     checks: readonly CheckDescriptor[] = [],
     refinements: readonly RefinementDescriptor[] = [],
     error?: ErrorConfig,
     extra: Record<string, unknown> = {},
   ) {
-    super(ctx, kind, checks, refinements, error, extra);
+    super(kind, checks, refinements, error, extra);
   }
 
   protected _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | TypedNode;
+    error?: ErrorConfig;
     extra?: Record<string, unknown>;
   }): ZodPrimitiveBuilder<T> {
     return new ZodPrimitiveBuilder<T>(
-      this._ctx,
       this._kind,
       overrides?.checks ?? this._checks,
       overrides?.refinements ?? this._refinements,
@@ -68,88 +39,39 @@ export class ZodPrimitiveBuilder<T> extends ZodSchemaBuilder<T> {
   }
 }
 
-/** Node kinds contributed by the primitives schema types. */
-export const primitivesNodeKinds: string[] = [
-  "zod/boolean",
-  "zod/null",
-  "zod/undefined",
-  "zod/void",
-  "zod/symbol",
-];
-
-/**
- * Namespace fragment for primitive schema factories.
- */
-export interface ZodPrimitivesNamespace {
-  /** Create a boolean schema builder. */
-  boolean(errorOrOpts?: string | { error?: string }): ZodPrimitiveBuilder<boolean>;
-  /** Create a null schema builder. */
-  null(errorOrOpts?: string | { error?: string }): ZodPrimitiveBuilder<null>;
-  /** Create an undefined schema builder. */
-  undefined(errorOrOpts?: string | { error?: string }): ZodPrimitiveBuilder<undefined>;
-  /** Create a void schema builder (alias for undefined). */
-  void(errorOrOpts?: string | { error?: string }): ZodPrimitiveBuilder<void>;
-  /** Create a symbol schema builder. */
-  symbol(errorOrOpts?: string | { error?: string }): ZodPrimitiveBuilder<symbol>;
-}
-
 /** Build the primitives namespace factory methods. */
 export function primitivesNamespace(
-  ctx: PluginContext,
   parseError: (errorOrOpts?: string | { error?: string }) => string | undefined,
-): ZodPrimitivesNamespace {
+) {
   return {
-    boolean(errorOrOpts?: string | { error?: string }): ZodPrimitiveBuilder<boolean> {
-      return new ZodPrimitiveBuilder<boolean>(ctx, "zod/boolean", [], [], parseError(errorOrOpts));
-    },
-    null(errorOrOpts?: string | { error?: string }): ZodPrimitiveBuilder<null> {
-      return new ZodPrimitiveBuilder<null>(ctx, "zod/null", [], [], parseError(errorOrOpts));
-    },
-    undefined(errorOrOpts?: string | { error?: string }): ZodPrimitiveBuilder<undefined> {
-      return new ZodPrimitiveBuilder<undefined>(
-        ctx,
-        "zod/undefined",
-        [],
-        [],
-        parseError(errorOrOpts),
-      );
-    },
-    void(errorOrOpts?: string | { error?: string }): ZodPrimitiveBuilder<void> {
-      return new ZodPrimitiveBuilder<void>(ctx, "zod/void", [], [], parseError(errorOrOpts));
-    },
-    symbol(errorOrOpts?: string | { error?: string }): ZodPrimitiveBuilder<symbol> {
-      return new ZodPrimitiveBuilder<symbol>(ctx, "zod/symbol", [], [], parseError(errorOrOpts));
-    },
+    boolean: (e?: string | { error?: string }) =>
+      new ZodPrimitiveBuilder<boolean>("zod/boolean", [], [], parseError(e)),
+    null: (e?: string | { error?: string }) =>
+      new ZodPrimitiveBuilder<null>("zod/null", [], [], parseError(e)),
+    undefined: (e?: string | { error?: string }) =>
+      new ZodPrimitiveBuilder<undefined>("zod/undefined", [], [], parseError(e)),
+    void: (e?: string | { error?: string }) =>
+      new ZodPrimitiveBuilder<void>("zod/void", [], [], parseError(e)),
+    symbol: (e?: string | { error?: string }) =>
+      new ZodPrimitiveBuilder<symbol>("zod/symbol", [], [], parseError(e)),
   };
 }
 
-/** Interpreter handlers for primitive schema nodes. */
 export const primitivesInterpreter: SchemaInterpreterMap = {
-  // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/boolean": async function* (
-    node: ZodBooleanNode,
-  ): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/boolean": async function* (node: ZodSchemaNodeBase) {
     const errorFn = toZodError(node.error as ErrorConfig | undefined);
     return errorFn ? z.boolean({ error: errorFn }) : z.boolean();
   },
-  // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/null": async function* (_node: ZodNullNode): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/null": async function* () {
     return z.null();
   },
-  // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/undefined": async function* (
-    _node: ZodUndefinedNode,
-  ): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/undefined": async function* () {
     return z.undefined();
   },
-  // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/void": async function* (_node: ZodVoidNode): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/void": async function* () {
     return z.void();
   },
-  // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/symbol": async function* (
-    _node: ZodSymbolNode,
-  ): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/symbol": async function* () {
     return z.symbol();
   },
 };

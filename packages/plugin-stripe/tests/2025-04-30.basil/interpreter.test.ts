@@ -1,50 +1,64 @@
-import type { Program } from "@mvfm/core";
-import { coreInterpreter, foldAST, injectInput, mvfm, num, str } from "@mvfm/core";
+import { boolPluginU, createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
 import { describe, expect, it, vi } from "vitest";
 import { stripeInterpreter } from "../../src";
 import { stripe } from "../../src/2025-04-30.basil";
 import { createStripeInterpreter, type StripeClient } from "../../src/2025-04-30.basil/interpreter";
 
-const app = mvfm(num, str, stripe({ apiKey: "sk_test_123" }));
+const plugin = stripe({ apiKey: "sk_test_123" });
+const plugins = [numPluginU, strPluginU, boolPluginU, plugin] as const;
+const $ = mvfmU(...plugins);
+const app = createApp(...plugins);
+
+async function run(expr: unknown) {
+  const captured: Array<{
+    method: string;
+    path: string;
+    params?: Record<string, unknown>;
+  }> = [];
+  const mockClient: StripeClient = {
+    async request(method, path, params) {
+      captured.push({ method, path, params });
+      return { id: "mock_id", object: "mock" };
+    },
+  };
+  const nexpr = app(expr as Parameters<typeof app>[0]);
+  const interp = defaults(plugins, {
+    stripe: createStripeInterpreter(mockClient),
+  });
+  const result = await fold(nexpr, interp);
+  return { result, captured };
+}
+
+// ============================================================
+// Default interpreter
+// ============================================================
 
 describe("stripe interpreter: default export", () => {
-  it("throws when STRIPE_API_KEY is missing", async () => {
+  it("stripeInterpreter throws when STRIPE_API_KEY is missing", async () => {
     vi.stubEnv("STRIPE_API_KEY", "");
-    const prog = app(($) => $.stripe.paymentIntents.create({ amount: 2000, currency: "usd" }));
-    const combined = { ...stripeInterpreter, ...coreInterpreter };
-    await expect(foldAST(combined, prog.ast.result)).rejects.toThrow(/STRIPE_API_KEY/);
+    const expr = $.stripe.paymentIntents.create({ amount: 2000, currency: "usd" });
+    const nexpr = app(expr as Parameters<typeof app>[0]);
+    const stdInterp = defaults([numPluginU, strPluginU, boolPluginU]);
+    const combined = { ...stdInterp, ...stripeInterpreter };
+    await expect(fold(nexpr, combined)).rejects.toThrow(/STRIPE_API_KEY/);
     vi.unstubAllEnvs();
   });
 
-  it("exports a default ready-to-use interpreter when STRIPE_API_KEY is set", () => {
+  it("exports a default ready-to-use interpreter with STRIPE_API_KEY", () => {
     vi.stubEnv("STRIPE_API_KEY", "sk_test_default");
     expect(typeof stripeInterpreter["stripe/create_payment_intent"]).toBe("function");
     vi.unstubAllEnvs();
   });
 });
 
-async function run(prog: Program, input: Record<string, unknown> = {}) {
-  const captured: Array<{ method: string; path: string; params?: Record<string, unknown> }> = [];
-  const injected = injectInput(prog, input);
-  const mockClient: StripeClient = {
-    async request(method: string, path: string, params?: Record<string, unknown>) {
-      captured.push({ method, path, params });
-      return { id: "mock_id", object: "mock" };
-    },
-  };
-  const combined = { ...createStripeInterpreter(mockClient), ...coreInterpreter };
-  const result = await foldAST(combined, injected);
-  return { result, captured };
-}
-
 // ============================================================
 // Payment Intents
 // ============================================================
 
 describe("stripe interpreter: create_payment_intent", () => {
-  it("yields POST /v1/payment_intents with correct params", async () => {
-    const prog = app(($) => $.stripe.paymentIntents.create({ amount: 2000, currency: "usd" }));
-    const { captured } = await run(prog);
+  it("calls POST /v1/payment_intents with correct params", async () => {
+    const expr = $.stripe.paymentIntents.create({ amount: 2000, currency: "usd" });
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].method).toBe("POST");
     expect(captured[0].path).toBe("/v1/payment_intents");
@@ -53,9 +67,9 @@ describe("stripe interpreter: create_payment_intent", () => {
 });
 
 describe("stripe interpreter: retrieve_payment_intent", () => {
-  it("yields GET /v1/payment_intents/{id}", async () => {
-    const prog = app(($) => $.stripe.paymentIntents.retrieve("pi_123"));
-    const { captured } = await run(prog);
+  it("calls GET /v1/payment_intents/{id}", async () => {
+    const expr = $.stripe.paymentIntents.retrieve("pi_123");
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].method).toBe("GET");
     expect(captured[0].path).toBe("/v1/payment_intents/pi_123");
@@ -64,20 +78,18 @@ describe("stripe interpreter: retrieve_payment_intent", () => {
 });
 
 describe("stripe interpreter: confirm_payment_intent", () => {
-  it("yields POST /v1/payment_intents/{id}/confirm with params", async () => {
-    const prog = app(($) =>
-      $.stripe.paymentIntents.confirm("pi_123", { payment_method: "pm_abc" }),
-    );
-    const { captured } = await run(prog);
+  it("calls POST /v1/payment_intents/{id}/confirm with params", async () => {
+    const expr = $.stripe.paymentIntents.confirm("pi_123", { payment_method: "pm_abc" });
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].method).toBe("POST");
     expect(captured[0].path).toBe("/v1/payment_intents/pi_123/confirm");
     expect(captured[0].params).toEqual({ payment_method: "pm_abc" });
   });
 
-  it("yields POST without params when omitted", async () => {
-    const prog = app(($) => $.stripe.paymentIntents.confirm("pi_123"));
-    const { captured } = await run(prog);
+  it("calls POST without params when omitted", async () => {
+    const expr = $.stripe.paymentIntents.confirm("pi_123");
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].method).toBe("POST");
     expect(captured[0].path).toBe("/v1/payment_intents/pi_123/confirm");
@@ -90,9 +102,9 @@ describe("stripe interpreter: confirm_payment_intent", () => {
 // ============================================================
 
 describe("stripe interpreter: create_customer", () => {
-  it("yields POST /v1/customers with correct params", async () => {
-    const prog = app(($) => $.stripe.customers.create({ email: "test@example.com" }));
-    const { captured } = await run(prog);
+  it("calls POST /v1/customers with correct params", async () => {
+    const expr = $.stripe.customers.create({ email: "test@example.com" });
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].method).toBe("POST");
     expect(captured[0].path).toBe("/v1/customers");
@@ -101,9 +113,9 @@ describe("stripe interpreter: create_customer", () => {
 });
 
 describe("stripe interpreter: retrieve_customer", () => {
-  it("yields GET /v1/customers/{id}", async () => {
-    const prog = app(($) => $.stripe.customers.retrieve("cus_123"));
-    const { captured } = await run(prog);
+  it("calls GET /v1/customers/{id}", async () => {
+    const expr = $.stripe.customers.retrieve("cus_123");
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].method).toBe("GET");
     expect(captured[0].path).toBe("/v1/customers/cus_123");
@@ -112,9 +124,9 @@ describe("stripe interpreter: retrieve_customer", () => {
 });
 
 describe("stripe interpreter: update_customer", () => {
-  it("yields POST /v1/customers/{id} with params", async () => {
-    const prog = app(($) => $.stripe.customers.update("cus_123", { name: "Updated Name" }));
-    const { captured } = await run(prog);
+  it("calls POST /v1/customers/{id} with params", async () => {
+    const expr = $.stripe.customers.update("cus_123", { name: "Updated Name" });
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].method).toBe("POST");
     expect(captured[0].path).toBe("/v1/customers/cus_123");
@@ -123,18 +135,18 @@ describe("stripe interpreter: update_customer", () => {
 });
 
 describe("stripe interpreter: list_customers", () => {
-  it("yields GET /v1/customers with params", async () => {
-    const prog = app(($) => $.stripe.customers.list({ limit: 10 }));
-    const { captured } = await run(prog);
+  it("calls GET /v1/customers with params", async () => {
+    const expr = $.stripe.customers.list({ limit: 10 });
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].method).toBe("GET");
     expect(captured[0].path).toBe("/v1/customers");
     expect(captured[0].params).toEqual({ limit: 10 });
   });
 
-  it("yields GET /v1/customers with undefined params when omitted", async () => {
-    const prog = app(($) => $.stripe.customers.list());
-    const { captured } = await run(prog);
+  it("calls GET /v1/customers with undefined params when omitted", async () => {
+    const expr = $.stripe.customers.list();
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].method).toBe("GET");
     expect(captured[0].path).toBe("/v1/customers");
@@ -147,11 +159,9 @@ describe("stripe interpreter: list_customers", () => {
 // ============================================================
 
 describe("stripe interpreter: create_charge", () => {
-  it("yields POST /v1/charges with correct params", async () => {
-    const prog = app(($) =>
-      $.stripe.charges.create({ amount: 5000, currency: "usd", source: "tok_visa" }),
-    );
-    const { captured } = await run(prog);
+  it("calls POST /v1/charges with correct params", async () => {
+    const expr = $.stripe.charges.create({ amount: 5000, currency: "usd", source: "tok_visa" });
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].method).toBe("POST");
     expect(captured[0].path).toBe("/v1/charges");
@@ -160,9 +170,9 @@ describe("stripe interpreter: create_charge", () => {
 });
 
 describe("stripe interpreter: retrieve_charge", () => {
-  it("yields GET /v1/charges/{id}", async () => {
-    const prog = app(($) => $.stripe.charges.retrieve("ch_123"));
-    const { captured } = await run(prog);
+  it("calls GET /v1/charges/{id}", async () => {
+    const expr = $.stripe.charges.retrieve("ch_123");
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].method).toBe("GET");
     expect(captured[0].path).toBe("/v1/charges/ch_123");
@@ -171,18 +181,18 @@ describe("stripe interpreter: retrieve_charge", () => {
 });
 
 describe("stripe interpreter: list_charges", () => {
-  it("yields GET /v1/charges with params", async () => {
-    const prog = app(($) => $.stripe.charges.list({ limit: 25 }));
-    const { captured } = await run(prog);
+  it("calls GET /v1/charges with params", async () => {
+    const expr = $.stripe.charges.list({ limit: 25 });
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].method).toBe("GET");
     expect(captured[0].path).toBe("/v1/charges");
     expect(captured[0].params).toEqual({ limit: 25 });
   });
 
-  it("yields GET /v1/charges with undefined params when omitted", async () => {
-    const prog = app(($) => $.stripe.charges.list());
-    const { captured } = await run(prog);
+  it("calls GET /v1/charges with undefined params when omitted", async () => {
+    const expr = $.stripe.charges.list();
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].method).toBe("GET");
     expect(captured[0].path).toBe("/v1/charges");
@@ -191,38 +201,13 @@ describe("stripe interpreter: list_charges", () => {
 });
 
 // ============================================================
-// Input resolution
-// ============================================================
-
-describe("stripe interpreter: input resolution", () => {
-  it("resolves input params through recurse", async () => {
-    const prog = app({ amount: "number", currency: "string" }, ($) =>
-      $.stripe.paymentIntents.create({
-        amount: $.input.amount,
-        currency: $.input.currency,
-      }),
-    );
-    const { captured } = await run(prog, { amount: 3000, currency: "eur" });
-    expect(captured).toHaveLength(1);
-    expect(captured[0].params).toEqual({ amount: 3000, currency: "eur" });
-  });
-
-  it("resolves input id for retrieve", async () => {
-    const prog = app({ piId: "string" }, ($) => $.stripe.paymentIntents.retrieve($.input.piId));
-    const { captured } = await run(prog, { piId: "pi_dynamic_456" });
-    expect(captured).toHaveLength(1);
-    expect(captured[0].path).toBe("/v1/payment_intents/pi_dynamic_456");
-  });
-});
-
-// ============================================================
-// Mock return value
+// Return value
 // ============================================================
 
 describe("stripe interpreter: return value", () => {
-  it("returns the handler response as the result", async () => {
-    const prog = app(($) => $.stripe.customers.retrieve("cus_123"));
-    const { result } = await run(prog);
+  it("returns the client response as the result", async () => {
+    const expr = $.stripe.customers.retrieve("cus_123");
+    const { result } = await run(expr);
     expect(result).toEqual({ id: "mock_id", object: "mock" });
   });
 });

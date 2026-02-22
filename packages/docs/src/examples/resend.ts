@@ -15,7 +15,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(result);
 });
-await foldAST(defaults(app, { resend: crystalBallResendInterpreter }), prog);`,
+await fold(defaults(app, { resend: crystalBallResendInterpreter }), prog);`,
     plugins: RESEND,
   },
 
@@ -26,7 +26,7 @@ const prog = app({}, ($) => {
   const email = $.resend.emails.get("email_abc123");
   return $.console.log(email);
 });
-await foldAST(defaults(app, { resend: crystalBallResendInterpreter }), prog);`,
+await fold(defaults(app, { resend: crystalBallResendInterpreter }), prog);`,
     plugins: RESEND,
   },
 
@@ -40,7 +40,7 @@ const prog = app({}, ($) => {
   ]);
   return $.console.log(batch);
 });
-await foldAST(defaults(app, { resend: crystalBallResendInterpreter }), prog);`,
+await fold(defaults(app, { resend: crystalBallResendInterpreter }), prog);`,
     plugins: RESEND,
   },
 
@@ -54,7 +54,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(contact);
 });
-await foldAST(defaults(app, { resend: crystalBallResendInterpreter }), prog);`,
+await fold(defaults(app, { resend: crystalBallResendInterpreter }), prog);`,
     plugins: RESEND,
   },
 
@@ -65,7 +65,7 @@ const prog = app({}, ($) => {
   const contact = $.resend.contacts.get("contact_abc123");
   return $.console.log(contact);
 });
-await foldAST(defaults(app, { resend: crystalBallResendInterpreter }), prog);`,
+await fold(defaults(app, { resend: crystalBallResendInterpreter }), prog);`,
     plugins: RESEND,
   },
 
@@ -76,7 +76,7 @@ const prog = app({}, ($) => {
   const contacts = $.resend.contacts.list();
   return $.console.log(contacts);
 });
-await foldAST(defaults(app, { resend: crystalBallResendInterpreter }), prog);`,
+await fold(defaults(app, { resend: crystalBallResendInterpreter }), prog);`,
     plugins: RESEND,
   },
 
@@ -87,7 +87,7 @@ const prog = app({}, ($) => {
   const result = $.resend.contacts.remove("contact_abc123");
   return $.console.log(result);
 });
-await foldAST(defaults(app, { resend: crystalBallResendInterpreter }), prog);`,
+await fold(defaults(app, { resend: crystalBallResendInterpreter }), prog);`,
     plugins: RESEND,
   },
 };

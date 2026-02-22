@@ -13,7 +13,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(pi);
 });
-await foldAST(defaults(app, { stripe: crystalBallStripeInterpreter }), prog);`,
+await fold(defaults(app, { stripe: crystalBallStripeInterpreter }), prog);`,
     plugins: STRIPE,
   },
 
@@ -24,7 +24,7 @@ const prog = app({}, ($) => {
   const pi = $.stripe.paymentIntents.retrieve("pi_abc123");
   return $.console.log(pi);
 });
-await foldAST(defaults(app, { stripe: crystalBallStripeInterpreter }), prog);`,
+await fold(defaults(app, { stripe: crystalBallStripeInterpreter }), prog);`,
     plugins: STRIPE,
   },
 
@@ -37,7 +37,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(pi);
 });
-await foldAST(defaults(app, { stripe: crystalBallStripeInterpreter }), prog);`,
+await fold(defaults(app, { stripe: crystalBallStripeInterpreter }), prog);`,
     plugins: STRIPE,
   },
 
@@ -51,7 +51,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(customer);
 });
-await foldAST(defaults(app, { stripe: crystalBallStripeInterpreter }), prog);`,
+await fold(defaults(app, { stripe: crystalBallStripeInterpreter }), prog);`,
     plugins: STRIPE,
   },
 
@@ -62,7 +62,7 @@ const prog = app({}, ($) => {
   const customer = $.stripe.customers.retrieve("cus_abc123");
   return $.console.log(customer);
 });
-await foldAST(defaults(app, { stripe: crystalBallStripeInterpreter }), prog);`,
+await fold(defaults(app, { stripe: crystalBallStripeInterpreter }), prog);`,
     plugins: STRIPE,
   },
 
@@ -75,7 +75,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(customer);
 });
-await foldAST(defaults(app, { stripe: crystalBallStripeInterpreter }), prog);`,
+await fold(defaults(app, { stripe: crystalBallStripeInterpreter }), prog);`,
     plugins: STRIPE,
   },
 
@@ -86,7 +86,7 @@ const prog = app({}, ($) => {
   const customers = $.stripe.customers.list({ limit: 10 });
   return $.console.log(customers);
 });
-await foldAST(defaults(app, { stripe: crystalBallStripeInterpreter }), prog);`,
+await fold(defaults(app, { stripe: crystalBallStripeInterpreter }), prog);`,
     plugins: STRIPE,
   },
 
@@ -101,7 +101,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(charge);
 });
-await foldAST(defaults(app, { stripe: crystalBallStripeInterpreter }), prog);`,
+await fold(defaults(app, { stripe: crystalBallStripeInterpreter }), prog);`,
     plugins: STRIPE,
   },
 
@@ -112,7 +112,7 @@ const prog = app({}, ($) => {
   const charge = $.stripe.charges.retrieve("ch_abc123");
   return $.console.log(charge);
 });
-await foldAST(defaults(app, { stripe: crystalBallStripeInterpreter }), prog);`,
+await fold(defaults(app, { stripe: crystalBallStripeInterpreter }), prog);`,
     plugins: STRIPE,
   },
 
@@ -123,7 +123,7 @@ const prog = app({}, ($) => {
   const charges = $.stripe.charges.list({ limit: 25 });
   return $.console.log(charges);
 });
-await foldAST(defaults(app, { stripe: crystalBallStripeInterpreter }), prog);`,
+await fold(defaults(app, { stripe: crystalBallStripeInterpreter }), prog);`,
     plugins: STRIPE,
   },
 };

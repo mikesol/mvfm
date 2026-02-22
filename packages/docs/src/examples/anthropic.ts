@@ -14,7 +14,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(msg);
 });
-await foldAST(defaults(app, { anthropic: crystalBallAnthropicInterpreter }), prog);`,
+await fold(defaults(app, { anthropic: crystalBallAnthropicInterpreter }), prog);`,
     plugins: ANTHROPIC,
   },
 
@@ -28,7 +28,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(count);
 });
-await foldAST(defaults(app, { anthropic: crystalBallAnthropicInterpreter }), prog);`,
+await fold(defaults(app, { anthropic: crystalBallAnthropicInterpreter }), prog);`,
     plugins: ANTHROPIC,
   },
 
@@ -48,7 +48,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(batch);
 });
-await foldAST(defaults(app, { anthropic: crystalBallAnthropicInterpreter }), prog);`,
+await fold(defaults(app, { anthropic: crystalBallAnthropicInterpreter }), prog);`,
     plugins: ANTHROPIC,
   },
 
@@ -59,7 +59,7 @@ const prog = app({}, ($) => {
   const batch = $.anthropic.messages.batches.retrieve("msgbatch-abc123");
   return $.console.log(batch);
 });
-await foldAST(defaults(app, { anthropic: crystalBallAnthropicInterpreter }), prog);`,
+await fold(defaults(app, { anthropic: crystalBallAnthropicInterpreter }), prog);`,
     plugins: ANTHROPIC,
   },
 
@@ -70,7 +70,7 @@ const prog = app({}, ($) => {
   const page = $.anthropic.messages.batches.list({ limit: 5 });
   return $.console.log(page);
 });
-await foldAST(defaults(app, { anthropic: crystalBallAnthropicInterpreter }), prog);`,
+await fold(defaults(app, { anthropic: crystalBallAnthropicInterpreter }), prog);`,
     plugins: ANTHROPIC,
   },
 
@@ -81,7 +81,7 @@ const prog = app({}, ($) => {
   const result = $.anthropic.messages.batches.delete("msgbatch-abc123");
   return $.console.log(result);
 });
-await foldAST(defaults(app, { anthropic: crystalBallAnthropicInterpreter }), prog);`,
+await fold(defaults(app, { anthropic: crystalBallAnthropicInterpreter }), prog);`,
     plugins: ANTHROPIC,
   },
 
@@ -92,7 +92,7 @@ const prog = app({}, ($) => {
   const batch = $.anthropic.messages.batches.cancel("msgbatch-abc123");
   return $.console.log(batch);
 });
-await foldAST(defaults(app, { anthropic: crystalBallAnthropicInterpreter }), prog);`,
+await fold(defaults(app, { anthropic: crystalBallAnthropicInterpreter }), prog);`,
     plugins: ANTHROPIC,
   },
 
@@ -103,7 +103,7 @@ const prog = app({}, ($) => {
   const model = $.anthropic.models.retrieve("claude-sonnet-4-20250514");
   return $.console.log(model);
 });
-await foldAST(defaults(app, { anthropic: crystalBallAnthropicInterpreter }), prog);`,
+await fold(defaults(app, { anthropic: crystalBallAnthropicInterpreter }), prog);`,
     plugins: ANTHROPIC,
   },
 
@@ -114,7 +114,7 @@ const prog = app({}, ($) => {
   const page = $.anthropic.models.list({ limit: 10 });
   return $.console.log(page);
 });
-await foldAST(defaults(app, { anthropic: crystalBallAnthropicInterpreter }), prog);`,
+await fold(defaults(app, { anthropic: crystalBallAnthropicInterpreter }), prog);`,
     plugins: ANTHROPIC,
   },
 };

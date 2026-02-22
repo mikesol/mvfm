@@ -1,5 +1,4 @@
-import type { Interpreter } from "@mvfm/core";
-import { definePlugin } from "@mvfm/core";
+import type { Interpreter, KindSpec, Plugin } from "@mvfm/core";
 import { wrapSlackWebClient } from "./client-slack-web-api";
 import { buildSlackMethods } from "./generated/build-methods";
 import type { SlackClient } from "./generated/interpreter";
@@ -76,6 +75,34 @@ export const slackInterpreter: Interpreter = lazyInterpreter(() =>
   ),
 );
 
+// ---- Node kinds (built once, reused) --------------------------------------
+
+/** KindSpec for slack API methods: single params input, unknown output. */
+const slackMethodKind: KindSpec<[unknown], unknown> = {
+  inputs: [undefined] as [unknown],
+  output: undefined as unknown,
+};
+
+const slackKinds = Object.fromEntries([
+  ...SLACK_NODE_KINDS.map((k) => [k, slackMethodKind] as const),
+  [
+    "slack/record",
+    {
+      inputs: [] as unknown[],
+      output: {} as Record<string, unknown>,
+    } as KindSpec<unknown[], Record<string, unknown>>,
+  ],
+  [
+    "slack/array",
+    {
+      inputs: [] as unknown[],
+      output: [] as unknown[],
+    } as KindSpec<unknown[], unknown[]>,
+  ],
+]) as Record<string, KindSpec<any, any>>;
+
+// ---- Plugin factory -------------------------------------------------------
+
 /**
  * Slack plugin factory. Namespace: `slack/`.
  *
@@ -83,15 +110,15 @@ export const slackInterpreter: Interpreter = lazyInterpreter(() =>
  * resource methods for building parameterized Slack API call AST nodes.
  *
  * @param config - A {@link SlackConfig} with a token.
- * @returns A PluginDefinition for the slack plugin.
+ * @returns A unified Plugin for the slack plugin.
  */
-export function slack(config: SlackConfig) {
-  return definePlugin({
-    name: "slack",
-    nodeKinds: [...SLACK_NODE_KINDS],
-    defaultInterpreter: () => slackInterpreter,
-    build(ctx) {
-      return buildSlackMethods(ctx, config);
-    },
-  });
+export function slack(_config: SlackConfig) {
+  return {
+    name: "slack" as const,
+    ctors: buildSlackMethods(),
+    kinds: slackKinds,
+    traits: {},
+    lifts: {},
+    defaultInterpreter: (): Interpreter => slackInterpreter,
+  } satisfies Plugin;
 }

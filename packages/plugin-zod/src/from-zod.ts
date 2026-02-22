@@ -1,4 +1,3 @@
-import type { PluginContext, TypedNode } from "@mvfm/core";
 import type { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import { type ConvertState, convertZodSchemaToNode } from "./from-zod-convert";
@@ -17,11 +16,8 @@ export interface ZodFromOptions {
 }
 
 class ZodImportedBuilder<T> extends ZodSchemaBuilder<T> {
-  constructor(
-    ctx: PluginContext,
-    private readonly node: SchemaASTNode | WrapperASTNode,
-  ) {
-    super(ctx, node.kind);
+  constructor(private readonly node: SchemaASTNode | WrapperASTNode) {
+    super(node.kind);
   }
 
   protected _buildSchemaNode(): SchemaASTNode | WrapperASTNode {
@@ -31,12 +27,12 @@ class ZodImportedBuilder<T> extends ZodSchemaBuilder<T> {
   protected _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | TypedNode;
+    error?: string | unknown;
     extra?: Record<string, unknown>;
   }): ZodImportedBuilder<T> {
     if ("checks" in this.node && "refinements" in this.node) {
       const base = this.node as SchemaASTNode;
-      return new ZodImportedBuilder<T>(this._ctx, {
+      return new ZodImportedBuilder<T>({
         ...base,
         checks: [...(overrides?.checks ?? base.checks)],
         refinements: [...(overrides?.refinements ?? base.refinements)],
@@ -44,26 +40,17 @@ class ZodImportedBuilder<T> extends ZodSchemaBuilder<T> {
         ...(overrides?.extra ?? {}),
       });
     }
-    return new ZodImportedBuilder<T>(this._ctx, this.node);
+    return new ZodImportedBuilder<T>(this.node);
   }
-}
-
-/**
- * Namespace fragment for converting runtime Zod schemas into mvfm schema builders.
- */
-export interface ZodFromNamespace {
-  /** Convert a runtime Zod schema into an mvfm `$.zod` schema builder. */
-  from<T>(schema: z.ZodType<T>, options?: ZodFromOptions): ZodSchemaBuilder<T>;
 }
 
 /**
  * Build the `$.zod.from(...)` converter method.
  */
-export function fromZodNamespace(ctx: PluginContext): ZodFromNamespace {
+export function fromZodNamespace() {
   return {
     from<T>(schema: z.ZodType<T>, options?: ZodFromOptions): ZodSchemaBuilder<T> {
       const state: ConvertState = {
-        ctx,
         strict: options?.strict ?? true,
         warnings: [],
         lazyIds: new WeakMap<object, string>(),
@@ -72,7 +59,7 @@ export function fromZodNamespace(ctx: PluginContext): ZodFromNamespace {
       };
       const node = convertZodSchemaToNode(schema, state);
       for (const warning of state.warnings) console.warn(`[zod.from] ${warning}`);
-      return new ZodImportedBuilder<T>(ctx, node);
+      return new ZodImportedBuilder<T>(node);
     },
   };
 }

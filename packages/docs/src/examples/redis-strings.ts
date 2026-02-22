@@ -9,7 +9,7 @@ const examples: Record<string, NodeExample> = {
 const prog = app({}, ($) => {
   return $.redis.set("greeting", "hello");
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -26,7 +26,7 @@ const prog = app({}, ($) => {
     $.redis.get("greeting")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -43,7 +43,7 @@ const prog = app({}, ($) => {
     $.redis.incr("counter")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -60,7 +60,7 @@ const prog = app({}, ($) => {
     $.redis.incrby("counter", 5)
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -77,7 +77,7 @@ const prog = app({}, ($) => {
     $.redis.decr("counter")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -94,7 +94,7 @@ const prog = app({}, ($) => {
     $.redis.decrby("counter", 3)
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -112,7 +112,7 @@ const prog = app({}, ($) => {
     $.redis.mget("a", "b", "missing")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -129,7 +129,7 @@ const prog = app({}, ($) => {
     $.redis.mget("x", "y", "z")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -147,7 +147,7 @@ const prog = app({}, ($) => {
     $.redis.get("msg")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -164,7 +164,7 @@ const prog = app({}, ($) => {
     $.redis.getrange("msg", 0, 4)
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -182,7 +182,7 @@ const prog = app({}, ($) => {
     $.redis.get("msg")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,

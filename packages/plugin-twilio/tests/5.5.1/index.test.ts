@@ -1,189 +1,145 @@
-import { mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
-import { twilio } from "../../src/5.5.1";
+import { twilio, twilioPlugin } from "../../src/5.5.1";
 
-function strip(ast: unknown): unknown {
-  return JSON.parse(
-    JSON.stringify(ast, (k, v) => (k === "__id" || k === "config" ? undefined : v)),
-  );
-}
-
-const app = mvfm(num, str, twilio({ accountSid: "AC_test_123", authToken: "auth_test_456" }));
+const plugin = twilio({ accountSid: "AC_test_123", authToken: "auth_test_456" });
+const api = plugin.ctors.twilio;
 
 // ============================================================
-// Messages
+// CExpr construction tests — Messages
 // ============================================================
 
 describe("twilio: messages.create", () => {
-  it("produces twilio/create_message node", () => {
-    const prog = app(($) => {
-      return $.twilio.messages.create({ to: "+15551234567", from: "+15559876543", body: "Hello" });
+  it("produces twilio/create_message CExpr", () => {
+    const expr = api.messages.create({
+      to: "+15551234567",
+      from: "+15559876543",
+      body: "Hello",
     });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("twilio/create_message");
-    expect(ast.result.params.kind).toBe("core/record");
-    expect(ast.result.params.fields.to.kind).toBe("core/literal");
-    expect(ast.result.params.fields.to.value).toBe("+15551234567");
-    expect(ast.result.params.fields.body.value).toBe("Hello");
-  });
-
-  it("accepts Expr params", () => {
-    const prog = app(($) => {
-      return $.twilio.messages.create({
-        to: $.input.to,
-        from: $.input.from,
-        body: $.input.body,
-      });
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("twilio/create_message");
-    expect(ast.result.params.fields.to.kind).toBe("core/prop_access");
-    expect(ast.result.params.fields.body.kind).toBe("core/prop_access");
+    expect(expr.__kind).toBe("twilio/create_message");
+    expect(expr.__args).toHaveLength(1);
+    const paramsArg = expr.__args[0] as { __kind: string };
+    expect(paramsArg.__kind).toBe("twilio/record");
   });
 });
 
 describe("twilio: messages(sid).fetch", () => {
-  it("produces twilio/fetch_message node with literal sid", () => {
-    const prog = app(($) => {
-      return $.twilio.messages("SM800f449d0399ed014aae2bcc0cc2f2ec").fetch();
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("twilio/fetch_message");
-    expect(ast.result.sid.kind).toBe("core/literal");
-    expect(ast.result.sid.value).toBe("SM800f449d0399ed014aae2bcc0cc2f2ec");
+  it("produces twilio/fetch_message CExpr with literal sid", () => {
+    const expr = api.messages("SM800f449d0399ed014aae2bcc0cc2f2ec").fetch();
+    expect(expr.__kind).toBe("twilio/fetch_message");
+    expect(expr.__args).toHaveLength(1);
+    expect(expr.__args[0]).toBe("SM800f449d0399ed014aae2bcc0cc2f2ec");
   });
 
-  it("accepts Expr<string> sid", () => {
-    const prog = app(($) => {
-      return $.twilio.messages($.input.messageSid).fetch();
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("twilio/fetch_message");
-    expect(ast.result.sid.kind).toBe("core/prop_access");
+  it("accepts CExpr sid (proxy chained value)", () => {
+    const msg = api.messages("SM123").fetch();
+    const expr = api.messages(msg.sid).fetch();
+    expect(expr.__kind).toBe("twilio/fetch_message");
+    expect(expr.__args).toHaveLength(1);
+    const sidArg = expr.__args[0] as { __kind: string };
+    expect(sidArg.__kind).toBe("core/access");
   });
 });
 
 describe("twilio: messages.list", () => {
-  it("produces twilio/list_messages node with params", () => {
-    const prog = app(($) => {
-      return $.twilio.messages.list({ limit: 10 });
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("twilio/list_messages");
-    expect(ast.result.params.kind).toBe("core/record");
-    expect(ast.result.params.fields.limit.value).toBe(10);
+  it("produces twilio/list_messages CExpr with params", () => {
+    const expr = api.messages.list({ limit: 10 });
+    expect(expr.__kind).toBe("twilio/list_messages");
+    expect(expr.__args).toHaveLength(1);
+    const paramsArg = expr.__args[0] as { __kind: string };
+    expect(paramsArg.__kind).toBe("twilio/record");
   });
 
-  it("optional params are null when omitted", () => {
-    const prog = app(($) => {
-      return $.twilio.messages.list();
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("twilio/list_messages");
-    expect(ast.result.params).toBeNull();
+  it("produces CExpr with no args when omitted", () => {
+    const expr = api.messages.list();
+    expect(expr.__kind).toBe("twilio/list_messages");
+    expect(expr.__args).toHaveLength(0);
   });
 });
 
 // ============================================================
-// Calls
+// CExpr construction tests — Calls
 // ============================================================
 
 describe("twilio: calls.create", () => {
-  it("produces twilio/create_call node", () => {
-    const prog = app(($) => {
-      return $.twilio.calls.create({
-        to: "+15551234567",
-        from: "+15559876543",
-        url: "https://example.com/twiml",
-      });
+  it("produces twilio/create_call CExpr", () => {
+    const expr = api.calls.create({
+      to: "+15551234567",
+      from: "+15559876543",
+      url: "https://example.com/twiml",
     });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("twilio/create_call");
-    expect(ast.result.params.kind).toBe("core/record");
-    expect(ast.result.params.fields.to.value).toBe("+15551234567");
-    expect(ast.result.params.fields.url.value).toBe("https://example.com/twiml");
+    expect(expr.__kind).toBe("twilio/create_call");
+    expect(expr.__args).toHaveLength(1);
+    const paramsArg = expr.__args[0] as { __kind: string };
+    expect(paramsArg.__kind).toBe("twilio/record");
   });
 });
 
 describe("twilio: calls(sid).fetch", () => {
-  it("produces twilio/fetch_call node with literal sid", () => {
-    const prog = app(($) => {
-      return $.twilio.calls("CA42ed11f93dc08b952027ffbc406d0868").fetch();
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("twilio/fetch_call");
-    expect(ast.result.sid.kind).toBe("core/literal");
-    expect(ast.result.sid.value).toBe("CA42ed11f93dc08b952027ffbc406d0868");
+  it("produces twilio/fetch_call CExpr with literal sid", () => {
+    const expr = api.calls("CA42ed11f93dc08b952027ffbc406d0868").fetch();
+    expect(expr.__kind).toBe("twilio/fetch_call");
+    expect(expr.__args).toHaveLength(1);
+    expect(expr.__args[0]).toBe("CA42ed11f93dc08b952027ffbc406d0868");
   });
 });
 
 describe("twilio: calls.list", () => {
-  it("produces twilio/list_calls node with params", () => {
-    const prog = app(($) => {
-      return $.twilio.calls.list({ limit: 20 });
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("twilio/list_calls");
-    expect(ast.result.params.kind).toBe("core/record");
-    expect(ast.result.params.fields.limit.value).toBe(20);
+  it("produces twilio/list_calls CExpr with params", () => {
+    const expr = api.calls.list({ limit: 20 });
+    expect(expr.__kind).toBe("twilio/list_calls");
+    expect(expr.__args).toHaveLength(1);
+    const paramsArg = expr.__args[0] as { __kind: string };
+    expect(paramsArg.__kind).toBe("twilio/record");
   });
 
-  it("optional params are null when omitted", () => {
-    const prog = app(($) => {
-      return $.twilio.calls.list();
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("twilio/list_calls");
-    expect(ast.result.params).toBeNull();
+  it("produces CExpr with no args when omitted", () => {
+    const expr = api.calls.list();
+    expect(expr.__kind).toBe("twilio/list_calls");
+    expect(expr.__args).toHaveLength(0);
   });
 });
 
 // ============================================================
-// Integration: $.begin() and cross-operation dependencies
+// Unified Plugin shape
 // ============================================================
 
-describe("twilio: integration with $.begin()", () => {
-  it("side-effecting operations wrapped in $.begin() are reachable", () => {
-    expect(() => {
-      app(($) => {
-        const msg = $.twilio.messages.create({
-          to: "+15551234567",
-          from: "+15559876543",
-          body: "Hello",
-        });
-        const call = $.twilio.calls.create({
-          to: "+15551234567",
-          from: "+15559876543",
-          url: "https://example.com/twiml",
-        });
-        return $.begin(msg, call);
-      });
-    }).not.toThrow();
+describe("twilio plugin: unified Plugin shape", () => {
+  it("has correct name", () => {
+    expect(plugin.name).toBe("twilio");
   });
 
-  it("orphaned operations are rejected", () => {
-    expect(() => {
-      app(($) => {
-        const msg = $.twilio.messages("SM_123").fetch();
-        $.twilio.messages.create({ to: "+1", from: "+2", body: "orphan" }); // orphan!
-        return msg;
-      });
-    }).toThrow(/unreachable node/i);
+  it("has 8 node kinds (6 core + record + array)", () => {
+    expect(Object.keys(plugin.kinds)).toHaveLength(8);
+  });
+
+  it("kinds are all namespaced", () => {
+    for (const kind of Object.keys(plugin.kinds)) {
+      expect(kind).toMatch(/^twilio\//);
+    }
+  });
+
+  it("kinds map has entries for all node kinds", () => {
+    for (const kind of Object.keys(plugin.kinds)) {
+      expect(plugin.kinds[kind]).toBeDefined();
+    }
+  });
+
+  it("has empty traits and lifts", () => {
+    expect(plugin.traits).toEqual({});
+    expect(plugin.lifts).toEqual({});
+  });
+
+  it("has a defaultInterpreter factory", () => {
+    expect(typeof plugin.defaultInterpreter).toBe("function");
   });
 });
 
-describe("twilio: cross-operation dependencies", () => {
-  it("can use result of one operation as input to another", () => {
-    const prog = app(($) => {
-      const msg = $.twilio.messages.create({
-        to: "+15551234567",
-        from: "+15559876543",
-        body: "Hello",
-      });
-      const fetched = $.twilio.messages((msg as any).sid).fetch();
-      return $.begin(msg, fetched);
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/begin");
+// ============================================================
+// Factory aliases
+// ============================================================
+
+describe("twilio plugin: factory aliases", () => {
+  it("twilio and twilioPlugin are the same function", () => {
+    expect(twilio).toBe(twilioPlugin);
   });
 });

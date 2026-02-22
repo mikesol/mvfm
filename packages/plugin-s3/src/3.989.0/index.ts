@@ -1,9 +1,12 @@
 // ============================================================
-// MVFM PLUGIN: s3 (@aws-sdk/client-s3 compatible API)
+// MVFM PLUGIN: s3 (@aws-sdk/client-s3 compatible API) — unified Plugin
 // ============================================================
 //
+// Ported to the unified Plugin type with makeCExpr and
+// index-based fold handlers. Config captured in interpreter
+// closure, not stored on AST nodes.
+//
 // Implementation status: PARTIAL (5 of 108 commands)
-// Plugin size: LARGE — at pass 1 of 60/30/10 split (5 of 108 commands)
 //
 // Implemented:
 //   - putObject: upload an object
@@ -12,124 +15,53 @@
 //   - headObject: check existence / get metadata
 //   - listObjectsV2: list objects in a bucket
 //
-// Not doable (fundamental mismatch with AST model):
-//   - SelectObjectContent: event stream output (push-based)
-//   - Multipart upload as a workflow: stateful multi-step loop
-//
-// Remaining (same command pattern, add as needed):
-//   CopyObject, DeleteObjects, RenameObject, GetObjectAttributes,
-//   GetObjectTagging, PutObjectTagging, DeleteObjectTagging,
-//   CreateBucket, DeleteBucket, HeadBucket, ListBuckets,
-//   and 80+ bucket configuration commands (lifecycle, CORS,
-//   encryption, versioning, etc.).
-//
-//   Each command follows the same pattern: add node kind,
-//   add method to S3Methods, add switch case to interpreter.
-//   The interpreter/handler architecture does not need to
-//   change — s3/command covers everything.
-//
-// ============================================================
-//
-// Goal: An LLM that knows @aws-sdk/client-s3 should be able
-// to write Mvfm programs with near-zero learning curve. The API
-// mirrors the high-level S3 aggregated client (method calls
-// with PascalCase input objects).
-//
-// Real @aws-sdk/client-s3 API (v3.989.0):
-//   const s3 = new S3({ region: 'us-east-1' })
-//   await s3.putObject({ Bucket: 'b', Key: 'k', Body: 'hello' })
-//   const obj = await s3.getObject({ Bucket: 'b', Key: 'k' })
-//   await s3.deleteObject({ Bucket: 'b', Key: 'k' })
-//   const head = await s3.headObject({ Bucket: 'b', Key: 'k' })
-//   const list = await s3.listObjectsV2({ Bucket: 'b', Prefix: 'uploads/' })
-//
-// Based on source-level analysis of aws-sdk-js-v3
-// (github.com/aws/aws-sdk-js-v3, clients/client-s3).
-// The SDK uses Smithy-generated Command classes dispatched
-// via client.send(). The S3 aggregated class wraps these
-// as convenience methods via createAggregatedClient().
-//
+// NO defaultInterpreter — requires createS3Interpreter(client) at runtime.
 // ============================================================
 
 import type {
-  DeleteObjectCommandInput,
   DeleteObjectCommandOutput,
-  GetObjectCommandInput,
   GetObjectCommandOutput,
-  HeadObjectCommandInput,
   HeadObjectCommandOutput,
-  ListObjectsV2CommandInput,
   ListObjectsV2CommandOutput,
-  PutObjectCommandInput,
   PutObjectCommandOutput,
 } from "@aws-sdk/client-s3";
-import type { Expr, PluginContext } from "@mvfm/core";
-import { definePlugin } from "@mvfm/core";
+import type { CExpr, KindSpec, Plugin } from "@mvfm/core";
+import { isCExpr, makeCExpr } from "@mvfm/core";
 
-type PutObjectInput = PutObjectCommandInput;
-type PutObjectResult = PutObjectCommandOutput;
-type GetObjectInput = GetObjectCommandInput;
-type GetObjectResult = GetObjectCommandOutput;
-type DeleteObjectInput = DeleteObjectCommandInput;
-type DeleteObjectResult = DeleteObjectCommandOutput;
-type HeadObjectInput = HeadObjectCommandInput;
-type HeadObjectResult = HeadObjectCommandOutput;
-type ListObjectsV2Input = ListObjectsV2CommandInput;
-type ListObjectsV2Result = ListObjectsV2CommandOutput;
-
-// ---- What the plugin adds to $ ----------------------------
+// ---- liftArg: recursive plain-value -> CExpr lifting --------
 
 /**
- * S3 operations added to the DSL context by the s3 plugin.
- *
- * Mirrors the high-level `S3` aggregated client from
- * `@aws-sdk/client-s3` v3.989.0: putObject, getObject,
- * deleteObject, headObject, listObjectsV2.
+ * Recursively lifts a plain value into a CExpr tree.
+ * - CExpr values are returned as-is.
+ * - Primitives are returned as-is (elaborate lifts them).
+ * - Plain objects become `s3/record` CExprs with key-value child pairs.
+ * - Arrays become `s3/array` CExprs.
  */
-export interface S3Methods {
-  /** S3 operations, namespaced under `$.s3`. */
-  s3: {
-    /**
-     * Upload an object to S3.
-     *
-     * @param input - PutObject input (Bucket, Key, Body required).
-     * @returns The PutObject response (ETag, VersionId, etc.).
-     */
-    putObject(input: Expr<PutObjectInput> | PutObjectInput): Expr<PutObjectResult>;
-
-    /**
-     * Download an object from S3.
-     *
-     * @param input - GetObject input (Bucket, Key required).
-     * @returns The GetObject response (Body as string, ContentType, etc.).
-     */
-    getObject(input: Expr<GetObjectInput> | GetObjectInput): Expr<GetObjectResult>;
-
-    /**
-     * Delete an object from S3.
-     *
-     * @param input - DeleteObject input (Bucket, Key required).
-     * @returns The DeleteObject response (DeleteMarker, VersionId, etc.).
-     */
-    deleteObject(input: Expr<DeleteObjectInput> | DeleteObjectInput): Expr<DeleteObjectResult>;
-
-    /**
-     * Check existence and retrieve metadata for an object.
-     *
-     * @param input - HeadObject input (Bucket, Key required).
-     * @returns The HeadObject response (ContentLength, ContentType, etc.).
-     */
-    headObject(input: Expr<HeadObjectInput> | HeadObjectInput): Expr<HeadObjectResult>;
-
-    /**
-     * List objects in a bucket (v2).
-     *
-     * @param input - ListObjectsV2 input (Bucket required, Prefix optional).
-     * @returns The ListObjectsV2 response (Contents, IsTruncated, etc.).
-     */
-    listObjectsV2(input: Expr<ListObjectsV2Input> | ListObjectsV2Input): Expr<ListObjectsV2Result>;
-  };
+function liftArg(value: unknown): unknown {
+  if (isCExpr(value)) return value;
+  if (typeof value === "string") return value;
+  if (typeof value === "number") return value;
+  if (typeof value === "boolean") return value;
+  if (value === null || value === undefined) return value;
+  if (Array.isArray(value)) {
+    return makeCExpr("s3/array", value.map(liftArg));
+  }
+  if (typeof value === "object") {
+    const pairs: unknown[] = [];
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      pairs.push(k, liftArg(v));
+    }
+    return makeCExpr("s3/record", pairs);
+  }
+  return value;
 }
+
+// liftArg erases generic type info at runtime (returns unknown).
+// Cast helpers restore the declared CExpr Args types for ExtractKinds.
+const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]>(
+  kind: Kind,
+  args: readonly unknown[],
+) => CExpr<O, Kind, Args>;
 
 // ---- Configuration ----------------------------------------
 
@@ -155,129 +87,93 @@ export interface S3Config {
   forcePathStyle?: boolean;
 }
 
-// ---- Plugin implementation --------------------------------
+// ---- Plugin factory ---------------------------------------
 
 /**
- * S3 plugin factory. Namespace: `s3/`.
+ * Creates the s3 plugin definition (unified Plugin type).
  *
- * Creates a plugin that exposes S3 object operations for building
- * parameterized S3 command AST nodes.
+ * This plugin has NO defaultInterpreter. You must provide one
+ * via `defaults(plugins, { s3: createS3Interpreter(client) })`.
  *
- * @param config - An {@link S3Config} with region and optional credentials.
- * @returns A PluginDefinition for the s3 plugin.
+ * @param _config - An {@link S3Config} with region and optional credentials.
+ *   Config is captured by the interpreter, not stored on AST nodes.
+ * @returns A unified Plugin that contributes `$.s3`.
  *
  * @example
  * ```ts
- * const app = mvfm(num, str, s3({ region: "us-east-1" }));
- * const prog = app(($) => $.s3.putObject({ Bucket: "b", Key: "k", Body: "hello" }));
+ * const plugin = s3({ region: "us-east-1" });
+ * const $ = mvfmU(numPluginU, strPluginU, plugin);
+ * const expr = $.s3.putObject({ Bucket: "b", Key: "k", Body: "hello" });
+ * const nexpr = app(expr);
+ * const interp = defaults([numPluginU, strPluginU, plugin], {
+ *   s3: createS3Interpreter(myClient),
+ * });
+ * const result = await fold(nexpr, interp);
  * ```
  */
-export function s3(config: S3Config) {
-  return definePlugin({
-    name: "s3",
-    nodeKinds: [
-      "s3/put_object",
-      "s3/get_object",
-      "s3/delete_object",
-      "s3/head_object",
-      "s3/list_objects_v2",
-    ],
-
-    build(ctx: PluginContext): S3Methods {
-      function resolveInput<T>(input: Expr<T> | T) {
-        return ctx.lift(input).__node;
-      }
-
-      return {
-        s3: {
-          putObject(input) {
-            return ctx.expr({
-              kind: "s3/put_object",
-              input: resolveInput(input),
-              config,
-            });
-          },
-
-          getObject(input) {
-            return ctx.expr({
-              kind: "s3/get_object",
-              input: resolveInput(input),
-              config,
-            });
-          },
-
-          deleteObject(input) {
-            return ctx.expr({
-              kind: "s3/delete_object",
-              input: resolveInput(input),
-              config,
-            });
-          },
-
-          headObject(input) {
-            return ctx.expr({
-              kind: "s3/head_object",
-              input: resolveInput(input),
-              config,
-            });
-          },
-
-          listObjectsV2(input) {
-            return ctx.expr({
-              kind: "s3/list_objects_v2",
-              input: resolveInput(input),
-              config,
-            });
-          },
+export function s3(_config: S3Config) {
+  return {
+    name: "s3" as const,
+    ctors: {
+      s3: {
+        /** Upload an object to S3. */
+        putObject<A>(input: A): CExpr<PutObjectCommandOutput, "s3/put_object", [A]> {
+          return mk("s3/put_object", [liftArg(input)]);
         },
-      };
+        /** Download an object from S3. */
+        getObject<A>(input: A): CExpr<GetObjectCommandOutput, "s3/get_object", [A]> {
+          return mk("s3/get_object", [liftArg(input)]);
+        },
+        /** Delete an object from S3. */
+        deleteObject<A>(input: A): CExpr<DeleteObjectCommandOutput, "s3/delete_object", [A]> {
+          return mk("s3/delete_object", [liftArg(input)]);
+        },
+        /** Check existence and retrieve metadata for an object. */
+        headObject<A>(input: A): CExpr<HeadObjectCommandOutput, "s3/head_object", [A]> {
+          return mk("s3/head_object", [liftArg(input)]);
+        },
+        /** List objects in a bucket (v2). */
+        listObjectsV2<A>(input: A): CExpr<ListObjectsV2CommandOutput, "s3/list_objects_v2", [A]> {
+          return mk("s3/list_objects_v2", [liftArg(input)]);
+        },
+      },
     },
-  });
+    kinds: {
+      "s3/put_object": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "s3/get_object": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "s3/delete_object": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "s3/head_object": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "s3/list_objects_v2": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "s3/record": {
+        inputs: [] as unknown[],
+        output: {} as Record<string, unknown>,
+      } as KindSpec<unknown[], Record<string, unknown>>,
+      "s3/array": {
+        inputs: [] as unknown[],
+        output: [] as unknown[],
+      } as KindSpec<unknown[], unknown[]>,
+    },
+    traits: {},
+    lifts: {},
+  } satisfies Plugin;
 }
 
-// ============================================================
-// HONEST ASSESSMENT: What works, what's hard, what breaks
-// ============================================================
-//
-// WORKS GREAT:
-//
-// 1. Basic object operations:
-//    Real:  await s3.putObject({ Bucket: 'b', Key: 'k', Body: 'hello' })
-//    Mvfm:   $.s3.putObject({ Bucket: 'b', Key: 'k', Body: 'hello' })
-//    Nearly identical. Only difference is $ prefix and no await.
-//
-// 2. Parameterized operations with proxy values:
-//    const list = $.s3.listObjectsV2({ Bucket: $.input.bucket })
-//    const head = $.s3.headObject({ Bucket: $.input.bucket, Key: list.Contents[0].Key })
-//    Proxy chains capture the dependency graph perfectly.
-//
-// 3. Method and parameter naming:
-//    Real:  s3.putObject({ Bucket, Key, Body, ContentType, Metadata })
-//    Mvfm:   $.s3.putObject({ Bucket, Key, Body, ContentType, Metadata })
-//    1:1 match. PascalCase params, camelCase methods.
-//
-// WORKS BUT DIFFERENT:
-//
-// 4. GetObject Body:
-//    Real:  const body = await response.Body.transformToString()
-//    Mvfm:   const body = result.Body  (already a string)
-//    The handler converts the stream to string before returning.
-//    More ergonomic but different from the real SDK.
-//
-// 5. Return types:
-//    Real SDK has typed CommandOutput interfaces (PutObjectOutput, etc.)
-//    Mvfm uses Record<string, unknown>. Property access works via proxy.
-//
-// DOESN'T WORK / NOT MODELED:
-//
-// 6. SelectObjectContent: Event stream, not request-response.
-// 7. Multipart upload workflow: Stateful multi-step.
-// 8. Presigned URLs: Utility function, not a command.
-// 9. Waiters: waitUntilObjectExists — polling-based.
-//
-// SUMMARY:
-// For the core 80% use case of "put/get/delete/head/list objects"
-// — nearly identical to the real @aws-sdk/client-s3 high-level API.
-// An LLM trained on the real SDK can write mvfm S3 programs immediately.
-// Not supported: streaming, multipart, presigned URLs, waiters.
-// ============================================================
+/**
+ * Alias for {@link s3}, kept for readability at call sites.
+ */
+export const s3Plugin = s3;

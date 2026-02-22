@@ -1,5 +1,5 @@
-import type { Interpreter, TypedNode } from "@mvfm/core";
-import { foldAST } from "@mvfm/core";
+import type { Interpreter, NExpr } from "@mvfm/core";
+import { fold } from "@mvfm/core";
 import { createSlackInterpreter, type SlackClient } from "./generated/interpreter";
 
 /**
@@ -17,12 +17,12 @@ export function serverInterpreter(client: SlackClient): Interpreter {
  *
  * @param client - The {@link SlackClient} to execute against.
  * @param baseInterpreter - Base interpreter for evaluating sub-expressions.
- * @returns An async AST evaluator function.
+ * @returns An async NExpr evaluator function.
  */
 export function serverEvaluate(
   client: SlackClient,
   baseInterpreter: Interpreter,
-): (root: TypedNode) => Promise<unknown> {
+): (expr: NExpr<any, any, any, any>) => Promise<unknown> {
   const interp = { ...baseInterpreter, ...createSlackInterpreter(client) };
-  return (root: TypedNode) => foldAST(interp, root);
+  return (expr: NExpr<any, any, any, any>) => fold(expr, interp);
 }

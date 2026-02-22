@@ -13,7 +13,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(result);
 });
-await foldAST(defaults(app, { openai: crystalBallOpenAIInterpreter }), prog);`,
+await fold(defaults(app, { openai: crystalBallOpenAIInterpreter }), prog);`,
     plugins: OPENAI,
   },
 
@@ -24,7 +24,7 @@ const prog = app({}, ($) => {
   const result = $.openai.chat.completions.retrieve("chatcmpl-abc123");
   return $.console.log(result);
 });
-await foldAST(defaults(app, { openai: crystalBallOpenAIInterpreter }), prog);`,
+await fold(defaults(app, { openai: crystalBallOpenAIInterpreter }), prog);`,
     plugins: OPENAI,
   },
 
@@ -35,7 +35,7 @@ const prog = app({}, ($) => {
   const page = $.openai.chat.completions.list({ limit: 5 });
   return $.console.log(page);
 });
-await foldAST(defaults(app, { openai: crystalBallOpenAIInterpreter }), prog);`,
+await fold(defaults(app, { openai: crystalBallOpenAIInterpreter }), prog);`,
     plugins: OPENAI,
   },
 
@@ -48,7 +48,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(updated);
 });
-await foldAST(defaults(app, { openai: crystalBallOpenAIInterpreter }), prog);`,
+await fold(defaults(app, { openai: crystalBallOpenAIInterpreter }), prog);`,
     plugins: OPENAI,
   },
 
@@ -59,7 +59,7 @@ const prog = app({}, ($) => {
   const result = $.openai.chat.completions.delete("chatcmpl-abc123");
   return $.console.log(result);
 });
-await foldAST(defaults(app, { openai: crystalBallOpenAIInterpreter }), prog);`,
+await fold(defaults(app, { openai: crystalBallOpenAIInterpreter }), prog);`,
     plugins: OPENAI,
   },
 
@@ -73,7 +73,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(result);
 });
-await foldAST(defaults(app, { openai: crystalBallOpenAIInterpreter }), prog);`,
+await fold(defaults(app, { openai: crystalBallOpenAIInterpreter }), prog);`,
     plugins: OPENAI,
   },
 
@@ -87,7 +87,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(result);
 });
-await foldAST(defaults(app, { openai: crystalBallOpenAIInterpreter }), prog);`,
+await fold(defaults(app, { openai: crystalBallOpenAIInterpreter }), prog);`,
     plugins: OPENAI,
   },
 
@@ -102,7 +102,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(result);
 });
-await foldAST(defaults(app, { openai: crystalBallOpenAIInterpreter }), prog);`,
+await fold(defaults(app, { openai: crystalBallOpenAIInterpreter }), prog);`,
     plugins: OPENAI,
   },
 };

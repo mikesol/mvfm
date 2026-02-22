@@ -7,7 +7,7 @@ const examples: Record<string, NodeExample> = {
 const prog = app({ x: "number", y: "number" }, ($) => {
   return $.gt($.input.x, $.input.y);
 });
-await foldAST(defaults(app), injectInput(prog, { x: 10, y: 5 }));`,
+await fold(defaults(app), injectInput(prog, { x: 10, y: 5 }));`,
   },
   "ord/gte": {
     description: "Greater than or equal comparison — dispatches to the ord typeclass",
@@ -15,7 +15,7 @@ await foldAST(defaults(app), injectInput(prog, { x: 10, y: 5 }));`,
 const prog = app({ x: "number", y: "number" }, ($) => {
   return $.gte($.input.x, $.input.y);
 });
-await foldAST(defaults(app), injectInput(prog, { x: 7, y: 7 }));`,
+await fold(defaults(app), injectInput(prog, { x: 7, y: 7 }));`,
   },
   "ord/lt": {
     description: "Less than comparison — dispatches to the ord typeclass",
@@ -23,7 +23,7 @@ await foldAST(defaults(app), injectInput(prog, { x: 7, y: 7 }));`,
 const prog = app({ x: "number", y: "number" }, ($) => {
   return $.lt($.input.x, $.input.y);
 });
-await foldAST(defaults(app), injectInput(prog, { x: 3, y: 8 }));`,
+await fold(defaults(app), injectInput(prog, { x: 3, y: 8 }));`,
   },
   "ord/lte": {
     description: "Less than or equal comparison — dispatches to the ord typeclass",
@@ -31,7 +31,7 @@ await foldAST(defaults(app), injectInput(prog, { x: 3, y: 8 }));`,
 const prog = app({ x: "number", y: "number" }, ($) => {
   return $.lte($.input.x, $.input.y);
 });
-await foldAST(defaults(app), injectInput(prog, { x: 5, y: 10 }));`,
+await fold(defaults(app), injectInput(prog, { x: 5, y: 10 }));`,
   },
 };
 

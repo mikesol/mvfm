@@ -1,33 +1,30 @@
 // ============================================================
-// MVFM PLUGIN: console (Node.js console API)
+// MVFM PLUGIN: console (Node.js console API) — unified Plugin
 // ============================================================
 //
-// Implementation status: COMPLETE (all console methods in scope)
-// Plugin size: SMALL — fully implemented modulo known limitations
-//
-// Implemented:
-//   - assert, clear, count, countReset, debug, dir, dirxml
-//   - error, group, groupCollapsed, groupEnd, info, log
-//   - table, time, timeEnd, timeLog, trace, warn
-//
-// Not doable (fundamental mismatch with AST model):
-//   - (none)
-//
-// Goal: A developer familiar with Node console should write
-// Mvfm programs with near-zero learning curve via $.console.*.
-//
-// Real Node console API:
-//   console.log('hello', 1)
-//   console.warn('careful')
-//   console.assert(ok, 'must be ok')
-//   console.time('t'); console.timeLog('t', 'checkpoint'); console.timeEnd('t')
-//   console.group('A'); console.groupEnd()
-//
+// Permissive constructors with kind strings so ExtractKinds can
+// derive all console/* kinds from the ctor return types.
 // ============================================================
 
-import type { Expr, PluginContext } from "@mvfm/core";
-import { definePlugin } from "@mvfm/core";
-import { consoleInterpreter } from "./interpreter";
+import type { CExpr, Interpreter, KindSpec, Plugin } from "@mvfm/core";
+import { isCExpr, makeCExpr } from "@mvfm/core";
+import { createConsoleInterpreter } from "./interpreter";
+
+/** Lift plain objects/arrays to structural CExpr nodes so elaborate can process them. */
+function liftConsoleArg(value: unknown): unknown {
+  if (value === null || value === undefined) return value;
+  if (isCExpr(value)) return value;
+  if (typeof value !== "object") return value;
+  if (Array.isArray(value)) return makeCExpr("core/tuple", [value]);
+  return makeCExpr("core/record", [value]);
+}
+
+// liftConsoleArg erases generic type info at runtime (returns unknown).
+// Cast helper restores the declared CExpr Args types for ExtractKinds.
+const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]>(
+  kind: Kind,
+  args: readonly unknown[],
+) => CExpr<O, Kind, Args>;
 
 /**
  * Full set of Node.js console methods covered by this plugin.
@@ -53,30 +50,6 @@ export type ConsoleMethodName =
   | "trace"
   | "warn";
 
-const METHOD_NAMES: ReadonlyArray<ConsoleMethodName> = [
-  "assert",
-  "clear",
-  "count",
-  "countReset",
-  "debug",
-  "dir",
-  "dirxml",
-  "error",
-  "group",
-  "groupCollapsed",
-  "groupEnd",
-  "info",
-  "log",
-  "table",
-  "time",
-  "timeEnd",
-  "timeLog",
-  "trace",
-  "warn",
-];
-
-type ConsoleArg = Expr<unknown> | unknown;
-
 /**
  * Configuration for the console plugin.
  */
@@ -85,155 +58,146 @@ export interface ConsoleConfig {
   tag?: string;
 }
 
-/**
- * Console API exposed on `$.console`.
- */
-export interface ConsoleApi {
-  /** Calls `console.assert(condition, ...data)`. */
-  assert(condition: ConsoleArg, ...data: ConsoleArg[]): Expr<void>;
-  /** Calls `console.clear()`. */
-  clear(): Expr<void>;
-  /** Calls `console.count(label?)`. */
-  count(label?: ConsoleArg): Expr<void>;
-  /** Calls `console.countReset(label?)`. */
-  countReset(label?: ConsoleArg): Expr<void>;
-  /** Calls `console.debug(...data)`. */
-  debug(...data: ConsoleArg[]): Expr<void>;
-  /** Calls `console.dir(item, options?)`. */
-  dir(item?: ConsoleArg, options?: ConsoleArg): Expr<void>;
-  /** Calls `console.dirxml(...data)`. */
-  dirxml(...data: ConsoleArg[]): Expr<void>;
-  /** Calls `console.error(...data)`. */
-  error(...data: ConsoleArg[]): Expr<void>;
-  /** Calls `console.group(...data)`. */
-  group(...data: ConsoleArg[]): Expr<void>;
-  /** Calls `console.groupCollapsed(...data)`. */
-  groupCollapsed(...data: ConsoleArg[]): Expr<void>;
-  /** Calls `console.groupEnd()`. */
-  groupEnd(): Expr<void>;
-  /** Calls `console.info(...data)`. */
-  info(...data: ConsoleArg[]): Expr<void>;
-  /** Calls `console.log(...data)`. */
-  log(...data: ConsoleArg[]): Expr<void>;
-  /** Calls `console.table(tabularData, properties?)`. */
-  table(tabularData?: ConsoleArg, properties?: ConsoleArg): Expr<void>;
-  /** Calls `console.time(label?)`. */
-  time(label?: ConsoleArg): Expr<void>;
-  /** Calls `console.timeEnd(label?)`. */
-  timeEnd(label?: ConsoleArg): Expr<void>;
-  /** Calls `console.timeLog(label?, ...data)`. */
-  timeLog(label?: ConsoleArg, ...data: ConsoleArg[]): Expr<void>;
-  /** Calls `console.trace(...data)`. */
-  trace(...data: ConsoleArg[]): Expr<void>;
-  /** Calls `console.warn(...data)`. */
-  warn(...data: ConsoleArg[]): Expr<void>;
-}
+/** Variadic KindSpec for console methods: unknown[] inputs, void output. */
+const variadicVoidKind: KindSpec<unknown[], void> = {
+  inputs: [] as unknown[],
+  output: undefined as unknown as undefined,
+};
 
-/**
- * Console operations contributed to the DSL context.
- */
-export interface ConsoleMethods {
-  /** Console API namespace. */
-  console: ConsoleApi;
-}
-
-function liftMany(ctx: PluginContext, args: ConsoleArg[]): unknown[] {
-  return args.map((arg) => ctx.lift(arg).__node);
-}
-
-/**
- * Creates the console plugin definition.
- *
- * @param config - Optional plugin configuration.
- * @returns A plugin definition that contributes `$.console`.
- */
-export function console(config: ConsoleConfig = {}) {
-  const nodeKinds = METHOD_NAMES.map((method) => `console/${method}`);
-
-  return definePlugin({
-    name: "console",
-    nodeKinds,
-    defaultInterpreter: () => consoleInterpreter,
-    build(ctx: PluginContext): ConsoleMethods {
-      function call(method: ConsoleMethodName, args: ConsoleArg[]): Expr<void> {
-        return ctx.expr<void>({
-          kind: `console/${method}`,
-          args: liftMany(ctx, args),
-          config,
-        });
-      }
-
-      const api: ConsoleApi = {
-        assert(condition: ConsoleArg, ...data: ConsoleArg[]): Expr<void> {
-          return call("assert", [condition, ...data]);
-        },
-        clear(): Expr<void> {
-          return call("clear", []);
-        },
-        count(label?: ConsoleArg): Expr<void> {
-          return call("count", label === undefined ? [] : [label]);
-        },
-        countReset(label?: ConsoleArg): Expr<void> {
-          return call("countReset", label === undefined ? [] : [label]);
-        },
-        debug(...data: ConsoleArg[]): Expr<void> {
-          return call("debug", data);
-        },
-        dir(item?: ConsoleArg, options?: ConsoleArg): Expr<void> {
-          const args: ConsoleArg[] = [];
-          if (item !== undefined) args.push(item);
-          if (options !== undefined) args.push(options);
-          return call("dir", args);
-        },
-        dirxml(...data: ConsoleArg[]): Expr<void> {
-          return call("dirxml", data);
-        },
-        error(...data: ConsoleArg[]): Expr<void> {
-          return call("error", data);
-        },
-        group(...data: ConsoleArg[]): Expr<void> {
-          return call("group", data);
-        },
-        groupCollapsed(...data: ConsoleArg[]): Expr<void> {
-          return call("groupCollapsed", data);
-        },
-        groupEnd(): Expr<void> {
-          return call("groupEnd", []);
-        },
-        info(...data: ConsoleArg[]): Expr<void> {
-          return call("info", data);
-        },
-        log(...data: ConsoleArg[]): Expr<void> {
-          return call("log", data);
-        },
-        table(tabularData?: ConsoleArg, properties?: ConsoleArg): Expr<void> {
-          const args: ConsoleArg[] = [];
-          if (tabularData !== undefined) args.push(tabularData);
-          if (properties !== undefined) args.push(properties);
-          return call("table", args);
-        },
-        time(label?: ConsoleArg): Expr<void> {
-          return call("time", label === undefined ? [] : [label]);
-        },
-        timeEnd(label?: ConsoleArg): Expr<void> {
-          return call("timeEnd", label === undefined ? [] : [label]);
-        },
-        timeLog(label?: ConsoleArg, ...data: ConsoleArg[]): Expr<void> {
-          const args: ConsoleArg[] = [];
-          if (label !== undefined) args.push(label);
-          return call("timeLog", [...args, ...data]);
-        },
-        trace(...data: ConsoleArg[]): Expr<void> {
-          return call("trace", data);
-        },
-        warn(...data: ConsoleArg[]): Expr<void> {
-          return call("warn", data);
-        },
-      };
-
-      return { console: api };
+/** Builds the console constructor methods with permissive generics and kind strings. */
+function buildConsoleApi() {
+  return {
+    /** Calls `console.assert(condition, ...data)`. */
+    assert<A, B extends readonly unknown[]>(
+      condition: A,
+      ...data: B
+    ): CExpr<void, "console/assert", [A, ...B]> {
+      return mk("console/assert", [condition, ...data]);
     },
-  });
+    /** Calls `console.clear()`. */
+    clear(): CExpr<void, "console/clear", []> {
+      return mk("console/clear", []);
+    },
+    /** Calls `console.count(label?)`. */
+    count<A>(...args: [label: A] | []): CExpr<void, "console/count", unknown[]> {
+      return mk("console/count", args);
+    },
+    /** Calls `console.countReset(label?)`. */
+    countReset<A>(...args: [label: A] | []): CExpr<void, "console/countReset", unknown[]> {
+      return mk("console/countReset", args);
+    },
+    /** Calls `console.debug(...data)`. */
+    debug<A extends readonly unknown[]>(...data: A): CExpr<void, "console/debug", A> {
+      return mk("console/debug", data);
+    },
+    /** Calls `console.dir(item, options?)`. */
+    dir<A, B>(
+      ...args: [item: A, options: B] | [item: A] | []
+    ): CExpr<void, "console/dir", unknown[]> {
+      const lifted: unknown[] = [];
+      if (args.length > 0) lifted.push(liftConsoleArg(args[0]));
+      if (args.length > 1) lifted.push(liftConsoleArg(args[1]));
+      return mk("console/dir", lifted);
+    },
+    /** Calls `console.dirxml(...data)`. */
+    dirxml<A extends readonly unknown[]>(...data: A): CExpr<void, "console/dirxml", A> {
+      return mk("console/dirxml", data.map(liftConsoleArg));
+    },
+    /** Calls `console.error(...data)`. */
+    error<A extends readonly unknown[]>(...data: A): CExpr<void, "console/error", A> {
+      return mk("console/error", data);
+    },
+    /** Calls `console.group(...data)`. */
+    group<A extends readonly unknown[]>(...data: A): CExpr<void, "console/group", A> {
+      return mk("console/group", data);
+    },
+    /** Calls `console.groupCollapsed(...data)`. */
+    groupCollapsed<A extends readonly unknown[]>(
+      ...data: A
+    ): CExpr<void, "console/groupCollapsed", A> {
+      return mk("console/groupCollapsed", data);
+    },
+    /** Calls `console.groupEnd()`. */
+    groupEnd(): CExpr<void, "console/groupEnd", []> {
+      return mk("console/groupEnd", []);
+    },
+    /** Calls `console.info(...data)`. */
+    info<A extends readonly unknown[]>(...data: A): CExpr<void, "console/info", A> {
+      return mk("console/info", data);
+    },
+    /** Calls `console.log(...data)`. */
+    log<A extends readonly unknown[]>(...data: A): CExpr<void, "console/log", A> {
+      return mk("console/log", data);
+    },
+    /** Calls `console.table(tabularData, properties?)`. */
+    table<A, B>(
+      ...args: [tabularData: A, properties: B] | [tabularData: A] | []
+    ): CExpr<void, "console/table", unknown[]> {
+      const lifted: unknown[] = [];
+      if (args.length > 0) lifted.push(liftConsoleArg(args[0]));
+      if (args.length > 1) lifted.push(liftConsoleArg(args[1]));
+      return mk("console/table", lifted);
+    },
+    /** Calls `console.time(label?)`. */
+    time<A>(...args: [label: A] | []): CExpr<void, "console/time", unknown[]> {
+      return mk("console/time", args);
+    },
+    /** Calls `console.timeEnd(label?)`. */
+    timeEnd<A>(...args: [label: A] | []): CExpr<void, "console/timeEnd", unknown[]> {
+      return mk("console/timeEnd", args);
+    },
+    /** Calls `console.timeLog(label?, ...data)`. */
+    timeLog<A, B extends readonly unknown[]>(
+      ...args: [label: A, ...data: B] | []
+    ): CExpr<void, "console/timeLog", unknown[]> {
+      return mk("console/timeLog", [...args]);
+    },
+    /** Calls `console.trace(...data)`. */
+    trace<A extends readonly unknown[]>(...data: A): CExpr<void, "console/trace", A> {
+      return mk("console/trace", data);
+    },
+    /** Calls `console.warn(...data)`. */
+    warn<A extends readonly unknown[]>(...data: A): CExpr<void, "console/warn", A> {
+      return mk("console/warn", data);
+    },
+  };
+}
+
+/**
+ * Creates the console plugin definition (unified Plugin type).
+ *
+ * @param _config - Optional plugin configuration.
+ * @returns A unified Plugin that contributes `$.console`.
+ */
+export function console(_config: ConsoleConfig = {}) {
+  return {
+    name: "console" as const,
+    ctors: { console: buildConsoleApi() },
+    kinds: {
+      "console/assert": variadicVoidKind,
+      "console/clear": variadicVoidKind,
+      "console/count": variadicVoidKind,
+      "console/countReset": variadicVoidKind,
+      "console/debug": variadicVoidKind,
+      "console/dir": variadicVoidKind,
+      "console/dirxml": variadicVoidKind,
+      "console/error": variadicVoidKind,
+      "console/group": variadicVoidKind,
+      "console/groupCollapsed": variadicVoidKind,
+      "console/groupEnd": variadicVoidKind,
+      "console/info": variadicVoidKind,
+      "console/log": variadicVoidKind,
+      "console/table": variadicVoidKind,
+      "console/time": variadicVoidKind,
+      "console/timeEnd": variadicVoidKind,
+      "console/timeLog": variadicVoidKind,
+      "console/trace": variadicVoidKind,
+      "console/warn": variadicVoidKind,
+    },
+    traits: {},
+    lifts: {},
+    defaultInterpreter: (): Interpreter => createConsoleInterpreter(),
+  } satisfies Plugin;
 }
 
 /**

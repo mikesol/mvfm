@@ -1,4 +1,3 @@
-import type { PluginContext, TypedNode } from "@mvfm/core";
 import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
@@ -16,29 +15,24 @@ interface ZodBigIntNode extends ZodSchemaNodeBase {
 
 /**
  * Builder for Zod bigint schemas.
- *
- * Provides bigint-specific validations (gt, gte, lt, lte, positive, negative,
- * multipleOf) on top of the common base methods.
  */
 export class ZodBigIntBuilder extends ZodSchemaBuilder<bigint> {
   constructor(
-    ctx: PluginContext,
     checks: readonly CheckDescriptor[] = [],
     refinements: readonly RefinementDescriptor[] = [],
     error?: ErrorConfig,
     extra: Record<string, unknown> = {},
   ) {
-    super(ctx, "zod/bigint", checks, refinements, error, extra);
+    super("zod/bigint", checks, refinements, error, extra);
   }
 
   protected _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | TypedNode;
+    error?: ErrorConfig;
     extra?: Record<string, unknown>;
   }): ZodBigIntBuilder {
     return new ZodBigIntBuilder(
-      this._ctx,
       overrides?.checks ?? this._checks,
       overrides?.refinements ?? this._refinements,
       overrides?.error ?? this._error,
@@ -46,124 +40,72 @@ export class ZodBigIntBuilder extends ZodSchemaBuilder<bigint> {
     );
   }
 
-  // ---- Comparison checks ----
-
-  /** Greater than. Produces `gt` check descriptor. */
-  gt(
-    value: bigint,
-    opts?: { error?: string; abort?: boolean; when?: TypedNode },
-  ): ZodBigIntBuilder {
+  gt(value: bigint, opts?: { error?: string; abort?: boolean; when?: unknown }): ZodBigIntBuilder {
     return this._addCheck("gt", { value: value.toString() }, opts);
   }
 
-  /** Greater than or equal (alias: min). Produces `gte` check descriptor. */
-  gte(
-    value: bigint,
-    opts?: { error?: string; abort?: boolean; when?: TypedNode },
-  ): ZodBigIntBuilder {
+  gte(value: bigint, opts?: { error?: string; abort?: boolean; when?: unknown }): ZodBigIntBuilder {
     return this._addCheck("gte", { value: value.toString() }, opts);
   }
 
-  /** Alias for gte(). */
-  min(
-    value: bigint,
-    opts?: { error?: string; abort?: boolean; when?: TypedNode },
-  ): ZodBigIntBuilder {
+  min(value: bigint, opts?: { error?: string; abort?: boolean; when?: unknown }): ZodBigIntBuilder {
     return this.gte(value, opts);
   }
 
-  /** Less than. Produces `lt` check descriptor. */
-  lt(
-    value: bigint,
-    opts?: { error?: string; abort?: boolean; when?: TypedNode },
-  ): ZodBigIntBuilder {
+  lt(value: bigint, opts?: { error?: string; abort?: boolean; when?: unknown }): ZodBigIntBuilder {
     return this._addCheck("lt", { value: value.toString() }, opts);
   }
 
-  /** Less than or equal (alias: max). Produces `lte` check descriptor. */
-  lte(
-    value: bigint,
-    opts?: { error?: string; abort?: boolean; when?: TypedNode },
-  ): ZodBigIntBuilder {
+  lte(value: bigint, opts?: { error?: string; abort?: boolean; when?: unknown }): ZodBigIntBuilder {
     return this._addCheck("lte", { value: value.toString() }, opts);
   }
 
-  /** Alias for lte(). */
-  max(
-    value: bigint,
-    opts?: { error?: string; abort?: boolean; when?: TypedNode },
-  ): ZodBigIntBuilder {
+  max(value: bigint, opts?: { error?: string; abort?: boolean; when?: unknown }): ZodBigIntBuilder {
     return this.lte(value, opts);
   }
 
-  // ---- Sign checks ----
-
-  /** Must be > 0n. Produces `positive` check descriptor. */
-  positive(opts?: { error?: string; abort?: boolean; when?: TypedNode }): ZodBigIntBuilder {
+  positive(opts?: { error?: string; abort?: boolean; when?: unknown }): ZodBigIntBuilder {
     return this._addCheck("positive", {}, opts);
   }
 
-  /** Must be >= 0n. Produces `nonnegative` check descriptor. */
-  nonnegative(opts?: { error?: string; abort?: boolean; when?: TypedNode }): ZodBigIntBuilder {
+  nonnegative(opts?: { error?: string; abort?: boolean; when?: unknown }): ZodBigIntBuilder {
     return this._addCheck("nonnegative", {}, opts);
   }
 
-  /** Must be < 0n. Produces `negative` check descriptor. */
-  negative(opts?: { error?: string; abort?: boolean; when?: TypedNode }): ZodBigIntBuilder {
+  negative(opts?: { error?: string; abort?: boolean; when?: unknown }): ZodBigIntBuilder {
     return this._addCheck("negative", {}, opts);
   }
 
-  /** Must be <= 0n. Produces `nonpositive` check descriptor. */
-  nonpositive(opts?: { error?: string; abort?: boolean; when?: TypedNode }): ZodBigIntBuilder {
+  nonpositive(opts?: { error?: string; abort?: boolean; when?: unknown }): ZodBigIntBuilder {
     return this._addCheck("nonpositive", {}, opts);
   }
 
-  // ---- Divisibility ----
-
-  /** Must be a multiple of step. Produces `multiple_of` check descriptor. */
   multipleOf(
     step: bigint,
-    opts?: { error?: string; abort?: boolean; when?: TypedNode },
+    opts?: { error?: string; abort?: boolean; when?: unknown },
   ): ZodBigIntBuilder {
     return this._addCheck("multiple_of", { value: step.toString() }, opts);
   }
 
-  /** Alias for multipleOf(). */
   step(
     value: bigint,
-    opts?: { error?: string; abort?: boolean; when?: TypedNode },
+    opts?: { error?: string; abort?: boolean; when?: unknown },
   ): ZodBigIntBuilder {
     return this.multipleOf(value, opts);
   }
 }
 
-/** Node kinds contributed by the bigint schema. */
-export const bigintNodeKinds: string[] = ["zod/bigint"];
-
-/**
- * Namespace fragment for bigint schema factories.
- */
-export interface ZodBigIntNamespace {
-  /** Create a bigint schema builder. */
-  bigint(errorOrOpts?: string | { error?: string }): ZodBigIntBuilder;
-}
-
 /** Build the bigint namespace factory methods. */
 export function bigintNamespace(
-  ctx: PluginContext,
   parseError: (errorOrOpts?: string | { error?: string }) => string | undefined,
-): ZodBigIntNamespace {
+) {
   return {
     bigint(errorOrOpts?: string | { error?: string }): ZodBigIntBuilder {
-      return new ZodBigIntBuilder(ctx, [], [], parseError(errorOrOpts));
+      return new ZodBigIntBuilder([], [], parseError(errorOrOpts));
     },
   };
 }
 
-/**
- * Apply check descriptors to a Zod bigint schema.
- * BigInt values are serialized as strings in the AST and converted back here.
- */
 function applyBigIntChecks(schema: z.ZodBigInt, checks: CheckDescriptor[]): z.ZodBigInt {
   let s = schema;
   for (const check of checks) {
@@ -203,12 +145,8 @@ function applyBigIntChecks(schema: z.ZodBigInt, checks: CheckDescriptor[]): z.Zo
   return s;
 }
 
-/** Interpreter handlers for bigint schema nodes. */
 export const bigintInterpreter: SchemaInterpreterMap = {
-  // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/bigint": async function* (
-    node: ZodBigIntNode,
-  ): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/bigint": async function* (node: ZodBigIntNode): AsyncGenerator<unknown, z.ZodType, unknown> {
     const checks = (node.checks as CheckDescriptor[]) ?? [];
     const errorFn = toZodError(node.error as ErrorConfig | undefined);
     const base = errorFn ? z.bigint({ error: errorFn }) : z.bigint();

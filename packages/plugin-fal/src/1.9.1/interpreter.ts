@@ -4,8 +4,7 @@ import type {
   QueueStatus,
   Result,
 } from "@fal-ai/client";
-import type { Interpreter, TypedNode } from "@mvfm/core";
-import { defineInterpreter, eval_ } from "@mvfm/core";
+import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import { wrapFalSdk } from "./client-fal-sdk";
 
 /**
@@ -44,82 +43,77 @@ export interface FalClient {
   ): Promise<void>;
 }
 
-interface FalNode<K extends string, T> extends TypedNode<T> {
-  kind: K;
-  endpointId: TypedNode<string>;
-  options?: TypedNode<unknown>;
-}
-
-interface FalRunNode extends FalNode<"fal/run", Result<unknown>> {}
-interface FalSubscribeNode extends FalNode<"fal/subscribe", Result<unknown>> {}
-interface FalQueueSubmitNode extends FalNode<"fal/queue_submit", unknown> {}
-interface FalQueueStatusNode extends FalNode<"fal/queue_status", QueueStatus> {}
-interface FalQueueResultNode extends FalNode<"fal/queue_result", unknown> {}
-interface FalQueueCancelNode extends FalNode<"fal/queue_cancel", void> {}
-
-declare module "@mvfm/core" {
-  interface NodeTypeMap {
-    "fal/run": FalRunNode;
-    "fal/subscribe": FalSubscribeNode;
-    "fal/queue_submit": FalQueueSubmitNode;
-    "fal/queue_status": FalQueueStatusNode;
-    "fal/queue_result": FalQueueResultNode;
-    "fal/queue_cancel": FalQueueCancelNode;
-  }
-}
-
 /**
- * Creates an interpreter for `fal/*` node kinds.
+ * Creates an interpreter for `fal/*` node kinds using the new
+ * RuntimeEntry + positional yield pattern.
+ *
+ * Config (credentials) is captured in the closure,
+ * not stored on AST nodes.
  *
  * @param client - The {@link FalClient} to execute against.
  * @returns An Interpreter handling all fal node kinds.
  */
 export function createFalInterpreter(client: FalClient): Interpreter {
-  return defineInterpreter<
-    | "fal/run"
-    | "fal/subscribe"
-    | "fal/queue_submit"
-    | "fal/queue_status"
-    | "fal/queue_result"
-    | "fal/queue_cancel"
-  >()({
-    "fal/run": async function* (node: FalRunNode) {
-      const endpointId = yield* eval_(node.endpointId);
-      const options = node.options != null ? yield* eval_(node.options) : undefined;
-      return await client.run(endpointId, options as any);
+  return {
+    "fal/run": async function* (entry: RuntimeEntry) {
+      const endpointId = (yield 0) as string;
+      const options =
+        entry.children.length > 1 ? ((yield 1) as Parameters<FalSdkClient["run"]>[1]) : undefined;
+      return await client.run(endpointId, options);
     },
 
-    "fal/subscribe": async function* (node: FalSubscribeNode) {
-      const endpointId = yield* eval_(node.endpointId);
-      const options = node.options != null ? yield* eval_(node.options) : undefined;
-      return await client.subscribe(endpointId, options as any);
+    "fal/subscribe": async function* (entry: RuntimeEntry) {
+      const endpointId = (yield 0) as string;
+      const options =
+        entry.children.length > 1
+          ? ((yield 1) as Parameters<FalSdkClient["subscribe"]>[1])
+          : undefined;
+      return await client.subscribe(endpointId, options);
     },
 
-    "fal/queue_submit": async function* (node: FalQueueSubmitNode) {
-      const endpointId = yield* eval_(node.endpointId);
-      const options = node.options != null ? yield* eval_(node.options) : undefined;
-      return await client.queueSubmit(endpointId, options as any);
+    "fal/queue_submit": async function* (_entry: RuntimeEntry) {
+      const endpointId = (yield 0) as string;
+      const options = (yield 1) as Parameters<FalSdkQueueClient["submit"]>[1];
+      return await client.queueSubmit(endpointId, options);
     },
 
-    "fal/queue_status": async function* (node: FalQueueStatusNode) {
-      const endpointId = yield* eval_(node.endpointId);
-      const options = node.options != null ? yield* eval_(node.options) : undefined;
-      return await client.queueStatus(endpointId, options as any);
+    "fal/queue_status": async function* (_entry: RuntimeEntry) {
+      const endpointId = (yield 0) as string;
+      const options = (yield 1) as Parameters<FalSdkQueueClient["status"]>[1];
+      return await client.queueStatus(endpointId, options);
     },
 
-    "fal/queue_result": async function* (node: FalQueueResultNode) {
-      const endpointId = yield* eval_(node.endpointId);
-      const options = node.options != null ? yield* eval_(node.options) : undefined;
-      return await client.queueResult(endpointId, options as any);
+    "fal/queue_result": async function* (_entry: RuntimeEntry) {
+      const endpointId = (yield 0) as string;
+      const options = (yield 1) as Parameters<FalSdkQueueClient["result"]>[1];
+      return await client.queueResult(endpointId, options);
     },
 
-    "fal/queue_cancel": async function* (node: FalQueueCancelNode) {
-      const endpointId = yield* eval_(node.endpointId);
-      const options = node.options != null ? yield* eval_(node.options) : undefined;
-      await client.queueCancel(endpointId, options as any);
+    "fal/queue_cancel": async function* (_entry: RuntimeEntry) {
+      const endpointId = (yield 0) as string;
+      const options = (yield 1) as Parameters<FalSdkQueueClient["cancel"]>[1];
+      await client.queueCancel(endpointId, options);
       return undefined;
     },
-  });
+
+    "fal/record": async function* (entry: RuntimeEntry) {
+      const result: Record<string, unknown> = {};
+      for (let i = 0; i < entry.children.length; i += 2) {
+        const key = (yield i) as string;
+        const value = yield i + 1;
+        result[key] = value;
+      }
+      return result;
+    },
+
+    "fal/array": async function* (entry: RuntimeEntry) {
+      const result: unknown[] = [];
+      for (let i = 0; i < entry.children.length; i++) {
+        result.push(yield i);
+      }
+      return result;
+    },
+  };
 }
 
 function requiredEnv(name: "FAL_KEY"): string {
@@ -134,7 +128,9 @@ function requiredEnv(name: "FAL_KEY"): string {
   return value;
 }
 
-const dynamicImport = new Function("m", "return import(m)") as (moduleName: string) => Promise<any>;
+const dynamicImport = new Function("m", "return import(m)") as (
+  moduleName: string,
+) => Promise<Record<string, unknown>>;
 
 function lazyInterpreter(factory: () => Interpreter): Interpreter {
   let cached: Interpreter | undefined;
@@ -167,8 +163,10 @@ export const falInterpreter: Interpreter = lazyInterpreter(() => {
     if (!clientPromise) {
       const credentials = requiredEnv("FAL_KEY");
       clientPromise = dynamicImport("@fal-ai/client").then((moduleValue) => {
-        const falClient = moduleValue.fal;
-        falClient.config({ credentials });
+        const falClient = moduleValue.fal as FalSdkClient;
+        (falClient as unknown as { config: (o: { credentials: string }) => void }).config({
+          credentials,
+        });
         return wrapFalSdk(falClient);
       });
     }
@@ -176,47 +174,29 @@ export const falInterpreter: Interpreter = lazyInterpreter(() => {
   };
 
   return createFalInterpreter({
-    async run(
-      endpointId: string,
-      options?: Parameters<FalSdkClient["run"]>[1],
-    ): Promise<Result<unknown>> {
-      const client = await getClient();
-      return client.run(endpointId, options);
+    async run(endpointId, options) {
+      const c = await getClient();
+      return c.run(endpointId, options);
     },
-    async subscribe(
-      endpointId: string,
-      options?: Parameters<FalSdkClient["subscribe"]>[1],
-    ): Promise<Result<unknown>> {
-      const client = await getClient();
-      return client.subscribe(endpointId, options);
+    async subscribe(endpointId, options) {
+      const c = await getClient();
+      return c.subscribe(endpointId, options);
     },
-    async queueSubmit(
-      endpointId: string,
-      options: Parameters<FalSdkQueueClient["submit"]>[1],
-    ): Promise<unknown> {
-      const client = await getClient();
-      return client.queueSubmit(endpointId, options);
+    async queueSubmit(endpointId, options) {
+      const c = await getClient();
+      return c.queueSubmit(endpointId, options);
     },
-    async queueStatus(
-      endpointId: string,
-      options: Parameters<FalSdkQueueClient["status"]>[1],
-    ): Promise<QueueStatus> {
-      const client = await getClient();
-      return client.queueStatus(endpointId, options);
+    async queueStatus(endpointId, options) {
+      const c = await getClient();
+      return c.queueStatus(endpointId, options);
     },
-    async queueResult(
-      endpointId: string,
-      options: Parameters<FalSdkQueueClient["result"]>[1],
-    ): Promise<unknown> {
-      const client = await getClient();
-      return client.queueResult(endpointId, options);
+    async queueResult(endpointId, options) {
+      const c = await getClient();
+      return c.queueResult(endpointId, options);
     },
-    async queueCancel(
-      endpointId: string,
-      options: Parameters<FalSdkQueueClient["cancel"]>[1],
-    ): Promise<void> {
-      const client = await getClient();
-      await client.queueCancel(endpointId, options);
+    async queueCancel(endpointId, options) {
+      const c = await getClient();
+      await c.queueCancel(endpointId, options);
     },
   });
 });

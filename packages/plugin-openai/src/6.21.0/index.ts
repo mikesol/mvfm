@@ -1,131 +1,65 @@
 // ============================================================
-// MVFM PLUGIN: openai (openai-node compatible API)
+// MVFM PLUGIN: openai (openai-node compatible API) — unified Plugin
 // ============================================================
 //
-// Implementation status: PARTIAL (4 of 22 top-level resources)
-// Plugin size: SMALL — fully implemented for "AI text" scope
+// Ported to the unified Plugin type with makeCExpr and
+// index-based fold handlers. Config captured in interpreter
+// closure, not stored on AST nodes.
 //
 // Implemented:
 //   - Chat Completions: create, retrieve, list, update, delete
 //   - Embeddings: create
 //   - Moderations: create
 //   - Completions (legacy): create
-//
-// Not doable (fundamental mismatch with AST model):
-//   - Streaming (stream: true) — returns async iterable Stream<ChatCompletionChunk>,
-//     not a finite request-response. Omitted from params entirely.
-//   - Auto-pagination — list() returns first page. Full pagination
-//     via $.rec() with has_more/after logic.
-//   - Realtime API — WebSocket-based, bidirectional push.
-//   - File uploads — files.create() takes Uploadable (binary stream).
-//
-// Remaining (same request-response pattern, add as needed):
-//   images, audio, files, models, fine-tuning, vector-stores,
-//   batches, uploads, responses, beta, graders, evals,
-//   containers, skills, videos, conversations, webhooks.
-//
-//   Each resource follows the same pattern: add node kinds,
-//   add methods to OpenAIMethods, add switch cases to the
-//   interpreter. The interpreter/handler architecture does
-//   not need to change — openai/api_call covers everything.
-//
-// ============================================================
-//
-// Goal: An LLM that knows openai-node should be able to write
-// Mvfm programs with near-zero learning curve. The API hugs the
-// real openai-node SDK 1:1.
-//
-// Real openai-node API (v6.21.0):
-//   const openai = new OpenAI({ apiKey: 'sk-...' })
-//   const completion = await openai.chat.completions.create({ model: 'gpt-4o', messages: [...] })
-//   const completion = await openai.chat.completions.retrieve('cmpl_123')
-//   const completions = await openai.chat.completions.list({ model: 'gpt-4o' })
-//   const updated = await openai.chat.completions.update('cmpl_123', { metadata: {...} })
-//   const deleted = await openai.chat.completions.delete('cmpl_123')
-//   const embedding = await openai.embeddings.create({ model: 'text-embedding-3-small', input: 'hello' })
-//   const moderation = await openai.moderations.create({ input: 'some text' })
-//   const completion = await openai.completions.create({ model: 'gpt-3.5-turbo-instruct', prompt: 'Say hello' })
-//
-// Based on source-level analysis of openai-node v6.21.0
-// (github.com/openai/openai-node). The SDK extends APIResource
-// with methods calling this._client.post/get/delete with path
-// and body/options.
-//
 // ============================================================
 
-import type { Expr, PluginContext } from "@mvfm/core";
-import { definePlugin } from "@mvfm/core";
+import type { CExpr, Interpreter, KindSpec, Plugin } from "@mvfm/core";
+import { isCExpr, makeCExpr } from "@mvfm/core";
 import type {
   ChatCompletion,
-  ChatCompletionCreateParamsNonStreaming,
   ChatCompletionDeleted,
-  ChatCompletionListParams,
   ChatCompletionsPage,
-  ChatCompletionUpdateParams,
 } from "openai/resources/chat/completions/completions";
-import type { Completion, CompletionCreateParamsNonStreaming } from "openai/resources/completions";
-import type { CreateEmbeddingResponse, EmbeddingCreateParams } from "openai/resources/embeddings";
-import type {
-  ModerationCreateParams,
-  ModerationCreateResponse,
-} from "openai/resources/moderations";
-import { openaiInterpreter } from "./interpreter";
+import type { Completion } from "openai/resources/completions";
+import type { CreateEmbeddingResponse } from "openai/resources/embeddings";
+import type { ModerationCreateResponse } from "openai/resources/moderations";
+import { wrapOpenAISdk } from "./client-openai-sdk";
+import { createOpenAIInterpreter, type OpenAIClient } from "./interpreter";
 
-// ---- What the plugin adds to $ ----------------------------
+// ---- liftArg: recursive plain-value → CExpr lifting --------
 
 /**
- * OpenAI operations added to the DSL context by the openai plugin.
- *
- * Mirrors the openai-node SDK resource API: chat completions,
- * embeddings, moderations, and legacy completions. Each resource
- * exposes methods that produce namespaced AST nodes.
+ * Recursively lifts a plain value into a CExpr tree.
+ * - CExpr values are returned as-is.
+ * - Primitives are returned as-is (elaborate lifts them).
+ * - Plain objects become `openai/record` CExprs with key-value child pairs.
+ * - Arrays become `openai/array` CExprs.
  */
-export interface OpenAIMethods {
-  /** OpenAI API operations, namespaced under `$.openai`. */
-  openai: {
-    chat: {
-      completions: {
-        /** Create a chat completion (non-streaming). */
-        create(
-          params:
-            | Expr<ChatCompletionCreateParamsNonStreaming>
-            | ChatCompletionCreateParamsNonStreaming,
-        ): Expr<ChatCompletion>;
-        /** Retrieve a chat completion by ID. */
-        retrieve(id: Expr<string> | string): Expr<ChatCompletion>;
-        /** List chat completions with optional filter params. */
-        list(
-          params?: Expr<ChatCompletionListParams> | ChatCompletionListParams,
-        ): Expr<ChatCompletionsPage>;
-        /** Update a chat completion by ID. */
-        update(
-          id: Expr<string> | string,
-          params: Expr<ChatCompletionUpdateParams> | ChatCompletionUpdateParams,
-        ): Expr<ChatCompletion>;
-        /** Delete a chat completion by ID. */
-        delete(id: Expr<string> | string): Expr<ChatCompletionDeleted>;
-      };
-    };
-    embeddings: {
-      /** Create embeddings for the given input. */
-      create(
-        params: Expr<EmbeddingCreateParams> | EmbeddingCreateParams,
-      ): Expr<CreateEmbeddingResponse>;
-    };
-    moderations: {
-      /** Classify text for policy compliance. */
-      create(
-        params: Expr<ModerationCreateParams> | ModerationCreateParams,
-      ): Expr<ModerationCreateResponse>;
-    };
-    completions: {
-      /** Create a legacy completion (non-streaming). */
-      create(
-        params: Expr<CompletionCreateParamsNonStreaming> | CompletionCreateParamsNonStreaming,
-      ): Expr<Completion>;
-    };
-  };
+function liftArg(value: unknown): unknown {
+  if (isCExpr(value)) return value;
+  if (typeof value === "string") return value;
+  if (typeof value === "number") return value;
+  if (typeof value === "boolean") return value;
+  if (value === null || value === undefined) return value;
+  if (Array.isArray(value)) {
+    return makeCExpr("openai/array", value.map(liftArg));
+  }
+  if (typeof value === "object") {
+    const pairs: unknown[] = [];
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      pairs.push(k, liftArg(v));
+    }
+    return makeCExpr("openai/record", pairs);
+  }
+  return value;
 }
+
+// liftArg erases generic type info at runtime (returns unknown).
+// Cast helper restores the declared CExpr Args types for ExtractKinds.
+const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]>(
+  kind: Kind,
+  args: readonly unknown[],
+) => CExpr<O, Kind, Args>;
 
 // ---- Configuration ----------------------------------------
 
@@ -144,175 +78,161 @@ export interface OpenAIConfig {
   project?: string;
 }
 
-// ---- Plugin implementation --------------------------------
+// ---- Constructor builder ----------------------------------
 
 /**
- * OpenAI plugin factory. Namespace: `openai/`.
+ * Builds the openai constructor methods using makeCExpr + liftArg.
  *
- * Creates a plugin that exposes chat completions, embeddings,
- * moderations, and legacy completions for building parameterized
- * OpenAI API call AST nodes.
- *
- * @param config - An {@link OpenAIConfig} with apiKey and optional org/project.
- * @returns A PluginDefinition for the openai plugin.
+ * Constructors use permissive generics so any argument type is accepted
+ * at construction time. Validation happens at `app()` time via KindSpec.
  */
-export function openai(config: OpenAIConfig) {
-  return definePlugin({
-    name: "openai",
-    nodeKinds: [
-      "openai/create_chat_completion",
-      "openai/retrieve_chat_completion",
-      "openai/list_chat_completions",
-      "openai/update_chat_completion",
-      "openai/delete_chat_completion",
-      "openai/create_embedding",
-      "openai/create_moderation",
-      "openai/create_completion",
-    ],
-    defaultInterpreter: () => openaiInterpreter,
-
-    build(ctx: PluginContext): OpenAIMethods {
-      function resolveId(id: Expr<string> | string) {
-        return ctx.isExpr(id) ? id.__node : ctx.lift(id).__node;
-      }
-
-      function resolveParams<T>(params: Expr<T> | T) {
-        return ctx.lift(params).__node;
-      }
-
-      return {
-        openai: {
-          chat: {
-            completions: {
-              create(params) {
-                return ctx.expr({
-                  kind: "openai/create_chat_completion",
-                  params: resolveParams(params),
-                  config,
-                });
-              },
-
-              retrieve(id) {
-                return ctx.expr({
-                  kind: "openai/retrieve_chat_completion",
-                  id: resolveId(id),
-                  config,
-                });
-              },
-
-              list(params?) {
-                return ctx.expr({
-                  kind: "openai/list_chat_completions",
-                  params: params != null ? resolveParams(params) : null,
-                  config,
-                });
-              },
-
-              update(id, params) {
-                return ctx.expr({
-                  kind: "openai/update_chat_completion",
-                  id: resolveId(id),
-                  params: resolveParams(params),
-                  config,
-                });
-              },
-
-              delete(id) {
-                return ctx.expr({
-                  kind: "openai/delete_chat_completion",
-                  id: resolveId(id),
-                  config,
-                });
-              },
-            },
-          },
-
-          embeddings: {
-            create(params) {
-              return ctx.expr({
-                kind: "openai/create_embedding",
-                params: resolveParams(params),
-                config,
-              });
-            },
-          },
-
-          moderations: {
-            create(params) {
-              return ctx.expr({
-                kind: "openai/create_moderation",
-                params: resolveParams(params),
-                config,
-              });
-            },
-          },
-
-          completions: {
-            create(params) {
-              return ctx.expr({
-                kind: "openai/create_completion",
-                params: resolveParams(params),
-                config,
-              });
-            },
-          },
+function buildOpenAIApi() {
+  return {
+    chat: {
+      completions: {
+        /** Create a chat completion (non-streaming). */
+        create<A>(params: A): CExpr<ChatCompletion, "openai/create_chat_completion", [A]> {
+          return mk("openai/create_chat_completion", [liftArg(params)]);
         },
-      };
+        /** Retrieve a chat completion by ID. */
+        retrieve<A>(id: A): CExpr<ChatCompletion, "openai/retrieve_chat_completion", [A]> {
+          return mk("openai/retrieve_chat_completion", [id]);
+        },
+        /** List chat completions with optional filter params. */
+        list<A extends readonly unknown[]>(
+          ...params: A
+        ): CExpr<ChatCompletionsPage, "openai/list_chat_completions", A> {
+          return mk(
+            "openai/list_chat_completions",
+            params.map((p) => liftArg(p)),
+          );
+        },
+        /** Update a chat completion by ID. */
+        update<A, B>(
+          id: A,
+          params: B,
+        ): CExpr<ChatCompletion, "openai/update_chat_completion", [A, B]> {
+          return mk("openai/update_chat_completion", [id, liftArg(params)]);
+        },
+        /** Delete a chat completion by ID. */
+        delete<A>(id: A): CExpr<ChatCompletionDeleted, "openai/delete_chat_completion", [A]> {
+          return mk("openai/delete_chat_completion", [id]);
+        },
+      },
     },
-  });
+    embeddings: {
+      /** Create embeddings for the given input. */
+      create<A>(params: A): CExpr<CreateEmbeddingResponse, "openai/create_embedding", [A]> {
+        return mk("openai/create_embedding", [liftArg(params)]);
+      },
+    },
+    moderations: {
+      /** Classify text for policy compliance. */
+      create<A>(params: A): CExpr<ModerationCreateResponse, "openai/create_moderation", [A]> {
+        return mk("openai/create_moderation", [liftArg(params)]);
+      },
+    },
+    completions: {
+      /** Create a legacy completion (non-streaming). */
+      create<A>(params: A): CExpr<Completion, "openai/create_completion", [A]> {
+        return mk("openai/create_completion", [liftArg(params)]);
+      },
+    },
+  };
 }
 
-// ============================================================
-// HONEST ASSESSMENT: What works, what's hard, what breaks
-// ============================================================
-//
-// WORKS GREAT:
-//
-// 1. Chat completions (non-streaming):
-//    Real:  const c = await openai.chat.completions.create({ model: 'gpt-4o', messages: [...] })
-//    Mvfm:   const c = $.openai.chat.completions.create({ model: 'gpt-4o', messages: [...] })
-//    Nearly identical. Only difference is $ prefix and no await.
-//
-// 2. Embeddings:
-//    Real:  const e = await openai.embeddings.create({ model: 'text-embedding-3-small', input: 'hello' })
-//    Mvfm:   const e = $.openai.embeddings.create({ model: 'text-embedding-3-small', input: 'hello' })
-//    1:1 mapping.
-//
-// 3. Resource method naming:
-//    Real:  openai.chat.completions.create(...)
-//    Mvfm:   $.openai.chat.completions.create(...)
-//    The nested resource pattern maps 1:1. An LLM that knows
-//    openai-node can write Mvfm OpenAI programs immediately.
-//
-// WORKS BUT DIFFERENT:
-//
-// 4. Return types:
-//    Mvfm now uses openai-node SDK types (ChatCompletion,
-//    CreateEmbeddingResponse, etc.) for both params and returns.
-//    IDE autocomplete works for OpenAI-specific fields via Expr<T>.
-//
-// 5. Sequencing side effects:
-//    Real:  await openai.chat.completions.create(...)
-//           await openai.embeddings.create(...)
-//    Mvfm:   const c = $.openai.chat.completions.create(...)
-//           const e = $.openai.embeddings.create(...)
-//           return $.begin(c, e)
-//    Must use $.begin() for sequencing.
-//
-// DOESN'T WORK / NOT MODELED:
-//
-// 6. Streaming (stream: true):
-//    Real:  const stream = await openai.chat.completions.create({ stream: true, ... })
-//           for await (const chunk of stream) { ... }
-//    Mvfm:   Not modeled. Async iterators are not request-response.
-//           The stream parameter is omitted entirely.
-//
-// 7. Auto-pagination:
-//    Real:  for await (const c of openai.chat.completions.list()) { ... }
-//    Mvfm:   Returns first page only. Use $.rec() with has_more/after.
-//
-// 8. RequestOptions (second argument):
-//    Real:  openai.chat.completions.create({...}, { timeout: 5000 })
-//    Mvfm:   Not modeled. These are runtime concerns.
-//
-// ============================================================
+// ---- Default interpreter wiring ---------------------------
+
+const dynamicImport = new Function("m", "return import(m)") as (
+  moduleName: string,
+) => Promise<Record<string, unknown>>;
+
+function createDefaultInterpreter(config: OpenAIConfig): Interpreter {
+  let clientPromise: Promise<OpenAIClient> | undefined;
+  const getClient = async (): Promise<OpenAIClient> => {
+    if (!clientPromise) {
+      clientPromise = dynamicImport("openai").then((moduleValue) => {
+        const OpenAI = moduleValue.default as new (
+          opts: OpenAIConfig,
+        ) => Parameters<typeof wrapOpenAISdk>[0];
+        return wrapOpenAISdk(new OpenAI(config));
+      });
+    }
+    return clientPromise;
+  };
+
+  const lazyClient: OpenAIClient = {
+    async request(method: string, path: string, body?: Record<string, unknown>): Promise<unknown> {
+      const client = await getClient();
+      return client.request(method, path, body);
+    },
+  };
+
+  return createOpenAIInterpreter(lazyClient);
+}
+
+// ---- Plugin factory ---------------------------------------
+
+/**
+ * Creates the openai plugin definition (unified Plugin type).
+ *
+ * @param config - An {@link OpenAIConfig} with apiKey and optional org/project.
+ * @returns A unified Plugin that contributes `$.openai`.
+ */
+export function openai(config: OpenAIConfig) {
+  return {
+    name: "openai" as const,
+    ctors: { openai: buildOpenAIApi() },
+    kinds: {
+      "openai/create_chat_completion": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "openai/retrieve_chat_completion": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "openai/list_chat_completions": {
+        inputs: [] as unknown[],
+        output: undefined as unknown,
+      } as KindSpec<unknown[], unknown>,
+      "openai/update_chat_completion": {
+        inputs: [undefined, undefined] as [unknown, unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown, unknown], unknown>,
+      "openai/delete_chat_completion": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "openai/create_embedding": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "openai/create_moderation": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "openai/create_completion": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      // Structural helpers (produced by liftArg)
+      "openai/record": {
+        inputs: [] as unknown[],
+        output: {} as Record<string, unknown>,
+      } as KindSpec<unknown[], Record<string, unknown>>,
+      "openai/array": {
+        inputs: [] as unknown[],
+        output: [] as unknown[],
+      } as KindSpec<unknown[], unknown[]>,
+    },
+    traits: {},
+    lifts: {},
+    defaultInterpreter: (): Interpreter => createDefaultInterpreter(config),
+  } satisfies Plugin;
+}
+
+/**
+ * Alias for {@link openai}, kept for readability at call sites.
+ */
+export const openaiPlugin = openai;

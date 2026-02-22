@@ -5,39 +5,59 @@
 ```ts
 
 import type { ChatCompletion } from 'openai/resources/chat/completions/completions';
-import type { ChatCompletionCreateParamsNonStreaming } from 'openai/resources/chat/completions/completions';
 import type { ChatCompletionDeleted } from 'openai/resources/chat/completions/completions';
-import type { ChatCompletionListParams } from 'openai/resources/chat/completions/completions';
 import type { ChatCompletionsPage } from 'openai/resources/chat/completions/completions';
-import type { ChatCompletionUpdateParams } from 'openai/resources/chat/completions/completions';
 import type { Completion } from 'openai/resources/completions';
-import type { CompletionCreateParamsNonStreaming } from 'openai/resources/completions';
 import type { CreateEmbeddingResponse } from 'openai/resources/embeddings';
-import type { EmbeddingCreateParams } from 'openai/resources/embeddings';
-import type { ModerationCreateParams } from 'openai/resources/moderations';
 import type { ModerationCreateResponse } from 'openai/resources/moderations';
 import type OpenAI from 'openai';
-
-// @public
-export interface ClientHandlerOptions {
-    baseUrl: string;
-    contractHash: string;
-    fetch?: typeof globalThis.fetch;
-    headers?: Record<string, string>;
-}
 
 // Warning: (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter;
-
-// @public
 export function createOpenAIInterpreter(client: OpenAIClient): Interpreter;
 
-// Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
-//
 // @public
-export function openai(config: OpenAIConfig): PluginDefinition<OpenAIMethods, {}, "openai/create_chat_completion" | "openai/retrieve_chat_completion" | "openai/list_chat_completions" | "openai/update_chat_completion" | "openai/delete_chat_completion" | "openai/create_embedding" | "openai/create_moderation" | "openai/create_completion">;
+export function openai(config: OpenAIConfig): {
+    name: "openai";
+    ctors: {
+        openai: {
+            chat: {
+                completions: {
+                    create<A>(params: A): CExpr<ChatCompletion, "openai/create_chat_completion", [A]>;
+                    retrieve<A>(id: A): CExpr<ChatCompletion, "openai/retrieve_chat_completion", [A]>;
+                    list<A extends readonly unknown[]>(...params: A): CExpr<ChatCompletionsPage, "openai/list_chat_completions", A>;
+                    update<A, B>(id: A, params: B): CExpr<ChatCompletion, "openai/update_chat_completion", [A, B]>;
+                    delete<A>(id: A): CExpr<ChatCompletionDeleted, "openai/delete_chat_completion", [A]>;
+                };
+            };
+            embeddings: {
+                create<A>(params: A): CExpr<CreateEmbeddingResponse, "openai/create_embedding", [A]>;
+            };
+            moderations: {
+                create<A>(params: A): CExpr<ModerationCreateResponse, "openai/create_moderation", [A]>;
+            };
+            completions: {
+                create<A>(params: A): CExpr<Completion, "openai/create_completion", [A]>;
+            };
+        };
+    };
+    kinds: {
+        "openai/create_chat_completion": KindSpec<[unknown], unknown>;
+        "openai/retrieve_chat_completion": KindSpec<[unknown], unknown>;
+        "openai/list_chat_completions": KindSpec<unknown[], unknown>;
+        "openai/update_chat_completion": KindSpec<[unknown, unknown], unknown>;
+        "openai/delete_chat_completion": KindSpec<[unknown], unknown>;
+        "openai/create_embedding": KindSpec<[unknown], unknown>;
+        "openai/create_moderation": KindSpec<[unknown], unknown>;
+        "openai/create_completion": KindSpec<[unknown], unknown>;
+        "openai/record": KindSpec<unknown[], Record<string, unknown>>;
+        "openai/array": KindSpec<unknown[], unknown[]>;
+    };
+    traits: {};
+    lifts: {};
+    defaultInterpreter: () => Interpreter;
+};
 
 // @public
 export interface OpenAIClient {
@@ -55,43 +75,15 @@ export interface OpenAIConfig {
 export const openaiInterpreter: Interpreter;
 
 // @public
-export interface OpenAIMethods {
-    openai: {
-        chat: {
-            completions: {
-                create(params: Expr<ChatCompletionCreateParamsNonStreaming> | ChatCompletionCreateParamsNonStreaming): Expr<ChatCompletion>;
-                retrieve(id: Expr<string> | string): Expr<ChatCompletion>;
-                list(params?: Expr<ChatCompletionListParams> | ChatCompletionListParams): Expr<ChatCompletionsPage>;
-                update(id: Expr<string> | string, params: Expr<ChatCompletionUpdateParams> | ChatCompletionUpdateParams): Expr<ChatCompletion>;
-                delete(id: Expr<string> | string): Expr<ChatCompletionDeleted>;
-            };
-        };
-        embeddings: {
-            create(params: Expr<EmbeddingCreateParams> | EmbeddingCreateParams): Expr<CreateEmbeddingResponse>;
-        };
-        moderations: {
-            create(params: Expr<ModerationCreateParams> | ModerationCreateParams): Expr<ModerationCreateResponse>;
-        };
-        completions: {
-            create(params: Expr<CompletionCreateParamsNonStreaming> | CompletionCreateParamsNonStreaming): Expr<Completion>;
-        };
-    };
-}
-
-// Warning: (ae-forgotten-export) The symbol "TypedNode" needs to be exported by the entry point index.d.ts
-//
-// @public
-export function serverEvaluate(client: OpenAIClient, baseInterpreter: Interpreter): (root: TypedNode) => Promise<unknown>;
-
-// @public
-export function serverInterpreter(client: OpenAIClient): Interpreter;
+export const openaiPlugin: typeof openai;
 
 // @public
 export function wrapOpenAISdk(client: OpenAI): OpenAIClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/6.21.0/index.d.ts:19:17 - (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
+// dist/6.21.0/index.d.ts:33:21 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/6.21.0/index.d.ts:59:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

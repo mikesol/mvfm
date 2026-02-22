@@ -1,194 +1,161 @@
-import { mvfm, num, str } from "@mvfm/core";
+import { createApp, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { postgres } from "../../src/3.4.8";
 
-function strip(ast: unknown): unknown {
-  return JSON.parse(
-    JSON.stringify(ast, (k, v) => (k === "__id" || k === "config" ? undefined : v)),
-  );
-}
+const plugin = postgres("postgres://localhost/test");
+const plugins = [numPluginU, strPluginU, plugin] as const;
+const $ = mvfmU(...plugins);
+const app = createApp(...plugins);
 
-const app = mvfm(num, str, postgres("postgres://localhost/test"));
-
-// ============================================================
-// Parity tests: encoding the Honest Assessment Matrix
-// ============================================================
-
-describe("postgres: tagged template queries", () => {
-  it("basic query produces postgres/query node", () => {
-    const prog = app(($) => {
-      return $.sql`select * from users where age > ${30}`;
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("postgres/query");
-    expect(ast.result.strings).toEqual(["select * from users where age > ", ""]);
-    expect(ast.result.params).toHaveLength(1);
-    expect(ast.result.params[0].kind).toBe("core/literal");
-    expect(ast.result.params[0].value).toBe(30);
+describe("postgres: CExpr construction (tagged template)", () => {
+  it("basic query produces postgres/query CExpr", () => {
+    const expr = $.sql`select * from users where age > ${30}`;
+    expect(expr.__kind).toBe("postgres/query");
+    // args: [numStrings=2, "select * from users where age > ", "", 30]
+    expect(expr.__args[0]).toBe(2);
+    expect(expr.__args[1]).toBe("select * from users where age > ");
+    expect(expr.__args[2]).toBe("");
+    expect(expr.__args[3]).toBe(30);
   });
 
-  it("parameterized query with Expr values captures dependency", () => {
-    const prog = app(($) => {
-      const user = $.sql`select * from users where id = ${$.input.id}`;
-      const posts = $.sql`select * from posts where user_id = ${user[0].id}`;
-      return { user: user[0], posts };
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/record");
-    expect(ast.result.fields.posts.kind).toBe("postgres/query");
-    // The param should reference through prop_access chain, not a literal
-    const postParam = ast.result.fields.posts.params[0];
-    expect(postParam.kind).toBe("core/prop_access");
+  it("query with no params produces correct args", () => {
+    const expr = $.sql`select 1`;
+    expect(expr.__kind).toBe("postgres/query");
+    expect(expr.__args[0]).toBe(1); // numStrings
+    expect(expr.__args[1]).toBe("select 1");
+    expect(expr.__args).toHaveLength(2); // numStrings + 1 string part, no params
   });
 
-  it("query with no params produces empty params array", () => {
-    const prog = app(($) => $.sql`select 1`);
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.params).toEqual([]);
+  it("query elaborates to NExpr without error", () => {
+    expect(() => app($.sql`select * from users where age > ${30}`)).not.toThrow();
+  });
+
+  it("parameterized query with CExpr values captures dependency", () => {
+    const user = $.sql`select * from users where id = ${1}`;
+    const posts = $.sql`select * from posts where user_id = ${user[0].id}`;
+    // Should elaborate without error — dependency captured via proxy
+    expect(() => app(posts)).not.toThrow();
   });
 });
 
 describe("postgres: dynamic identifiers ($.sql.id)", () => {
-  it("produces postgres/identifier node", () => {
-    const prog = app(($) => {
-      return $.sql`select ${$.sql.id("name")} from users`;
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("postgres/query");
-    expect(ast.result.params[0].kind).toBe("postgres/identifier");
+  it("produces postgres/identifier CExpr", () => {
+    const expr = $.sql.id("name");
+    expect(expr.__kind).toBe("postgres/identifier");
+    expect(expr.__args[0]).toBe("name");
   });
 
-  it("accepts Expr<string> argument", () => {
-    const prog = app(($) => {
-      return $.sql`select ${$.sql.id($.input.column)} from users`;
-    });
-    const ast = strip(prog.ast) as any;
-    const idNode = ast.result.params[0];
-    expect(idNode.kind).toBe("postgres/identifier");
-    expect(idNode.name.kind).toBe("core/prop_access");
+  it("accepts CExpr argument", () => {
+    const col = $.sql`select 1`[0].column;
+    const expr = $.sql.id(col);
+    expect(expr.__kind).toBe("postgres/identifier");
+  });
+
+  it("identifier inside query elaborates", () => {
+    expect(() => app($.sql`select ${$.sql.id("name")} from users`)).not.toThrow();
   });
 });
 
 describe("postgres: insert helper ($.sql.insert)", () => {
-  it("produces postgres/insert_helper node", () => {
-    const prog = app(($) => {
-      return $.sql`insert into users ${$.sql.insert($.input.user, ["name", "age"])} returning *`;
-    });
-    const ast = strip(prog.ast) as any;
-    const insertNode = ast.result.params[0];
-    expect(insertNode.kind).toBe("postgres/insert_helper");
-    expect(insertNode.columns).toEqual(["name", "age"]);
+  it("produces postgres/insert_helper CExpr", () => {
+    const data = $.sql`select 1`[0];
+    const expr = $.sql.insert(data, ["name", "age"]);
+    expect(expr.__kind).toBe("postgres/insert_helper");
+    // arg[1] should be JSON-encoded columns
+    expect(expr.__args[1]).toBe('["name","age"]');
+  });
+
+  it("insert with no columns stores null", () => {
+    const data = $.sql`select 1`[0];
+    const expr = $.sql.insert(data);
+    expect(expr.__args[1]).toBe("null");
   });
 });
 
 describe("postgres: set helper ($.sql.set)", () => {
-  it("produces postgres/set_helper node", () => {
-    const prog = app(($) => {
-      return $.sql`update users set ${$.sql.set($.input.data, ["name", "age"])} where id = ${$.input.id}`;
-    });
-    const ast = strip(prog.ast) as any;
-    // First param is the set helper, second is the id
-    const setNode = ast.result.params[0];
-    expect(setNode.kind).toBe("postgres/set_helper");
-    expect(setNode.columns).toEqual(["name", "age"]);
+  it("produces postgres/set_helper CExpr", () => {
+    const data = $.sql`select 1`[0];
+    const expr = $.sql.set(data, ["name", "age"]);
+    expect(expr.__kind).toBe("postgres/set_helper");
+    expect(expr.__args[1]).toBe('["name","age"]');
   });
 });
 
 describe("postgres: transactions", () => {
-  it("pipeline mode (array return) produces postgres/begin with mode=pipeline", () => {
-    const prog = app(($) => {
-      return $.sql.begin((sql) => [
-        sql`update users set active = false where id = ${$.input.id}`,
-        sql`insert into audit_log (action) values ('deactivate')`,
-      ]);
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("postgres/begin");
-    expect(ast.result.mode).toBe("pipeline");
-    expect(ast.result.queries).toHaveLength(2);
-    expect(ast.result.queries[0].kind).toBe("postgres/query");
-    expect(ast.result.queries[1].kind).toBe("postgres/query");
+  it("pipeline mode produces postgres/begin CExpr with mode=pipeline", () => {
+    const expr = $.sql.begin((sql) => [
+      sql`update users set active = false where id = ${1}`,
+      sql`insert into audit_log (action) values ('deactivate')`,
+    ]);
+    expect(expr.__kind).toBe("postgres/begin");
+    expect(expr.__args[0]).toBe("pipeline");
+    expect(expr.__args).toHaveLength(3); // mode + 2 queries
   });
 
-  it("callback mode (Expr return) produces postgres/begin with mode=callback", () => {
-    const prog = app(($) => {
-      return $.sql.begin((sql) => {
-        const user = sql`insert into users (name) values ('test') returning *`;
-        const account = sql`insert into accounts (user_id) values (${user[0].id}) returning *`;
-        return $.begin(user, account, { user: user[0], account: account[0] });
-      });
+  it("callback mode produces postgres/begin CExpr with mode=callback", () => {
+    const expr = $.sql.begin((sql) => {
+      const user = sql`insert into users (name) values ('test') returning *`;
+      return user;
     });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("postgres/begin");
-    expect(ast.result.mode).toBe("callback");
-    expect(ast.result.body.kind).toBe("core/begin");
+    expect(expr.__kind).toBe("postgres/begin");
+    expect(expr.__args[0]).toBe("callback");
+    expect(expr.__args).toHaveLength(2); // mode + body
   });
 
   it("transaction sql instance has savepoint", () => {
-    const prog = app(($) => {
-      return $.sql.begin((sql) => {
-        const user = sql`select * from users where id = ${$.input.id}`;
-        const sp = (sql as any).savepoint((sql2: any) => [
-          sql2`update users set name = 'test' where id = ${user[0].id}`,
-        ]);
-        return $.begin(sp, user[0]);
-      });
+    const expr = $.sql.begin((sql) => {
+      return (sql as unknown as { savepoint: Function }).savepoint((sql2: typeof sql) => [
+        sql2`update users set name = 'test'`,
+      ]);
     });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("postgres/begin");
-    const doNode = ast.result.body;
-    expect(doNode.kind).toBe("core/begin");
-    expect(doNode.steps[0].kind).toBe("postgres/savepoint");
+    expect(expr.__kind).toBe("postgres/begin");
+    // The body is a savepoint CExpr
+    const body = expr.__args[1] as { __kind: string };
+    expect(body.__kind).toBe("postgres/savepoint");
+  });
+
+  it("transaction elaborates", () => {
+    expect(() =>
+      app(
+        $.sql.begin((sql) => [
+          sql`update users set active = false where id = ${1}`,
+          sql`insert into audit_log (action) values ('deactivate')`,
+        ]),
+      ),
+    ).not.toThrow();
   });
 });
 
 describe("postgres: cursor", () => {
-  it("$.sql.cursor() produces postgres/cursor node", () => {
-    const prog = app(($) => {
-      const query = $.sql`select * from users`;
-      return $.sql.cursor(query, 100, (batch: any) => {
-        return $.sql`insert into archive ${$.sql.insert(batch)}`;
-      });
+  it("produces postgres/cursor CExpr", () => {
+    const query = $.sql`select * from users`;
+    const expr = $.sql.cursor(query, 100, (batch) => {
+      return $.sql`insert into archive ${$.sql.insert(batch)}`;
     });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("postgres/cursor");
-    expect(ast.result.query.kind).toBe("postgres/query");
-    expect(ast.result.batchSize.kind).toBe("core/literal");
-    expect(ast.result.batchSize.value).toBe(100);
-    expect(ast.result.body.kind).toBe("postgres/query");
+    expect(expr.__kind).toBe("postgres/cursor");
+    expect(expr.__args).toHaveLength(3); // query, batchSize, body
   });
 
-  it("cursor batch parameter is a postgres/cursor_batch node", () => {
-    const prog = app(($) => {
-      const query = $.sql`select * from users`;
-      return $.sql.cursor(query, 50, (batch: any) => {
-        return batch; // just return the batch proxy itself
-      });
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("postgres/cursor");
-    expect(ast.result.body.kind).toBe("postgres/cursor_batch");
-    expect(ast.result.batchSize.value).toBe(50);
+  it("cursor batch parameter is a postgres/cursor_batch CExpr", () => {
+    const query = $.sql`select * from users`;
+    const expr = $.sql.cursor(query, 50, (batch) => batch);
+    expect(expr.__kind).toBe("postgres/cursor");
+    const body = expr.__args[2] as { __kind: string };
+    expect(body.__kind).toBe("postgres/cursor_batch");
   });
 });
 
-describe("postgres: integration with $.begin()", () => {
-  it("side-effecting queries wrapped in $.begin() are reachable", () => {
-    expect(() => {
-      app(($) => {
-        const user = $.sql`select * from users where id = ${$.input.id}`;
-        return $.begin($.sql`update users set last_seen = now() where id = ${$.input.id}`, user[0]);
-      });
-    }).not.toThrow();
+describe("postgres: plugin structure", () => {
+  it("has correct name and kinds", () => {
+    expect(plugin.name).toBe("postgres");
+    expect(Object.keys(plugin.kinds)).toContain("postgres/query");
+    expect(Object.keys(plugin.kinds)).toContain("postgres/begin");
+    expect(Object.keys(plugin.kinds)).toContain("postgres/cursor");
+    expect(Object.keys(plugin.kinds)).toHaveLength(10);
   });
 
-  it("orphaned queries are rejected", () => {
-    expect(() => {
-      app(($) => {
-        const user = $.sql`select * from users where id = ${$.input.id}`;
-        $.sql`update users set last_seen = now() where id = ${$.input.id}`; // orphan!
-        return user[0];
-      });
-    }).toThrow(/unreachable node/i);
+  it("string config accepted", () => {
+    const p = postgres("postgres://localhost:5432/mydb");
+    expect(p.name).toBe("postgres");
   });
 });

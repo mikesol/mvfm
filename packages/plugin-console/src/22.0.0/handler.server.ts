@@ -1,5 +1,5 @@
-import type { Interpreter, TypedNode } from "@mvfm/core";
-import { foldAST } from "@mvfm/core";
+import type { Interpreter, NExpr } from "@mvfm/core";
+import { fold } from "@mvfm/core";
 import { type ConsoleClient, createConsoleInterpreter } from "./interpreter";
 
 /**
@@ -17,12 +17,12 @@ export function serverInterpreter(client: ConsoleClient): Interpreter {
  *
  * @param client - Console effect execution client.
  * @param baseInterpreter - Base interpreter for evaluating sub-expressions.
- * @returns An async AST evaluator function.
+ * @returns An async evaluator function for NExpr.
  */
 export function serverEvaluate(
   client: ConsoleClient,
   baseInterpreter: Interpreter,
-): (root: TypedNode) => Promise<unknown> {
+): (expr: NExpr<unknown, string, unknown, string>) => Promise<unknown> {
   const interp = { ...baseInterpreter, ...createConsoleInterpreter(client) };
-  return (root: TypedNode) => foldAST(interp, root);
+  return (expr: NExpr<unknown, string, unknown, string>) => fold(expr, interp);
 }

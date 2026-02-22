@@ -4,13 +4,12 @@ const REDIS = ["@mvfm/plugin-redis"];
 
 const examples: Record<string, NodeExample> = {
   "redis/hset": {
-    description:
-      "Set fields in a hash and return the count of new fields added",
+    description: "Set fields in a hash and return the count of new fields added",
     code: `const app = mvfm(prelude, redis);
 const prog = app({}, ($) => {
   return $.redis.hset("user:1", { name: "Alice", email: "alice@example.com" });
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -27,7 +26,7 @@ const prog = app({}, ($) => {
     $.redis.hget("user:1", "name")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -44,7 +43,7 @@ const prog = app({}, ($) => {
     $.redis.hmget("user:1", "name", "email", "missing")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -61,7 +60,7 @@ const prog = app({}, ($) => {
     $.redis.hgetall("user:1")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -78,7 +77,7 @@ const prog = app({}, ($) => {
     $.redis.hdel("user:1", "email")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -95,7 +94,7 @@ const prog = app({}, ($) => {
     $.redis.hexists("user:1", "name")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -112,7 +111,7 @@ const prog = app({}, ($) => {
     $.redis.hlen("user:1")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -129,7 +128,7 @@ const prog = app({}, ($) => {
     $.redis.hkeys("user:1")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -146,7 +145,7 @@ const prog = app({}, ($) => {
     $.redis.hvals("user:1")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -163,7 +162,7 @@ const prog = app({}, ($) => {
     $.redis.hincrby("user:1", "age", 5)
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,

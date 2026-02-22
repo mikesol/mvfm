@@ -16,7 +16,7 @@ const prog = app({ x: "number", y: "number" }, ($) => {
 });
 
 // 3. run
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { x: 1, y: 100 })
 );`,
@@ -36,7 +36,7 @@ const prog = app({ limit: "number" }, ($) => {
 });
 
 // 3. run
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { limit: 4 })
 );`,

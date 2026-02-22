@@ -1,17 +1,18 @@
 import { Writable } from "node:stream";
-import type { Program } from "@mvfm/core";
-import { coreInterpreter, injectInput, mvfm, num, str } from "@mvfm/core";
+import { boolPluginU, createApp, defaults, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
 import pinoLib from "pino";
 import { describe, expect, it } from "vitest";
 import { pino } from "../../src/10.3.1";
 import { wrapPino } from "../../src/10.3.1/client-pino";
 import { serverEvaluate } from "../../src/10.3.1/handler.server";
 
-const baseInterpreter = coreInterpreter;
-const app = mvfm(num, str, pino({ level: "trace" }));
+const plugin = pino({ level: "trace" });
+const plugins = [numPluginU, strPluginU, boolPluginU, plugin] as const;
+const $ = mvfmU(...plugins);
+const app = createApp(...plugins);
 
 function createCapturingLogger() {
-  const lines: any[] = [];
+  const lines: Record<string, unknown>[] = [];
   const dest = new Writable({
     write(chunk: Buffer, _encoding: string, callback: () => void) {
       lines.push(JSON.parse(chunk.toString()));
@@ -22,18 +23,19 @@ function createCapturingLogger() {
   return { logger, lines };
 }
 
-async function run(prog: Program, logger: any, input: Record<string, unknown> = {}) {
-  const injected = injectInput(prog, input);
-  const client = wrapPino(logger);
-  const evaluate = serverEvaluate(client, baseInterpreter);
-  return await evaluate(injected.ast.result);
+async function run(expr: unknown, logger: unknown) {
+  const nexpr = app(expr as any);
+  const client = wrapPino(logger as Parameters<typeof wrapPino>[0]);
+  const baseInterp = defaults(plugins);
+  const evaluate = serverEvaluate(client, baseInterp);
+  return await evaluate(nexpr);
 }
 
 describe("pino integration: basic logging", () => {
   it("info writes a log line", async () => {
     const { logger, lines } = createCapturingLogger();
-    const prog = app(($) => $.pino.info("hello world"));
-    await run(prog, logger);
+    const expr = $.pino.info("hello world");
+    await run(expr, logger);
     expect(lines).toHaveLength(1);
     expect(lines[0].msg).toBe("hello world");
     expect(lines[0].level).toBe(30); // pino info = 30
@@ -41,8 +43,8 @@ describe("pino integration: basic logging", () => {
 
   it("info with merge object", async () => {
     const { logger, lines } = createCapturingLogger();
-    const prog = app(($) => $.pino.info({ userId: 123 }, "user action"));
-    await run(prog, logger);
+    const expr = $.pino.info({ userId: 123 }, "user action");
+    await run(expr, logger);
     expect(lines).toHaveLength(1);
     expect(lines[0].msg).toBe("user action");
     expect(lines[0].userId).toBe(123);
@@ -52,12 +54,10 @@ describe("pino integration: basic logging", () => {
 describe("pino integration: object-only logging", () => {
   it("object-only log writes merge fields without msg", async () => {
     const { logger, lines } = createCapturingLogger();
-    const prog = app(($) => $.pino.info({ userId: 123 }));
-    await run(prog, logger);
+    const expr = $.pino.info({ userId: 123 });
+    await run(expr, logger);
     expect(lines).toHaveLength(1);
     expect(lines[0].userId).toBe(123);
-    // pino may or may not include a msg field for object-only calls
-    // The key assertion is that userId appears as a top-level field
   });
 });
 
@@ -74,8 +74,8 @@ describe("pino integration: all levels", () => {
   for (const [level, num] of Object.entries(levelMap)) {
     it(`${level} writes at level ${num}`, async () => {
       const { logger, lines } = createCapturingLogger();
-      const prog = app(($) => ($.pino as any)[level]("test"));
-      await run(prog, logger);
+      const expr = ($.pino as any)[level]("test");
+      await run(expr, logger);
       expect(lines).toHaveLength(1);
       expect(lines[0].level).toBe(num);
     });
@@ -85,8 +85,8 @@ describe("pino integration: all levels", () => {
 describe("pino integration: child loggers", () => {
   it("child bindings appear in log output", async () => {
     const { logger, lines } = createCapturingLogger();
-    const prog = app(($) => $.pino.child({ requestId: "abc" }).info("handling"));
-    await run(prog, logger);
+    const expr = $.pino.child({ requestId: "abc" }).info("handling");
+    await run(expr, logger);
     expect(lines).toHaveLength(1);
     expect(lines[0].requestId).toBe("abc");
     expect(lines[0].msg).toBe("handling");
@@ -94,23 +94,11 @@ describe("pino integration: child loggers", () => {
 
   it("nested children accumulate bindings", async () => {
     const { logger, lines } = createCapturingLogger();
-    const prog = app(($) => $.pino.child({ requestId: "abc" }).child({ userId: 42 }).warn("slow"));
-    await run(prog, logger);
+    const expr = $.pino.child({ requestId: "abc" }).child({ userId: 42 }).warn("slow");
+    await run(expr, logger);
     expect(lines).toHaveLength(1);
     expect(lines[0].requestId).toBe("abc");
     expect(lines[0].userId).toBe(42);
     expect(lines[0].level).toBe(40);
-  });
-});
-
-describe("pino integration: input resolution", () => {
-  it("resolves dynamic input values", async () => {
-    const { logger, lines } = createCapturingLogger();
-    const prog = app({ userId: "number" }, ($) =>
-      $.pino.info({ userId: $.input.userId }, "action"),
-    );
-    await run(prog, logger, { userId: 789 });
-    expect(lines).toHaveLength(1);
-    expect(lines[0].userId).toBe(789);
   });
 });

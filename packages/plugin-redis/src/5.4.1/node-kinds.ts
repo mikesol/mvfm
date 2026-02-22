@@ -36,4 +36,6 @@ export const REDIS_NODE_KINDS = [
   "redis/lset",
   "redis/lrem",
   "redis/linsert",
+  "redis/record",
+  "redis/array",
 ] as const;

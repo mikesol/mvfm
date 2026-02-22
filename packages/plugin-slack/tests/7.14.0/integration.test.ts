@@ -1,44 +1,41 @@
+import { defaults, fold } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
-import { app, strip } from "./slack.shared";
+import { createSlackInterpreter, type SlackClient } from "../../src/7.14.0/generated/interpreter";
+import { $, app, plugins } from "./slack.shared";
 
-describe("slack: integration with $.begin()", () => {
-  it("side-effecting operations wrapped in $.begin() are reachable", () => {
-    expect(() => {
-      app(($) => {
-        const msg = $.slack.chat.postMessage({ channel: "#general", text: "Hello" });
-        const reaction = $.slack.reactions.add({
-          channel: "#general",
-          timestamp: (msg as any).ts,
-          name: "thumbsup",
-        });
-        return $.begin(msg, reaction);
-      });
-    }).not.toThrow();
-  });
+async function run(expr: unknown) {
+  const captured: Array<{ method: string; params?: Record<string, unknown> }> = [];
+  const mockClient: SlackClient = {
+    async apiCall(method: string, params?: Record<string, unknown>) {
+      captured.push({ method, params });
+      return { ok: true, channel: "C123", ts: "1234567890.123456" };
+    },
+  };
+  const nexpr = app(expr as Parameters<typeof app>[0]);
+  const interp = defaults(plugins, { slack: createSlackInterpreter(mockClient) });
+  const result = await fold(nexpr, interp);
+  return { result, captured };
+}
 
-  it("orphaned operations are rejected", () => {
-    expect(() => {
-      app(($) => {
-        const info = $.slack.conversations.info({ channel: "C123" });
-        $.slack.chat.postMessage({ channel: "C123", text: "orphan!" });
-        return info;
-      });
-    }).toThrow(/unreachable node/i);
+describe("slack: cross-operation dependencies", () => {
+  it("can construct expressions that reference other expressions", () => {
+    const user = $.slack.users.lookupByEmail({ email: "user@example.com" });
+    const msg = $.slack.chat.postMessage({
+      channel: "#general",
+      text: "Hello",
+      user: (user as any).user.id,
+    });
+    expect(msg.__kind).toBe("slack/chat_postMessage");
   });
 });
 
-describe("slack: cross-operation dependencies", () => {
-  it("can use result of one operation as input to another", () => {
-    const prog = app(($) => {
-      const user = $.slack.users.lookupByEmail({ email: "user@example.com" });
-      const msg = $.slack.chat.postMessage({
-        channel: "#general",
-        text: "Hello",
-        user: (user as any).user.id,
-      });
-      return $.begin(user, msg);
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/begin");
+describe("slack: end-to-end fold", () => {
+  it("folds a simple chat.postMessage", async () => {
+    const expr = $.slack.chat.postMessage({ channel: "#general", text: "Hello" });
+    const { result, captured } = await run(expr);
+    expect(captured).toHaveLength(1);
+    expect(captured[0].method).toBe("chat.postMessage");
+    expect(captured[0].params).toEqual({ channel: "#general", text: "Hello" });
+    expect(result).toEqual({ ok: true, channel: "C123", ts: "1234567890.123456" });
   });
 });

@@ -1,27 +1,8 @@
-export type { PostgresConfig, PostgresMethods } from "./3.4.8";
-export { postgres } from "./3.4.8";
+export type { PostgresConfig } from "./3.4.8";
+export { postgres, postgresPlugin } from "./3.4.8";
 export { wrapPostgresJs } from "./3.4.8/client-postgres-js";
 export type { ClientHandlerOptions } from "./3.4.8/handler.client";
 export { clientInterpreter } from "./3.4.8/handler.client";
-export {
-  createPostgresServerInterpreter,
-  serverEvaluate,
-  serverInterpreter,
-} from "./3.4.8/handler.server";
-export type {
-  PostgresBeginNode,
-  PostgresClient,
-  PostgresCursorBatchNode,
-  PostgresCursorNode,
-  PostgresIdentifierNode,
-  PostgresInsertHelperNode,
-  PostgresParamNode,
-  PostgresQueryNode,
-  PostgresSavepointNode,
-  PostgresSetHelperNode,
-} from "./3.4.8/interpreter";
-export {
-  buildSQL,
-  createPostgresInterpreter,
-  escapeIdentifier,
-} from "./3.4.8/interpreter";
+export { createPostgresServerInterpreter } from "./3.4.8/handler.server";
+export type { PostgresClient } from "./3.4.8/interpreter";
+export { createPostgresInterpreter, escapeIdentifier } from "./3.4.8/interpreter";

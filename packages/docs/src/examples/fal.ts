@@ -12,7 +12,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(result);
 });
-await foldAST(defaults(app, { fal: crystalBallFalInterpreter }), prog);`,
+await fold(defaults(app, { fal: crystalBallFalInterpreter }), prog);`,
     plugins: FAL,
   },
 
@@ -25,7 +25,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(result);
 });
-await foldAST(defaults(app, { fal: crystalBallFalInterpreter }), prog);`,
+await fold(defaults(app, { fal: crystalBallFalInterpreter }), prog);`,
     plugins: FAL,
   },
 
@@ -38,7 +38,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(queued);
 });
-await foldAST(defaults(app, { fal: crystalBallFalInterpreter }), prog);`,
+await fold(defaults(app, { fal: crystalBallFalInterpreter }), prog);`,
     plugins: FAL,
   },
 
@@ -51,7 +51,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(status);
 });
-await foldAST(defaults(app, { fal: crystalBallFalInterpreter }), prog);`,
+await fold(defaults(app, { fal: crystalBallFalInterpreter }), prog);`,
     plugins: FAL,
   },
 
@@ -64,7 +64,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(result);
 });
-await foldAST(defaults(app, { fal: crystalBallFalInterpreter }), prog);`,
+await fold(defaults(app, { fal: crystalBallFalInterpreter }), prog);`,
     plugins: FAL,
   },
 
@@ -77,7 +77,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(canceled);
 });
-await foldAST(defaults(app, { fal: crystalBallFalInterpreter }), prog);`,
+await fold(defaults(app, { fal: crystalBallFalInterpreter }), prog);`,
     plugins: FAL,
   },
 };

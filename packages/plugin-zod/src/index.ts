@@ -1,54 +1,31 @@
-import { definePlugin } from "@mvfm/core";
+import type { Interpreter, KindSpec, Plugin } from "@mvfm/core";
 
 export { z } from "zod";
 
-import type { ZodArrayNamespace } from "./array";
-import { arrayNamespace, arrayNodeKinds } from "./array";
-import type { ZodBigIntNamespace } from "./bigint";
-import { bigintNamespace, bigintNodeKinds } from "./bigint";
-import type { ZodCoerceNamespace } from "./coerce";
-import { coerceNamespace, coerceNodeKinds } from "./coerce";
-import type { ZodDateNamespace } from "./date";
-import { dateNamespace, dateNodeKinds } from "./date";
-import type { ZodDiscriminatedUnionNamespace } from "./discriminated-union";
-import { discriminatedUnionNamespace, discriminatedUnionNodeKinds } from "./discriminated-union";
-import type { ZodEnumNamespace } from "./enum";
-import { enumNamespace, enumNodeKinds } from "./enum";
-import type { ZodFromNamespace } from "./from-zod";
+import { arrayNamespace } from "./array";
+import { bigintNamespace } from "./bigint";
+import { coerceNamespace } from "./coerce";
+import { dateNamespace } from "./date";
+import { discriminatedUnionNamespace } from "./discriminated-union";
+import { enumNamespace } from "./enum";
 import { fromZodNamespace } from "./from-zod";
 import { createZodInterpreter } from "./interpreter";
-import type { ZodIntersectionNamespace } from "./intersection";
-import { intersectionNamespace, intersectionNodeKinds } from "./intersection";
-import type { ZodLazyNamespace } from "./lazy";
-import { lazyNamespace, lazyNodeKinds } from "./lazy";
-import type { ZodLiteralNamespace } from "./literal";
-import { literalNamespace, literalNodeKinds } from "./literal";
-import type { ZodMapSetNamespace } from "./map-set";
-import { mapSetNamespace, mapSetNodeKinds } from "./map-set";
-import type { ZodNumberNamespace } from "./number";
-import { numberNamespace, numberNodeKinds } from "./number";
-import type { ZodObjectNamespace } from "./object";
-import { objectNamespace, objectNodeKinds } from "./object";
-import type { ZodPrimitivesNamespace } from "./primitives";
-import { primitivesNamespace, primitivesNodeKinds } from "./primitives";
-import type { ZodRecordNamespace } from "./record";
-import { recordNamespace, recordNodeKinds } from "./record";
-import type { ZodSpecialNamespace } from "./special";
-import { specialNamespace, specialNodeKinds } from "./special";
-import type { ZodStringNamespace } from "./string";
-import { stringNamespace, stringNodeKinds } from "./string";
-import type { ZodStringFormatsNamespace } from "./string-formats";
-import { stringFormatsNamespace, stringFormatsNodeKinds } from "./string-formats";
-import type { ZodStringboolNamespace } from "./stringbool";
-import { stringboolNamespace, stringboolNodeKinds } from "./stringbool";
-import type { ZodTemplateLiteralNamespace } from "./template-literal";
-import { templateLiteralNamespace, templateLiteralNodeKinds } from "./template-literal";
-import type { ZodTransformNamespace } from "./transform";
-import { transformNamespace, transformNodeKinds } from "./transform";
-import type { ZodTupleNamespace } from "./tuple";
-import { tupleNamespace, tupleNodeKinds } from "./tuple";
-import type { ZodUnionNamespace } from "./union";
-import { unionNamespace, unionNodeKinds } from "./union";
+import { intersectionNamespace } from "./intersection";
+import { lazyNamespace } from "./lazy";
+import { literalNamespace } from "./literal";
+import { mapSetNamespace } from "./map-set";
+import { numberNamespace } from "./number";
+import { objectNamespace } from "./object";
+import { primitivesNamespace } from "./primitives";
+import { recordNamespace } from "./record";
+import { specialNamespace } from "./special";
+import { stringNamespace } from "./string";
+import { stringFormatsNamespace } from "./string-formats";
+import { stringboolNamespace } from "./stringbool";
+import { templateLiteralNamespace } from "./template-literal";
+import { transformNamespace } from "./transform";
+import { tupleNamespace } from "./tuple";
+import { unionNamespace } from "./union";
 
 // Re-export types, builders, and interpreter for consumers
 export { ZodArrayBuilder } from "./array";
@@ -92,63 +69,11 @@ function parseError(errorOrOpts?: string | { error?: string }): string | undefin
   return typeof errorOrOpts === "string" ? errorOrOpts : errorOrOpts?.error;
 }
 
-/**
- * The `$.zod` namespace contributed by the Zod plugin.
- *
- * Provides factory methods for creating Zod schema builders:
- * `$.zod.string()`, `$.zod.number()`, `$.zod.object(...)`, etc.
- *
- * Each factory returns a schema builder with chainable methods
- * for adding checks, refinements, and wrappers. Call `.parse()`
- * or `.safeParse()` to produce a validation AST node.
- */
-export interface ZodNamespace
-  extends ZodArrayNamespace,
-    ZodStringNamespace,
-    ZodBigIntNamespace,
-    ZodDateNamespace,
-    ZodDiscriminatedUnionNamespace,
-    ZodEnumNamespace,
-    ZodIntersectionNamespace,
-    ZodLazyNamespace,
-    ZodLiteralNamespace,
-    ZodMapSetNamespace,
-    ZodNumberNamespace,
-    ZodObjectNamespace,
-    ZodPrimitivesNamespace,
-    ZodRecordNamespace,
-    ZodSpecialNamespace,
-    ZodStringboolNamespace,
-    ZodStringFormatsNamespace,
-    ZodTemplateLiteralNamespace,
-    ZodTransformNamespace,
-    ZodTupleNamespace,
-    ZodUnionNamespace,
-    ZodFromNamespace {
-  /** Coercion constructors -- convert input before validating. */
-  coerce: ZodCoerceNamespace;
-  // ^^^ Each new schema type adds ONE extends clause here
-}
-
-/** Parsing and wrapper node kinds shared across all schema types. */
-const COMMON_NODE_KINDS: string[] = [
-  "zod/parse",
-  "zod/safe_parse",
-  "zod/parse_async",
-  "zod/safe_parse_async",
-  "zod/optional",
-  "zod/nullable",
-  "zod/nullish",
-  "zod/nonoptional",
-  "zod/default",
-  "zod/prefault",
-  "zod/catch",
-  "zod/readonly",
-  "zod/branded",
-];
+/** Safe-parse result shape. */
+type SafeParseResult = { success: boolean; data?: unknown; error?: unknown };
 
 /**
- * Zod validation DSL plugin for mvfm.
+ * Zod validation DSL plugin for mvfm (unified Plugin type).
  *
  * Adds the `$.zod` namespace to the dollar object, providing factory
  * methods for building Zod-compatible validation schemas as AST nodes.
@@ -156,66 +81,57 @@ const COMMON_NODE_KINDS: string[] = [
  *
  * Requires `zod` v4+ as a peer dependency.
  */
-export const zod = definePlugin({
-  name: "zod",
-
-  defaultInterpreter: createZodInterpreter,
-
-  nodeKinds: [
-    ...COMMON_NODE_KINDS,
-    ...arrayNodeKinds,
-    ...stringNodeKinds,
-    ...bigintNodeKinds,
-    ...dateNodeKinds,
-    ...discriminatedUnionNodeKinds,
-    ...enumNodeKinds,
-    ...intersectionNodeKinds,
-    ...lazyNodeKinds,
-    ...literalNodeKinds,
-    ...mapSetNodeKinds,
-    ...numberNodeKinds,
-    ...objectNodeKinds,
-    ...primitivesNodeKinds,
-    ...coerceNodeKinds,
-    ...recordNodeKinds,
-    ...specialNodeKinds,
-    ...stringboolNodeKinds,
-    ...stringFormatsNodeKinds,
-    ...templateLiteralNodeKinds,
-    ...transformNodeKinds,
-    ...tupleNodeKinds,
-    ...unionNodeKinds,
-    // ^^^ Each new schema type adds ONE spread here
-  ],
-
-  build(ctx) {
-    return {
+export function zod() {
+  return {
+    name: "zod" as const,
+    ctors: {
       zod: {
-        ...arrayNamespace(ctx, parseError),
-        ...stringNamespace(ctx, parseError),
-        ...bigintNamespace(ctx, parseError),
-        ...dateNamespace(ctx, parseError),
-        ...discriminatedUnionNamespace(ctx, parseError),
-        ...enumNamespace(ctx, parseError),
-        ...fromZodNamespace(ctx),
-        ...intersectionNamespace(ctx, parseError),
-        ...lazyNamespace(ctx),
-        ...literalNamespace(ctx),
-        ...mapSetNamespace(ctx, parseError),
-        ...numberNamespace(ctx, parseError),
-        ...objectNamespace(ctx, parseError),
-        ...primitivesNamespace(ctx, parseError),
-        ...coerceNamespace(ctx, parseError),
-        ...recordNamespace(ctx, parseError),
-        ...specialNamespace(ctx, parseError),
-        ...stringboolNamespace(ctx),
-        ...stringFormatsNamespace(ctx, parseError),
-        ...templateLiteralNamespace(ctx),
-        ...transformNamespace(ctx),
-        ...tupleNamespace(ctx, parseError),
-        ...unionNamespace(ctx, parseError),
+        ...arrayNamespace(parseError),
+        ...stringNamespace(parseError),
+        ...bigintNamespace(parseError),
+        ...dateNamespace(parseError),
+        ...discriminatedUnionNamespace(parseError),
+        ...enumNamespace(parseError),
+        ...fromZodNamespace(),
+        ...intersectionNamespace(parseError),
+        ...lazyNamespace(),
+        ...literalNamespace(),
+        ...mapSetNamespace(parseError),
+        ...numberNamespace(parseError),
+        ...objectNamespace(parseError),
+        ...primitivesNamespace(parseError),
+        ...coerceNamespace(parseError),
+        ...recordNamespace(parseError),
+        ...specialNamespace(parseError),
+        ...stringboolNamespace(),
+        ...stringFormatsNamespace(parseError),
+        ...templateLiteralNamespace(),
+        ...transformNamespace(),
+        ...tupleNamespace(parseError),
+        ...unionNamespace(parseError),
         // ^^^ Each new schema type adds ONE spread here
-      } as ZodNamespace,
-    };
-  },
-});
+      },
+    },
+    kinds: {
+      "zod/parse": {
+        inputs: [undefined, undefined] as [unknown, unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown, unknown], unknown>,
+      "zod/safe_parse": {
+        inputs: [undefined, undefined] as [unknown, unknown],
+        output: {} as SafeParseResult,
+      } as KindSpec<[unknown, unknown], SafeParseResult>,
+      "zod/parse_async": {
+        inputs: [undefined, undefined] as [unknown, unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown, unknown], unknown>,
+      "zod/safe_parse_async": {
+        inputs: [undefined, undefined] as [unknown, unknown],
+        output: {} as SafeParseResult,
+      } as KindSpec<[unknown, unknown], SafeParseResult>,
+    },
+    traits: {},
+    lifts: {},
+    defaultInterpreter: (): Interpreter => createZodInterpreter(),
+  } satisfies Plugin;
+}

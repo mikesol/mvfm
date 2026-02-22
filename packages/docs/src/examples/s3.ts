@@ -13,7 +13,7 @@ const prog = app({}, ($) => {
     Body: "hello world",
   });
 });
-await foldAST(
+await fold(
   defaults(app, { s3: memoryS3Interpreter }),
   prog
 );`,
@@ -34,7 +34,7 @@ const prog = app({}, ($) => {
     $.s3.getObject({ Bucket: "my-bucket", Key: "data.json" })
   );
 });
-await foldAST(
+await fold(
   defaults(app, { s3: memoryS3Interpreter }),
   prog
 );`,
@@ -55,7 +55,7 @@ const prog = app({}, ($) => {
     $.s3.deleteObject({ Bucket: "my-bucket", Key: "temp.txt" })
   );
 });
-await foldAST(
+await fold(
   defaults(app, { s3: memoryS3Interpreter }),
   prog
 );`,
@@ -77,7 +77,7 @@ const prog = app({}, ($) => {
     $.s3.headObject({ Bucket: "my-bucket", Key: "report.csv" })
   );
 });
-await foldAST(
+await fold(
   defaults(app, { s3: memoryS3Interpreter }),
   prog
 );`,
@@ -111,7 +111,7 @@ const prog = app({}, ($) => {
     })
   );
 });
-await foldAST(
+await fold(
   defaults(app, { s3: memoryS3Interpreter }),
   prog
 );`,

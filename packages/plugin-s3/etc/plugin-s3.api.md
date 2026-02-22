@@ -4,15 +4,10 @@
 
 ```ts
 
-import type { DeleteObjectCommandInput } from '@aws-sdk/client-s3';
 import type { DeleteObjectCommandOutput } from '@aws-sdk/client-s3';
-import type { GetObjectCommandInput } from '@aws-sdk/client-s3';
 import type { GetObjectCommandOutput } from '@aws-sdk/client-s3';
-import type { HeadObjectCommandInput } from '@aws-sdk/client-s3';
 import type { HeadObjectCommandOutput } from '@aws-sdk/client-s3';
-import type { ListObjectsV2CommandInput } from '@aws-sdk/client-s3';
 import type { ListObjectsV2CommandOutput } from '@aws-sdk/client-s3';
-import type { PutObjectCommandInput } from '@aws-sdk/client-s3';
 import type { PutObjectCommandOutput } from '@aws-sdk/client-s3';
 import type { S3Client as S3Client_2 } from '@aws-sdk/client-s3';
 
@@ -27,15 +22,35 @@ export interface ClientHandlerOptions {
 // Warning: (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter;
+export function clientInterpreter(options: ClientHandlerOptions, kinds: string[]): Interpreter;
 
 // @public
 export function createS3Interpreter(client: S3Client): Interpreter;
 
-// Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
-//
 // @public
-export function s3(config: S3Config): PluginDefinition<S3Methods, {}, "s3/put_object" | "s3/get_object" | "s3/delete_object" | "s3/head_object" | "s3/list_objects_v2">;
+export function s3(_config: S3Config): {
+    name: "s3";
+    ctors: {
+        s3: {
+            putObject<A>(input: A): CExpr<PutObjectCommandOutput, "s3/put_object", [A]>;
+            getObject<A>(input: A): CExpr<GetObjectCommandOutput, "s3/get_object", [A]>;
+            deleteObject<A>(input: A): CExpr<DeleteObjectCommandOutput, "s3/delete_object", [A]>;
+            headObject<A>(input: A): CExpr<HeadObjectCommandOutput, "s3/head_object", [A]>;
+            listObjectsV2<A>(input: A): CExpr<ListObjectsV2CommandOutput, "s3/list_objects_v2", [A]>;
+        };
+    };
+    kinds: {
+        "s3/put_object": KindSpec<[unknown], unknown>;
+        "s3/get_object": KindSpec<[unknown], unknown>;
+        "s3/delete_object": KindSpec<[unknown], unknown>;
+        "s3/head_object": KindSpec<[unknown], unknown>;
+        "s3/list_objects_v2": KindSpec<[unknown], unknown>;
+        "s3/record": KindSpec<unknown[], Record<string, unknown>>;
+        "s3/array": KindSpec<unknown[], unknown[]>;
+    };
+    traits: {};
+    lifts: {};
+};
 
 // @public
 export interface S3Client {
@@ -55,20 +70,10 @@ export interface S3Config {
 }
 
 // @public
-export interface S3Methods {
-    s3: {
-        putObject(input: Expr<PutObjectInput> | PutObjectInput): Expr<PutObjectResult>;
-        getObject(input: Expr<GetObjectInput> | GetObjectInput): Expr<GetObjectResult>;
-        deleteObject(input: Expr<DeleteObjectInput> | DeleteObjectInput): Expr<DeleteObjectResult>;
-        headObject(input: Expr<HeadObjectInput> | HeadObjectInput): Expr<HeadObjectResult>;
-        listObjectsV2(input: Expr<ListObjectsV2Input> | ListObjectsV2Input): Expr<ListObjectsV2Result>;
-    };
-}
+export const s3Plugin: typeof s3;
 
-// Warning: (ae-forgotten-export) The symbol "TypedNode" needs to be exported by the entry point index.d.ts
-//
 // @public
-export function serverEvaluate(client: S3Client, baseInterpreter: Interpreter): (root: TypedNode) => Promise<unknown>;
+export function serverEvaluate(client: S3Client, baseInterpreter: Interpreter): Interpreter;
 
 // @public
 export function serverInterpreter(client: S3Client): Interpreter;
@@ -80,17 +85,8 @@ export function wrapAwsSdk(client: S3Client_2, commands: Record<string, CommandC
 
 // Warnings were encountered during analysis:
 //
-// dist/3.989.0/index.d.ts:29:9 - (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
-// dist/3.989.0/index.d.ts:29:9 - (ae-forgotten-export) The symbol "PutObjectInput" needs to be exported by the entry point index.d.ts
-// dist/3.989.0/index.d.ts:29:9 - (ae-forgotten-export) The symbol "PutObjectResult" needs to be exported by the entry point index.d.ts
-// dist/3.989.0/index.d.ts:36:9 - (ae-forgotten-export) The symbol "GetObjectInput" needs to be exported by the entry point index.d.ts
-// dist/3.989.0/index.d.ts:36:9 - (ae-forgotten-export) The symbol "GetObjectResult" needs to be exported by the entry point index.d.ts
-// dist/3.989.0/index.d.ts:43:9 - (ae-forgotten-export) The symbol "DeleteObjectInput" needs to be exported by the entry point index.d.ts
-// dist/3.989.0/index.d.ts:43:9 - (ae-forgotten-export) The symbol "DeleteObjectResult" needs to be exported by the entry point index.d.ts
-// dist/3.989.0/index.d.ts:50:9 - (ae-forgotten-export) The symbol "HeadObjectInput" needs to be exported by the entry point index.d.ts
-// dist/3.989.0/index.d.ts:50:9 - (ae-forgotten-export) The symbol "HeadObjectResult" needs to be exported by the entry point index.d.ts
-// dist/3.989.0/index.d.ts:57:9 - (ae-forgotten-export) The symbol "ListObjectsV2Input" needs to be exported by the entry point index.d.ts
-// dist/3.989.0/index.d.ts:57:9 - (ae-forgotten-export) The symbol "ListObjectsV2Result" needs to be exported by the entry point index.d.ts
+// dist/3.989.0/index.d.ts:51:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/3.989.0/index.d.ts:63:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

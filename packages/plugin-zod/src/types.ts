@@ -1,15 +1,13 @@
-import type { TypedNode } from "@mvfm/core";
-
 // ============================================================
 // Zod Plugin AST Types
 // ============================================================
 
 /**
  * Error configuration accepted by schema constructors, check methods,
- * and parse operations. Can be a simple string message or an error map
- * AST node (a DSL expression producing a string from the validation issue).
+ * and parse operations. Can be a simple string message or a CExpr/unknown
+ * value producing a string from the validation issue.
  */
-export type ErrorConfig = string | TypedNode;
+export type ErrorConfig = string | unknown;
 
 /**
  * A check descriptor stored inside a schema node's `checks` array.
@@ -20,12 +18,12 @@ export type ErrorConfig = string | TypedNode;
 export interface CheckDescriptor {
   /** Check kind identifier (e.g. `"min_length"`, `"gt"`, `"regex"`) */
   kind: string;
-  /** Optional custom error message or error map AST node */
+  /** Optional custom error message or error map */
   error?: ErrorConfig;
   /** If true, validation stops after this check fails */
   abort?: boolean;
-  /** Conditional execution predicate (AST node returning boolean) */
-  when?: TypedNode;
+  /** Conditional execution predicate */
+  when?: unknown;
   /** Check-specific parameters (value, pattern, etc.) */
   [key: string]: unknown;
 }
@@ -34,13 +32,13 @@ export interface CheckDescriptor {
  * A refinement node stored in a schema node's `refinements` array.
  *
  * Unlike checks (which are declarative descriptors), refinements carry
- * a predicate AST expression that uses mvfm DSL operations.
+ * a predicate expression that uses mvfm DSL operations.
  */
 export interface RefinementDescriptor {
   /** Refinement type */
   kind: "refine" | "super_refine" | "check" | "overwrite";
-  /** Predicate or transform AST expression */
-  fn: TypedNode;
+  /** Predicate or transform expression (lambda descriptor with param/body) */
+  fn: unknown;
   /** Optional custom error */
   error?: ErrorConfig;
   /** If true, validation stops after this refinement fails */
@@ -48,16 +46,16 @@ export interface RefinementDescriptor {
   /** Error path override */
   path?: string[];
   /** Conditional execution predicate */
-  when?: TypedNode;
+  when?: unknown;
 }
 
 /**
- * The AST node representing a Zod schema definition.
+ * The descriptor representing a Zod schema definition.
  *
  * Every Zod schema (string, number, object, etc.) produces one of these.
  * The `kind` is namespaced to the plugin (e.g. `"zod/string"`, `"zod/number"`).
  */
-export interface SchemaASTNode extends TypedNode {
+export interface SchemaASTNode {
   /** Schema kind (e.g. `"zod/string"`, `"zod/number"`, `"zod/object"`) */
   kind: string;
   /** Accumulated check descriptors */
@@ -66,12 +64,14 @@ export interface SchemaASTNode extends TypedNode {
   refinements: RefinementDescriptor[];
   /** Schema-level error config */
   error?: ErrorConfig;
+  /** Additional kind-specific payload */
+  [key: string]: unknown;
 }
 
 /**
- * A wrapper AST node that wraps an inner schema (e.g. optional, nullable).
+ * A wrapper descriptor that wraps an inner schema (e.g. optional, nullable).
  */
-export interface WrapperASTNode extends TypedNode {
+export interface WrapperASTNode {
   /** Wrapper kind (e.g. `"zod/optional"`, `"zod/nullable"`) */
   kind: string;
   /** The inner schema being wrapped */
@@ -81,15 +81,15 @@ export interface WrapperASTNode extends TypedNode {
 }
 
 /**
- * A validation operation AST node (parse, safeParse).
+ * A validation operation descriptor (parse, safeParse).
  */
-export interface ValidationASTNode extends TypedNode {
+export interface ValidationASTNode {
   /** Operation kind (`"zod/parse"` or `"zod/safe_parse"`) */
   kind: "zod/parse" | "zod/safe_parse" | "zod/parse_async" | "zod/safe_parse_async";
   /** The schema to validate against */
   schema: SchemaASTNode | WrapperASTNode;
   /** The input expression to validate */
-  input: TypedNode;
+  input: unknown;
   /** Optional per-parse error config */
   parseError?: ErrorConfig;
 }
@@ -97,7 +97,7 @@ export interface ValidationASTNode extends TypedNode {
 /**
  * Shared schema node base used by zod interpreter handlers.
  */
-export interface ZodSchemaNodeBase extends TypedNode {
+export interface ZodSchemaNodeBase {
   /** Schema kind (e.g. `"zod/string"`). */
   kind: string;
   /** Optional check descriptors carried by this node. */
@@ -111,24 +111,16 @@ export interface ZodSchemaNodeBase extends TypedNode {
 }
 
 /**
- * Lambda AST shape used by preprocess/transform/refinement helpers.
+ * Lambda descriptor shape used by preprocess/transform/refinement helpers.
+ * In the new system, param and body are CExpr references (or __ref placeholders
+ * after extractCExprs serialization).
  */
-export interface ZodLambdaNode extends TypedNode {
-  kind: "core/lambda";
-  param: { __id: number; name?: string };
-  body: TypedNode;
+export interface ZodLambdaNode {
+  param: unknown;
+  body: unknown;
 }
 
 /**
  * Union of schema nodes accepted by the zod interpreter.
  */
 export type AnyZodSchemaNode = ZodSchemaNodeBase;
-
-declare module "@mvfm/core" {
-  interface NodeTypeMap {
-    "zod/parse": ValidationASTNode;
-    "zod/safe_parse": ValidationASTNode;
-    "zod/parse_async": ValidationASTNode;
-    "zod/safe_parse_async": ValidationASTNode;
-  }
-}

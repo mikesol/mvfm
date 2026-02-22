@@ -1,6 +1,6 @@
-import type { Interpreter, TypedNode } from "@mvfm/core";
-import { defineInterpreter, eval_ } from "@mvfm/core";
+import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import { wrapFetch } from "./client-fetch";
+import type { FetchConfig } from "./index";
 
 /**
  * Fetch client interface consumed by the fetch handler.
@@ -13,64 +13,27 @@ export interface FetchClient {
   request(url: string, init?: RequestInit): Promise<Response>;
 }
 
-/** A `fetch/request` node representing an HTTP request execution. */
-export interface FetchRequestNode extends TypedNode<Response> {
-  kind: "fetch/request";
-  url: TypedNode<string>;
-  init: TypedNode<unknown> | null;
-  config: { baseUrl?: string; defaultHeaders?: Record<string, string> };
-}
-
-/** A `fetch/json` node representing `response.json()`. */
-export interface FetchJsonNode extends TypedNode<unknown> {
-  kind: "fetch/json";
-  response: TypedNode<unknown>;
-}
-
-/** A `fetch/text` node representing `response.text()`. */
-export interface FetchTextNode extends TypedNode<string> {
-  kind: "fetch/text";
-  response: TypedNode<unknown>;
-}
-
-/** A `fetch/status` node representing `response.status`. */
-export interface FetchStatusNode extends TypedNode<number> {
-  kind: "fetch/status";
-  response: TypedNode<unknown>;
-}
-
-/** A `fetch/headers` node representing materialized response headers. */
-export interface FetchHeadersNode extends TypedNode<Record<string, string>> {
-  kind: "fetch/headers";
-  response: TypedNode<unknown>;
-}
-
-type FetchKind = "fetch/request" | "fetch/json" | "fetch/text" | "fetch/status" | "fetch/headers";
-
-declare module "@mvfm/core" {
-  interface NodeTypeMap {
-    "fetch/request": FetchRequestNode;
-    "fetch/json": FetchJsonNode;
-    "fetch/text": FetchTextNode;
-    "fetch/status": FetchStatusNode;
-    "fetch/headers": FetchHeadersNode;
-  }
-}
-
 /**
- * Creates an interpreter for `fetch/*` node kinds.
+ * Creates an interpreter for `fetch/*` node kinds using the new
+ * RuntimeEntry + positional yield pattern.
  *
- * @param client - The {@link FetchClient} to execute against.
+ * Config (baseUrl, defaultHeaders) is captured in the closure,
+ * not stored on AST nodes.
+ *
+ * @param client - Fetch effect execution client (defaults to globalThis.fetch).
+ * @param config - Optional fetch config with baseUrl and defaultHeaders.
  * @returns An Interpreter handling all fetch node kinds.
  */
-export function createFetchInterpreter(client: FetchClient): Interpreter {
-  return defineInterpreter<FetchKind>()({
-    "fetch/request": async function* (node: FetchRequestNode) {
-      const url = yield* eval_(node.url);
-      const init = node.init != null ? yield* eval_(node.init) : undefined;
+export function createFetchInterpreter(
+  client: FetchClient = wrapFetch(globalThis.fetch),
+  config: FetchConfig = {},
+): Interpreter {
+  return {
+    "fetch/request": async function* (entry: RuntimeEntry) {
+      const url = (yield 0) as string;
+      const init = entry.children.length > 1 ? yield 1 : undefined;
 
       let resolvedUrl = url;
-      const config = node.config;
       if (config?.baseUrl && !url.startsWith("http://") && !url.startsWith("https://")) {
         resolvedUrl = `${config.baseUrl.replace(/\/$/, "")}/${url.replace(/^\//, "")}`;
       }
@@ -86,30 +49,50 @@ export function createFetchInterpreter(client: FetchClient): Interpreter {
       return await client.request(resolvedUrl, mergedInit);
     },
 
-    "fetch/json": async function* (node: FetchJsonNode) {
-      const response = yield* eval_(node.response);
-      return await (response as Response).json();
+    "fetch/json": async function* (_entry: RuntimeEntry) {
+      const response = (yield 0) as Response;
+      return await response.json();
     },
 
-    "fetch/text": async function* (node: FetchTextNode) {
-      const response = yield* eval_(node.response);
-      return await (response as Response).text();
+    "fetch/text": async function* (_entry: RuntimeEntry) {
+      const response = (yield 0) as Response;
+      return await response.text();
     },
 
-    "fetch/status": async function* (node: FetchStatusNode) {
-      const response = yield* eval_(node.response);
-      return (response as Response).status;
+    "fetch/status": async function* (_entry: RuntimeEntry) {
+      const response = (yield 0) as Response;
+      return response.status;
     },
 
-    "fetch/headers": async function* (node: FetchHeadersNode) {
-      const response = yield* eval_(node.response);
+    "fetch/headers": async function* (_entry: RuntimeEntry) {
+      const response = (yield 0) as Response;
       const headers: Record<string, string> = {};
-      (response as Response).headers.forEach((v, k) => {
+      response.headers.forEach((v, k) => {
         headers[k] = v;
       });
       return headers;
     },
-  });
+
+    "fetch/record": async function* (entry: RuntimeEntry) {
+      // Children are key-value pairs: [key0, val0, key1, val1, ...]
+      // Keys are string literals (out field), values need yielding.
+      const result: Record<string, unknown> = {};
+      for (let i = 0; i < entry.children.length; i += 2) {
+        const key = (yield i) as string;
+        const value = yield i + 1;
+        result[key] = value;
+      }
+      return result;
+    },
+
+    "fetch/array": async function* (entry: RuntimeEntry) {
+      const result: unknown[] = [];
+      for (let i = 0; i < entry.children.length; i++) {
+        result.push(yield i);
+      }
+      return result;
+    },
+  };
 }
 
 /**

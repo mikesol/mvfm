@@ -12,7 +12,7 @@ const prog = app({}, ($) => {
     $.redis.lrange("tasks", 0, -1)
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -29,7 +29,7 @@ const prog = app({}, ($) => {
     $.redis.lrange("tasks", 0, -1)
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -46,7 +46,7 @@ const prog = app({}, ($) => {
     $.redis.lpop("tasks")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -63,7 +63,7 @@ const prog = app({}, ($) => {
     $.redis.rpop("tasks")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -80,7 +80,7 @@ const prog = app({}, ($) => {
     $.redis.llen("tasks")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -97,7 +97,7 @@ const prog = app({}, ($) => {
     $.redis.lrange("tasks", 1, 2)
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -114,7 +114,7 @@ const prog = app({}, ($) => {
     $.redis.lindex("tasks", -1)
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -132,7 +132,7 @@ const prog = app({}, ($) => {
     $.redis.lrange("tasks", 0, -1)
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -141,8 +141,7 @@ await foldAST(
   },
 
   "redis/lrem": {
-    description:
-      "Remove elements by value (count=0 all, >0 from head, <0 from tail)",
+    description: "Remove elements by value (count=0 all, >0 from head, <0 from tail)",
     code: `const app = mvfm(prelude, redis);
 const prog = app({}, ($) => {
   return $.begin(
@@ -151,7 +150,7 @@ const prog = app({}, ($) => {
     $.redis.lrange("tasks", 0, -1)
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -169,7 +168,7 @@ const prog = app({}, ($) => {
     $.redis.lrange("tasks", 0, -1)
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,

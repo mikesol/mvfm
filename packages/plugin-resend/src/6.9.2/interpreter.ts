@@ -1,5 +1,4 @@
-import type { Interpreter, TypedNode } from "@mvfm/core";
-import { defineInterpreter, eval_ } from "@mvfm/core";
+import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import { wrapResendSdk } from "./client-resend-sdk";
 
 /**
@@ -13,101 +12,67 @@ export interface ResendClient {
   request(method: string, path: string, params?: unknown): Promise<unknown>;
 }
 
-type ResendKind =
-  | "resend/send_email"
-  | "resend/get_email"
-  | "resend/send_batch"
-  | "resend/create_contact"
-  | "resend/get_contact"
-  | "resend/list_contacts"
-  | "resend/remove_contact";
-
-interface ResendNode<K extends ResendKind = ResendKind> extends TypedNode<unknown> {
-  kind: K;
-  config: { apiKey: string };
-}
-
-export interface ResendSendEmailNode extends ResendNode<"resend/send_email"> {
-  params: TypedNode<Record<string, unknown>>;
-}
-
-export interface ResendGetEmailNode extends ResendNode<"resend/get_email"> {
-  id: TypedNode<string>;
-}
-
-export interface ResendSendBatchNode extends ResendNode<"resend/send_batch"> {
-  emails: TypedNode<unknown[]>;
-}
-
-export interface ResendCreateContactNode extends ResendNode<"resend/create_contact"> {
-  params: TypedNode<Record<string, unknown>>;
-}
-
-export interface ResendGetContactNode extends ResendNode<"resend/get_contact"> {
-  id: TypedNode<string>;
-}
-
-export interface ResendListContactsNode extends ResendNode<"resend/list_contacts"> {}
-
-export interface ResendRemoveContactNode extends ResendNode<"resend/remove_contact"> {
-  id: TypedNode<string>;
-}
-
-declare module "@mvfm/core" {
-  interface NodeTypeMap {
-    "resend/send_email": ResendSendEmailNode;
-    "resend/get_email": ResendGetEmailNode;
-    "resend/send_batch": ResendSendBatchNode;
-    "resend/create_contact": ResendCreateContactNode;
-    "resend/get_contact": ResendGetContactNode;
-    "resend/list_contacts": ResendListContactsNode;
-    "resend/remove_contact": ResendRemoveContactNode;
-  }
-}
-
 /**
- * Creates an interpreter for `resend/*` node kinds.
+ * Creates an interpreter for `resend/*` node kinds using the new
+ * RuntimeEntry + positional yield pattern.
  *
  * @param client - The {@link ResendClient} to execute against.
  * @returns An Interpreter handling all resend node kinds.
  */
 export function createResendInterpreter(client: ResendClient): Interpreter {
-  return defineInterpreter<ResendKind>()({
-    "resend/send_email": async function* (node: ResendSendEmailNode) {
-      const params = yield* eval_(node.params);
+  return {
+    "resend/send_email": async function* (_entry: RuntimeEntry) {
+      const params = yield 0;
       return await client.request("POST", "/emails", params);
     },
 
-    "resend/get_email": async function* (node: ResendGetEmailNode) {
-      const id = yield* eval_(node.id);
+    "resend/get_email": async function* (_entry: RuntimeEntry) {
+      const id = yield 0;
       return await client.request("GET", `/emails/${id}`);
     },
 
-    "resend/send_batch": async function* (node: ResendSendBatchNode) {
-      const emails = yield* eval_(node.emails);
+    "resend/send_batch": async function* (_entry: RuntimeEntry) {
+      const emails = yield 0;
       return await client.request("POST", "/emails/batch", emails);
     },
 
-    "resend/create_contact": async function* (node: ResendCreateContactNode) {
-      const params = yield* eval_(node.params);
+    "resend/create_contact": async function* (_entry: RuntimeEntry) {
+      const params = yield 0;
       return await client.request("POST", "/contacts", params);
     },
 
-    "resend/get_contact": async function* (node: ResendGetContactNode) {
-      const id = yield* eval_(node.id);
+    "resend/get_contact": async function* (_entry: RuntimeEntry) {
+      const id = yield 0;
       return await client.request("GET", `/contacts/${id}`);
     },
 
-    // biome-ignore lint/correctness/useYield: no child nodes to evaluate
-    "resend/list_contacts": async function* () {
+    "resend/list_contacts": async function* (_entry: RuntimeEntry) {
       return await client.request("GET", "/contacts");
     },
 
-    "resend/remove_contact": async function* (node: ResendRemoveContactNode) {
-      const id = yield* eval_(node.id);
+    "resend/remove_contact": async function* (_entry: RuntimeEntry) {
+      const id = yield 0;
       return await client.request("DELETE", `/contacts/${id}`);
     },
-  });
+
+    "resend/record": async function* (entry: RuntimeEntry) {
+      const result: Record<string, unknown> = {};
+      for (let i = 0; i < entry.children.length; i += 2) {
+        const key = (yield i) as string;
+        const value = yield i + 1;
+        result[key] = value;
+      }
+      return result;
+    },
+
+    "resend/array": async function* (entry: RuntimeEntry) {
+      const result: unknown[] = [];
+      for (let i = 0; i < entry.children.length; i++) {
+        result.push(yield i);
+      }
+      return result;
+    },
+  };
 }
 
 function requiredEnv(name: "RESEND_API_KEY"): string {
@@ -122,7 +87,9 @@ function requiredEnv(name: "RESEND_API_KEY"): string {
   return value;
 }
 
-const dynamicImport = new Function("m", "return import(m)") as (moduleName: string) => Promise<any>;
+const dynamicImport = new Function("m", "return import(m)") as (
+  moduleName: string,
+) => Promise<Record<string, unknown>>;
 
 function lazyInterpreter(factory: () => Interpreter): Interpreter {
   let cached: Interpreter | undefined;
@@ -141,7 +108,12 @@ function lazyInterpreter(factory: () => Interpreter): Interpreter {
       const descriptor = Object.getOwnPropertyDescriptor(get(), property);
       return descriptor
         ? descriptor
-        : { configurable: true, enumerable: true, writable: false, value: undefined };
+        : {
+            configurable: true,
+            enumerable: true,
+            writable: false,
+            value: undefined,
+          };
     },
   });
 }
@@ -157,8 +129,10 @@ export const resendInterpreter: Interpreter = lazyInterpreter(() =>
         if (!clientPromise) {
           const apiKey = requiredEnv("RESEND_API_KEY");
           clientPromise = dynamicImport("resend").then((moduleValue) => {
-            const Resend = moduleValue.Resend;
-            return wrapResendSdk(new Resend(apiKey) as any);
+            const Resend = moduleValue.Resend as new (key: string) => Record<string, unknown>;
+            return wrapResendSdk(
+              new Resend(apiKey) as unknown as Parameters<typeof wrapResendSdk>[0],
+            );
           });
         }
         return clientPromise;

@@ -1,8 +1,8 @@
 import type { PostgresClient } from "@mvfm/plugin-postgres";
 
-interface PgLiteQueryable {
+export interface PgLiteQueryable {
   query<T>(sql: string, params?: unknown[]): Promise<{ rows: T[] }>;
-  transaction<T>(fn: (tx: PgLiteQueryable) => Promise<T>): Promise<T>;
+  transaction?<T>(fn: (tx: PgLiteQueryable) => Promise<T>): Promise<T>;
 }
 
 /**
@@ -21,9 +21,8 @@ export function wrapPgLite(db: PgLiteQueryable): PostgresClient {
     },
 
     async begin<T>(fn: (tx: PostgresClient) => Promise<T>): Promise<T> {
-      return db.transaction(async (tx) => {
-        return fn(wrapPgLite(tx));
-      });
+      if (!db.transaction) throw new Error("PGLite: transaction not available on this context");
+      return db.transaction(async (tx) => fn(wrapPgLite(tx)));
     },
 
     async savepoint<T>(fn: (tx: PostgresClient) => Promise<T>): Promise<T> {

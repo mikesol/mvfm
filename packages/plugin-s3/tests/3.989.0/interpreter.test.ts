@@ -1,18 +1,18 @@
-import type { Program } from "@mvfm/core";
-import { coreInterpreter, foldAST, injectInput, mvfm, num, str } from "@mvfm/core";
+import { createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { s3 } from "../../src/3.989.0";
 import { createS3Interpreter, type S3Client } from "../../src/3.989.0/interpreter";
 
-const app = mvfm(num, str, s3({ region: "us-east-1" }));
+const plugin = s3({ region: "us-east-1" });
+const plugins = [numPluginU, strPluginU, plugin] as const;
+const $ = mvfmU(...plugins);
+const app = createApp(...plugins);
 
-async function run(prog: Program, input: Record<string, unknown> = {}) {
+async function run(expr: unknown) {
   const captured: Array<{ command: string; input: Record<string, unknown> }> = [];
-  const injected = injectInput(prog, input);
   const mockClient: S3Client = {
     async execute(command: string, input: Record<string, unknown>) {
       captured.push({ command, input });
-      // Return a mock response matching the command type
       if (command === "GetObject") {
         return { Body: "file content", ContentType: "text/plain", ETag: '"abc123"' };
       }
@@ -31,8 +31,9 @@ async function run(prog: Program, input: Record<string, unknown> = {}) {
       return {};
     },
   };
-  const combined = { ...createS3Interpreter(mockClient), ...coreInterpreter };
-  const result = await foldAST(combined, injected);
+  const nexpr = app(expr as Parameters<typeof app>[0]);
+  const interp = defaults(plugins, { s3: createS3Interpreter(mockClient) });
+  const result = await fold(nexpr, interp);
   return { result, captured };
 }
 
@@ -41,11 +42,9 @@ async function run(prog: Program, input: Record<string, unknown> = {}) {
 // ============================================================
 
 describe("s3 interpreter: putObject", () => {
-  it("yields s3/command with PutObject and correct input", async () => {
-    const prog = app(($) =>
-      $.s3.putObject({ Bucket: "my-bucket", Key: "file.txt", Body: "hello" }),
-    );
-    const { captured } = await run(prog);
+  it("yields PutObject command with correct input", async () => {
+    const expr = $.s3.putObject({ Bucket: "my-bucket", Key: "file.txt", Body: "hello" });
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].command).toBe("PutObject");
     expect(captured[0].input).toEqual({
@@ -61,9 +60,9 @@ describe("s3 interpreter: putObject", () => {
 // ============================================================
 
 describe("s3 interpreter: getObject", () => {
-  it("yields s3/command with GetObject and correct input", async () => {
-    const prog = app(($) => $.s3.getObject({ Bucket: "my-bucket", Key: "file.txt" }));
-    const { captured } = await run(prog);
+  it("yields GetObject command with correct input", async () => {
+    const expr = $.s3.getObject({ Bucket: "my-bucket", Key: "file.txt" });
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].command).toBe("GetObject");
     expect(captured[0].input).toEqual({
@@ -78,9 +77,9 @@ describe("s3 interpreter: getObject", () => {
 // ============================================================
 
 describe("s3 interpreter: deleteObject", () => {
-  it("yields s3/command with DeleteObject", async () => {
-    const prog = app(($) => $.s3.deleteObject({ Bucket: "my-bucket", Key: "file.txt" }));
-    const { captured } = await run(prog);
+  it("yields DeleteObject command", async () => {
+    const expr = $.s3.deleteObject({ Bucket: "my-bucket", Key: "file.txt" });
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].command).toBe("DeleteObject");
     expect(captured[0].input).toEqual({
@@ -95,9 +94,9 @@ describe("s3 interpreter: deleteObject", () => {
 // ============================================================
 
 describe("s3 interpreter: headObject", () => {
-  it("yields s3/command with HeadObject", async () => {
-    const prog = app(($) => $.s3.headObject({ Bucket: "my-bucket", Key: "file.txt" }));
-    const { captured } = await run(prog);
+  it("yields HeadObject command", async () => {
+    const expr = $.s3.headObject({ Bucket: "my-bucket", Key: "file.txt" });
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].command).toBe("HeadObject");
     expect(captured[0].input).toEqual({
@@ -112,9 +111,9 @@ describe("s3 interpreter: headObject", () => {
 // ============================================================
 
 describe("s3 interpreter: listObjectsV2", () => {
-  it("yields s3/command with ListObjectsV2 and correct input", async () => {
-    const prog = app(($) => $.s3.listObjectsV2({ Bucket: "my-bucket", Prefix: "uploads/" }));
-    const { captured } = await run(prog);
+  it("yields ListObjectsV2 command with correct input", async () => {
+    const expr = $.s3.listObjectsV2({ Bucket: "my-bucket", Prefix: "uploads/" });
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].command).toBe("ListObjectsV2");
     expect(captured[0].input).toEqual({
@@ -125,31 +124,27 @@ describe("s3 interpreter: listObjectsV2", () => {
 });
 
 // ============================================================
-// Input resolution
-// ============================================================
-
-describe("s3 interpreter: input resolution", () => {
-  it("resolves input params through recurse", async () => {
-    const prog = app({ bucket: "string", key: "string" }, ($) =>
-      $.s3.getObject({ Bucket: $.input.bucket, Key: $.input.key }),
-    );
-    const { captured } = await run(prog, { bucket: "dynamic-bucket", key: "dynamic-key" });
-    expect(captured).toHaveLength(1);
-    expect(captured[0].input).toEqual({
-      Bucket: "dynamic-bucket",
-      Key: "dynamic-key",
-    });
-  });
-});
-
-// ============================================================
 // Return value
 // ============================================================
 
 describe("s3 interpreter: return value", () => {
   it("returns the handler response as the result", async () => {
-    const prog = app(($) => $.s3.headObject({ Bucket: "b", Key: "k" }));
-    const { result } = await run(prog);
-    expect(result).toEqual({ ContentLength: 1024, ContentType: "text/plain", ETag: '"abc123"' });
+    const expr = $.s3.headObject({ Bucket: "b", Key: "k" });
+    const { result } = await run(expr);
+    expect(result).toEqual({
+      ContentLength: 1024,
+      ContentType: "text/plain",
+      ETag: '"abc123"',
+    });
+  });
+});
+
+// ============================================================
+// defaults() throws without override
+// ============================================================
+
+describe("s3 interpreter: defaults() without override", () => {
+  it("throws when no override provided for s3 plugin", () => {
+    expect(() => defaults(plugins)).toThrow(/no defaultInterpreter/i);
   });
 });

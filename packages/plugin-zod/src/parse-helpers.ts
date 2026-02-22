@@ -1,16 +1,12 @@
-import type { FoldYield, TypedNode } from "@mvfm/core";
+import type { FoldYield, RuntimeEntry } from "@mvfm/core";
+import { recurseScoped } from "@mvfm/core";
 import { toZodError } from "./interpreter-utils";
-import type {
-  AnyZodSchemaNode,
-  ErrorConfig,
-  RefinementDescriptor,
-  ValidationASTNode,
-  ZodLambdaNode,
-  ZodSchemaNodeBase,
-} from "./types";
+import type { AnyZodSchemaNode, ErrorConfig, RefinementDescriptor, ZodLambdaNode } from "./types";
 
-export function parseErrorOpt(node: ValidationASTNode): { error?: (iss: unknown) => string } {
-  const fn = toZodError(node.parseError as ErrorConfig | undefined);
+export function parseErrorOpt(parseError: ErrorConfig | undefined): {
+  error?: (iss: unknown) => string;
+} {
+  const fn = toZodError(parseError);
   return fn ? { error: fn } : {};
 }
 
@@ -19,7 +15,7 @@ export function extractRefinements(schemaNode: AnyZodSchemaNode): RefinementDesc
   if (schemaNode.kind === "zod/custom" && schemaNode.predicate) {
     const predRef: RefinementDescriptor = {
       kind: "refine",
-      fn: schemaNode.predicate as TypedNode,
+      fn: schemaNode.predicate as unknown,
       error: typeof schemaNode.error === "string" ? schemaNode.error : "Custom validation failed",
     };
     return [predRef, ...refinements];
@@ -27,15 +23,31 @@ export function extractRefinements(schemaNode: AnyZodSchemaNode): RefinementDesc
   return refinements;
 }
 
+/**
+ * Children offset: children[0] = serialized JSON, children[1] = input value,
+ * children[2..] = extracted CExpr refs. So __ref index N maps to children[N + 2].
+ */
+const CHILDREN_REF_OFFSET = 2;
+
+/**
+ * Evaluate a lambda descriptor from deserialized metadata.
+ *
+ * In the new system, lambda descriptors contain `{ param: { __ref: N }, body: { __ref: M } }`
+ * where N and M are 0-based indices into the extracted refs array. These map to
+ * entry.children[N + 2] and entry.children[M + 2] respectively. The resolved node IDs
+ * are used with recurseScoped to evaluate the lambda body under scoped bindings.
+ */
 export async function* evaluateLambda(
   value: unknown,
   lambda: ZodLambdaNode,
+  entry: RuntimeEntry,
 ): AsyncGenerator<FoldYield, unknown, unknown> {
-  return yield {
-    type: "recurse_scoped",
-    child: lambda.body as TypedNode,
-    bindings: [{ paramId: lambda.param.__id, value }],
-  };
+  // lambda.param and lambda.body are { __ref: N } placeholders
+  const paramRef = lambda.param as { __ref: number };
+  const bodyRef = lambda.body as { __ref: number };
+  const paramId = entry.children[paramRef.__ref + CHILDREN_REF_OFFSET];
+  const bodyId = entry.children[bodyRef.__ref + CHILDREN_REF_OFFSET];
+  return yield recurseScoped(bodyId, [{ paramId, value }]);
 }
 
 export function collectTransformLambdas(node: AnyZodSchemaNode): ZodLambdaNode[] {
@@ -68,15 +80,16 @@ export function extractPreprocessLambda(node: AnyZodSchemaNode): ZodLambdaNode |
 export async function* applyRefinements(
   value: unknown,
   refinements: RefinementDescriptor[],
+  entry: RuntimeEntry,
 ): AsyncGenerator<FoldYield, unknown, unknown> {
   let current = value;
   for (const ref of refinements) {
     const lambda = ref.fn as ZodLambdaNode;
-    const result = yield {
-      type: "recurse_scoped",
-      child: lambda.body as ZodSchemaNodeBase,
-      bindings: [{ paramId: lambda.param.__id, value: current }],
-    };
+    const paramRef = lambda.param as { __ref: number };
+    const bodyRef = lambda.body as { __ref: number };
+    const paramId = entry.children[paramRef.__ref + CHILDREN_REF_OFFSET];
+    const bodyId = entry.children[bodyRef.__ref + CHILDREN_REF_OFFSET];
+    const result = yield recurseScoped(bodyId, [{ paramId, value: current }]);
 
     switch (ref.kind) {
       case "refine":

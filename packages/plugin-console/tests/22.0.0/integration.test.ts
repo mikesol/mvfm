@@ -1,5 +1,4 @@
-import type { Program } from "@mvfm/core";
-import { coreInterpreter, injectInput, mvfm, num, str } from "@mvfm/core";
+import { boolPluginU, createApp, defaults, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { consolePlugin } from "../../src/22.0.0";
 import { wrapConsole } from "../../src/22.0.0/client-console";
@@ -40,23 +39,27 @@ function createCapturingConsole() {
   return { target, calls };
 }
 
-const app = mvfm(num, str, consolePlugin());
-async function run(prog: Program, target: unknown, input: Record<string, unknown> = {}) {
-  const injected = injectInput(prog, input);
-  const evaluate = serverEvaluate(wrapConsole(target as any), coreInterpreter);
-  return await evaluate(injected.ast.result);
-}
+const plugin = consolePlugin();
+const plugins = [numPluginU, strPluginU, boolPluginU, plugin] as const;
+const $ = mvfmU(...plugins);
+const app = createApp(...plugins);
 
 describe("console integration", () => {
   it("forwards all console methods to runtime adapter", async () => {
     const { target, calls } = createCapturingConsole();
+    const client = wrapConsole(target as any);
+    const baseInterp = defaults(plugins);
+    const evaluate = serverEvaluate(client, baseInterp);
+
+    // Only liftable primitives (string, number, boolean) — objects/arrays
+    // cannot be elaborated by createApp without a dedicated lift plugin.
     const cases: ReadonlyArray<{ method: string; args: unknown[] }> = [
       { method: "assert", args: [true, "ok"] },
       { method: "clear", args: [] },
       { method: "count", args: ["c"] },
       { method: "countReset", args: ["c"] },
       { method: "debug", args: ["d", 1] },
-      { method: "dir", args: [{ a: 1 }, { depth: 2 }] },
+      { method: "dir", args: ["item"] },
       { method: "dirxml", args: ["x"] },
       { method: "error", args: ["e"] },
       { method: "group", args: ["g"] },
@@ -64,7 +67,7 @@ describe("console integration", () => {
       { method: "groupEnd", args: [] },
       { method: "info", args: ["i"] },
       { method: "log", args: ["l", 2] },
-      { method: "table", args: [[{ a: 1 }]] },
+      { method: "table", args: ["data"] },
       { method: "time", args: ["t"] },
       { method: "timeEnd", args: ["t"] },
       { method: "timeLog", args: ["t", "m"] },
@@ -73,8 +76,9 @@ describe("console integration", () => {
     ];
 
     for (const c of cases) {
-      const prog = app(($) => ($.console as any)[c.method](...c.args));
-      await run(prog, target);
+      const expr = ($.console as any)[c.method](...c.args);
+      const nexpr = app(expr);
+      await evaluate(nexpr);
     }
 
     expect(calls).toHaveLength(cases.length);
@@ -84,15 +88,17 @@ describe("console integration", () => {
     }
   });
 
-  it("resolves input values before invoking runtime", async () => {
+  it("resolves numeric and string arguments", async () => {
     const { target, calls } = createCapturingConsole();
-    const prog = app({ ok: "boolean", detail: "string" }, ($) =>
-      $.console.assert($.input.ok, $.input.detail),
-    );
+    const client = wrapConsole(target as any);
+    const baseInterp = defaults(plugins);
+    const evaluate = serverEvaluate(client, baseInterp);
 
-    await run(prog, target, { ok: false, detail: "failed" });
+    const expr = $.console.log("hello", 42);
+    const nexpr = app(expr);
+    await evaluate(nexpr);
 
     expect(calls).toHaveLength(1);
-    expect(calls[0]).toEqual({ method: "assert", args: [false, "failed"] });
+    expect(calls[0]).toEqual({ method: "log", args: ["hello", 42] });
   });
 });

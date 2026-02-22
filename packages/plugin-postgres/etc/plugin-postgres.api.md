@@ -6,12 +6,6 @@
 
 import type { default as postgres_2 } from 'postgres';
 
-// Warning: (ae-forgotten-export) The symbol "TypedNode" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "BuiltQuery" needs to be exported by the entry point index.d.ts
-//
-// @public
-export function buildSQL(node: PostgresQueryNode): AsyncGenerator<TypedNode, BuiltQuery, unknown>;
-
 // @public
 export interface ClientHandlerOptions {
     baseUrl: string;
@@ -23,33 +17,38 @@ export interface ClientHandlerOptions {
 // Warning: (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter<string>;
+export function clientInterpreter(options: ClientHandlerOptions, kinds: string[]): Interpreter;
 
 // @public
-export function createPostgresInterpreter(client: PostgresClient): Interpreter<"postgres/query" | "postgres/identifier" | "postgres/insert_helper" | "postgres/set_helper" | "postgres/begin" | "postgres/savepoint" | "postgres/cursor" | "postgres/cursor_batch">;
+export function createPostgresInterpreter(client: PostgresClient): Interpreter;
 
 // @public
-export function createPostgresServerInterpreter(client: PostgresClient, baseInterpreter: Interpreter): Interpreter;
+export function createPostgresServerInterpreter(client: PostgresClient): Interpreter;
 
 // @public
 export function escapeIdentifier(name: string): string;
 
-// Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
-//
 // @public
-export function postgres(config?: PostgresConfig | string): PluginDefinition<PostgresMethods, {}, "postgres/query" | "postgres/identifier" | "postgres/insert_helper" | "postgres/set_helper" | "postgres/begin" | "postgres/savepoint" | "postgres/cursor" | "postgres/cursor_batch">;
-
-// @public
-export interface PostgresBeginNode extends TypedNode<unknown> {
-    // (undocumented)
-    body?: TypedNode;
-    // (undocumented)
-    kind: "postgres/begin";
-    // (undocumented)
-    mode: string;
-    // (undocumented)
-    queries?: TypedNode[];
-}
+export function postgres(config?: PostgresConfig | string): {
+    name: "postgres";
+    ctors: {
+        sql: (<T = Record<string, unknown>>(strings: TemplateStringsArray, ...values: unknown[]) => CExpr<T[], "postgres/query", unknown[]>) & Record<string, unknown>;
+    };
+    kinds: {
+        "postgres/query": KindSpec<[number, ...unknown[]], unknown[]>;
+        "postgres/identifier": KindSpec<[unknown], unknown>;
+        "postgres/insert_helper": KindSpec<[unknown, string], unknown>;
+        "postgres/set_helper": KindSpec<[unknown, string], unknown>;
+        "postgres/begin": KindSpec<[string, ...unknown[]], unknown>;
+        "postgres/savepoint": KindSpec<[string, ...unknown[]], unknown>;
+        "postgres/cursor": KindSpec<[unknown, unknown, unknown], void>;
+        "postgres/cursor_batch": KindSpec<[], unknown[]>;
+        "postgres/record": KindSpec<unknown[], Record<string, unknown>>;
+        "postgres/array": KindSpec<unknown[], unknown[]>;
+    };
+    traits: {};
+    lifts: {};
+};
 
 // @public
 export interface PostgresClient {
@@ -91,93 +90,18 @@ export interface PostgresConfig {
 }
 
 // @public
-export interface PostgresCursorBatchNode extends TypedNode<unknown[]> {
-    // (undocumented)
-    kind: "postgres/cursor_batch";
-}
-
-// @public
-export interface PostgresCursorNode extends TypedNode<unknown> {
-    // (undocumented)
-    batchSize: TypedNode<number>;
-    // (undocumented)
-    body: TypedNode;
-    // (undocumented)
-    kind: "postgres/cursor";
-    // (undocumented)
-    query: PostgresQueryNode;
-}
-
-// @public
-export interface PostgresIdentifierNode extends TypedNode<string> {
-    // (undocumented)
-    kind: "postgres/identifier";
-    // (undocumented)
-    name: TypedNode<string>;
-}
-
-// @public
-export interface PostgresInsertHelperNode extends TypedNode<string> {
-    // (undocumented)
-    columns?: string[];
-    // (undocumented)
-    data: TypedNode<Record<string, unknown> | Record<string, unknown>[]>;
-    // (undocumented)
-    kind: "postgres/insert_helper";
-}
-
-// @public
-export interface PostgresMethods {
-    // Warning: (ae-forgotten-export) The symbol "PostgresSql" needs to be exported by the entry point index.d.ts
-    sql: PostgresSql;
-}
-
-// @public
-export type PostgresParamNode = PostgresIdentifierNode | PostgresInsertHelperNode | PostgresSetHelperNode | TypedNode;
-
-// @public
-export interface PostgresQueryNode extends TypedNode<unknown[]> {
-    // (undocumented)
-    kind: "postgres/query";
-    // (undocumented)
-    params: PostgresParamNode[];
-    // (undocumented)
-    strings: string[];
-}
-
-// @public
-export interface PostgresSavepointNode extends TypedNode<unknown> {
-    // (undocumented)
-    body?: TypedNode;
-    // (undocumented)
-    kind: "postgres/savepoint";
-    // (undocumented)
-    mode: string;
-    // (undocumented)
-    queries?: TypedNode[];
-}
-
-// @public
-export interface PostgresSetHelperNode extends TypedNode<string> {
-    // (undocumented)
-    columns?: string[];
-    // (undocumented)
-    data: TypedNode<Record<string, unknown>>;
-    // (undocumented)
-    kind: "postgres/set_helper";
-}
-
-// @public
-export function serverEvaluate(client: PostgresClient, baseInterpreter: Interpreter): (root: TypedNode) => Promise<unknown>;
-
-// @public
-export function serverInterpreter(client: PostgresClient, baseInterpreter: Interpreter): Interpreter;
+export const postgresPlugin: typeof postgres;
 
 // Warning: (ae-forgotten-export) The symbol "Sql" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "TransactionSql" needs to be exported by the entry point index.d.ts
 //
 // @public
 export function wrapPostgresJs(sql: Sql | TransactionSql): PostgresClient;
+
+// Warnings were encountered during analysis:
+//
+// dist/3.4.8/index.d.ts:38:9 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/3.4.8/index.d.ts:41:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

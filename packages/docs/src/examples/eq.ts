@@ -7,7 +7,7 @@ const examples: Record<string, NodeExample> = {
 const prog = app({ x: "number", y: "number" }, ($) => {
   return $.eq($.input.x, $.input.y);
 });
-await foldAST(defaults(app), injectInput(prog, { x: 10, y: 10 }));`,
+await fold(defaults(app), injectInput(prog, { x: 10, y: 10 }));`,
   },
   "eq/neq": {
     description: "Structural inequality — negated equality via the eq typeclass",
@@ -15,7 +15,7 @@ await foldAST(defaults(app), injectInput(prog, { x: 10, y: 10 }));`,
 const prog = app({ x: "number", y: "number" }, ($) => {
   return $.neq($.input.x, $.input.y);
 });
-await foldAST(defaults(app), injectInput(prog, { x: 10, y: 20 }));`,
+await fold(defaults(app), injectInput(prog, { x: 10, y: 20 }));`,
   },
 };
 

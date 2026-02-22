@@ -1,4 +1,3 @@
-import type { TypedNode } from "@mvfm/core";
 import { z } from "zod";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
 import { checkErrorOpt, toZodError } from "./interpreter-utils";
@@ -92,10 +91,7 @@ function variantChecks(variant: string | undefined): CheckDescriptor[] {
 }
 
 export const numberInterpreter: SchemaInterpreterMap = {
-  // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/number": async function* (
-    node: ZodNumberNode,
-  ): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/number": async function* (node: ZodNumberNode): AsyncGenerator<unknown, z.ZodType, unknown> {
     const variant = node.variant as string | undefined;
     const explicitChecks = (node.checks as CheckDescriptor[]) ?? [];
     const allChecks = [...variantChecks(variant), ...explicitChecks];
@@ -104,8 +100,7 @@ export const numberInterpreter: SchemaInterpreterMap = {
     const base = errorFn ? ctor({ error: errorFn }) : ctor();
     return applyNumberChecks(base as z.ZodNumber, allChecks);
   },
-  // biome-ignore lint/correctness/useYield: conforms to SchemaInterpreterMap generator signature
-  "zod/nan": async function* (node: ZodNanNode): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+  "zod/nan": async function* (node: ZodNanNode): AsyncGenerator<unknown, z.ZodType, unknown> {
     const errorFn = toZodError(node.error as ErrorConfig | undefined);
     return errorFn ? z.nan({ error: errorFn }) : z.nan();
   },

@@ -28,7 +28,7 @@ const examples: Record<string, NodeExample> = {
 const prog = app({ search: "string" }, ($) => {
   return $.sql\`SELECT * FROM users WHERE name LIKE $\{$.input.search}\`;
 });
-await foldAST(
+await fold(
   defaults(app, { postgres: wasmPgInterpreter }),
   injectInput(prog, { search: "%li%" })
 );`,
@@ -42,7 +42,7 @@ await foldAST(
 const prog = app({ col: "string" }, ($) => {
   return $.sql\`SELECT $\{$.sql.id($.input.col)} FROM users\`;
 });
-await foldAST(
+await fold(
   defaults(app, { postgres: wasmPgInterpreter }),
   injectInput(prog, { col: "name" })
 );`,
@@ -57,7 +57,7 @@ const prog = app({}, ($) => {
   const user = { name: "Diana", email: "diana@example.com" };
   return $.sql\`INSERT INTO users $\{$.sql.insert(user)} RETURNING *\`;
 });
-await foldAST(defaults(app, { postgres: wasmPgInterpreter }), prog);`,
+await fold(defaults(app, { postgres: wasmPgInterpreter }), prog);`,
     plugins: PG,
     pglite: { seedSQL: SEED_SQL },
   },
@@ -69,7 +69,7 @@ const prog = app({}, ($) => {
   const updates = { name: "Alicia", email: "alicia@example.com" };
   return $.sql\`UPDATE users SET $\{$.sql.set(updates)} WHERE id = 1 RETURNING *\`;
 });
-await foldAST(defaults(app, { postgres: wasmPgInterpreter }), prog);`,
+await fold(defaults(app, { postgres: wasmPgInterpreter }), prog);`,
     plugins: PG,
     pglite: { seedSQL: SEED_SQL },
   },
@@ -85,7 +85,7 @@ const prog = app({}, ($) => {
     sql\`SELECT * FROM users ORDER BY id\`,
   ]);
 });
-await foldAST(defaults(app, { postgres: wasmPgInterpreter }), prog);`,
+await fold(defaults(app, { postgres: wasmPgInterpreter }), prog);`,
     plugins: PG,
     pglite: { seedSQL: SEED_SQL },
   },
@@ -104,7 +104,7 @@ const prog = app({}, ($) => {
     return [main, sp, final_];
   });
 });
-await foldAST(defaults(app, { postgres: wasmPgInterpreter }), prog);`,
+await fold(defaults(app, { postgres: wasmPgInterpreter }), prog);`,
     plugins: PG,
     pglite: { seedSQL: SEED_SQL },
   },
@@ -118,7 +118,7 @@ const prog = app({}, ($) => {
     return $.console.log("batch:", batch);
   });
 });
-await foldAST(defaults(app, { postgres: wasmPgInterpreter }), prog);`,
+await fold(defaults(app, { postgres: wasmPgInterpreter }), prog);`,
     plugins: PG,
     pglite: { seedSQL: SEED_SQL },
   },
@@ -132,7 +132,7 @@ const prog = app({}, ($) => {
     return $.console.log("row:", batch);
   });
 });
-await foldAST(defaults(app, { postgres: wasmPgInterpreter }), prog);`,
+await fold(defaults(app, { postgres: wasmPgInterpreter }), prog);`,
     plugins: PG,
     pglite: { seedSQL: SEED_SQL },
   },

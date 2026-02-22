@@ -12,7 +12,7 @@ const prog = app({ reqId: "string" }, ($) => {
     $.input.reqId
   );
 });
-await foldAST(defaults(app), injectInput(prog, { reqId: "abc-123" }));`,
+await fold(defaults(app), injectInput(prog, { reqId: "abc-123" }));`,
     plugins: PINO,
   },
 
@@ -25,7 +25,7 @@ const prog = app({ userId: "number" }, ($) => {
     $.input.userId
   );
 });
-await foldAST(defaults(app), injectInput(prog, { userId: 42 }));`,
+await fold(defaults(app), injectInput(prog, { userId: 42 }));`,
     plugins: PINO,
   },
 
@@ -38,7 +38,7 @@ const prog = app({ port: "number" }, ($) => {
     $.input.port
   );
 });
-await foldAST(defaults(app), injectInput(prog, { port: 3000 }));`,
+await fold(defaults(app), injectInput(prog, { port: 3000 }));`,
     plugins: PINO,
   },
 
@@ -51,7 +51,7 @@ const prog = app({ retries: "number" }, ($) => {
     $.input.retries
   );
 });
-await foldAST(defaults(app), injectInput(prog, { retries: 4 }));`,
+await fold(defaults(app), injectInput(prog, { retries: 4 }));`,
     plugins: PINO,
   },
 
@@ -64,7 +64,7 @@ const prog = app({ code: "number" }, ($) => {
     $.input.code
   );
 });
-await foldAST(defaults(app), injectInput(prog, { code: 500 }));`,
+await fold(defaults(app), injectInput(prog, { code: 500 }));`,
     plugins: PINO,
   },
 
@@ -77,7 +77,7 @@ const prog = app({ reason: "string" }, ($) => {
     $.input.reason
   );
 });
-await foldAST(defaults(app), injectInput(prog, { reason: "out of memory" }));`,
+await fold(defaults(app), injectInput(prog, { reason: "out of memory" }));`,
     plugins: PINO,
   },
 };

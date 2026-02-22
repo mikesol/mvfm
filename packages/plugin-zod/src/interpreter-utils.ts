@@ -1,10 +1,9 @@
-import type { TypedNode } from "@mvfm/core";
 import type { z } from "zod";
 import type { CheckDescriptor, ErrorConfig } from "./types";
 
 export type SchemaInterpreterMap = Record<
   string,
-  (node: any) => AsyncGenerator<TypedNode, z.ZodType, unknown>
+  (node: any) => AsyncGenerator<unknown, z.ZodType, unknown>
 >;
 
 /**

@@ -1,6 +1,6 @@
-import type { Interpreter, TypedNode } from "@mvfm/core";
-import { defineInterpreter, eval_ } from "@mvfm/core";
+import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import { wrapAnthropicSdk } from "./client-anthropic-sdk";
+import type { AnthropicConfig } from "./index";
 
 /**
  * Anthropic client interface consumed by the anthropic handler.
@@ -13,138 +13,85 @@ export interface AnthropicClient {
   request(method: string, path: string, params?: Record<string, unknown>): Promise<unknown>;
 }
 
-/** A `anthropic/create_message` node. */
-export interface AnthropicCreateMessageNode extends TypedNode<unknown> {
-  kind: "anthropic/create_message";
-  params: TypedNode<Record<string, unknown>>;
-}
-
-/** A `anthropic/count_tokens` node. */
-export interface AnthropicCountTokensNode extends TypedNode<unknown> {
-  kind: "anthropic/count_tokens";
-  params: TypedNode<Record<string, unknown>>;
-}
-
-/** A `anthropic/create_message_batch` node. */
-export interface AnthropicCreateMessageBatchNode extends TypedNode<unknown> {
-  kind: "anthropic/create_message_batch";
-  params: TypedNode<Record<string, unknown>>;
-}
-
-/** A `anthropic/retrieve_message_batch` node. */
-export interface AnthropicRetrieveMessageBatchNode extends TypedNode<unknown> {
-  kind: "anthropic/retrieve_message_batch";
-  id: TypedNode<string>;
-}
-
-/** A `anthropic/list_message_batches` node. */
-export interface AnthropicListMessageBatchesNode extends TypedNode<unknown> {
-  kind: "anthropic/list_message_batches";
-  params?: TypedNode<Record<string, unknown>> | null;
-}
-
-/** A `anthropic/delete_message_batch` node. */
-export interface AnthropicDeleteMessageBatchNode extends TypedNode<unknown> {
-  kind: "anthropic/delete_message_batch";
-  id: TypedNode<string>;
-}
-
-/** A `anthropic/cancel_message_batch` node. */
-export interface AnthropicCancelMessageBatchNode extends TypedNode<unknown> {
-  kind: "anthropic/cancel_message_batch";
-  id: TypedNode<string>;
-}
-
-/** A `anthropic/retrieve_model` node. */
-export interface AnthropicRetrieveModelNode extends TypedNode<unknown> {
-  kind: "anthropic/retrieve_model";
-  id: TypedNode<string>;
-}
-
-/** A `anthropic/list_models` node. */
-export interface AnthropicListModelsNode extends TypedNode<unknown> {
-  kind: "anthropic/list_models";
-  params?: TypedNode<Record<string, unknown>> | null;
-}
-
-declare module "@mvfm/core" {
-  interface NodeTypeMap {
-    "anthropic/create_message": AnthropicCreateMessageNode;
-    "anthropic/count_tokens": AnthropicCountTokensNode;
-    "anthropic/create_message_batch": AnthropicCreateMessageBatchNode;
-    "anthropic/retrieve_message_batch": AnthropicRetrieveMessageBatchNode;
-    "anthropic/list_message_batches": AnthropicListMessageBatchesNode;
-    "anthropic/delete_message_batch": AnthropicDeleteMessageBatchNode;
-    "anthropic/cancel_message_batch": AnthropicCancelMessageBatchNode;
-    "anthropic/retrieve_model": AnthropicRetrieveModelNode;
-    "anthropic/list_models": AnthropicListModelsNode;
-  }
-}
-
-type AnthropicKind =
-  | "anthropic/create_message"
-  | "anthropic/count_tokens"
-  | "anthropic/create_message_batch"
-  | "anthropic/retrieve_message_batch"
-  | "anthropic/list_message_batches"
-  | "anthropic/delete_message_batch"
-  | "anthropic/cancel_message_batch"
-  | "anthropic/retrieve_model"
-  | "anthropic/list_models";
-
 /**
- * Creates an interpreter for `anthropic/*` node kinds.
+ * Creates an interpreter for `anthropic/*` node kinds using the new
+ * RuntimeEntry + positional yield pattern.
+ *
+ * Config (apiKey, baseURL) is captured in the closure,
+ * not stored on AST nodes.
  *
  * @param client - The {@link AnthropicClient} to execute against.
  * @returns An Interpreter handling all anthropic node kinds.
  */
 export function createAnthropicInterpreter(client: AnthropicClient): Interpreter {
-  return defineInterpreter<AnthropicKind>()({
-    "anthropic/create_message": async function* (node: AnthropicCreateMessageNode) {
-      const params = yield* eval_(node.params);
-      return await client.request("POST", "/v1/messages", params);
+  return {
+    "anthropic/create_message": async function* (_entry: RuntimeEntry) {
+      const body = yield 0;
+      return await client.request("POST", "/v1/messages", body as Record<string, unknown>);
     },
 
-    "anthropic/count_tokens": async function* (node: AnthropicCountTokensNode) {
-      const params = yield* eval_(node.params);
-      return await client.request("POST", "/v1/messages/count_tokens", params);
+    "anthropic/count_tokens": async function* (_entry: RuntimeEntry) {
+      const body = yield 0;
+      return await client.request(
+        "POST",
+        "/v1/messages/count_tokens",
+        body as Record<string, unknown>,
+      );
     },
 
-    "anthropic/create_message_batch": async function* (node: AnthropicCreateMessageBatchNode) {
-      const params = yield* eval_(node.params);
-      return await client.request("POST", "/v1/messages/batches", params);
+    "anthropic/create_message_batch": async function* (_entry: RuntimeEntry) {
+      const body = yield 0;
+      return await client.request("POST", "/v1/messages/batches", body as Record<string, unknown>);
     },
 
-    "anthropic/retrieve_message_batch": async function* (node: AnthropicRetrieveMessageBatchNode) {
-      const id = yield* eval_(node.id);
+    "anthropic/retrieve_message_batch": async function* (_entry: RuntimeEntry) {
+      const id = yield 0;
       return await client.request("GET", `/v1/messages/batches/${id}`);
     },
 
-    "anthropic/list_message_batches": async function* (node: AnthropicListMessageBatchesNode) {
-      const params = node.params != null ? yield* eval_(node.params) : undefined;
-      return await client.request("GET", "/v1/messages/batches", params);
+    "anthropic/list_message_batches": async function* (entry: RuntimeEntry) {
+      const body = entry.children.length > 0 ? ((yield 0) as Record<string, unknown>) : undefined;
+      return await client.request("GET", "/v1/messages/batches", body);
     },
 
-    "anthropic/delete_message_batch": async function* (node: AnthropicDeleteMessageBatchNode) {
-      const id = yield* eval_(node.id);
+    "anthropic/delete_message_batch": async function* (_entry: RuntimeEntry) {
+      const id = yield 0;
       return await client.request("DELETE", `/v1/messages/batches/${id}`);
     },
 
-    "anthropic/cancel_message_batch": async function* (node: AnthropicCancelMessageBatchNode) {
-      const id = yield* eval_(node.id);
+    "anthropic/cancel_message_batch": async function* (_entry: RuntimeEntry) {
+      const id = yield 0;
       return await client.request("POST", `/v1/messages/batches/${id}/cancel`);
     },
 
-    "anthropic/retrieve_model": async function* (node: AnthropicRetrieveModelNode) {
-      const id = yield* eval_(node.id);
+    "anthropic/retrieve_model": async function* (_entry: RuntimeEntry) {
+      const id = yield 0;
       return await client.request("GET", `/v1/models/${id}`);
     },
 
-    "anthropic/list_models": async function* (node: AnthropicListModelsNode) {
-      const params = node.params != null ? yield* eval_(node.params) : undefined;
-      return await client.request("GET", "/v1/models", params);
+    "anthropic/list_models": async function* (entry: RuntimeEntry) {
+      const body = entry.children.length > 0 ? ((yield 0) as Record<string, unknown>) : undefined;
+      return await client.request("GET", "/v1/models", body);
     },
-  });
+
+    "anthropic/record": async function* (entry: RuntimeEntry) {
+      const result: Record<string, unknown> = {};
+      for (let i = 0; i < entry.children.length; i += 2) {
+        const key = (yield i) as string;
+        const value = yield i + 1;
+        result[key] = value;
+      }
+      return result;
+    },
+
+    "anthropic/array": async function* (entry: RuntimeEntry) {
+      const result: unknown[] = [];
+      for (let i = 0; i < entry.children.length; i++) {
+        result.push(yield i);
+      }
+      return result;
+    },
+  };
 }
 
 function requiredEnv(name: "ANTHROPIC_API_KEY"): string {
@@ -159,7 +106,9 @@ function requiredEnv(name: "ANTHROPIC_API_KEY"): string {
   return value;
 }
 
-const dynamicImport = new Function("m", "return import(m)") as (moduleName: string) => Promise<any>;
+const dynamicImport = new Function("m", "return import(m)") as (
+  moduleName: string,
+) => Promise<Record<string, unknown>>;
 
 function lazyInterpreter(factory: () => Interpreter): Interpreter {
   let cached: Interpreter | undefined;
@@ -178,7 +127,12 @@ function lazyInterpreter(factory: () => Interpreter): Interpreter {
       const descriptor = Object.getOwnPropertyDescriptor(get(), property);
       return descriptor
         ? descriptor
-        : { configurable: true, enumerable: true, writable: false, value: undefined };
+        : {
+            configurable: true,
+            enumerable: true,
+            writable: false,
+            value: undefined,
+          };
     },
   });
 }
@@ -194,12 +148,10 @@ export const anthropicInterpreter: Interpreter = lazyInterpreter(() =>
         if (!clientPromise) {
           const apiKey = requiredEnv("ANTHROPIC_API_KEY");
           clientPromise = dynamicImport("@anthropic-ai/sdk").then((moduleValue) => {
-            const Anthropic = moduleValue.default;
-            return wrapAnthropicSdk(
-              new Anthropic({
-                apiKey,
-              }),
-            );
+            const Anthropic = moduleValue.default as new (
+              opts: AnthropicConfig,
+            ) => Parameters<typeof wrapAnthropicSdk>[0];
+            return wrapAnthropicSdk(new Anthropic({ apiKey }));
           });
         }
         return clientPromise;

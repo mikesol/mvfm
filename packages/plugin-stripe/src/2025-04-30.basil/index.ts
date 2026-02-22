@@ -1,122 +1,56 @@
 // ============================================================
-// MVFM PLUGIN: stripe (stripe-node compatible API)
+// MVFM PLUGIN: stripe (stripe-node compatible API) — unified Plugin
 // ============================================================
 //
-// Implementation status: PARTIAL (3 of 57 top-level resources)
-// Plugin size: LARGE — at pass 1 of 60/30/10 split (3 of 57 resources)
+// Ported to the unified Plugin type with makeCExpr and
+// index-based fold handlers. Config captured in interpreter
+// closure, not stored on AST nodes.
 //
 // Implemented:
 //   - PaymentIntents: create, retrieve, confirm
 //   - Customers: create, retrieve, update, list
 //   - Charges: create, retrieve, list
-//
-// Not doable (fundamental mismatch with AST model):
-//   (none — every Stripe resource is request/response, all are
-//   modelable. Even pagination can be done via $.rec + has_more.)
-//
-// Remaining (same CRUD pattern, add as needed):
-//   Accounts, AccountLinks, AccountSessions, ApplicationFees,
-//   Balance, BalanceTransactions, Coupons, CreditNotes,
-//   Disputes, Events, Files, FileLinks, Invoices, InvoiceItems,
-//   Mandates, PaymentLinks, PaymentMethods, Payouts, Plans,
-//   Prices, Products, PromotionCodes, Quotes, Refunds,
-//   SetupIntents, ShippingRates, Sources, Subscriptions,
-//   SubscriptionItems, SubscriptionSchedules, Tokens, Topups,
-//   Transfers, WebhookEndpoints, and sub-resources under
-//   Billing, Checkout, Climate, Identity, Issuing, Radar,
-//   Reporting, Sigma, Tax, Terminal, Treasury.
-//
-//   Each resource follows the same pattern: add node kinds,
-//   add methods to StripeMethods, add switch cases to the
-//   interpreter. The interpreter/handler architecture does
-//   not need to change — stripe/api_call covers everything.
-//
-// ============================================================
-//
-// Goal: An LLM that knows stripe-node should be able to write
-// Mvfm programs with near-zero learning curve. The API should
-// look like the real stripe-node SDK as closely as possible.
-//
-// Real stripe-node API (v2025-04-30.basil):
-//   const stripe = new Stripe('sk_test_...')
-//   const pi = await stripe.paymentIntents.create({ amount: 2000, currency: 'usd' })
-//   const pi = await stripe.paymentIntents.retrieve('pi_123')
-//   const pi = await stripe.paymentIntents.confirm('pi_123', { payment_method: 'pm_abc' })
-//   const customer = await stripe.customers.create({ email: 'test@example.com' })
-//   const customer = await stripe.customers.retrieve('cus_123')
-//   const customer = await stripe.customers.update('cus_123', { name: 'New Name' })
-//   const customers = await stripe.customers.list({ limit: 10 })
-//   const charge = await stripe.charges.create({ amount: 5000, currency: 'usd' })
-//   const charge = await stripe.charges.retrieve('ch_123')
-//   const charges = await stripe.charges.list({ limit: 25 })
-//
-// Based on source-level analysis of stripe-node
-// (github.com/stripe/stripe-node). The SDK uses
-// StripeResource.extend() with stripeMethod() specs defining
-// HTTP method + fullPath for each operation.
-//
 // ============================================================
 
-import type { Expr, PluginContext } from "@mvfm/core";
-import { definePlugin } from "@mvfm/core";
-import { stripeInterpreter } from "./interpreter";
+import type { CExpr, Interpreter, KindSpec, Plugin } from "@mvfm/core";
+import { isCExpr, makeCExpr } from "@mvfm/core";
+import { wrapStripeSdk } from "./client-stripe-sdk";
+import { createStripeInterpreter, type StripeClient } from "./interpreter";
 
-// ---- What the plugin adds to $ ----------------------------
+// ---- liftArg: recursive plain-value → CExpr lifting --------
 
 /**
- * Stripe operations added to the DSL context by the stripe plugin.
- *
- * Mirrors the stripe-node SDK resource API: payment intents,
- * customers, and charges. Each resource exposes CRUD-style methods
- * that produce namespaced AST nodes.
+ * Recursively lifts a plain value into a CExpr tree.
+ * - CExpr values are returned as-is.
+ * - Primitives are returned as-is (elaborate lifts them).
+ * - Plain objects become `stripe/record` CExprs with key-value child pairs.
+ * - Arrays become `stripe/array` CExprs.
  */
-export interface StripeMethods {
-  /** Stripe API operations, namespaced under `$.stripe`. */
-  stripe: {
-    paymentIntents: {
-      /** Create a PaymentIntent. */
-      create(
-        params: Expr<Record<string, unknown>> | Record<string, unknown>,
-      ): Expr<Record<string, unknown>>;
-      /** Retrieve a PaymentIntent by ID. */
-      retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
-      /** Confirm a PaymentIntent, optionally with additional params. */
-      confirm(
-        id: Expr<string> | string,
-        params?: Expr<Record<string, unknown>> | Record<string, unknown>,
-      ): Expr<Record<string, unknown>>;
-    };
-    customers: {
-      /** Create a Customer. */
-      create(
-        params: Expr<Record<string, unknown>> | Record<string, unknown>,
-      ): Expr<Record<string, unknown>>;
-      /** Retrieve a Customer by ID. */
-      retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
-      /** Update a Customer by ID. */
-      update(
-        id: Expr<string> | string,
-        params: Expr<Record<string, unknown>> | Record<string, unknown>,
-      ): Expr<Record<string, unknown>>;
-      /** List Customers with optional filter params. */
-      list(
-        params?: Expr<Record<string, unknown>> | Record<string, unknown>,
-      ): Expr<Record<string, unknown>>;
-    };
-    charges: {
-      /** Create a Charge. */
-      create(
-        params: Expr<Record<string, unknown>> | Record<string, unknown>,
-      ): Expr<Record<string, unknown>>;
-      /** Retrieve a Charge by ID. */
-      retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
-      /** List Charges with optional filter params. */
-      list(
-        params?: Expr<Record<string, unknown>> | Record<string, unknown>,
-      ): Expr<Record<string, unknown>>;
-    };
-  };
+function liftArg(value: unknown): unknown {
+  if (isCExpr(value)) return value;
+  if (typeof value === "string") return value;
+  if (typeof value === "number") return value;
+  if (typeof value === "boolean") return value;
+  if (value === null || value === undefined) return value;
+  if (Array.isArray(value)) {
+    return makeCExpr("stripe/array", value.map(liftArg));
+  }
+  if (typeof value === "object") {
+    const pairs: unknown[] = [];
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      pairs.push(k, liftArg(v));
+    }
+    return makeCExpr("stripe/record", pairs);
+  }
+  return value;
 }
+
+// liftArg erases generic type info at runtime (returns unknown).
+// Cast helper restores the declared CExpr Args types for ExtractKinds.
+const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]>(
+  kind: Kind,
+  args: readonly unknown[],
+) => CExpr<O, Kind, Args>;
 
 // ---- Configuration ----------------------------------------
 
@@ -133,233 +67,191 @@ export interface StripeConfig {
   apiVersion?: string;
 }
 
-// ---- Plugin implementation --------------------------------
+// ---- Default interpreter wiring ---------------------------
 
-/**
- * Stripe plugin factory. Namespace: `stripe/`.
- *
- * Creates a plugin that exposes payment intents, customers, and charges
- * resource methods for building parameterized Stripe API call AST nodes.
- *
- * @param config - A {@link StripeConfig} with apiKey and optional apiVersion.
- * @returns A PluginDefinition for the stripe plugin.
- */
-export function stripe(config: StripeConfig) {
-  return definePlugin({
-    name: "stripe",
-    nodeKinds: [
-      "stripe/create_payment_intent",
-      "stripe/retrieve_payment_intent",
-      "stripe/confirm_payment_intent",
-      "stripe/create_customer",
-      "stripe/retrieve_customer",
-      "stripe/update_customer",
-      "stripe/list_customers",
-      "stripe/create_charge",
-      "stripe/retrieve_charge",
-      "stripe/list_charges",
-    ],
-    defaultInterpreter: () => stripeInterpreter,
+const dynamicImport = new Function("m", "return import(m)") as (
+  moduleName: string,
+) => Promise<Record<string, unknown>>;
 
-    build(ctx: PluginContext): StripeMethods {
-      // Helper: resolve an id argument to an AST node.
-      // If it's already an Expr, use its __node; otherwise lift the raw value.
-      function resolveId(id: Expr<string> | string) {
-        return ctx.isExpr(id) ? id.__node : ctx.lift(id).__node;
-      }
+function createDefaultInterpreter(config: StripeConfig): Interpreter {
+  let clientPromise: Promise<StripeClient> | undefined;
+  const getClient = async (): Promise<StripeClient> => {
+    if (!clientPromise) {
+      clientPromise = dynamicImport("stripe").then((moduleValue) => {
+        const Stripe = moduleValue.default as new (
+          apiKey: string,
+          opts?: Record<string, unknown>,
+        ) => Parameters<typeof wrapStripeSdk>[0];
+        const opts: Record<string, unknown> = {};
+        if (config.apiVersion) opts.apiVersion = config.apiVersion;
+        return wrapStripeSdk(new Stripe(config.apiKey, opts));
+      });
+    }
+    return clientPromise;
+  };
 
-      // Helper: resolve a params object to an AST node.
-      // ctx.lift handles both Expr and raw objects (lifts to core/record).
-      function resolveParams(params: Expr<Record<string, unknown>> | Record<string, unknown>) {
-        return ctx.lift(params).__node;
-      }
-
-      return {
-        stripe: {
-          paymentIntents: {
-            create(params) {
-              return ctx.expr({
-                kind: "stripe/create_payment_intent",
-                params: resolveParams(params),
-                config,
-              });
-            },
-
-            retrieve(id) {
-              return ctx.expr({
-                kind: "stripe/retrieve_payment_intent",
-                id: resolveId(id),
-                config,
-              });
-            },
-
-            confirm(id, params?) {
-              return ctx.expr({
-                kind: "stripe/confirm_payment_intent",
-                id: resolveId(id),
-                params: params != null ? resolveParams(params) : null,
-                config,
-              });
-            },
-          },
-
-          customers: {
-            create(params) {
-              return ctx.expr({
-                kind: "stripe/create_customer",
-                params: resolveParams(params),
-                config,
-              });
-            },
-
-            retrieve(id) {
-              return ctx.expr({
-                kind: "stripe/retrieve_customer",
-                id: resolveId(id),
-                config,
-              });
-            },
-
-            update(id, params) {
-              return ctx.expr({
-                kind: "stripe/update_customer",
-                id: resolveId(id),
-                params: resolveParams(params),
-                config,
-              });
-            },
-
-            list(params?) {
-              return ctx.expr({
-                kind: "stripe/list_customers",
-                params: params != null ? resolveParams(params) : null,
-                config,
-              });
-            },
-          },
-
-          charges: {
-            create(params) {
-              return ctx.expr({
-                kind: "stripe/create_charge",
-                params: resolveParams(params),
-                config,
-              });
-            },
-
-            retrieve(id) {
-              return ctx.expr({
-                kind: "stripe/retrieve_charge",
-                id: resolveId(id),
-                config,
-              });
-            },
-
-            list(params?) {
-              return ctx.expr({
-                kind: "stripe/list_charges",
-                params: params != null ? resolveParams(params) : null,
-                config,
-              });
-            },
-          },
-        },
-      };
+  const lazyClient: StripeClient = {
+    async request(
+      method: string,
+      path: string,
+      params?: Record<string, unknown>,
+    ): Promise<unknown> {
+      const client = await getClient();
+      return client.request(method, path, params);
     },
-  });
+  };
+
+  return createStripeInterpreter(lazyClient);
 }
 
-// ============================================================
-// HONEST ASSESSMENT: What works, what's hard, what breaks
-// ============================================================
-//
-// WORKS GREAT:
-//
-// 1. Basic CRUD operations:
-//    Real:  const pi = await stripe.paymentIntents.create({ amount: 2000, currency: 'usd' })
-//    Mvfm:   const pi = $.stripe.paymentIntents.create({ amount: 2000, currency: 'usd' })
-//    Nearly identical. Only difference is $ prefix and no await.
-//
-// 2. Parameterized operations with proxy values:
-//    const customer = $.stripe.customers.create({ email: $.input.email })
-//    const pi = $.stripe.paymentIntents.create({ customer: customer.id, amount: $.input.amount })
-//    Proxy chains capture the dependency graph perfectly.
-//
-// 3. Resource method naming:
-//    Real:  stripe.paymentIntents.create(...)
-//    Mvfm:   $.stripe.paymentIntents.create(...)
-//    The nested resource pattern maps 1:1. An LLM that knows
-//    stripe-node can write Mvfm Stripe programs immediately.
-//
-// 4. Optional params:
-//    Real:  await stripe.paymentIntents.confirm('pi_123')
-//    Mvfm:   $.stripe.paymentIntents.confirm('pi_123')
-//    Both work. The AST stores null for omitted optional params.
-//
-// WORKS BUT DIFFERENT:
-//
-// 5. Return types:
-//    Real stripe-node has 100+ field response types (PaymentIntent,
-//    Customer, Charge, etc.) with precise type definitions.
-//    Mvfm uses Record<string, unknown> for all return types.
-//    Property access still works via proxy (customer.id, pi.status),
-//    but there's no IDE autocomplete for Stripe-specific fields.
-//    A future enhancement could add typed response interfaces.
-//
-// 6. Sequencing side effects:
-//    Real:  await stripe.customers.create(...)
-//           await stripe.paymentIntents.create(...)
-//    Mvfm:   const c = $.stripe.customers.create(...)
-//           const pi = $.stripe.paymentIntents.create({ customer: c.id })
-//           return $.begin(c, pi)
-//    Must use $.begin() for sequencing when there are data dependencies.
-//    Without data dependency, $.begin() is required to avoid orphan errors.
-//
-// DOESN'T WORK / NOT MODELED:
-//
-// 7. Pagination (auto-pagination):
-//    Real:  for await (const customer of stripe.customers.list()) { ... }
-//    Mvfm:   Can't model async iterators. $.stripe.customers.list()
-//           returns the first page. For full pagination, you'd need
-//           $.rec() with has_more / starting_after logic.
-//
-// 8. Webhooks:
-//    Real:  stripe.webhooks.constructEvent(body, sig, secret)
-//    Mvfm:   Not modeled. Webhooks are server-initiated push events,
-//           not request/response operations. They belong in the
-//           interpreter/runtime layer, not in the AST.
-//
-// 9. Idempotency keys, request options:
-//    Real:  stripe.paymentIntents.create({...}, { idempotencyKey: '...' })
-//    Mvfm:   Not modeled yet. stripe-node accepts a second RequestOptions
-//           argument on every method. This could be added as an optional
-//           second/third parameter that becomes an AST field.
-//
-// 10. Error handling:
-//    Real:  try { await stripe.charges.create(...) } catch (e) { if (e.type === 'card_error') ... }
-//    Mvfm:   $.try($.stripe.charges.create(...)).catch(err => fallback)
-//    Works via the error plugin. Stripe-specific error types
-//    (CardError, InvalidRequestError, etc.) would need interpreter
-//    support to map correctly.
-//
-// ============================================================
-// SUMMARY:
-// Based on source-level analysis of stripe-node
-// (github.com/stripe/stripe-node, API version 2025-04-30.basil).
-//
-// For the core 80% use case of "create/retrieve/update/list
-// resources" — this is nearly identical to real stripe-node.
-// Resource nesting (paymentIntents, customers, charges) maps 1:1.
-// Proxy chains capture cross-operation dependencies perfectly.
-//
-// The main gap is typed response objects — we use
-// Record<string, unknown> instead of Stripe.PaymentIntent etc.
-// This means no autocomplete on response fields, but property
-// access still works at runtime via proxy.
-//
-// Not supported: auto-pagination, webhooks, file uploads,
-// streaming, request-level options (idempotency keys, API
-// version overrides). These are either runtime concerns
-// (webhooks, streaming) or could be added incrementally
-// (idempotency keys as AST fields, pagination via $.rec).
-// ============================================================
+// ---- Constructor builder ----------------------------------
+
+/**
+ * Builds the stripe constructor methods using makeCExpr + liftArg.
+ *
+ * Each method produces a CExpr node with positional children.
+ * Config is NOT stored on AST nodes — it's captured by the interpreter.
+ *
+ * Constructors use permissive generics so any argument type is accepted
+ * at construction time. Validation happens at `app()` time via KindSpec.
+ */
+function buildStripeApi() {
+  return {
+    paymentIntents: {
+      /** Create a PaymentIntent. */
+      create<A>(params: A): CExpr<Record<string, unknown>, "stripe/create_payment_intent", [A]> {
+        return mk("stripe/create_payment_intent", [liftArg(params)]);
+      },
+      /** Retrieve a PaymentIntent by ID. */
+      retrieve<A>(id: A): CExpr<Record<string, unknown>, "stripe/retrieve_payment_intent", [A]> {
+        return mk("stripe/retrieve_payment_intent", [id]);
+      },
+      /** Confirm a PaymentIntent, optionally with additional params. */
+      confirm<A, B extends readonly unknown[]>(
+        id: A,
+        ...params: B
+      ): CExpr<Record<string, unknown>, "stripe/confirm_payment_intent", [A, ...B]> {
+        const lifted = params.map((p) => liftArg(p));
+        return mk("stripe/confirm_payment_intent", [id, ...lifted]);
+      },
+    },
+    customers: {
+      /** Create a Customer. */
+      create<A>(params: A): CExpr<Record<string, unknown>, "stripe/create_customer", [A]> {
+        return mk("stripe/create_customer", [liftArg(params)]);
+      },
+      /** Retrieve a Customer by ID. */
+      retrieve<A>(id: A): CExpr<Record<string, unknown>, "stripe/retrieve_customer", [A]> {
+        return mk("stripe/retrieve_customer", [id]);
+      },
+      /** Update a Customer by ID. */
+      update<A, B>(
+        id: A,
+        params: B,
+      ): CExpr<Record<string, unknown>, "stripe/update_customer", [A, B]> {
+        return mk("stripe/update_customer", [id, liftArg(params)]);
+      },
+      /** List Customers with optional filter params. */
+      list<A extends readonly unknown[]>(
+        ...params: A
+      ): CExpr<Record<string, unknown>, "stripe/list_customers", A> {
+        return mk(
+          "stripe/list_customers",
+          params.map((p) => liftArg(p)),
+        );
+      },
+    },
+    charges: {
+      /** Create a Charge. */
+      create<A>(params: A): CExpr<Record<string, unknown>, "stripe/create_charge", [A]> {
+        return mk("stripe/create_charge", [liftArg(params)]);
+      },
+      /** Retrieve a Charge by ID. */
+      retrieve<A>(id: A): CExpr<Record<string, unknown>, "stripe/retrieve_charge", [A]> {
+        return mk("stripe/retrieve_charge", [id]);
+      },
+      /** List Charges with optional filter params. */
+      list<A extends readonly unknown[]>(
+        ...params: A
+      ): CExpr<Record<string, unknown>, "stripe/list_charges", A> {
+        return mk(
+          "stripe/list_charges",
+          params.map((p) => liftArg(p)),
+        );
+      },
+    },
+  };
+}
+
+// ---- Plugin factory ---------------------------------------
+
+/**
+ * Creates the stripe plugin definition (unified Plugin type).
+ *
+ * @param config - A {@link StripeConfig} with apiKey and optional apiVersion.
+ * @returns A unified Plugin that contributes `$.stripe`.
+ */
+export function stripe(config: StripeConfig) {
+  return {
+    name: "stripe" as const,
+    ctors: { stripe: buildStripeApi() },
+    kinds: {
+      "stripe/create_payment_intent": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "stripe/retrieve_payment_intent": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "stripe/confirm_payment_intent": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "stripe/create_customer": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "stripe/retrieve_customer": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "stripe/update_customer": {
+        inputs: [undefined, undefined] as [unknown, unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown, unknown], unknown>,
+      "stripe/list_customers": {
+        inputs: [] as unknown[],
+        output: undefined as unknown,
+      } as KindSpec<unknown[], unknown>,
+      "stripe/create_charge": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "stripe/retrieve_charge": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "stripe/list_charges": {
+        inputs: [] as unknown[],
+        output: undefined as unknown,
+      } as KindSpec<unknown[], unknown>,
+      "stripe/record": {
+        inputs: [] as unknown[],
+        output: {} as Record<string, unknown>,
+      } as KindSpec<unknown[], Record<string, unknown>>,
+      "stripe/array": {
+        inputs: [] as unknown[],
+        output: [] as unknown[],
+      } as KindSpec<unknown[], unknown[]>,
+    },
+    traits: {},
+    lifts: {},
+    defaultInterpreter: (): Interpreter => createDefaultInterpreter(config),
+  } satisfies Plugin;
+}
+
+/**
+ * Alias for {@link stripe}, kept for readability at call sites.
+ */
+export const stripePlugin = stripe;

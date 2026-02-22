@@ -1,6 +1,6 @@
-import type { Interpreter, TypedNode } from "@mvfm/core";
-import { defineInterpreter, eval_ } from "@mvfm/core";
+import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import { wrapPino } from "./client-pino";
+import type { PinoConfig, PinoLevel } from "./index";
 
 /**
  * Pino client interface consumed by the pino handler.
@@ -18,134 +18,99 @@ export interface PinoClient {
   ): Promise<void>;
 }
 
-interface PinoNode<K extends string> extends TypedNode<void> {
-  kind: K;
-  level: string;
-  msg?: TypedNode<string>;
-  mergeObject?: TypedNode<Record<string, unknown>>;
-  bindings: TypedNode<Record<string, unknown>>[];
-}
-
-interface PinoTraceNode extends PinoNode<"pino/trace"> {
-  level: "trace";
-}
-interface PinoDebugNode extends PinoNode<"pino/debug"> {
-  level: "debug";
-}
-interface PinoInfoNode extends PinoNode<"pino/info"> {
-  level: "info";
-}
-interface PinoWarnNode extends PinoNode<"pino/warn"> {
-  level: "warn";
-}
-interface PinoErrorNode extends PinoNode<"pino/error"> {
-  level: "error";
-}
-interface PinoFatalNode extends PinoNode<"pino/fatal"> {
-  level: "fatal";
-}
-
-type PinoAnyNode =
-  | PinoTraceNode
-  | PinoDebugNode
-  | PinoInfoNode
-  | PinoWarnNode
-  | PinoErrorNode
-  | PinoFatalNode;
-
-declare module "@mvfm/core" {
-  interface NodeTypeMap {
-    "pino/trace": PinoTraceNode;
-    "pino/debug": PinoDebugNode;
-    "pino/info": PinoInfoNode;
-    "pino/warn": PinoWarnNode;
-    "pino/error": PinoErrorNode;
-    "pino/fatal": PinoFatalNode;
-  }
-}
+const LEVELS: ReadonlyArray<PinoLevel> = ["trace", "debug", "info", "warn", "error", "fatal"];
 
 /**
- * Creates an interpreter for `pino/*` node kinds.
+ * Creates an interpreter for `pino/*` node kinds using the new
+ * RuntimeEntry + positional yield pattern.
+ *
+ * Children layout for pino/<level> nodes:
+ *   [hasMsg(0|1), hasMergeObj(0|1), msg?, mergeObj?, ...bindings]
+ *
+ * Config is captured in the closure, not stored on AST nodes.
  *
  * @param client - The {@link PinoClient} to execute against.
+ * @param _config - Plugin config (captured in closure for future use).
  * @returns An Interpreter handling all pino node kinds.
  */
-export function createPinoInterpreter(client: PinoClient): Interpreter {
-  const handler = async function* (node: PinoAnyNode) {
-    const msg = node.msg != null ? yield* eval_(node.msg) : undefined;
-    const mergeObject = node.mergeObject != null ? yield* eval_(node.mergeObject) : undefined;
-    const bindings: Record<string, unknown>[] = [];
-    for (const b of node.bindings) {
-      bindings.push(yield* eval_(b));
+export function createPinoInterpreter(client?: PinoClient, _config: PinoConfig = {}): Interpreter {
+  const resolvedClient = client ?? lazyDefaultClient();
+
+  const interp: Interpreter = {};
+
+  for (const level of LEVELS) {
+    interp[`pino/${level}`] = async function* (entry: RuntimeEntry) {
+      const hasMsg = (yield 0) as number;
+      const hasMergeObj = (yield 1) as number;
+
+      let idx = 2;
+      const msg = hasMsg ? ((yield idx++) as string) : undefined;
+      const mergeObject = hasMergeObj ? ((yield idx++) as Record<string, unknown>) : undefined;
+
+      const bindings: Record<string, unknown>[] = [];
+      while (idx < entry.children.length) {
+        bindings.push((yield idx++) as Record<string, unknown>);
+      }
+
+      await resolvedClient.log(level, bindings, mergeObject, msg);
+      return undefined;
+    };
+  }
+
+  interp["pino/record"] = async function* (entry: RuntimeEntry) {
+    // Children are key-value pairs: [key0, val0, key1, val1, ...]
+    const result: Record<string, unknown> = {};
+    for (let i = 0; i < entry.children.length; i += 2) {
+      const key = (yield i) as string;
+      const value = yield i + 1;
+      result[key] = value;
     }
-    await client.log(node.level, bindings, mergeObject, msg);
-    return undefined;
+    return result;
   };
 
-  return defineInterpreter<
-    "pino/trace" | "pino/debug" | "pino/info" | "pino/warn" | "pino/error" | "pino/fatal"
-  >()({
-    "pino/trace": handler,
-    "pino/debug": handler,
-    "pino/info": handler,
-    "pino/warn": handler,
-    "pino/error": handler,
-    "pino/fatal": handler,
-  });
+  interp["pino/array"] = async function* (entry: RuntimeEntry) {
+    const result: unknown[] = [];
+    for (let i = 0; i < entry.children.length; i++) {
+      result.push(yield i);
+    }
+    return result;
+  };
+
+  return interp;
 }
 
-const dynamicImport = new Function("m", "return import(m)") as (moduleName: string) => Promise<any>;
+// ---- Lazy default client (dynamic import of pino) ----------
 
-function lazyInterpreter(factory: () => Interpreter): Interpreter {
-  let cached: Interpreter | undefined;
-  const get = () => (cached ??= factory());
-  return new Proxy({} as Interpreter, {
-    get(_target, property) {
-      return get()[property as keyof Interpreter];
+const dynamicImport = new Function("m", "return import(m)") as (
+  moduleName: string,
+) => Promise<Record<string, unknown>>;
+
+function lazyDefaultClient(): PinoClient {
+  let clientPromise: Promise<PinoClient> | undefined;
+  const getClient = async (): Promise<PinoClient> => {
+    if (!clientPromise) {
+      clientPromise = dynamicImport("pino").then((moduleValue) => {
+        const pinoFactory = moduleValue.default as () => unknown;
+        return wrapPino(pinoFactory() as Parameters<typeof wrapPino>[0]);
+      });
+    }
+    return clientPromise;
+  };
+
+  return {
+    async log(
+      level: string,
+      bindings: Record<string, unknown>[],
+      mergeObject?: Record<string, unknown>,
+      msg?: string,
+    ): Promise<void> {
+      const c = await getClient();
+      return c.log(level, bindings, mergeObject, msg);
     },
-    has(_target, property) {
-      return property in get();
-    },
-    ownKeys() {
-      return Reflect.ownKeys(get());
-    },
-    getOwnPropertyDescriptor(_target, property) {
-      const descriptor = Object.getOwnPropertyDescriptor(get(), property);
-      return descriptor
-        ? descriptor
-        : { configurable: true, enumerable: true, writable: false, value: undefined };
-    },
-  });
+  } satisfies PinoClient;
 }
 
 /**
- * Default pino interpreter that uses a default `pino()` logger.
+ * Default pino interpreter that uses a lazily-loaded `pino()` logger.
  */
-export const pinoInterpreter: Interpreter = lazyInterpreter(() =>
-  createPinoInterpreter(
-    (() => {
-      let clientPromise: Promise<PinoClient> | undefined;
-      const getClient = async (): Promise<PinoClient> => {
-        if (!clientPromise) {
-          clientPromise = dynamicImport("pino").then((moduleValue) => {
-            const pino = moduleValue.default as () => unknown;
-            return wrapPino(pino() as any);
-          });
-        }
-        return clientPromise;
-      };
-
-      return {
-        async log(
-          level: string,
-          bindings: Record<string, unknown>[],
-          mergeObject?: Record<string, unknown>,
-          msg?: string,
-        ): Promise<void> {
-          const client = await getClient();
-          return client.log(level, bindings, mergeObject, msg);
-        },
-      } satisfies PinoClient;
-    })(),
-  ),
-);
+export const pinoInterpreter: Interpreter = createPinoInterpreter();

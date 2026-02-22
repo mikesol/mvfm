@@ -3,6 +3,7 @@ import _Editor from "react-simple-code-editor";
 // Handle CJS default export
 const Editor = (_Editor as any).default || _Editor;
 import { createHighlighter, type Highlighter } from "shiki";
+import type { ConsoleInstance } from "@mvfm/plugin-console";
 
 import { MONO_THEME } from "../themes/mono";
 
@@ -105,13 +106,14 @@ export default function Playground({ code: initialCode, pglite, mockInterpreter,
     ]) {
       fakeConsole[m] = noop;
     }
+    const typedConsole = fakeConsole as unknown as ConsoleInstance;
 
     try {
       const { createPlaygroundScope } = await import("../playground-scope");
       const scope = await createPlaygroundScope(
-        fakeConsole,
+        typedConsole,
         parsedMockInterpreter.current,
-        pglite ? dbRef.current : undefined,
+        pglite ? (dbRef.current as import("../pglite-adapter").PgLiteQueryable) : undefined,
         redis,
         s3,
         cloudflareKv,

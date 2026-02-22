@@ -7,21 +7,11 @@ import {
   ListObjectsV2Command,
   PutObjectCommand,
 } from "@aws-sdk/client-s3";
-import type { Program } from "@mvfm/core";
-import {
-  coreInterpreter,
-  injectInput,
-  mvfm,
-  num,
-  numInterpreter,
-  str,
-  strInterpreter,
-} from "@mvfm/core";
+import { createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
 import { GenericContainer, type StartedTestContainer } from "testcontainers";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { s3 as s3Plugin } from "../../src/3.989.0";
+import { s3 as s3Factory } from "../../src/3.989.0";
 import { wrapAwsSdk } from "../../src/3.989.0/client-aws-sdk";
-import { serverEvaluate } from "../../src/3.989.0/handler.server";
 import { createS3Interpreter } from "../../src/3.989.0/interpreter";
 
 let container: StartedTestContainer | undefined;
@@ -29,7 +19,7 @@ let awsClient: AwsS3Client | undefined;
 
 const BUCKET = "test-bucket";
 
-const commands: Record<string, new (input: any) => any> = {
+const commands: Record<string, new (input: unknown) => unknown> = {
   PutObject: PutObjectCommand,
   GetObject: GetObjectCommand,
   DeleteObject: DeleteObjectCommand,
@@ -37,22 +27,19 @@ const commands: Record<string, new (input: any) => any> = {
   ListObjectsV2: ListObjectsV2Command,
 };
 
-const app = mvfm(num, str, s3Plugin({ region: "us-east-1" }));
+const plugin = s3Factory({ region: "us-east-1" });
+const plugins = [numPluginU, strPluginU, plugin] as const;
+const $ = mvfmU(...plugins);
+const app = createApp(...plugins);
 
-async function run(prog: Program, input: Record<string, unknown> = {}) {
+async function run(expr: unknown) {
   if (!awsClient) {
     throw new Error("S3 test client was not initialized");
   }
-  const injected = injectInput(prog, input);
   const client = wrapAwsSdk(awsClient, commands);
-  const baseInterpreter = {
-    ...createS3Interpreter(client),
-    ...coreInterpreter,
-    ...numInterpreter,
-    ...strInterpreter,
-  };
-  const evaluate = serverEvaluate(client, baseInterpreter);
-  return await evaluate(injected.ast.result);
+  const nexpr = app(expr as Parameters<typeof app>[0]);
+  const interp = defaults(plugins, { s3: createS3Interpreter(client) });
+  return await fold(nexpr, interp);
 }
 
 beforeAll(async () => {
@@ -81,7 +68,6 @@ beforeAll(async () => {
     },
   });
 
-  // Create the test bucket
   await awsClient.send(new CreateBucketCommand({ Bucket: BUCKET }));
 }, 120000);
 
@@ -98,24 +84,19 @@ afterAll(async () => {
 
 describe("s3 integration: putObject + getObject", () => {
   it("upload and download an object", async () => {
-    // Put
-    const putProg = app(($) =>
-      $.s3.putObject({ Bucket: BUCKET, Key: "hello.txt", Body: "Hello, S3!" }),
-    );
-    const putResult = (await run(putProg)) as any;
+    const putExpr = $.s3.putObject({ Bucket: BUCKET, Key: "hello.txt", Body: "Hello, S3!" });
+    const putResult = (await run(putExpr)) as Record<string, unknown>;
     expect(putResult.ETag).toBeDefined();
 
-    // Get
-    const getProg = app(($) => $.s3.getObject({ Bucket: BUCKET, Key: "hello.txt" }));
-    const getResult = (await run(getProg)) as any;
+    const getExpr = $.s3.getObject({ Bucket: BUCKET, Key: "hello.txt" });
+    const getResult = (await run(getExpr)) as Record<string, unknown>;
     expect(getResult.Body).toBe("Hello, S3!");
   });
 });
 
 describe("s3 integration: headObject", () => {
   it("get object metadata", async () => {
-    // Ensure object exists
-    await awsClient.send(
+    await awsClient!.send(
       new PutObjectCommand({
         Bucket: BUCKET,
         Key: "meta.txt",
@@ -123,16 +104,15 @@ describe("s3 integration: headObject", () => {
       }),
     );
 
-    const prog = app(($) => $.s3.headObject({ Bucket: BUCKET, Key: "meta.txt" }));
-    const result = (await run(prog)) as any;
+    const expr = $.s3.headObject({ Bucket: BUCKET, Key: "meta.txt" });
+    const result = (await run(expr)) as Record<string, unknown>;
     expect(result.ContentLength).toBeGreaterThan(0);
   });
 });
 
 describe("s3 integration: deleteObject", () => {
   it("delete an object", async () => {
-    // Create then delete
-    await awsClient.send(
+    await awsClient!.send(
       new PutObjectCommand({
         Bucket: BUCKET,
         Key: "to-delete.txt",
@@ -140,23 +120,22 @@ describe("s3 integration: deleteObject", () => {
       }),
     );
 
-    const prog = app(($) => $.s3.deleteObject({ Bucket: BUCKET, Key: "to-delete.txt" }));
-    const result = await run(prog);
+    const expr = $.s3.deleteObject({ Bucket: BUCKET, Key: "to-delete.txt" });
+    const result = await run(expr);
     expect(result).toBeDefined();
   });
 });
 
 describe("s3 integration: listObjectsV2", () => {
   it("list objects with prefix", async () => {
-    // Create objects with a prefix
-    await awsClient.send(
+    await awsClient!.send(
       new PutObjectCommand({
         Bucket: BUCKET,
         Key: "list-test/a.txt",
         Body: "a",
       }),
     );
-    await awsClient.send(
+    await awsClient!.send(
       new PutObjectCommand({
         Bucket: BUCKET,
         Key: "list-test/b.txt",
@@ -164,30 +143,13 @@ describe("s3 integration: listObjectsV2", () => {
       }),
     );
 
-    const prog = app(($) => $.s3.listObjectsV2({ Bucket: BUCKET, Prefix: "list-test/" }));
-    const result = (await run(prog)) as any;
+    const expr = $.s3.listObjectsV2({ Bucket: BUCKET, Prefix: "list-test/" });
+    const result = (await run(expr)) as Record<string, unknown>;
     expect(result.Contents).toBeDefined();
-    expect(result.Contents.length).toBeGreaterThanOrEqual(2);
-    const keys = result.Contents.map((c: any) => c.Key);
+    const contents = result.Contents as Array<{ Key: string }>;
+    expect(contents.length).toBeGreaterThanOrEqual(2);
+    const keys = contents.map((c) => c.Key);
     expect(keys).toContain("list-test/a.txt");
     expect(keys).toContain("list-test/b.txt");
-  });
-});
-
-describe("s3 integration: input resolution", () => {
-  it("resolves dynamic input values", async () => {
-    await awsClient.send(
-      new PutObjectCommand({
-        Bucket: BUCKET,
-        Key: "dynamic.txt",
-        Body: "dynamic content",
-      }),
-    );
-
-    const prog = app({ key: "string" }, ($) =>
-      $.s3.getObject({ Bucket: BUCKET, Key: $.input.key }),
-    );
-    const result = (await run(prog, { key: "dynamic.txt" })) as any;
-    expect(result.Body).toBe("dynamic content");
   });
 });

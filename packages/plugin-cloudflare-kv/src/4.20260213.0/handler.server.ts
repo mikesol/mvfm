@@ -1,5 +1,4 @@
-import type { Interpreter, TypedNode } from "@mvfm/core";
-import { foldAST } from "@mvfm/core";
+import type { Interpreter } from "@mvfm/core";
 import { type CloudflareKvClient, createCloudflareKvInterpreter } from "./interpreter";
 
 /**
@@ -13,16 +12,15 @@ export function serverInterpreter(client: CloudflareKvClient): Interpreter {
 }
 
 /**
- * Creates a unified evaluator using the cloudflare-kv server interpreter.
+ * Creates a combined interpreter merging cloudflare-kv handlers with a base interpreter.
  *
  * @param client - The {@link CloudflareKvClient} to execute against.
  * @param baseInterpreter - Base interpreter for evaluating sub-expressions.
- * @returns An async AST evaluator function.
+ * @returns A merged Interpreter for both base and cloudflare-kv node kinds.
  */
 export function serverEvaluate(
   client: CloudflareKvClient,
   baseInterpreter: Interpreter,
-): (root: TypedNode) => Promise<unknown> {
-  const interp = { ...baseInterpreter, ...createCloudflareKvInterpreter(client) };
-  return (root: TypedNode) => foldAST(interp, root);
+): Interpreter {
+  return { ...baseInterpreter, ...createCloudflareKvInterpreter(client) };
 }

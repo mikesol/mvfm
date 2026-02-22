@@ -1,5 +1,4 @@
-import type { Program } from "@mvfm/core";
-import { coreInterpreter, foldAST, injectInput, mvfm, num, str } from "@mvfm/core";
+import { createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { cloudflareKv } from "../../src/4.20260213.0";
 import {
@@ -7,10 +6,13 @@ import {
   createCloudflareKvInterpreter,
 } from "../../src/4.20260213.0/interpreter";
 
-const app = mvfm(num, str, cloudflareKv({ namespaceId: "MY_KV" }));
+const plugin = cloudflareKv({ namespaceId: "MY_KV" });
+const plugins = [numPluginU, strPluginU, plugin] as const;
+const $ = mvfmU(...plugins);
+const app = createApp(...plugins);
 
-async function run(prog: Program, input: Record<string, unknown> = {}) {
-  const captured: any[] = [];
+async function run(expr: unknown) {
+  const captured: Array<Record<string, unknown>> = [];
   const mockClient: CloudflareKvClient = {
     async get(key) {
       captured.push({ operation: "get", key });
@@ -31,9 +33,11 @@ async function run(prog: Program, input: Record<string, unknown> = {}) {
       return { keys: [{ name: "key1" }], list_complete: true };
     },
   };
-  const injected = injectInput(prog, input);
-  const combined = { ...createCloudflareKvInterpreter(mockClient), ...coreInterpreter };
-  const result = await foldAST(combined, injected);
+  const nexpr = app(expr as Parameters<typeof app>[0]);
+  const interp = defaults(plugins, {
+    "cloudflare-kv": createCloudflareKvInterpreter(mockClient),
+  });
+  const result = await fold(nexpr, interp);
   return { result, captured };
 }
 
@@ -43,8 +47,8 @@ async function run(prog: Program, input: Record<string, unknown> = {}) {
 
 describe("cloudflare-kv interpreter: get", () => {
   it("calls client.get with the key", async () => {
-    const prog = app(($) => $.kv.get("my-key"));
-    const { captured } = await run(prog);
+    const expr = $.kv.get("my-key");
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].operation).toBe("get");
     expect(captured[0].key).toBe("my-key");
@@ -57,8 +61,8 @@ describe("cloudflare-kv interpreter: get", () => {
 
 describe("cloudflare-kv interpreter: get with json type", () => {
   it("calls client.getJson with the key", async () => {
-    const prog = app(($) => $.kv.get("config-key", "json"));
-    const { captured } = await run(prog);
+    const expr = $.kv.get("config-key", "json");
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].operation).toBe("get_json");
     expect(captured[0].key).toBe("config-key");
@@ -71,8 +75,8 @@ describe("cloudflare-kv interpreter: get with json type", () => {
 
 describe("cloudflare-kv interpreter: put", () => {
   it("calls client.put with key and value", async () => {
-    const prog = app(($) => $.kv.put("my-key", "my-value"));
-    const { captured } = await run(prog);
+    const expr = $.kv.put("my-key", "my-value");
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].operation).toBe("put");
     expect(captured[0].key).toBe("my-key");
@@ -81,8 +85,8 @@ describe("cloudflare-kv interpreter: put", () => {
   });
 
   it("includes options when provided", async () => {
-    const prog = app(($) => $.kv.put("key", "val", { expirationTtl: 3600 }));
-    const { captured } = await run(prog);
+    const expr = $.kv.put("key", "val", { expirationTtl: 3600 });
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].options).toEqual({ expirationTtl: 3600 });
   });
@@ -94,8 +98,8 @@ describe("cloudflare-kv interpreter: put", () => {
 
 describe("cloudflare-kv interpreter: delete", () => {
   it("calls client.delete with the key", async () => {
-    const prog = app(($) => $.kv.delete("old-key"));
-    const { captured } = await run(prog);
+    const expr = $.kv.delete("old-key");
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].operation).toBe("delete");
     expect(captured[0].key).toBe("old-key");
@@ -108,40 +112,19 @@ describe("cloudflare-kv interpreter: delete", () => {
 
 describe("cloudflare-kv interpreter: list", () => {
   it("calls client.list with options", async () => {
-    const prog = app(($) => $.kv.list({ prefix: "user:", limit: 100 }));
-    const { captured } = await run(prog);
+    const expr = $.kv.list({ prefix: "user:", limit: 100 });
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].operation).toBe("list");
     expect(captured[0].options).toEqual({ prefix: "user:", limit: 100 });
   });
 
   it("calls client.list with undefined options when not provided", async () => {
-    const prog = app(($) => $.kv.list());
-    const { captured } = await run(prog);
+    const expr = $.kv.list();
+    const { captured } = await run(expr);
     expect(captured).toHaveLength(1);
     expect(captured[0].operation).toBe("list");
     expect(captured[0].options).toBeUndefined();
-  });
-});
-
-// ============================================================
-// input resolution
-// ============================================================
-
-describe("cloudflare-kv interpreter: input resolution", () => {
-  it("resolves input key through evaluation", async () => {
-    const prog = app({ cacheKey: "string" }, ($) => $.kv.get($.input.cacheKey));
-    const { captured } = await run(prog, { cacheKey: "dynamic-key" });
-    expect(captured).toHaveLength(1);
-    expect(captured[0].key).toBe("dynamic-key");
-  });
-
-  it("resolves input key and value for put", async () => {
-    const prog = app({ key: "string", val: "string" }, ($) => $.kv.put($.input.key, $.input.val));
-    const { captured } = await run(prog, { key: "k", val: "v" });
-    expect(captured).toHaveLength(1);
-    expect(captured[0].key).toBe("k");
-    expect(captured[0].value).toBe("v");
   });
 });
 
@@ -151,20 +134,30 @@ describe("cloudflare-kv interpreter: input resolution", () => {
 
 describe("cloudflare-kv interpreter: return value", () => {
   it("returns the client response for get", async () => {
-    const prog = app(($) => $.kv.get("key"));
-    const { result } = await run(prog);
+    const expr = $.kv.get("key");
+    const { result } = await run(expr);
     expect(result).toBe("mock-text-value");
   });
 
   it("returns the client response for get json", async () => {
-    const prog = app(($) => $.kv.get("key", "json"));
-    const { result } = await run(prog);
+    const expr = $.kv.get("key", "json");
+    const { result } = await run(expr);
     expect(result).toEqual({ mock: true });
   });
 
   it("returns the client response for list", async () => {
-    const prog = app(($) => $.kv.list());
-    const { result } = await run(prog);
+    const expr = $.kv.list();
+    const { result } = await run(expr);
     expect(result).toEqual({ keys: [{ name: "key1" }], list_complete: true });
+  });
+});
+
+// ============================================================
+// defaults() throws without override
+// ============================================================
+
+describe("cloudflare-kv interpreter: defaults() without override", () => {
+  it("throws when no override provided for cloudflare-kv plugin", () => {
+    expect(() => defaults(plugins)).toThrow(/no defaultInterpreter/i);
   });
 });

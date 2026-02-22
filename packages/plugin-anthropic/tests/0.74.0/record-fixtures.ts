@@ -48,7 +48,7 @@ function save(name: string, fixture: Fixture): void {
   const filePath = resolve(FIXTURES_DIR, `${name}.json`);
   writeFileSync(
     filePath,
-    JSON.stringify({ request: fixture.request, response: fixture.response }, null, 2) + "\n",
+    `${JSON.stringify({ request: fixture.request, response: fixture.response }, null, 2)}\n`,
   );
   console.log(`  saved ${name}.json`);
 }

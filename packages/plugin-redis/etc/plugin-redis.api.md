@@ -15,15 +15,99 @@ export interface ClientHandlerOptions {
 // Warning: (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter;
+export function clientInterpreter(options: ClientHandlerOptions, kinds: string[]): Interpreter;
 
 // @public
-export function createRedisInterpreter(client: RedisClient): Interpreter<"redis/get" | "redis/set" | "redis/incr" | "redis/incrby" | "redis/decr" | "redis/decrby" | "redis/mget" | "redis/mset" | "redis/append" | "redis/getrange" | "redis/setrange" | "redis/del" | "redis/exists" | "redis/expire" | "redis/pexpire" | "redis/ttl" | "redis/pttl" | "redis/hget" | "redis/hset" | "redis/hmget" | "redis/hgetall" | "redis/hdel" | "redis/hexists" | "redis/hlen" | "redis/hkeys" | "redis/hvals" | "redis/hincrby" | "redis/lpush" | "redis/rpush" | "redis/lpop" | "redis/rpop" | "redis/llen" | "redis/lrange" | "redis/lindex" | "redis/lset" | "redis/lrem" | "redis/linsert">;
+export function createRedisInterpreter(client: RedisClient): Interpreter;
 
-// Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
-//
 // @public
-export function redis(config?: RedisConfig | string): PluginDefinition<RedisMethods, {}, "redis/get" | "redis/set" | "redis/incr" | "redis/incrby" | "redis/decr" | "redis/decrby" | "redis/mget" | "redis/mset" | "redis/append" | "redis/getrange" | "redis/setrange" | "redis/del" | "redis/exists" | "redis/expire" | "redis/pexpire" | "redis/ttl" | "redis/pttl" | "redis/hget" | "redis/hset" | "redis/hmget" | "redis/hgetall" | "redis/hdel" | "redis/hexists" | "redis/hlen" | "redis/hkeys" | "redis/hvals" | "redis/hincrby" | "redis/lpush" | "redis/rpush" | "redis/lpop" | "redis/rpop" | "redis/llen" | "redis/lrange" | "redis/lindex" | "redis/lset" | "redis/lrem" | "redis/linsert">;
+export function redis(config?: RedisConfig | string): {
+    name: "redis";
+    ctors: {
+        redis: {
+            get<A>(key: A): CExpr<string | null, "redis/get", [A]>;
+            set<A, B, C extends readonly unknown[]>(key: A, value: B, ...args: C): CExpr<string | null, "redis/set", [A, B, ...C]>;
+            incr<A>(key: A): CExpr<number, "redis/incr", [A]>;
+            incrby<A, B>(key: A, increment: B): CExpr<number, "redis/incrby", [A, B]>;
+            decr<A>(key: A): CExpr<number, "redis/decr", [A]>;
+            decrby<A, B>(key: A, decrement: B): CExpr<number, "redis/decrby", [A, B]>;
+            mget<A extends readonly unknown[]>(...keys: A): CExpr<(string | null)[], "redis/mget", A>;
+            mset<A>(mapping: A): CExpr<"OK", "redis/mset", [A]>;
+            append<A, B>(key: A, value: B): CExpr<number, "redis/append", [A, B]>;
+            getrange<A, B, C>(key: A, start: B, end: C): CExpr<string, "redis/getrange", [A, B, C]>;
+            setrange<A, B, C>(key: A, offset: B, value: C): CExpr<number, "redis/setrange", [A, B, C]>;
+            del<A extends readonly unknown[]>(...keys: A): CExpr<number, "redis/del", A>;
+            exists<A extends readonly unknown[]>(...keys: A): CExpr<number, "redis/exists", A>;
+            expire<A, B>(key: A, seconds: B): CExpr<number, "redis/expire", [A, B]>;
+            pexpire<A, B>(key: A, milliseconds: B): CExpr<number, "redis/pexpire", [A, B]>;
+            ttl<A>(key: A): CExpr<number, "redis/ttl", [A]>;
+            pttl<A>(key: A): CExpr<number, "redis/pttl", [A]>;
+            hget<A, B>(key: A, field: B): CExpr<string | null, "redis/hget", [A, B]>;
+            hset<A, B>(key: A, mapping: B): CExpr<number, "redis/hset", [A, B]>;
+            hmget<A, B extends readonly unknown[]>(key: A, ...fields: B): CExpr<(string | null)[], "redis/hmget", [A, ...B]>;
+            hgetall<A>(key: A): CExpr<string[], "redis/hgetall", [A]>;
+            hdel<A, B extends readonly unknown[]>(key: A, ...fields: B): CExpr<number, "redis/hdel", [A, ...B]>;
+            hexists<A, B>(key: A, field: B): CExpr<number, "redis/hexists", [A, B]>;
+            hlen<A>(key: A): CExpr<number, "redis/hlen", [A]>;
+            hkeys<A>(key: A): CExpr<string[], "redis/hkeys", [A]>;
+            hvals<A>(key: A): CExpr<string[], "redis/hvals", [A]>;
+            hincrby<A, B, C>(key: A, field: B, increment: C): CExpr<number, "redis/hincrby", [A, B, C]>;
+            lpush<A, B extends readonly unknown[]>(key: A, ...elements: B): CExpr<number, "redis/lpush", [A, ...B]>;
+            rpush<A, B extends readonly unknown[]>(key: A, ...elements: B): CExpr<number, "redis/rpush", [A, ...B]>;
+            lpop<A>(key: A, count?: unknown): CExpr<string | null | string[], "redis/lpop", [A, ...unknown[]]>;
+            rpop<A>(key: A, count?: unknown): CExpr<string | null | string[], "redis/rpop", [A, ...unknown[]]>;
+            llen<A>(key: A): CExpr<number, "redis/llen", [A]>;
+            lrange<A, B, C>(key: A, start: B, stop: C): CExpr<string[], "redis/lrange", [A, B, C]>;
+            lindex<A, B>(key: A, index: B): CExpr<string | null, "redis/lindex", [A, B]>;
+            lset<A, B, C>(key: A, index: B, element: C): CExpr<"OK", "redis/lset", [A, B, C]>;
+            lrem<A, B, C>(key: A, count: B, element: C): CExpr<number, "redis/lrem", [A, B, C]>;
+            linsert<A, B, C>(key: A, position: "BEFORE" | "AFTER", pivot: B, element: C): CExpr<number, "redis/linsert", [A, string, B, C]>;
+        };
+    };
+    kinds: {
+        "redis/get": KindSpec<[string], string | null>;
+        "redis/set": KindSpec<[string, string], string>;
+        "redis/incr": KindSpec<[string], number>;
+        "redis/incrby": KindSpec<[string, number], number>;
+        "redis/decr": KindSpec<[string], number>;
+        "redis/decrby": KindSpec<[string, number], number>;
+        "redis/mget": KindSpec<string[], (string | null)[]>;
+        "redis/mset": KindSpec<string[], string>;
+        "redis/append": KindSpec<[string, string], number>;
+        "redis/getrange": KindSpec<[string, number, number], string>;
+        "redis/setrange": KindSpec<[string, number, string], number>;
+        "redis/del": KindSpec<string[], number>;
+        "redis/exists": KindSpec<string[], number>;
+        "redis/expire": KindSpec<[string, number], number>;
+        "redis/pexpire": KindSpec<[string, number], number>;
+        "redis/ttl": KindSpec<[string], number>;
+        "redis/pttl": KindSpec<[string], number>;
+        "redis/hget": KindSpec<[string, string], string | null>;
+        "redis/hset": KindSpec<[string, string, ...string[]], number>;
+        "redis/hmget": KindSpec<[string, ...string[]], (string | null)[]>;
+        "redis/hgetall": KindSpec<[string], Record<string, string>>;
+        "redis/hdel": KindSpec<[string, ...string[]], number>;
+        "redis/hexists": KindSpec<[string, string], number>;
+        "redis/hlen": KindSpec<[string], number>;
+        "redis/hkeys": KindSpec<[string], string[]>;
+        "redis/hvals": KindSpec<[string], string[]>;
+        "redis/hincrby": KindSpec<[string, string, number], number>;
+        "redis/lpush": KindSpec<[string, ...string[]], number>;
+        "redis/rpush": KindSpec<[string, ...string[]], number>;
+        "redis/lpop": KindSpec<[string], string | null>;
+        "redis/rpop": KindSpec<[string], string | null>;
+        "redis/llen": KindSpec<[string], number>;
+        "redis/lrange": KindSpec<[string, number, number], string[]>;
+        "redis/lindex": KindSpec<[string, number], string | null>;
+        "redis/lset": KindSpec<[string, number, string], string>;
+        "redis/lrem": KindSpec<[string, number, string], number>;
+        "redis/linsert": KindSpec<[string, string, string, string], number>;
+        "redis/record": KindSpec<unknown[], Record<string, unknown>>;
+        "redis/array": KindSpec<unknown[], unknown[]>;
+    };
+    traits: {};
+    lifts: {};
+};
 
 // @public
 export interface RedisClient {
@@ -42,52 +126,7 @@ export interface RedisConfig {
 }
 
 // @public
-export interface RedisMethods {
-    redis: {
-        get(key: Expr<string> | string): Expr<string | null>;
-        set(key: Expr<string> | string, value: Expr<string | number> | string | number, ...args: (Expr<string | number> | string | number)[]): Expr<string | null>;
-        incr(key: Expr<string> | string): Expr<number>;
-        incrby(key: Expr<string> | string, increment: Expr<number> | number): Expr<number>;
-        decr(key: Expr<string> | string): Expr<number>;
-        decrby(key: Expr<string> | string, decrement: Expr<number> | number): Expr<number>;
-        mget(...keys: (Expr<string> | string)[]): Expr<(string | null)[]>;
-        mset(mapping: Expr<Record<string, string | number>> | Record<string, string | number>): Expr<"OK">;
-        append(key: Expr<string> | string, value: Expr<string | number> | string | number): Expr<number>;
-        getrange(key: Expr<string> | string, start: Expr<number> | number, end: Expr<number> | number): Expr<string>;
-        setrange(key: Expr<string> | string, offset: Expr<number> | number, value: Expr<string | number> | string | number): Expr<number>;
-        del(...keys: (Expr<string> | string)[]): Expr<number>;
-        exists(...keys: (Expr<string> | string)[]): Expr<number>;
-        expire(key: Expr<string> | string, seconds: Expr<number> | number): Expr<number>;
-        pexpire(key: Expr<string> | string, milliseconds: Expr<number> | number): Expr<number>;
-        ttl(key: Expr<string> | string): Expr<number>;
-        pttl(key: Expr<string> | string): Expr<number>;
-        hget(key: Expr<string> | string, field: Expr<string> | string): Expr<string | null>;
-        hset(key: Expr<string> | string, mapping: Expr<Record<string, string | number>> | Record<string, string | number>): Expr<number>;
-        hmget(key: Expr<string> | string, ...fields: (Expr<string> | string)[]): Expr<(string | null)[]>;
-        hgetall(key: Expr<string> | string): Expr<string[]>;
-        hdel(key: Expr<string> | string, ...fields: (Expr<string> | string)[]): Expr<number>;
-        hexists(key: Expr<string> | string, field: Expr<string> | string): Expr<number>;
-        hlen(key: Expr<string> | string): Expr<number>;
-        hkeys(key: Expr<string> | string): Expr<string[]>;
-        hvals(key: Expr<string> | string): Expr<string[]>;
-        hincrby(key: Expr<string> | string, field: Expr<string> | string, increment: Expr<number> | number): Expr<number>;
-        lpush(key: Expr<string> | string, ...elements: (Expr<string | number> | string | number)[]): Expr<number>;
-        rpush(key: Expr<string> | string, ...elements: (Expr<string | number> | string | number)[]): Expr<number>;
-        lpop(key: Expr<string> | string, count?: Expr<number> | number): Expr<string | null | string[]>;
-        rpop(key: Expr<string> | string, count?: Expr<number> | number): Expr<string | null | string[]>;
-        llen(key: Expr<string> | string): Expr<number>;
-        lrange(key: Expr<string> | string, start: Expr<number> | number, stop: Expr<number> | number): Expr<string[]>;
-        lindex(key: Expr<string> | string, index: Expr<number> | number): Expr<string | null>;
-        lset(key: Expr<string> | string, index: Expr<number> | number, element: Expr<string | number> | string | number): Expr<"OK">;
-        lrem(key: Expr<string> | string, count: Expr<number> | number, element: Expr<string | number> | string | number): Expr<number>;
-        linsert(key: Expr<string> | string, position: "BEFORE" | "AFTER", pivot: Expr<string | number> | string | number, element: Expr<string | number> | string | number): Expr<number>;
-    };
-}
-
-// Warning: (ae-forgotten-export) The symbol "TypedNode" needs to be exported by the entry point index.d.ts
-//
-// @public
-export function serverEvaluate(client: RedisClient, baseInterpreter: Interpreter): (root: TypedNode) => Promise<unknown>;
+export const redisPlugin: typeof redis;
 
 // @public
 export function serverInterpreter(client: RedisClient): Interpreter;
@@ -99,7 +138,8 @@ export function wrapIoredis(redis: {
 
 // Warnings were encountered during analysis:
 //
-// dist/5.4.1/types.d.ts:12:9 - (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
+// dist/5.4.1/index.d.ts:30:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/5.4.1/index.d.ts:70:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

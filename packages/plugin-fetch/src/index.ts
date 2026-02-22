@@ -1,4 +1,4 @@
-export type { FetchConfig, FetchMethods, FetchRequestInit } from "./whatwg";
+export type { FetchConfig, FetchRequestInit } from "./whatwg";
 export { fetch } from "./whatwg";
 export { wrapFetch } from "./whatwg/client-fetch";
 export type { ClientHandlerOptions } from "./whatwg/handler.client";

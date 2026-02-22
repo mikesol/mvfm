@@ -1,4 +1,3 @@
-import type { PluginContext } from "@mvfm/core";
 import { z } from "zod";
 import { ZodStringBuilder } from "./string";
 
@@ -84,26 +83,21 @@ export interface ZodStringFormatsNamespace {
   iso: ZodIsoNamespace;
 }
 
-/** Node kinds contributed by string formats -- none; they reuse zod/string. */
-export const stringFormatsNodeKinds: string[] = [];
-
 /** Create a string builder with a format descriptor in extra. */
 function formatBuilder(
-  ctx: PluginContext,
   format: Record<string, unknown>,
   parseError: (errorOrOpts?: string | { error?: string }) => string | undefined,
   errorOrOpts?: string | { error?: string },
 ): ZodStringBuilder {
-  return new ZodStringBuilder(ctx, [], [], parseError(errorOrOpts), { format });
+  return new ZodStringBuilder([], [], parseError(errorOrOpts), { format });
 }
 
 /** Build the string formats namespace factory methods. */
 export function stringFormatsNamespace(
-  ctx: PluginContext,
   parseError: (errorOrOpts?: string | { error?: string }) => string | undefined,
 ): ZodStringFormatsNamespace {
   const fmt = (format: Record<string, unknown>, errorOrOpts?: string | { error?: string }) =>
-    formatBuilder(ctx, format, parseError, errorOrOpts);
+    formatBuilder(format, parseError, errorOrOpts);
 
   return {
     email: (e) => fmt({ type: "email" }, e),

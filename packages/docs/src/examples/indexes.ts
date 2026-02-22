@@ -6,7 +6,7 @@ const indexes: Record<string, NamespaceIndex> = {
 <ul>
   <li><code>mvfm(plugins...)</code> creates an app with the plugins you need.</li>
   <li><code>app(schema, builder)</code> defines a program from a schema and builder function.</li>
-  <li><code>foldAST(interpreter, program)</code> executes the program with a concrete interpreter.</li>
+  <li><code>fold(interpreter, program)</code> executes the program with a concrete interpreter.</li>
 </ul>
 <p>MVFM stands for Minimum Viable Free Monad. The eventual goal is to reimplement TypeScript in TypeScript.</p>
 `,
@@ -16,13 +16,13 @@ const prog = app({ greeting: "string" }, ($) =>
   $.console.log($.concat($.input.greeting, " — have fun!"))
 );
 
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { greeting: "hello, mvfm" })
 );`,
   },
 
-  boolean: {
+  bool: {
     content: `<p>Boolean logic operations. Provides typeclass instances that allow boolean values to participate in equality, display, and logical algebra.</p>
 <p>Included on the default interpreter.</p>`,
     code: `const app = mvfm(prelude);
@@ -31,7 +31,7 @@ const prog = app({ x: "number" }, ($) =>
   $.and(true, $.gt($.input.x, 0))
 );
 
-await foldAST(defaults(app), injectInput(prog, { x: 7 }));`,
+await fold(defaults(app), injectInput(prog, { x: 7 }));`,
   },
 
   num: {
@@ -43,7 +43,7 @@ const prog = app({ x: "number" }, ($) =>
   $.mul($.add($.input.x, 10), 2)
 );
 
-await foldAST(defaults(app), injectInput(prog, { x: 11 }));`,
+await fold(defaults(app), injectInput(prog, { x: 11 }));`,
   },
 
   str: {
@@ -55,7 +55,7 @@ const prog = app({ first: "string", last: "string" }, ($) =>
   $.upper($.concat($.input.first, " ", $.input.last))
 );
 
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { first: "Jane", last: "Doe" })
 );`,
@@ -70,7 +70,7 @@ const prog = app({ x: "number", y: "number" }, ($) =>
   $.eq($.add($.input.x, 1), $.input.y)
 );
 
-await foldAST(defaults(app), injectInput(prog, { x: 9, y: 10 }));`,
+await fold(defaults(app), injectInput(prog, { x: 9, y: 10 }));`,
   },
 
   ord: {
@@ -82,7 +82,7 @@ const prog = app({ age: "number" }, ($) =>
   $.cond($.gte($.input.age, 18)).t("allowed").f("denied")
 );
 
-await foldAST(defaults(app), injectInput(prog, { age: 21 }));`,
+await fold(defaults(app), injectInput(prog, { age: 21 }));`,
   },
 
   st: {
@@ -96,7 +96,7 @@ const prog = app({ n: "number" }, ($) => {
   return counter.get();
 });
 
-await foldAST(defaults(app), injectInput(prog, { n: 21 }));`,
+await fold(defaults(app), injectInput(prog, { n: 21 }));`,
   },
 
   control: {
@@ -112,7 +112,7 @@ const prog = app({ x: "number" }, ($) => {
   return sum.get();
 });
 
-await foldAST(defaults(app), injectInput(prog, { x: 1 }));`,
+await fold(defaults(app), injectInput(prog, { x: 1 }));`,
   },
 
   error: {
@@ -129,7 +129,7 @@ const prog = app({ x: "number" }, ($) => {
   );
 });
 
-await foldAST(defaults(app), injectInput(prog, { x: 3 }));`,
+await fold(defaults(app), injectInput(prog, { x: 3 }));`,
   },
 
   fiber: {
@@ -143,7 +143,7 @@ const prog = app({ x: "number" }, ($) => {
   return $.race(fast, slow);
 });
 
-await foldAST(defaults(app), injectInput(prog, { x: 5 }));`,
+await fold(defaults(app), injectInput(prog, { x: 5 }));`,
   },
 
   console: {
@@ -159,7 +159,7 @@ const prog = app({ name: "string" }, ($) =>
   )
 );
 
-await foldAST(defaults(app), injectInput(prog, { name: "world" }));`,
+await fold(defaults(app), injectInput(prog, { name: "world" }));`,
   },
 
   anthropic: {
@@ -209,7 +209,7 @@ const baseInterp = defaults(app);
 const pgInterp = serverInterpreter(client, baseInterp);
 
 // 4. Merge and run
-await foldAST(
+await fold(
   { ...baseInterp, ...pgInterp },
   injectInput(prog, { userId: 42 })
 );`,
@@ -249,7 +249,7 @@ const prog = app({ value: "string" }, ($) =>
   $.zod.string().min(3).parse($.input.value)
 );
 
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: "hello" })
 );`,

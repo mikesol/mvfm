@@ -1,112 +1,73 @@
-import { mvfm } from "@mvfm/core";
+import { isCExpr } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
-import { ZodTransformBuilder, ZodWrappedBuilder, zod } from "../src/index";
-
-// Helper: strip __id from AST for snapshot-stable assertions
-function strip(ast: unknown): unknown {
-  return JSON.parse(JSON.stringify(ast, (k, v) => (k === "__id" ? undefined : v)));
-}
+import { ZodTransformBuilder, ZodWrappedBuilder } from "../src/index";
+import { $, schemaOf } from "./test-helpers";
 
 describe("transform/pipe/preprocess methods (#118)", () => {
   it(".transform(fn) produces zod/transform wrapper with lambda", () => {
-    const app = mvfm(zod);
-    const prog = app(($) => {
-      return $.zod
-        .string()
-        .transform((val) => val)
-        .parse($.input);
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.schema.kind).toBe("zod/transform");
-    expect(ast.result.schema.inner.kind).toBe("zod/string");
-    expect(ast.result.schema.fn.kind).toBe("core/lambda");
-    expect(ast.result.schema.fn.param.kind).toBe("core/lambda_param");
-    expect(ast.result.schema.fn.param.name).toBe("transform_val");
+    const schema = schemaOf($.zod.string().transform((val) => val));
+    expect(schema.kind).toBe("zod/transform");
+    expect(schema.inner.kind).toBe("zod/string");
+    // In new system, fn is { param, body } with CExpr values
+    expect(schema.fn).toBeDefined();
+    expect(isCExpr(schema.fn.param)).toBe(true);
+    expect(isCExpr(schema.fn.body)).toBe(true);
   });
 
   it(".transform(fn) returns ZodWrappedBuilder", () => {
-    const app = mvfm(zod);
-    app(($) => {
-      const wrapped = $.zod.string().transform((val) => val);
-      expect(wrapped).toBeInstanceOf(ZodWrappedBuilder);
-      return wrapped.parse($.input);
-    });
+    expect($.zod.string().transform((val) => val)).toBeInstanceOf(ZodWrappedBuilder);
   });
 
   it(".pipe(target) produces zod/pipe wrapper with target schema", () => {
-    const app = mvfm(zod);
-    const prog = app(($) => {
-      return $.zod.string().pipe($.zod.string()).parse($.input);
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.schema.kind).toBe("zod/pipe");
-    expect(ast.result.schema.inner.kind).toBe("zod/string");
-    expect(ast.result.schema.target.kind).toBe("zod/string");
+    const schema = schemaOf($.zod.string().pipe($.zod.string()));
+    expect(schema.kind).toBe("zod/pipe");
+    expect(schema.inner.kind).toBe("zod/string");
+    expect(schema.target.kind).toBe("zod/string");
   });
 
   it("$.zod.transform(fn) produces standalone transform AST", () => {
-    const app = mvfm(zod);
-    const prog = app(($) => {
-      return $.zod.transform((val) => val).parse($.input);
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.schema.kind).toBe("zod/transform");
-    expect(ast.result.schema.fn.kind).toBe("core/lambda");
-    expect(ast.result.schema.fn.param.name).toBe("transform_val");
+    const schema = schemaOf($.zod.transform((val) => val));
+    expect(schema.kind).toBe("zod/transform");
+    expect(schema.fn).toBeDefined();
     // Standalone transform has no inner
-    expect(ast.result.schema.inner).toBeUndefined();
+    expect(schema.inner).toBeUndefined();
   });
 
   it("$.zod.transform(fn) returns ZodTransformBuilder", () => {
-    const app = mvfm(zod);
-    app(($) => {
-      const builder = $.zod.transform((val) => val);
-      expect(builder).toBeInstanceOf(ZodTransformBuilder);
-      return builder.parse($.input);
-    });
+    expect($.zod.transform((val) => val)).toBeInstanceOf(ZodTransformBuilder);
   });
 
   it("$.zod.preprocess(fn, schema) produces zod/preprocess wrapper", () => {
-    const app = mvfm(zod);
-    const prog = app(($) => {
-      return $.zod.preprocess((val) => val, $.zod.string()).parse($.input);
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.schema.kind).toBe("zod/preprocess");
-    expect(ast.result.schema.inner.kind).toBe("zod/string");
-    expect(ast.result.schema.fn.kind).toBe("core/lambda");
-    expect(ast.result.schema.fn.param.name).toBe("preprocess_val");
+    const schema = schemaOf($.zod.preprocess((val) => val, $.zod.string()));
+    expect(schema.kind).toBe("zod/preprocess");
+    expect(schema.inner.kind).toBe("zod/string");
+    expect(schema.fn).toBeDefined();
+    expect(isCExpr(schema.fn.param)).toBe(true);
   });
 
   it("chained transforms nest correctly", () => {
-    const app = mvfm(zod);
-    const prog = app(($) => {
-      return $.zod
+    const schema = schemaOf(
+      $.zod
         .string()
         .transform((val) => val)
-        .transform((val) => val)
-        .parse($.input);
-    });
-    const ast = strip(prog.ast) as any;
+        .transform((val) => val),
+    );
     // Outer transform wraps inner transform wraps string
-    expect(ast.result.schema.kind).toBe("zod/transform");
-    expect(ast.result.schema.inner.kind).toBe("zod/transform");
-    expect(ast.result.schema.inner.inner.kind).toBe("zod/string");
+    expect(schema.kind).toBe("zod/transform");
+    expect(schema.inner.kind).toBe("zod/transform");
+    expect(schema.inner.inner.kind).toBe("zod/string");
   });
 
   it(".transform(fn) preserves inner schema checks", () => {
-    const app = mvfm(zod);
-    const prog = app(($) => {
-      return $.zod
+    const schema = schemaOf(
+      $.zod
         .string()
         .min(3)
-        .transform((val) => val)
-        .parse($.input);
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.schema.kind).toBe("zod/transform");
-    expect(ast.result.schema.inner.kind).toBe("zod/string");
-    expect(ast.result.schema.inner.checks).toHaveLength(1);
-    expect(ast.result.schema.inner.checks[0].kind).toBe("min_length");
+        .transform((val) => val),
+    );
+    expect(schema.kind).toBe("zod/transform");
+    expect(schema.inner.kind).toBe("zod/string");
+    expect(schema.inner.checks).toHaveLength(1);
+    expect(schema.inner.checks[0].kind).toBe("min_length");
   });
 });

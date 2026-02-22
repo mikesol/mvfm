@@ -1,14 +1,14 @@
 [
   {
-    "name": "Minimal pure-logic (num + eq)",
+    "name": "Minimal pure-logic (numPlugin + ordPlugin)",
     "path": "dist/index.js",
-    "import": "{ num, eq }",
+    "import": "{ numPlugin, ordPlugin }",
     "limit": "1.1 kB"
   },
   {
-    "name": "Medium prelude (num + str + eq + boolean + control)",
+    "name": "Medium prelude (numPlugin + strPlugin + boolPlugin + control)",
     "path": "dist/index.js",
-    "import": "{ num, str, eq, boolean, control }",
+    "import": "{ numPlugin, strPlugin, boolPlugin, control }",
     "limit": "2.2 kB"
   }
 ]

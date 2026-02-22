@@ -1,3 +1,26 @@
+import type { FoldState, Interpreter, NExpr, PluginDef, RuntimeEntry } from "@mvfm/core";
+import * as core from "@mvfm/core";
+import type { ConsoleInstance } from "@mvfm/plugin-console";
+import * as pluginConsole from "@mvfm/plugin-console";
+import * as pluginZod from "@mvfm/plugin-zod";
+import * as pluginFetch from "@mvfm/plugin-fetch";
+import type { PinoClient } from "@mvfm/plugin-pino";
+import * as pluginPino from "@mvfm/plugin-pino";
+import * as pluginSlack from "@mvfm/plugin-slack";
+import * as pluginOpenAI from "@mvfm/plugin-openai";
+import * as pluginAnthropic from "@mvfm/plugin-anthropic";
+import * as pluginFal from "@mvfm/plugin-fal";
+import * as pluginStripe from "@mvfm/plugin-stripe";
+import * as pluginTwilio from "@mvfm/plugin-twilio";
+import * as pluginResend from "@mvfm/plugin-resend";
+import * as pluginPostgres from "@mvfm/plugin-postgres";
+import * as pluginRedis from "@mvfm/plugin-redis";
+import * as pluginCfKv from "@mvfm/plugin-cloudflare-kv";
+import * as pluginS3 from "@mvfm/plugin-s3";
+import { wrapPgLite, type PgLiteQueryable } from "./pglite-adapter";
+import { MemoryRedisClient } from "./memory-redis-client";
+import { MemoryCloudflareKvClient } from "./memory-cloudflare-kv-client";
+import { MemoryS3Client } from "./memory-s3-client";
 import {
   createCrystalBallAnthropicClient,
   createCrystalBallFalClient,
@@ -6,44 +29,39 @@ import {
   createCrystalBallStripeClient,
 } from "./crystal-ball-clients";
 
+const { console: _drop, consoleInterpreter: _defaultInterp, ...consoleRest } = {
+  ...pluginConsole,
+};
+
 /** Builds the injected scope for playground code execution. */
-export async function createPlaygroundScope(
-  fakeConsole: Record<string, (...args: unknown[]) => void>,
+export function createPlaygroundScope(
+  fakeConsole: ConsoleInstance,
   mockInterpreter?: Record<string, unknown>,
-  pgliteDb?: unknown,
+  pgliteDb?: PgLiteQueryable,
   redis?: true,
   s3?: true,
   cloudflareKv?: true,
 ) {
-  const core = await import("@mvfm/core");
-  const pluginConsole = await import("@mvfm/plugin-console");
-  const pluginZod = await import("@mvfm/plugin-zod");
-  const { console: _drop, consoleInterpreter: _defaultInterp, ...consoleRest } = pluginConsole;
   const fakeConsoleInterpreter = pluginConsole.createConsoleInterpreter(
-    pluginConsole.wrapConsole(fakeConsole as any),
+    pluginConsole.wrapConsole(fakeConsole),
   );
-  const realDefaults = core.defaults;
-  const realFoldAST = core.foldAST;
 
   // Group mock handler keys (e.g. "st/let") by plugin name (e.g. "st")
   // so they can be passed as overrides to defaults().
-  const mockOverrides: Record<string, Record<string, unknown>> = {};
+  const mockOverrides: Record<string, Interpreter> = {};
   if (mockInterpreter) {
     for (const [key, handler] of Object.entries(mockInterpreter)) {
       const pluginName = key.split("/")[0];
-      if (!mockOverrides[pluginName]) mockOverrides[pluginName] = {};
-      mockOverrides[pluginName][key] = handler;
+      if (!mockOverrides[pluginName]) mockOverrides[pluginName] = {} as Interpreter;
+      (mockOverrides[pluginName] as Record<string, unknown>)[key] = handler;
     }
   }
 
-  // Track the last foldAST return value for display in the playground.
+  // Track the last fold return value for display in the playground.
   let lastFoldResult: unknown;
 
-  const pluginFetch = await import("@mvfm/plugin-fetch");
-  const pluginPino = await import("@mvfm/plugin-pino");
-
   // Build a fake pino client that routes log output to fakeConsole
-  const fakePinoClient: import("@mvfm/plugin-pino").PinoClient = {
+  const fakePinoClient: PinoClient = {
     async log(level, bindings, mergeObject, msg) {
       const parts: unknown[] = [`[pino:${level}]`];
       for (const b of bindings) parts.push(JSON.stringify(b));
@@ -54,49 +72,47 @@ export async function createPlaygroundScope(
   };
   const fakePinoInterpreter = pluginPino.createPinoInterpreter(fakePinoClient);
 
-  const pluginSlack = await import("@mvfm/plugin-slack");
-
-  const pluginOpenAI = await import("@mvfm/plugin-openai");
   const crystalBallOpenAIInterpreter = pluginOpenAI.createOpenAIInterpreter(
     createCrystalBallOpenAIClient(),
   );
 
-  const pluginAnthropic = await import("@mvfm/plugin-anthropic");
   const crystalBallAnthropicInterpreter = pluginAnthropic.createAnthropicInterpreter(
     createCrystalBallAnthropicClient(),
   );
 
-  const pluginFal = await import("@mvfm/plugin-fal");
   const crystalBallFalInterpreter = pluginFal.createFalInterpreter(createCrystalBallFalClient());
 
-  const pluginStripe = await import("@mvfm/plugin-stripe");
   const crystalBallStripeInterpreter = pluginStripe.createStripeInterpreter(
     createCrystalBallStripeClient(),
   );
 
-  const pluginTwilio = await import("@mvfm/plugin-twilio");
-  const crystalBallTwilioInterpreter = pluginTwilio.createTwilioInterpreter({
-    async request(method: string, path: string, params?: Record<string, unknown>) {
-      return {
-        method,
-        path,
-        params: params ?? null,
-        sid: "TWILIO_CRYSTAL_BALL",
-        status: "queued",
-      };
+  const crystalBallTwilioInterpreter = pluginTwilio.createTwilioInterpreter(
+    {
+      async request(method: string, path: string, params?: Record<string, unknown>) {
+        return {
+          method,
+          path,
+          params: params ?? null,
+          sid: "TWILIO_CRYSTAL_BALL",
+          status: "queued",
+        };
+      },
     },
-  });
+    "AC_CRYSTAL_BALL",
+  );
 
-  const pluginResend = await import("@mvfm/plugin-resend");
   const crystalBallResendInterpreter = pluginResend.createResendInterpreter(
     createCrystalBallResendClient(),
   );
 
+  // Exclude core exports whose names clash with common example variable names
+  // (e.g. `const app = mvfm(prelude)` conflicts with core's `app` export).
+  const { app: _app, ...coreRest } = { ...core } as Record<string, unknown>;
   const injected: Record<string, unknown> = {
-    ...core,
+    ...coreRest,
     console_: pluginConsole.consolePlugin(),
     ...consoleRest,
-    zod: pluginZod.zod,
+    zod: pluginZod.zod(),
     z: pluginZod.z,
     createZodInterpreter: pluginZod.createZodInterpreter,
     consoleInterpreter: fakeConsoleInterpreter,
@@ -122,34 +138,21 @@ export async function createPlaygroundScope(
 
   // Wire PGLite-backed postgres when a db instance is provided
   if (pgliteDb) {
-    const pluginPostgres = await import("@mvfm/plugin-postgres");
-    const { wrapPgLite } = await import("./pglite-adapter");
     const pg = pluginPostgres.postgres();
-    const client = wrapPgLite(pgliteDb as any);
+    const client = wrapPgLite(pgliteDb);
     injected.pg = pg;
+    injected.wasmPgInterpreter = pluginPostgres.createPostgresServerInterpreter(client);
 
-    // Build the WASM postgres interpreter eagerly so examples pass it
-    // explicitly: defaults(app, { postgres: wasmPgInterpreter })
-    const baseInterp: Record<string, unknown> = {
-      ...(core.coreInterpreter as any),
-      ...fakeConsoleInterpreter,
-    };
-    injected.wasmPgInterpreter = pluginPostgres.serverInterpreter(client, baseInterp as any);
-
-    injected.defaults = (app: any, ...args: any[]) => {
-      const userOverrides = (args[0] ?? {}) as Record<string, unknown>;
-      const interp = realDefaults(app, {
-        ...mockOverrides,
-        ...userOverrides,
-      });
+    injected.defaults = (plugins: readonly PluginDef[], overrides?: Record<string, Interpreter>) => {
+      const merged = { ...mockOverrides, ...overrides };
+      const interp = core.defaults(plugins, merged);
       Object.assign(interp, fakeConsoleInterpreter, fakePinoInterpreter);
       return interp;
     };
   } else {
-    injected.defaults = (app: any, ...args: any[]) => {
-      const userOverrides = (args[0] ?? {}) as Record<string, unknown>;
-      const merged = { ...mockOverrides, ...userOverrides };
-      const interp = realDefaults(app, merged);
+    injected.defaults = (plugins: readonly PluginDef[], overrides?: Record<string, Interpreter>) => {
+      const merged = { ...mockOverrides, ...overrides };
+      const interp = core.defaults(plugins, merged);
       Object.assign(interp, fakeConsoleInterpreter, fakePinoInterpreter);
       return interp;
     };
@@ -157,8 +160,6 @@ export async function createPlaygroundScope(
 
   // Wire in-memory Redis when redis flag is set
   if (redis) {
-    const { MemoryRedisClient } = await import("./memory-redis-client");
-    const pluginRedis = await import("@mvfm/plugin-redis");
     const client = new MemoryRedisClient();
     injected.redis = pluginRedis.redis();
     injected.memoryRedisInterpreter = pluginRedis.createRedisInterpreter(client);
@@ -166,8 +167,6 @@ export async function createPlaygroundScope(
 
   // Wire in-memory Cloudflare KV when cloudflareKv flag is set
   if (cloudflareKv) {
-    const { MemoryCloudflareKvClient } = await import("./memory-cloudflare-kv-client");
-    const pluginCfKv = await import("@mvfm/plugin-cloudflare-kv");
     const client = new MemoryCloudflareKvClient();
     injected.cloudflareKv = pluginCfKv.cloudflareKv;
     injected.memoryCloudflareKvInterpreter = pluginCfKv.createCloudflareKvInterpreter(client);
@@ -175,15 +174,26 @@ export async function createPlaygroundScope(
 
   // Wire in-memory S3 when s3 flag is set
   if (s3) {
-    const { MemoryS3Client } = await import("./memory-s3-client");
-    const pluginS3 = await import("@mvfm/plugin-s3");
     const client = new MemoryS3Client();
     injected.s3_ = pluginS3.s3({ region: "us-east-1" });
     injected.memoryS3Interpreter = pluginS3.createS3Interpreter(client);
   }
 
-  injected.foldAST = async (...args: any[]) => {
-    const result = await (realFoldAST as any)(...args);
+  // Wrap fold to track the last result for playground display.
+  // Cast needed at this dynamic injection boundary — fold has overloaded
+  // signatures that can't be expressed in a single wrapper type.
+  const foldImpl = core.fold as (
+    ...args: [
+      string | NExpr<any, any, any, any>,
+      Record<string, RuntimeEntry> | Interpreter,
+      (Interpreter | FoldState)?,
+      FoldState?,
+    ]
+  ) => Promise<unknown>;
+  injected.fold = async (...args: unknown[]) => {
+    const result = await foldImpl(
+      ...(args as Parameters<typeof foldImpl>),
+    );
     lastFoldResult = result;
     return result;
   };

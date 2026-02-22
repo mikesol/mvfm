@@ -11,7 +11,7 @@ const prog = app({}, ($) => {
   const body = $.fetch.text(response);
   return $.console.log(body);
 });
-await foldAST(defaults(app), prog);`,
+await fold(defaults(app), prog);`,
     plugins: FETCH,
   },
 
@@ -23,7 +23,7 @@ const prog = app({}, ($) => {
   const data = $.fetch.json(response);
   return $.console.log(data);
 });
-await foldAST(defaults(app), prog);`,
+await fold(defaults(app), prog);`,
     plugins: FETCH,
   },
 
@@ -35,7 +35,7 @@ const prog = app({}, ($) => {
   const text = $.fetch.text(response);
   return $.console.log(text);
 });
-await foldAST(defaults(app), prog);`,
+await fold(defaults(app), prog);`,
     plugins: FETCH,
   },
 
@@ -47,7 +47,7 @@ const prog = app({}, ($) => {
   const code = $.fetch.status(response);
   return $.console.log(code);
 });
-await foldAST(defaults(app), prog);`,
+await fold(defaults(app), prog);`,
     plugins: FETCH,
   },
 
@@ -59,7 +59,7 @@ const prog = app({}, ($) => {
   const hdrs = $.fetch.headers(response);
   return $.console.log(hdrs);
 });
-await foldAST(defaults(app), prog);`,
+await fold(defaults(app), prog);`,
     plugins: FETCH,
   },
 };

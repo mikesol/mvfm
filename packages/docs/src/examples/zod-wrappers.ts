@@ -9,7 +9,7 @@ const examples: Record<string, NodeExample> = {
 const prog = app({ value: "string" }, ($) => {
   return $.zod.string().brand("Email").parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: "user@example.com" })
 );`,
@@ -21,7 +21,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.string().catch("default").parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: "hello" })
 );`,
@@ -33,7 +33,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.string().default("hello").parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: undefined })
 );`,
@@ -45,7 +45,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.string().optional().nonoptional().parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: "required" })
 );`,
@@ -57,7 +57,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.string().nullable().parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: "hello" })
 );`,
@@ -69,7 +69,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.string().nullish().parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: "hello" })
 );`,
@@ -81,7 +81,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.string().optional().parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: "hello" })
 );`,
@@ -93,7 +93,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.string().parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: "hello" })
 );`,
@@ -105,7 +105,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.string().parseAsync($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: "hello" })
 );`,
@@ -117,7 +117,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.string().min(1).prefault("fallback").parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: undefined })
 );`,
@@ -129,7 +129,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.object({ name: $.zod.string() }).readonly().parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: { name: "Alice" } })
 );`,
@@ -141,7 +141,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.string().safeParse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: "hello" })
 );`,
@@ -153,7 +153,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.string().safeParseAsync($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: "hello" })
 );`,
@@ -169,7 +169,7 @@ const app = mvfm(prelude, zod);
 const prog = app(($) => {
   return $.zod.from(userSchema).safeParse($.input);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { name: "Ada", age: 21 })
 );`,

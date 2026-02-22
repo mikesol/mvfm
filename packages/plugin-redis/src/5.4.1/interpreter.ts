@@ -1,44 +1,5 @@
-import { defineInterpreter, eval_ } from "@mvfm/core";
-import type { REDIS_NODE_KINDS } from "./node-kinds";
-import type {
-  RedisAppendNode,
-  RedisDecrByNode,
-  RedisDecrNode,
-  RedisDelNode,
-  RedisExistsNode,
-  RedisExpireNode,
-  RedisGetNode,
-  RedisGetRangeNode,
-  RedisHDelNode,
-  RedisHExistsNode,
-  RedisHGetAllNode,
-  RedisHGetNode,
-  RedisHIncrByNode,
-  RedisHKeysNode,
-  RedisHLenNode,
-  RedisHMGetNode,
-  RedisHSetNode,
-  RedisHValsNode,
-  RedisIncrByNode,
-  RedisIncrNode,
-  RedisLIndexNode,
-  RedisLInsertNode,
-  RedisLLenNode,
-  RedisLPopNode,
-  RedisLPushNode,
-  RedisLRangeNode,
-  RedisLRemNode,
-  RedisLSetNode,
-  RedisMGetNode,
-  RedisMSetNode,
-  RedisPExpireNode,
-  RedisPTTLNode,
-  RedisRPopNode,
-  RedisRPushNode,
-  RedisSetNode,
-  RedisSetRangeNode,
-  RedisTTLNode,
-} from "./nodes";
+import type { Interpreter, RuntimeEntry } from "@mvfm/core";
+import { buildListHandlers } from "./interpreter-list";
 
 /**
  * Redis client interface consumed by the redis handler.
@@ -57,224 +18,205 @@ function flattenRecord(obj: Record<string, unknown>): unknown[] {
   return result;
 }
 
-type RedisKind = (typeof REDIS_NODE_KINDS)[number];
-
 /**
- * Creates an interpreter for `redis/*` node kinds.
+ * Creates an interpreter for `redis/*` node kinds using the
+ * RuntimeEntry + positional yield pattern.
  *
  * @param client - The {@link RedisClient} to execute against.
  * @returns An Interpreter handling all redis node kinds.
  */
-export function createRedisInterpreter(client: RedisClient) {
-  return defineInterpreter<RedisKind>()({
-    "redis/get": async function* (node: RedisGetNode) {
-      return (await client.command("GET", yield* eval_(node.key))) as string | null;
+export function createRedisInterpreter(client: RedisClient): Interpreter {
+  return {
+    // ---- String commands ----
+
+    "redis/get": async function* (_entry: RuntimeEntry) {
+      const key = yield 0;
+      return (await client.command("GET", key)) as string | null;
     },
-    "redis/set": async function* (node: RedisSetNode) {
+
+    "redis/set": async function* (entry: RuntimeEntry) {
+      const key = yield 0;
+      const value = yield 1;
       const extra: unknown[] = [];
-      for (const a of node.args || []) extra.push(yield* eval_(a));
-      return (await client.command(
-        "SET",
-        yield* eval_(node.key),
-        yield* eval_(node.value),
-        ...extra,
-      )) as string | null;
+      for (let i = 2; i < entry.children.length; i++) {
+        extra.push(yield i);
+      }
+      return (await client.command("SET", key, value, ...extra)) as string | null;
     },
-    "redis/incr": async function* (node: RedisIncrNode) {
-      return (await client.command("INCR", yield* eval_(node.key))) as number;
+
+    "redis/incr": async function* (_entry: RuntimeEntry) {
+      return (await client.command("INCR", yield 0)) as number;
     },
-    "redis/incrby": async function* (node: RedisIncrByNode) {
-      return (await client.command(
-        "INCRBY",
-        yield* eval_(node.key),
-        yield* eval_(node.increment),
-      )) as number;
+
+    "redis/incrby": async function* (_entry: RuntimeEntry) {
+      const key = yield 0;
+      const increment = yield 1;
+      return (await client.command("INCRBY", key, increment)) as number;
     },
-    "redis/decr": async function* (node: RedisDecrNode) {
-      return (await client.command("DECR", yield* eval_(node.key))) as number;
+
+    "redis/decr": async function* (_entry: RuntimeEntry) {
+      return (await client.command("DECR", yield 0)) as number;
     },
-    "redis/decrby": async function* (node: RedisDecrByNode) {
-      return (await client.command(
-        "DECRBY",
-        yield* eval_(node.key),
-        yield* eval_(node.decrement),
-      )) as number;
+
+    "redis/decrby": async function* (_entry: RuntimeEntry) {
+      const key = yield 0;
+      const decrement = yield 1;
+      return (await client.command("DECRBY", key, decrement)) as number;
     },
-    "redis/mget": async function* (node: RedisMGetNode) {
+
+    "redis/mget": async function* (entry: RuntimeEntry) {
       const keys: unknown[] = [];
-      for (const k of node.keys) keys.push(yield* eval_(k));
+      for (let i = 0; i < entry.children.length; i++) {
+        keys.push(yield i);
+      }
       return (await client.command("MGET", ...keys)) as (string | null)[];
     },
-    "redis/mset": async function* (node: RedisMSetNode) {
-      const mapping = (yield* eval_(node.mapping)) as Record<string, unknown>;
+
+    "redis/mset": async function* (_entry: RuntimeEntry) {
+      const mapping = (yield 0) as Record<string, unknown>;
       return (await client.command("MSET", ...flattenRecord(mapping))) as "OK";
     },
-    "redis/append": async function* (node: RedisAppendNode) {
-      return (await client.command(
-        "APPEND",
-        yield* eval_(node.key),
-        yield* eval_(node.value),
-      )) as number;
+
+    "redis/append": async function* (_entry: RuntimeEntry) {
+      const key = yield 0;
+      const value = yield 1;
+      return (await client.command("APPEND", key, value)) as number;
     },
-    "redis/getrange": async function* (node: RedisGetRangeNode) {
-      return (await client.command(
-        "GETRANGE",
-        yield* eval_(node.key),
-        yield* eval_(node.start),
-        yield* eval_(node.end),
-      )) as string;
+
+    "redis/getrange": async function* (_entry: RuntimeEntry) {
+      const key = yield 0;
+      const start = yield 1;
+      const end = yield 2;
+      return (await client.command("GETRANGE", key, start, end)) as string;
     },
-    "redis/setrange": async function* (node: RedisSetRangeNode) {
-      return (await client.command(
-        "SETRANGE",
-        yield* eval_(node.key),
-        yield* eval_(node.offset),
-        yield* eval_(node.value),
-      )) as number;
+
+    "redis/setrange": async function* (_entry: RuntimeEntry) {
+      const key = yield 0;
+      const offset = yield 1;
+      const value = yield 2;
+      return (await client.command("SETRANGE", key, offset, value)) as number;
     },
-    "redis/del": async function* (node: RedisDelNode) {
+
+    // ---- Key commands ----
+
+    "redis/del": async function* (entry: RuntimeEntry) {
       const keys: unknown[] = [];
-      for (const k of node.keys) keys.push(yield* eval_(k));
+      for (let i = 0; i < entry.children.length; i++) {
+        keys.push(yield i);
+      }
       return (await client.command("DEL", ...keys)) as number;
     },
-    "redis/exists": async function* (node: RedisExistsNode) {
+
+    "redis/exists": async function* (entry: RuntimeEntry) {
       const keys: unknown[] = [];
-      for (const k of node.keys) keys.push(yield* eval_(k));
+      for (let i = 0; i < entry.children.length; i++) {
+        keys.push(yield i);
+      }
       return (await client.command("EXISTS", ...keys)) as number;
     },
-    "redis/expire": async function* (node: RedisExpireNode) {
-      return (await client.command(
-        "EXPIRE",
-        yield* eval_(node.key),
-        yield* eval_(node.seconds),
-      )) as number;
+
+    "redis/expire": async function* (_entry: RuntimeEntry) {
+      const key = yield 0;
+      const seconds = yield 1;
+      return (await client.command("EXPIRE", key, seconds)) as number;
     },
-    "redis/pexpire": async function* (node: RedisPExpireNode) {
-      return (await client.command(
-        "PEXPIRE",
-        yield* eval_(node.key),
-        yield* eval_(node.milliseconds),
-      )) as number;
+
+    "redis/pexpire": async function* (_entry: RuntimeEntry) {
+      const key = yield 0;
+      const milliseconds = yield 1;
+      return (await client.command("PEXPIRE", key, milliseconds)) as number;
     },
-    "redis/ttl": async function* (node: RedisTTLNode) {
-      return (await client.command("TTL", yield* eval_(node.key))) as number;
+
+    "redis/ttl": async function* (_entry: RuntimeEntry) {
+      return (await client.command("TTL", yield 0)) as number;
     },
-    "redis/pttl": async function* (node: RedisPTTLNode) {
-      return (await client.command("PTTL", yield* eval_(node.key))) as number;
+
+    "redis/pttl": async function* (_entry: RuntimeEntry) {
+      return (await client.command("PTTL", yield 0)) as number;
     },
-    "redis/hget": async function* (node: RedisHGetNode) {
-      return (await client.command("HGET", yield* eval_(node.key), yield* eval_(node.field))) as
-        | string
-        | null;
+
+    // ---- Hash commands ----
+
+    "redis/hget": async function* (_entry: RuntimeEntry) {
+      const key = yield 0;
+      const field = yield 1;
+      return (await client.command("HGET", key, field)) as string | null;
     },
-    "redis/hset": async function* (node: RedisHSetNode) {
-      const mapping = (yield* eval_(node.mapping)) as Record<string, unknown>;
-      return (await client.command(
-        "HSET",
-        yield* eval_(node.key),
-        ...flattenRecord(mapping),
-      )) as number;
+
+    "redis/hset": async function* (_entry: RuntimeEntry) {
+      const key = yield 0;
+      const mapping = (yield 1) as Record<string, unknown>;
+      return (await client.command("HSET", key, ...flattenRecord(mapping))) as number;
     },
-    "redis/hmget": async function* (node: RedisHMGetNode) {
+
+    "redis/hmget": async function* (entry: RuntimeEntry) {
+      const key = yield 0;
       const fields: unknown[] = [];
-      for (const f of node.fields) fields.push(yield* eval_(f));
-      return (await client.command("HMGET", yield* eval_(node.key), ...fields)) as (
-        | string
-        | null
-      )[];
+      for (let i = 1; i < entry.children.length; i++) {
+        fields.push(yield i);
+      }
+      return (await client.command("HMGET", key, ...fields)) as (string | null)[];
     },
-    "redis/hgetall": async function* (node: RedisHGetAllNode) {
-      return (await client.command("HGETALL", yield* eval_(node.key))) as string[];
+
+    "redis/hgetall": async function* (_entry: RuntimeEntry) {
+      return (await client.command("HGETALL", yield 0)) as string[];
     },
-    "redis/hdel": async function* (node: RedisHDelNode) {
+
+    "redis/hdel": async function* (entry: RuntimeEntry) {
+      const key = yield 0;
       const fields: unknown[] = [];
-      for (const f of node.fields) fields.push(yield* eval_(f));
-      return (await client.command("HDEL", yield* eval_(node.key), ...fields)) as number;
+      for (let i = 1; i < entry.children.length; i++) {
+        fields.push(yield i);
+      }
+      return (await client.command("HDEL", key, ...fields)) as number;
     },
-    "redis/hexists": async function* (node: RedisHExistsNode) {
-      return (await client.command(
-        "HEXISTS",
-        yield* eval_(node.key),
-        yield* eval_(node.field),
-      )) as number;
+
+    "redis/hexists": async function* (_entry: RuntimeEntry) {
+      const key = yield 0;
+      const field = yield 1;
+      return (await client.command("HEXISTS", key, field)) as number;
     },
-    "redis/hlen": async function* (node: RedisHLenNode) {
-      return (await client.command("HLEN", yield* eval_(node.key))) as number;
+
+    "redis/hlen": async function* (_entry: RuntimeEntry) {
+      return (await client.command("HLEN", yield 0)) as number;
     },
-    "redis/hkeys": async function* (node: RedisHKeysNode) {
-      return (await client.command("HKEYS", yield* eval_(node.key))) as string[];
+
+    "redis/hkeys": async function* (_entry: RuntimeEntry) {
+      return (await client.command("HKEYS", yield 0)) as string[];
     },
-    "redis/hvals": async function* (node: RedisHValsNode) {
-      return (await client.command("HVALS", yield* eval_(node.key))) as string[];
+
+    "redis/hvals": async function* (_entry: RuntimeEntry) {
+      return (await client.command("HVALS", yield 0)) as string[];
     },
-    "redis/hincrby": async function* (node: RedisHIncrByNode) {
-      return (await client.command(
-        "HINCRBY",
-        yield* eval_(node.key),
-        yield* eval_(node.field),
-        yield* eval_(node.increment),
-      )) as number;
+
+    "redis/hincrby": async function* (_entry: RuntimeEntry) {
+      const key = yield 0;
+      const field = yield 1;
+      const increment = yield 2;
+      return (await client.command("HINCRBY", key, field, increment)) as number;
     },
-    "redis/lpush": async function* (node: RedisLPushNode) {
-      const elements: unknown[] = [];
-      for (const e of node.elements) elements.push(yield* eval_(e));
-      return (await client.command("LPUSH", yield* eval_(node.key), ...elements)) as number;
+
+    // ---- List commands (delegated to interpreter-list.ts) ----
+    ...buildListHandlers(client),
+
+    // ---- Internal structural kinds ----
+
+    "redis/record": async function* (entry: RuntimeEntry) {
+      const result: Record<string, unknown> = {};
+      for (let i = 0; i < entry.children.length; i += 2) {
+        const key = (yield i) as string;
+        const value = yield i + 1;
+        result[key] = value;
+      }
+      return result;
     },
-    "redis/rpush": async function* (node: RedisRPushNode) {
-      const elements: unknown[] = [];
-      for (const e of node.elements) elements.push(yield* eval_(e));
-      return (await client.command("RPUSH", yield* eval_(node.key), ...elements)) as number;
+
+    "redis/array": async function* (entry: RuntimeEntry) {
+      const result: unknown[] = [];
+      for (let i = 0; i < entry.children.length; i++) {
+        result.push(yield i);
+      }
+      return result;
     },
-    "redis/lpop": async function* (node: RedisLPopNode) {
-      const args: unknown[] = [yield* eval_(node.key)];
-      if (node.count != null) args.push(yield* eval_(node.count));
-      return (await client.command("LPOP", ...args)) as string | null | string[];
-    },
-    "redis/rpop": async function* (node: RedisRPopNode) {
-      const args: unknown[] = [yield* eval_(node.key)];
-      if (node.count != null) args.push(yield* eval_(node.count));
-      return (await client.command("RPOP", ...args)) as string | null | string[];
-    },
-    "redis/llen": async function* (node: RedisLLenNode) {
-      return (await client.command("LLEN", yield* eval_(node.key))) as number;
-    },
-    "redis/lrange": async function* (node: RedisLRangeNode) {
-      return (await client.command(
-        "LRANGE",
-        yield* eval_(node.key),
-        yield* eval_(node.start),
-        yield* eval_(node.stop),
-      )) as string[];
-    },
-    "redis/lindex": async function* (node: RedisLIndexNode) {
-      return (await client.command("LINDEX", yield* eval_(node.key), yield* eval_(node.index))) as
-        | string
-        | null;
-    },
-    "redis/lset": async function* (node: RedisLSetNode) {
-      return (await client.command(
-        "LSET",
-        yield* eval_(node.key),
-        yield* eval_(node.index),
-        yield* eval_(node.element),
-      )) as "OK";
-    },
-    "redis/lrem": async function* (node: RedisLRemNode) {
-      return (await client.command(
-        "LREM",
-        yield* eval_(node.key),
-        yield* eval_(node.count),
-        yield* eval_(node.element),
-      )) as number;
-    },
-    "redis/linsert": async function* (node: RedisLInsertNode) {
-      return (await client.command(
-        "LINSERT",
-        yield* eval_(node.key),
-        node.position,
-        yield* eval_(node.pivot),
-        yield* eval_(node.element),
-      )) as number;
-    },
-  });
+  };
 }

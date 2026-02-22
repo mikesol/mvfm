@@ -10,7 +10,7 @@ const examples: Record<string, NodeExample> = {
 const prog = app({ value: "string" }, ($) => {
   return $.zod.object({ name: $.zod.string() }).partial().parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: { name: "Alice" } })
 );`,
@@ -32,7 +32,7 @@ const prog = app({ value: "string" }, ($) => {
 const prog = app({ value: "string" }, ($) => {
   return $.zod.record($.zod.string(), $.zod.number()).parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: { x: 1, y: 2 } })
 );`,
@@ -44,7 +44,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.set($.zod.string()).parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: new Set(["a", "b"]) })
 );`,
@@ -56,7 +56,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.string().min(1).max(255).parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: "hello world" })
 );`,
@@ -68,7 +68,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.stringbool().parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: "true" })
 );`,
@@ -80,7 +80,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.symbol().safeParse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: Symbol("test") })
 );`,
@@ -92,7 +92,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.templateLiteral([$.zod.number(), "px"]).parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: "42px" })
 );`,
@@ -104,7 +104,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.tuple([$.zod.string(), $.zod.number()]).parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: ["hello", 42] })
 );`,
@@ -116,7 +116,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.undefined().safeParse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: undefined })
 );`,
@@ -128,14 +128,15 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.union([$.zod.string(), $.zod.number()]).parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: "hello" })
 );`,
     plugins: ZP,
   },
   "zod/discriminated_union": {
-    description: "Schema for discriminated unions that use a discriminator key for efficient parsing",
+    description:
+      "Schema for discriminated unions that use a discriminator key for efficient parsing",
     code: `const app = mvfm(prelude, zod);
 const prog = app({ value: "string" }, ($) => {
   return $.zod.discriminatedUnion("status", [
@@ -143,7 +144,7 @@ const prog = app({ value: "string" }, ($) => {
     $.zod.object({ status: $.zod.literal("failed"), error: $.zod.string() }),
   ]).parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: { status: "success", data: "hello" } })
 );`,
@@ -155,7 +156,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.unknown().parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: "anything" })
 );`,
@@ -167,7 +168,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.void().safeParse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: undefined })
 );`,
@@ -179,7 +180,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.xor([$.zod.string(), $.zod.number()]).parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: "hello" })
 );`,
@@ -191,7 +192,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.transform((val) => val).parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: "hello" })
 );`,
@@ -203,7 +204,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.string().pipe($.zod.string()).parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: "hello" })
 );`,
@@ -215,7 +216,7 @@ await foldAST(
 const prog = app({ value: "string" }, ($) => {
   return $.zod.preprocess((val) => val, $.zod.string()).parse($.input.value);
 });
-await foldAST(
+await fold(
   defaults(app),
   injectInput(prog, { value: "hello" })
 );`,

@@ -15,38 +15,60 @@ export interface ClientHandlerOptions {
 // Warning: (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter;
+export function clientInterpreter(options: ClientHandlerOptions, kinds: string[]): Interpreter;
 
-// Warning: (ae-forgotten-export) The symbol "PluginDefinition" needs to be exported by the entry point index.d.ts
-//
 // @public
-function console_2(config?: ConsoleConfig): PluginDefinition<ConsoleMethods, {}, string>;
+function console_2(_config?: ConsoleConfig): {
+    name: "console";
+    ctors: {
+        console: {
+            assert<A, B extends readonly unknown[]>(condition: A, ...data: B): CExpr<void, "console/assert", [A, ...B]>;
+            clear(): CExpr<void, "console/clear", []>;
+            count<A>(...args: [label: A] | []): CExpr<void, "console/count", unknown[]>;
+            countReset<A>(...args: [label: A] | []): CExpr<void, "console/countReset", unknown[]>;
+            debug<A extends readonly unknown[]>(...data: A): CExpr<void, "console/debug", A>;
+            dir<A, B>(...args: [item: A, options: B] | [item: A] | []): CExpr<void, "console/dir", unknown[]>;
+            dirxml<A extends readonly unknown[]>(...data: A): CExpr<void, "console/dirxml", A>;
+            error<A extends readonly unknown[]>(...data: A): CExpr<void, "console/error", A>;
+            group<A extends readonly unknown[]>(...data: A): CExpr<void, "console/group", A>;
+            groupCollapsed<A extends readonly unknown[]>(...data: A): CExpr<void, "console/groupCollapsed", A>;
+            groupEnd(): CExpr<void, "console/groupEnd", []>;
+            info<A extends readonly unknown[]>(...data: A): CExpr<void, "console/info", A>;
+            log<A extends readonly unknown[]>(...data: A): CExpr<void, "console/log", A>;
+            table<A, B>(...args: [tabularData: A, properties: B] | [tabularData: A] | []): CExpr<void, "console/table", unknown[]>;
+            time<A>(...args: [label: A] | []): CExpr<void, "console/time", unknown[]>;
+            timeEnd<A>(...args: [label: A] | []): CExpr<void, "console/timeEnd", unknown[]>;
+            timeLog<A, B extends readonly unknown[]>(...args: [label: A, ...data: B] | []): CExpr<void, "console/timeLog", unknown[]>;
+            trace<A extends readonly unknown[]>(...data: A): CExpr<void, "console/trace", A>;
+            warn<A extends readonly unknown[]>(...data: A): CExpr<void, "console/warn", A>;
+        };
+    };
+    kinds: {
+        "console/assert": KindSpec<unknown[], void>;
+        "console/clear": KindSpec<unknown[], void>;
+        "console/count": KindSpec<unknown[], void>;
+        "console/countReset": KindSpec<unknown[], void>;
+        "console/debug": KindSpec<unknown[], void>;
+        "console/dir": KindSpec<unknown[], void>;
+        "console/dirxml": KindSpec<unknown[], void>;
+        "console/error": KindSpec<unknown[], void>;
+        "console/group": KindSpec<unknown[], void>;
+        "console/groupCollapsed": KindSpec<unknown[], void>;
+        "console/groupEnd": KindSpec<unknown[], void>;
+        "console/info": KindSpec<unknown[], void>;
+        "console/log": KindSpec<unknown[], void>;
+        "console/table": KindSpec<unknown[], void>;
+        "console/time": KindSpec<unknown[], void>;
+        "console/timeEnd": KindSpec<unknown[], void>;
+        "console/timeLog": KindSpec<unknown[], void>;
+        "console/trace": KindSpec<unknown[], void>;
+        "console/warn": KindSpec<unknown[], void>;
+    };
+    traits: {};
+    lifts: {};
+    defaultInterpreter: () => Interpreter;
+};
 export { console_2 as console }
-
-// @public
-export interface ConsoleApi {
-    // Warning: (ae-forgotten-export) The symbol "ConsoleArg" needs to be exported by the entry point index.d.ts
-    // Warning: (ae-forgotten-export) The symbol "Expr" needs to be exported by the entry point index.d.ts
-    assert(condition: ConsoleArg, ...data: ConsoleArg[]): Expr<void>;
-    clear(): Expr<void>;
-    count(label?: ConsoleArg): Expr<void>;
-    countReset(label?: ConsoleArg): Expr<void>;
-    debug(...data: ConsoleArg[]): Expr<void>;
-    dir(item?: ConsoleArg, options?: ConsoleArg): Expr<void>;
-    dirxml(...data: ConsoleArg[]): Expr<void>;
-    error(...data: ConsoleArg[]): Expr<void>;
-    group(...data: ConsoleArg[]): Expr<void>;
-    groupCollapsed(...data: ConsoleArg[]): Expr<void>;
-    groupEnd(): Expr<void>;
-    info(...data: ConsoleArg[]): Expr<void>;
-    log(...data: ConsoleArg[]): Expr<void>;
-    table(tabularData?: ConsoleArg, properties?: ConsoleArg): Expr<void>;
-    time(label?: ConsoleArg): Expr<void>;
-    timeEnd(label?: ConsoleArg): Expr<void>;
-    timeLog(label?: ConsoleArg, ...data: ConsoleArg[]): Expr<void>;
-    trace(...data: ConsoleArg[]): Expr<void>;
-    warn(...data: ConsoleArg[]): Expr<void>;
-}
 
 // @public
 export interface ConsoleClient {
@@ -88,26 +110,26 @@ export const consoleInterpreter: Interpreter;
 export type ConsoleMethodName = "assert" | "clear" | "count" | "countReset" | "debug" | "dir" | "dirxml" | "error" | "group" | "groupCollapsed" | "groupEnd" | "info" | "log" | "table" | "time" | "timeEnd" | "timeLog" | "trace" | "warn";
 
 // @public
-export interface ConsoleMethods {
-    console: ConsoleApi;
-}
-
-// @public
 export const consolePlugin: typeof console_2;
 
 // @public
-export function createConsoleInterpreter(client: ConsoleClient): Interpreter;
+export function createConsoleInterpreter(client?: ConsoleClient): Interpreter;
 
-// Warning: (ae-forgotten-export) The symbol "TypedNode" needs to be exported by the entry point index.d.ts
+// Warning: (ae-forgotten-export) The symbol "NExpr" needs to be exported by the entry point index.d.ts
 //
 // @public
-export function serverEvaluate(client: ConsoleClient, baseInterpreter: Interpreter): (root: TypedNode) => Promise<unknown>;
+export function serverEvaluate(client: ConsoleClient, baseInterpreter: Interpreter): (expr: NExpr<unknown, string, unknown, string>) => Promise<unknown>;
 
 // @public
 export function serverInterpreter(client: ConsoleClient): Interpreter;
 
 // @public
 export function wrapConsole(instance: ConsoleInstance): ConsoleClient;
+
+// Warnings were encountered during analysis:
+//
+// dist/22.0.0/index.d.ts:24:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/22.0.0/index.d.ts:64:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

@@ -1,15 +1,14 @@
 /**
  * Code template generator for Slack plugin documentation examples.
  *
- * Generates executable playground code following the `app -> prog -> foldAST`
+ * Generates executable playground code following the `app -> prog -> fold`
  * pipeline pattern for each Slack API method node kind.
  */
 
 /** Well-known methods with sensible default arguments for documentation. */
 const WELL_KNOWN_ARGS: Record<string, string> = {
   "chat.postMessage": '{ channel: "C0123456789", text: "Hello from mvfm!" }',
-  "chat.update":
-    '{ channel: "C0123456789", ts: "1700000000.000001", text: "Updated message" }',
+  "chat.update": '{ channel: "C0123456789", ts: "1700000000.000001", text: "Updated message" }',
   "chat.delete": '{ channel: "C0123456789", ts: "1700000000.000001" }',
   "conversations.create": '{ name: "new-channel" }',
   "conversations.invite": '{ channel: "C0123456789", users: "U0123456789" }',
@@ -18,19 +17,14 @@ const WELL_KNOWN_ARGS: Record<string, string> = {
   "conversations.archive": '{ channel: "C0123456789" }',
   "conversations.unarchive": '{ channel: "C0123456789" }',
   "conversations.rename": '{ channel: "C0123456789", name: "renamed-channel" }',
-  "conversations.setPurpose":
-    '{ channel: "C0123456789", purpose: "Channel purpose" }',
-  "conversations.setTopic":
-    '{ channel: "C0123456789", topic: "Channel topic" }',
+  "conversations.setPurpose": '{ channel: "C0123456789", purpose: "Channel purpose" }',
+  "conversations.setTopic": '{ channel: "C0123456789", topic: "Channel topic" }',
   "conversations.history": '{ channel: "C0123456789" }',
   "conversations.info": '{ channel: "C0123456789" }',
   "conversations.members": '{ channel: "C0123456789" }',
-  "conversations.replies":
-    '{ channel: "C0123456789", ts: "1700000000.000001" }',
-  "conversations.kick":
-    '{ channel: "C0123456789", user: "U0123456789" }',
-  "reactions.add":
-    '{ channel: "C0123456789", name: "thumbsup", timestamp: "1700000000.000001" }',
+  "conversations.replies": '{ channel: "C0123456789", ts: "1700000000.000001" }',
+  "conversations.kick": '{ channel: "C0123456789", user: "U0123456789" }',
+  "reactions.add": '{ channel: "C0123456789", name: "thumbsup", timestamp: "1700000000.000001" }',
   "reactions.remove":
     '{ channel: "C0123456789", name: "thumbsup", timestamp: "1700000000.000001" }',
   "reactions.get": '{ channel: "C0123456789", timestamp: "1700000000.000001" }',
@@ -52,14 +46,16 @@ const WELL_KNOWN_ARGS: Record<string, string> = {
   "stars.add": '{ channel: "C0123456789", timestamp: "1700000000.000001" }',
   "stars.remove": '{ channel: "C0123456789", timestamp: "1700000000.000001" }',
   "usergroups.create": '{ name: "Engineering" }',
-  "usergroups.update":
-    '{ usergroup: "S0123456789", name: "Updated Group" }',
+  "usergroups.update": '{ usergroup: "S0123456789", name: "Updated Group" }',
   "usergroups.disable": '{ usergroup: "S0123456789" }',
   "usergroups.enable": '{ usergroup: "S0123456789" }',
-  "views.open": '{ trigger_id: "T0123456789", view: { type: "modal", title: { type: "plain_text", text: "Title" } } }',
-  "views.update": '{ view_id: "V0123456789", view: { type: "modal", title: { type: "plain_text", text: "Updated" } } }',
+  "views.open":
+    '{ trigger_id: "T0123456789", view: { type: "modal", title: { type: "plain_text", text: "Title" } } }',
+  "views.update":
+    '{ view_id: "V0123456789", view: { type: "modal", title: { type: "plain_text", text: "Updated" } } }',
   "views.publish": '{ user_id: "U0123456789", view: { type: "home", blocks: [] } }',
-  "views.push": '{ trigger_id: "T0123456789", view: { type: "modal", title: { type: "plain_text", text: "Pushed" } } }',
+  "views.push":
+    '{ trigger_id: "T0123456789", view: { type: "modal", title: { type: "plain_text", text: "Pushed" } } }',
 };
 
 /**
@@ -84,7 +80,7 @@ export function generateCodeString(
     `  const result = ${callExpr};`,
     "  return $.begin($.console.log(result), result);",
     "});",
-    "await foldAST(defaults(app), prog);",
+    "await fold(defaults(app), prog);",
   ].join("\n");
 }
 

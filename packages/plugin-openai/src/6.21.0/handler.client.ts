@@ -22,16 +22,16 @@ export interface ClientHandlerOptions {
  * the resolved data to `{baseUrl}/mvfm/execute` as a JSON POST.
  *
  * @param options - Handler options.
- * @param nodeKinds - Node kinds to create handlers for.
+ * @param kinds - Kind strings to create handlers for (use Object.keys(plugin.kinds)).
  * @returns An Interpreter that proxies all operations to the server.
  */
-export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: string[]): Interpreter {
+export function clientInterpreter(options: ClientHandlerOptions, kinds: string[]): Interpreter {
   const { baseUrl, contractHash, headers = {} } = options;
   const fetchFn = options.fetch ?? globalThis.fetch;
   let stepIndex = 0;
 
   const interp: Record<string, (node: TypedNode) => AsyncGenerator<any, unknown, unknown>> = {};
-  for (const kind of nodeKinds) {
+  for (const kind of kinds) {
     interp[kind] = async function* (node: TypedNode) {
       const resolved: Record<string, unknown> = {};
       for (const [key, val] of Object.entries(node as unknown as Record<string, unknown>)) {

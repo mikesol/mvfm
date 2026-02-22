@@ -1,4 +1,3 @@
-import type { PluginContext, TypedNode } from "@mvfm/core";
 import { z } from "zod";
 import { ZodSchemaBuilder } from "./base";
 import type { SchemaInterpreterMap } from "./interpreter-utils";
@@ -11,44 +10,23 @@ import type {
   ZodSchemaNodeBase,
 } from "./types";
 
-interface ZodMapNode extends ZodSchemaNodeBase {
-  kind: "zod/map";
-  key: AnyZodSchemaNode;
-  value: AnyZodSchemaNode;
-}
-
-interface ZodSetNode extends ZodSchemaNodeBase {
-  kind: "zod/set";
-  value: AnyZodSchemaNode;
-}
-
-/**
- * Builder for Zod map schemas.
- *
- * Stores key and value schemas as AST nodes in extra fields.
- *
- * @typeParam K - The key type
- * @typeParam V - The value type
- */
 export class ZodMapBuilder<K, V> extends ZodSchemaBuilder<Map<K, V>> {
   constructor(
-    ctx: PluginContext,
     checks: readonly CheckDescriptor[] = [],
     refinements: readonly RefinementDescriptor[] = [],
     error?: ErrorConfig,
     extra: Record<string, unknown> = {},
   ) {
-    super(ctx, "zod/map", checks, refinements, error, extra);
+    super("zod/map", checks, refinements, error, extra);
   }
 
   protected _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | TypedNode;
+    error?: ErrorConfig;
     extra?: Record<string, unknown>;
   }): ZodMapBuilder<K, V> {
     return new ZodMapBuilder<K, V>(
-      this._ctx,
       overrides?.checks ?? this._checks,
       overrides?.refinements ?? this._refinements,
       overrides?.error ?? this._error,
@@ -57,33 +35,23 @@ export class ZodMapBuilder<K, V> extends ZodSchemaBuilder<Map<K, V>> {
   }
 }
 
-/**
- * Builder for Zod set schemas with size constraints.
- *
- * Stores value schema as AST node in extra field.
- * Provides min, max, and size check methods.
- *
- * @typeParam T - The element type
- */
 export class ZodSetBuilder<T> extends ZodSchemaBuilder<Set<T>> {
   constructor(
-    ctx: PluginContext,
     checks: readonly CheckDescriptor[] = [],
     refinements: readonly RefinementDescriptor[] = [],
     error?: ErrorConfig,
     extra: Record<string, unknown> = {},
   ) {
-    super(ctx, "zod/set", checks, refinements, error, extra);
+    super("zod/set", checks, refinements, error, extra);
   }
 
   protected _clone(overrides?: {
     checks?: readonly CheckDescriptor[];
     refinements?: readonly RefinementDescriptor[];
-    error?: string | TypedNode;
+    error?: ErrorConfig;
     extra?: Record<string, unknown>;
   }): ZodSetBuilder<T> {
     return new ZodSetBuilder<T>(
-      this._ctx,
       overrides?.checks ?? this._checks,
       overrides?.refinements ?? this._refinements,
       overrides?.error ?? this._error,
@@ -91,92 +59,53 @@ export class ZodSetBuilder<T> extends ZodSchemaBuilder<Set<T>> {
     );
   }
 
-  /** Require at least `value` elements. */
   min(value: number, opts?: { error?: string }): ZodSetBuilder<T> {
     return this._addCheck("min_size", { value }, opts) as ZodSetBuilder<T>;
   }
-
-  /** Require at most `value` elements. */
   max(value: number, opts?: { error?: string }): ZodSetBuilder<T> {
     return this._addCheck("max_size", { value }, opts) as ZodSetBuilder<T>;
   }
-
-  /** Require exactly `value` elements. */
   size(value: number, opts?: { error?: string }): ZodSetBuilder<T> {
     return this._addCheck("size", { value }, opts) as ZodSetBuilder<T>;
   }
 }
 
-/** Node kinds contributed by the map/set schemas. */
-export const mapSetNodeKinds: string[] = ["zod/map", "zod/set"];
-
-/**
- * Namespace fragment for map and set schema factories.
- */
-export interface ZodMapSetNamespace {
-  /** Create a map schema builder. */
-  map<K, V>(
-    keySchema: ZodSchemaBuilder<K>,
-    valueSchema: ZodSchemaBuilder<V>,
-    errorOrOpts?: string | { error?: string },
-  ): ZodMapBuilder<K, V>;
-
-  /** Create a set schema builder with optional size constraints. */
-  set<T>(
-    valueSchema: ZodSchemaBuilder<T>,
-    errorOrOpts?: string | { error?: string },
-  ): ZodSetBuilder<T>;
-}
-
 /** Build the map/set namespace factory methods. */
 export function mapSetNamespace(
-  ctx: PluginContext,
   parseError: (errorOrOpts?: string | { error?: string }) => string | undefined,
-): ZodMapSetNamespace {
+) {
   return {
-    map<K, V>(
-      keySchema: ZodSchemaBuilder<K>,
-      valueSchema: ZodSchemaBuilder<V>,
-      errorOrOpts?: string | { error?: string },
-    ): ZodMapBuilder<K, V> {
-      const error = parseError(errorOrOpts);
-      return new ZodMapBuilder<K, V>(ctx, [], [], error, {
-        key: keySchema.__schemaNode,
-        value: valueSchema.__schemaNode,
-      });
-    },
-
-    set<T>(
-      valueSchema: ZodSchemaBuilder<T>,
-      errorOrOpts?: string | { error?: string },
-    ): ZodSetBuilder<T> {
-      const error = parseError(errorOrOpts);
-      return new ZodSetBuilder<T>(ctx, [], [], error, {
-        value: valueSchema.__schemaNode,
-      });
-    },
+    map: <K, V>(k: ZodSchemaBuilder<K>, v: ZodSchemaBuilder<V>, e?: string | { error?: string }) =>
+      new ZodMapBuilder<K, V>([], [], parseError(e), {
+        key: k.__schemaNode,
+        value: v.__schemaNode,
+      }),
+    set: <T>(v: ZodSchemaBuilder<T>, e?: string | { error?: string }) =>
+      new ZodSetBuilder<T>([], [], parseError(e), { value: v.__schemaNode }),
   };
 }
 
-/**
- * Build a Zod schema from a field's AST node by delegating to the
- * interpreter's buildSchemaGen. This is passed in at registration time
- * to avoid circular imports.
- */
-type SchemaBuildFn = (node: AnyZodSchemaNode) => AsyncGenerator<TypedNode, z.ZodType, unknown>;
+type SchemaBuildFn = (node: AnyZodSchemaNode) => AsyncGenerator<unknown, z.ZodType, unknown>;
+interface ZodMapNode extends ZodSchemaNodeBase {
+  kind: "zod/map";
+  key: AnyZodSchemaNode;
+  value: AnyZodSchemaNode;
+}
+interface ZodSetNode extends ZodSchemaNodeBase {
+  kind: "zod/set";
+  value: AnyZodSchemaNode;
+}
 
-/** Create map/set interpreter handlers with access to the shared schema builder. */
 export function createMapSetInterpreter(buildSchema: SchemaBuildFn): SchemaInterpreterMap {
   return {
-    "zod/map": async function* (node: ZodMapNode): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+    "zod/map": async function* (node: ZodMapNode) {
       const keySchema = yield* buildSchema(node.key);
       const valueSchema = yield* buildSchema(node.value);
       const errorFn = toZodError(node.error as ErrorConfig | undefined);
       const errOpt = errorFn ? { error: errorFn } : {};
       return z.map(keySchema as z.ZodString, valueSchema, errOpt);
     },
-
-    "zod/set": async function* (node: ZodSetNode): AsyncGenerator<TypedNode, z.ZodType, unknown> {
+    "zod/set": async function* (node: ZodSetNode) {
       const valueSchema = yield* buildSchema(node.value);
       const checks = (node.checks as CheckDescriptor[]) ?? [];
       const errorFn = toZodError(node.error as ErrorConfig | undefined);

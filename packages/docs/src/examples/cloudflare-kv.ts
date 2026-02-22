@@ -12,7 +12,7 @@ const prog = app({}, ($) => {
     $.kv.get("greeting")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { "cloudflare-kv": memoryCloudflareKvInterpreter }),
   prog
 );`,
@@ -29,7 +29,7 @@ const prog = app({}, ($) => {
     $.kv.get("user", "json")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { "cloudflare-kv": memoryCloudflareKvInterpreter }),
   prog
 );`,
@@ -46,7 +46,7 @@ const prog = app({}, ($) => {
     $.kv.get("session")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { "cloudflare-kv": memoryCloudflareKvInterpreter }),
   prog
 );`,
@@ -64,7 +64,7 @@ const prog = app({}, ($) => {
     $.kv.get("temp")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { "cloudflare-kv": memoryCloudflareKvInterpreter }),
   prog
 );`,
@@ -83,7 +83,7 @@ const prog = app({}, ($) => {
     $.kv.list({ prefix: "user:" })
   );
 });
-await foldAST(
+await fold(
   defaults(app, { "cloudflare-kv": memoryCloudflareKvInterpreter }),
   prog
 );`,

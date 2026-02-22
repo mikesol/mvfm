@@ -1,4 +1,5 @@
-import type { Expr, PluginContext, TypedNode } from "@mvfm/core";
+import type { CExpr } from "@mvfm/core";
+import { isCExpr, makeCExpr } from "@mvfm/core";
 import { ZodSchemaBuilderCore } from "./base-core";
 import type { WrapperASTNode } from "./types";
 
@@ -9,7 +10,7 @@ export abstract class ZodSchemaBuilder<T> extends ZodSchemaBuilderCore<T> {
       inner: this.__schemaNode,
       ...extra,
     };
-    return new ZodWrappedBuilder<U>(this._ctx, wrapperNode);
+    return new ZodWrappedBuilder<U>(wrapperNode);
   }
 
   optional(): ZodWrappedBuilder<T | undefined> {
@@ -28,16 +29,16 @@ export abstract class ZodSchemaBuilder<T> extends ZodSchemaBuilderCore<T> {
     return this._wrap<T | null | undefined>("zod/nullish");
   }
 
-  default(value: Expr<T> | T): ZodWrappedBuilder<T> {
-    return this._wrap<T>("zod/default", { value: this._ctx.lift(value).__node });
+  default(value: unknown): ZodWrappedBuilder<T> {
+    return this._wrap<T>("zod/default", { value });
   }
 
-  prefault(value: Expr<T> | T): ZodWrappedBuilder<T> {
-    return this._wrap<T>("zod/prefault", { value: this._ctx.lift(value).__node });
+  prefault(value: unknown): ZodWrappedBuilder<T> {
+    return this._wrap<T>("zod/prefault", { value });
   }
 
-  catch(value: Expr<T> | T): ZodWrappedBuilder<T> {
-    return this._wrap<T>("zod/catch", { value: this._ctx.lift(value).__node });
+  catch(value: unknown): ZodWrappedBuilder<T> {
+    return this._wrap<T>("zod/catch", { value });
   }
 
   readonly(): ZodWrappedBuilder<Readonly<T>> {
@@ -48,17 +49,16 @@ export abstract class ZodSchemaBuilder<T> extends ZodSchemaBuilderCore<T> {
     return this._wrap<T & { __brand: B }>("zod/branded", brand ? { brand } : {});
   }
 
-  transform<U>(fn: (val: Expr<T>) => Expr<U>): ZodWrappedBuilder<U> {
-    const paramNode = { kind: "core/lambda_param", name: "transform_val" } as TypedNode;
-    const paramProxy = this._ctx.expr<T>(paramNode);
-    const result = fn(paramProxy);
-    const bodyNode = this._ctx.isExpr(result) ? result.__node : paramNode;
+  transform<U>(fn: (val: CExpr<T>) => CExpr<U>): ZodWrappedBuilder<U> {
+    const param = makeCExpr<T, "core/lambda_param", []>("core/lambda_param", []);
+    const result = fn(param);
+    const body = isCExpr(result) ? result : param;
     const wrapperNode: WrapperASTNode = {
       kind: "zod/transform",
       inner: this.__schemaNode,
-      fn: { kind: "core/lambda", param: paramNode, body: bodyNode },
+      fn: { param, body },
     };
-    return new ZodWrappedBuilder<U>(this._ctx, wrapperNode);
+    return new ZodWrappedBuilder<U>(wrapperNode);
   }
 
   pipe<U>(target: ZodSchemaBuilder<U>): ZodWrappedBuilder<U> {
@@ -67,15 +67,15 @@ export abstract class ZodSchemaBuilder<T> extends ZodSchemaBuilderCore<T> {
       inner: this.__schemaNode,
       target: target.__schemaNode,
     };
-    return new ZodWrappedBuilder<U>(this._ctx, wrapperNode);
+    return new ZodWrappedBuilder<U>(wrapperNode);
   }
 }
 
 export class ZodWrappedBuilder<T> extends ZodSchemaBuilder<T> {
   private readonly _wrapperNode: WrapperASTNode;
 
-  constructor(ctx: PluginContext, wrapperNode: WrapperASTNode) {
-    super(ctx, wrapperNode.kind);
+  constructor(wrapperNode: WrapperASTNode) {
+    super(wrapperNode.kind);
     this._wrapperNode = wrapperNode;
   }
 
@@ -84,6 +84,6 @@ export class ZodWrappedBuilder<T> extends ZodSchemaBuilder<T> {
   }
 
   protected _clone(): ZodWrappedBuilder<T> {
-    return new ZodWrappedBuilder<T>(this._ctx, this._wrapperNode);
+    return new ZodWrappedBuilder<T>(this._wrapperNode);
   }
 }

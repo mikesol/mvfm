@@ -1,91 +1,61 @@
 import { describe, expect, it } from "vitest";
-import { app, strip } from "./slack.shared";
+import { $ } from "./slack.shared";
 
 describe("slack: users", () => {
-  it("produces users operation nodes", () => {
-    expect((strip(app(($) => $.slack.users.info({ user: "U123" })).ast) as any).result.kind).toBe(
-      "slack/users_info",
+  it("produces users operation CExprs", () => {
+    expect($.slack.users.info({ user: "U123" }).__kind).toBe("slack/users_info");
+    expect($.slack.users.list({ limit: 200 }).__kind).toBe("slack/users_list");
+    expect($.slack.users.lookupByEmail({ email: "user@example.com" }).__kind).toBe(
+      "slack/users_lookupByEmail",
     );
-    expect((strip(app(($) => $.slack.users.list({ limit: 200 })).ast) as any).result.kind).toBe(
-      "slack/users_list",
-    );
-    expect(
-      (strip(app(($) => $.slack.users.lookupByEmail({ email: "user@example.com" })).ast) as any)
-        .result.kind,
-    ).toBe("slack/users_lookupByEmail");
-    expect(
-      (strip(app(($) => $.slack.users.conversations({ user: "U123" })).ast) as any).result.kind,
-    ).toBe("slack/users_conversations");
+    expect($.slack.users.conversations({ user: "U123" }).__kind).toBe("slack/users_conversations");
   });
 
-  it("stores null for omitted users.list params", () => {
-    const ast = strip(app(($) => $.slack.users.list()).ast) as any;
-    expect(ast.result.kind).toBe("slack/users_list");
-    expect(ast.result.params).toBeNull();
+  it("produces CExpr with no args when users.list params omitted", () => {
+    const expr = ($.slack.users as any).list();
+    expect(expr.__kind).toBe("slack/users_list");
+    expect(expr.__args).toHaveLength(0);
   });
 });
 
 describe("slack: reactions", () => {
-  it("produces reactions operation nodes", () => {
+  it("produces reactions operation CExprs", () => {
     expect(
-      (
-        strip(
-          app(($) =>
-            $.slack.reactions.add({
-              channel: "C123",
-              timestamp: "1234567890.123456",
-              name: "thumbsup",
-            }),
-          ).ast,
-        ) as any
-      ).result.kind,
+      $.slack.reactions.add({
+        channel: "C123",
+        timestamp: "1234567890.123456",
+        name: "thumbsup",
+      }).__kind,
     ).toBe("slack/reactions_add");
+    expect($.slack.reactions.get({ channel: "C123", timestamp: "1234567890.123456" }).__kind).toBe(
+      "slack/reactions_get",
+    );
     expect(
-      (
-        strip(
-          app(($) => $.slack.reactions.get({ channel: "C123", timestamp: "1234567890.123456" }))
-            .ast,
-        ) as any
-      ).result.kind,
-    ).toBe("slack/reactions_get");
-    expect(
-      (
-        strip(
-          app(($) =>
-            $.slack.reactions.remove({
-              channel: "C123",
-              timestamp: "1234567890.123456",
-              name: "thumbsup",
-            }),
-          ).ast,
-        ) as any
-      ).result.kind,
+      $.slack.reactions.remove({
+        channel: "C123",
+        timestamp: "1234567890.123456",
+        name: "thumbsup",
+      }).__kind,
     ).toBe("slack/reactions_remove");
   });
 
-  it("stores null for omitted reactions.list params", () => {
-    const ast = strip(app(($) => $.slack.reactions.list()).ast) as any;
-    expect(ast.result.kind).toBe("slack/reactions_list");
-    expect(ast.result.params).toBeNull();
+  it("produces CExpr with no args when reactions.list params omitted", () => {
+    const expr = $.slack.reactions.list();
+    expect(expr.__kind).toBe("slack/reactions_list");
+    expect(expr.__args).toHaveLength(0);
   });
 });
 
 describe("slack: files", () => {
-  it("produces file operation nodes", () => {
-    expect(
-      (strip(app(($) => $.slack.files.list({ channel: "C123" })).ast) as any).result.kind,
-    ).toBe("slack/files_list");
-    expect((strip(app(($) => $.slack.files.info({ file: "F123" })).ast) as any).result.kind).toBe(
-      "slack/files_info",
-    );
-    expect((strip(app(($) => $.slack.files.delete({ file: "F123" })).ast) as any).result.kind).toBe(
-      "slack/files_delete",
-    );
+  it("produces file operation CExprs", () => {
+    expect($.slack.files.list({ channel: "C123" }).__kind).toBe("slack/files_list");
+    expect($.slack.files.info({ file: "F123" }).__kind).toBe("slack/files_info");
+    expect($.slack.files.delete({ file: "F123" }).__kind).toBe("slack/files_delete");
   });
 
-  it("stores null for omitted files.list params", () => {
-    const ast = strip(app(($) => $.slack.files.list()).ast) as any;
-    expect(ast.result.kind).toBe("slack/files_list");
-    expect(ast.result.params).toBeNull();
+  it("produces CExpr with no args when files.list params omitted", () => {
+    const expr = ($.slack.files as any).list();
+    expect(expr.__kind).toBe("slack/files_list");
+    expect(expr.__args).toHaveLength(0);
   });
 });

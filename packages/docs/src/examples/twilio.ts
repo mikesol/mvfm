@@ -14,7 +14,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(message);
 });
-await foldAST(defaults(app, { twilio: crystalBallTwilioInterpreter }), prog);`,
+await fold(defaults(app, { twilio: crystalBallTwilioInterpreter }), prog);`,
     plugins: TWILIO,
   },
 
@@ -25,7 +25,7 @@ const prog = app({}, ($) => {
   const message = $.twilio.messages("SM1234567890abcdef").fetch();
   return $.console.log(message);
 });
-await foldAST(defaults(app, { twilio: crystalBallTwilioInterpreter }), prog);`,
+await fold(defaults(app, { twilio: crystalBallTwilioInterpreter }), prog);`,
     plugins: TWILIO,
   },
 
@@ -36,7 +36,7 @@ const prog = app({}, ($) => {
   const messages = $.twilio.messages.list({ limit: 10 });
   return $.console.log(messages);
 });
-await foldAST(defaults(app, { twilio: crystalBallTwilioInterpreter }), prog);`,
+await fold(defaults(app, { twilio: crystalBallTwilioInterpreter }), prog);`,
     plugins: TWILIO,
   },
 
@@ -51,7 +51,7 @@ const prog = app({}, ($) => {
   });
   return $.console.log(call);
 });
-await foldAST(defaults(app, { twilio: crystalBallTwilioInterpreter }), prog);`,
+await fold(defaults(app, { twilio: crystalBallTwilioInterpreter }), prog);`,
     plugins: TWILIO,
   },
 
@@ -62,7 +62,7 @@ const prog = app({}, ($) => {
   const call = $.twilio.calls("CA1234567890abcdef").fetch();
   return $.console.log(call);
 });
-await foldAST(defaults(app, { twilio: crystalBallTwilioInterpreter }), prog);`,
+await fold(defaults(app, { twilio: crystalBallTwilioInterpreter }), prog);`,
     plugins: TWILIO,
   },
 
@@ -73,7 +73,7 @@ const prog = app({}, ($) => {
   const calls = $.twilio.calls.list({ limit: 20 });
   return $.console.log(calls);
 });
-await foldAST(defaults(app, { twilio: crystalBallTwilioInterpreter }), prog);`,
+await fold(defaults(app, { twilio: crystalBallTwilioInterpreter }), prog);`,
     plugins: TWILIO,
   },
 };

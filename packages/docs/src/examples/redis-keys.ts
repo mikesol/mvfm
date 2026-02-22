@@ -13,7 +13,7 @@ const prog = app({}, ($) => {
     $.redis.del("a", "b")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -31,7 +31,7 @@ const prog = app({}, ($) => {
     $.redis.exists("a", "b", "missing")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -48,7 +48,7 @@ const prog = app({}, ($) => {
     $.redis.expire("temp", 60)
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -65,7 +65,7 @@ const prog = app({}, ($) => {
     $.redis.pexpire("temp", 30000)
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -83,7 +83,7 @@ const prog = app({}, ($) => {
     $.redis.ttl("temp")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,
@@ -101,7 +101,7 @@ const prog = app({}, ($) => {
     $.redis.pttl("temp")
   );
 });
-await foldAST(
+await fold(
   defaults(app, { redis: memoryRedisInterpreter }),
   prog
 );`,

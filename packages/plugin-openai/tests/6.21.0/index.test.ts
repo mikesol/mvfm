@@ -1,107 +1,79 @@
-import { mvfm, num, str } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
-import { openai } from "../../src/6.21.0";
+import { openai, openaiPlugin } from "../../src/6.21.0";
 
-function strip(ast: unknown): unknown {
-  return JSON.parse(
-    JSON.stringify(ast, (k, v) => (k === "__id" || k === "config" ? undefined : v)),
-  );
-}
-
-const app = mvfm(num, str, openai({ apiKey: "sk-test-123" }));
+const plugin = openai({ apiKey: "sk-test-123" });
+const api = plugin.ctors.openai;
 
 // ============================================================
-// Chat Completions
+// CExpr construction tests
 // ============================================================
 
 describe("openai: chat.completions.create", () => {
-  it("produces openai/create_chat_completion node", () => {
-    const prog = app(($) => {
-      return $.openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [{ role: "user", content: "Hello" }],
-      });
+  it("produces openai/create_chat_completion CExpr", () => {
+    const expr = api.chat.completions.create({
+      model: "gpt-4o",
+      messages: [{ role: "user", content: "Hello" }],
     });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("openai/create_chat_completion");
-    expect(ast.result.params.kind).toBe("core/record");
-  });
-
-  it("accepts Expr params and captures proxy dependencies", () => {
-    const prog = app(($) => {
-      return $.openai.chat.completions.create({
-        model: $.input.model,
-        messages: $.input.messages,
-      });
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("openai/create_chat_completion");
-    expect(ast.result.params.fields.model.kind).toBe("core/prop_access");
+    expect(expr.__kind).toBe("openai/create_chat_completion");
+    expect(expr.__args).toHaveLength(1);
+    const paramsArg = expr.__args[0] as { __kind: string };
+    expect(paramsArg.__kind).toBe("openai/record");
   });
 });
 
 describe("openai: chat.completions.retrieve", () => {
-  it("produces openai/retrieve_chat_completion node with literal id", () => {
-    const prog = app(($) => {
-      return $.openai.chat.completions.retrieve("cmpl_123");
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("openai/retrieve_chat_completion");
-    expect(ast.result.id.kind).toBe("core/literal");
-    expect(ast.result.id.value).toBe("cmpl_123");
+  it("produces openai/retrieve_chat_completion CExpr with string id", () => {
+    const expr = api.chat.completions.retrieve("cmpl_123");
+    expect(expr.__kind).toBe("openai/retrieve_chat_completion");
+    expect(expr.__args).toHaveLength(1);
+    expect(expr.__args[0]).toBe("cmpl_123");
   });
 
-  it("accepts Expr<string> id", () => {
-    const prog = app(($) => {
-      return $.openai.chat.completions.retrieve($.input.completionId);
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.id.kind).toBe("core/prop_access");
+  it("accepts CExpr id (proxy chained value)", () => {
+    const completion = api.chat.completions.retrieve("cmpl_123");
+    const expr = api.chat.completions.retrieve(completion.id);
+    expect(expr.__kind).toBe("openai/retrieve_chat_completion");
+    expect(expr.__args).toHaveLength(1);
+    const idArg = expr.__args[0] as { __kind: string };
+    expect(idArg.__kind).toBe("core/access");
   });
 });
 
 describe("openai: chat.completions.list", () => {
-  it("produces openai/list_chat_completions node with params", () => {
-    const prog = app(($) => {
-      return $.openai.chat.completions.list({ model: "gpt-4o", limit: 10 });
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("openai/list_chat_completions");
-    expect(ast.result.params.kind).toBe("core/record");
+  it("produces openai/list_chat_completions CExpr with params", () => {
+    const expr = api.chat.completions.list({ model: "gpt-4o", limit: 10 });
+    expect(expr.__kind).toBe("openai/list_chat_completions");
+    expect(expr.__args).toHaveLength(1);
+    const paramsArg = expr.__args[0] as { __kind: string };
+    expect(paramsArg.__kind).toBe("openai/record");
   });
 
-  it("optional params are null when omitted", () => {
-    const prog = app(($) => {
-      return $.openai.chat.completions.list();
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("openai/list_chat_completions");
-    expect(ast.result.params).toBeNull();
+  it("produces CExpr with no args when omitted", () => {
+    const expr = api.chat.completions.list();
+    expect(expr.__kind).toBe("openai/list_chat_completions");
+    expect(expr.__args).toHaveLength(0);
   });
 });
 
 describe("openai: chat.completions.update", () => {
-  it("produces openai/update_chat_completion node", () => {
-    const prog = app(($) => {
-      return $.openai.chat.completions.update("cmpl_123", { metadata: { key: "value" } });
+  it("produces openai/update_chat_completion CExpr", () => {
+    const expr = api.chat.completions.update("cmpl_123", {
+      metadata: { key: "value" },
     });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("openai/update_chat_completion");
-    expect(ast.result.id.kind).toBe("core/literal");
-    expect(ast.result.id.value).toBe("cmpl_123");
-    expect(ast.result.params.kind).toBe("core/record");
+    expect(expr.__kind).toBe("openai/update_chat_completion");
+    expect(expr.__args).toHaveLength(2);
+    expect(expr.__args[0]).toBe("cmpl_123");
+    const paramsArg = expr.__args[1] as { __kind: string };
+    expect(paramsArg.__kind).toBe("openai/record");
   });
 });
 
 describe("openai: chat.completions.delete", () => {
-  it("produces openai/delete_chat_completion node", () => {
-    const prog = app(($) => {
-      return $.openai.chat.completions.delete("cmpl_123");
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("openai/delete_chat_completion");
-    expect(ast.result.id.kind).toBe("core/literal");
-    expect(ast.result.id.value).toBe("cmpl_123");
+  it("produces openai/delete_chat_completion CExpr", () => {
+    const expr = api.chat.completions.delete("cmpl_123");
+    expect(expr.__kind).toBe("openai/delete_chat_completion");
+    expect(expr.__args).toHaveLength(1);
+    expect(expr.__args[0]).toBe("cmpl_123");
   });
 });
 
@@ -110,16 +82,15 @@ describe("openai: chat.completions.delete", () => {
 // ============================================================
 
 describe("openai: embeddings.create", () => {
-  it("produces openai/create_embedding node", () => {
-    const prog = app(($) => {
-      return $.openai.embeddings.create({
-        model: "text-embedding-3-small",
-        input: "Hello world",
-      });
+  it("produces openai/create_embedding CExpr", () => {
+    const expr = api.embeddings.create({
+      model: "text-embedding-3-small",
+      input: "Hello world",
     });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("openai/create_embedding");
-    expect(ast.result.params.kind).toBe("core/record");
+    expect(expr.__kind).toBe("openai/create_embedding");
+    expect(expr.__args).toHaveLength(1);
+    const paramsArg = expr.__args[0] as { __kind: string };
+    expect(paramsArg.__kind).toBe("openai/record");
   });
 });
 
@@ -128,16 +99,15 @@ describe("openai: embeddings.create", () => {
 // ============================================================
 
 describe("openai: moderations.create", () => {
-  it("produces openai/create_moderation node", () => {
-    const prog = app(($) => {
-      return $.openai.moderations.create({
-        model: "omni-moderation-latest",
-        input: "some text to moderate",
-      });
+  it("produces openai/create_moderation CExpr", () => {
+    const expr = api.moderations.create({
+      model: "omni-moderation-latest",
+      input: "some text to moderate",
     });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("openai/create_moderation");
-    expect(ast.result.params.kind).toBe("core/record");
+    expect(expr.__kind).toBe("openai/create_moderation");
+    expect(expr.__args).toHaveLength(1);
+    const paramsArg = expr.__args[0] as { __kind: string };
+    expect(paramsArg.__kind).toBe("openai/record");
   });
 });
 
@@ -146,54 +116,59 @@ describe("openai: moderations.create", () => {
 // ============================================================
 
 describe("openai: completions.create", () => {
-  it("produces openai/create_completion node", () => {
-    const prog = app(($) => {
-      return $.openai.completions.create({
-        model: "gpt-3.5-turbo-instruct",
-        prompt: "Say hello",
-      });
+  it("produces openai/create_completion CExpr", () => {
+    const expr = api.completions.create({
+      model: "gpt-3.5-turbo-instruct",
+      prompt: "Say hello",
     });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("openai/create_completion");
-    expect(ast.result.params.kind).toBe("core/record");
+    expect(expr.__kind).toBe("openai/create_completion");
+    expect(expr.__args).toHaveLength(1);
+    const paramsArg = expr.__args[0] as { __kind: string };
+    expect(paramsArg.__kind).toBe("openai/record");
   });
 });
 
 // ============================================================
-// Integration with $.begin() and cross-operation dependencies
+// Unified Plugin shape
 // ============================================================
 
-describe("openai: integration with $.begin()", () => {
-  it("side-effecting operations wrapped in $.begin() are reachable", () => {
-    expect(() => {
-      app(($) => {
-        const completion = $.openai.chat.completions.create({
-          model: "gpt-4o",
-          messages: [{ role: "user", content: "Hello" }],
-        });
-        const embedding = $.openai.embeddings.create({
-          model: "text-embedding-3-small",
-          input: "Hello world",
-        });
-        return $.begin(completion, embedding);
-      });
-    }).not.toThrow();
+describe("openai plugin: unified Plugin shape", () => {
+  it("has correct name", () => {
+    expect(plugin.name).toBe("openai");
+  });
+
+  it("has 10 node kinds (8 core + record + array)", () => {
+    expect(Object.keys(plugin.kinds)).toHaveLength(10);
+  });
+
+  it("kinds are all namespaced", () => {
+    for (const kind of Object.keys(plugin.kinds)) {
+      expect(kind).toMatch(/^openai\//);
+    }
+  });
+
+  it("kinds map has entries for all node kinds", () => {
+    for (const kind of Object.keys(plugin.kinds)) {
+      expect(plugin.kinds[kind]).toBeDefined();
+    }
+  });
+
+  it("has empty traits and lifts", () => {
+    expect(plugin.traits).toEqual({});
+    expect(plugin.lifts).toEqual({});
+  });
+
+  it("has a defaultInterpreter factory", () => {
+    expect(typeof plugin.defaultInterpreter).toBe("function");
   });
 });
 
-describe("openai: cross-operation dependencies", () => {
-  it("can use result of one operation as input to another", () => {
-    const prog = app(($) => {
-      const completion = $.openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [{ role: "user", content: "Hello" }],
-      });
-      const moderation = $.openai.moderations.create({
-        input: (completion as any).choices,
-      });
-      return $.begin(completion, moderation);
-    });
-    const ast = strip(prog.ast) as any;
-    expect(ast.result.kind).toBe("core/begin");
+// ============================================================
+// Factory aliases
+// ============================================================
+
+describe("openai plugin: factory aliases", () => {
+  it("openai and openaiPlugin are the same function", () => {
+    expect(openai).toBe(openaiPlugin);
   });
 });

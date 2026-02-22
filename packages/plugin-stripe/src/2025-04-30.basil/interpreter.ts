@@ -1,5 +1,4 @@
-import type { Interpreter, TypedNode } from "@mvfm/core";
-import { defineInterpreter, eval_ } from "@mvfm/core";
+import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import { wrapStripeSdk } from "./client-stripe-sdk";
 
 /**
@@ -13,126 +12,88 @@ export interface StripeClient {
   request(method: string, path: string, params?: Record<string, unknown>): Promise<unknown>;
 }
 
-interface StripeNode<K extends string> extends TypedNode<unknown> {
-  kind: K;
-  id?: TypedNode<string>;
-  params?: TypedNode<Record<string, unknown>>;
-}
-
-interface StripeCreatePaymentIntentNode extends StripeNode<"stripe/create_payment_intent"> {
-  params: TypedNode<Record<string, unknown>>;
-}
-interface StripeRetrievePaymentIntentNode extends StripeNode<"stripe/retrieve_payment_intent"> {
-  id: TypedNode<string>;
-}
-interface StripeConfirmPaymentIntentNode extends StripeNode<"stripe/confirm_payment_intent"> {
-  id: TypedNode<string>;
-}
-interface StripeCreateCustomerNode extends StripeNode<"stripe/create_customer"> {
-  params: TypedNode<Record<string, unknown>>;
-}
-interface StripeRetrieveCustomerNode extends StripeNode<"stripe/retrieve_customer"> {
-  id: TypedNode<string>;
-}
-interface StripeUpdateCustomerNode extends StripeNode<"stripe/update_customer"> {
-  id: TypedNode<string>;
-  params: TypedNode<Record<string, unknown>>;
-}
-interface StripeListCustomersNode extends StripeNode<"stripe/list_customers"> {}
-interface StripeCreateChargeNode extends StripeNode<"stripe/create_charge"> {
-  params: TypedNode<Record<string, unknown>>;
-}
-interface StripeRetrieveChargeNode extends StripeNode<"stripe/retrieve_charge"> {
-  id: TypedNode<string>;
-}
-interface StripeListChargesNode extends StripeNode<"stripe/list_charges"> {}
-
-declare module "@mvfm/core" {
-  interface NodeTypeMap {
-    "stripe/create_payment_intent": StripeCreatePaymentIntentNode;
-    "stripe/retrieve_payment_intent": StripeRetrievePaymentIntentNode;
-    "stripe/confirm_payment_intent": StripeConfirmPaymentIntentNode;
-    "stripe/create_customer": StripeCreateCustomerNode;
-    "stripe/retrieve_customer": StripeRetrieveCustomerNode;
-    "stripe/update_customer": StripeUpdateCustomerNode;
-    "stripe/list_customers": StripeListCustomersNode;
-    "stripe/create_charge": StripeCreateChargeNode;
-    "stripe/retrieve_charge": StripeRetrieveChargeNode;
-    "stripe/list_charges": StripeListChargesNode;
-  }
-}
-
 /**
- * Creates an interpreter for `stripe/*` node kinds.
+ * Creates an interpreter for `stripe/*` node kinds using the new
+ * RuntimeEntry + positional yield pattern.
+ *
+ * Config (apiKey, apiVersion) is captured in the closure,
+ * not stored on AST nodes.
  *
  * @param client - The {@link StripeClient} to execute against.
  * @returns An Interpreter handling all stripe node kinds.
  */
 export function createStripeInterpreter(client: StripeClient): Interpreter {
-  return defineInterpreter<
-    | "stripe/create_payment_intent"
-    | "stripe/retrieve_payment_intent"
-    | "stripe/confirm_payment_intent"
-    | "stripe/create_customer"
-    | "stripe/retrieve_customer"
-    | "stripe/update_customer"
-    | "stripe/list_customers"
-    | "stripe/create_charge"
-    | "stripe/retrieve_charge"
-    | "stripe/list_charges"
-  >()({
-    "stripe/create_payment_intent": async function* (node: StripeCreatePaymentIntentNode) {
-      const params = yield* eval_(node.params!);
-      return await client.request("POST", "/v1/payment_intents", params);
+  return {
+    "stripe/create_payment_intent": async function* (_entry: RuntimeEntry) {
+      const params = yield 0;
+      return await client.request("POST", "/v1/payment_intents", params as Record<string, unknown>);
     },
 
-    "stripe/retrieve_payment_intent": async function* (node: StripeRetrievePaymentIntentNode) {
-      const id = yield* eval_(node.id!);
+    "stripe/retrieve_payment_intent": async function* (_entry: RuntimeEntry) {
+      const id = yield 0;
       return await client.request("GET", `/v1/payment_intents/${id}`);
     },
 
-    "stripe/confirm_payment_intent": async function* (node: StripeConfirmPaymentIntentNode) {
-      const id = yield* eval_(node.id!);
-      const params = node.params != null ? yield* eval_(node.params) : undefined;
+    "stripe/confirm_payment_intent": async function* (entry: RuntimeEntry) {
+      const id = yield 0;
+      const params = entry.children.length > 1 ? ((yield 1) as Record<string, unknown>) : undefined;
       return await client.request("POST", `/v1/payment_intents/${id}/confirm`, params);
     },
 
-    "stripe/create_customer": async function* (node: StripeCreateCustomerNode) {
-      const params = yield* eval_(node.params!);
-      return await client.request("POST", "/v1/customers", params);
+    "stripe/create_customer": async function* (_entry: RuntimeEntry) {
+      const params = yield 0;
+      return await client.request("POST", "/v1/customers", params as Record<string, unknown>);
     },
 
-    "stripe/retrieve_customer": async function* (node: StripeRetrieveCustomerNode) {
-      const id = yield* eval_(node.id!);
+    "stripe/retrieve_customer": async function* (_entry: RuntimeEntry) {
+      const id = yield 0;
       return await client.request("GET", `/v1/customers/${id}`);
     },
 
-    "stripe/update_customer": async function* (node: StripeUpdateCustomerNode) {
-      const id = yield* eval_(node.id!);
-      const params = yield* eval_(node.params!);
-      return await client.request("POST", `/v1/customers/${id}`, params);
+    "stripe/update_customer": async function* (_entry: RuntimeEntry) {
+      const id = yield 0;
+      const params = yield 1;
+      return await client.request("POST", `/v1/customers/${id}`, params as Record<string, unknown>);
     },
 
-    "stripe/list_customers": async function* (node: StripeListCustomersNode) {
-      const params = node.params != null ? yield* eval_(node.params) : undefined;
+    "stripe/list_customers": async function* (entry: RuntimeEntry) {
+      const params = entry.children.length > 0 ? ((yield 0) as Record<string, unknown>) : undefined;
       return await client.request("GET", "/v1/customers", params);
     },
 
-    "stripe/create_charge": async function* (node: StripeCreateChargeNode) {
-      const params = yield* eval_(node.params!);
-      return await client.request("POST", "/v1/charges", params);
+    "stripe/create_charge": async function* (_entry: RuntimeEntry) {
+      const params = yield 0;
+      return await client.request("POST", "/v1/charges", params as Record<string, unknown>);
     },
 
-    "stripe/retrieve_charge": async function* (node: StripeRetrieveChargeNode) {
-      const id = yield* eval_(node.id!);
+    "stripe/retrieve_charge": async function* (_entry: RuntimeEntry) {
+      const id = yield 0;
       return await client.request("GET", `/v1/charges/${id}`);
     },
 
-    "stripe/list_charges": async function* (node: StripeListChargesNode) {
-      const params = node.params != null ? yield* eval_(node.params) : undefined;
+    "stripe/list_charges": async function* (entry: RuntimeEntry) {
+      const params = entry.children.length > 0 ? ((yield 0) as Record<string, unknown>) : undefined;
       return await client.request("GET", "/v1/charges", params);
     },
-  });
+
+    "stripe/record": async function* (entry: RuntimeEntry) {
+      const result: Record<string, unknown> = {};
+      for (let i = 0; i < entry.children.length; i += 2) {
+        const key = (yield i) as string;
+        const value = yield i + 1;
+        result[key] = value;
+      }
+      return result;
+    },
+
+    "stripe/array": async function* (entry: RuntimeEntry) {
+      const result: unknown[] = [];
+      for (let i = 0; i < entry.children.length; i++) {
+        result.push(yield i);
+      }
+      return result;
+    },
+  };
 }
 
 function requiredEnv(name: "STRIPE_API_KEY"): string {
@@ -147,7 +108,9 @@ function requiredEnv(name: "STRIPE_API_KEY"): string {
   return value;
 }
 
-const dynamicImport = new Function("m", "return import(m)") as (moduleName: string) => Promise<any>;
+const dynamicImport = new Function("m", "return import(m)") as (
+  moduleName: string,
+) => Promise<Record<string, unknown>>;
 
 function lazyInterpreter(factory: () => Interpreter): Interpreter {
   let cached: Interpreter | undefined;
@@ -182,7 +145,9 @@ export const stripeInterpreter: Interpreter = lazyInterpreter(() =>
         if (!clientPromise) {
           const apiKey = requiredEnv("STRIPE_API_KEY");
           clientPromise = dynamicImport("stripe").then((moduleValue) => {
-            const Stripe = moduleValue.default;
+            const Stripe = moduleValue.default as new (
+              apiKey: string,
+            ) => Parameters<typeof wrapStripeSdk>[0];
             return wrapStripeSdk(new Stripe(apiKey));
           });
         }

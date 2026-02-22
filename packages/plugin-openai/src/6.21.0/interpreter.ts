@@ -1,6 +1,6 @@
-import type { Interpreter, TypedNode } from "@mvfm/core";
-import { defineInterpreter, eval_ } from "@mvfm/core";
+import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import { wrapOpenAISdk } from "./client-openai-sdk";
+import type { OpenAIConfig } from "./index";
 
 /**
  * OpenAI client interface consumed by the openai handler.
@@ -13,127 +13,81 @@ export interface OpenAIClient {
   request(method: string, path: string, body?: Record<string, unknown>): Promise<unknown>;
 }
 
-/** A `openai/create_chat_completion` node. */
-export interface OpenAICreateChatCompletionNode extends TypedNode<unknown> {
-  kind: "openai/create_chat_completion";
-  params: TypedNode<Record<string, unknown>>;
-}
-
-/** A `openai/retrieve_chat_completion` node. */
-export interface OpenAIRetrieveChatCompletionNode extends TypedNode<unknown> {
-  kind: "openai/retrieve_chat_completion";
-  id: TypedNode<string>;
-}
-
-/** A `openai/list_chat_completions` node. */
-export interface OpenAIListChatCompletionsNode extends TypedNode<unknown> {
-  kind: "openai/list_chat_completions";
-  params?: TypedNode<Record<string, unknown>> | null;
-}
-
-/** A `openai/update_chat_completion` node. */
-export interface OpenAIUpdateChatCompletionNode extends TypedNode<unknown> {
-  kind: "openai/update_chat_completion";
-  id: TypedNode<string>;
-  params: TypedNode<Record<string, unknown>>;
-}
-
-/** A `openai/delete_chat_completion` node. */
-export interface OpenAIDeleteChatCompletionNode extends TypedNode<unknown> {
-  kind: "openai/delete_chat_completion";
-  id: TypedNode<string>;
-}
-
-/** A `openai/create_embedding` node. */
-export interface OpenAICreateEmbeddingNode extends TypedNode<unknown> {
-  kind: "openai/create_embedding";
-  params: TypedNode<Record<string, unknown>>;
-}
-
-/** A `openai/create_moderation` node. */
-export interface OpenAICreateModerationNode extends TypedNode<unknown> {
-  kind: "openai/create_moderation";
-  params: TypedNode<Record<string, unknown>>;
-}
-
-/** A `openai/create_completion` node. */
-export interface OpenAICreateCompletionNode extends TypedNode<unknown> {
-  kind: "openai/create_completion";
-  params: TypedNode<Record<string, unknown>>;
-}
-
-declare module "@mvfm/core" {
-  interface NodeTypeMap {
-    "openai/create_chat_completion": OpenAICreateChatCompletionNode;
-    "openai/retrieve_chat_completion": OpenAIRetrieveChatCompletionNode;
-    "openai/list_chat_completions": OpenAIListChatCompletionsNode;
-    "openai/update_chat_completion": OpenAIUpdateChatCompletionNode;
-    "openai/delete_chat_completion": OpenAIDeleteChatCompletionNode;
-    "openai/create_embedding": OpenAICreateEmbeddingNode;
-    "openai/create_moderation": OpenAICreateModerationNode;
-    "openai/create_completion": OpenAICreateCompletionNode;
-  }
-}
-
-type OpenAIKind =
-  | "openai/create_chat_completion"
-  | "openai/retrieve_chat_completion"
-  | "openai/list_chat_completions"
-  | "openai/update_chat_completion"
-  | "openai/delete_chat_completion"
-  | "openai/create_embedding"
-  | "openai/create_moderation"
-  | "openai/create_completion";
-
 /**
- * Creates an interpreter for `openai/*` node kinds.
+ * Creates an interpreter for `openai/*` node kinds using the new
+ * RuntimeEntry + positional yield pattern.
+ *
+ * Config (apiKey, org, project) is captured in the closure,
+ * not stored on AST nodes.
  *
  * @param client - The {@link OpenAIClient} to execute against.
  * @returns An Interpreter handling all openai node kinds.
  */
 export function createOpenAIInterpreter(client: OpenAIClient): Interpreter {
-  return defineInterpreter<OpenAIKind>()({
-    "openai/create_chat_completion": async function* (node: OpenAICreateChatCompletionNode) {
-      const body = yield* eval_(node.params);
-      return await client.request("POST", "/chat/completions", body);
+  return {
+    "openai/create_chat_completion": async function* (_entry: RuntimeEntry) {
+      const body = yield 0;
+      return await client.request("POST", "/chat/completions", body as Record<string, unknown>);
     },
 
-    "openai/retrieve_chat_completion": async function* (node: OpenAIRetrieveChatCompletionNode) {
-      const id = yield* eval_(node.id);
+    "openai/retrieve_chat_completion": async function* (_entry: RuntimeEntry) {
+      const id = yield 0;
       return await client.request("GET", `/chat/completions/${id}`);
     },
 
-    "openai/list_chat_completions": async function* (node: OpenAIListChatCompletionsNode) {
-      const body = node.params != null ? yield* eval_(node.params) : undefined;
+    "openai/list_chat_completions": async function* (entry: RuntimeEntry) {
+      const body = entry.children.length > 0 ? ((yield 0) as Record<string, unknown>) : undefined;
       return await client.request("GET", "/chat/completions", body);
     },
 
-    "openai/update_chat_completion": async function* (node: OpenAIUpdateChatCompletionNode) {
-      const id = yield* eval_(node.id);
-      const body = yield* eval_(node.params);
-      return await client.request("POST", `/chat/completions/${id}`, body);
+    "openai/update_chat_completion": async function* (_entry: RuntimeEntry) {
+      const id = yield 0;
+      const body = yield 1;
+      return await client.request(
+        "POST",
+        `/chat/completions/${id}`,
+        body as Record<string, unknown>,
+      );
     },
 
-    "openai/delete_chat_completion": async function* (node: OpenAIDeleteChatCompletionNode) {
-      const id = yield* eval_(node.id);
+    "openai/delete_chat_completion": async function* (_entry: RuntimeEntry) {
+      const id = yield 0;
       return await client.request("DELETE", `/chat/completions/${id}`);
     },
 
-    "openai/create_embedding": async function* (node: OpenAICreateEmbeddingNode) {
-      const body = yield* eval_(node.params);
-      return await client.request("POST", "/embeddings", body);
+    "openai/create_embedding": async function* (_entry: RuntimeEntry) {
+      const body = yield 0;
+      return await client.request("POST", "/embeddings", body as Record<string, unknown>);
     },
 
-    "openai/create_moderation": async function* (node: OpenAICreateModerationNode) {
-      const body = yield* eval_(node.params);
-      return await client.request("POST", "/moderations", body);
+    "openai/create_moderation": async function* (_entry: RuntimeEntry) {
+      const body = yield 0;
+      return await client.request("POST", "/moderations", body as Record<string, unknown>);
     },
 
-    "openai/create_completion": async function* (node: OpenAICreateCompletionNode) {
-      const body = yield* eval_(node.params);
-      return await client.request("POST", "/completions", body);
+    "openai/create_completion": async function* (_entry: RuntimeEntry) {
+      const body = yield 0;
+      return await client.request("POST", "/completions", body as Record<string, unknown>);
     },
-  });
+
+    "openai/record": async function* (entry: RuntimeEntry) {
+      const result: Record<string, unknown> = {};
+      for (let i = 0; i < entry.children.length; i += 2) {
+        const key = (yield i) as string;
+        const value = yield i + 1;
+        result[key] = value;
+      }
+      return result;
+    },
+
+    "openai/array": async function* (entry: RuntimeEntry) {
+      const result: unknown[] = [];
+      for (let i = 0; i < entry.children.length; i++) {
+        result.push(yield i);
+      }
+      return result;
+    },
+  };
 }
 
 function requiredEnv(name: "OPENAI_API_KEY"): string {
@@ -148,7 +102,9 @@ function requiredEnv(name: "OPENAI_API_KEY"): string {
   return value;
 }
 
-const dynamicImport = new Function("m", "return import(m)") as (moduleName: string) => Promise<any>;
+const dynamicImport = new Function("m", "return import(m)") as (
+  moduleName: string,
+) => Promise<Record<string, unknown>>;
 
 function lazyInterpreter(factory: () => Interpreter): Interpreter {
   let cached: Interpreter | undefined;
@@ -167,7 +123,12 @@ function lazyInterpreter(factory: () => Interpreter): Interpreter {
       const descriptor = Object.getOwnPropertyDescriptor(get(), property);
       return descriptor
         ? descriptor
-        : { configurable: true, enumerable: true, writable: false, value: undefined };
+        : {
+            configurable: true,
+            enumerable: true,
+            writable: false,
+            value: undefined,
+          };
     },
   });
 }
@@ -183,12 +144,10 @@ export const openaiInterpreter: Interpreter = lazyInterpreter(() =>
         if (!clientPromise) {
           const apiKey = requiredEnv("OPENAI_API_KEY");
           clientPromise = dynamicImport("openai").then((moduleValue) => {
-            const OpenAI = moduleValue.default;
-            return wrapOpenAISdk(
-              new OpenAI({
-                apiKey,
-              }),
-            );
+            const OpenAI = moduleValue.default as new (
+              opts: OpenAIConfig,
+            ) => Parameters<typeof wrapOpenAISdk>[0];
+            return wrapOpenAISdk(new OpenAI({ apiKey }));
           });
         }
         return clientPromise;

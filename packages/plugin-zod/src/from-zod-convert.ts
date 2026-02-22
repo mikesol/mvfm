@@ -1,4 +1,3 @@
-import type { PluginContext } from "@mvfm/core";
 import type { z } from "zod";
 import {
   mapComparableChecks,
@@ -12,7 +11,6 @@ import type { SchemaASTNode, WrapperASTNode } from "./types";
 type ZodNode = SchemaASTNode | WrapperASTNode;
 
 export type ConvertState = {
-  ctx: PluginContext;
   strict: boolean;
   warnings: string[];
   lazyIds: WeakMap<object, string>;
@@ -49,7 +47,7 @@ function convert(schema: unknown, state: ConvertState, path: string): ZodNode {
     return {
       kind: `zod/${type}`,
       inner: convert(def.innerType, state, `${path}.${type}`),
-      value: state.ctx.lift(value).__node,
+      value,
     } as WrapperASTNode;
   }
   if (type === "catch") {
@@ -57,7 +55,7 @@ function convert(schema: unknown, state: ConvertState, path: string): ZodNode {
     return {
       kind: "zod/catch",
       inner: convert(def.innerType, state, `${path}.catch`),
-      value: state.ctx.lift(value).__node,
+      value,
     } as WrapperASTNode;
   }
 
