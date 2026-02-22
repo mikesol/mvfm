@@ -11,7 +11,7 @@
 //   - Calls: create, fetch, list
 // ============================================================
 
-import type { CExpr, Interpreter, KindSpec } from "@mvfm/core";
+import type { CExpr, Interpreter, KindSpec, Plugin } from "@mvfm/core";
 import { isCExpr, makeCExpr } from "@mvfm/core";
 import { wrapTwilioSdk } from "./client-twilio-sdk";
 import { createTwilioInterpreter, type TwilioClient } from "./interpreter";
@@ -44,70 +44,12 @@ function liftArg(value: unknown): unknown {
   return value;
 }
 
-// ---- What the plugin adds to $ ----------------------------
-
-/** Context returned by `$.twilio.messages(sid)` — mirrors twilio-node's MessageContext. */
-export interface TwilioMessageContext {
-  /** Fetch this message by its SID. */
-  fetch(): CExpr<Record<string, unknown>>;
-}
-
-/** Context returned by `$.twilio.calls(sid)` — mirrors twilio-node's CallContext. */
-export interface TwilioCallContext {
-  /** Fetch this call by its SID. */
-  fetch(): CExpr<Record<string, unknown>>;
-}
-
-/**
- * The messages resource — callable to get a context, with create/list methods.
- * Mirrors twilio-node: `client.messages.create(...)` and `client.messages(sid).fetch()`.
- */
-export interface TwilioMessagesResource {
-  /** Get a message context by SID (for .fetch()). */
-  (sid: string | CExpr<string>): TwilioMessageContext;
-  /** Send an SMS/MMS message. */
-  create(
-    params: Record<string, unknown> | CExpr<Record<string, unknown>>,
-  ): CExpr<Record<string, unknown>>;
-  /** List messages with optional filter params. */
-  list(
-    params?: Record<string, unknown> | CExpr<Record<string, unknown>>,
-  ): CExpr<Record<string, unknown>>;
-}
-
-/**
- * The calls resource — callable to get a context, with create/list methods.
- * Mirrors twilio-node: `client.calls.create(...)` and `client.calls(sid).fetch()`.
- */
-export interface TwilioCallsResource {
-  /** Get a call context by SID (for .fetch()). */
-  (sid: string | CExpr<string>): TwilioCallContext;
-  /** Initiate an outbound call. */
-  create(
-    params: Record<string, unknown> | CExpr<Record<string, unknown>>,
-  ): CExpr<Record<string, unknown>>;
-  /** List calls with optional filter params. */
-  list(
-    params?: Record<string, unknown> | CExpr<Record<string, unknown>>,
-  ): CExpr<Record<string, unknown>>;
-}
-
-/**
- * Twilio operations added to the DSL context by the twilio plugin.
- *
- * Mirrors the twilio-node SDK resource API: messages and calls.
- * Each resource exposes create/fetch/list methods that produce
- * CExpr nodes.
- */
-export interface TwilioMethods {
-  /** Twilio API operations, namespaced under `$.twilio`. */
-  twilio: {
-    /** Messages resource. Callable: `messages(sid).fetch()`, or `messages.create(...)`. */
-    messages: TwilioMessagesResource;
-    /** Calls resource. Callable: `calls(sid).fetch()`, or `calls.create(...)`. */
-    calls: TwilioCallsResource;
-  };
-}
+// liftArg erases generic type info at runtime (returns unknown).
+// Cast helper restores the declared CExpr Args types for ExtractKinds.
+const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]>(
+  kind: Kind,
+  args: readonly unknown[],
+) => CExpr<O, Kind, Args>;
 
 // ---- Configuration ----------------------------------------
 
@@ -124,85 +66,61 @@ export interface TwilioConfig {
   authToken: string;
 }
 
-// ---- Node kinds -------------------------------------------
-
-function buildKinds(): Record<string, KindSpec<any, any>> {
-  return {
-    "twilio/create_message": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "twilio/fetch_message": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "twilio/list_messages": {
-      inputs: [] as unknown[],
-      output: undefined as unknown,
-    } as KindSpec<unknown[], unknown>,
-    "twilio/create_call": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "twilio/fetch_call": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "twilio/list_calls": {
-      inputs: [] as unknown[],
-      output: undefined as unknown,
-    } as KindSpec<unknown[], unknown>,
-    "twilio/record": {
-      inputs: [] as unknown[],
-      output: {} as Record<string, unknown>,
-    } as KindSpec<unknown[], Record<string, unknown>>,
-    "twilio/array": {
-      inputs: [] as unknown[],
-      output: [] as unknown[],
-    } as KindSpec<unknown[], unknown[]>,
-  };
-}
-
 // ---- Constructor builder ----------------------------------
 
-function buildTwilioApi(): TwilioMethods["twilio"] {
+/**
+ * Builds the twilio constructor methods using makeCExpr + liftArg.
+ *
+ * Each method produces a CExpr node with positional children.
+ * Config is NOT stored on AST nodes — it's captured by the interpreter.
+ *
+ * Constructors use permissive generics so any argument type is accepted
+ * at construction time. Validation happens at `app()` time via KindSpec.
+ */
+function buildTwilioApi() {
   const messages = Object.assign(
-    (sid: string | CExpr<string>): TwilioMessageContext => ({
-      fetch() {
-        return makeCExpr("twilio/fetch_message", [sid]);
+    <A>(sid: A) => ({
+      /** Fetch this message by its SID. */
+      fetch(): CExpr<Record<string, unknown>, "twilio/fetch_message", [A]> {
+        return mk("twilio/fetch_message", [sid]);
       },
     }),
     {
-      create(params: Record<string, unknown> | CExpr<Record<string, unknown>>) {
-        return makeCExpr("twilio/create_message", [liftArg(params)]);
+      /** Send an SMS/MMS message. */
+      create<A>(params: A): CExpr<Record<string, unknown>, "twilio/create_message", [A]> {
+        return mk("twilio/create_message", [liftArg(params)]);
       },
-      list(params?: Record<string, unknown> | CExpr<Record<string, unknown>>) {
+      /** List messages with optional filter params. */
+      list<A>(params?: A): CExpr<Record<string, unknown>, "twilio/list_messages", [A]> {
         if (params == null) {
-          return makeCExpr("twilio/list_messages", []);
+          return mk("twilio/list_messages", []);
         }
-        return makeCExpr("twilio/list_messages", [liftArg(params)]);
+        return mk("twilio/list_messages", [liftArg(params)]);
       },
     },
-  ) as unknown as TwilioMessagesResource;
+  );
 
   const calls = Object.assign(
-    (sid: string | CExpr<string>): TwilioCallContext => ({
-      fetch() {
-        return makeCExpr("twilio/fetch_call", [sid]);
+    <A>(sid: A) => ({
+      /** Fetch this call by its SID. */
+      fetch(): CExpr<Record<string, unknown>, "twilio/fetch_call", [A]> {
+        return mk("twilio/fetch_call", [sid]);
       },
     }),
     {
-      create(params: Record<string, unknown> | CExpr<Record<string, unknown>>) {
-        return makeCExpr("twilio/create_call", [liftArg(params)]);
+      /** Initiate an outbound call. */
+      create<A>(params: A): CExpr<Record<string, unknown>, "twilio/create_call", [A]> {
+        return mk("twilio/create_call", [liftArg(params)]);
       },
-      list(params?: Record<string, unknown> | CExpr<Record<string, unknown>>) {
+      /** List calls with optional filter params. */
+      list<A>(params?: A): CExpr<Record<string, unknown>, "twilio/list_calls", [A]> {
         if (params == null) {
-          return makeCExpr("twilio/list_calls", []);
+          return mk("twilio/list_calls", []);
         }
-        return makeCExpr("twilio/list_calls", [liftArg(params)]);
+        return mk("twilio/list_calls", [liftArg(params)]);
       },
     },
-  ) as unknown as TwilioCallsResource;
+  );
 
   return { messages, calls };
 }
@@ -272,11 +190,44 @@ export function twilio(config: TwilioConfig) {
   return {
     name: "twilio" as const,
     ctors: { twilio: buildTwilioApi() },
-    kinds: buildKinds(),
+    kinds: {
+      "twilio/create_message": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "twilio/fetch_message": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "twilio/list_messages": {
+        inputs: [] as unknown[],
+        output: undefined as unknown,
+      } as KindSpec<unknown[], unknown>,
+      "twilio/create_call": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "twilio/fetch_call": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "twilio/list_calls": {
+        inputs: [] as unknown[],
+        output: undefined as unknown,
+      } as KindSpec<unknown[], unknown>,
+      "twilio/record": {
+        inputs: [] as unknown[],
+        output: {} as Record<string, unknown>,
+      } as KindSpec<unknown[], Record<string, unknown>>,
+      "twilio/array": {
+        inputs: [] as unknown[],
+        output: [] as unknown[],
+      } as KindSpec<unknown[], unknown[]>,
+    },
     traits: {},
     lifts: {},
     defaultInterpreter: (): Interpreter => createDefaultInterpreter(config),
-  };
+  } satisfies Plugin;
 }
 
 /**
