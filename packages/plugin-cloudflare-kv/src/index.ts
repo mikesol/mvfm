@@ -1,7 +1,5 @@
 export type {
   CloudflareKvConfig,
-  CloudflareKvMethods,
-  KvGet,
   KvListOptions,
   KvListResult,
   KvPutOptions,

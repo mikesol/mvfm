@@ -17,7 +17,7 @@
 // NO defaultInterpreter — requires createCloudflareKvInterpreter(client).
 // ============================================================
 
-import type { CExpr, KindSpec } from "@mvfm/core";
+import type { CExpr, KindSpec, Plugin } from "@mvfm/core";
 import { isCExpr, makeCExpr } from "@mvfm/core";
 
 // ---- liftArg: recursive plain-value -> CExpr lifting --------
@@ -48,41 +48,12 @@ function liftArg(value: unknown): unknown {
   return value;
 }
 
-// ---- What the plugin adds to $ ----------------------------
-
-/** Return type of `kv.get()` — text or JSON depending on the type parameter. */
-export interface KvGet {
-  /** Get a text value by key. Returns null if key does not exist. */
-  (key: CExpr<string> | string): CExpr<string | null>;
-  /** Get a text value by key (explicit "text" type). */
-  (key: CExpr<string> | string, type: "text"): CExpr<string | null>;
-  /** Get a JSON-parsed value by key. Returns null if key does not exist. */
-  <T = unknown>(key: CExpr<string> | string, type: "json"): CExpr<T | null>;
-}
-
-/**
- * Cloudflare KV operations added to the DSL context.
- *
- * Mirrors the KVNamespace API: get, put, delete, list.
- * Each method produces a namespaced CExpr node.
- */
-export interface CloudflareKvMethods {
-  /** Cloudflare KV operations, namespaced under `$.kv`. */
-  kv: {
-    /** Get a value by key. Pass "json" as second arg to parse JSON. */
-    get: KvGet;
-    /** Store a string value at key with optional expiration settings. */
-    put(
-      key: CExpr<string> | string,
-      value: CExpr<string> | string,
-      options?: CExpr<KvPutOptions> | KvPutOptions,
-    ): CExpr<void>;
-    /** Delete a key. */
-    delete(key: CExpr<string> | string): CExpr<void>;
-    /** List keys with optional prefix filter and pagination cursor. */
-    list(options?: CExpr<KvListOptions> | KvListOptions): CExpr<KvListResult>;
-  };
-}
+// liftArg erases generic type info at runtime (returns unknown).
+// Cast helper restores the declared CExpr Args types for ExtractKinds.
+const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]>(
+  kind: Kind,
+  args: readonly unknown[],
+) => CExpr<O, Kind, Args>;
 
 // ---- Supporting types -------------------------------------
 
@@ -128,69 +99,60 @@ export interface CloudflareKvConfig {
   namespaceId: string;
 }
 
-// ---- Node kinds -------------------------------------------
+// ---- Overloaded get constructor ----------------------------
 
-function buildKinds(): Record<string, KindSpec<any, any>> {
-  return {
-    "cloudflare-kv/get": {
-      inputs: [""] as [string],
-      output: null as string | null,
-    } as KindSpec<[string], string | null>,
-    "cloudflare-kv/get_json": {
-      inputs: [""] as [string],
-      output: undefined as unknown,
-    } as KindSpec<[string], unknown>,
-    "cloudflare-kv/put": {
-      inputs: ["", ""] as [string, string],
-      output: undefined as unknown as undefined,
-    } as KindSpec<[string, string], void>,
-    "cloudflare-kv/delete": {
-      inputs: [""] as [string],
-      output: undefined as unknown as undefined,
-    } as KindSpec<[string], void>,
-    "cloudflare-kv/list": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "cloudflare-kv/record": {
-      inputs: [] as unknown[],
-      output: {} as Record<string, unknown>,
-    } as KindSpec<unknown[], Record<string, unknown>>,
-    "cloudflare-kv/array": {
-      inputs: [] as unknown[],
-      output: [] as unknown[],
-    } as KindSpec<unknown[], unknown[]>,
-  };
+/** Get a text value by key. Returns null if key does not exist. */
+function kvGet<A>(key: A): CExpr<string | null, "cloudflare-kv/get", [A]>;
+/** Get a text value by key (explicit "text" type). */
+function kvGet<A>(key: A, type: "text"): CExpr<string | null, "cloudflare-kv/get", [A]>;
+/** Get a JSON-parsed value by key. Returns null if key does not exist. */
+function kvGet<A>(key: A, type: "json"): CExpr<unknown, "cloudflare-kv/get_json", [A]>;
+function kvGet<A>(key: A, type?: "text" | "json") {
+  if (type === "json") {
+    return mk("cloudflare-kv/get_json", [liftArg(key)]);
+  }
+  return mk("cloudflare-kv/get", [liftArg(key)]);
 }
 
 // ---- Constructor builder ----------------------------------
 
-function buildKvApi(): CloudflareKvMethods["kv"] {
+/**
+ * Builds the cloudflare-kv constructor methods using makeCExpr + liftArg.
+ *
+ * Each method produces a CExpr node with positional children.
+ * Config is NOT stored on AST nodes — it's captured by the interpreter.
+ *
+ * Constructors use permissive generics so any argument type is accepted
+ * at construction time. Validation happens at `app()` time via KindSpec.
+ */
+function buildKvApi() {
   return {
-    get: ((key: CExpr<string> | string, type?: "text" | "json") => {
-      if (type === "json") {
-        return makeCExpr("cloudflare-kv/get_json", [liftArg(key)]);
-      }
-      return makeCExpr("cloudflare-kv/get", [liftArg(key)]);
-    }) as KvGet,
+    /** Get a value by key. Pass "json" as second arg to parse JSON. */
+    get: kvGet,
 
-    put(key, value, options?) {
+    /** Store a string value at key with optional expiration settings. */
+    put<A, B, C extends readonly unknown[]>(
+      key: A,
+      value: B,
+      ...args: C
+    ): CExpr<void, "cloudflare-kv/put", [A, B, ...C]> {
       const children: unknown[] = [liftArg(key), liftArg(value)];
-      if (options != null) {
-        children.push(liftArg(options));
+      for (const a of args) {
+        children.push(liftArg(a));
       }
-      return makeCExpr("cloudflare-kv/put", children);
+      return mk("cloudflare-kv/put", children);
     },
 
-    delete(key) {
-      return makeCExpr("cloudflare-kv/delete", [liftArg(key)]);
+    /** Delete a key. */
+    delete<A>(key: A): CExpr<void, "cloudflare-kv/delete", [A]> {
+      return mk("cloudflare-kv/delete", [liftArg(key)]);
     },
 
-    list(options?) {
-      if (options != null) {
-        return makeCExpr("cloudflare-kv/list", [liftArg(options)]);
-      }
-      return makeCExpr("cloudflare-kv/list", []);
+    /** List keys with optional prefix filter and pagination cursor. */
+    list<A extends readonly unknown[]>(
+      ...args: A
+    ): CExpr<KvListResult, "cloudflare-kv/list", A> {
+      return mk("cloudflare-kv/list", args.map((a) => liftArg(a)));
     },
   };
 }
@@ -223,10 +185,40 @@ export function cloudflareKv(_config: CloudflareKvConfig) {
   return {
     name: "cloudflare-kv" as const,
     ctors: { kv: buildKvApi() },
-    kinds: buildKinds(),
+    kinds: {
+      "cloudflare-kv/get": {
+        inputs: [""] as [string],
+        output: null as string | null,
+      } as KindSpec<[string], string | null>,
+      "cloudflare-kv/get_json": {
+        inputs: [""] as [string],
+        output: undefined as unknown,
+      } as KindSpec<[string], unknown>,
+      "cloudflare-kv/put": {
+        inputs: ["", ""] as [string, string],
+        output: undefined as unknown as undefined,
+      } as KindSpec<[string, string], void>,
+      "cloudflare-kv/delete": {
+        inputs: [""] as [string],
+        output: undefined as unknown as undefined,
+      } as KindSpec<[string], void>,
+      "cloudflare-kv/list": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      // Structural helpers (produced by liftArg)
+      "cloudflare-kv/record": {
+        inputs: [] as unknown[],
+        output: {} as Record<string, unknown>,
+      } as KindSpec<unknown[], Record<string, unknown>>,
+      "cloudflare-kv/array": {
+        inputs: [] as unknown[],
+        output: [] as unknown[],
+      } as KindSpec<unknown[], unknown[]>,
+    },
     traits: {},
     lifts: {},
-  };
+  } satisfies Plugin;
 }
 
 /**
