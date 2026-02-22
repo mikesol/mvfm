@@ -138,17 +138,17 @@ describe("openai plugin: unified Plugin shape", () => {
   });
 
   it("has 10 node kinds (8 core + record + array)", () => {
-    expect(plugin.nodeKinds).toHaveLength(10);
+    expect(Object.keys(plugin.kinds)).toHaveLength(10);
   });
 
   it("nodeKinds are all namespaced", () => {
-    for (const kind of plugin.nodeKinds) {
+    for (const kind of Object.keys(plugin.kinds)) {
       expect(kind).toMatch(/^openai\//);
     }
   });
 
   it("kinds map has entries for all node kinds", () => {
-    for (const kind of plugin.nodeKinds) {
+    for (const kind of Object.keys(plugin.kinds)) {
       expect(plugin.kinds[kind]).toBeDefined();
     }
   });

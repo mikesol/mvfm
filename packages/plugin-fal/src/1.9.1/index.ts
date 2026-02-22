@@ -138,26 +138,41 @@ export interface FalConfig {
 
 // ---- Node kinds -------------------------------------------
 
-const NODE_KINDS = [
-  "fal/run",
-  "fal/subscribe",
-  "fal/queue_submit",
-  "fal/queue_status",
-  "fal/queue_result",
-  "fal/queue_cancel",
-  "fal/record",
-  "fal/array",
-] as const;
-
-function buildKinds(): Record<string, KindSpec<unknown[], unknown>> {
-  const kinds: Record<string, KindSpec<unknown[], unknown>> = {};
-  for (const kind of NODE_KINDS) {
-    kinds[kind] = {
-      inputs: [] as unknown[],
+function buildKinds(): Record<string, KindSpec<any, any>> {
+  return {
+    "fal/run": {
+      inputs: [undefined] as [unknown],
       output: undefined as unknown,
-    } as KindSpec<unknown[], unknown>;
-  }
-  return kinds;
+    } as KindSpec<[unknown], unknown>,
+    "fal/subscribe": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "fal/queue_submit": {
+      inputs: [undefined, undefined] as [unknown, unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown, unknown], unknown>,
+    "fal/queue_status": {
+      inputs: [undefined, undefined] as [unknown, unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown, unknown], unknown>,
+    "fal/queue_result": {
+      inputs: [undefined, undefined] as [unknown, unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown, unknown], unknown>,
+    "fal/queue_cancel": {
+      inputs: [undefined, undefined] as [unknown, unknown],
+      output: undefined as unknown as undefined,
+    } as KindSpec<[unknown, unknown], void>,
+    "fal/record": {
+      inputs: [] as unknown[],
+      output: {} as Record<string, unknown>,
+    } as KindSpec<unknown[], Record<string, unknown>>,
+    "fal/array": {
+      inputs: [] as unknown[],
+      output: [] as unknown[],
+    } as KindSpec<unknown[], unknown[]>,
+  };
 }
 
 // ---- Constructor builder ----------------------------------
@@ -262,7 +277,6 @@ export function fal(config: FalConfig) {
     kinds: buildKinds(),
     traits: {},
     lifts: {},
-    nodeKinds: [...NODE_KINDS],
     defaultInterpreter: (): Interpreter => createDefaultInterpreter(config),
   };
 }

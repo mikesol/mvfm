@@ -40,10 +40,9 @@ export function anthropic(config: AnthropicConfig): {
             };
         };
     };
-    kinds: Record<string, KindSpec<unknown[], unknown>>;
+    kinds: Record<string, KindSpec<any, any>>;
     traits: {};
     lifts: {};
-    nodeKinds: ("anthropic/create_message" | "anthropic/count_tokens" | "anthropic/create_message_batch" | "anthropic/retrieve_message_batch" | "anthropic/list_message_batches" | "anthropic/delete_message_batch" | "anthropic/cancel_message_batch" | "anthropic/retrieve_model" | "anthropic/list_models" | "anthropic/record" | "anthropic/array")[];
     defaultInterpreter: () => Interpreter;
 };
 
@@ -95,7 +94,7 @@ export function wrapAnthropicSdk(client: Anthropic): AnthropicClient;
 //
 // dist/0.74.0/index.d.ts:66:17 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
 // dist/0.74.0/index.d.ts:90:5 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
-// dist/0.74.0/index.d.ts:94:5 - (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
+// dist/0.74.0/index.d.ts:93:5 - (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

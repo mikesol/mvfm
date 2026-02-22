@@ -29,10 +29,9 @@ export function fal(config: FalConfig): {
             };
         };
     };
-    kinds: Record<string, KindSpec<unknown[], unknown>>;
+    kinds: Record<string, KindSpec<any, any>>;
     traits: {};
     lifts: {};
-    nodeKinds: ("fal/run" | "fal/subscribe" | "fal/queue_submit" | "fal/queue_status" | "fal/queue_result" | "fal/queue_cancel" | "fal/record" | "fal/array")[];
     defaultInterpreter: () => Interpreter;
 };
 

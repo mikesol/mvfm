@@ -687,7 +687,7 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown[], unknown>>;\n    traits: {};\n    lifts: {};\n    nodeKinds: (\"stripe/create_payment_intent\" | \"stripe/retrieve_payment_intent\" | \"stripe/confirm_payment_intent\" | \"stripe/create_customer\" | \"stripe/retrieve_customer\" | \"stripe/update_customer\" | \"stripe/list_customers\" | \"stripe/create_charge\" | \"stripe/retrieve_charge\" | \"stripe/list_charges\" | \"stripe/record\" | \"stripe/array\")[];\n    defaultInterpreter: () => "
+              "text": "<any, any>>;\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
             },
             {
               "kind": "Reference",

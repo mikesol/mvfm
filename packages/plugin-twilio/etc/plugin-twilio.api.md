@@ -18,10 +18,9 @@ export function twilio(config: TwilioConfig): {
             calls: TwilioCallsResource;
         };
     };
-    kinds: Record<string, KindSpec<unknown[], unknown>>;
+    kinds: Record<string, KindSpec<any, any>>;
     traits: {};
     lifts: {};
-    nodeKinds: ("twilio/create_message" | "twilio/fetch_message" | "twilio/list_messages" | "twilio/create_call" | "twilio/fetch_call" | "twilio/list_calls" | "twilio/record" | "twilio/array")[];
     defaultInterpreter: () => Interpreter;
 };
 

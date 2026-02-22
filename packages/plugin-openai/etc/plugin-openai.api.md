@@ -48,10 +48,9 @@ export function openai(config: OpenAIConfig): {
             };
         };
     };
-    kinds: Record<string, KindSpec<unknown[], unknown>>;
+    kinds: Record<string, KindSpec<any, any>>;
     traits: {};
     lifts: {};
-    nodeKinds: ("openai/create_chat_completion" | "openai/retrieve_chat_completion" | "openai/list_chat_completions" | "openai/update_chat_completion" | "openai/delete_chat_completion" | "openai/create_embedding" | "openai/create_moderation" | "openai/create_completion" | "openai/record" | "openai/array")[];
     defaultInterpreter: () => Interpreter;
 };
 

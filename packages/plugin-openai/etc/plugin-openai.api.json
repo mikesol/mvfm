@@ -606,7 +606,7 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown[], unknown>>;\n    traits: {};\n    lifts: {};\n    nodeKinds: (\"openai/create_chat_completion\" | \"openai/retrieve_chat_completion\" | \"openai/list_chat_completions\" | \"openai/update_chat_completion\" | \"openai/delete_chat_completion\" | \"openai/create_embedding\" | \"openai/create_moderation\" | \"openai/create_completion\" | \"openai/record\" | \"openai/array\")[];\n    defaultInterpreter: () => "
+              "text": "<any, any>>;\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
             },
             {
               "kind": "Reference",

@@ -724,7 +724,7 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown[], unknown>>;\n    traits: {};\n    lifts: {};\n    nodeKinds: (\"resend/send_email\" | \"resend/get_email\" | \"resend/send_batch\" | \"resend/create_contact\" | \"resend/get_contact\" | \"resend/list_contacts\" | \"resend/remove_contact\" | \"resend/record\" | \"resend/array\")[];\n    defaultInterpreter: () => "
+              "text": "<any, any>>;\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
             },
             {
               "kind": "Reference",

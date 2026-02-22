@@ -120,17 +120,17 @@ describe("resend plugin: unified Plugin shape", () => {
   });
 
   it("has 9 node kinds (7 core + record + array)", () => {
-    expect(plugin.nodeKinds).toHaveLength(9);
+    expect(Object.keys(plugin.kinds)).toHaveLength(9);
   });
 
   it("nodeKinds are all namespaced", () => {
-    for (const kind of plugin.nodeKinds) {
+    for (const kind of Object.keys(plugin.kinds)) {
       expect(kind).toMatch(/^resend\//);
     }
   });
 
   it("kinds map has entries for all node kinds", () => {
-    for (const kind of plugin.nodeKinds) {
+    for (const kind of Object.keys(plugin.kinds)) {
       expect(plugin.kinds[kind]).toBeDefined();
     }
   });

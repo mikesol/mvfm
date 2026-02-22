@@ -119,30 +119,57 @@ export interface StripeConfig {
 
 // ---- Node kinds -------------------------------------------
 
-const NODE_KINDS = [
-  "stripe/create_payment_intent",
-  "stripe/retrieve_payment_intent",
-  "stripe/confirm_payment_intent",
-  "stripe/create_customer",
-  "stripe/retrieve_customer",
-  "stripe/update_customer",
-  "stripe/list_customers",
-  "stripe/create_charge",
-  "stripe/retrieve_charge",
-  "stripe/list_charges",
-  "stripe/record",
-  "stripe/array",
-] as const;
-
-function buildKinds(): Record<string, KindSpec<unknown[], unknown>> {
-  const kinds: Record<string, KindSpec<unknown[], unknown>> = {};
-  for (const kind of NODE_KINDS) {
-    kinds[kind] = {
+function buildKinds(): Record<string, KindSpec<any, any>> {
+  return {
+    "stripe/create_payment_intent": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "stripe/retrieve_payment_intent": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "stripe/confirm_payment_intent": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "stripe/create_customer": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "stripe/retrieve_customer": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "stripe/update_customer": {
+      inputs: [undefined, undefined] as [unknown, unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown, unknown], unknown>,
+    "stripe/list_customers": {
       inputs: [] as unknown[],
       output: undefined as unknown,
-    } as KindSpec<unknown[], unknown>;
-  }
-  return kinds;
+    } as KindSpec<unknown[], unknown>,
+    "stripe/create_charge": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "stripe/retrieve_charge": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "stripe/list_charges": {
+      inputs: [] as unknown[],
+      output: undefined as unknown,
+    } as KindSpec<unknown[], unknown>,
+    "stripe/record": {
+      inputs: [] as unknown[],
+      output: {} as Record<string, unknown>,
+    } as KindSpec<unknown[], Record<string, unknown>>,
+    "stripe/array": {
+      inputs: [] as unknown[],
+      output: [] as unknown[],
+    } as KindSpec<unknown[], unknown[]>,
+  };
 }
 
 // ---- Constructor builder ----------------------------------
@@ -249,7 +276,6 @@ export function stripe(config: StripeConfig) {
     kinds: buildKinds(),
     traits: {},
     lifts: {},
-    nodeKinds: [...NODE_KINDS],
     defaultInterpreter: (): Interpreter => createDefaultInterpreter(config),
   };
 }

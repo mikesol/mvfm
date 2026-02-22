@@ -34,10 +34,9 @@ export function stripe(config: StripeConfig): {
             };
         };
     };
-    kinds: Record<string, KindSpec<unknown[], unknown>>;
+    kinds: Record<string, KindSpec<any, any>>;
     traits: {};
     lifts: {};
-    nodeKinds: ("stripe/create_payment_intent" | "stripe/retrieve_payment_intent" | "stripe/confirm_payment_intent" | "stripe/create_customer" | "stripe/retrieve_customer" | "stripe/update_customer" | "stripe/list_customers" | "stripe/create_charge" | "stripe/retrieve_charge" | "stripe/list_charges" | "stripe/record" | "stripe/array")[];
     defaultInterpreter: () => Interpreter;
 };
 

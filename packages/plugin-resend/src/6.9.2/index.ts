@@ -116,27 +116,45 @@ export interface ResendConfig {
 
 // ---- Node kinds -------------------------------------------
 
-const NODE_KINDS = [
-  "resend/send_email",
-  "resend/get_email",
-  "resend/send_batch",
-  "resend/create_contact",
-  "resend/get_contact",
-  "resend/list_contacts",
-  "resend/remove_contact",
-  "resend/record",
-  "resend/array",
-] as const;
-
-function buildKinds(): Record<string, KindSpec<unknown[], unknown>> {
-  const kinds: Record<string, KindSpec<unknown[], unknown>> = {};
-  for (const kind of NODE_KINDS) {
-    kinds[kind] = {
-      inputs: [] as unknown[],
+function buildKinds(): Record<string, KindSpec<any, any>> {
+  return {
+    "resend/send_email": {
+      inputs: [undefined] as [unknown],
       output: undefined as unknown,
-    } as KindSpec<unknown[], unknown>;
-  }
-  return kinds;
+    } as KindSpec<[unknown], unknown>,
+    "resend/get_email": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "resend/send_batch": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "resend/create_contact": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "resend/get_contact": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "resend/list_contacts": {
+      inputs: [] as [],
+      output: undefined as unknown,
+    } as KindSpec<[], unknown>,
+    "resend/remove_contact": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "resend/record": {
+      inputs: [] as unknown[],
+      output: {} as Record<string, unknown>,
+    } as KindSpec<unknown[], Record<string, unknown>>,
+    "resend/array": {
+      inputs: [] as unknown[],
+      output: [] as unknown[],
+    } as KindSpec<unknown[], unknown[]>,
+  };
 }
 
 // ---- Constructor builder ----------------------------------
@@ -225,7 +243,6 @@ export function resend(config: ResendConfig) {
     kinds: buildKinds(),
     traits: {},
     lifts: {},
-    nodeKinds: [...NODE_KINDS],
     defaultInterpreter: (): Interpreter => createDefaultInterpreter(config),
   };
 }

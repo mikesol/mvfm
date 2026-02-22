@@ -307,7 +307,7 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown[], unknown>>;\n    traits: {};\n    lifts: {};\n    nodeKinds: (\"twilio/create_message\" | \"twilio/fetch_message\" | \"twilio/list_messages\" | \"twilio/create_call\" | \"twilio/fetch_call\" | \"twilio/list_calls\" | \"twilio/record\" | \"twilio/array\")[];\n    defaultInterpreter: () => "
+              "text": "<any, any>>;\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
             },
             {
               "kind": "Reference",

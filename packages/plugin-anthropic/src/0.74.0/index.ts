@@ -124,29 +124,53 @@ export interface AnthropicConfig {
 
 // ---- Node kinds -------------------------------------------
 
-const NODE_KINDS = [
-  "anthropic/create_message",
-  "anthropic/count_tokens",
-  "anthropic/create_message_batch",
-  "anthropic/retrieve_message_batch",
-  "anthropic/list_message_batches",
-  "anthropic/delete_message_batch",
-  "anthropic/cancel_message_batch",
-  "anthropic/retrieve_model",
-  "anthropic/list_models",
-  "anthropic/record",
-  "anthropic/array",
-] as const;
-
-function buildKinds(): Record<string, KindSpec<unknown[], unknown>> {
-  const kinds: Record<string, KindSpec<unknown[], unknown>> = {};
-  for (const kind of NODE_KINDS) {
-    kinds[kind] = {
+function buildKinds(): Record<string, KindSpec<any, any>> {
+  return {
+    "anthropic/create_message": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "anthropic/count_tokens": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "anthropic/create_message_batch": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "anthropic/retrieve_message_batch": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "anthropic/list_message_batches": {
       inputs: [] as unknown[],
       output: undefined as unknown,
-    } as KindSpec<unknown[], unknown>;
-  }
-  return kinds;
+    } as KindSpec<unknown[], unknown>,
+    "anthropic/delete_message_batch": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "anthropic/cancel_message_batch": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "anthropic/retrieve_model": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "anthropic/list_models": {
+      inputs: [] as unknown[],
+      output: undefined as unknown,
+    } as KindSpec<unknown[], unknown>,
+    "anthropic/record": {
+      inputs: [] as unknown[],
+      output: {} as Record<string, unknown>,
+    } as KindSpec<unknown[], Record<string, unknown>>,
+    "anthropic/array": {
+      inputs: [] as unknown[],
+      output: [] as unknown[],
+    } as KindSpec<unknown[], unknown[]>,
+  };
 }
 
 // ---- Constructor builder ----------------------------------
@@ -244,7 +268,6 @@ export function anthropic(config: AnthropicConfig) {
     kinds: buildKinds(),
     traits: {},
     lifts: {},
-    nodeKinds: [...NODE_KINDS],
     defaultInterpreter: (): Interpreter => createDefaultInterpreter(config),
   };
 }

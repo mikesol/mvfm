@@ -126,26 +126,41 @@ export interface TwilioConfig {
 
 // ---- Node kinds -------------------------------------------
 
-const NODE_KINDS = [
-  "twilio/create_message",
-  "twilio/fetch_message",
-  "twilio/list_messages",
-  "twilio/create_call",
-  "twilio/fetch_call",
-  "twilio/list_calls",
-  "twilio/record",
-  "twilio/array",
-] as const;
-
-function buildKinds(): Record<string, KindSpec<unknown[], unknown>> {
-  const kinds: Record<string, KindSpec<unknown[], unknown>> = {};
-  for (const kind of NODE_KINDS) {
-    kinds[kind] = {
+function buildKinds(): Record<string, KindSpec<any, any>> {
+  return {
+    "twilio/create_message": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "twilio/fetch_message": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "twilio/list_messages": {
       inputs: [] as unknown[],
       output: undefined as unknown,
-    } as KindSpec<unknown[], unknown>;
-  }
-  return kinds;
+    } as KindSpec<unknown[], unknown>,
+    "twilio/create_call": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "twilio/fetch_call": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "twilio/list_calls": {
+      inputs: [] as unknown[],
+      output: undefined as unknown,
+    } as KindSpec<unknown[], unknown>,
+    "twilio/record": {
+      inputs: [] as unknown[],
+      output: {} as Record<string, unknown>,
+    } as KindSpec<unknown[], Record<string, unknown>>,
+    "twilio/array": {
+      inputs: [] as unknown[],
+      output: [] as unknown[],
+    } as KindSpec<unknown[], unknown[]>,
+  };
 }
 
 // ---- Constructor builder ----------------------------------
@@ -260,7 +275,6 @@ export function twilio(config: TwilioConfig) {
     kinds: buildKinds(),
     traits: {},
     lifts: {},
-    nodeKinds: [...NODE_KINDS],
     defaultInterpreter: (): Interpreter => createDefaultInterpreter(config),
   };
 }

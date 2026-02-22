@@ -135,28 +135,49 @@ export interface OpenAIConfig {
 
 // ---- Node kinds -------------------------------------------
 
-const NODE_KINDS = [
-  "openai/create_chat_completion",
-  "openai/retrieve_chat_completion",
-  "openai/list_chat_completions",
-  "openai/update_chat_completion",
-  "openai/delete_chat_completion",
-  "openai/create_embedding",
-  "openai/create_moderation",
-  "openai/create_completion",
-  "openai/record",
-  "openai/array",
-] as const;
-
-function buildKinds(): Record<string, KindSpec<unknown[], unknown>> {
-  const kinds: Record<string, KindSpec<unknown[], unknown>> = {};
-  for (const kind of NODE_KINDS) {
-    kinds[kind] = {
+function buildKinds(): Record<string, KindSpec<any, any>> {
+  return {
+    "openai/create_chat_completion": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "openai/retrieve_chat_completion": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "openai/list_chat_completions": {
       inputs: [] as unknown[],
       output: undefined as unknown,
-    } as KindSpec<unknown[], unknown>;
-  }
-  return kinds;
+    } as KindSpec<unknown[], unknown>,
+    "openai/update_chat_completion": {
+      inputs: [undefined, undefined] as [unknown, unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown, unknown], unknown>,
+    "openai/delete_chat_completion": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "openai/create_embedding": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "openai/create_moderation": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "openai/create_completion": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "openai/record": {
+      inputs: [] as unknown[],
+      output: {} as Record<string, unknown>,
+    } as KindSpec<unknown[], Record<string, unknown>>,
+    "openai/array": {
+      inputs: [] as unknown[],
+      output: [] as unknown[],
+    } as KindSpec<unknown[], unknown[]>,
+  };
 }
 
 // ---- Constructor builder ----------------------------------
@@ -248,7 +269,6 @@ export function openai(config: OpenAIConfig) {
     kinds: buildKinds(),
     traits: {},
     lifts: {},
-    nodeKinds: [...NODE_KINDS],
     defaultInterpreter: (): Interpreter => createDefaultInterpreter(config),
   };
 }

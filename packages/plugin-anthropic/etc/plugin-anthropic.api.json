@@ -559,7 +559,7 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown[], unknown>>;\n    traits: {};\n    lifts: {};\n    nodeKinds: (\"anthropic/create_message\" | \"anthropic/count_tokens\" | \"anthropic/create_message_batch\" | \"anthropic/retrieve_message_batch\" | \"anthropic/list_message_batches\" | \"anthropic/delete_message_batch\" | \"anthropic/cancel_message_batch\" | \"anthropic/retrieve_model\" | \"anthropic/list_models\" | \"anthropic/record\" | \"anthropic/array\")[];\n    defaultInterpreter: () => "
+              "text": "<any, any>>;\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
             },
             {
               "kind": "Reference",

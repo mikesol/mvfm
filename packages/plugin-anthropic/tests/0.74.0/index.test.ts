@@ -143,17 +143,17 @@ describe("anthropic plugin: unified Plugin shape", () => {
   });
 
   it("has 11 node kinds (9 core + record + array)", () => {
-    expect(plugin.nodeKinds).toHaveLength(11);
+    expect(Object.keys(plugin.kinds)).toHaveLength(11);
   });
 
   it("nodeKinds are all namespaced", () => {
-    for (const kind of plugin.nodeKinds) {
+    for (const kind of Object.keys(plugin.kinds)) {
       expect(kind).toMatch(/^anthropic\//);
     }
   });
 
   it("kinds map has entries for all node kinds", () => {
-    for (const kind of plugin.nodeKinds) {
+    for (const kind of Object.keys(plugin.kinds)) {
       expect(plugin.kinds[kind]).toBeDefined();
     }
   });

@@ -52,10 +52,9 @@ export function resend(config: ResendConfig): {
             };
         };
     };
-    kinds: Record<string, KindSpec<unknown[], unknown>>;
+    kinds: Record<string, KindSpec<any, any>>;
     traits: {};
     lifts: {};
-    nodeKinds: ("resend/send_email" | "resend/get_email" | "resend/send_batch" | "resend/create_contact" | "resend/get_contact" | "resend/list_contacts" | "resend/remove_contact" | "resend/record" | "resend/array")[];
     defaultInterpreter: () => Interpreter;
 };
 

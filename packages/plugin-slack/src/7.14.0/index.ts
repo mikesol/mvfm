@@ -77,16 +77,25 @@ export const slackInterpreter: Interpreter = lazyInterpreter(() =>
 
 // ---- Node kinds with record/array ----------------------------------------
 
-const ALL_NODE_KINDS = [...SLACK_NODE_KINDS, "slack/record", "slack/array"] as const;
+/** KindSpec for slack API methods: single params input, unknown output. */
+const slackMethodKind: KindSpec<[unknown], unknown> = {
+  inputs: [undefined] as [unknown],
+  output: undefined as unknown,
+};
 
-function buildKinds(): Record<string, KindSpec<unknown[], unknown>> {
-  const kinds: Record<string, KindSpec<unknown[], unknown>> = {};
-  for (const kind of ALL_NODE_KINDS) {
-    kinds[kind] = {
-      inputs: [] as unknown[],
-      output: undefined as unknown,
-    } as KindSpec<unknown[], unknown>;
+function buildKinds(): Record<string, KindSpec<any, any>> {
+  const kinds: Record<string, KindSpec<any, any>> = {};
+  for (const kind of SLACK_NODE_KINDS) {
+    kinds[kind] = slackMethodKind;
   }
+  kinds["slack/record"] = {
+    inputs: [] as unknown[],
+    output: {} as Record<string, unknown>,
+  } as KindSpec<unknown[], Record<string, unknown>>;
+  kinds["slack/array"] = {
+    inputs: [] as unknown[],
+    output: [] as unknown[],
+  } as KindSpec<unknown[], unknown[]>;
   return kinds;
 }
 
@@ -108,7 +117,6 @@ export function slack(_config: SlackConfig) {
     kinds: buildKinds(),
     traits: {},
     lifts: {},
-    nodeKinds: [...ALL_NODE_KINDS],
     defaultInterpreter: (): Interpreter => slackInterpreter,
   };
 }

@@ -145,17 +145,17 @@ describe("stripe plugin: unified Plugin shape", () => {
   });
 
   it("has 12 node kinds (10 core + record + array)", () => {
-    expect(plugin.nodeKinds).toHaveLength(12);
+    expect(Object.keys(plugin.kinds)).toHaveLength(12);
   });
 
   it("nodeKinds are all namespaced", () => {
-    for (const kind of plugin.nodeKinds) {
+    for (const kind of Object.keys(plugin.kinds)) {
       expect(kind).toMatch(/^stripe\//);
     }
   });
 
   it("kinds map has entries for all node kinds", () => {
-    for (const kind of plugin.nodeKinds) {
+    for (const kind of Object.keys(plugin.kinds)) {
       expect(plugin.kinds[kind]).toBeDefined();
     }
   });

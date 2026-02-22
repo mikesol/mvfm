@@ -570,7 +570,7 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown[], unknown>>;\n    traits: {};\n    lifts: {};\n    nodeKinds: (\"fal/run\" | \"fal/subscribe\" | \"fal/queue_submit\" | \"fal/queue_status\" | \"fal/queue_result\" | \"fal/queue_cancel\" | \"fal/record\" | \"fal/array\")[];\n    defaultInterpreter: () => "
+              "text": "<any, any>>;\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
             },
             {
               "kind": "Reference",
