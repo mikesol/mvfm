@@ -5,14 +5,14 @@
  * Provides the ergonomic builder pattern used by consumers.
  */
 
+import { corePlugin } from "./core-plugin";
+import { createApp } from "./elaborate";
 import type { CExpr, NExpr, RuntimeEntry } from "./expr";
 import { isCExpr, makeCExpr, makeNExpr } from "./expr";
-import { createApp } from "./elaborate";
-import { fold as internalFold, defaults as internalDefaults } from "./fold";
+import { defaults as internalDefaults, fold as internalFold } from "./fold";
 import type { Interpreter, Plugin } from "./plugin";
 import { mvfmU } from "./plugin";
-import { numPlugin, boolPlugin, strPlugin, ordPlugin } from "./std-plugins";
-import { corePlugin } from "./core-plugin";
+import { boolPlugin, numPlugin, ordPlugin, strPlugin } from "./std-plugins";
 
 export { coreInterpreter, corePlugin } from "./core-plugin";
 
@@ -232,9 +232,7 @@ export function mvfm(...pluginInputs: (Plugin | readonly Plugin[])[]) {
 // ─── injectInput ────────────────────────────────────────────────────
 
 /** Inject input data into a compiled program, replacing core/input node outputs. */
-export function injectInput(
-  prog: Program, data: Record<string, unknown>,
-): Program {
+export function injectInput(prog: Program, data: Record<string, unknown>): Program {
   const oldAdj = prog.__nexpr.__adj;
   const newAdj: Record<string, RuntimeEntry> = {};
   for (const [id, entry] of Object.entries(oldAdj)) {
@@ -253,9 +251,7 @@ export function injectInput(
 // ─── Public defaults ────────────────────────────────────────────────
 
 /** Build a merged interpreter from plugins or an app object, with optional overrides. */
-export function defaults(
-  appOrPlugins: any, overrides?: Record<string, Interpreter>,
-): Interpreter {
+export function defaults(appOrPlugins: any, overrides?: Record<string, Interpreter>): Interpreter {
   if (Array.isArray(appOrPlugins)) {
     return internalDefaults(appOrPlugins, overrides);
   }
@@ -266,9 +262,7 @@ export function defaults(
 // ─── Public fold ────────────────────────────────────────────────────
 
 /** Evaluate a program/NExpr. Supports fold(interp, prog) and fold(nexpr, interp). */
-export async function fold(
-  first: any, second: any, third?: any, fourth?: any,
-): Promise<unknown> {
+export async function fold(first: any, second: any, third?: any, fourth?: any): Promise<unknown> {
   if (typeof first === "string") {
     return internalFold(first, second, third, fourth);
   }

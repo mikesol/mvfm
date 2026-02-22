@@ -145,8 +145,10 @@ function elaborate(
         // Type mismatch check for binary traits (skip when either arg is object/unknown)
         if (
           childResults.length > 1 &&
-          childResults[0][1] !== "object" && childResults[0][1] !== "unknown" &&
-          childResults[1][1] !== "object" && childResults[1][1] !== "unknown" &&
+          childResults[0][1] !== "object" &&
+          childResults[0][1] !== "unknown" &&
+          childResults[1][1] !== "object" &&
+          childResults[1][1] !== "unknown" &&
           childResults[1][1] !== childResults[0][1]
         ) {
           throw new Error(

@@ -5,8 +5,8 @@
  * replacing `foldAST` with the public `fold` from api.ts.
  * Examples requiring external plugins (console_, fiber) are skipped.
  */
-import { describe, it, expect } from "vitest";
-import { mvfm, fold, defaults, injectInput, prelude, st, error } from "../src/index";
+import { describe, expect, it } from "vitest";
+import { defaults, error, fold, injectInput, mvfm, prelude, st } from "../src/index";
 
 // ─── core examples ──────────────────────────────────────────────────
 
@@ -53,10 +53,7 @@ describe("core doc examples", () => {
       const nextAge = $.add($.input.age, 1);
       return { greeting, nextAge };
     });
-    const result = await fold(
-      defaults(app),
-      injectInput(prog, { name: "Alice", age: 30 }),
-    );
+    const result = await fold(defaults(app), injectInput(prog, { name: "Alice", age: 30 }));
     expect(result).toEqual({ greeting: "Hi, Alice", nextAge: 31 });
   });
 
@@ -66,10 +63,7 @@ describe("core doc examples", () => {
       const doubled = $.mul($.input.x, 2);
       return { value: doubled, tag: $.input.label };
     });
-    const result = await fold(
-      defaults(app),
-      injectInput(prog, { x: 5, label: "result" }),
-    );
+    const result = await fold(defaults(app), injectInput(prog, { x: 5, label: "result" }));
     expect(result).toEqual({ value: 10, tag: "result" });
   });
 
@@ -80,10 +74,7 @@ describe("core doc examples", () => {
       const diff = $.sub($.input.a, $.input.b);
       return [sum, diff];
     });
-    const result = await fold(
-      defaults(app),
-      injectInput(prog, { a: 10, b: 3 }),
-    );
+    const result = await fold(defaults(app), injectInput(prog, { a: 10, b: 3 }));
     expect(result).toEqual([13, 7]);
   });
 });
@@ -132,9 +123,7 @@ describe("num doc examples", () => {
     const prog = app({ x: "number" }, ($: any) => {
       return $.concat("value is: ", $.show($.input.x));
     });
-    expect(await fold(defaults(app), injectInput(prog, { x: 123 }))).toBe(
-      "value is: 123",
-    );
+    expect(await fold(defaults(app), injectInput(prog, { x: 123 }))).toBe("value is: 123");
   });
 });
 
@@ -146,17 +135,15 @@ describe("str doc examples", () => {
     const prog = app({ first: "string", last: "string" }, ($: any) => {
       return $.concat($.input.first, " ", $.input.last);
     });
-    expect(
-      await fold(defaults(app), injectInput(prog, { first: "Jane", last: "Doe" })),
-    ).toBe("Jane Doe");
+    expect(await fold(defaults(app), injectInput(prog, { first: "Jane", last: "Doe" }))).toBe(
+      "Jane Doe",
+    );
   });
 
   it("str/upper", async () => {
     const app = mvfm(prelude);
     const prog = app({ s: "string" }, ($: any) => $.upper($.input.s));
-    expect(
-      await fold(defaults(app), injectInput(prog, { s: "hello world" })),
-    ).toBe("HELLO WORLD");
+    expect(await fold(defaults(app), injectInput(prog, { s: "hello world" }))).toBe("HELLO WORLD");
   });
 
   it("str/len", async () => {
@@ -168,17 +155,13 @@ describe("str doc examples", () => {
   it("str/lower", async () => {
     const app = mvfm(prelude);
     const prog = app({ s: "string" }, ($: any) => $.lower($.input.s));
-    expect(
-      await fold(defaults(app), injectInput(prog, { s: "HELLO WORLD" })),
-    ).toBe("hello world");
+    expect(await fold(defaults(app), injectInput(prog, { s: "HELLO WORLD" }))).toBe("hello world");
   });
 
   it("str/trim", async () => {
     const app = mvfm(prelude);
     const prog = app({ s: "string" }, ($: any) => $.trim($.input.s));
-    expect(
-      await fold(defaults(app), injectInput(prog, { s: "  padded  " })),
-    ).toBe("padded");
+    expect(await fold(defaults(app), injectInput(prog, { s: "  padded  " }))).toBe("padded");
   });
 });
 
@@ -190,9 +173,7 @@ describe("eq doc examples", () => {
     const prog = app({ x: "number", y: "number" }, ($: any) => {
       return $.eq($.input.x, $.input.y);
     });
-    expect(
-      await fold(defaults(app), injectInput(prog, { x: 10, y: 10 })),
-    ).toBe(true);
+    expect(await fold(defaults(app), injectInput(prog, { x: 10, y: 10 }))).toBe(true);
   });
 
   it("eq/neq — unequal values", async () => {
@@ -200,9 +181,7 @@ describe("eq doc examples", () => {
     const prog = app({ x: "number", y: "number" }, ($: any) => {
       return $.neq($.input.x, $.input.y);
     });
-    expect(
-      await fold(defaults(app), injectInput(prog, { x: 10, y: 20 })),
-    ).toBe(true);
+    expect(await fold(defaults(app), injectInput(prog, { x: 10, y: 20 }))).toBe(true);
   });
 });
 
@@ -214,9 +193,7 @@ describe("ord doc examples", () => {
     const prog = app({ x: "number", y: "number" }, ($: any) => {
       return $.gt($.input.x, $.input.y);
     });
-    expect(
-      await fold(defaults(app), injectInput(prog, { x: 10, y: 5 })),
-    ).toBe(true);
+    expect(await fold(defaults(app), injectInput(prog, { x: 10, y: 5 }))).toBe(true);
   });
 
   it("ord/lt", async () => {
@@ -224,9 +201,7 @@ describe("ord doc examples", () => {
     const prog = app({ x: "number", y: "number" }, ($: any) => {
       return $.lt($.input.x, $.input.y);
     });
-    expect(
-      await fold(defaults(app), injectInput(prog, { x: 3, y: 8 })),
-    ).toBe(true);
+    expect(await fold(defaults(app), injectInput(prog, { x: 3, y: 8 }))).toBe(true);
   });
 });
 
@@ -270,12 +245,8 @@ describe("error doc examples", () => {
   it("error/try — recover from failure", async () => {
     const app = mvfm(prelude, error);
     const prog = app({ x: "number" }, ($: any) => {
-      const risky = $.cond($.gt($.input.x, 10))
-        .t($.input.x)
-        .f($.fail("too small"));
-      return $.try(risky).catch((err: any) =>
-        $.concat("recovered: ", err),
-      );
+      const risky = $.cond($.gt($.input.x, 10)).t($.input.x).f($.fail("too small"));
+      return $.try(risky).catch((err: any) => $.concat("recovered: ", err));
     });
     const result = await fold(defaults(app), injectInput(prog, { x: 3 }));
     expect(result).toBe("recovered: too small");
@@ -287,9 +258,7 @@ describe("error doc examples", () => {
       const checked = $.cond($.gte($.input.age, 18))
         .t($.concat("welcome, age ", $.show($.input.age)))
         .f($.fail("must be 18+"));
-      return $.try(checked).catch((err: any) =>
-        $.concat("denied: ", err),
-      );
+      return $.try(checked).catch((err: any) => $.concat("denied: ", err));
     });
     const result = await fold(defaults(app), injectInput(prog, { age: 15 }));
     expect(result).toBe("denied: must be 18+");

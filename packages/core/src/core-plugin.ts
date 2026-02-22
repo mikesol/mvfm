@@ -42,7 +42,7 @@ export const coreInterpreter: Interpreter = {
     const map = e.children[0] as unknown as unknown[];
     const results: unknown[] = [];
     for (const childId of map) {
-      results.push(yield (childId as string));
+      results.push(yield childId as string);
     }
     return results;
   },
@@ -63,8 +63,13 @@ export const corePlugin: Plugin = {
   traits: {},
   lifts: {},
   nodeKinds: [
-    "core/literal", "core/input", "core/access", "core/begin", "core/cond",
-    "core/record", "core/tuple",
+    "core/literal",
+    "core/input",
+    "core/access",
+    "core/begin",
+    "core/cond",
+    "core/record",
+    "core/tuple",
   ],
   shapes: { "core/record": "*", "core/tuple": "*" },
   defaultInterpreter: () => coreInterpreter,

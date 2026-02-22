@@ -12,48 +12,62 @@
 // ─── 1. Public API ──────────────────────────────────────────────────
 // Consumer-facing: mvfm, fold, defaults, injectInput, prelude
 
-export { mvfm, fold, defaults, injectInput, prelude } from "./api";
+export { defaults, fold, injectInput, mvfm, prelude } from "./api";
 
 // ─── 2. Plugins ─────────────────────────────────────────────────────
 // Built-in plugin values and the core plugin/interpreter
 
-export { numPlugin, boolPlugin, strPlugin, ordPlugin } from "./std-plugins";
-export { coreInterpreter, corePlugin } from "./core-plugin";
-export { st } from "./st";
-export { error } from "./error";
 export { control } from "./control";
+export { coreInterpreter, corePlugin } from "./core-plugin";
+export { error } from "./error";
+export { st } from "./st";
+export { boolPlugin, numPlugin, ordPlugin, strPlugin } from "./std-plugins";
 
 // ─── 3. Types ───────────────────────────────────────────────────────
 // Core type definitions used by plugin authors and consumers
 
 export type { Program } from "./api";
-export type { Plugin, Interpreter, Handler, FoldYield } from "./plugin";
 export type { CExpr, NExpr, RuntimeEntry } from "./expr";
-export type { KindSpec, TraitKindSpec, RegistryEntry, StdRegistry } from "./registry";
-export type { LiftKind, TypeKey } from "./registry";
-export type { ScopedBinding, RecurseScopedEffect, TraitDef, DollarSign } from "./plugin";
-export type { PluginDef, FoldState } from "./fold";
+export type { FoldState, PluginDef } from "./fold";
+export type {
+  DollarSign,
+  FoldYield,
+  Handler,
+  Interpreter,
+  Plugin,
+  RecurseScopedEffect,
+  ScopedBinding,
+  TraitDef,
+} from "./plugin";
+export type {
+  KindSpec,
+  LiftKind,
+  RegistryEntry,
+  StdRegistry,
+  TraitKindSpec,
+  TypeKey,
+} from "./registry";
 
 // ─── 4. Compat shims ───────────────────────────────────────────────
 // Legacy API bridge — kept for external plugins not yet migrated (zod, openai, anthropic).
 // These will be removed once all external plugins use the new API.
 
 export {
-  type TypedNode,
-  type NodeTypeMap,
-  type ExprBase,
-  type Expr,
-  type PluginContext,
-  definePlugin,
   defineInterpreter,
+  definePlugin,
+  type Expr,
+  type ExprBase,
   eval_,
   foldAST,
+  type NodeTypeMap,
+  type PluginContext,
+  type TypedNode,
 } from "./compat";
 
 // U-suffixed aliases — deprecated, kept for external plugins not yet migrated.
 import { numPlugin } from "./std-plugins";
-import { strPlugin } from "./std-plugins-str";
 import { boolPlugin } from "./std-plugins-bool";
+import { strPlugin } from "./std-plugins-str";
 /** @deprecated Use numPlugin instead. */
 export const numPluginU = numPlugin;
 /** @deprecated Use strPlugin instead. */
@@ -65,51 +79,59 @@ export const boolPluginU = boolPlugin;
 // DAG construction, elaboration, predicates, expression helpers.
 // Use these when building custom tooling on top of the core.
 
-// Expression constructors and inspectors
-export { makeCExpr, isCExpr, makeNExpr, CREF } from "./expr";
-export type {
-  COutOf, CKindOf, CArgsOf,
-  IdOf, AdjOf, CtrOf, OutOf,
-  NodeEntry, AccessorOverlay,
-} from "./expr";
-
-// Elaboration (CExpr → NExpr)
-export { createApp, app } from "./elaborate";
-export { LIFT_MAP, TRAIT_MAP, KIND_INPUTS } from "./elaborate";
-export type {
-  SNodeEntry, NeverGuard, DeepResolve, UnionToTuple,
-  ElaborateExpr, AppResult,
-} from "./elaborate-types";
-
-// Plugin composition
-export { mvfmU, buildLiftMap, buildTraitMap, buildKindInputs, buildStructuralShapes } from "./plugin";
-export type { RegistryOf } from "./plugin";
-
-// Fold internals
-export { VOLATILE_KINDS, createFoldState, recurseScoped } from "./fold";
-
+// Commit / gc
+export { commit, gc } from "./commit";
+// Constructors (num, str, bool helpers)
+export * from "./constructors";
 // DAG operations
 export { pipe } from "./dagql";
 export * from "./dirty";
+// Elaboration (CExpr → NExpr)
+export { app, createApp, KIND_INPUTS, LIFT_MAP, TRAIT_MAP } from "./elaborate";
+export type {
+  AppResult,
+  DeepResolve,
+  ElaborateExpr,
+  NeverGuard,
+  SNodeEntry,
+  UnionToTuple,
+} from "./elaborate-types";
+export type {
+  AccessorOverlay,
+  AdjOf,
+  CArgsOf,
+  CKindOf,
+  COutOf,
+  CtrOf,
+  IdOf,
+  NodeEntry,
+  OutOf,
+} from "./expr";
+// Expression constructors and inspectors
+export { CREF, isCExpr, makeCExpr, makeNExpr } from "./expr";
+// Fold internals
+export { createFoldState, recurseScoped, VOLATILE_KINDS } from "./fold";
 export * from "./gc";
+export * from "./increment";
 export * from "./map";
 export * from "./named";
+export type { RegistryOf } from "./plugin";
+// Plugin composition
+export {
+  buildKindInputs,
+  buildLiftMap,
+  buildStructuralShapes,
+  buildTraitMap,
+  mvfmU,
+} from "./plugin";
 export * from "./predicates";
 export * from "./replace";
 export * from "./select";
 export * from "./splice";
-export * from "./wrap";
-export * from "./increment";
-export * from "./structural-children";
-
-// Commit / gc
-export { gc, commit } from "./commit";
-
-// Constructors (num, str, bool helpers)
-export * from "./constructors";
-
 // Std plugin internals
-export { stdPlugins, lt } from "./std-plugins";
+export { lt, stdPlugins } from "./std-plugins";
 export { boolPlugin as _boolPluginDef } from "./std-plugins-bool";
-export { strPlugin as _strPluginDef } from "./std-plugins-str";
 export { ordPlugin as _ordPluginDef } from "./std-plugins-ord";
+export { strPlugin as _strPluginDef } from "./std-plugins-str";
+export * from "./structural-children";
+export * from "./wrap";

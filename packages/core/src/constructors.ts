@@ -174,8 +174,6 @@ export function boolNot<A>(a: A): CExpr<boolean, "bool/not", [A]> {
   return makeCExpr<boolean, "bool/not", [A]>("bool/not", [a]);
 }
 
-
-
 // ─── Equality constructor ───────────────────────────────────────────
 
 /** Create an equality comparison expression (trait-dispatched). */

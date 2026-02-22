@@ -7,8 +7,8 @@
  * @deprecated Prefer the new API: mvfm, fold, defaults, Plugin, Interpreter.
  */
 
-import type { Interpreter } from "./plugin";
 import { fold } from "./api";
+import type { Interpreter } from "./plugin";
 
 // ─── TypedNode: old interpreter node type ────────────────────────────
 

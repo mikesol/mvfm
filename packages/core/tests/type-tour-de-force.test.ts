@@ -21,11 +21,26 @@
 
 import { describe, test } from "vitest";
 import {
-  mvfm, fold, defaults, injectInput, prelude,
-  pipe, commit, replaceWhere, selectWhere, byKind,
-  type OutOf, type AdjOf, type COutOf, type CtrOf,
-  app, add, sub, mul, eq, numLit,
-  dirty, mapWhere,
+  type AdjOf,
+  add,
+  app,
+  byKind,
+  type COutOf,
+  type CtrOf,
+  commit,
+  defaults,
+  dirty,
+  eq,
+  fold,
+  injectInput,
+  mapWhere,
+  mul,
+  mvfm,
+  numLit,
+  type OutOf,
+  prelude,
+  replaceWhere,
+  selectWhere,
 } from "../src/index";
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -44,12 +59,12 @@ describe("type-tour-de-force: golden version compiles", () => {
     });
     const injected = injectInput(prog, { a: 10, b: 3 });
     const interp = defaults(myApp);
-    const result = await fold(interp, injected);
+    const _result = await fold(interp, injected);
 
     // DagQL: replace sub→add on the NExpr
     const nexpr = injected.__nexpr;
     const transformed = commit(replaceWhere(nexpr, byKind("num/sub"), "num/add"));
-    const subs = selectWhere(transformed, byKind("num/sub"));
+    const _subs = selectWhere(transformed, byKind("num/sub"));
 
     // Type extractors work
     type _Out = OutOf<typeof transformed>;
@@ -107,7 +122,12 @@ describe("variant 3: AdjOf tracks replaced kind", () => {
 describe("variant 4: IdOf rejects wrong root", () => {
   test("add(3,4) root is 'c', not 'a'", () => {
     const prog = app(add(3, 4));
-    type Id = OutOf<typeof prog> extends number ? typeof prog extends { __id: infer I } ? I : never : never;
+    type _Id =
+      OutOf<typeof prog> extends number
+        ? typeof prog extends { __id: infer I }
+          ? I
+          : never
+        : never;
     // @ts-expect-error — root is "c", not "a"
     const _bad: typeof prog extends { __id: infer I } ? I : never = "a";
   });

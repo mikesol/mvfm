@@ -19,7 +19,7 @@ export const st: Plugin = {
   ctors: {
     let: (initial: unknown) => {
       const cellId = `__cell_${cellCounter++}`;
-      const letExpr = makeCExpr("st/let", [initial, cellId]);
+      const _letExpr = makeCExpr("st/let", [initial, cellId]);
       return {
         get: () => makeCExpr("st/get", [cellId]),
         set: (val: unknown) => makeCExpr("st/set", [cellId, val]),
