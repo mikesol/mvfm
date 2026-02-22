@@ -1,6 +1,5 @@
 export type {
   FalConfig,
-  FalMethods,
   FalQueueCancelOptions,
   FalQueueResultOptions,
   FalQueueStatusOptions,
