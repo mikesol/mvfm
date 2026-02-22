@@ -6,14 +6,14 @@
  */
 
 import type { CExpr } from "@mvfm/core";
-import { boolPluginU, createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
+import { boolPlugin, createApp, defaults, fold, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
 import { zod } from "../src/index";
 
 const zodPlugin = zod();
-const plugins = [numPluginU, strPluginU, boolPluginU, zodPlugin] as const;
+const plugins = [numPlugin, strPlugin, boolPlugin, zodPlugin] as const;
 
 /** The composed constructor bag with $.zod namespace. */
-export const $ = mvfmU(...plugins);
+export const $ = composeDollar(...plugins);
 
 /** Normalize a CExpr into an NExpr. */
 export const app = createApp(...plugins);

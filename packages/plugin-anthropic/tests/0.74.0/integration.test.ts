@@ -1,6 +1,6 @@
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { boolPluginU, createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
+import { boolPlugin, createApp, defaults, fold, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { anthropic } from "../../src/0.74.0";
 import { createAnthropicInterpreter } from "../../src/0.74.0/interpreter";
@@ -9,8 +9,8 @@ import { createFixtureClient } from "./fixture-client";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const fixtureClient = createFixtureClient(join(__dirname, "fixtures"));
 const plugin = anthropic({ apiKey: "sk-ant-fixture" });
-const plugins = [numPluginU, strPluginU, boolPluginU, plugin] as const;
-const $ = mvfmU(...plugins);
+const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
+const $ = composeDollar(...plugins);
 const app = createApp(...plugins);
 
 async function run(expr: unknown) {

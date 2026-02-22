@@ -1,12 +1,12 @@
-import { boolPluginU, createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
+import { boolPlugin, createApp, defaults, fold, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
 import { describe, expect, it, vi } from "vitest";
 import { openaiInterpreter } from "../../src";
 import { openai } from "../../src/6.21.0";
 import { createOpenAIInterpreter, type OpenAIClient } from "../../src/6.21.0/interpreter";
 
 const plugin = openai({ apiKey: "sk-test-123" });
-const plugins = [numPluginU, strPluginU, boolPluginU, plugin] as const;
-const $ = mvfmU(...plugins);
+const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
+const $ = composeDollar(...plugins);
 const app = createApp(...plugins);
 
 async function run(expr: unknown) {
@@ -41,7 +41,7 @@ describe("openai interpreter: default export", () => {
       messages: [{ role: "user", content: "Hello" }],
     });
     const nexpr = app(expr as Parameters<typeof app>[0]);
-    const stdInterp = defaults([numPluginU, strPluginU, boolPluginU]);
+    const stdInterp = defaults([numPlugin, strPlugin, boolPlugin]);
     const combined = { ...stdInterp, ...openaiInterpreter };
     await expect(fold(nexpr, combined)).rejects.toThrow(/OPENAI_API_KEY/);
     vi.unstubAllEnvs();

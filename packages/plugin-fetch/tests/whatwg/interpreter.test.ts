@@ -1,4 +1,4 @@
-import { boolPluginU, createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
+import { boolPlugin, createApp, defaults, fold, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { fetchInterpreter } from "../../src";
 import { fetch as fetchPlugin } from "../../src/whatwg";
@@ -17,8 +17,8 @@ function mockResponse(body: unknown, status = 200, headers: Record<string, strin
 }
 
 const plugin = fetchPlugin({ baseUrl: "https://api.test.com" });
-const plugins = [numPluginU, strPluginU, boolPluginU, plugin] as const;
-const $ = mvfmU(...plugins);
+const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
+const $ = composeDollar(...plugins);
 const app = createApp(...plugins);
 
 async function run(expr: unknown) {

@@ -1,5 +1,5 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
-import { createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
+import { createApp, defaults, fold, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { fetch as fetchPlugin } from "../../src/whatwg";
 import { wrapFetch } from "../../src/whatwg/client-fetch";
@@ -62,8 +62,8 @@ afterAll(async () => {
 // Helper: build plugins, $, app, and run for a given config
 function setup(config?: { baseUrl?: string; defaultHeaders?: Record<string, string> }) {
   const plugin = fetchPlugin(config);
-  const plugins = [numPluginU, strPluginU, plugin] as const;
-  const $ = mvfmU(...plugins);
+  const plugins = [numPlugin, strPlugin, plugin] as const;
+  const $ = composeDollar(...plugins);
   const app = createApp(...plugins);
   const client = wrapFetch();
 

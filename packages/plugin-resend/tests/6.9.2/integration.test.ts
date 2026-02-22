@@ -1,5 +1,5 @@
 import http from "node:http";
-import { boolPluginU, createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
+import { boolPlugin, createApp, defaults, fold, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { resend as resendPlugin } from "../../src/6.9.2";
 import type { ResendClient } from "../../src/6.9.2/interpreter";
@@ -9,8 +9,8 @@ let server: http.Server;
 let port: number;
 
 const plugin = resendPlugin({ apiKey: "re_test_fake" });
-const plugins = [numPluginU, strPluginU, boolPluginU, plugin] as const;
-const $ = mvfmU(...plugins);
+const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
+const $ = composeDollar(...plugins);
 const app = createApp(...plugins);
 
 function createMockClient(): ResendClient {

@@ -1,12 +1,12 @@
-import { boolPluginU, createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
+import { boolPlugin, createApp, defaults, fold, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
 import { describe, expect, it, vi } from "vitest";
 import { stripeInterpreter } from "../../src";
 import { stripe } from "../../src/2025-04-30.basil";
 import { createStripeInterpreter, type StripeClient } from "../../src/2025-04-30.basil/interpreter";
 
 const plugin = stripe({ apiKey: "sk_test_123" });
-const plugins = [numPluginU, strPluginU, boolPluginU, plugin] as const;
-const $ = mvfmU(...plugins);
+const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
+const $ = composeDollar(...plugins);
 const app = createApp(...plugins);
 
 async function run(expr: unknown) {
@@ -38,7 +38,7 @@ describe("stripe interpreter: default export", () => {
     vi.stubEnv("STRIPE_API_KEY", "");
     const expr = $.stripe.paymentIntents.create({ amount: 2000, currency: "usd" });
     const nexpr = app(expr as Parameters<typeof app>[0]);
-    const stdInterp = defaults([numPluginU, strPluginU, boolPluginU]);
+    const stdInterp = defaults([numPlugin, strPlugin, boolPlugin]);
     const combined = { ...stdInterp, ...stripeInterpreter };
     await expect(fold(nexpr, combined)).rejects.toThrow(/STRIPE_API_KEY/);
     vi.unstubAllEnvs();

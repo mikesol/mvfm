@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import { boolPluginU, createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
+import { boolPlugin, createApp, defaults, fold, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { fal as falPlugin } from "../../src/1.9.1";
 import { wrapFalSdk } from "../../src/1.9.1/client-fal-sdk";
@@ -12,7 +12,7 @@ const isRecording = !!process.env.FAL_RECORD;
 let client: FixtureClient;
 
 const plugin = falPlugin({ credentials: "fixture" });
-const plugins = [numPluginU, strPluginU, boolPluginU, plugin] as const;
+const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
 const app = createApp(...plugins);
 
 beforeAll(async () => {
@@ -32,7 +32,7 @@ afterAll(async () => {
 }, 10_000);
 
 function evaluate(expr: unknown) {
-  const _$ = mvfmU(...plugins);
+  const _$ = composeDollar(...plugins);
   const nexpr = app(expr as Parameters<typeof app>[0]);
   const interp = defaults(plugins, {
     fal: createFalInterpreter(client),
@@ -42,7 +42,7 @@ function evaluate(expr: unknown) {
 
 describe("fal integration: real API fixtures", () => {
   it("run returns image data", async () => {
-    const $ = mvfmU(...plugins);
+    const $ = composeDollar(...plugins);
     const expr = $.fal.run("fal-ai/fast-sdxl", {
       input: { prompt: "a cat sitting on a windowsill" },
     });
@@ -59,7 +59,7 @@ describe("fal integration: real API fixtures", () => {
   }, 30_000);
 
   it("subscribe returns image data", async () => {
-    const $ = mvfmU(...plugins);
+    const $ = composeDollar(...plugins);
     const expr = $.fal.subscribe("fal-ai/fast-sdxl", {
       input: { prompt: "a dog in a park" },
       mode: "polling" as const,
@@ -75,7 +75,7 @@ describe("fal integration: real API fixtures", () => {
   }, 60_000);
 
   it("queue submit returns queue status", async () => {
-    const $ = mvfmU(...plugins);
+    const $ = composeDollar(...plugins);
     const expr = $.fal.queue.submit("fal-ai/fast-sdxl", {
       input: { prompt: "a mountain landscape" },
     });
@@ -108,7 +108,7 @@ describe("fal integration: real API fixtures", () => {
       requestId = (submitEntry.response as Record<string, string>).request_id;
     }
 
-    const $ = mvfmU(...plugins);
+    const $ = composeDollar(...plugins);
     const expr = $.fal.queue.status("fal-ai/fast-sdxl", { requestId, logs: true });
     const result = (await evaluate(expr)) as Record<string, unknown>;
 
@@ -135,7 +135,7 @@ describe("fal integration: real API fixtures", () => {
       requestId = (submitEntry.response as Record<string, string>).request_id;
     }
 
-    const $ = mvfmU(...plugins);
+    const $ = composeDollar(...plugins);
     const expr = $.fal.queue.result("fal-ai/fast-sdxl", { requestId });
     const result = (await evaluate(expr)) as Record<string, unknown>;
 
@@ -162,7 +162,7 @@ describe("fal integration: real API fixtures", () => {
       requestId = (submitEntry.response as Record<string, string>).request_id;
     }
 
-    const $ = mvfmU(...plugins);
+    const $ = composeDollar(...plugins);
     const expr = $.fal.queue.cancel("fal-ai/fast-sdxl", { requestId });
     const cancelResult = await evaluate(expr);
     expect(cancelResult).toBeUndefined();

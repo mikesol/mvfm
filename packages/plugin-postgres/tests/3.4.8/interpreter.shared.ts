@@ -1,5 +1,5 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
-import { createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
+import { createApp, defaults, fold, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import pg from "postgres";
 import { afterAll, beforeAll } from "vitest";
@@ -11,8 +11,8 @@ let container: StartedPostgreSqlContainer;
 let sqlClient: ReturnType<typeof pg>;
 
 const plugin = postgres("postgres://test");
-const plugins = [numPluginU, strPluginU, plugin] as const;
-const $ = mvfmU(...plugins);
+const plugins = [numPlugin, strPlugin, plugin] as const;
+const $ = composeDollar(...plugins);
 const app = createApp(...plugins);
 
 /** Handler for core/access: property access on evaluated parent. */
@@ -45,7 +45,7 @@ async function run(nexpr: ReturnType<typeof app>): Promise<unknown> {
   const adj = nexpr.__adj;
 
   // Build base interpreter from standard plugins + core/access
-  const baseInterp = { ...defaults([numPluginU, strPluginU]), ...coreAccessInterpreter };
+  const baseInterp = { ...defaults([numPlugin, strPlugin]), ...coreAccessInterpreter };
 
   // Build postgres server interpreter with base (for transaction sub-folding)
   const pgInterp = createPostgresServerInterpreter(client, adj, baseInterp);

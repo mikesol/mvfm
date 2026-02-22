@@ -173,10 +173,10 @@ function buildKvApi() {
  * @example
  * ```ts
  * const plugin = cloudflareKv({ namespaceId: "MY_KV" });
- * const $ = mvfmU(numPluginU, strPluginU, plugin);
+ * const $ = composeDollar(numPlugin, strPlugin, plugin);
  * const expr = $.kv.get("my-key");
  * const nexpr = app(expr);
- * const interp = defaults([numPluginU, strPluginU, plugin], {
+ * const interp = defaults([numPlugin, strPlugin, plugin], {
  *   "cloudflare-kv": createCloudflareKvInterpreter(myClient),
  * });
  * const result = await fold(nexpr, interp);

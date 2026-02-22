@@ -1,4 +1,4 @@
-import { boolPluginU, createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
+import { boolPlugin, createApp, defaults, fold, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
 import { describe, expect, it, vi } from "vitest";
 import { twilioInterpreter } from "../../src";
 import { twilio } from "../../src/5.5.1";
@@ -8,8 +8,8 @@ const plugin = twilio({
   accountSid: "AC_test_123",
   authToken: "auth_test_456",
 });
-const plugins = [numPluginU, strPluginU, boolPluginU, plugin] as const;
-const $ = mvfmU(...plugins);
+const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
+const $ = composeDollar(...plugins);
 const app = createApp(...plugins);
 
 async function run(expr: unknown) {
@@ -46,7 +46,7 @@ describe("twilio interpreter: default export", () => {
       body: "Hello",
     });
     const nexpr = app(expr as Parameters<typeof app>[0]);
-    const stdInterp = defaults([numPluginU, strPluginU, boolPluginU]);
+    const stdInterp = defaults([numPlugin, strPlugin, boolPlugin]);
     const combined = { ...stdInterp, ...twilioInterpreter };
     await expect(fold(nexpr, combined)).rejects.toThrow(/TWILIO_ACCOUNT_SID/);
     vi.unstubAllEnvs();
@@ -61,7 +61,7 @@ describe("twilio interpreter: default export", () => {
       body: "Hello",
     });
     const nexpr = app(expr as Parameters<typeof app>[0]);
-    const stdInterp = defaults([numPluginU, strPluginU, boolPluginU]);
+    const stdInterp = defaults([numPlugin, strPlugin, boolPlugin]);
     const combined = { ...stdInterp, ...twilioInterpreter };
     await expect(fold(nexpr, combined)).rejects.toThrow(/TWILIO_AUTH_TOKEN/);
     vi.unstubAllEnvs();
