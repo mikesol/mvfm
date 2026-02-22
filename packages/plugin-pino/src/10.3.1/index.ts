@@ -2,9 +2,8 @@
 // MVFM PLUGIN: pino (structured logging) — unified Plugin
 // ============================================================
 //
-// Ported to the unified Plugin type with makeCExpr and
-// index-based fold handlers. Config captured in interpreter
-// closure, not stored on AST nodes.
+// Permissive constructors with inline kinds and kind strings
+// in CExpr return types for ExtractKinds compatibility.
 //
 // Implemented:
 //   - Log levels: trace, debug, info, warn, error, fatal
@@ -18,7 +17,7 @@
 //   [key0, val0, key1, val1, ...]
 // ============================================================
 
-import type { CExpr, Interpreter, KindSpec } from "@mvfm/core";
+import type { CExpr, Interpreter, KindSpec, Plugin } from "@mvfm/core";
 import { isCExpr, makeCExpr } from "@mvfm/core";
 import { createPinoInterpreter } from "./interpreter";
 
@@ -57,6 +56,13 @@ function liftArg(value: unknown): unknown {
   return value;
 }
 
+// liftArg erases generic type info at runtime (returns unknown).
+// Cast helper restores the declared CExpr type params for ExtractKinds.
+const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]>(
+  kind: Kind,
+  args: readonly unknown[],
+) => CExpr<O, Kind, Args>;
+
 // ---- What the plugin adds to $ ----------------------------
 
 /**
@@ -64,45 +70,27 @@ function liftArg(value: unknown): unknown {
  *
  * Provides six log level methods and `child()` for creating
  * loggers with accumulated bindings. Each method returns
- * `CExpr<void>` for composition via `$.begin()`.
+ * a CExpr with the appropriate kind string for ExtractKinds.
  */
 export interface PinoLogger {
   /** Log at trace level. */
-  trace(msg: CExpr<string> | string): CExpr<void>;
-  trace(
-    mergeObject: CExpr<Record<string, unknown>> | Record<string, unknown>,
-    msg: CExpr<string> | string,
-  ): CExpr<void>;
+  trace<A>(msg: A): CExpr<void, "pino/trace", [number, number, A]>;
+  trace<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/trace", [number, number, B, A]>;
   /** Log at debug level. */
-  debug(msg: CExpr<string> | string): CExpr<void>;
-  debug(
-    mergeObject: CExpr<Record<string, unknown>> | Record<string, unknown>,
-    msg: CExpr<string> | string,
-  ): CExpr<void>;
+  debug<A>(msg: A): CExpr<void, "pino/debug", [number, number, A]>;
+  debug<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/debug", [number, number, B, A]>;
   /** Log at info level. */
-  info(msg: CExpr<string> | string): CExpr<void>;
-  info(
-    mergeObject: CExpr<Record<string, unknown>> | Record<string, unknown>,
-    msg: CExpr<string> | string,
-  ): CExpr<void>;
+  info<A>(msg: A): CExpr<void, "pino/info", [number, number, A]>;
+  info<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/info", [number, number, B, A]>;
   /** Log at warn level. */
-  warn(msg: CExpr<string> | string): CExpr<void>;
-  warn(
-    mergeObject: CExpr<Record<string, unknown>> | Record<string, unknown>,
-    msg: CExpr<string> | string,
-  ): CExpr<void>;
+  warn<A>(msg: A): CExpr<void, "pino/warn", [number, number, A]>;
+  warn<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/warn", [number, number, B, A]>;
   /** Log at error level. */
-  error(msg: CExpr<string> | string): CExpr<void>;
-  error(
-    mergeObject: CExpr<Record<string, unknown>> | Record<string, unknown>,
-    msg: CExpr<string> | string,
-  ): CExpr<void>;
+  error<A>(msg: A): CExpr<void, "pino/error", [number, number, A]>;
+  error<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/error", [number, number, B, A]>;
   /** Log at fatal level. */
-  fatal(msg: CExpr<string> | string): CExpr<void>;
-  fatal(
-    mergeObject: CExpr<Record<string, unknown>> | Record<string, unknown>,
-    msg: CExpr<string> | string,
-  ): CExpr<void>;
+  fatal<A>(msg: A): CExpr<void, "pino/fatal", [number, number, A]>;
+  fatal<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/fatal", [number, number, B, A]>;
   /** Create a child logger with additional bindings. */
   child(bindings: CExpr<Record<string, unknown>> | Record<string, unknown>): PinoLogger;
 }
@@ -125,34 +113,6 @@ export interface PinoConfig {
   level?: string;
   /** Base bindings merged into every log line. */
   base?: Record<string, unknown>;
-}
-
-// ---- Node kinds -------------------------------------------
-
-/** KindSpec for log-level methods: variadic inputs, void output. */
-const voidKind: KindSpec<[unknown, ...unknown[]], void> = {
-  inputs: [undefined] as unknown as [unknown, ...unknown[]],
-  output: undefined as unknown as undefined,
-};
-
-const recordKind: KindSpec<unknown[], Record<string, unknown>> = {
-  inputs: [] as unknown[],
-  output: {} as Record<string, unknown>,
-};
-
-const arrayKind: KindSpec<unknown[], unknown[]> = {
-  inputs: [] as unknown[],
-  output: [] as unknown[],
-};
-
-function buildKinds(): Record<string, KindSpec<any, any>> {
-  const kinds: Record<string, KindSpec<any, any>> = {};
-  for (const level of LEVELS) {
-    kinds[`pino/${level}`] = voidKind;
-  }
-  kinds["pino/record"] = recordKind;
-  kinds["pino/array"] = arrayKind;
-  return kinds;
 }
 
 // ---- Constructor builder ----------------------------------
@@ -183,7 +143,7 @@ function buildPinoApi(): PinoLogger {
         // Append bindings
         children.push(...parentBindings);
 
-        return makeCExpr(`pino/${level}`, children);
+        return mk(`pino/${level}`, children);
       };
     }
 
@@ -202,6 +162,23 @@ function buildPinoApi(): PinoLogger {
   return buildLogger([]);
 }
 
+// ---- Kind spec helpers ------------------------------------
+
+const voidKind = {
+  inputs: [undefined] as unknown as [unknown, ...unknown[]],
+  output: undefined as unknown as undefined,
+} as KindSpec<[unknown, ...unknown[]], void>;
+
+const recordKind = {
+  inputs: [] as unknown[],
+  output: {} as Record<string, unknown>,
+} as KindSpec<unknown[], Record<string, unknown>>;
+
+const arrayKind = {
+  inputs: [] as unknown[],
+  output: [] as unknown[],
+} as KindSpec<unknown[], unknown[]>;
+
 // ---- Plugin factory ---------------------------------------
 
 /**
@@ -218,11 +195,20 @@ export function pino(config: PinoConfig = {}) {
   return {
     name: "pino" as const,
     ctors: { pino: buildPinoApi() },
-    kinds: buildKinds(),
+    kinds: {
+      "pino/trace": voidKind,
+      "pino/debug": voidKind,
+      "pino/info": voidKind,
+      "pino/warn": voidKind,
+      "pino/error": voidKind,
+      "pino/fatal": voidKind,
+      "pino/record": recordKind,
+      "pino/array": arrayKind,
+    },
     traits: {},
     lifts: {},
     defaultInterpreter: (): Interpreter => createPinoInterpreter(undefined, config),
-  };
+  } satisfies Plugin;
 }
 
 /**
