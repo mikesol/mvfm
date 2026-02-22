@@ -12,7 +12,7 @@
 //   - Charges: create, retrieve, list
 // ============================================================
 
-import type { CExpr, Interpreter, KindSpec } from "@mvfm/core";
+import type { CExpr, Interpreter, KindSpec, Plugin } from "@mvfm/core";
 import { isCExpr, makeCExpr } from "@mvfm/core";
 import { wrapStripeSdk } from "./client-stripe-sdk";
 import { createStripeInterpreter, type StripeClient } from "./interpreter";
@@ -45,62 +45,12 @@ function liftArg(value: unknown): unknown {
   return value;
 }
 
-// ---- What the plugin adds to $ ----------------------------
-
-/**
- * Stripe operations added to the DSL context by the stripe plugin.
- *
- * Mirrors the stripe-node SDK resource API: payment intents,
- * customers, and charges. Each resource exposes CRUD-style methods
- * that produce CExpr nodes.
- */
-export interface StripeMethods {
-  /** Stripe API operations, namespaced under `$.stripe`. */
-  stripe: {
-    paymentIntents: {
-      /** Create a PaymentIntent. */
-      create(
-        params: Record<string, unknown> | CExpr<Record<string, unknown>>,
-      ): CExpr<Record<string, unknown>>;
-      /** Retrieve a PaymentIntent by ID. */
-      retrieve(id: string | CExpr<string>): CExpr<Record<string, unknown>>;
-      /** Confirm a PaymentIntent, optionally with additional params. */
-      confirm(
-        id: string | CExpr<string>,
-        params?: Record<string, unknown> | CExpr<Record<string, unknown>>,
-      ): CExpr<Record<string, unknown>>;
-    };
-    customers: {
-      /** Create a Customer. */
-      create(
-        params: Record<string, unknown> | CExpr<Record<string, unknown>>,
-      ): CExpr<Record<string, unknown>>;
-      /** Retrieve a Customer by ID. */
-      retrieve(id: string | CExpr<string>): CExpr<Record<string, unknown>>;
-      /** Update a Customer by ID. */
-      update(
-        id: string | CExpr<string>,
-        params: Record<string, unknown> | CExpr<Record<string, unknown>>,
-      ): CExpr<Record<string, unknown>>;
-      /** List Customers with optional filter params. */
-      list(
-        params?: Record<string, unknown> | CExpr<Record<string, unknown>>,
-      ): CExpr<Record<string, unknown>>;
-    };
-    charges: {
-      /** Create a Charge. */
-      create(
-        params: Record<string, unknown> | CExpr<Record<string, unknown>>,
-      ): CExpr<Record<string, unknown>>;
-      /** Retrieve a Charge by ID. */
-      retrieve(id: string | CExpr<string>): CExpr<Record<string, unknown>>;
-      /** List Charges with optional filter params. */
-      list(
-        params?: Record<string, unknown> | CExpr<Record<string, unknown>>,
-      ): CExpr<Record<string, unknown>>;
-    };
-  };
-}
+// liftArg erases generic type info at runtime (returns unknown).
+// Cast helper restores the declared CExpr Args types for ExtractKinds.
+const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]>(
+  kind: Kind,
+  args: readonly unknown[],
+) => CExpr<O, Kind, Args>;
 
 // ---- Configuration ----------------------------------------
 
@@ -115,113 +65,6 @@ export interface StripeConfig {
   apiKey: string;
   /** Stripe API version override. Defaults to `2025-04-30.basil`. */
   apiVersion?: string;
-}
-
-// ---- Node kinds -------------------------------------------
-
-function buildKinds(): Record<string, KindSpec<any, any>> {
-  return {
-    "stripe/create_payment_intent": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "stripe/retrieve_payment_intent": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "stripe/confirm_payment_intent": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "stripe/create_customer": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "stripe/retrieve_customer": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "stripe/update_customer": {
-      inputs: [undefined, undefined] as [unknown, unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown, unknown], unknown>,
-    "stripe/list_customers": {
-      inputs: [] as unknown[],
-      output: undefined as unknown,
-    } as KindSpec<unknown[], unknown>,
-    "stripe/create_charge": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "stripe/retrieve_charge": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "stripe/list_charges": {
-      inputs: [] as unknown[],
-      output: undefined as unknown,
-    } as KindSpec<unknown[], unknown>,
-    "stripe/record": {
-      inputs: [] as unknown[],
-      output: {} as Record<string, unknown>,
-    } as KindSpec<unknown[], Record<string, unknown>>,
-    "stripe/array": {
-      inputs: [] as unknown[],
-      output: [] as unknown[],
-    } as KindSpec<unknown[], unknown[]>,
-  };
-}
-
-// ---- Constructor builder ----------------------------------
-
-function buildStripeApi(): StripeMethods["stripe"] {
-  return {
-    paymentIntents: {
-      create(params) {
-        return makeCExpr("stripe/create_payment_intent", [liftArg(params)]);
-      },
-      retrieve(id) {
-        return makeCExpr("stripe/retrieve_payment_intent", [id]);
-      },
-      confirm(id, params?) {
-        if (params == null) {
-          return makeCExpr("stripe/confirm_payment_intent", [id]);
-        }
-        return makeCExpr("stripe/confirm_payment_intent", [id, liftArg(params)]);
-      },
-    },
-    customers: {
-      create(params) {
-        return makeCExpr("stripe/create_customer", [liftArg(params)]);
-      },
-      retrieve(id) {
-        return makeCExpr("stripe/retrieve_customer", [id]);
-      },
-      update(id, params) {
-        return makeCExpr("stripe/update_customer", [id, liftArg(params)]);
-      },
-      list(params?) {
-        if (params == null) {
-          return makeCExpr("stripe/list_customers", []);
-        }
-        return makeCExpr("stripe/list_customers", [liftArg(params)]);
-      },
-    },
-    charges: {
-      create(params) {
-        return makeCExpr("stripe/create_charge", [liftArg(params)]);
-      },
-      retrieve(id) {
-        return makeCExpr("stripe/retrieve_charge", [id]);
-      },
-      list(params?) {
-        if (params == null) {
-          return makeCExpr("stripe/list_charges", []);
-        }
-        return makeCExpr("stripe/list_charges", [liftArg(params)]);
-      },
-    },
-  };
 }
 
 // ---- Default interpreter wiring ---------------------------
@@ -261,6 +104,79 @@ function createDefaultInterpreter(config: StripeConfig): Interpreter {
   return createStripeInterpreter(lazyClient);
 }
 
+// ---- Constructor builder ----------------------------------
+
+/**
+ * Builds the stripe constructor methods using makeCExpr + liftArg.
+ *
+ * Each method produces a CExpr node with positional children.
+ * Config is NOT stored on AST nodes — it's captured by the interpreter.
+ *
+ * Constructors use permissive generics so any argument type is accepted
+ * at construction time. Validation happens at `app()` time via KindSpec.
+ */
+function buildStripeApi() {
+  return {
+    paymentIntents: {
+      /** Create a PaymentIntent. */
+      create<A>(params: A): CExpr<Record<string, unknown>, "stripe/create_payment_intent", [A]> {
+        return mk("stripe/create_payment_intent", [liftArg(params)]);
+      },
+      /** Retrieve a PaymentIntent by ID. */
+      retrieve<A>(id: A): CExpr<Record<string, unknown>, "stripe/retrieve_payment_intent", [A]> {
+        return mk("stripe/retrieve_payment_intent", [id]);
+      },
+      /** Confirm a PaymentIntent, optionally with additional params. */
+      confirm<A, B extends readonly unknown[]>(
+        id: A,
+        ...params: B
+      ): CExpr<Record<string, unknown>, "stripe/confirm_payment_intent", [A, ...B]> {
+        const lifted = params.map((p) => liftArg(p));
+        return mk("stripe/confirm_payment_intent", [id, ...lifted]);
+      },
+    },
+    customers: {
+      /** Create a Customer. */
+      create<A>(params: A): CExpr<Record<string, unknown>, "stripe/create_customer", [A]> {
+        return mk("stripe/create_customer", [liftArg(params)]);
+      },
+      /** Retrieve a Customer by ID. */
+      retrieve<A>(id: A): CExpr<Record<string, unknown>, "stripe/retrieve_customer", [A]> {
+        return mk("stripe/retrieve_customer", [id]);
+      },
+      /** Update a Customer by ID. */
+      update<A, B>(
+        id: A,
+        params: B,
+      ): CExpr<Record<string, unknown>, "stripe/update_customer", [A, B]> {
+        return mk("stripe/update_customer", [id, liftArg(params)]);
+      },
+      /** List Customers with optional filter params. */
+      list<A extends readonly unknown[]>(
+        ...params: A
+      ): CExpr<Record<string, unknown>, "stripe/list_customers", A> {
+        return mk("stripe/list_customers", params.map((p) => liftArg(p)));
+      },
+    },
+    charges: {
+      /** Create a Charge. */
+      create<A>(params: A): CExpr<Record<string, unknown>, "stripe/create_charge", [A]> {
+        return mk("stripe/create_charge", [liftArg(params)]);
+      },
+      /** Retrieve a Charge by ID. */
+      retrieve<A>(id: A): CExpr<Record<string, unknown>, "stripe/retrieve_charge", [A]> {
+        return mk("stripe/retrieve_charge", [id]);
+      },
+      /** List Charges with optional filter params. */
+      list<A extends readonly unknown[]>(
+        ...params: A
+      ): CExpr<Record<string, unknown>, "stripe/list_charges", A> {
+        return mk("stripe/list_charges", params.map((p) => liftArg(p)));
+      },
+    },
+  };
+}
+
 // ---- Plugin factory ---------------------------------------
 
 /**
@@ -273,11 +189,60 @@ export function stripe(config: StripeConfig) {
   return {
     name: "stripe" as const,
     ctors: { stripe: buildStripeApi() },
-    kinds: buildKinds(),
+    kinds: {
+      "stripe/create_payment_intent": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "stripe/retrieve_payment_intent": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "stripe/confirm_payment_intent": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "stripe/create_customer": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "stripe/retrieve_customer": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "stripe/update_customer": {
+        inputs: [undefined, undefined] as [unknown, unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown, unknown], unknown>,
+      "stripe/list_customers": {
+        inputs: [] as unknown[],
+        output: undefined as unknown,
+      } as KindSpec<unknown[], unknown>,
+      "stripe/create_charge": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "stripe/retrieve_charge": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "stripe/list_charges": {
+        inputs: [] as unknown[],
+        output: undefined as unknown,
+      } as KindSpec<unknown[], unknown>,
+      "stripe/record": {
+        inputs: [] as unknown[],
+        output: {} as Record<string, unknown>,
+      } as KindSpec<unknown[], Record<string, unknown>>,
+      "stripe/array": {
+        inputs: [] as unknown[],
+        output: [] as unknown[],
+      } as KindSpec<unknown[], unknown[]>,
+    },
     traits: {},
     lifts: {},
     defaultInterpreter: (): Interpreter => createDefaultInterpreter(config),
-  };
+  } satisfies Plugin;
 }
 
 /**
