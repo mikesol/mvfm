@@ -31,10 +31,9 @@ function fetch_2(config?: FetchConfig): {
             headers<A>(response: A): CExpr<Record<string, string>>;
         };
     };
-    kinds: Record<string, KindSpec<unknown[], unknown>>;
+    kinds: Record<string, KindSpec<any, any>>;
     traits: {};
     lifts: {};
-    nodeKinds: ("fetch/request" | "fetch/json" | "fetch/text" | "fetch/status" | "fetch/headers" | "fetch/record" | "fetch/array")[];
     defaultInterpreter: () => Interpreter;
 };
 export { fetch_2 as fetch }

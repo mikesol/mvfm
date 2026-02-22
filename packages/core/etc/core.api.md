@@ -97,7 +97,6 @@ const boolPlugin: {
     readonly lifts: {
         readonly boolean: "bool/literal";
     };
-    readonly nodeKinds: readonly ["bool/literal", "bool/eq", "bool/neq", "bool/and", "bool/or", "bool/not", "bool/implies", "bool/show", "bool/tt", "bool/ff"];
     readonly defaultInterpreter: () => Interpreter;
 };
 export { boolPlugin as _boolPluginDef }
@@ -138,7 +137,6 @@ export const boolPluginU: {
     readonly lifts: {
         readonly boolean: "bool/literal";
     };
-    readonly nodeKinds: readonly ["bool/literal", "bool/eq", "bool/neq", "bool/and", "bool/or", "bool/not", "bool/implies", "bool/show", "bool/tt", "bool/ff"];
     readonly defaultInterpreter: () => Interpreter;
 };
 
@@ -246,7 +244,7 @@ export function defineInterpreter<K extends string>(): <T extends InterpreterHan
 // @public @deprecated (undocumented)
 export function definePlugin<T extends {
     name: string;
-    nodeKinds: string[];
+    kinds: Record<string, unknown>;
 }>(def: T): T;
 
 // @public
@@ -628,7 +626,6 @@ export const numPlugin: {
     readonly lifts: {
         readonly number: "num/literal";
     };
-    readonly nodeKinds: readonly ["num/literal", "num/add", "num/mul", "num/sub", "num/div", "num/mod", "num/neg", "num/abs", "num/floor", "num/ceil", "num/round", "num/min", "num/max", "num/show", "num/compare", "num/eq", "num/neq", "num/zero", "num/one", "num/top", "num/bottom"];
     readonly defaultInterpreter: () => Interpreter;
 };
 
@@ -687,7 +684,6 @@ export const numPluginU: {
     readonly lifts: {
         readonly number: "num/literal";
     };
-    readonly nodeKinds: readonly ["num/literal", "num/add", "num/mul", "num/sub", "num/div", "num/mod", "num/neg", "num/abs", "num/floor", "num/ceil", "num/round", "num/min", "num/max", "num/show", "num/compare", "num/eq", "num/neq", "num/zero", "num/one", "num/top", "num/bottom"];
     readonly defaultInterpreter: () => Interpreter;
 };
 
@@ -735,7 +731,6 @@ const ordPlugin: {
         }>;
     };
     readonly lifts: {};
-    readonly nodeKinds: readonly ["num/lt", "num/gt", "num/gte", "num/lte", "str/lt", "str/gt", "str/gte", "str/lte", "str/compare", "num/compare"];
     readonly defaultInterpreter: () => Interpreter;
 };
 export { ordPlugin as _ordPluginDef }
@@ -779,8 +774,6 @@ interface Plugin_2<Name extends string = string, Ctors extends Record<string, (.
     // (undocumented)
     readonly name: Name;
     // (undocumented)
-    readonly nodeKinds: readonly string[];
-    // (undocumented)
     readonly shapes?: Record<string, unknown>;
     // (undocumented)
     readonly traits: Traits;
@@ -812,9 +805,9 @@ export interface PluginDef {
     // (undocumented)
     defaultInterpreter?: () => Interpreter;
     // (undocumented)
-    name: string;
+    kinds: Record<string, unknown>;
     // (undocumented)
-    nodeKinds: readonly string[];
+    name: string;
 }
 
 // @public
@@ -1032,7 +1025,6 @@ export const stdPlugins: readonly [{
     readonly lifts: {
         readonly number: "num/literal";
     };
-    readonly nodeKinds: readonly ["num/literal", "num/add", "num/mul", "num/sub", "num/div", "num/mod", "num/neg", "num/abs", "num/floor", "num/ceil", "num/round", "num/min", "num/max", "num/show", "num/compare", "num/eq", "num/neq", "num/zero", "num/one", "num/top", "num/bottom"];
     readonly defaultInterpreter: () => Interpreter;
 }, {
     readonly name: "str";
@@ -1091,7 +1083,6 @@ export const stdPlugins: readonly [{
     readonly lifts: {
         readonly string: "str/literal";
     };
-    readonly nodeKinds: readonly ["str/literal", "str/concat", "str/upper", "str/lower", "str/trim", "str/slice", "str/includes", "str/startsWith", "str/endsWith", "str/split", "str/join", "str/replace", "str/len", "str/show", "str/append", "str/mempty", "str/eq", "str/neq"];
     readonly defaultInterpreter: () => Interpreter;
 }, {
     readonly name: "bool";
@@ -1127,7 +1118,6 @@ export const stdPlugins: readonly [{
     readonly lifts: {
         readonly boolean: "bool/literal";
     };
-    readonly nodeKinds: readonly ["bool/literal", "bool/eq", "bool/neq", "bool/and", "bool/or", "bool/not", "bool/implies", "bool/show", "bool/tt", "bool/ff"];
     readonly defaultInterpreter: () => Interpreter;
 }];
 
@@ -1216,7 +1206,6 @@ const strPlugin: {
     readonly lifts: {
         readonly string: "str/literal";
     };
-    readonly nodeKinds: readonly ["str/literal", "str/concat", "str/upper", "str/lower", "str/trim", "str/slice", "str/includes", "str/startsWith", "str/endsWith", "str/split", "str/join", "str/replace", "str/len", "str/show", "str/append", "str/mempty", "str/eq", "str/neq"];
     readonly defaultInterpreter: () => Interpreter;
 };
 export { strPlugin as _strPluginDef }
@@ -1280,7 +1269,6 @@ export const strPluginU: {
     readonly lifts: {
         readonly string: "str/literal";
     };
-    readonly nodeKinds: readonly ["str/literal", "str/concat", "str/upper", "str/lower", "str/trim", "str/slice", "str/includes", "str/startsWith", "str/endsWith", "str/split", "str/join", "str/replace", "str/len", "str/show", "str/append", "str/mempty", "str/eq", "str/neq"];
     readonly defaultInterpreter: () => Interpreter;
 };
 

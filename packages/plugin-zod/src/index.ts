@@ -1,4 +1,4 @@
-import type { Interpreter } from "@mvfm/core";
+import type { Interpreter, KindSpec } from "@mvfm/core";
 
 export { z } from "zod";
 
@@ -130,13 +130,8 @@ export interface ZodNamespace
   // ^^^ Each new schema type adds ONE extends clause here
 }
 
-/** Node kinds for the zod plugin (only parse operations appear in adjacency map). */
-const NODE_KINDS: readonly string[] = [
-  "zod/parse",
-  "zod/safe_parse",
-  "zod/parse_async",
-  "zod/safe_parse_async",
-];
+/** Safe-parse result shape. */
+type SafeParseResult = { success: boolean; data?: unknown; error?: unknown };
 
 /**
  * Zod validation DSL plugin for mvfm (unified Plugin type).
@@ -178,10 +173,26 @@ export function zod() {
         // ^^^ Each new schema type adds ONE spread here
       } as ZodNamespace,
     },
-    kinds: {} as Record<string, never>,
+    kinds: {
+      "zod/parse": {
+        inputs: [undefined, undefined] as [unknown, unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown, unknown], unknown>,
+      "zod/safe_parse": {
+        inputs: [undefined, undefined] as [unknown, unknown],
+        output: {} as SafeParseResult,
+      } as KindSpec<[unknown, unknown], SafeParseResult>,
+      "zod/parse_async": {
+        inputs: [undefined, undefined] as [unknown, unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown, unknown], unknown>,
+      "zod/safe_parse_async": {
+        inputs: [undefined, undefined] as [unknown, unknown],
+        output: {} as SafeParseResult,
+      } as KindSpec<[unknown, unknown], SafeParseResult>,
+    },
     traits: {},
     lifts: {},
-    nodeKinds: NODE_KINDS,
     defaultInterpreter: (): Interpreter => createZodInterpreter(),
   };
 }

@@ -26,7 +26,6 @@ function console_2(_config?: ConsoleConfig): {
     kinds: Record<string, KindSpec<unknown[], void>>;
     traits: {};
     lifts: {};
-    nodeKinds: string[];
     defaultInterpreter: () => Interpreter;
 };
 export { console_2 as console }

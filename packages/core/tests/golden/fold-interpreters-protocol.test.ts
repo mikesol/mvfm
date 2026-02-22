@@ -16,7 +16,7 @@ import {
 const numInterp = defaults([
   {
     name: "num",
-    nodeKinds: ["num/literal", "num/add", "num/mul", "num/sub"],
+    kinds: { "num/literal": {}, "num/add": {}, "num/mul": {}, "num/sub": {} },
     defaultInterpreter: () => ({
       "num/literal": async function* (e) {
         return e.out as number;
@@ -114,24 +114,26 @@ describe("defaults()", () => {
     expect(await fold(app(add(numLit(1), numLit(2))), interp)).toBe(300);
   });
   test("throws without defaultInterpreter and no override", () => {
-    expect(() => defaults([{ name: "x", nodeKinds: ["x/foo"] }])).toThrow("no defaultInterpreter");
+    expect(() => defaults([{ name: "x", kinds: { "x/foo": {} } }])).toThrow(
+      "no defaultInterpreter",
+    );
   });
   test("empty plugin is harmless", () => {
-    expect(defaults([{ name: "e", nodeKinds: [] }])).toEqual({});
+    expect(defaults([{ name: "e", kinds: {} }])).toEqual({});
   });
   test("override with custom handlers", async () => {
     const interp = defaults(
       [
         {
           name: "num",
-          nodeKinds: ["num/literal"],
+          kinds: { "num/literal": {} },
           defaultInterpreter: () => ({
             "num/literal": async function* (e) {
               return e.out as number;
             },
           }),
         },
-        { name: "c", nodeKinds: ["c/dbl"] } as PluginDef,
+        { name: "c", kinds: { "c/dbl": {} } } as PluginDef,
       ],
       {
         c: {

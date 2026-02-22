@@ -18,7 +18,6 @@ export const stPlugin = {
   },
   traits: {},
   lifts: {},
-  nodeKinds: ["st/cell", "st/get", "st/set"],
 } as const;
 
 export const errorPlugin = {
@@ -30,7 +29,6 @@ export const errorPlugin = {
   },
   traits: {},
   lifts: {},
-  nodeKinds: ["error/try", "error/fail"],
 } as const;
 
 export const lambdaPlugin = {
@@ -42,7 +40,6 @@ export const lambdaPlugin = {
   },
   traits: {},
   lifts: {},
-  nodeKinds: ["core/lambda_param", "lambda/apply"],
 } as const;
 
 export const sleepPlugin = {
@@ -53,7 +50,6 @@ export const sleepPlugin = {
   },
   traits: {},
   lifts: {},
-  nodeKinds: ["sleep/delay"],
 } as const;
 
 // ─── Composite interpreter ───────────────────────────────────────────

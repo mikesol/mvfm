@@ -74,15 +74,15 @@ export interface ConsoleConfig {
 }
 
 /** Variadic KindSpec for console methods: unknown[] inputs, void output. */
-const variadicKind = {
+const variadicVoidKind: KindSpec<unknown[], void> = {
   inputs: [] as unknown[],
-  output: undefined as undefined,
-} as KindSpec<unknown[], void>;
+  output: undefined as unknown as undefined,
+};
 
 function buildKinds(): Record<string, KindSpec<unknown[], void>> {
   const kinds: Record<string, KindSpec<unknown[], void>> = {};
   for (const m of METHOD_NAMES) {
-    kinds[`console/${m}`] = variadicKind;
+    kinds[`console/${m}`] = variadicVoidKind;
   }
   return kinds;
 }
@@ -186,15 +186,12 @@ function buildConsoleApi(): ConsoleApi {
  * @returns A unified Plugin that contributes `$.console`.
  */
 export function console(_config: ConsoleConfig = {}) {
-  const nodeKinds = METHOD_NAMES.map((method) => `console/${method}`);
-
   return {
     name: "console" as const,
     ctors: { console: buildConsoleApi() },
     kinds: buildKinds(),
     traits: {},
     lifts: {},
-    nodeKinds,
     defaultInterpreter: (): Interpreter => createConsoleInterpreter(),
   };
 }

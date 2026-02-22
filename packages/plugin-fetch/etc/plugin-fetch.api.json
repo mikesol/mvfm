@@ -543,7 +543,7 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown[], unknown>>;\n    traits: {};\n    lifts: {};\n    nodeKinds: (\"fetch/request\" | \"fetch/json\" | \"fetch/text\" | \"fetch/status\" | \"fetch/headers\" | \"fetch/record\" | \"fetch/array\")[];\n    defaultInterpreter: () => "
+              "text": "<any, any>>;\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
             },
             {
               "kind": "Reference",

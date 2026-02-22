@@ -29,10 +29,22 @@ export const st: Plugin = {
     },
   },
   kinds: {
-    "st/let": { inputs: [undefined, ""] as [unknown, string], output: undefined as unknown } as KindSpec<[unknown, string], unknown>,
-    "st/get": { inputs: [""] as [string], output: undefined as unknown } as KindSpec<[string], unknown>,
-    "st/set": { inputs: ["", undefined] as [string, unknown], output: undefined as unknown } as KindSpec<[string, unknown], unknown>,
-    "st/push": { inputs: ["", undefined] as [string, unknown], output: undefined as unknown } as KindSpec<[string, unknown], unknown>,
+    "st/let": {
+      inputs: [undefined, ""] as [unknown, string],
+      output: undefined as unknown,
+    } as KindSpec<[unknown, string], unknown>,
+    "st/get": { inputs: [""] as [string], output: undefined as unknown } as KindSpec<
+      [string],
+      unknown
+    >,
+    "st/set": {
+      inputs: ["", undefined] as [string, unknown],
+      output: undefined as unknown,
+    } as KindSpec<[string, unknown], unknown>,
+    "st/push": {
+      inputs: ["", undefined] as [string, unknown],
+      output: undefined as unknown,
+    } as KindSpec<[string, unknown], unknown>,
   },
   traits: {},
   lifts: {},

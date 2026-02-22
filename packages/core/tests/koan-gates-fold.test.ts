@@ -24,7 +24,7 @@ import {
 // Local plugin defs for fold tests
 const numPD: PluginDef = {
   name: "num",
-  nodeKinds: ["num/literal", "num/add", "num/mul", "num/sub"],
+  kinds: { "num/literal": {}, "num/add": {}, "num/mul": {}, "num/sub": {} },
   defaultInterpreter: () => ({
     "num/literal": async function* (e) {
       return e.out as number;
@@ -42,7 +42,7 @@ const numPD: PluginDef = {
 };
 const boolPD: PluginDef = {
   name: "bool",
-  nodeKinds: ["bool/literal"],
+  kinds: { "bool/literal": {} },
   defaultInterpreter: () => ({
     "bool/literal": async function* (e) {
       return e.out as boolean;
@@ -51,7 +51,7 @@ const boolPD: PluginDef = {
 };
 const corePD: PluginDef = {
   name: "core",
-  nodeKinds: ["core/cond"],
+  kinds: { "core/cond": {} },
   defaultInterpreter: () => ({
     "core/cond": async function* () {
       const pred = (yield 0) as boolean;
@@ -61,7 +61,7 @@ const corePD: PluginDef = {
 };
 const strPD: PluginDef = {
   name: "str",
-  nodeKinds: ["str/literal", "str/concat"],
+  kinds: { "str/literal": {}, "str/concat": {} },
   defaultInterpreter: () => ({
     "str/literal": async function* (e) {
       return e.out as string;
@@ -73,8 +73,8 @@ const strPD: PluginDef = {
     },
   }),
 };
-const customPD: PluginDef = { name: "custom", nodeKinds: ["custom/double"] };
-const emptyPD: PluginDef = { name: "meta", nodeKinds: [] };
+const customPD: PluginDef = { name: "custom", kinds: { "custom/double": {} } };
+const emptyPD: PluginDef = { name: "meta", kinds: {} };
 
 describe("16-bridge", () => {
   const prog = app(mul(add(numLit(3), numLit(4)), numLit(5)));
@@ -257,7 +257,7 @@ describe("16-bridge", () => {
     };
     const fpEq: PluginDef = {
       name: "eq",
-      nodeKinds: ["num/eq", "str/eq", "bool/eq"],
+      kinds: { "num/eq": {}, "str/eq": {}, "bool/eq": {} },
       defaultInterpreter: () => eqI,
     };
     const fi = defaults([numPD, strPD, boolPD, fpEq]);

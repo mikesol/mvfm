@@ -7,8 +7,8 @@ const plugin = fetch();
 // Name is the literal "fetch"
 const _name: "fetch" = plugin.name;
 
-// nodeKinds includes all expected kinds
-const _kinds: readonly string[] = plugin.nodeKinds;
+// kinds includes all expected kind specs
+const _kinds: string[] = Object.keys(plugin.kinds);
 
 // defaultInterpreter returns an Interpreter
 const _interp: Interpreter = plugin.defaultInterpreter();

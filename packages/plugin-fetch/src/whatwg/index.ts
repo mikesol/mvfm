@@ -107,43 +107,28 @@ export interface FetchConfig {
 
 // ---- Node kinds -------------------------------------------
 
-const NODE_KINDS = [
-  "fetch/request",
-  "fetch/json",
-  "fetch/text",
-  "fetch/status",
-  "fetch/headers",
-  "fetch/record",
-  "fetch/array",
-] as const;
-
-type _FetchKindName = (typeof NODE_KINDS)[number];
-
-function buildKinds(): Record<string, KindSpec<unknown[], unknown>> {
-  // Inputs left empty to skip type-checking at elaboration time.
-  // Fetch args are polymorphic (CExprs, literals, objects) —
-  // validation happens at runtime in the interpreter.
+function buildKinds(): Record<string, KindSpec<any, any>> {
   return {
     "fetch/request": {
-      inputs: [] as unknown[],
+      inputs: ["", undefined] as [string, ...unknown[]],
       output: undefined as unknown,
-    } as KindSpec<unknown[], unknown>,
+    } as KindSpec<[string, ...unknown[]], unknown>,
     "fetch/json": {
-      inputs: [] as unknown[],
+      inputs: [undefined] as [unknown],
       output: undefined as unknown,
-    } as KindSpec<unknown[], unknown>,
+    } as KindSpec<[unknown], unknown>,
     "fetch/text": {
-      inputs: [] as unknown[],
+      inputs: [undefined] as [unknown],
       output: "" as string,
-    } as KindSpec<unknown[], string>,
+    } as KindSpec<[unknown], string>,
     "fetch/status": {
-      inputs: [] as unknown[],
+      inputs: [undefined] as [unknown],
       output: 0 as number,
-    } as KindSpec<unknown[], number>,
+    } as KindSpec<[unknown], number>,
     "fetch/headers": {
-      inputs: [] as unknown[],
+      inputs: [undefined] as [unknown],
       output: {} as Record<string, string>,
-    } as KindSpec<unknown[], Record<string, string>>,
+    } as KindSpec<[unknown], Record<string, string>>,
     "fetch/record": {
       inputs: [] as unknown[],
       output: {} as Record<string, unknown>,
@@ -192,7 +177,6 @@ export function fetch(config?: FetchConfig) {
     kinds: buildKinds(),
     traits: {},
     lifts: {},
-    nodeKinds: [...NODE_KINDS],
     defaultInterpreter: (): Interpreter =>
       createFetchInterpreter(wrapFetch(globalThis.fetch), resolvedConfig),
   };

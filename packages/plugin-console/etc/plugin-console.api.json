@@ -434,7 +434,7 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown[], void>>;\n    traits: {};\n    lifts: {};\n    nodeKinds: string[];\n    defaultInterpreter: () => "
+              "text": "<unknown[], void>>;\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
             },
             {
               "kind": "Reference",

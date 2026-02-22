@@ -98,17 +98,17 @@ describe("pino: unified Plugin shape", () => {
   });
 
   it("has 8 node kinds (6 levels + record + array)", () => {
-    expect(plugin.nodeKinds).toHaveLength(8);
+    expect(Object.keys(plugin.kinds)).toHaveLength(8);
   });
 
   it("nodeKinds are all namespaced", () => {
-    for (const kind of plugin.nodeKinds) {
+    for (const kind of Object.keys(plugin.kinds)) {
       expect(kind).toMatch(/^pino\//);
     }
   });
 
   it("kinds map has entries for all node kinds", () => {
-    for (const kind of plugin.nodeKinds) {
+    for (const kind of Object.keys(plugin.kinds)) {
       expect(plugin.kinds[kind]).toBeDefined();
     }
   });
@@ -121,7 +121,7 @@ describe("pino: unified Plugin shape", () => {
   it("has a defaultInterpreter factory", () => {
     expect(typeof plugin.defaultInterpreter).toBe("function");
     const interp = plugin.defaultInterpreter();
-    for (const kind of plugin.nodeKinds) {
+    for (const kind of Object.keys(plugin.kinds)) {
       expect(typeof interp[kind]).toBe("function");
     }
   });

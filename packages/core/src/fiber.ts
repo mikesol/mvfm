@@ -44,11 +44,26 @@ export const fiber: Plugin = {
       makeCExpr("fiber/retry", [expr, opts.attempts, opts.delay ?? 0]),
   },
   kinds: {
-    "fiber/par_map": { inputs: [] as unknown[], output: [] as unknown[] } as KindSpec<unknown[], unknown[]>,
-    "fiber/par_item": { inputs: [undefined] as [unknown], output: undefined as unknown } as KindSpec<[unknown], unknown>,
-    "fiber/race": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
-    "fiber/timeout": { inputs: [undefined, 0] as [unknown, number], output: undefined as unknown } as KindSpec<[unknown, number], unknown>,
-    "fiber/retry": { inputs: [undefined, 0, 0] as [unknown, number, number], output: undefined as unknown } as KindSpec<[unknown, number, number], unknown>,
+    "fiber/par_map": { inputs: [] as unknown[], output: [] as unknown[] } as KindSpec<
+      unknown[],
+      unknown[]
+    >,
+    "fiber/par_item": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "fiber/race": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<
+      unknown[],
+      unknown
+    >,
+    "fiber/timeout": {
+      inputs: [undefined, 0] as [unknown, number],
+      output: undefined as unknown,
+    } as KindSpec<[unknown, number], unknown>,
+    "fiber/retry": {
+      inputs: [undefined, 0, 0] as [unknown, number, number],
+      output: undefined as unknown,
+    } as KindSpec<[unknown, number, number], unknown>,
   },
   traits: {},
   lifts: {},

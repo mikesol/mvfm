@@ -66,17 +66,17 @@ describe("console plugin: unified Plugin shape", () => {
   });
 
   it("has 19 node kinds", () => {
-    expect(plugin.nodeKinds).toHaveLength(19);
+    expect(Object.keys(plugin.kinds)).toHaveLength(19);
   });
 
   it("nodeKinds are all namespaced", () => {
-    for (const kind of plugin.nodeKinds) {
+    for (const kind of Object.keys(plugin.kinds)) {
       expect(kind).toMatch(/^console\//);
     }
   });
 
   it("kinds map has entries for all node kinds", () => {
-    for (const kind of plugin.nodeKinds) {
+    for (const kind of Object.keys(plugin.kinds)) {
       expect(plugin.kinds[kind]).toBeDefined();
     }
   });
@@ -89,7 +89,7 @@ describe("console plugin: unified Plugin shape", () => {
   it("has a defaultInterpreter factory", () => {
     expect(typeof plugin.defaultInterpreter).toBe("function");
     const interp = plugin.defaultInterpreter();
-    for (const kind of plugin.nodeKinds) {
+    for (const kind of Object.keys(plugin.kinds)) {
       expect(typeof interp[kind]).toBe("function");
     }
   });

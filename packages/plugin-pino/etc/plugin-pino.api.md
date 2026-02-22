@@ -26,10 +26,9 @@ export function pino(config?: PinoConfig): {
     ctors: {
         pino: PinoLogger;
     };
-    kinds: Record<string, KindSpec<unknown[], unknown>>;
+    kinds: Record<string, KindSpec<any, any>>;
     traits: {};
     lifts: {};
-    nodeKinds: ("pino/trace" | "pino/debug" | "pino/info" | "pino/warn" | "pino/error" | "pino/fatal" | "pino/record" | "pino/array")[];
     defaultInterpreter: () => Interpreter;
 };
 

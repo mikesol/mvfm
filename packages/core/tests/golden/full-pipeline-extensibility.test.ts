@@ -37,7 +37,7 @@ const eqInterp: Interpreter = {
 
 const fpEq = {
   name: "eq",
-  nodeKinds: ["num/eq", "str/eq", "bool/eq"],
+  kinds: { "num/eq": {}, "str/eq": {}, "bool/eq": {} },
   defaultInterpreter: () => eqInterp,
 };
 const fullInterp = defaults([...stdPlugins, fpEq]);

@@ -129,37 +129,24 @@ export interface PinoConfig {
 
 // ---- Node kinds -------------------------------------------
 
-const NODE_KINDS = [
-  "pino/trace",
-  "pino/debug",
-  "pino/info",
-  "pino/warn",
-  "pino/error",
-  "pino/fatal",
-  "pino/record",
-  "pino/array",
-] as const;
+/** KindSpec for log-level methods: variadic inputs, void output. */
+const voidKind: KindSpec<[unknown, ...unknown[]], void> = {
+  inputs: [undefined] as unknown as [unknown, ...unknown[]],
+  output: undefined as unknown as undefined,
+};
 
-type _PinoKindName = (typeof NODE_KINDS)[number];
-
-/** Variadic KindSpec: unknown[] inputs, void output. */
-const voidKind = {
-  inputs: [] as unknown[],
-  output: undefined as undefined,
-} as KindSpec<unknown[], void>;
-
-const recordKind = {
+const recordKind: KindSpec<unknown[], Record<string, unknown>> = {
   inputs: [] as unknown[],
   output: {} as Record<string, unknown>,
-} as KindSpec<unknown[], Record<string, unknown>>;
+};
 
-const arrayKind = {
+const arrayKind: KindSpec<unknown[], unknown[]> = {
   inputs: [] as unknown[],
   output: [] as unknown[],
-} as KindSpec<unknown[], unknown[]>;
+};
 
-function buildKinds(): Record<string, KindSpec<unknown[], unknown>> {
-  const kinds: Record<string, KindSpec<unknown[], unknown>> = {};
+function buildKinds(): Record<string, KindSpec<any, any>> {
+  const kinds: Record<string, KindSpec<any, any>> = {};
   for (const level of LEVELS) {
     kinds[`pino/${level}`] = voidKind;
   }
@@ -234,7 +221,6 @@ export function pino(config: PinoConfig = {}) {
     kinds: buildKinds(),
     traits: {},
     lifts: {},
-    nodeKinds: [...NODE_KINDS],
     defaultInterpreter: (): Interpreter => createPinoInterpreter(undefined, config),
   };
 }

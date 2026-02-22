@@ -42,7 +42,6 @@ const geomPlugin = {
   },
   traits: {},
   lifts: {},
-  nodeKinds: ["geom/point"] as const,
   shapes: { "geom/point": { x: "number", y: "number" } },
 } satisfies Plugin;
 

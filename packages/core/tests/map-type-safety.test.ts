@@ -39,7 +39,6 @@ const itePlugin = {
   },
   traits: {},
   lifts: {},
-  nodeKinds: ["ctrl/ite"] as const,
   shapes: {},
 } satisfies Plugin;
 

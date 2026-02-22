@@ -58,11 +58,26 @@ export const corePlugin: Plugin = {
   kinds: {
     "core/literal": { inputs: [] as [], output: undefined as unknown } as KindSpec<[], unknown>,
     "core/input": { inputs: [] as [], output: undefined as unknown } as KindSpec<[], unknown>,
-    "core/access": { inputs: [undefined] as [unknown], output: undefined as unknown } as KindSpec<[unknown], unknown>,
-    "core/begin": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
-    "core/cond": { inputs: [false, undefined, undefined] as [boolean, unknown, unknown], output: undefined as unknown } as KindSpec<[boolean, unknown, unknown], unknown>,
-    "core/record": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
-    "core/tuple": { inputs: [] as unknown[], output: [] as unknown[] } as KindSpec<unknown[], unknown[]>,
+    "core/access": { inputs: [undefined] as [unknown], output: undefined as unknown } as KindSpec<
+      [unknown],
+      unknown
+    >,
+    "core/begin": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<
+      unknown[],
+      unknown
+    >,
+    "core/cond": {
+      inputs: [false, undefined, undefined] as [boolean, unknown, unknown],
+      output: undefined as unknown,
+    } as KindSpec<[boolean, unknown, unknown], unknown>,
+    "core/record": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<
+      unknown[],
+      unknown
+    >,
+    "core/tuple": { inputs: [] as unknown[], output: [] as unknown[] } as KindSpec<
+      unknown[],
+      unknown[]
+    >,
   },
   traits: {},
   lifts: {},

@@ -27,7 +27,10 @@ export const control: Plugin = {
     }),
   },
   kinds: {
-    "control/while": { inputs: [false, undefined] as [boolean, unknown], output: undefined as unknown } as KindSpec<[boolean, unknown], unknown>,
+    "control/while": {
+      inputs: [false, undefined] as [boolean, unknown],
+      output: undefined as unknown,
+    } as KindSpec<[boolean, unknown], unknown>,
   },
   traits: {},
   lifts: {},

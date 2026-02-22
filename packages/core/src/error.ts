@@ -28,12 +28,30 @@ export const error: Plugin = {
     settle: (...exprs: unknown[]) => makeCExpr("error/settle", exprs),
   },
   kinds: {
-    "error/try": { inputs: [undefined] as [unknown], output: undefined as unknown } as KindSpec<[unknown], unknown>,
-    "error/fail": { inputs: [""] as [string], output: undefined as unknown } as KindSpec<[string], unknown>,
-    "error/guard": { inputs: [false, ""] as [boolean, string], output: undefined as unknown } as KindSpec<[boolean, string], unknown>,
-    "error/caught": { inputs: [undefined] as [unknown], output: "" as string } as KindSpec<[unknown], string>,
-    "error/attempt": { inputs: [undefined] as [unknown], output: undefined as unknown } as KindSpec<[unknown], unknown>,
-    "error/settle": { inputs: [undefined] as [unknown], output: undefined as unknown } as KindSpec<[unknown], unknown>,
+    "error/try": { inputs: [undefined] as [unknown], output: undefined as unknown } as KindSpec<
+      [unknown],
+      unknown
+    >,
+    "error/fail": { inputs: [""] as [string], output: undefined as unknown } as KindSpec<
+      [string],
+      unknown
+    >,
+    "error/guard": {
+      inputs: [false, ""] as [boolean, string],
+      output: undefined as unknown,
+    } as KindSpec<[boolean, string], unknown>,
+    "error/caught": { inputs: [undefined] as [unknown], output: "" as string } as KindSpec<
+      [unknown],
+      string
+    >,
+    "error/attempt": { inputs: [undefined] as [unknown], output: undefined as unknown } as KindSpec<
+      [unknown],
+      unknown
+    >,
+    "error/settle": { inputs: [undefined] as [unknown], output: undefined as unknown } as KindSpec<
+      [unknown],
+      unknown
+    >,
   },
   traits: {},
   lifts: {},
