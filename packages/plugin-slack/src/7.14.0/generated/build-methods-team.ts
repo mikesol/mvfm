@@ -26,15 +26,19 @@ export function buildSlackTeam(): SlackMethodsTeam {
   return {
     billing: {
       info(params) {
-        return makeCExpr("slack/team_billing_info", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/team_billing_info", [liftArg(params)]);
+        return makeCExpr("slack/team_billing_info", []);
       },
     },
     externalTeams: {
       disconnect(params) {
-        return makeCExpr("slack/team_externalTeams_disconnect", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/team_externalTeams_disconnect", [liftArg(params)]);
+        return makeCExpr("slack/team_externalTeams_disconnect", []);
       },
       list(params) {
-        return makeCExpr("slack/team_externalTeams_list", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/team_externalTeams_list", [liftArg(params)]);
+        return makeCExpr("slack/team_externalTeams_list", []);
       },
     },
     preferences: {

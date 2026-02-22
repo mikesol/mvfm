@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_ADMIN_ROLES } from "./node-kinds-admin-roles";
 
-type _SlackAdminRolesKind = (typeof SLACK_NODE_KINDS_ADMIN_ROLES)[number];
+type SlackAdminRolesKind = (typeof SLACK_NODE_KINDS_ADMIN_ROLES)[number];
 
 export const NODE_TO_METHOD_ADMIN_ROLES: Record<string, string> = {
   "slack/admin_roles_addAssignments": "admin.roles.addAssignments",

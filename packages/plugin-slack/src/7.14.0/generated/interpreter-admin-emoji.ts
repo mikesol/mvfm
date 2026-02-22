@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_ADMIN_EMOJI } from "./node-kinds-admin-emoji";
 
-type _SlackAdminEmojiKind = (typeof SLACK_NODE_KINDS_ADMIN_EMOJI)[number];
+type SlackAdminEmojiKind = (typeof SLACK_NODE_KINDS_ADMIN_EMOJI)[number];
 
 export const NODE_TO_METHOD_ADMIN_EMOJI: Record<string, string> = {
   "slack/admin_emoji_add": "admin.emoji.add",

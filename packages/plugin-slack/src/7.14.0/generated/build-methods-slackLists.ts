@@ -26,45 +26,58 @@ export function buildSlackSlackLists(): SlackMethodsSlackLists {
   return {
     access: {
       delete(params) {
-        return makeCExpr("slack/slackLists_access_delete", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/slackLists_access_delete", [liftArg(params)]);
+        return makeCExpr("slack/slackLists_access_delete", []);
       },
       set(params) {
-        return makeCExpr("slack/slackLists_access_set", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/slackLists_access_set", [liftArg(params)]);
+        return makeCExpr("slack/slackLists_access_set", []);
       },
     },
     download: {
       get(params) {
-        return makeCExpr("slack/slackLists_download_get", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/slackLists_download_get", [liftArg(params)]);
+        return makeCExpr("slack/slackLists_download_get", []);
       },
       start(params) {
-        return makeCExpr("slack/slackLists_download_start", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/slackLists_download_start", [liftArg(params)]);
+        return makeCExpr("slack/slackLists_download_start", []);
       },
     },
     items: {
       create(params) {
-        return makeCExpr("slack/slackLists_items_create", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/slackLists_items_create", [liftArg(params)]);
+        return makeCExpr("slack/slackLists_items_create", []);
       },
       delete(params) {
-        return makeCExpr("slack/slackLists_items_delete", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/slackLists_items_delete", [liftArg(params)]);
+        return makeCExpr("slack/slackLists_items_delete", []);
       },
       deleteMultiple(params) {
-        return makeCExpr("slack/slackLists_items_deleteMultiple", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/slackLists_items_deleteMultiple", [liftArg(params)]);
+        return makeCExpr("slack/slackLists_items_deleteMultiple", []);
       },
       info(params) {
-        return makeCExpr("slack/slackLists_items_info", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/slackLists_items_info", [liftArg(params)]);
+        return makeCExpr("slack/slackLists_items_info", []);
       },
       list(params) {
-        return makeCExpr("slack/slackLists_items_list", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/slackLists_items_list", [liftArg(params)]);
+        return makeCExpr("slack/slackLists_items_list", []);
       },
       update(params) {
-        return makeCExpr("slack/slackLists_items_update", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/slackLists_items_update", [liftArg(params)]);
+        return makeCExpr("slack/slackLists_items_update", []);
       },
     },
     create(params) {
-      return makeCExpr("slack/slackLists_create", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/slackLists_create", [liftArg(params)]);
+      return makeCExpr("slack/slackLists_create", []);
     },
     update(params) {
-      return makeCExpr("slack/slackLists_update", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/slackLists_update", [liftArg(params)]);
+      return makeCExpr("slack/slackLists_update", []);
     },
   };
 }

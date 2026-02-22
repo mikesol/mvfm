@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_REMINDERS } from "./node-kinds-reminders";
 
-type _SlackRemindersKind = (typeof SLACK_NODE_KINDS_REMINDERS)[number];
+type SlackRemindersKind = (typeof SLACK_NODE_KINDS_REMINDERS)[number];
 
 export const NODE_TO_METHOD_REMINDERS: Record<string, string> = {
   "slack/reminders_add": "reminders.add",

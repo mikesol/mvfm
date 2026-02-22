@@ -33,29 +33,37 @@ export function buildSlackApps(): SlackMethodsApps {
     event: {
       authorizations: {
         list(params) {
-          return makeCExpr("slack/apps_event_authorizations_list", [liftArg(params)]);
+          if (params != null)
+            return makeCExpr("slack/apps_event_authorizations_list", [liftArg(params)]);
+          return makeCExpr("slack/apps_event_authorizations_list", []);
         },
       },
     },
     manifest: {
       create(params) {
-        return makeCExpr("slack/apps_manifest_create", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/apps_manifest_create", [liftArg(params)]);
+        return makeCExpr("slack/apps_manifest_create", []);
       },
       delete(params) {
-        return makeCExpr("slack/apps_manifest_delete", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/apps_manifest_delete", [liftArg(params)]);
+        return makeCExpr("slack/apps_manifest_delete", []);
       },
       export(params) {
-        return makeCExpr("slack/apps_manifest_export", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/apps_manifest_export", [liftArg(params)]);
+        return makeCExpr("slack/apps_manifest_export", []);
       },
       update(params) {
-        return makeCExpr("slack/apps_manifest_update", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/apps_manifest_update", [liftArg(params)]);
+        return makeCExpr("slack/apps_manifest_update", []);
       },
       validate(params) {
-        return makeCExpr("slack/apps_manifest_validate", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/apps_manifest_validate", [liftArg(params)]);
+        return makeCExpr("slack/apps_manifest_validate", []);
       },
     },
     uninstall(params) {
-      return makeCExpr("slack/apps_uninstall", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/apps_uninstall", [liftArg(params)]);
+      return makeCExpr("slack/apps_uninstall", []);
     },
   };
 }

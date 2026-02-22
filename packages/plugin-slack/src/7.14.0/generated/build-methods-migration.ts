@@ -25,7 +25,8 @@ function liftArg(value: unknown): unknown {
 export function buildSlackMigration(): SlackMethodsMigration {
   return {
     exchange(params) {
-      return makeCExpr("slack/migration_exchange", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/migration_exchange", [liftArg(params)]);
+      return makeCExpr("slack/migration_exchange", []);
     },
   };
 }

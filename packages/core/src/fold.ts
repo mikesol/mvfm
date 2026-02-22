@@ -28,6 +28,7 @@ export const VOLATILE_KINDS = new Set<string>([
   "error/try",
   "error/caught",
   "control/while",
+  "fiber/par_item",
 ]);
 
 // ─── FoldState: externalized cache for sharing across fold calls ────

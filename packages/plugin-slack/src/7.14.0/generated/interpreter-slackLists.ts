@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_SLACKLISTS } from "./node-kinds-slackLists";
 
-type _SlackSlackListsKind = (typeof SLACK_NODE_KINDS_SLACKLISTS)[number];
+type SlackSlackListsKind = (typeof SLACK_NODE_KINDS_SLACKLISTS)[number];
 
 export const NODE_TO_METHOD_SLACKLISTS: Record<string, string> = {
   "slack/slackLists_access_delete": "slackLists.access.delete",

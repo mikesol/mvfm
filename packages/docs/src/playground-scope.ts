@@ -99,7 +99,7 @@ export async function createPlaygroundScope(
     ...coreRest,
     console_: pluginConsole.consolePlugin(),
     ...consoleRest,
-    zod: pluginZod.zod,
+    zod: pluginZod.zod(),
     z: pluginZod.z,
     createZodInterpreter: pluginZod.createZodInterpreter,
     consoleInterpreter: fakeConsoleInterpreter,
@@ -137,7 +137,10 @@ export async function createPlaygroundScope(
       ...(core.coreInterpreter as any),
       ...fakeConsoleInterpreter,
     };
-    injected.wasmPgInterpreter = pluginPostgres.serverInterpreter(client, baseInterp as any);
+    injected.wasmPgInterpreter = pluginPostgres.createPostgresServerInterpreter(
+      client,
+      baseInterp as any,
+    );
 
     injected.defaults = (app: any, ...args: any[]) => {
       const userOverrides = (args[0] ?? {}) as Record<string, unknown>;

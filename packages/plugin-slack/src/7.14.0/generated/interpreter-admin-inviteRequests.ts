@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_ADMIN_INVITEREQUESTS } from "./node-kinds-admin-inviteRequests";
 
-type _SlackAdminInviteRequestsKind = (typeof SLACK_NODE_KINDS_ADMIN_INVITEREQUESTS)[number];
+type SlackAdminInviteRequestsKind = (typeof SLACK_NODE_KINDS_ADMIN_INVITEREQUESTS)[number];
 
 export const NODE_TO_METHOD_ADMIN_INVITEREQUESTS: Record<string, string> = {
   "slack/admin_inviteRequests_approve": "admin.inviteRequests.approve",

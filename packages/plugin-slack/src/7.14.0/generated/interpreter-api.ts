@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_API } from "./node-kinds-api";
 
-type _SlackApiKind = (typeof SLACK_NODE_KINDS_API)[number];
+type SlackApiKind = (typeof SLACK_NODE_KINDS_API)[number];
 
 export const NODE_TO_METHOD_API: Record<string, string> = {
   "slack/api_test": "api.test",

@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_USERS } from "./node-kinds-users";
 
-type _SlackUsersKind = (typeof SLACK_NODE_KINDS_USERS)[number];
+type SlackUsersKind = (typeof SLACK_NODE_KINDS_USERS)[number];
 
 export const NODE_TO_METHOD_USERS: Record<string, string> = {
   "slack/users_conversations": "users.conversations",

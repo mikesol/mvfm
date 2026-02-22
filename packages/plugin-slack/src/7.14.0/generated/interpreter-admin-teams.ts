@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_ADMIN_TEAMS } from "./node-kinds-admin-teams";
 
-type _SlackAdminTeamsKind = (typeof SLACK_NODE_KINDS_ADMIN_TEAMS)[number];
+type SlackAdminTeamsKind = (typeof SLACK_NODE_KINDS_ADMIN_TEAMS)[number];
 
 export const NODE_TO_METHOD_ADMIN_TEAMS: Record<string, string> = {
   "slack/admin_teams_admins_list": "admin.teams.admins.list",

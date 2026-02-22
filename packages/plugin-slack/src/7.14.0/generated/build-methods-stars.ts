@@ -25,13 +25,16 @@ function liftArg(value: unknown): unknown {
 export function buildSlackStars(): SlackMethodsStars {
   return {
     add(params) {
-      return makeCExpr("slack/stars_add", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/stars_add", [liftArg(params)]);
+      return makeCExpr("slack/stars_add", []);
     },
     list(params) {
-      return makeCExpr("slack/stars_list", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/stars_list", [liftArg(params)]);
+      return makeCExpr("slack/stars_list", []);
     },
     remove(params) {
-      return makeCExpr("slack/stars_remove", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/stars_remove", [liftArg(params)]);
+      return makeCExpr("slack/stars_remove", []);
     },
   };
 }

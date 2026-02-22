@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_ADMIN_APPS } from "./node-kinds-admin-apps";
 
-type _SlackAdminAppsKind = (typeof SLACK_NODE_KINDS_ADMIN_APPS)[number];
+type SlackAdminAppsKind = (typeof SLACK_NODE_KINDS_ADMIN_APPS)[number];
 
 export const NODE_TO_METHOD_ADMIN_APPS: Record<string, string> = {
   "slack/admin_apps_activities_list": "admin.apps.activities.list",

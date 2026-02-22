@@ -25,13 +25,16 @@ function liftArg(value: unknown): unknown {
 export function buildSlackSearch(): SlackMethodsSearch {
   return {
     all(params) {
-      return makeCExpr("slack/search_all", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/search_all", [liftArg(params)]);
+      return makeCExpr("slack/search_all", []);
     },
     files(params) {
-      return makeCExpr("slack/search_files", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/search_files", [liftArg(params)]);
+      return makeCExpr("slack/search_files", []);
     },
     messages(params) {
-      return makeCExpr("slack/search_messages", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/search_messages", [liftArg(params)]);
+      return makeCExpr("slack/search_messages", []);
     },
   };
 }

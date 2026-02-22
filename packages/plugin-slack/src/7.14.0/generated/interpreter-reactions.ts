@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_REACTIONS } from "./node-kinds-reactions";
 
-type _SlackReactionsKind = (typeof SLACK_NODE_KINDS_REACTIONS)[number];
+type SlackReactionsKind = (typeof SLACK_NODE_KINDS_REACTIONS)[number];
 
 export const NODE_TO_METHOD_REACTIONS: Record<string, string> = {
   "slack/reactions_add": "reactions.add",

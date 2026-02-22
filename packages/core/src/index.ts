@@ -20,6 +20,7 @@ export { defaults, fold, injectInput, mvfm, prelude } from "./api";
 export { control } from "./control";
 export { coreInterpreter, corePlugin } from "./core-plugin";
 export { error } from "./error";
+export { fiber } from "./fiber";
 export { st } from "./st";
 export { boolPlugin, numPlugin, ordPlugin, strPlugin } from "./std-plugins";
 

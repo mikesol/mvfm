@@ -25,7 +25,8 @@ function liftArg(value: unknown): unknown {
 export function buildSlackAdminAnalytics(): SlackMethodsAdminAnalytics {
   return {
     getFile(params) {
-      return makeCExpr("slack/admin_analytics_getFile", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_analytics_getFile", [liftArg(params)]);
+      return makeCExpr("slack/admin_analytics_getFile", []);
     },
   };
 }

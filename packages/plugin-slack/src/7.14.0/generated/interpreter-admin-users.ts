@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_ADMIN_USERS } from "./node-kinds-admin-users";
 
-type _SlackAdminUsersKind = (typeof SLACK_NODE_KINDS_ADMIN_USERS)[number];
+type SlackAdminUsersKind = (typeof SLACK_NODE_KINDS_ADMIN_USERS)[number];
 
 export const NODE_TO_METHOD_ADMIN_USERS: Record<string, string> = {
   "slack/admin_users_assign": "admin.users.assign",

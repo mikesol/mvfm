@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_BOOKMARKS } from "./node-kinds-bookmarks";
 
-type _SlackBookmarksKind = (typeof SLACK_NODE_KINDS_BOOKMARKS)[number];
+type SlackBookmarksKind = (typeof SLACK_NODE_KINDS_BOOKMARKS)[number];
 
 export const NODE_TO_METHOD_BOOKMARKS: Record<string, string> = {
   "slack/bookmarks_add": "bookmarks.add",

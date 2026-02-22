@@ -26,14 +26,19 @@ export function buildSlackAdminFunctions(): SlackMethodsAdminFunctions {
   return {
     permissions: {
       lookup(params) {
-        return makeCExpr("slack/admin_functions_permissions_lookup", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_functions_permissions_lookup", [liftArg(params)]);
+        return makeCExpr("slack/admin_functions_permissions_lookup", []);
       },
       set(params) {
-        return makeCExpr("slack/admin_functions_permissions_set", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_functions_permissions_set", [liftArg(params)]);
+        return makeCExpr("slack/admin_functions_permissions_set", []);
       },
     },
     list(params) {
-      return makeCExpr("slack/admin_functions_list", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_functions_list", [liftArg(params)]);
+      return makeCExpr("slack/admin_functions_list", []);
     },
   };
 }

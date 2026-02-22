@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_DND } from "./node-kinds-dnd";
 
-type _SlackDndKind = (typeof SLACK_NODE_KINDS_DND)[number];
+type SlackDndKind = (typeof SLACK_NODE_KINDS_DND)[number];
 
 export const NODE_TO_METHOD_DND: Record<string, string> = {
   "slack/dnd_endDnd": "dnd.endDnd",

@@ -155,6 +155,20 @@ export function strAppend<A, B>(a: A, b: B): CExpr<string, "str/append", [A, B]>
   return makeCExpr<string, "str/append", [A, B]>("str/append", [a, b]);
 }
 
+/** Tagged template literal for string interpolation — desugars to str/concat. */
+export function str(
+  strings: TemplateStringsArray,
+  ...exprs: unknown[]
+): CExpr<string, "str/concat", unknown[]> {
+  const parts: unknown[] = [];
+  for (let i = 0; i < exprs.length; i++) {
+    if (strings[i]) parts.push(strings[i]);
+    parts.push(makeCExpr("show", [exprs[i]]));
+  }
+  if (strings[exprs.length]) parts.push(strings[exprs.length]);
+  return makeCExpr("str/concat", parts as any) as any;
+}
+
 // ─── Boolean constructors ──────────────────────────────────────────
 // NOTE: These are exported for use by std-plugins-bool.ts but must NOT
 // be re-exported from index.ts (conflicts with predicates.ts).
@@ -179,6 +193,13 @@ export function boolNot<A>(a: A): CExpr<boolean, "bool/not", [A]> {
 /** Create an equality comparison expression (trait-dispatched). */
 export function eq<A, B>(a: A, b: B): CExpr<boolean, "eq", [A, B]> {
   return makeCExpr<boolean, "eq", [A, B]>("eq", [a, b]);
+}
+
+// ─── Schema descriptors ─────────────────────────────────────────────
+
+/** Describe an array type in an input schema. */
+export function array(type: string): string {
+  return `${type}[]`;
 }
 
 // ─── Literal constructors ───────────────────────────────────────────

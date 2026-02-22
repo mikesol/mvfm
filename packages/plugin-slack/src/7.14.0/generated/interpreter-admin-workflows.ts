@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_ADMIN_WORKFLOWS } from "./node-kinds-admin-workflows";
 
-type _SlackAdminWorkflowsKind = (typeof SLACK_NODE_KINDS_ADMIN_WORKFLOWS)[number];
+type SlackAdminWorkflowsKind = (typeof SLACK_NODE_KINDS_ADMIN_WORKFLOWS)[number];
 
 export const NODE_TO_METHOD_ADMIN_WORKFLOWS: Record<string, string> = {
   "slack/admin_workflows_collaborators_add": "admin.workflows.collaborators.add",

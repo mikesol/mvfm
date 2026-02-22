@@ -25,13 +25,16 @@ function liftArg(value: unknown): unknown {
 export function buildSlackPins(): SlackMethodsPins {
   return {
     add(params) {
-      return makeCExpr("slack/pins_add", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/pins_add", [liftArg(params)]);
+      return makeCExpr("slack/pins_add", []);
     },
     list(params) {
-      return makeCExpr("slack/pins_list", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/pins_list", [liftArg(params)]);
+      return makeCExpr("slack/pins_list", []);
     },
     remove(params) {
-      return makeCExpr("slack/pins_remove", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/pins_remove", [liftArg(params)]);
+      return makeCExpr("slack/pins_remove", []);
     },
   };
 }

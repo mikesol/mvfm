@@ -37,10 +37,12 @@ export function buildSlackDnd(): SlackMethodsDnd {
       return makeCExpr("slack/dnd_info", []);
     },
     setSnooze(params) {
-      return makeCExpr("slack/dnd_setSnooze", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/dnd_setSnooze", [liftArg(params)]);
+      return makeCExpr("slack/dnd_setSnooze", []);
     },
     teamInfo(params) {
-      return makeCExpr("slack/dnd_teamInfo", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/dnd_teamInfo", [liftArg(params)]);
+      return makeCExpr("slack/dnd_teamInfo", []);
     },
   };
 }

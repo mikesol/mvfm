@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_EMOJI } from "./node-kinds-emoji";
 
-type _SlackEmojiKind = (typeof SLACK_NODE_KINDS_EMOJI)[number];
+type SlackEmojiKind = (typeof SLACK_NODE_KINDS_EMOJI)[number];
 
 export const NODE_TO_METHOD_EMOJI: Record<string, string> = {
   "slack/emoji_list": "emoji.list",

@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_FILES } from "./node-kinds-files";
 
-type _SlackFilesKind = (typeof SLACK_NODE_KINDS_FILES)[number];
+type SlackFilesKind = (typeof SLACK_NODE_KINDS_FILES)[number];
 
 export const NODE_TO_METHOD_FILES: Record<string, string> = {
   "slack/files_completeUploadExternal": "files.completeUploadExternal",

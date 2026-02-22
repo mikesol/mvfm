@@ -25,16 +25,20 @@ function liftArg(value: unknown): unknown {
 export function buildSlackReminders(): SlackMethodsReminders {
   return {
     add(params) {
-      return makeCExpr("slack/reminders_add", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/reminders_add", [liftArg(params)]);
+      return makeCExpr("slack/reminders_add", []);
     },
     complete(params) {
-      return makeCExpr("slack/reminders_complete", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/reminders_complete", [liftArg(params)]);
+      return makeCExpr("slack/reminders_complete", []);
     },
     delete(params) {
-      return makeCExpr("slack/reminders_delete", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/reminders_delete", [liftArg(params)]);
+      return makeCExpr("slack/reminders_delete", []);
     },
     info(params) {
-      return makeCExpr("slack/reminders_info", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/reminders_info", [liftArg(params)]);
+      return makeCExpr("slack/reminders_info", []);
     },
     list(params?) {
       if (params != null) return makeCExpr("slack/reminders_list", [liftArg(params)]);

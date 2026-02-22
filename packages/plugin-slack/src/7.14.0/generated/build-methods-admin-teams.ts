@@ -26,36 +26,50 @@ export function buildSlackAdminTeams(): SlackMethodsAdminTeams {
   return {
     admins: {
       list(params) {
-        return makeCExpr("slack/admin_teams_admins_list", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/admin_teams_admins_list", [liftArg(params)]);
+        return makeCExpr("slack/admin_teams_admins_list", []);
       },
     },
     owners: {
       list(params) {
-        return makeCExpr("slack/admin_teams_owners_list", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/admin_teams_owners_list", [liftArg(params)]);
+        return makeCExpr("slack/admin_teams_owners_list", []);
       },
     },
     settings: {
       info(params) {
-        return makeCExpr("slack/admin_teams_settings_info", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/admin_teams_settings_info", [liftArg(params)]);
+        return makeCExpr("slack/admin_teams_settings_info", []);
       },
       setDefaultChannels(params) {
-        return makeCExpr("slack/admin_teams_settings_setDefaultChannels", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_teams_settings_setDefaultChannels", [liftArg(params)]);
+        return makeCExpr("slack/admin_teams_settings_setDefaultChannels", []);
       },
       setDescription(params) {
-        return makeCExpr("slack/admin_teams_settings_setDescription", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_teams_settings_setDescription", [liftArg(params)]);
+        return makeCExpr("slack/admin_teams_settings_setDescription", []);
       },
       setDiscoverability(params) {
-        return makeCExpr("slack/admin_teams_settings_setDiscoverability", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_teams_settings_setDiscoverability", [liftArg(params)]);
+        return makeCExpr("slack/admin_teams_settings_setDiscoverability", []);
       },
       setIcon(params) {
-        return makeCExpr("slack/admin_teams_settings_setIcon", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_teams_settings_setIcon", [liftArg(params)]);
+        return makeCExpr("slack/admin_teams_settings_setIcon", []);
       },
       setName(params) {
-        return makeCExpr("slack/admin_teams_settings_setName", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_teams_settings_setName", [liftArg(params)]);
+        return makeCExpr("slack/admin_teams_settings_setName", []);
       },
     },
     create(params) {
-      return makeCExpr("slack/admin_teams_create", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_teams_create", [liftArg(params)]);
+      return makeCExpr("slack/admin_teams_create", []);
     },
     list(params?) {
       if (params != null) return makeCExpr("slack/admin_teams_list", [liftArg(params)]);

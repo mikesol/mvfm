@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_DIALOG } from "./node-kinds-dialog";
 
-type _SlackDialogKind = (typeof SLACK_NODE_KINDS_DIALOG)[number];
+type SlackDialogKind = (typeof SLACK_NODE_KINDS_DIALOG)[number];
 
 export const NODE_TO_METHOD_DIALOG: Record<string, string> = {
   "slack/dialog_open": "dialog.open",

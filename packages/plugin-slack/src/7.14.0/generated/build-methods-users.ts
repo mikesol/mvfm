@@ -26,43 +26,56 @@ export function buildSlackUsers(): SlackMethodsUsers {
   return {
     discoverableContacts: {
       lookup(params) {
-        return makeCExpr("slack/users_discoverableContacts_lookup", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/users_discoverableContacts_lookup", [liftArg(params)]);
+        return makeCExpr("slack/users_discoverableContacts_lookup", []);
       },
     },
     profile: {
       get(params) {
-        return makeCExpr("slack/users_profile_get", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/users_profile_get", [liftArg(params)]);
+        return makeCExpr("slack/users_profile_get", []);
       },
       set(params) {
-        return makeCExpr("slack/users_profile_set", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/users_profile_set", [liftArg(params)]);
+        return makeCExpr("slack/users_profile_set", []);
       },
     },
     conversations(params) {
-      return makeCExpr("slack/users_conversations", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/users_conversations", [liftArg(params)]);
+      return makeCExpr("slack/users_conversations", []);
     },
     deletePhoto(params) {
-      return makeCExpr("slack/users_deletePhoto", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/users_deletePhoto", [liftArg(params)]);
+      return makeCExpr("slack/users_deletePhoto", []);
     },
     getPresence(params) {
-      return makeCExpr("slack/users_getPresence", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/users_getPresence", [liftArg(params)]);
+      return makeCExpr("slack/users_getPresence", []);
     },
     identity(params) {
-      return makeCExpr("slack/users_identity", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/users_identity", [liftArg(params)]);
+      return makeCExpr("slack/users_identity", []);
     },
     info(params) {
-      return makeCExpr("slack/users_info", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/users_info", [liftArg(params)]);
+      return makeCExpr("slack/users_info", []);
     },
     list(params) {
-      return makeCExpr("slack/users_list", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/users_list", [liftArg(params)]);
+      return makeCExpr("slack/users_list", []);
     },
     lookupByEmail(params) {
-      return makeCExpr("slack/users_lookupByEmail", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/users_lookupByEmail", [liftArg(params)]);
+      return makeCExpr("slack/users_lookupByEmail", []);
     },
     setPhoto(params) {
-      return makeCExpr("slack/users_setPhoto", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/users_setPhoto", [liftArg(params)]);
+      return makeCExpr("slack/users_setPhoto", []);
     },
     setPresence(params) {
-      return makeCExpr("slack/users_setPresence", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/users_setPresence", [liftArg(params)]);
+      return makeCExpr("slack/users_setPresence", []);
     },
   };
 }

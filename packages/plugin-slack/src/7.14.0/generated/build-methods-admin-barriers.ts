@@ -25,17 +25,20 @@ function liftArg(value: unknown): unknown {
 export function buildSlackAdminBarriers(): SlackMethodsAdminBarriers {
   return {
     create(params) {
-      return makeCExpr("slack/admin_barriers_create", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_barriers_create", [liftArg(params)]);
+      return makeCExpr("slack/admin_barriers_create", []);
     },
     delete(params) {
-      return makeCExpr("slack/admin_barriers_delete", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_barriers_delete", [liftArg(params)]);
+      return makeCExpr("slack/admin_barriers_delete", []);
     },
     list(params?) {
       if (params != null) return makeCExpr("slack/admin_barriers_list", [liftArg(params)]);
       return makeCExpr("slack/admin_barriers_list", []);
     },
     update(params) {
-      return makeCExpr("slack/admin_barriers_update", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_barriers_update", [liftArg(params)]);
+      return makeCExpr("slack/admin_barriers_update", []);
     },
   };
 }

@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_OPENID } from "./node-kinds-openid";
 
-type _SlackOpenidKind = (typeof SLACK_NODE_KINDS_OPENID)[number];
+type SlackOpenidKind = (typeof SLACK_NODE_KINDS_OPENID)[number];
 
 export const NODE_TO_METHOD_OPENID: Record<string, string> = {
   "slack/openid_connect_token": "openid.connect.token",

@@ -23,11 +23,20 @@ export const error: Plugin = {
     }),
     fail: (msg: unknown) => makeCExpr("error/fail", [msg]),
     guard: (cond: unknown, msg: unknown) => makeCExpr("error/guard", [cond, msg]),
+    attempt: (expr: unknown) => makeCExpr("error/attempt", [expr]),
+    settle: (...exprs: unknown[]) => makeCExpr("error/settle", exprs),
   },
   kinds: {},
   traits: {},
   lifts: {},
-  nodeKinds: ["error/try", "error/fail", "error/guard", "error/caught"],
+  nodeKinds: [
+    "error/try",
+    "error/fail",
+    "error/guard",
+    "error/caught",
+    "error/attempt",
+    "error/settle",
+  ],
   defaultInterpreter: (): Interpreter => {
     const errorStack: unknown[] = [];
     return {
@@ -58,6 +67,28 @@ export const error: Plugin = {
           throw new Error(String(msg));
         }
         return cond;
+      },
+      "error/attempt": async function* () {
+        try {
+          const value = yield 0;
+          return { ok: value };
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          return { err: msg };
+        }
+      },
+      "error/settle": async function* (e) {
+        const results: Array<{ ok?: unknown; err?: string }> = [];
+        for (let i = 0; i < e.children.length; i++) {
+          try {
+            const value = yield i;
+            results.push({ ok: value });
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            results.push({ err: msg });
+          }
+        }
+        return results;
       },
     };
   },

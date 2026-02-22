@@ -26,15 +26,18 @@ export function buildSlackCanvases(): SlackMethodsCanvases {
   return {
     access: {
       delete(params) {
-        return makeCExpr("slack/canvases_access_delete", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/canvases_access_delete", [liftArg(params)]);
+        return makeCExpr("slack/canvases_access_delete", []);
       },
       set(params) {
-        return makeCExpr("slack/canvases_access_set", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/canvases_access_set", [liftArg(params)]);
+        return makeCExpr("slack/canvases_access_set", []);
       },
     },
     sections: {
       lookup(params) {
-        return makeCExpr("slack/canvases_sections_lookup", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/canvases_sections_lookup", [liftArg(params)]);
+        return makeCExpr("slack/canvases_sections_lookup", []);
       },
     },
     create(params?) {
@@ -42,10 +45,12 @@ export function buildSlackCanvases(): SlackMethodsCanvases {
       return makeCExpr("slack/canvases_create", []);
     },
     delete(params) {
-      return makeCExpr("slack/canvases_delete", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/canvases_delete", [liftArg(params)]);
+      return makeCExpr("slack/canvases_delete", []);
     },
     edit(params) {
-      return makeCExpr("slack/canvases_edit", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/canvases_edit", [liftArg(params)]);
+      return makeCExpr("slack/canvases_edit", []);
     },
   };
 }

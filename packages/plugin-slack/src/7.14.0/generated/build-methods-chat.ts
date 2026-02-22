@@ -32,40 +32,52 @@ export function buildSlackChat(): SlackMethodsChat {
       },
     },
     appendStream(params) {
-      return makeCExpr("slack/chat_appendStream", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/chat_appendStream", [liftArg(params)]);
+      return makeCExpr("slack/chat_appendStream", []);
     },
     delete(params) {
-      return makeCExpr("slack/chat_delete", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/chat_delete", [liftArg(params)]);
+      return makeCExpr("slack/chat_delete", []);
     },
     deleteScheduledMessage(params) {
-      return makeCExpr("slack/chat_deleteScheduledMessage", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/chat_deleteScheduledMessage", [liftArg(params)]);
+      return makeCExpr("slack/chat_deleteScheduledMessage", []);
     },
     getPermalink(params) {
-      return makeCExpr("slack/chat_getPermalink", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/chat_getPermalink", [liftArg(params)]);
+      return makeCExpr("slack/chat_getPermalink", []);
     },
     meMessage(params) {
-      return makeCExpr("slack/chat_meMessage", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/chat_meMessage", [liftArg(params)]);
+      return makeCExpr("slack/chat_meMessage", []);
     },
     postEphemeral(params) {
-      return makeCExpr("slack/chat_postEphemeral", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/chat_postEphemeral", [liftArg(params)]);
+      return makeCExpr("slack/chat_postEphemeral", []);
     },
     postMessage(params) {
-      return makeCExpr("slack/chat_postMessage", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/chat_postMessage", [liftArg(params)]);
+      return makeCExpr("slack/chat_postMessage", []);
     },
     scheduleMessage(params) {
-      return makeCExpr("slack/chat_scheduleMessage", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/chat_scheduleMessage", [liftArg(params)]);
+      return makeCExpr("slack/chat_scheduleMessage", []);
     },
     startStream(params) {
-      return makeCExpr("slack/chat_startStream", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/chat_startStream", [liftArg(params)]);
+      return makeCExpr("slack/chat_startStream", []);
     },
     stopStream(params) {
-      return makeCExpr("slack/chat_stopStream", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/chat_stopStream", [liftArg(params)]);
+      return makeCExpr("slack/chat_stopStream", []);
     },
     unfurl(params) {
-      return makeCExpr("slack/chat_unfurl", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/chat_unfurl", [liftArg(params)]);
+      return makeCExpr("slack/chat_unfurl", []);
     },
     update(params) {
-      return makeCExpr("slack/chat_update", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/chat_update", [liftArg(params)]);
+      return makeCExpr("slack/chat_update", []);
     },
   };
 }

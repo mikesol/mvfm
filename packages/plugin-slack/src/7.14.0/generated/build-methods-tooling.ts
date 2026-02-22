@@ -26,7 +26,8 @@ export function buildSlackTooling(): SlackMethodsTooling {
   return {
     tokens: {
       rotate(params) {
-        return makeCExpr("slack/tooling_tokens_rotate", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/tooling_tokens_rotate", [liftArg(params)]);
+        return makeCExpr("slack/tooling_tokens_rotate", []);
       },
     },
   };

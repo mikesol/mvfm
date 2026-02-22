@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_TEAM } from "./node-kinds-team";
 
-type _SlackTeamKind = (typeof SLACK_NODE_KINDS_TEAM)[number];
+type SlackTeamKind = (typeof SLACK_NODE_KINDS_TEAM)[number];
 
 export const NODE_TO_METHOD_TEAM: Record<string, string> = {
   "slack/team_accessLogs": "team.accessLogs",

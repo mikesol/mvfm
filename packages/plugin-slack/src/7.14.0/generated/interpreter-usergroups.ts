@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_USERGROUPS } from "./node-kinds-usergroups";
 
-type _SlackUsergroupsKind = (typeof SLACK_NODE_KINDS_USERGROUPS)[number];
+type SlackUsergroupsKind = (typeof SLACK_NODE_KINDS_USERGROUPS)[number];
 
 export const NODE_TO_METHOD_USERGROUPS: Record<string, string> = {
   "slack/usergroups_create": "usergroups.create",

@@ -32,41 +32,51 @@ export function buildSlackAdminApps(): SlackMethodsAdminApps {
     },
     approved: {
       list(params) {
-        return makeCExpr("slack/admin_apps_approved_list", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/admin_apps_approved_list", [liftArg(params)]);
+        return makeCExpr("slack/admin_apps_approved_list", []);
       },
     },
     config: {
       lookup(params) {
-        return makeCExpr("slack/admin_apps_config_lookup", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/admin_apps_config_lookup", [liftArg(params)]);
+        return makeCExpr("slack/admin_apps_config_lookup", []);
       },
       set(params) {
-        return makeCExpr("slack/admin_apps_config_set", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/admin_apps_config_set", [liftArg(params)]);
+        return makeCExpr("slack/admin_apps_config_set", []);
       },
     },
     requests: {
       cancel(params) {
-        return makeCExpr("slack/admin_apps_requests_cancel", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/admin_apps_requests_cancel", [liftArg(params)]);
+        return makeCExpr("slack/admin_apps_requests_cancel", []);
       },
       list(params) {
-        return makeCExpr("slack/admin_apps_requests_list", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/admin_apps_requests_list", [liftArg(params)]);
+        return makeCExpr("slack/admin_apps_requests_list", []);
       },
     },
     restricted: {
       list(params) {
-        return makeCExpr("slack/admin_apps_restricted_list", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/admin_apps_restricted_list", [liftArg(params)]);
+        return makeCExpr("slack/admin_apps_restricted_list", []);
       },
     },
     approve(params) {
-      return makeCExpr("slack/admin_apps_approve", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_apps_approve", [liftArg(params)]);
+      return makeCExpr("slack/admin_apps_approve", []);
     },
     clearResolution(params) {
-      return makeCExpr("slack/admin_apps_clearResolution", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_apps_clearResolution", [liftArg(params)]);
+      return makeCExpr("slack/admin_apps_clearResolution", []);
     },
     restrict(params) {
-      return makeCExpr("slack/admin_apps_restrict", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_apps_restrict", [liftArg(params)]);
+      return makeCExpr("slack/admin_apps_restrict", []);
     },
     uninstall(params) {
-      return makeCExpr("slack/admin_apps_uninstall", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_apps_uninstall", [liftArg(params)]);
+      return makeCExpr("slack/admin_apps_uninstall", []);
     },
   };
 }

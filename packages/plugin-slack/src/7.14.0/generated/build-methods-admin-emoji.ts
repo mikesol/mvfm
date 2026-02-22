@@ -25,20 +25,24 @@ function liftArg(value: unknown): unknown {
 export function buildSlackAdminEmoji(): SlackMethodsAdminEmoji {
   return {
     add(params) {
-      return makeCExpr("slack/admin_emoji_add", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_emoji_add", [liftArg(params)]);
+      return makeCExpr("slack/admin_emoji_add", []);
     },
     addAlias(params) {
-      return makeCExpr("slack/admin_emoji_addAlias", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_emoji_addAlias", [liftArg(params)]);
+      return makeCExpr("slack/admin_emoji_addAlias", []);
     },
     list(params?) {
       if (params != null) return makeCExpr("slack/admin_emoji_list", [liftArg(params)]);
       return makeCExpr("slack/admin_emoji_list", []);
     },
     remove(params) {
-      return makeCExpr("slack/admin_emoji_remove", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_emoji_remove", [liftArg(params)]);
+      return makeCExpr("slack/admin_emoji_remove", []);
     },
     rename(params) {
-      return makeCExpr("slack/admin_emoji_rename", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_emoji_rename", [liftArg(params)]);
+      return makeCExpr("slack/admin_emoji_rename", []);
     },
   };
 }

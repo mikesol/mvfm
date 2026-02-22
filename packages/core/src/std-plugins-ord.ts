@@ -59,6 +59,10 @@ export const ordPlugin = {
       [string, string],
       number
     >,
+    "num/compare": { inputs: [0, 0] as [number, number], output: 0 as number } as KindSpec<
+      [number, number],
+      number
+    >,
   },
   traits: {
     lt: { output: false as boolean, mapping: { number: "num/lt", string: "str/lt" } } as TraitDef<
@@ -77,6 +81,10 @@ export const ordPlugin = {
       output: false as boolean,
       mapping: { number: "num/lte", string: "str/lte" },
     } as TraitDef<boolean, { number: "num/lte"; string: "str/lte" }>,
+    compare: {
+      output: 0 as number,
+      mapping: { number: "num/compare", string: "str/compare" },
+    } as TraitDef<number, { number: "num/compare"; string: "str/compare" }>,
   },
   lifts: {},
   nodeKinds: [
@@ -89,6 +97,7 @@ export const ordPlugin = {
     "str/gte",
     "str/lte",
     "str/compare",
+    "num/compare",
   ],
   defaultInterpreter: (): Interpreter => ({
     "num/lt": async function* () {
@@ -118,6 +127,11 @@ export const ordPlugin = {
     "str/compare": async function* () {
       const a = (yield 0) as string;
       const b = (yield 1) as string;
+      return a < b ? -1 : a > b ? 1 : 0;
+    },
+    "num/compare": async function* () {
+      const a = (yield 0) as number;
+      const b = (yield 1) as number;
       return a < b ? -1 : a > b ? 1 : 0;
     },
   }),

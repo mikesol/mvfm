@@ -35,78 +35,119 @@ export function buildSlackAdminConversations(): SlackMethodsAdminConversations {
     },
     restrictAccess: {
       addGroup(params) {
-        return makeCExpr("slack/admin_conversations_restrictAccess_addGroup", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_conversations_restrictAccess_addGroup", [liftArg(params)]);
+        return makeCExpr("slack/admin_conversations_restrictAccess_addGroup", []);
       },
       listGroups(params) {
-        return makeCExpr("slack/admin_conversations_restrictAccess_listGroups", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_conversations_restrictAccess_listGroups", [
+            liftArg(params),
+          ]);
+        return makeCExpr("slack/admin_conversations_restrictAccess_listGroups", []);
       },
       removeGroup(params) {
-        return makeCExpr("slack/admin_conversations_restrictAccess_removeGroup", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_conversations_restrictAccess_removeGroup", [
+            liftArg(params),
+          ]);
+        return makeCExpr("slack/admin_conversations_restrictAccess_removeGroup", []);
       },
     },
     archive(params) {
-      return makeCExpr("slack/admin_conversations_archive", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_conversations_archive", [liftArg(params)]);
+      return makeCExpr("slack/admin_conversations_archive", []);
     },
     bulkArchive(params) {
-      return makeCExpr("slack/admin_conversations_bulkArchive", [liftArg(params)]);
+      if (params != null)
+        return makeCExpr("slack/admin_conversations_bulkArchive", [liftArg(params)]);
+      return makeCExpr("slack/admin_conversations_bulkArchive", []);
     },
     bulkDelete(params) {
-      return makeCExpr("slack/admin_conversations_bulkDelete", [liftArg(params)]);
+      if (params != null)
+        return makeCExpr("slack/admin_conversations_bulkDelete", [liftArg(params)]);
+      return makeCExpr("slack/admin_conversations_bulkDelete", []);
     },
     bulkMove(params) {
-      return makeCExpr("slack/admin_conversations_bulkMove", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_conversations_bulkMove", [liftArg(params)]);
+      return makeCExpr("slack/admin_conversations_bulkMove", []);
     },
     convertToPrivate(params) {
-      return makeCExpr("slack/admin_conversations_convertToPrivate", [liftArg(params)]);
+      if (params != null)
+        return makeCExpr("slack/admin_conversations_convertToPrivate", [liftArg(params)]);
+      return makeCExpr("slack/admin_conversations_convertToPrivate", []);
     },
     convertToPublic(params) {
-      return makeCExpr("slack/admin_conversations_convertToPublic", [liftArg(params)]);
+      if (params != null)
+        return makeCExpr("slack/admin_conversations_convertToPublic", [liftArg(params)]);
+      return makeCExpr("slack/admin_conversations_convertToPublic", []);
     },
     create(params) {
-      return makeCExpr("slack/admin_conversations_create", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_conversations_create", [liftArg(params)]);
+      return makeCExpr("slack/admin_conversations_create", []);
     },
     delete(params) {
-      return makeCExpr("slack/admin_conversations_delete", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_conversations_delete", [liftArg(params)]);
+      return makeCExpr("slack/admin_conversations_delete", []);
     },
     disconnectShared(params) {
-      return makeCExpr("slack/admin_conversations_disconnectShared", [liftArg(params)]);
+      if (params != null)
+        return makeCExpr("slack/admin_conversations_disconnectShared", [liftArg(params)]);
+      return makeCExpr("slack/admin_conversations_disconnectShared", []);
     },
     getConversationPrefs(params) {
-      return makeCExpr("slack/admin_conversations_getConversationPrefs", [liftArg(params)]);
+      if (params != null)
+        return makeCExpr("slack/admin_conversations_getConversationPrefs", [liftArg(params)]);
+      return makeCExpr("slack/admin_conversations_getConversationPrefs", []);
     },
     getCustomRetention(params) {
-      return makeCExpr("slack/admin_conversations_getCustomRetention", [liftArg(params)]);
+      if (params != null)
+        return makeCExpr("slack/admin_conversations_getCustomRetention", [liftArg(params)]);
+      return makeCExpr("slack/admin_conversations_getCustomRetention", []);
     },
     getTeams(params) {
-      return makeCExpr("slack/admin_conversations_getTeams", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_conversations_getTeams", [liftArg(params)]);
+      return makeCExpr("slack/admin_conversations_getTeams", []);
     },
     invite(params) {
-      return makeCExpr("slack/admin_conversations_invite", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_conversations_invite", [liftArg(params)]);
+      return makeCExpr("slack/admin_conversations_invite", []);
     },
     lookup(params) {
-      return makeCExpr("slack/admin_conversations_lookup", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_conversations_lookup", [liftArg(params)]);
+      return makeCExpr("slack/admin_conversations_lookup", []);
     },
     removeCustomRetention(params) {
-      return makeCExpr("slack/admin_conversations_removeCustomRetention", [liftArg(params)]);
+      if (params != null)
+        return makeCExpr("slack/admin_conversations_removeCustomRetention", [liftArg(params)]);
+      return makeCExpr("slack/admin_conversations_removeCustomRetention", []);
     },
     rename(params) {
-      return makeCExpr("slack/admin_conversations_rename", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_conversations_rename", [liftArg(params)]);
+      return makeCExpr("slack/admin_conversations_rename", []);
     },
     search(params?) {
       if (params != null) return makeCExpr("slack/admin_conversations_search", [liftArg(params)]);
       return makeCExpr("slack/admin_conversations_search", []);
     },
     setConversationPrefs(params) {
-      return makeCExpr("slack/admin_conversations_setConversationPrefs", [liftArg(params)]);
+      if (params != null)
+        return makeCExpr("slack/admin_conversations_setConversationPrefs", [liftArg(params)]);
+      return makeCExpr("slack/admin_conversations_setConversationPrefs", []);
     },
     setCustomRetention(params) {
-      return makeCExpr("slack/admin_conversations_setCustomRetention", [liftArg(params)]);
+      if (params != null)
+        return makeCExpr("slack/admin_conversations_setCustomRetention", [liftArg(params)]);
+      return makeCExpr("slack/admin_conversations_setCustomRetention", []);
     },
     setTeams(params) {
-      return makeCExpr("slack/admin_conversations_setTeams", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_conversations_setTeams", [liftArg(params)]);
+      return makeCExpr("slack/admin_conversations_setTeams", []);
     },
     unarchive(params) {
-      return makeCExpr("slack/admin_conversations_unarchive", [liftArg(params)]);
+      if (params != null)
+        return makeCExpr("slack/admin_conversations_unarchive", [liftArg(params)]);
+      return makeCExpr("slack/admin_conversations_unarchive", []);
     },
   };
 }

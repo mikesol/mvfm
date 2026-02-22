@@ -25,16 +25,22 @@ function liftArg(value: unknown): unknown {
 export function buildSlackAdminUsergroups(): SlackMethodsAdminUsergroups {
   return {
     addChannels(params) {
-      return makeCExpr("slack/admin_usergroups_addChannels", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_usergroups_addChannels", [liftArg(params)]);
+      return makeCExpr("slack/admin_usergroups_addChannels", []);
     },
     addTeams(params) {
-      return makeCExpr("slack/admin_usergroups_addTeams", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_usergroups_addTeams", [liftArg(params)]);
+      return makeCExpr("slack/admin_usergroups_addTeams", []);
     },
     listChannels(params) {
-      return makeCExpr("slack/admin_usergroups_listChannels", [liftArg(params)]);
+      if (params != null)
+        return makeCExpr("slack/admin_usergroups_listChannels", [liftArg(params)]);
+      return makeCExpr("slack/admin_usergroups_listChannels", []);
     },
     removeChannels(params) {
-      return makeCExpr("slack/admin_usergroups_removeChannels", [liftArg(params)]);
+      if (params != null)
+        return makeCExpr("slack/admin_usergroups_removeChannels", [liftArg(params)]);
+      return makeCExpr("slack/admin_usergroups_removeChannels", []);
     },
   };
 }

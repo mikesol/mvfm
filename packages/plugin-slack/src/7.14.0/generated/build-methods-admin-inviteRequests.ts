@@ -26,22 +26,29 @@ export function buildSlackAdminInviteRequests(): SlackMethodsAdminInviteRequests
   return {
     approved: {
       list(params) {
-        return makeCExpr("slack/admin_inviteRequests_approved_list", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_inviteRequests_approved_list", [liftArg(params)]);
+        return makeCExpr("slack/admin_inviteRequests_approved_list", []);
       },
     },
     denied: {
       list(params) {
-        return makeCExpr("slack/admin_inviteRequests_denied_list", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_inviteRequests_denied_list", [liftArg(params)]);
+        return makeCExpr("slack/admin_inviteRequests_denied_list", []);
       },
     },
     approve(params) {
-      return makeCExpr("slack/admin_inviteRequests_approve", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_inviteRequests_approve", [liftArg(params)]);
+      return makeCExpr("slack/admin_inviteRequests_approve", []);
     },
     deny(params) {
-      return makeCExpr("slack/admin_inviteRequests_deny", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_inviteRequests_deny", [liftArg(params)]);
+      return makeCExpr("slack/admin_inviteRequests_deny", []);
     },
     list(params) {
-      return makeCExpr("slack/admin_inviteRequests_list", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_inviteRequests_list", [liftArg(params)]);
+      return makeCExpr("slack/admin_inviteRequests_list", []);
     },
   };
 }

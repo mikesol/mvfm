@@ -26,26 +26,33 @@ export function buildSlackWorkflows(): SlackMethodsWorkflows {
   return {
     featured: {
       add(params) {
-        return makeCExpr("slack/workflows_featured_add", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/workflows_featured_add", [liftArg(params)]);
+        return makeCExpr("slack/workflows_featured_add", []);
       },
       list(params) {
-        return makeCExpr("slack/workflows_featured_list", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/workflows_featured_list", [liftArg(params)]);
+        return makeCExpr("slack/workflows_featured_list", []);
       },
       remove(params) {
-        return makeCExpr("slack/workflows_featured_remove", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/workflows_featured_remove", [liftArg(params)]);
+        return makeCExpr("slack/workflows_featured_remove", []);
       },
       set(params) {
-        return makeCExpr("slack/workflows_featured_set", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/workflows_featured_set", [liftArg(params)]);
+        return makeCExpr("slack/workflows_featured_set", []);
       },
     },
     stepCompleted(params) {
-      return makeCExpr("slack/workflows_stepCompleted", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/workflows_stepCompleted", [liftArg(params)]);
+      return makeCExpr("slack/workflows_stepCompleted", []);
     },
     stepFailed(params) {
-      return makeCExpr("slack/workflows_stepFailed", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/workflows_stepFailed", [liftArg(params)]);
+      return makeCExpr("slack/workflows_stepFailed", []);
     },
     updateStep(params) {
-      return makeCExpr("slack/workflows_updateStep", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/workflows_updateStep", [liftArg(params)]);
+      return makeCExpr("slack/workflows_updateStep", []);
     },
   };
 }

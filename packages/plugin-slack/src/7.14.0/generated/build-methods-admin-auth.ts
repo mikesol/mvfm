@@ -26,13 +26,19 @@ export function buildSlackAdminAuth(): SlackMethodsAdminAuth {
   return {
     policy: {
       assignEntities(params) {
-        return makeCExpr("slack/admin_auth_policy_assignEntities", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_auth_policy_assignEntities", [liftArg(params)]);
+        return makeCExpr("slack/admin_auth_policy_assignEntities", []);
       },
       getEntities(params) {
-        return makeCExpr("slack/admin_auth_policy_getEntities", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_auth_policy_getEntities", [liftArg(params)]);
+        return makeCExpr("slack/admin_auth_policy_getEntities", []);
       },
       removeEntities(params) {
-        return makeCExpr("slack/admin_auth_policy_removeEntities", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_auth_policy_removeEntities", [liftArg(params)]);
+        return makeCExpr("slack/admin_auth_policy_removeEntities", []);
       },
     },
   };

@@ -26,14 +26,17 @@ export function buildSlackOauth(): SlackMethodsOauth {
   return {
     v2: {
       access(params) {
-        return makeCExpr("slack/oauth_v2_access", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/oauth_v2_access", [liftArg(params)]);
+        return makeCExpr("slack/oauth_v2_access", []);
       },
       exchange(params) {
-        return makeCExpr("slack/oauth_v2_exchange", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/oauth_v2_exchange", [liftArg(params)]);
+        return makeCExpr("slack/oauth_v2_exchange", []);
       },
     },
     access(params) {
-      return makeCExpr("slack/oauth_access", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/oauth_access", [liftArg(params)]);
+      return makeCExpr("slack/oauth_access", []);
     },
   };
 }

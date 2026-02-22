@@ -26,15 +26,21 @@ export function buildSlackAdminWorkflows(): SlackMethodsAdminWorkflows {
   return {
     collaborators: {
       add(params) {
-        return makeCExpr("slack/admin_workflows_collaborators_add", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_workflows_collaborators_add", [liftArg(params)]);
+        return makeCExpr("slack/admin_workflows_collaborators_add", []);
       },
       remove(params) {
-        return makeCExpr("slack/admin_workflows_collaborators_remove", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_workflows_collaborators_remove", [liftArg(params)]);
+        return makeCExpr("slack/admin_workflows_collaborators_remove", []);
       },
     },
     permissions: {
       lookup(params) {
-        return makeCExpr("slack/admin_workflows_permissions_lookup", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_workflows_permissions_lookup", [liftArg(params)]);
+        return makeCExpr("slack/admin_workflows_permissions_lookup", []);
       },
     },
     search(params?) {
@@ -42,7 +48,8 @@ export function buildSlackAdminWorkflows(): SlackMethodsAdminWorkflows {
       return makeCExpr("slack/admin_workflows_search", []);
     },
     unpublish(params) {
-      return makeCExpr("slack/admin_workflows_unpublish", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_workflows_unpublish", [liftArg(params)]);
+      return makeCExpr("slack/admin_workflows_unpublish", []);
     },
   };
 }

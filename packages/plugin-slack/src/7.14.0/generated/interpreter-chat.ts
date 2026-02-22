@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_CHAT } from "./node-kinds-chat";
 
-type _SlackChatKind = (typeof SLACK_NODE_KINDS_CHAT)[number];
+type SlackChatKind = (typeof SLACK_NODE_KINDS_CHAT)[number];
 
 export const NODE_TO_METHOD_CHAT: Record<string, string> = {
   "slack/chat_appendStream": "chat.appendStream",

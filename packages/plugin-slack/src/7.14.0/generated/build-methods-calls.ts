@@ -26,23 +26,29 @@ export function buildSlackCalls(): SlackMethodsCalls {
   return {
     participants: {
       add(params) {
-        return makeCExpr("slack/calls_participants_add", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/calls_participants_add", [liftArg(params)]);
+        return makeCExpr("slack/calls_participants_add", []);
       },
       remove(params) {
-        return makeCExpr("slack/calls_participants_remove", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/calls_participants_remove", [liftArg(params)]);
+        return makeCExpr("slack/calls_participants_remove", []);
       },
     },
     add(params) {
-      return makeCExpr("slack/calls_add", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/calls_add", [liftArg(params)]);
+      return makeCExpr("slack/calls_add", []);
     },
     end(params) {
-      return makeCExpr("slack/calls_end", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/calls_end", [liftArg(params)]);
+      return makeCExpr("slack/calls_end", []);
     },
     info(params) {
-      return makeCExpr("slack/calls_info", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/calls_info", [liftArg(params)]);
+      return makeCExpr("slack/calls_info", []);
     },
     update(params) {
-      return makeCExpr("slack/calls_update", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/calls_update", [liftArg(params)]);
+      return makeCExpr("slack/calls_update", []);
     },
   };
 }

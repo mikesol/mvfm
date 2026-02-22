@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_PINS } from "./node-kinds-pins";
 
-type _SlackPinsKind = (typeof SLACK_NODE_KINDS_PINS)[number];
+type SlackPinsKind = (typeof SLACK_NODE_KINDS_PINS)[number];
 
 export const NODE_TO_METHOD_PINS: Record<string, string> = {
   "slack/pins_add": "pins.add",

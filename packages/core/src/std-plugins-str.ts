@@ -15,6 +15,7 @@ import {
   slice,
   split,
   startsWith,
+  str,
   strAppend,
   strLit,
   strShow,
@@ -29,6 +30,7 @@ export const strPlugin = {
   name: "str",
   ctors: {
     strLit,
+    str,
     concat,
     upper,
     lower,
@@ -106,6 +108,10 @@ export const strPlugin = {
     show: { output: "" as string, mapping: { string: "str/show" } } as TraitDef<
       string,
       { string: "str/show" }
+    >,
+    append: { output: "" as string, mapping: { string: "str/append" } } as TraitDef<
+      string,
+      { string: "str/append" }
     >,
   },
   lifts: { string: "str/literal" },

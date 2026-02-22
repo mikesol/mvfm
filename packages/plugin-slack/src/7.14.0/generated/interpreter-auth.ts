@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_AUTH } from "./node-kinds-auth";
 
-type _SlackAuthKind = (typeof SLACK_NODE_KINDS_AUTH)[number];
+type SlackAuthKind = (typeof SLACK_NODE_KINDS_AUTH)[number];
 
 export const NODE_TO_METHOD_AUTH: Record<string, string> = {
   "slack/auth_revoke": "auth.revoke",

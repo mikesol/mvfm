@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_WORKFLOWS } from "./node-kinds-workflows";
 
-type _SlackWorkflowsKind = (typeof SLACK_NODE_KINDS_WORKFLOWS)[number];
+type SlackWorkflowsKind = (typeof SLACK_NODE_KINDS_WORKFLOWS)[number];
 
 export const NODE_TO_METHOD_WORKFLOWS: Record<string, string> = {
   "slack/workflows_featured_add": "workflows.featured.add",

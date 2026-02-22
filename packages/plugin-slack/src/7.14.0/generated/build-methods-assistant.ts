@@ -26,13 +26,18 @@ export function buildSlackAssistant(): SlackMethodsAssistant {
   return {
     threads: {
       setStatus(params) {
-        return makeCExpr("slack/assistant_threads_setStatus", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/assistant_threads_setStatus", [liftArg(params)]);
+        return makeCExpr("slack/assistant_threads_setStatus", []);
       },
       setSuggestedPrompts(params) {
-        return makeCExpr("slack/assistant_threads_setSuggestedPrompts", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/assistant_threads_setSuggestedPrompts", [liftArg(params)]);
+        return makeCExpr("slack/assistant_threads_setSuggestedPrompts", []);
       },
       setTitle(params) {
-        return makeCExpr("slack/assistant_threads_setTitle", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/assistant_threads_setTitle", [liftArg(params)]);
+        return makeCExpr("slack/assistant_threads_setTitle", []);
       },
     },
   };

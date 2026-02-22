@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_BOTS } from "./node-kinds-bots";
 
-type _SlackBotsKind = (typeof SLACK_NODE_KINDS_BOTS)[number];
+type SlackBotsKind = (typeof SLACK_NODE_KINDS_BOTS)[number];
 
 export const NODE_TO_METHOD_BOTS: Record<string, string> = {
   "slack/bots_info": "bots.info",

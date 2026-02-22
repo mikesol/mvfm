@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_ENTITY } from "./node-kinds-entity";
 
-type _SlackEntityKind = (typeof SLACK_NODE_KINDS_ENTITY)[number];
+type SlackEntityKind = (typeof SLACK_NODE_KINDS_ENTITY)[number];
 
 export const NODE_TO_METHOD_ENTITY: Record<string, string> = {
   "slack/entity_presentDetails": "entity.presentDetails",

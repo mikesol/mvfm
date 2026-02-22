@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_TOOLING } from "./node-kinds-tooling";
 
-type _SlackToolingKind = (typeof SLACK_NODE_KINDS_TOOLING)[number];
+type SlackToolingKind = (typeof SLACK_NODE_KINDS_TOOLING)[number];
 
 export const NODE_TO_METHOD_TOOLING: Record<string, string> = {
   "slack/tooling_tokens_rotate": "tooling.tokens.rotate",

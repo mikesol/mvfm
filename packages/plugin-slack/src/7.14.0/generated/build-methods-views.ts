@@ -25,16 +25,20 @@ function liftArg(value: unknown): unknown {
 export function buildSlackViews(): SlackMethodsViews {
   return {
     open(params) {
-      return makeCExpr("slack/views_open", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/views_open", [liftArg(params)]);
+      return makeCExpr("slack/views_open", []);
     },
     publish(params) {
-      return makeCExpr("slack/views_publish", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/views_publish", [liftArg(params)]);
+      return makeCExpr("slack/views_publish", []);
     },
     push(params) {
-      return makeCExpr("slack/views_push", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/views_push", [liftArg(params)]);
+      return makeCExpr("slack/views_push", []);
     },
     update(params) {
-      return makeCExpr("slack/views_update", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/views_update", [liftArg(params)]);
+      return makeCExpr("slack/views_update", []);
     },
   };
 }

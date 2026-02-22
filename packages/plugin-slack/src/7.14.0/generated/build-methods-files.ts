@@ -26,52 +26,67 @@ export function buildSlackFiles(): SlackMethodsFiles {
   return {
     comments: {
       delete(params) {
-        return makeCExpr("slack/files_comments_delete", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/files_comments_delete", [liftArg(params)]);
+        return makeCExpr("slack/files_comments_delete", []);
       },
     },
     remote: {
       add(params) {
-        return makeCExpr("slack/files_remote_add", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/files_remote_add", [liftArg(params)]);
+        return makeCExpr("slack/files_remote_add", []);
       },
       info(params) {
-        return makeCExpr("slack/files_remote_info", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/files_remote_info", [liftArg(params)]);
+        return makeCExpr("slack/files_remote_info", []);
       },
       list(params) {
-        return makeCExpr("slack/files_remote_list", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/files_remote_list", [liftArg(params)]);
+        return makeCExpr("slack/files_remote_list", []);
       },
       remove(params) {
-        return makeCExpr("slack/files_remote_remove", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/files_remote_remove", [liftArg(params)]);
+        return makeCExpr("slack/files_remote_remove", []);
       },
       share(params) {
-        return makeCExpr("slack/files_remote_share", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/files_remote_share", [liftArg(params)]);
+        return makeCExpr("slack/files_remote_share", []);
       },
       update(params) {
-        return makeCExpr("slack/files_remote_update", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/files_remote_update", [liftArg(params)]);
+        return makeCExpr("slack/files_remote_update", []);
       },
     },
     completeUploadExternal(params) {
-      return makeCExpr("slack/files_completeUploadExternal", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/files_completeUploadExternal", [liftArg(params)]);
+      return makeCExpr("slack/files_completeUploadExternal", []);
     },
     delete(params) {
-      return makeCExpr("slack/files_delete", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/files_delete", [liftArg(params)]);
+      return makeCExpr("slack/files_delete", []);
     },
     getUploadURLExternal(params) {
-      return makeCExpr("slack/files_getUploadURLExternal", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/files_getUploadURLExternal", [liftArg(params)]);
+      return makeCExpr("slack/files_getUploadURLExternal", []);
     },
     info(params) {
-      return makeCExpr("slack/files_info", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/files_info", [liftArg(params)]);
+      return makeCExpr("slack/files_info", []);
     },
     list(params) {
-      return makeCExpr("slack/files_list", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/files_list", [liftArg(params)]);
+      return makeCExpr("slack/files_list", []);
     },
     revokePublicURL(params) {
-      return makeCExpr("slack/files_revokePublicURL", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/files_revokePublicURL", [liftArg(params)]);
+      return makeCExpr("slack/files_revokePublicURL", []);
     },
     sharedPublicURL(params) {
-      return makeCExpr("slack/files_sharedPublicURL", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/files_sharedPublicURL", [liftArg(params)]);
+      return makeCExpr("slack/files_sharedPublicURL", []);
     },
     upload(params) {
-      return makeCExpr("slack/files_upload", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/files_upload", [liftArg(params)]);
+      return makeCExpr("slack/files_upload", []);
     },
   };
 }

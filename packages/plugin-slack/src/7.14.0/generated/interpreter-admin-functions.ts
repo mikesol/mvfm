@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_ADMIN_FUNCTIONS } from "./node-kinds-admin-functions";
 
-type _SlackAdminFunctionsKind = (typeof SLACK_NODE_KINDS_ADMIN_FUNCTIONS)[number];
+type SlackAdminFunctionsKind = (typeof SLACK_NODE_KINDS_ADMIN_FUNCTIONS)[number];
 
 export const NODE_TO_METHOD_ADMIN_FUNCTIONS: Record<string, string> = {
   "slack/admin_functions_list": "admin.functions.list",

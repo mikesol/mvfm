@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_ADMIN_ANALYTICS } from "./node-kinds-admin-analytics";
 
-type _SlackAdminAnalyticsKind = (typeof SLACK_NODE_KINDS_ADMIN_ANALYTICS)[number];
+type SlackAdminAnalyticsKind = (typeof SLACK_NODE_KINDS_ADMIN_ANALYTICS)[number];
 
 export const NODE_TO_METHOD_ADMIN_ANALYTICS: Record<string, string> = {
   "slack/admin_analytics_getFile": "admin.analytics.getFile",

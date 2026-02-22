@@ -25,17 +25,20 @@ function liftArg(value: unknown): unknown {
 export function buildSlackReactions(): SlackMethodsReactions {
   return {
     add(params) {
-      return makeCExpr("slack/reactions_add", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/reactions_add", [liftArg(params)]);
+      return makeCExpr("slack/reactions_add", []);
     },
     get(params) {
-      return makeCExpr("slack/reactions_get", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/reactions_get", [liftArg(params)]);
+      return makeCExpr("slack/reactions_get", []);
     },
     list(params?) {
       if (params != null) return makeCExpr("slack/reactions_list", [liftArg(params)]);
       return makeCExpr("slack/reactions_list", []);
     },
     remove(params) {
-      return makeCExpr("slack/reactions_remove", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/reactions_remove", [liftArg(params)]);
+      return makeCExpr("slack/reactions_remove", []);
     },
   };
 }

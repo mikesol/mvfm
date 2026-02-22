@@ -25,7 +25,8 @@ function liftArg(value: unknown): unknown {
 export function buildSlackDialog(): SlackMethodsDialog {
   return {
     open(params) {
-      return makeCExpr("slack/dialog_open", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/dialog_open", [liftArg(params)]);
+      return makeCExpr("slack/dialog_open", []);
     },
   };
 }

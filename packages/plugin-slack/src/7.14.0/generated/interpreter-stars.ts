@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_STARS } from "./node-kinds-stars";
 
-type _SlackStarsKind = (typeof SLACK_NODE_KINDS_STARS)[number];
+type SlackStarsKind = (typeof SLACK_NODE_KINDS_STARS)[number];
 
 export const NODE_TO_METHOD_STARS: Record<string, string> = {
   "slack/stars_add": "stars.add",

@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_CANVASES } from "./node-kinds-canvases";
 
-type _SlackCanvasesKind = (typeof SLACK_NODE_KINDS_CANVASES)[number];
+type SlackCanvasesKind = (typeof SLACK_NODE_KINDS_CANVASES)[number];
 
 export const NODE_TO_METHOD_CANVASES: Record<string, string> = {
   "slack/canvases_access_delete": "canvases.access.delete",

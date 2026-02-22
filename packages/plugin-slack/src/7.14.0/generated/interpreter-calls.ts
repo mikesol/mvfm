@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_CALLS } from "./node-kinds-calls";
 
-type _SlackCallsKind = (typeof SLACK_NODE_KINDS_CALLS)[number];
+type SlackCallsKind = (typeof SLACK_NODE_KINDS_CALLS)[number];
 
 export const NODE_TO_METHOD_CALLS: Record<string, string> = {
   "slack/calls_add": "calls.add",

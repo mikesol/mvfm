@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_OAUTH } from "./node-kinds-oauth";
 
-type _SlackOauthKind = (typeof SLACK_NODE_KINDS_OAUTH)[number];
+type SlackOauthKind = (typeof SLACK_NODE_KINDS_OAUTH)[number];
 
 export const NODE_TO_METHOD_OAUTH: Record<string, string> = {
   "slack/oauth_access": "oauth.access",

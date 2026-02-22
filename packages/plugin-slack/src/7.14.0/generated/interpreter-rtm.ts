@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_RTM } from "./node-kinds-rtm";
 
-type _SlackRtmKind = (typeof SLACK_NODE_KINDS_RTM)[number];
+type SlackRtmKind = (typeof SLACK_NODE_KINDS_RTM)[number];
 
 export const NODE_TO_METHOD_RTM: Record<string, string> = {
   "slack/rtm_connect": "rtm.connect",

@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_SEARCH } from "./node-kinds-search";
 
-type _SlackSearchKind = (typeof SLACK_NODE_KINDS_SEARCH)[number];
+type SlackSearchKind = (typeof SLACK_NODE_KINDS_SEARCH)[number];
 
 export const NODE_TO_METHOD_SEARCH: Record<string, string> = {
   "slack/search_all": "search.all",

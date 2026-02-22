@@ -26,57 +26,77 @@ export function buildSlackAdminUsers(): SlackMethodsAdminUsers {
   return {
     session: {
       clearSettings(params) {
-        return makeCExpr("slack/admin_users_session_clearSettings", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_users_session_clearSettings", [liftArg(params)]);
+        return makeCExpr("slack/admin_users_session_clearSettings", []);
       },
       getSettings(params) {
-        return makeCExpr("slack/admin_users_session_getSettings", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_users_session_getSettings", [liftArg(params)]);
+        return makeCExpr("slack/admin_users_session_getSettings", []);
       },
       invalidate(params) {
-        return makeCExpr("slack/admin_users_session_invalidate", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_users_session_invalidate", [liftArg(params)]);
+        return makeCExpr("slack/admin_users_session_invalidate", []);
       },
       list(params?) {
         if (params != null) return makeCExpr("slack/admin_users_session_list", [liftArg(params)]);
         return makeCExpr("slack/admin_users_session_list", []);
       },
       reset(params) {
-        return makeCExpr("slack/admin_users_session_reset", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/admin_users_session_reset", [liftArg(params)]);
+        return makeCExpr("slack/admin_users_session_reset", []);
       },
       resetBulk(params) {
-        return makeCExpr("slack/admin_users_session_resetBulk", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_users_session_resetBulk", [liftArg(params)]);
+        return makeCExpr("slack/admin_users_session_resetBulk", []);
       },
       setSettings(params) {
-        return makeCExpr("slack/admin_users_session_setSettings", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_users_session_setSettings", [liftArg(params)]);
+        return makeCExpr("slack/admin_users_session_setSettings", []);
       },
     },
     unsupportedVersions: {
       export(params) {
-        return makeCExpr("slack/admin_users_unsupportedVersions_export", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/admin_users_unsupportedVersions_export", [liftArg(params)]);
+        return makeCExpr("slack/admin_users_unsupportedVersions_export", []);
       },
     },
     assign(params) {
-      return makeCExpr("slack/admin_users_assign", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_users_assign", [liftArg(params)]);
+      return makeCExpr("slack/admin_users_assign", []);
     },
     invite(params) {
-      return makeCExpr("slack/admin_users_invite", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_users_invite", [liftArg(params)]);
+      return makeCExpr("slack/admin_users_invite", []);
     },
     list(params?) {
       if (params != null) return makeCExpr("slack/admin_users_list", [liftArg(params)]);
       return makeCExpr("slack/admin_users_list", []);
     },
     remove(params) {
-      return makeCExpr("slack/admin_users_remove", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_users_remove", [liftArg(params)]);
+      return makeCExpr("slack/admin_users_remove", []);
     },
     setAdmin(params) {
-      return makeCExpr("slack/admin_users_setAdmin", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_users_setAdmin", [liftArg(params)]);
+      return makeCExpr("slack/admin_users_setAdmin", []);
     },
     setExpiration(params) {
-      return makeCExpr("slack/admin_users_setExpiration", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_users_setExpiration", [liftArg(params)]);
+      return makeCExpr("slack/admin_users_setExpiration", []);
     },
     setOwner(params) {
-      return makeCExpr("slack/admin_users_setOwner", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_users_setOwner", [liftArg(params)]);
+      return makeCExpr("slack/admin_users_setOwner", []);
     },
     setRegular(params) {
-      return makeCExpr("slack/admin_users_setRegular", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_users_setRegular", [liftArg(params)]);
+      return makeCExpr("slack/admin_users_setRegular", []);
     },
   };
 }

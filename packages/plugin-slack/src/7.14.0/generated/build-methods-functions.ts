@@ -25,10 +25,12 @@ function liftArg(value: unknown): unknown {
 export function buildSlackFunctions(): SlackMethodsFunctions {
   return {
     completeError(params) {
-      return makeCExpr("slack/functions_completeError", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/functions_completeError", [liftArg(params)]);
+      return makeCExpr("slack/functions_completeError", []);
     },
     completeSuccess(params) {
-      return makeCExpr("slack/functions_completeSuccess", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/functions_completeSuccess", [liftArg(params)]);
+      return makeCExpr("slack/functions_completeSuccess", []);
     },
   };
 }

@@ -7,8 +7,17 @@
 // ============================================================
 
 import type { CExpr, Interpreter, KindSpec } from "@mvfm/core";
-import { makeCExpr } from "@mvfm/core";
+import { isCExpr, makeCExpr } from "@mvfm/core";
 import { createConsoleInterpreter } from "./interpreter";
+
+/** Lift plain objects/arrays to structural CExpr nodes so elaborate can process them. */
+function liftConsoleArg(value: unknown): unknown {
+  if (value === null || value === undefined) return value;
+  if (isCExpr(value)) return value;
+  if (typeof value !== "object") return value;
+  if (Array.isArray(value)) return makeCExpr("core/tuple", [value]);
+  return makeCExpr("core/record", [value]);
+}
 
 /**
  * Full set of Node.js console methods covered by this plugin.
@@ -141,11 +150,11 @@ function buildConsoleApi(): ConsoleApi {
     debug: (...data) => call("debug", data),
     dir: (item?, options?) => {
       const args: unknown[] = [];
-      if (item !== undefined) args.push(item);
-      if (options !== undefined) args.push(options);
+      if (item !== undefined) args.push(liftConsoleArg(item));
+      if (options !== undefined) args.push(liftConsoleArg(options));
       return call("dir", args);
     },
-    dirxml: (...data) => call("dirxml", data),
+    dirxml: (...data) => call("dirxml", data.map(liftConsoleArg)),
     error: (...data) => call("error", data),
     group: (...data) => call("group", data),
     groupCollapsed: (...data) => call("groupCollapsed", data),
@@ -154,8 +163,8 @@ function buildConsoleApi(): ConsoleApi {
     log: (...data) => call("log", data),
     table: (tabularData?, properties?) => {
       const args: unknown[] = [];
-      if (tabularData !== undefined) args.push(tabularData);
-      if (properties !== undefined) args.push(properties);
+      if (tabularData !== undefined) args.push(liftConsoleArg(tabularData));
+      if (properties !== undefined) args.push(liftConsoleArg(properties));
       return call("table", args);
     },
     time: (label?) => call("time", label === undefined ? [] : [label]),

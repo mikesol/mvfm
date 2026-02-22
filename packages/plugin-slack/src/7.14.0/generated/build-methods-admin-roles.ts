@@ -25,14 +25,17 @@ function liftArg(value: unknown): unknown {
 export function buildSlackAdminRoles(): SlackMethodsAdminRoles {
   return {
     addAssignments(params) {
-      return makeCExpr("slack/admin_roles_addAssignments", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/admin_roles_addAssignments", [liftArg(params)]);
+      return makeCExpr("slack/admin_roles_addAssignments", []);
     },
     listAssignments(params?) {
       if (params != null) return makeCExpr("slack/admin_roles_listAssignments", [liftArg(params)]);
       return makeCExpr("slack/admin_roles_listAssignments", []);
     },
     removeAssignments(params) {
-      return makeCExpr("slack/admin_roles_removeAssignments", [liftArg(params)]);
+      if (params != null)
+        return makeCExpr("slack/admin_roles_removeAssignments", [liftArg(params)]);
+      return makeCExpr("slack/admin_roles_removeAssignments", []);
     },
   };
 }

@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_ADMIN_BARRIERS } from "./node-kinds-admin-barriers";
 
-type _SlackAdminBarriersKind = (typeof SLACK_NODE_KINDS_ADMIN_BARRIERS)[number];
+type SlackAdminBarriersKind = (typeof SLACK_NODE_KINDS_ADMIN_BARRIERS)[number];
 
 export const NODE_TO_METHOD_ADMIN_BARRIERS: Record<string, string> = {
   "slack/admin_barriers_create": "admin.barriers.create",

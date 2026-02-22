@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_FUNCTIONS } from "./node-kinds-functions";
 
-type _SlackFunctionsKind = (typeof SLACK_NODE_KINDS_FUNCTIONS)[number];
+type SlackFunctionsKind = (typeof SLACK_NODE_KINDS_FUNCTIONS)[number];
 
 export const NODE_TO_METHOD_FUNCTIONS: Record<string, string> = {
   "slack/functions_completeError": "functions.completeError",

@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_MIGRATION } from "./node-kinds-migration";
 
-type _SlackMigrationKind = (typeof SLACK_NODE_KINDS_MIGRATION)[number];
+type SlackMigrationKind = (typeof SLACK_NODE_KINDS_MIGRATION)[number];
 
 export const NODE_TO_METHOD_MIGRATION: Record<string, string> = {
   "slack/migration_exchange": "migration.exchange",

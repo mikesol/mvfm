@@ -26,20 +26,28 @@ export function buildSlackConversations(): SlackMethodsConversations {
   return {
     canvases: {
       create(params) {
-        return makeCExpr("slack/conversations_canvases_create", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/conversations_canvases_create", [liftArg(params)]);
+        return makeCExpr("slack/conversations_canvases_create", []);
       },
     },
     externalInvitePermissions: {
       set(params) {
-        return makeCExpr("slack/conversations_externalInvitePermissions_set", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/conversations_externalInvitePermissions_set", [liftArg(params)]);
+        return makeCExpr("slack/conversations_externalInvitePermissions_set", []);
       },
     },
     requestSharedInvite: {
       approve(params) {
-        return makeCExpr("slack/conversations_requestSharedInvite_approve", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/conversations_requestSharedInvite_approve", [liftArg(params)]);
+        return makeCExpr("slack/conversations_requestSharedInvite_approve", []);
       },
       deny(params) {
-        return makeCExpr("slack/conversations_requestSharedInvite_deny", [liftArg(params)]);
+        if (params != null)
+          return makeCExpr("slack/conversations_requestSharedInvite_deny", [liftArg(params)]);
+        return makeCExpr("slack/conversations_requestSharedInvite_deny", []);
       },
       list(params?) {
         if (params != null)
@@ -48,43 +56,59 @@ export function buildSlackConversations(): SlackMethodsConversations {
       },
     },
     acceptSharedInvite(params) {
-      return makeCExpr("slack/conversations_acceptSharedInvite", [liftArg(params)]);
+      if (params != null)
+        return makeCExpr("slack/conversations_acceptSharedInvite", [liftArg(params)]);
+      return makeCExpr("slack/conversations_acceptSharedInvite", []);
     },
     approveSharedInvite(params) {
-      return makeCExpr("slack/conversations_approveSharedInvite", [liftArg(params)]);
+      if (params != null)
+        return makeCExpr("slack/conversations_approveSharedInvite", [liftArg(params)]);
+      return makeCExpr("slack/conversations_approveSharedInvite", []);
     },
     archive(params) {
-      return makeCExpr("slack/conversations_archive", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/conversations_archive", [liftArg(params)]);
+      return makeCExpr("slack/conversations_archive", []);
     },
     close(params) {
-      return makeCExpr("slack/conversations_close", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/conversations_close", [liftArg(params)]);
+      return makeCExpr("slack/conversations_close", []);
     },
     create(params) {
-      return makeCExpr("slack/conversations_create", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/conversations_create", [liftArg(params)]);
+      return makeCExpr("slack/conversations_create", []);
     },
     declineSharedInvite(params) {
-      return makeCExpr("slack/conversations_declineSharedInvite", [liftArg(params)]);
+      if (params != null)
+        return makeCExpr("slack/conversations_declineSharedInvite", [liftArg(params)]);
+      return makeCExpr("slack/conversations_declineSharedInvite", []);
     },
     history(params) {
-      return makeCExpr("slack/conversations_history", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/conversations_history", [liftArg(params)]);
+      return makeCExpr("slack/conversations_history", []);
     },
     info(params) {
-      return makeCExpr("slack/conversations_info", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/conversations_info", [liftArg(params)]);
+      return makeCExpr("slack/conversations_info", []);
     },
     invite(params) {
-      return makeCExpr("slack/conversations_invite", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/conversations_invite", [liftArg(params)]);
+      return makeCExpr("slack/conversations_invite", []);
     },
     inviteShared(params) {
-      return makeCExpr("slack/conversations_inviteShared", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/conversations_inviteShared", [liftArg(params)]);
+      return makeCExpr("slack/conversations_inviteShared", []);
     },
     join(params) {
-      return makeCExpr("slack/conversations_join", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/conversations_join", [liftArg(params)]);
+      return makeCExpr("slack/conversations_join", []);
     },
     kick(params) {
-      return makeCExpr("slack/conversations_kick", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/conversations_kick", [liftArg(params)]);
+      return makeCExpr("slack/conversations_kick", []);
     },
     leave(params) {
-      return makeCExpr("slack/conversations_leave", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/conversations_leave", [liftArg(params)]);
+      return makeCExpr("slack/conversations_leave", []);
     },
     list(params?) {
       if (params != null) return makeCExpr("slack/conversations_list", [liftArg(params)]);
@@ -96,28 +120,36 @@ export function buildSlackConversations(): SlackMethodsConversations {
       return makeCExpr("slack/conversations_listConnectInvites", []);
     },
     mark(params) {
-      return makeCExpr("slack/conversations_mark", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/conversations_mark", [liftArg(params)]);
+      return makeCExpr("slack/conversations_mark", []);
     },
     members(params) {
-      return makeCExpr("slack/conversations_members", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/conversations_members", [liftArg(params)]);
+      return makeCExpr("slack/conversations_members", []);
     },
     open(params) {
-      return makeCExpr("slack/conversations_open", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/conversations_open", [liftArg(params)]);
+      return makeCExpr("slack/conversations_open", []);
     },
     rename(params) {
-      return makeCExpr("slack/conversations_rename", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/conversations_rename", [liftArg(params)]);
+      return makeCExpr("slack/conversations_rename", []);
     },
     replies(params) {
-      return makeCExpr("slack/conversations_replies", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/conversations_replies", [liftArg(params)]);
+      return makeCExpr("slack/conversations_replies", []);
     },
     setPurpose(params) {
-      return makeCExpr("slack/conversations_setPurpose", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/conversations_setPurpose", [liftArg(params)]);
+      return makeCExpr("slack/conversations_setPurpose", []);
     },
     setTopic(params) {
-      return makeCExpr("slack/conversations_setTopic", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/conversations_setTopic", [liftArg(params)]);
+      return makeCExpr("slack/conversations_setTopic", []);
     },
     unarchive(params) {
-      return makeCExpr("slack/conversations_unarchive", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/conversations_unarchive", [liftArg(params)]);
+      return makeCExpr("slack/conversations_unarchive", []);
     },
   };
 }

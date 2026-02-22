@@ -26,27 +26,33 @@ export function buildSlackUsergroups(): SlackMethodsUsergroups {
   return {
     users: {
       list(params) {
-        return makeCExpr("slack/usergroups_users_list", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/usergroups_users_list", [liftArg(params)]);
+        return makeCExpr("slack/usergroups_users_list", []);
       },
       update(params) {
-        return makeCExpr("slack/usergroups_users_update", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/usergroups_users_update", [liftArg(params)]);
+        return makeCExpr("slack/usergroups_users_update", []);
       },
     },
     create(params) {
-      return makeCExpr("slack/usergroups_create", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/usergroups_create", [liftArg(params)]);
+      return makeCExpr("slack/usergroups_create", []);
     },
     disable(params) {
-      return makeCExpr("slack/usergroups_disable", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/usergroups_disable", [liftArg(params)]);
+      return makeCExpr("slack/usergroups_disable", []);
     },
     enable(params) {
-      return makeCExpr("slack/usergroups_enable", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/usergroups_enable", [liftArg(params)]);
+      return makeCExpr("slack/usergroups_enable", []);
     },
     list(params?) {
       if (params != null) return makeCExpr("slack/usergroups_list", [liftArg(params)]);
       return makeCExpr("slack/usergroups_list", []);
     },
     update(params) {
-      return makeCExpr("slack/usergroups_update", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/usergroups_update", [liftArg(params)]);
+      return makeCExpr("slack/usergroups_update", []);
     },
   };
 }

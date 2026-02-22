@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_CONVERSATIONS } from "./node-kinds-conversations";
 
-type _SlackConversationsKind = (typeof SLACK_NODE_KINDS_CONVERSATIONS)[number];
+type SlackConversationsKind = (typeof SLACK_NODE_KINDS_CONVERSATIONS)[number];
 
 export const NODE_TO_METHOD_CONVERSATIONS: Record<string, string> = {
   "slack/conversations_acceptSharedInvite": "conversations.acceptSharedInvite",

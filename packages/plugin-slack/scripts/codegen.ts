@@ -424,18 +424,11 @@ function generateBuildMethodsGroup(group: GroupData): string {
     }
     for (const m of node.methods) {
       const methodName = m.path[m.path.length - 1];
-      if (m.optional) {
-        lines.push(`${indent}${methodName}(params?) {`);
-        lines.push(`${indent}  if (params != null) return makeCExpr("${m.nodeKind}", [liftArg(params)]);`);
-        lines.push(`${indent}  return makeCExpr("${m.nodeKind}", []);`);
-        lines.push(`${indent}},`);
-      } else {
-        lines.push(`${indent}${methodName}(params) {`);
-        lines.push(
-          `${indent}  return makeCExpr("${m.nodeKind}", [liftArg(params)]);`,
-        );
-        lines.push(`${indent}},`);
-      }
+      const paramSig = m.optional ? "params?" : "params";
+      lines.push(`${indent}${methodName}(${paramSig}) {`);
+      lines.push(`${indent}  if (params != null) return makeCExpr("${m.nodeKind}", [liftArg(params)]);`);
+      lines.push(`${indent}  return makeCExpr("${m.nodeKind}", []);`);
+      lines.push(`${indent}},`);
     }
   }
 

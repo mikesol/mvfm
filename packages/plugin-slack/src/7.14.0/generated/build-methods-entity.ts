@@ -25,7 +25,8 @@ function liftArg(value: unknown): unknown {
 export function buildSlackEntity(): SlackMethodsEntity {
   return {
     presentDetails(params) {
-      return makeCExpr("slack/entity_presentDetails", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/entity_presentDetails", [liftArg(params)]);
+      return makeCExpr("slack/entity_presentDetails", []);
     },
   };
 }

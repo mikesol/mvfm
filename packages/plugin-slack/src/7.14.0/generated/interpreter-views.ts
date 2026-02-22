@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_VIEWS } from "./node-kinds-views";
 
-type _SlackViewsKind = (typeof SLACK_NODE_KINDS_VIEWS)[number];
+type SlackViewsKind = (typeof SLACK_NODE_KINDS_VIEWS)[number];
 
 export const NODE_TO_METHOD_VIEWS: Record<string, string> = {
   "slack/views_open": "views.open",

@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_ASSISTANT } from "./node-kinds-assistant";
 
-type _SlackAssistantKind = (typeof SLACK_NODE_KINDS_ASSISTANT)[number];
+type SlackAssistantKind = (typeof SLACK_NODE_KINDS_ASSISTANT)[number];
 
 export const NODE_TO_METHOD_ASSISTANT: Record<string, string> = {
   "slack/assistant_threads_setStatus": "assistant.threads.setStatus",

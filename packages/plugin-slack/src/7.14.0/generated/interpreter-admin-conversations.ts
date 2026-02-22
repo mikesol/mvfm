@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_ADMIN_CONVERSATIONS } from "./node-kinds-admin-conversations";
 
-type _SlackAdminConversationsKind = (typeof SLACK_NODE_KINDS_ADMIN_CONVERSATIONS)[number];
+type SlackAdminConversationsKind = (typeof SLACK_NODE_KINDS_ADMIN_CONVERSATIONS)[number];
 
 export const NODE_TO_METHOD_ADMIN_CONVERSATIONS: Record<string, string> = {
   "slack/admin_conversations_archive": "admin.conversations.archive",

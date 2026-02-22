@@ -25,16 +25,20 @@ function liftArg(value: unknown): unknown {
 export function buildSlackBookmarks(): SlackMethodsBookmarks {
   return {
     add(params) {
-      return makeCExpr("slack/bookmarks_add", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/bookmarks_add", [liftArg(params)]);
+      return makeCExpr("slack/bookmarks_add", []);
     },
     edit(params) {
-      return makeCExpr("slack/bookmarks_edit", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/bookmarks_edit", [liftArg(params)]);
+      return makeCExpr("slack/bookmarks_edit", []);
     },
     list(params) {
-      return makeCExpr("slack/bookmarks_list", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/bookmarks_list", [liftArg(params)]);
+      return makeCExpr("slack/bookmarks_list", []);
     },
     remove(params) {
-      return makeCExpr("slack/bookmarks_remove", [liftArg(params)]);
+      if (params != null) return makeCExpr("slack/bookmarks_remove", [liftArg(params)]);
+      return makeCExpr("slack/bookmarks_remove", []);
     },
   };
 }

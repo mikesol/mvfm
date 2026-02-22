@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_ADMIN_USERGROUPS } from "./node-kinds-admin-usergroups";
 
-type _SlackAdminUsergroupsKind = (typeof SLACK_NODE_KINDS_ADMIN_USERGROUPS)[number];
+type SlackAdminUsergroupsKind = (typeof SLACK_NODE_KINDS_ADMIN_USERGROUPS)[number];
 
 export const NODE_TO_METHOD_ADMIN_USERGROUPS: Record<string, string> = {
   "slack/admin_usergroups_addChannels": "admin.usergroups.addChannels",

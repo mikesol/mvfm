@@ -26,7 +26,8 @@ export function buildSlackOpenid(): SlackMethodsOpenid {
   return {
     connect: {
       token(params) {
-        return makeCExpr("slack/openid_connect_token", [liftArg(params)]);
+        if (params != null) return makeCExpr("slack/openid_connect_token", [liftArg(params)]);
+        return makeCExpr("slack/openid_connect_token", []);
       },
       userInfo(params?) {
         if (params != null) return makeCExpr("slack/openid_connect_userInfo", [liftArg(params)]);

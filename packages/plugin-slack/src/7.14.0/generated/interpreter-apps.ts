@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_APPS } from "./node-kinds-apps";
 
-type _SlackAppsKind = (typeof SLACK_NODE_KINDS_APPS)[number];
+type SlackAppsKind = (typeof SLACK_NODE_KINDS_APPS)[number];
 
 export const NODE_TO_METHOD_APPS: Record<string, string> = {
   "slack/apps_connections_open": "apps.connections.open",

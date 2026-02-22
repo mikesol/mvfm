@@ -3,7 +3,7 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import type { SLACK_NODE_KINDS_ADMIN_AUTH } from "./node-kinds-admin-auth";
 
-type _SlackAdminAuthKind = (typeof SLACK_NODE_KINDS_ADMIN_AUTH)[number];
+type SlackAdminAuthKind = (typeof SLACK_NODE_KINDS_ADMIN_AUTH)[number];
 
 export const NODE_TO_METHOD_ADMIN_AUTH: Record<string, string> = {
   "slack/admin_auth_policy_assignEntities": "admin.auth.policy.assignEntities",
