@@ -12,7 +12,7 @@ import {
   defaults,
   fold,
   mul,
-  mvfmU,
+  composeDollar,
   numLit,
   numPlugin,
   pipe,
@@ -261,7 +261,7 @@ describe("16-bridge", () => {
       defaultInterpreter: () => eqI,
     };
     const fi = defaults([numPD, strPD, boolPD, fpEq]);
-    const $ = mvfmU(numPlugin, strPlugin, boolPlugin);
+    const $ = composeDollar(numPlugin, strPlugin, boolPlugin);
 
     expect(await fold<boolean>(app($.eq(3, 4)).__id, app($.eq(3, 4)).__adj, fi)).toBe(false);
     expect(await fold<boolean>(app($.eq(3, 3)).__id, app($.eq(3, 3)).__adj, fi)).toBe(true);

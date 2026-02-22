@@ -7,7 +7,7 @@ import {
   defaults,
   fold,
   type Interpreter,
-  mvfmU,
+  composeDollar,
   numPlugin,
   type PluginDef,
   pipe,
@@ -35,7 +35,7 @@ const fpEq: PluginDef = {
   defaultInterpreter: () => eqInterp,
 };
 const fullInterp = defaults([...stdPlugins, fpEq]);
-const $ = mvfmU(numPlugin, strPlugin, boolPlugin);
+const $ = composeDollar(numPlugin, strPlugin, boolPlugin);
 
 // ── num interpreter for structural tests ─────────────────────────────
 const numInterp = defaults(stdPlugins);

@@ -22,7 +22,7 @@ import {
   lt,
   makeCExpr,
   mul,
-  mvfmU,
+  composeDollar,
   not,
   numLit,
   or,
@@ -135,14 +135,14 @@ describe("02-build (types exist)", () => {
 // =====================================================================
 describe("03-traits (types exist)", () => {
   test("mvfm bag contains constructors", () => {
-    // mvfmU tests are in 03a-composition below
+    // composeDollar tests are in 03a-composition below
     const c = eq(3, 4);
     expect(c.__kind).toBe("eq");
   });
 });
 
 // =====================================================================
-// 03a-composition: runtime map builders + mvfmU
+// 03a-composition: runtime map builders + composeDollar
 // =====================================================================
 describe("03a-composition", () => {
   test("buildLiftMap from stdPlugins", () => {
@@ -177,17 +177,17 @@ describe("03a-composition", () => {
     expect(kiExt["num/lt"]).toEqual(["number", "number"]);
   });
 
-  test("mvfmU produces working constructors", () => {
-    const $std = mvfmU(...stdPlugins);
+  test("composeDollar produces working constructors", () => {
+    const $std = composeDollar(...stdPlugins);
     expect($std.add(1, 2).__kind).toBe("num/add");
     expect($std.eq(3, 4).__kind).toBe("eq");
-    const $ext = mvfmU(...stdPlugins, ordPlugin);
+    const $ext = composeDollar(...stdPlugins, ordPlugin);
     expect($ext.lt(3, 4).__kind).toBe("lt");
     expect($ext.eq(3, 4).__kind).toBe("eq");
   });
 
-  test("mvfmU multi-type simultaneous", () => {
-    const $all = mvfmU(...stdPlugins);
+  test("composeDollar multi-type simultaneous", () => {
+    const $all = composeDollar(...stdPlugins);
     expect($all.add(1, 2).__kind).toBe("num/add");
     expect($all.strLit("hi")).toBe("hi");
     expect($all.eq(1, 2).__kind).toBe("eq");

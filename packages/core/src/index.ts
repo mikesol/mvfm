@@ -125,7 +125,7 @@ export {
   buildLiftMap,
   buildStructuralShapes,
   buildTraitMap,
-  mvfmU,
+  composeDollar,
 } from "./plugin";
 export * from "./predicates";
 export * from "./replace";

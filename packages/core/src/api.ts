@@ -12,7 +12,7 @@ import { isCExpr, makeCExpr, makeNExpr } from "./expr";
 import type { FoldState } from "./fold";
 import { defaults as internalDefaults, fold as internalFold } from "./fold";
 import type { DollarSign, Interpreter, Plugin } from "./plugin";
-import { mvfmU } from "./plugin";
+import { composeDollar } from "./plugin";
 import type { RecordingStack } from "./recording";
 import { runBlock } from "./recording";
 import { boolPlugin, numPlugin, ordPlugin, strPlugin } from "./std-plugins";
@@ -118,7 +118,7 @@ export function mvfm<const P extends readonly PluginInput[]>(...pluginInputs: P)
 
     const effects: unknown[] = [];
     const recording: RecordingStack = [];
-    const pluginDollar = mvfmU(...plugins);
+    const pluginDollar = composeDollar(...plugins);
 
     // Build $ with core extensions. Runtime uses Record<string, unknown> internally;
     // the public type exposed to the callback is MvfmDollar<P>.
