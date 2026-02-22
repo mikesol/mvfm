@@ -50,18 +50,38 @@ export type Handler = (entry: RuntimeEntry) => AsyncGenerator<FoldYield, unknown
 /** Maps node kind strings to their handlers. */
 export type Interpreter = Record<string, Handler>;
 
+// ─── ExtractKinds: collect CExpr kinds from ctor types ──────────
+
+/** Recursively walks a type and collects all CExpr kind strings it produces. */
+export type ExtractKinds<T> =
+  T extends CExpr<any, infer K extends string, any>
+    ? K
+    : T extends (...args: any[]) => infer R
+      ? ExtractKinds<R>
+      : T extends Record<string, unknown>
+        ? { [P in keyof T]: ExtractKinds<T[P]> }[keyof T]
+        : never;
+
+/** Filters out core/* kinds — core is universal infrastructure any plugin can reference. */
+type NonCoreKinds<K> = K extends `core/${string}` ? never : K;
+
+/** Validates that all non-core kinds produced by Ctors are declared in Kinds. */
+type ValidateCtors<Ctors, Kinds> =
+  0 extends (1 & Ctors) ? Ctors
+  : [NonCoreKinds<ExtractKinds<Ctors>>] extends [keyof Kinds] ? Ctors : never;
+
 // ─── Plugin: unified type info + runtime ───────────────────────────
 
 /** Unified plugin type carrying constructors, kind specs, traits, lifts, and interpreter. */
 export interface Plugin<
   Name extends string = string,
-  Ctors extends Record<string, (...args: any[]) => any> = any,
+  Ctors = any,
   Kinds extends Record<string, KindSpec<any, any>> = any,
   Traits extends Record<string, TraitDef<any, any>> = any,
   Lifts extends Record<string, string> = any,
 > {
   readonly name: Name;
-  readonly ctors: Ctors;
+  readonly ctors: ValidateCtors<Ctors, Kinds>;
   readonly kinds: Kinds;
   readonly traits: Traits;
   readonly lifts: Lifts;
