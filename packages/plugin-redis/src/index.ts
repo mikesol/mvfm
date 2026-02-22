@@ -1,4 +1,4 @@
-export type { RedisConfig, RedisMethods } from "./5.4.1";
+export type { RedisConfig } from "./5.4.1";
 export { redis, redisPlugin } from "./5.4.1";
 export { wrapIoredis } from "./5.4.1/client-ioredis";
 export type { ClientHandlerOptions } from "./5.4.1/handler.client";
