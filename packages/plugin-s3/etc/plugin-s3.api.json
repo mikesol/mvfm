@@ -697,7 +697,7 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown[], unknown>>;\n    traits: {};\n    lifts: {};\n    nodeKinds: (\"s3/array\" | \"s3/record\" | \"s3/put_object\" | \"s3/get_object\" | \"s3/delete_object\" | \"s3/head_object\" | \"s3/list_objects_v2\")[];\n}"
+              "text": "<any, any>>;\n    traits: {};\n    lifts: {};\n}"
             },
             {
               "kind": "Content",

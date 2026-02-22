@@ -106,28 +106,49 @@ export interface PostgresConfig {
 
 // ---- Node kinds -------------------------------------------
 
-const NODE_KINDS = [
-  "postgres/query",
-  "postgres/identifier",
-  "postgres/insert_helper",
-  "postgres/set_helper",
-  "postgres/begin",
-  "postgres/savepoint",
-  "postgres/cursor",
-  "postgres/cursor_batch",
-  "postgres/record",
-  "postgres/array",
-] as const;
-
-function buildKinds(): Record<string, KindSpec<unknown[], unknown>> {
-  const kinds: Record<string, KindSpec<unknown[], unknown>> = {};
-  for (const kind of NODE_KINDS) {
-    kinds[kind] = {
-      inputs: [] as unknown[],
+function buildKinds(): Record<string, KindSpec<any, any>> {
+  return {
+    "postgres/query": {
+      inputs: [0] as [number, ...unknown[]],
+      output: [] as unknown[],
+    } as KindSpec<[number, ...unknown[]], unknown[]>,
+    "postgres/identifier": {
+      inputs: [undefined] as [unknown],
       output: undefined as unknown,
-    } as KindSpec<unknown[], unknown>;
-  }
-  return kinds;
+    } as KindSpec<[unknown], unknown>,
+    "postgres/insert_helper": {
+      inputs: [undefined, ""] as [unknown, string],
+      output: undefined as unknown,
+    } as KindSpec<[unknown, string], unknown>,
+    "postgres/set_helper": {
+      inputs: [undefined, ""] as [unknown, string],
+      output: undefined as unknown,
+    } as KindSpec<[unknown, string], unknown>,
+    "postgres/begin": {
+      inputs: [""] as [string, ...unknown[]],
+      output: undefined as unknown,
+    } as KindSpec<[string, ...unknown[]], unknown>,
+    "postgres/savepoint": {
+      inputs: [""] as [string, ...unknown[]],
+      output: undefined as unknown,
+    } as KindSpec<[string, ...unknown[]], unknown>,
+    "postgres/cursor": {
+      inputs: [undefined, undefined, undefined] as [unknown, unknown, unknown],
+      output: undefined as unknown as undefined,
+    } as KindSpec<[unknown, unknown, unknown], void>,
+    "postgres/cursor_batch": {
+      inputs: [] as [],
+      output: [] as unknown[],
+    } as KindSpec<[], unknown[]>,
+    "postgres/record": {
+      inputs: [] as unknown[],
+      output: {} as Record<string, unknown>,
+    } as KindSpec<unknown[], Record<string, unknown>>,
+    "postgres/array": {
+      inputs: [] as unknown[],
+      output: [] as unknown[],
+    } as KindSpec<unknown[], unknown[]>,
+  };
 }
 
 // ---- Lift helper ------------------------------------------
@@ -245,7 +266,6 @@ export function postgres(config?: PostgresConfig | string) {
     kinds: buildKinds(),
     traits: {},
     lifts: {},
-    nodeKinds: [...NODE_KINDS],
   };
 }
 

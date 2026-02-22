@@ -58,17 +58,17 @@ describe("redis plugin: unified Plugin shape", () => {
   });
 
   it("has 39 node kinds (37 commands + record + array)", () => {
-    expect(plugin.nodeKinds).toHaveLength(39);
+    expect(Object.keys(plugin.kinds)).toHaveLength(39);
   });
 
   it("nodeKinds are all namespaced", () => {
-    for (const kind of plugin.nodeKinds) {
+    for (const kind of Object.keys(plugin.kinds)) {
       expect(kind).toMatch(/^redis\//);
     }
   });
 
   it("kinds map has entries for all node kinds", () => {
-    for (const kind of plugin.nodeKinds) {
+    for (const kind of Object.keys(plugin.kinds)) {
       expect(plugin.kinds[kind]).toBeDefined();
     }
   });

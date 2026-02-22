@@ -34,10 +34,9 @@ export function postgres(config?: PostgresConfig | string): {
     ctors: {
         sql: PostgresSql;
     };
-    kinds: Record<string, KindSpec<unknown[], unknown>>;
+    kinds: Record<string, KindSpec<any, any>>;
     traits: {};
     lifts: {};
-    nodeKinds: ("postgres/query" | "postgres/identifier" | "postgres/insert_helper" | "postgres/set_helper" | "postgres/begin" | "postgres/savepoint" | "postgres/cursor" | "postgres/cursor_batch" | "postgres/record" | "postgres/array")[];
 };
 
 // @public

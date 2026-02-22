@@ -130,25 +130,37 @@ export interface CloudflareKvConfig {
 
 // ---- Node kinds -------------------------------------------
 
-const NODE_KINDS = [
-  "cloudflare-kv/get",
-  "cloudflare-kv/get_json",
-  "cloudflare-kv/put",
-  "cloudflare-kv/delete",
-  "cloudflare-kv/list",
-  "cloudflare-kv/record",
-  "cloudflare-kv/array",
-] as const;
-
-function buildKinds(): Record<string, KindSpec<unknown[], unknown>> {
-  const kinds: Record<string, KindSpec<unknown[], unknown>> = {};
-  for (const kind of NODE_KINDS) {
-    kinds[kind] = {
-      inputs: [] as unknown[],
+function buildKinds(): Record<string, KindSpec<any, any>> {
+  return {
+    "cloudflare-kv/get": {
+      inputs: [""] as [string],
+      output: null as string | null,
+    } as KindSpec<[string], string | null>,
+    "cloudflare-kv/get_json": {
+      inputs: [""] as [string],
       output: undefined as unknown,
-    } as KindSpec<unknown[], unknown>;
-  }
-  return kinds;
+    } as KindSpec<[string], unknown>,
+    "cloudflare-kv/put": {
+      inputs: ["", ""] as [string, string],
+      output: undefined as unknown as undefined,
+    } as KindSpec<[string, string], void>,
+    "cloudflare-kv/delete": {
+      inputs: [""] as [string],
+      output: undefined as unknown as undefined,
+    } as KindSpec<[string], void>,
+    "cloudflare-kv/list": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "cloudflare-kv/record": {
+      inputs: [] as unknown[],
+      output: {} as Record<string, unknown>,
+    } as KindSpec<unknown[], Record<string, unknown>>,
+    "cloudflare-kv/array": {
+      inputs: [] as unknown[],
+      output: [] as unknown[],
+    } as KindSpec<unknown[], unknown[]>,
+  };
 }
 
 // ---- Constructor builder ----------------------------------
@@ -214,7 +226,6 @@ export function cloudflareKv(_config: CloudflareKvConfig) {
     kinds: buildKinds(),
     traits: {},
     lifts: {},
-    nodeKinds: [...NODE_KINDS],
   };
 }
 

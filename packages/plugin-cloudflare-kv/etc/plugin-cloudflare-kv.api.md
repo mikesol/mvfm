@@ -28,10 +28,9 @@ export function cloudflareKv(_config: CloudflareKvConfig): {
             list(options?: CExpr<KvListOptions> | KvListOptions): CExpr<KvListResult>;
         };
     };
-    kinds: Record<string, KindSpec<unknown[], unknown>>;
+    kinds: Record<string, KindSpec<any, any>>;
     traits: {};
     lifts: {};
-    nodeKinds: ("cloudflare-kv/array" | "cloudflare-kv/record" | "cloudflare-kv/get" | "cloudflare-kv/get_json" | "cloudflare-kv/put" | "cloudflare-kv/delete" | "cloudflare-kv/list")[];
 };
 
 // @public

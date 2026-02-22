@@ -92,17 +92,17 @@ describe("cloudflare-kv plugin: unified Plugin shape", () => {
   });
 
   it("has 7 node kinds (5 core + record + array)", () => {
-    expect(plugin.nodeKinds).toHaveLength(7);
+    expect(Object.keys(plugin.kinds)).toHaveLength(7);
   });
 
   it("nodeKinds are all namespaced", () => {
-    for (const kind of plugin.nodeKinds) {
+    for (const kind of Object.keys(plugin.kinds)) {
       expect(kind).toMatch(/^cloudflare-kv\//);
     }
   });
 
   it("kinds map has entries for all node kinds", () => {
-    for (const kind of plugin.nodeKinds) {
+    for (const kind of Object.keys(plugin.kinds)) {
       expect(plugin.kinds[kind]).toBeDefined();
     }
   });

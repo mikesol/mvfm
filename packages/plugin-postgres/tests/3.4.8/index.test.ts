@@ -148,10 +148,10 @@ describe("postgres: cursor", () => {
 describe("postgres: plugin structure", () => {
   it("has correct name and nodeKinds", () => {
     expect(plugin.name).toBe("postgres");
-    expect(plugin.nodeKinds).toContain("postgres/query");
-    expect(plugin.nodeKinds).toContain("postgres/begin");
-    expect(plugin.nodeKinds).toContain("postgres/cursor");
-    expect(plugin.nodeKinds).toHaveLength(10);
+    expect(Object.keys(plugin.kinds)).toContain("postgres/query");
+    expect(Object.keys(plugin.kinds)).toContain("postgres/begin");
+    expect(Object.keys(plugin.kinds)).toContain("postgres/cursor");
+    expect(Object.keys(plugin.kinds)).toHaveLength(10);
   });
 
   it("string config accepted", () => {

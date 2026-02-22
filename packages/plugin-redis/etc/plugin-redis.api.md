@@ -64,10 +64,9 @@ export function redis(config?: RedisConfig | string): {
             linsert(key: CExpr<string> | string, position: "BEFORE" | "AFTER", pivot: CExpr<string | number> | string | number, element: CExpr<string | number> | string | number): CExpr<number>;
         };
     };
-    kinds: Record<string, KindSpec<unknown[], unknown>>;
+    kinds: Record<string, KindSpec<any, any>>;
     traits: {};
     lifts: {};
-    nodeKinds: ("redis/array" | "redis/record" | "redis/get" | "redis/set" | "redis/incr" | "redis/incrby" | "redis/decr" | "redis/decrby" | "redis/mget" | "redis/mset" | "redis/append" | "redis/getrange" | "redis/setrange" | "redis/del" | "redis/exists" | "redis/expire" | "redis/pexpire" | "redis/ttl" | "redis/pttl" | "redis/hget" | "redis/hset" | "redis/hmget" | "redis/hgetall" | "redis/hdel" | "redis/hexists" | "redis/hlen" | "redis/hkeys" | "redis/hvals" | "redis/hincrby" | "redis/lpush" | "redis/rpush" | "redis/lpop" | "redis/rpop" | "redis/llen" | "redis/lrange" | "redis/lindex" | "redis/lset" | "redis/lrem" | "redis/linsert")[];
 };
 
 // @public

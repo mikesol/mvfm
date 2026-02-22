@@ -577,7 +577,7 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown[], unknown>>;\n    traits: {};\n    lifts: {};\n    nodeKinds: (\"postgres/query\" | \"postgres/identifier\" | \"postgres/insert_helper\" | \"postgres/set_helper\" | \"postgres/begin\" | \"postgres/savepoint\" | \"postgres/cursor\" | \"postgres/cursor_batch\" | \"postgres/record\" | \"postgres/array\")[];\n}"
+              "text": "<any, any>>;\n    traits: {};\n    lifts: {};\n}"
             },
             {
               "kind": "Content",

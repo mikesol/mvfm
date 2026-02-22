@@ -125,25 +125,37 @@ export interface S3Config {
 
 // ---- Node kinds -------------------------------------------
 
-const NODE_KINDS = [
-  "s3/put_object",
-  "s3/get_object",
-  "s3/delete_object",
-  "s3/head_object",
-  "s3/list_objects_v2",
-  "s3/record",
-  "s3/array",
-] as const;
-
-function buildKinds(): Record<string, KindSpec<unknown[], unknown>> {
-  const kinds: Record<string, KindSpec<unknown[], unknown>> = {};
-  for (const kind of NODE_KINDS) {
-    kinds[kind] = {
-      inputs: [] as unknown[],
+function buildKinds(): Record<string, KindSpec<any, any>> {
+  return {
+    "s3/put_object": {
+      inputs: [undefined] as [unknown],
       output: undefined as unknown,
-    } as KindSpec<unknown[], unknown>;
-  }
-  return kinds;
+    } as KindSpec<[unknown], unknown>,
+    "s3/get_object": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "s3/delete_object": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "s3/head_object": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "s3/list_objects_v2": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "s3/record": {
+      inputs: [] as unknown[],
+      output: {} as Record<string, unknown>,
+    } as KindSpec<unknown[], Record<string, unknown>>,
+    "s3/array": {
+      inputs: [] as unknown[],
+      output: [] as unknown[],
+    } as KindSpec<unknown[], unknown[]>,
+  };
 }
 
 // ---- Constructor builder ----------------------------------
@@ -199,7 +211,6 @@ export function s3(_config: S3Config) {
     kinds: buildKinds(),
     traits: {},
     lifts: {},
-    nodeKinds: [...NODE_KINDS],
   };
 }
 

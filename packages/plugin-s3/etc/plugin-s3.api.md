@@ -44,10 +44,9 @@ export function s3(_config: S3Config): {
             listObjectsV2(input: CExpr<ListObjectsV2Input> | ListObjectsV2Input): CExpr<ListObjectsV2Result>;
         };
     };
-    kinds: Record<string, KindSpec<unknown[], unknown>>;
+    kinds: Record<string, KindSpec<any, any>>;
     traits: {};
     lifts: {};
-    nodeKinds: ("s3/array" | "s3/record" | "s3/put_object" | "s3/get_object" | "s3/delete_object" | "s3/head_object" | "s3/list_objects_v2")[];
 };
 
 // @public

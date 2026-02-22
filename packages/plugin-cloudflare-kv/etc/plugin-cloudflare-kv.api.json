@@ -551,7 +551,7 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown[], unknown>>;\n    traits: {};\n    lifts: {};\n    nodeKinds: (\"cloudflare-kv/array\" | \"cloudflare-kv/record\" | \"cloudflare-kv/get\" | \"cloudflare-kv/get_json\" | \"cloudflare-kv/put\" | \"cloudflare-kv/delete\" | \"cloudflare-kv/list\")[];\n}"
+              "text": "<any, any>>;\n    traits: {};\n    lifts: {};\n}"
             },
             {
               "kind": "Content",
