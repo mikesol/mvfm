@@ -70,7 +70,7 @@ interface Frame {
 /** Minimal plugin definition for defaults(). */
 export interface PluginDef {
   name: string;
-  nodeKinds: readonly string[];
+  kinds: Record<string, unknown>;
   defaultInterpreter?: () => Interpreter;
 }
 
@@ -256,7 +256,7 @@ export function defaults(
       Object.assign(composed, overrides[plugin.name]);
     } else if (plugin.defaultInterpreter) {
       Object.assign(composed, plugin.defaultInterpreter());
-    } else if (plugin.nodeKinds.length === 0) {
+    } else if (Object.keys(plugin.kinds).length === 0) {
       // no kinds → nothing to interpret
     } else {
       throw new Error(`Plugin "${plugin.name}" has no defaultInterpreter and no override`);

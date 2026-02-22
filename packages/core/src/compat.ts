@@ -54,7 +54,7 @@ export interface PluginContext {
 // ─── definePlugin: old plugin factory ───────────────────────────────
 
 /** @deprecated Old-API plugin factory. Returns the definition as-is. */
-export function definePlugin<T extends { name: string; nodeKinds: string[] }>(def: T): T {
+export function definePlugin<T extends { name: string; kinds: Record<string, unknown> }>(def: T): T {
   return def;
 }
 

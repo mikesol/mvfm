@@ -43,8 +43,8 @@ const INTERNAL_KINDS = new Set([
 ]);
 
 // Collect all node kinds from documented plugins.
-// Plugins may declare kinds via `nodeKinds: string[]` or `kinds: Record<string, ...>`.
-const plugins: Array<{ nodeKinds?: readonly string[]; kinds?: Record<string, unknown>; traits?: any }> = [
+// Plugins declare kinds via `kinds: Record<string, ...>`.
+const plugins: Array<{ kinds?: Record<string, unknown>; traits?: any }> = [
   boolPlugin,
   numPlugin,
   strPlugin,
@@ -89,8 +89,7 @@ for (const kind of CORE_KINDS) {
 }
 
 for (const plugin of plugins) {
-  // Extract node kinds from either nodeKinds array or kinds record keys
-  const kindNames = plugin.nodeKinds ?? (plugin.kinds ? Object.keys(plugin.kinds) : []);
+  const kindNames = plugin.kinds ? Object.keys(plugin.kinds) : [];
   for (const kind of kindNames) {
     if (!INTERNAL_KINDS.has(kind)) {
       allKinds.add(kind);
@@ -100,10 +99,10 @@ for (const plugin of plugins) {
   if (plugin.traits) {
     const traits = plugin.traits as Record<
       string,
-      { mapping?: Record<string, string>; nodeKinds?: Record<string, string> }
+      { mapping?: Record<string, string> }
     >;
     for (const trait of Object.values(traits)) {
-      const kindMap = trait.mapping ?? trait.nodeKinds;
+      const kindMap = trait.mapping;
       if (kindMap) {
         for (const kind of Object.values(kindMap)) {
           if (!INTERNAL_KINDS.has(kind)) {

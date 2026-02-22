@@ -65,7 +65,6 @@ export interface Plugin<
   readonly kinds: Kinds;
   readonly traits: Traits;
   readonly lifts: Lifts;
-  readonly nodeKinds: readonly string[];
   readonly defaultInterpreter?: () => Interpreter;
   readonly shapes?: Record<string, unknown>;
 }
