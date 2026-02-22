@@ -35,4 +35,4 @@ await fold(defaults(app), injectInput(prog, { x: 5, y: 10 }));`,
   },
 };
 
-export default examples;
+export { examples };

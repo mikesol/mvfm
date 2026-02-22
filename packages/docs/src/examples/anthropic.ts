@@ -119,4 +119,4 @@ await fold(defaults(app, { anthropic: crystalBallAnthropicInterpreter }), prog);
   },
 };
 
-export default examples;
+export { examples };

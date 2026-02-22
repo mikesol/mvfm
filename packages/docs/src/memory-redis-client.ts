@@ -114,7 +114,10 @@ export class MemoryRedisClient implements RedisClient {
       case "HSET": {
         const key = s(args[0]);
         let h = this.hashes.get(key);
-        if (!h) { h = new Map(); this.hashes.set(key, h); }
+        if (!h) {
+          h = new Map();
+          this.hashes.set(key, h);
+        }
         let added = 0;
         for (let i = 1; i < args.length; i += 2) {
           if (!h.has(s(args[i]))) added++;
@@ -161,7 +164,10 @@ export class MemoryRedisClient implements RedisClient {
         const field = s(args[1]);
         const inc = int(args[2]);
         let h = this.hashes.get(key);
-        if (!h) { h = new Map(); this.hashes.set(key, h); }
+        if (!h) {
+          h = new Map();
+          this.hashes.set(key, h);
+        }
         const cur = parseInt(h.get(field) ?? "0", 10);
         const next = cur + inc;
         h.set(field, String(next));
@@ -170,7 +176,10 @@ export class MemoryRedisClient implements RedisClient {
       case "LPUSH": {
         const key = s(args[0]);
         let list = this.lists.get(key);
-        if (!list) { list = []; this.lists.set(key, list); }
+        if (!list) {
+          list = [];
+          this.lists.set(key, list);
+        }
         for (let i = 1; i < args.length; i++) {
           list.unshift(s(args[i]));
         }
@@ -179,7 +188,10 @@ export class MemoryRedisClient implements RedisClient {
       case "RPUSH": {
         const key = s(args[0]);
         let list = this.lists.get(key);
-        if (!list) { list = []; this.lists.set(key, list); }
+        if (!list) {
+          list = [];
+          this.lists.set(key, list);
+        }
         for (let i = 1; i < args.length; i++) {
           list.push(s(args[i]));
         }
@@ -234,15 +246,25 @@ export class MemoryRedisClient implements RedisClient {
         let removed = 0;
         if (count > 0) {
           for (let i = 0; i < list.length && removed < count; i++) {
-            if (list[i] === element) { list.splice(i, 1); removed++; i--; }
+            if (list[i] === element) {
+              list.splice(i, 1);
+              removed++;
+              i--;
+            }
           }
         } else if (count < 0) {
           for (let i = list.length - 1; i >= 0 && removed < -count; i--) {
-            if (list[i] === element) { list.splice(i, 1); removed++; }
+            if (list[i] === element) {
+              list.splice(i, 1);
+              removed++;
+            }
           }
         } else {
           for (let i = list.length - 1; i >= 0; i--) {
-            if (list[i] === element) { list.splice(i, 1); removed++; }
+            if (list[i] === element) {
+              list.splice(i, 1);
+              removed++;
+            }
           }
         }
         return removed;

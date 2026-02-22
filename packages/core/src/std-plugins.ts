@@ -145,7 +145,9 @@ export const numPlugin = {
     "num/compare": async function* () {
       const a = (yield 0) as number;
       const b = (yield 1) as number;
-      return a < b ? -1 : a > b ? 1 : 0;
+      if (a < b) return -1;
+      if (a > b) return 1;
+      return 0;
     },
     "num/eq": async function* () {
       return ((yield 0) as number) === ((yield 1) as number);

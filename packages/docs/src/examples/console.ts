@@ -195,4 +195,4 @@ await fold(defaults(app), injectInput(prog, { msg: "trace point" }));`,
   },
 };
 
-export default examples;
+export { examples };

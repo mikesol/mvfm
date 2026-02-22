@@ -177,4 +177,4 @@ await fold(
   },
 };
 
-export default examples;
+export { examples };

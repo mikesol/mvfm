@@ -64,4 +64,4 @@ await fold(defaults(app), prog);`,
   },
 };
 
-export default examples;
+export { examples };

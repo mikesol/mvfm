@@ -78,4 +78,4 @@ await fold(defaults(app, { twilio: crystalBallTwilioInterpreter }), prog);`,
   },
 };
 
-export default examples;
+export { examples };

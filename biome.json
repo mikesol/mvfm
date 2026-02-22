@@ -10,19 +10,47 @@
     "enabled": true,
     "rules": {
       "recommended": true,
-      "suspicious": {
-        "noExplicitAny": "off",
-        "noThenProperty": "off",
-        "noEmptyInterface": "off"
-      },
       "complexity": {
-        "noBannedTypes": "off"
+        "noBannedTypes": "off",
+        "noExcessiveLinesPerFunction": {
+          "level": "error",
+          "options": {
+            "maxLines": 80,
+            "skipBlankLines": false
+          }
+        },
+        "noExcessiveCognitiveComplexity": {
+          "level": "error",
+          "options": {
+            "maxAllowedComplexity": 15
+          }
+        }
       },
       "correctness": {
         "useYield": "off"
       },
       "style": {
-        "noNonNullAssertion": "off"
+        "noNonNullAssertion": "off",
+        "noDefaultExport": "error",
+        "noNestedTernary": "error",
+        "noRestrictedImports": {
+          "level": "error",
+          "options": {
+            "patterns": [
+              {
+                "group": ["@mvfm/*/src/*", "@mvfm/*/tests/*"],
+                "message": "Import from package entrypoints, not internal source/test paths."
+              }
+            ]
+          }
+        },
+        "useFilenamingConvention": {
+          "level": "error",
+          "options": {
+            "requireAscii": true,
+            "filenameCases": ["kebab-case"]
+          }
+        }
       },
       "performance": {
         "noAccumulatingSpread": "off"
@@ -34,7 +62,16 @@
             "maxLines": 300,
             "skipBlankLines": false
           }
-        }
+        },
+        "noImportCycles": "error"
+      },
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noThenProperty": "off",
+        "noEmptyInterface": "off",
+        "noFocusedTests": "error",
+        "noSkippedTests": "error",
+        "noDuplicateTestHooks": "error"
       }
     }
   },
@@ -47,5 +84,79 @@
   },
   "files": {
     "includes": ["packages/*/src/**/*.ts", "packages/*/tests/**/*.ts"]
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["packages/*/tests/**/*.ts"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noExcessiveLinesPerFunction": "off",
+            "noExcessiveCognitiveComplexity": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "packages/core/src/api.ts",
+        "packages/core/src/elaborate.ts",
+        "packages/core/src/fold.ts",
+        "packages/core/src/recording.ts",
+        "packages/docs/src/crystal-ball-clients.ts",
+        "packages/docs/src/memory-redis-client.ts",
+        "packages/docs/src/examples/slack/field-heuristics.ts",
+        "packages/docs/src/examples/slack/mock-generator.ts",
+        "packages/docs/src/examples/slack/type-parser.ts",
+        "packages/docs/src/playground-scope.ts",
+        "packages/plugin-anthropic/src/0.74.0/handler.client.ts",
+        "packages/plugin-openai/src/6.21.0/handler.client.ts",
+        "packages/plugin-pino/src/10.3.1/index.ts",
+        "packages/plugin-postgres/src/3.4.8/handler.server.ts",
+        "packages/plugin-postgres/src/3.4.8/interpreter.ts",
+        "packages/plugin-redis/src/5.4.1/build-methods.ts",
+        "packages/plugin-redis/src/5.4.1/index.ts",
+        "packages/plugin-redis/src/5.4.1/interpreter.ts",
+        "packages/plugin-zod/src/from-zod-checks.ts",
+        "packages/plugin-zod/src/from-zod-convert.ts",
+        "packages/plugin-zod/src/interpreter.ts",
+        "packages/plugin-zod/src/lazy.ts",
+        "packages/plugin-zod/src/string-formats.ts"
+      ],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noExcessiveLinesPerFunction": "off",
+            "noExcessiveCognitiveComplexity": "off"
+          },
+          "nursery": {
+            "noExcessiveLinesPerFile": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "packages/*/src/**/generated/**/*.ts",
+        "packages/*/tests/**/generated/**/*.ts",
+        "packages/*/src/**/vendor/**/*.ts",
+        "packages/*/tests/**/vendor/**/*.ts"
+      ],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noExcessiveLinesPerFunction": "off",
+            "noExcessiveCognitiveComplexity": "off"
+          },
+          "style": {
+            "noNestedTernary": "off",
+            "useFilenamingConvention": "off"
+          },
+          "nursery": {
+            "noImportCycles": "off"
+          }
+        }
+      }
+    }
+  ]
 }

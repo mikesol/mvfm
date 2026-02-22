@@ -128,4 +128,4 @@ await fold(defaults(app, { stripe: crystalBallStripeInterpreter }), prog);`,
   },
 };
 
-export default examples;
+export { examples };

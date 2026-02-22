@@ -3,8 +3,9 @@
  * node kinds. Parses Slack SDK response types at build time to produce
  * deterministic mock data for interactive playgrounds.
  */
-import { createRequire } from "node:module";
+
 import { existsSync } from "node:fs";
+import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { faker } from "@faker-js/faker";
 import { NODE_TO_METHOD } from "@mvfm/plugin-slack";
@@ -32,12 +33,10 @@ function simpleHash(s: string): number {
  * e.g. `"chat.postMessage"` -> `"ChatPostMessageResponse.d.ts"`
  */
 function responseFileName(apiMethod: string): string {
-  return (
-    apiMethod
-      .split(".")
-      .map((s) => s[0].toUpperCase() + s.slice(1))
-      .join("") + "Response.d.ts"
-  );
+  return `${apiMethod
+    .split(".")
+    .map((s) => s[0].toUpperCase() + s.slice(1))
+    .join("")}Response.d.ts`;
 }
 
 /**
@@ -45,12 +44,10 @@ function responseFileName(apiMethod: string): string {
  * e.g. `"chat.postMessage"` -> `"ChatPostMessageResponse"`
  */
 function responseTypeName(apiMethod: string): string {
-  return (
-    apiMethod
-      .split(".")
-      .map((s) => s[0].toUpperCase() + s.slice(1))
-      .join("") + "Response"
-  );
+  return `${apiMethod
+    .split(".")
+    .map((s) => s[0].toUpperCase() + s.slice(1))
+    .join("")}Response`;
 }
 
 /**
@@ -100,7 +97,7 @@ export function generateSlackExamples(): Record<string, ExampleEntry> {
   const responseDir = resolveResponseDir();
 
   // Add namespace landing page
-  examples["slack"] = buildNamespaceIndex();
+  examples.slack = buildNamespaceIndex();
 
   for (const [nodeKind, apiMethod] of Object.entries(NODE_TO_METHOD)) {
     const accessor = nodeKindToAccessor(nodeKind);

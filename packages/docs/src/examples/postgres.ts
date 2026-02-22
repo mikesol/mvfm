@@ -138,4 +138,4 @@ await fold(defaults(app, { postgres: wasmPgInterpreter }), prog);`,
   },
 };
 
-export default examples;
+export { examples };
