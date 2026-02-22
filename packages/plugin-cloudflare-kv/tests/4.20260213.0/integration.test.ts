@@ -1,4 +1,4 @@
-import { createApp, defaults, fold, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
+import { composeDollar, createApp, defaults, fold, numPlugin, strPlugin } from "@mvfm/core";
 import { Miniflare } from "miniflare";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { cloudflareKv } from "../../src/4.20260213.0";

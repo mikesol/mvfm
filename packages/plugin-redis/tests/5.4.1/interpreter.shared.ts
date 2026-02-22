@@ -1,4 +1,4 @@
-import { createApp, defaults, fold, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
+import { composeDollar, createApp, defaults, fold, numPlugin, strPlugin } from "@mvfm/core";
 import { redis } from "../../src/5.4.1";
 import { createRedisInterpreter, type RedisClient } from "../../src/5.4.1/interpreter";
 

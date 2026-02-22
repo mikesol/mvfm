@@ -6,7 +6,15 @@
  */
 
 import type { CExpr } from "@mvfm/core";
-import { boolPlugin, createApp, defaults, fold, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
+import {
+  boolPlugin,
+  composeDollar,
+  createApp,
+  defaults,
+  fold,
+  numPlugin,
+  strPlugin,
+} from "@mvfm/core";
 import { zod } from "../src/index";
 
 const zodPlugin = zod();

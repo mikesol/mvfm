@@ -1,4 +1,4 @@
-import { createApp, defaults, fold, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
+import { composeDollar, createApp, defaults, fold, numPlugin, strPlugin } from "@mvfm/core";
 import Redis from "ioredis";
 import { GenericContainer, type StartedTestContainer } from "testcontainers";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";

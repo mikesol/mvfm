@@ -1,4 +1,12 @@
-import { boolPlugin, createApp, defaults, fold, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
+import {
+  boolPlugin,
+  composeDollar,
+  createApp,
+  defaults,
+  fold,
+  numPlugin,
+  strPlugin,
+} from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { pinoInterpreter } from "../../src";
 import { pino } from "../../src/10.3.1";

@@ -1,4 +1,12 @@
-import { boolPlugin, createApp, defaults, fold, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
+import {
+  boolPlugin,
+  composeDollar,
+  createApp,
+  defaults,
+  fold,
+  numPlugin,
+  strPlugin,
+} from "@mvfm/core";
 import { describe, expect, it, vi } from "vitest";
 import { anthropicInterpreter } from "../../src";
 import { anthropic } from "../../src/0.74.0";

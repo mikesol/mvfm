@@ -1,4 +1,4 @@
-import { createApp, defaults, fold, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
+import { composeDollar, createApp, defaults, fold, numPlugin, strPlugin } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { s3 } from "../../src/3.989.0";
 import { createS3Interpreter, type S3Client } from "../../src/3.989.0/interpreter";

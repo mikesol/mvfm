@@ -1,4 +1,12 @@
-import { boolPlugin, createApp, defaults, fold, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
+import {
+  boolPlugin,
+  composeDollar,
+  createApp,
+  defaults,
+  fold,
+  numPlugin,
+  strPlugin,
+} from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { consoleInterpreter } from "../../src";
 import type { ConsoleMethodName } from "../../src/22.0.0";

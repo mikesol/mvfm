@@ -1,4 +1,4 @@
-import { boolPlugin, createApp, defaults, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
+import { boolPlugin, composeDollar, createApp, defaults, numPlugin, strPlugin } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { consolePlugin } from "../../src/22.0.0";
 import { wrapConsole } from "../../src/22.0.0/client-console";

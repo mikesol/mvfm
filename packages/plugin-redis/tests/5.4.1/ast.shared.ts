@@ -1,4 +1,4 @@
-import { createApp, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
+import { composeDollar, createApp, numPlugin, strPlugin } from "@mvfm/core";
 import { redis } from "../../src/5.4.1";
 
 const plugin = redis({ host: "127.0.0.1", port: 6379 });

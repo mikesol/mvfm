@@ -7,7 +7,7 @@ import {
   ListObjectsV2Command,
   PutObjectCommand,
 } from "@aws-sdk/client-s3";
-import { createApp, defaults, fold, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
+import { composeDollar, createApp, defaults, fold, numPlugin, strPlugin } from "@mvfm/core";
 import { GenericContainer, type StartedTestContainer } from "testcontainers";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { s3 as s3Factory } from "../../src/3.989.0";

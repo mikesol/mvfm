@@ -1,6 +1,14 @@
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { boolPlugin, createApp, defaults, fold, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
+import {
+  boolPlugin,
+  composeDollar,
+  createApp,
+  defaults,
+  fold,
+  numPlugin,
+  strPlugin,
+} from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { openai } from "../../src/6.21.0";
 import { createOpenAIInterpreter } from "../../src/6.21.0/interpreter";

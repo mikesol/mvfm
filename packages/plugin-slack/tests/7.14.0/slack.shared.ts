@@ -1,4 +1,4 @@
-import { boolPlugin, createApp, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
+import { boolPlugin, composeDollar, createApp, numPlugin, strPlugin } from "@mvfm/core";
 import { slack } from "../../src/7.14.0";
 
 const plugin = slack({ token: "xoxb-test-token" });

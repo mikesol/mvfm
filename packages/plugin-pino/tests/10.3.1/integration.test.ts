@@ -1,5 +1,5 @@
 import { Writable } from "node:stream";
-import { boolPlugin, createApp, defaults, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
+import { boolPlugin, composeDollar, createApp, defaults, numPlugin, strPlugin } from "@mvfm/core";
 import pinoLib from "pino";
 import { describe, expect, it } from "vitest";
 import { pino } from "../../src/10.3.1";

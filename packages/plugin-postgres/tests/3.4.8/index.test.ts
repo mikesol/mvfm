@@ -1,4 +1,4 @@
-import { createApp, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
+import { composeDollar, createApp, numPlugin, strPlugin } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { postgres } from "../../src/3.4.8";
 

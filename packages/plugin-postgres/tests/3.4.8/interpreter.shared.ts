@@ -1,5 +1,5 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
-import { createApp, defaults, fold, composeDollar, numPlugin, strPlugin } from "@mvfm/core";
+import { composeDollar, createApp, defaults, fold, numPlugin, strPlugin } from "@mvfm/core";
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import pg from "postgres";
 import { afterAll, beforeAll } from "vitest";
