@@ -1,4 +1,4 @@
-import type { Interpreter, RuntimeEntry } from "@mvfm/core";
+import type { CExpr, Interpreter, RuntimeEntry } from "@mvfm/core";
 import { fetch } from "../whatwg";
 
 // Verify the plugin returns the correct shape
@@ -17,13 +17,18 @@ const _interp: Interpreter = plugin.defaultInterpreter();
 const _handler: (entry: RuntimeEntry) => AsyncGenerator<unknown, unknown, unknown> =
   _interp["fetch/request"];
 
-// ctors.fetch is callable
-const _fetchExpr = plugin.ctors.fetch("url");
-const _fetchWithInit = plugin.ctors.fetch("url", { method: "POST" });
-const _jsonExpr = plugin.ctors.fetch.json(_fetchExpr);
-const _textExpr = plugin.ctors.fetch.text(_fetchExpr);
-const _statusExpr = plugin.ctors.fetch.status(_fetchExpr);
-const _headersExpr = plugin.ctors.fetch.headers(_fetchExpr);
+// ctors.fetch is callable with kind strings in return types
+const _fetchExpr: CExpr<unknown, "fetch/request", [string]> = plugin.ctors.fetch("url");
+const _fetchWithInit: CExpr<unknown, "fetch/request", [string, { method: string }]> =
+  plugin.ctors.fetch("url", { method: "POST" });
+const _jsonExpr: CExpr<unknown, "fetch/json", [typeof _fetchExpr]> =
+  plugin.ctors.fetch.json(_fetchExpr);
+const _textExpr: CExpr<string, "fetch/text", [typeof _fetchExpr]> =
+  plugin.ctors.fetch.text(_fetchExpr);
+const _statusExpr: CExpr<number, "fetch/status", [typeof _fetchExpr]> =
+  plugin.ctors.fetch.status(_fetchExpr);
+const _headersExpr: CExpr<Record<string, string>, "fetch/headers", [typeof _fetchExpr]> =
+  plugin.ctors.fetch.headers(_fetchExpr);
 
 // Suppress unused variable warnings
 void _name;

@@ -14,7 +14,7 @@
 //   - fetch/headers: response.headers — get response headers
 // ============================================================
 
-import type { CExpr, Interpreter, KindSpec } from "@mvfm/core";
+import type { CExpr, Interpreter, KindSpec, Plugin } from "@mvfm/core";
 import { isCExpr, makeCExpr } from "@mvfm/core";
 import { wrapFetch } from "./client-fetch";
 import { createFetchInterpreter } from "./interpreter";
@@ -46,7 +46,12 @@ function liftArg(value: unknown): unknown {
   return value;
 }
 
-// ---- What the plugin adds to $ ----------------------------
+// liftArg erases generic type info at runtime (returns unknown).
+// Cast helpers restore the declared CExpr Args types for ExtractKinds.
+const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]>(
+  kind: Kind,
+  args: readonly unknown[],
+) => CExpr<O, Kind, Args>;
 
 /**
  * Request initialization options, mirroring the WHATWG RequestInit interface.
@@ -67,29 +72,6 @@ export interface FetchRequestInit {
   keepalive?: boolean;
 }
 
-/**
- * Fetch operations added to the DSL context by the fetch plugin.
- *
- * `$.fetch(url, init?)` makes an HTTP request (mirrors `globalThis.fetch`).
- * `$.fetch.json(response)`, `$.fetch.text(response)`, etc. read the response.
- */
-export interface FetchMethods {
-  /**
-   * Callable: `$.fetch(url, init?)` makes an HTTP request.
-   * Also has properties for response reading: `.json()`, `.text()`, `.status()`, `.headers()`.
-   */
-  fetch: (<A, B>(url: A, init?: B) => CExpr<unknown>) & {
-    /** Parse the response body as JSON. Mirrors `response.json()`. */
-    json<A>(response: A): CExpr<unknown>;
-    /** Read the response body as text. Mirrors `response.text()`. */
-    text<A>(response: A): CExpr<string>;
-    /** Get the HTTP status code. Mirrors `response.status`. */
-    status<A>(response: A): CExpr<number>;
-    /** Get the response headers as a record. Mirrors `response.headers`. */
-    headers<A>(response: A): CExpr<Record<string, string>>;
-  };
-}
-
 // ---- Configuration ----------------------------------------
 
 /**
@@ -105,62 +87,43 @@ export interface FetchConfig {
   defaultHeaders?: Record<string, string>;
 }
 
-// ---- Node kinds -------------------------------------------
+// ---- Plugin factory ---------------------------------------
 
-function buildKinds(): Record<string, KindSpec<any, any>> {
-  return {
-    "fetch/request": {
-      inputs: ["", undefined] as [string, ...unknown[]],
-      output: undefined as unknown,
-    } as KindSpec<[string, ...unknown[]], unknown>,
-    "fetch/json": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "fetch/text": {
-      inputs: [undefined] as [unknown],
-      output: "" as string,
-    } as KindSpec<[unknown], string>,
-    "fetch/status": {
-      inputs: [undefined] as [unknown],
-      output: 0 as number,
-    } as KindSpec<[unknown], number>,
-    "fetch/headers": {
-      inputs: [undefined] as [unknown],
-      output: {} as Record<string, string>,
-    } as KindSpec<[unknown], Record<string, string>>,
-    "fetch/record": {
-      inputs: [] as unknown[],
-      output: {} as Record<string, unknown>,
-    } as KindSpec<unknown[], Record<string, unknown>>,
-    "fetch/array": {
-      inputs: [] as unknown[],
-      output: [] as unknown[],
-    } as KindSpec<unknown[], unknown[]>,
-  };
-}
+/**
+ * Builds the callable fetch constructor with permissive generics.
+ *
+ * The returned function is callable (`fetch(url, init?)`) and also
+ * has `.json()`, `.text()`, `.status()`, `.headers()` methods.
+ * All return types include kind strings for ExtractKinds.
+ */
+function buildFetchApi() {
+  const fetchFn = <A, B extends readonly unknown[]>(
+    url: A,
+    ...init: B
+  ): CExpr<unknown, "fetch/request", [A, ...B]> =>
+    init.length > 0
+      ? mk("fetch/request", [url, liftArg(init[0])])
+      : mk("fetch/request", [url]);
 
-// ---- Constructor builder ----------------------------------
+  /** Parse the response body as JSON. Mirrors `response.json()`. */
+  fetchFn.json = <A>(response: A): CExpr<unknown, "fetch/json", [A]> =>
+    mk("fetch/json", [response]);
 
-function buildFetchApi(): FetchMethods["fetch"] {
-  const fetchFn = <A, B>(url: A, init?: B): CExpr<unknown> =>
-    init != null
-      ? makeCExpr("fetch/request", [url, liftArg(init)])
-      : makeCExpr("fetch/request", [url]);
+  /** Read the response body as text. Mirrors `response.text()`. */
+  fetchFn.text = <A>(response: A): CExpr<string, "fetch/text", [A]> =>
+    mk("fetch/text", [response]);
 
-  fetchFn.json = <A>(response: A): CExpr<unknown> => makeCExpr("fetch/json", [response]);
+  /** Get the HTTP status code. Mirrors `response.status`. */
+  fetchFn.status = <A>(response: A): CExpr<number, "fetch/status", [A]> =>
+    mk("fetch/status", [response]);
 
-  fetchFn.text = <A>(response: A): CExpr<string> => makeCExpr("fetch/text", [response]);
-
-  fetchFn.status = <A>(response: A): CExpr<number> => makeCExpr("fetch/status", [response]);
-
-  fetchFn.headers = <A>(response: A): CExpr<Record<string, string>> =>
-    makeCExpr("fetch/headers", [response]);
+  /** Get the response headers as a record. Mirrors `response.headers`. */
+  fetchFn.headers = <A>(
+    response: A,
+  ): CExpr<Record<string, string>, "fetch/headers", [A]> => mk("fetch/headers", [response]);
 
   return fetchFn;
 }
-
-// ---- Plugin factory ---------------------------------------
 
 /**
  * Creates the fetch plugin definition (unified Plugin type).
@@ -174,12 +137,41 @@ export function fetch(config?: FetchConfig) {
   return {
     name: "fetch" as const,
     ctors: { fetch: buildFetchApi() },
-    kinds: buildKinds(),
+    kinds: {
+      "fetch/request": {
+        inputs: ["", undefined] as [string, ...unknown[]],
+        output: undefined as unknown,
+      } as KindSpec<[string, ...unknown[]], unknown>,
+      "fetch/json": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "fetch/text": {
+        inputs: [undefined] as [unknown],
+        output: "" as string,
+      } as KindSpec<[unknown], string>,
+      "fetch/status": {
+        inputs: [undefined] as [unknown],
+        output: 0 as number,
+      } as KindSpec<[unknown], number>,
+      "fetch/headers": {
+        inputs: [undefined] as [unknown],
+        output: {} as Record<string, string>,
+      } as KindSpec<[unknown], Record<string, string>>,
+      "fetch/record": {
+        inputs: [] as unknown[],
+        output: {} as Record<string, unknown>,
+      } as KindSpec<unknown[], Record<string, unknown>>,
+      "fetch/array": {
+        inputs: [] as unknown[],
+        output: [] as unknown[],
+      } as KindSpec<unknown[], unknown[]>,
+    },
     traits: {},
     lifts: {},
     defaultInterpreter: (): Interpreter =>
       createFetchInterpreter(wrapFetch(globalThis.fetch), resolvedConfig),
-  };
+  } satisfies Plugin;
 }
 
 /**
