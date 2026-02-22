@@ -1,4 +1,4 @@
-export type { ResendConfig, ResendMethods } from "./6.9.2";
+export type { ResendConfig } from "./6.9.2";
 export { resend, resendPlugin } from "./6.9.2";
 export { wrapResendSdk } from "./6.9.2/client-resend-sdk";
 export type { ClientHandlerOptions } from "./6.9.2/handler.client";

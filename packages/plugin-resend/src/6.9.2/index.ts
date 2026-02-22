@@ -12,21 +12,8 @@
 //   - Contacts: create, get, list, remove
 // ============================================================
 
-import type { CExpr, Interpreter, KindSpec } from "@mvfm/core";
+import type { CExpr, Interpreter, KindSpec, Plugin } from "@mvfm/core";
 import { isCExpr, makeCExpr } from "@mvfm/core";
-import type {
-  CreateBatchOptions,
-  CreateBatchSuccessResponse,
-  CreateContactOptions,
-  CreateContactResponseSuccess,
-  CreateEmailOptions,
-  CreateEmailResponseSuccess,
-  GetContactResponseSuccess,
-  GetEmailResponseSuccess,
-  LegacyCreateContactOptions,
-  ListContactsResponseSuccess,
-  RemoveContactsResponseSuccess,
-} from "resend";
 import { wrapResendSdk } from "./client-resend-sdk";
 import { createResendInterpreter, type ResendClient } from "./interpreter";
 
@@ -58,48 +45,12 @@ function liftArg(value: unknown): unknown {
   return value;
 }
 
-// ---- What the plugin adds to $ ----------------------------
-
-/**
- * Resend operations added to the DSL context by the resend plugin.
- *
- * Mirrors the resend-node SDK resource API: emails, batch, and
- * contacts. Each resource exposes methods that produce CExpr nodes.
- */
-export interface ResendMethods {
-  /** Resend API operations, namespaced under `$.resend`. */
-  resend: {
-    emails: {
-      /** Send an email. */
-      send(
-        params: CreateEmailOptions | CExpr<CreateEmailOptions>,
-      ): CExpr<CreateEmailResponseSuccess>;
-      /** Get an email by ID. */
-      get(id: string | CExpr<string>): CExpr<GetEmailResponseSuccess>;
-    };
-    batch: {
-      /** Send a batch of emails. */
-      send(
-        emails: CreateBatchOptions | CExpr<CreateBatchOptions>,
-      ): CExpr<CreateBatchSuccessResponse>;
-    };
-    contacts: {
-      /** Create a contact. */
-      create(
-        params:
-          | CreateContactOptions
-          | LegacyCreateContactOptions
-          | CExpr<CreateContactOptions | LegacyCreateContactOptions>,
-      ): CExpr<CreateContactResponseSuccess>;
-      /** Get a contact by ID. */
-      get(id: string | CExpr<string>): CExpr<GetContactResponseSuccess>;
-      /** List all contacts. */
-      list(): CExpr<ListContactsResponseSuccess>;
-      /** Remove a contact by ID. */
-      remove(id: string | CExpr<string>): CExpr<RemoveContactsResponseSuccess>;
-    };
-  };
-}
+// liftArg erases generic type info at runtime (returns unknown).
+// Cast helper restores the declared CExpr Args types for ExtractKinds.
+const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]>(
+  kind: Kind,
+  args: readonly unknown[],
+) => CExpr<O, Kind, Args>;
 
 // ---- Configuration ----------------------------------------
 
@@ -114,85 +65,58 @@ export interface ResendConfig {
   apiKey: string;
 }
 
-// ---- Node kinds -------------------------------------------
-
-function buildKinds(): Record<string, KindSpec<any, any>> {
-  return {
-    "resend/send_email": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "resend/get_email": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "resend/send_batch": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "resend/create_contact": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "resend/get_contact": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "resend/list_contacts": {
-      inputs: [] as [],
-      output: undefined as unknown,
-    } as KindSpec<[], unknown>,
-    "resend/remove_contact": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
-    "resend/record": {
-      inputs: [] as unknown[],
-      output: {} as Record<string, unknown>,
-    } as KindSpec<unknown[], Record<string, unknown>>,
-    "resend/array": {
-      inputs: [] as unknown[],
-      output: [] as unknown[],
-    } as KindSpec<unknown[], unknown[]>,
-  };
-}
-
 // ---- Constructor builder ----------------------------------
 
-function buildResendApi(): ResendMethods["resend"] {
+/**
+ * Builds the resend constructor methods using makeCExpr + liftArg.
+ *
+ * Each method produces a CExpr node with positional children.
+ * Config is NOT stored on AST nodes — it's captured by the interpreter.
+ *
+ * Constructors use permissive generics so any argument type is accepted
+ * at construction time. Validation happens at `app()` time via KindSpec.
+ */
+function buildResendApi() {
   return {
     emails: {
-      send(params) {
-        return makeCExpr("resend/send_email", [liftArg(params)]);
+      /** Send an email. */
+      send<A>(params: A): CExpr<unknown, "resend/send_email", [A]> {
+        return mk("resend/send_email", [liftArg(params)]);
       },
-      get(id) {
-        return makeCExpr("resend/get_email", [id]);
+      /** Get an email by ID. */
+      get<A>(id: A): CExpr<unknown, "resend/get_email", [A]> {
+        return mk("resend/get_email", [id]);
       },
     },
     batch: {
-      send(emails) {
+      /** Send a batch of emails. */
+      send<A>(emails: A): CExpr<unknown, "resend/send_batch", [A]> {
         if (isCExpr(emails)) {
-          return makeCExpr("resend/send_batch", [emails]);
+          return mk("resend/send_batch", [emails]);
         }
         const lifted = makeCExpr(
           "resend/array",
-          (emails as CreateBatchOptions).map((e) => liftArg(e)),
+          (emails as unknown[]).map((e) => liftArg(e)),
         );
-        return makeCExpr("resend/send_batch", [lifted]);
+        return mk("resend/send_batch", [lifted]);
       },
     },
     contacts: {
-      create(params) {
-        return makeCExpr("resend/create_contact", [liftArg(params)]);
+      /** Create a contact. */
+      create<A>(params: A): CExpr<unknown, "resend/create_contact", [A]> {
+        return mk("resend/create_contact", [liftArg(params)]);
       },
-      get(id) {
-        return makeCExpr("resend/get_contact", [id]);
+      /** Get a contact by ID. */
+      get<A>(id: A): CExpr<unknown, "resend/get_contact", [A]> {
+        return mk("resend/get_contact", [id]);
       },
-      list() {
-        return makeCExpr("resend/list_contacts", []);
+      /** List all contacts. */
+      list(): CExpr<unknown, "resend/list_contacts", []> {
+        return mk("resend/list_contacts", []);
       },
-      remove(id) {
-        return makeCExpr("resend/remove_contact", [id]);
+      /** Remove a contact by ID. */
+      remove<A>(id: A): CExpr<unknown, "resend/remove_contact", [A]> {
+        return mk("resend/remove_contact", [id]);
       },
     },
   };
@@ -240,11 +164,48 @@ export function resend(config: ResendConfig) {
   return {
     name: "resend" as const,
     ctors: { resend: buildResendApi() },
-    kinds: buildKinds(),
+    kinds: {
+      "resend/send_email": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "resend/get_email": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "resend/send_batch": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "resend/create_contact": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "resend/get_contact": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "resend/list_contacts": {
+        inputs: [] as [],
+        output: undefined as unknown,
+      } as KindSpec<[], unknown>,
+      "resend/remove_contact": {
+        inputs: [undefined] as [unknown],
+        output: undefined as unknown,
+      } as KindSpec<[unknown], unknown>,
+      "resend/record": {
+        inputs: [] as unknown[],
+        output: {} as Record<string, unknown>,
+      } as KindSpec<unknown[], Record<string, unknown>>,
+      "resend/array": {
+        inputs: [] as unknown[],
+        output: [] as unknown[],
+      } as KindSpec<unknown[], unknown[]>,
+    },
     traits: {},
     lifts: {},
     defaultInterpreter: (): Interpreter => createDefaultInterpreter(config),
-  };
+  } satisfies Plugin;
 }
 
 /**
