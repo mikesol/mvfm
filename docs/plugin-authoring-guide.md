@@ -133,7 +133,7 @@ Mvfm-native plugins are unversioned. They live directly under `src/plugins/<name
 
 ```
 src/plugins/<name>/
-  index.ts           # PluginDefinition + types
+  index.ts           # Plugin definition + types
   interpreter.ts     # Interpreter (async generator-based)
 ```
 
@@ -175,9 +175,9 @@ External-service plugins are versioned. The upstream package version is the dire
 
 ```
 src/plugins/<name>/<version>/
-  index.ts            # PluginDefinition + types
+  index.ts            # Plugin definition + types
   interpreter.ts      # Factory function returning Interpreter (async generators, wraps SDK client)
-  handler.server.ts   # Server-side evaluator (composes interpreter + foldAST)
+  handler.server.ts   # Server-side evaluator (composes interpreter + fold)
   handler.client.ts   # Client-side interpreter (proxies over HTTP)
   client-<sdk>.ts     # SDK adapter (wraps real SDK into internal interface)
 ```
@@ -225,9 +225,9 @@ tests/plugins/stripe/2025-04-30.basil/
 
 | File | Purpose |
 |------|---------|
-| `index.ts` | Exports the `PluginDefinition`, all AST node types, and the public builder API. This is the only file other plugins import from. |
-| `interpreter.ts` | Exports a factory function `createXxxInterpreter(client: XxxClient): Interpreter` that returns an `Interpreter` — a `Record<string, (node) => AsyncGenerator>` mapping node kinds to async generator functions. Each generator yields child `TypedNode`s for recursive evaluation and performs IO directly via the client. |
-| `handler.server.ts` | Server-side evaluator. Exports `serverEvaluate(client, baseInterpreter)` which composes the plugin's interpreter with a base interpreter and calls `foldAST`. |
+| `index.ts` | Exports the `Plugin` definition, all AST node types, and the public builder API. This is the only file other plugins import from. |
+| `interpreter.ts` | Exports a factory function `createXxxInterpreter(client: XxxClient): Interpreter` that returns an `Interpreter` — a `Record<string, Handler>` mapping node kinds to async generator functions. Each generator yields child indices for positional child access and performs IO directly via the client. |
+| `handler.server.ts` | Server-side evaluator. Exports `serverEvaluate(client, baseInterpreter)` which composes the plugin's interpreter with a base interpreter and calls `fold`. |
 | `handler.client.ts` | Client-side interpreter that serializes operations and proxies them over HTTP to the server handler. |
 | `client-<sdk>.ts` | Thin adapter that wraps the real SDK (e.g., `postgres` or `stripe`) into an internal interface the handler consumes. Isolates SDK-specific types from mvfm's handler logic. |
 
@@ -247,221 +247,175 @@ tests/plugins/stripe/2025-04-30.basil/
 
 ## Step 2: Plugin Definition
 
-Every plugin is a `PluginDefinition<T>`. This is the contract. No exceptions.
+Every plugin is a `Plugin` object literal. This is the contract. No exceptions.
 
 ### The interface
 
-From `src/core.ts`:
+From `src/plugin.ts`:
 
 ```ts
-export interface PluginDefinition<T = any> {
-  name: string;           // unique namespace prefix
-  nodeKinds: string[];    // every AST node kind this plugin emits
-  build: (ctx: PluginContext) => T;  // returns what goes on $
-  defaultInterpreter?: Record<string, (node: any) => AsyncGenerator<any, unknown, unknown>>;
-  traits?: {              // optional typeclass implementations
-    eq?: TraitImpl;
-    ord?: TraitImpl;
-    semiring?: TraitImpl;
-    heytingAlgebra?: TraitImpl;
-    show?: TraitImpl;
-    semigroup?: TraitImpl;
-    monoid?: TraitImpl;
-    bounded?: TraitImpl;
-  };
+export interface Plugin<
+  Name extends string = string,
+  Ctors extends Record<string, (...args: any[]) => any> = any,
+  Kinds extends Record<string, KindSpec<any, any>> = any,
+  Traits extends Record<string, TraitDef<any, any>> = any,
+  Lifts extends Record<string, string> = any,
+> {
+  readonly name: Name;
+  readonly ctors: Ctors;
+  readonly kinds: Kinds;
+  readonly traits: Traits;
+  readonly lifts: Lifts;
+  readonly nodeKinds: readonly string[];
+  readonly defaultInterpreter?: () => Interpreter;
 }
 ```
 
-Three required fields plus one optional runtime field:
+Six required fields plus one optional runtime field:
 
 - **`name`** — A unique string that becomes the namespace prefix for this plugin's AST node kinds. For `num`, the prefix is `"num"`. For `stripe`, the prefix is `"stripe"`. Every node kind emitted by the plugin must start with `name/`.
 
+- **`ctors`** — An object of constructor functions. Each constructor creates a `CExpr` (compile-time expression) for a specific node kind. These constructors are what get spread onto `$` — if your plugin provides `{ sub, div, mod }` as ctors, then the program closure sees `$.sub()`, `$.div()`, `$.mod()`. Use `makeCExpr(kind, args)` to create expressions.
+
+- **`kinds`** — A record mapping each node kind string to a `KindSpec<Inputs, Output>`. The `KindSpec` declares the input types (as a tuple) and output type for each node kind. This provides type-level information for the DSL.
+
+- **`traits`** — A record of trait declarations using `TraitDef<Output, Mapping>`. Each trait declares its output type and a mapping from runtime type strings to node kinds. For example, `eq: { output: false as boolean, mapping: { number: "num/eq" } }` means "for the `eq` trait, numbers use the `num/eq` node kind and produce a boolean."
+
+- **`lifts`** — A record mapping runtime type strings (e.g., `"number"`, `"string"`) to the node kind used for auto-lifting raw JS values. For example, `{ number: "num/literal" }` tells the system that raw numbers should become `num/literal` nodes.
+
 - **`nodeKinds`** — An exhaustive list of every AST node `kind` string this plugin can emit. The interpreter uses this for dispatch; the build system uses it for validation. If a node kind is missing from this list, it is a bug.
 
-- **`build(ctx)`** — A function that receives a `PluginContext` and returns an object of type `T`. That object is spread onto `$`. If your plugin adds `{ sub, div, mod }`, then the program closure sees `$.sub()`, `$.div()`, `$.mod()`.
+- **`defaultInterpreter`** (optional) — A function that returns an `Interpreter` (a `Record<string, Handler>` mapping node kind strings to async generator handlers). Include this when there is an obvious default interpreter and users should get useful behavior without extra runtime wiring (for example mvfm-native plugins like `num`, `str`, `eq`, `ord`). Omit this when the interpreter requires runtime configuration or external clients (for example `postgres` connection/session config, `redis` client config, API keys).
 
-- **`defaultInterpreter`** (optional) — A map of node kind to interpreter handler that works as the plugin's default runtime behavior. Include this when there is an obvious default interpreter and users should get useful behavior without extra runtime wiring (for example mvfm-native plugins like `num`, `str`, `eq`, `ord`). Omit this when the interpreter requires runtime configuration or external clients (for example `postgres` connection/session config, `redis` client config, API keys).
+### Constructors and `makeCExpr`
 
-The optional **`traits`** field registers typeclass implementations. This is how the `eq`, `ord`, `semiring`, etc. plugins discover that `num` provides equality for numbers or that `str` provides a semigroup for strings. See Step 5 (when written) for details.
-
-### PluginContext methods
-
-The `PluginContext` object passed to `build()` is your only interface to the mvfm runtime. These are its methods and fields:
-
-| Method / Field | Signature | Purpose |
-|---|---|---|
-| `ctx.expr<T>(node)` | `<T>(node: ASTNode) => Expr<T>` | Wrap an AST node as an `Expr<T>`. This is how you create DSL values. The returned `Expr` is a Proxy that supports property access and method chaining. |
-| `ctx.lift(value)` | `<T>(value: T \| Expr<T>) => Expr<T>` | Auto-lift a raw JS value to `Expr` if it is not already one. Handles primitives (number, string, boolean, null), arrays (to `core/tuple`), and objects (to `core/record`). If the value is already an `Expr`, returns it unchanged. |
-| `ctx.isExpr(value)` | `(value: unknown) => value is Expr<unknown>` | Type guard that checks whether a value is already an `Expr`. Useful when you need to branch on whether an argument was passed as a raw value or a DSL expression. |
-| `ctx.emit(node)` | `(node: ASTNode) => void` | Add a statement-level AST node to the program. Used for side effects that do not produce a return value. |
-| `ctx.statements` | `ASTNode[]` | The current program's statement list. Nodes added via `ctx.emit()` appear here. |
-| `ctx.plugins` | `PluginDefinition[]` | All resolved plugin definitions loaded in this program. Used by typeclass plugins (eq, ord, etc.) to find trait implementations at build time. |
-
-There are also internal fields (`ctx._registry`, `ctx.inputSchema`) that plugins should not use directly.
-
-### Code example: stripe plugin (configured, factory function)
-
-This is the real stripe plugin from `src/plugins/stripe/2025-04-30.basil/index.ts`, simplified to show the essential pattern:
+Plugin constructors create `CExpr` values — compile-time expression nodes that get elaborated into the runtime adjacency map. Each constructor uses `makeCExpr(kind, args)`:
 
 ```ts
-import type { Expr, PluginContext, PluginDefinition } from "../../../core";
+import { makeCExpr } from "@mvfm/core";
 
-export interface StripeConfig {
-  apiKey: string;
-  apiVersion?: string;
-}
+// Binary operator constructor
+const add = (a: CExpr<number>, b: CExpr<number>) =>
+  makeCExpr("num/add", [a, b]);
 
-export interface StripeMethods {
-  stripe: {
-    paymentIntents: {
-      create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-      retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
-      confirm(id: Expr<string> | string, params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-    };
-    customers: {
-      create(params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-      retrieve(id: Expr<string> | string): Expr<Record<string, unknown>>;
-      update(id: Expr<string> | string, params: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-      list(params?: Expr<Record<string, unknown>> | Record<string, unknown>): Expr<Record<string, unknown>>;
-    };
-    // ... charges, etc.
-  };
-}
+// Unary operator constructor
+const neg = (a: CExpr<number>) =>
+  makeCExpr("num/neg", [a]);
 
-export function stripe(config: StripeConfig): PluginDefinition<StripeMethods> {
-  return {
-    name: "stripe",
-    nodeKinds: [
-      "stripe/create_payment_intent",
-      "stripe/retrieve_payment_intent",
-      "stripe/confirm_payment_intent",
-      "stripe/create_customer",
-      "stripe/retrieve_customer",
-      "stripe/update_customer",
-      "stripe/list_customers",
-      // ...
-    ],
-
-    build(ctx: PluginContext): StripeMethods {
-      function resolveId(id: Expr<string> | string) {
-        return ctx.isExpr(id) ? id.__node : ctx.lift(id).__node;
-      }
-
-      function resolveParams(params: Expr<Record<string, unknown>> | Record<string, unknown>) {
-        return ctx.lift(params).__node;
-      }
-
-      return {
-        stripe: {
-          paymentIntents: {
-            create(params) {
-              return ctx.expr({
-                kind: "stripe/create_payment_intent",
-                params: resolveParams(params),
-                config,  // baked into the AST node
-              });
-            },
-            retrieve(id) {
-              return ctx.expr({
-                kind: "stripe/retrieve_payment_intent",
-                id: resolveId(id),
-                config,
-              });
-            },
-            confirm(id, params?) {
-              return ctx.expr({
-                kind: "stripe/confirm_payment_intent",
-                id: resolveId(id),
-                params: params != null ? resolveParams(params) : null,
-                config,
-              });
-            },
-          },
-          customers: {
-            create(params) {
-              return ctx.expr({
-                kind: "stripe/create_customer",
-                params: resolveParams(params),
-                config,
-              });
-            },
-            // ... retrieve, update, list follow the same pattern
-          },
-        },
-      };
-    },
-  };
-}
+// Literal constructor (no children — value stored as `out`)
+const numLit = (value: number) =>
+  makeCExpr("num/literal", [], value);
 ```
 
-Key things to notice:
+Primitives passed as arguments are auto-lifted to `CExpr` by the `mvfm()` runtime — plugin constructors do not need to call `lift()` manually. The `args` array defines positional children that handlers access via `yield index`.
 
-1. `stripe` is a **function** that takes `StripeConfig` and returns `PluginDefinition<StripeMethods>`. The config is captured in the closure and baked into every AST node.
-2. Every node kind is prefixed with `stripe/`.
-3. Every method parameter accepts `Expr<T> | T` and uses `ctx.lift()` or `ctx.isExpr()` to normalize.
-4. `config` is stored directly on each AST node — the AST is self-contained.
-5. `build()` only constructs and returns an object of methods. No side effects.
-6. `defaultInterpreter` is intentionally omitted here because Stripe requires runtime config (API keys/client setup) to interpret effects safely.
+### Checking expressions with `isCExpr`
+
+Use `isCExpr(value)` to check whether a value is already a `CExpr`:
+
+```ts
+import { isCExpr } from "@mvfm/core";
+
+if (isCExpr(value)) {
+  // value is a CExpr — use it as a child
+} else {
+  // value is a raw JS value — it will be auto-lifted
+}
+```
 
 ### Code example: num plugin (unconfigured, const)
 
-This is the real num plugin from `src/plugins/num/index.ts`, simplified:
+This is the real num plugin from `packages/core/src/std-plugins.ts`, showing the canonical unified Plugin pattern:
 
 ```ts
-import type { Expr, PluginContext, PluginDefinition } from "../../core";
+import { makeCExpr } from "@mvfm/core";
+import type { Interpreter, TraitDef } from "@mvfm/core";
+import type { KindSpec } from "@mvfm/core";
 
-export interface NumMethods {
-  sub(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
-  div(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
-  mod(a: Expr<number> | number, b: Expr<number> | number): Expr<number>;
-  neg(a: Expr<number> | number): Expr<number>;
-  abs(a: Expr<number> | number): Expr<number>;
-  // ...
-}
+// Constructors: functions that create CExpr values
+const add = (a: CExpr<number>, b: CExpr<number>) => makeCExpr("num/add", [a, b]);
+const sub = (a: CExpr<number>, b: CExpr<number>) => makeCExpr("num/sub", [a, b]);
+const neg = (a: CExpr<number>) => makeCExpr("num/neg", [a]);
+const numLit = (value: number) => makeCExpr("num/literal", [], value);
+// ... mul, div, mod, abs, floor, ceil, round, min, max
 
-export const num: PluginDefinition<NumMethods> = {
+export const numPlugin = {
   name: "num",
-  nodeKinds: [
-    "num/add", "num/sub", "num/mul", "num/div", "num/mod",
-    "num/neg", "num/abs", "num/floor", "num/ceil", "num/round",
-    "num/min", "num/max", "num/eq", "num/zero", "num/one",
-    "num/show", "num/top", "num/bottom",
-    // ...
-  ],
+  ctors: { add, sub, neg, numLit, /* ... */ },
+  kinds: {
+    "num/literal": { inputs: [], output: 0 as number } as KindSpec<[], number>,
+    "num/add": { inputs: [0, 0] as [number, number], output: 0 as number } as KindSpec<
+      [number, number], number
+    >,
+    "num/sub": { inputs: [0, 0] as [number, number], output: 0 as number } as KindSpec<
+      [number, number], number
+    >,
+    "num/neg": { inputs: [0] as [number], output: 0 as number } as KindSpec<[number], number>,
+    // ... one entry per node kind
+  },
   traits: {
-    eq: { type: "number", nodeKinds: { eq: "num/eq" } },
-    ord: { type: "number", nodeKinds: { compare: "num/compare" } },
-    semiring: {
-      type: "number",
-      nodeKinds: { add: "num/add", zero: "num/zero", mul: "num/mul", one: "num/one" },
+    eq: { output: false as boolean, mapping: { number: "num/eq" } } as TraitDef<
+      boolean, { number: "num/eq" }
+    >,
+    neq: { output: false as boolean, mapping: { number: "num/neq" } } as TraitDef<
+      boolean, { number: "num/neq" }
+    >,
+    show: { output: "" as string, mapping: { number: "num/show" } } as TraitDef<
+      string, { number: "num/show" }
+    >,
+  },
+  lifts: { number: "num/literal" },
+  nodeKinds: [
+    "num/literal", "num/add", "num/sub", "num/mul", "num/div", "num/mod",
+    "num/neg", "num/abs", "num/floor", "num/ceil", "num/round",
+    "num/min", "num/max", "num/show", "num/compare", "num/eq", "num/neq",
+    "num/zero", "num/one", "num/top", "num/bottom",
+  ],
+  defaultInterpreter: (): Interpreter => ({
+    "num/literal": async function* (e) {
+      return e.out as number;
     },
-    show: { type: "number", nodeKinds: { show: "num/show" } },
-    bounded: { type: "number", nodeKinds: { top: "num/top", bottom: "num/bottom" } },
-  },
-  build(ctx: PluginContext): NumMethods {
-    const binop = (kind: string) => (a: Expr<number> | number, b: Expr<number> | number) =>
-      ctx.expr<number>({
-        kind,
-        left: ctx.lift(a).__node,
-        right: ctx.lift(b).__node,
-      });
-
-    const unop = (kind: string) => (a: Expr<number> | number) =>
-      ctx.expr<number>({ kind, operand: ctx.lift(a).__node });
-
-    return {
-      sub: binop("num/sub"),
-      div: binop("num/div"),
-      mod: binop("num/mod"),
-      neg: unop("num/neg"),
-      abs: unop("num/abs"),
-      // ...
-    };
-  },
-};
+    "num/add": async function* () {
+      return ((yield 0) as number) + ((yield 1) as number);
+    },
+    "num/sub": async function* () {
+      return ((yield 0) as number) - ((yield 1) as number);
+    },
+    "num/neg": async function* () {
+      return -((yield 0) as number);
+    },
+    // ... one handler per node kind
+  }),
+} as const;
 ```
 
-Key difference: `num` is a **const**, not a factory function. It needs no configuration, so it is directly a `PluginDefinition`. No wrapper function, no config parameter.
+Key difference: `numPlugin` is a **const**, not a factory function. It needs no configuration, so it is directly a `Plugin` object literal. No wrapper function, no config parameter.
+
+Key things to notice:
+
+1. `numPlugin` is a **const** — no factory function needed. It needs no configuration.
+2. **`ctors`** contains constructor functions that create `CExpr` values using `makeCExpr(kind, args)`.
+3. **`kinds`** declares input/output type info for each node kind via `KindSpec`.
+4. **`traits`** uses `TraitDef<Output, Mapping>` — the `mapping` field maps runtime type strings to node kinds.
+5. **`lifts`** declares that raw `number` values auto-lift to `num/literal` nodes.
+6. **`defaultInterpreter`** is a function returning an `Interpreter`. Each handler is `async function*` using `yield index` for positional child access.
+7. Every node kind is prefixed with `num/` and listed in `nodeKinds`.
+
+### The handler pattern: `yield index`
+
+In the new API, interpreter handlers access child nodes by yielding their positional index (a number). The fold trampoline resolves the child and sends the result back:
+
+```ts
+"num/add": async function* () {
+  return ((yield 0) as number) + ((yield 1) as number);
+},
+```
+
+- `yield 0` resolves the first child (positional index 0) and returns its value.
+- `yield 1` resolves the second child (positional index 1) and returns its value.
+- For literal/leaf nodes, access `e.out` directly: `return e.out as number`.
+
+This replaces the old `eval_<T>(node.left)` pattern. Children are positional, not named.
 
 ### The seven rules
 
@@ -473,23 +427,23 @@ Every AST node kind must be prefixed with the plugin's `name` followed by a slas
 
 **2. `nodeKinds` must list every kind the plugin emits.**
 
-If your `build()` function calls `ctx.expr({ kind: "my/foo" })`, then `"my/foo"` must appear in the `nodeKinds` array. The interpreter uses `nodeKinds` to route evaluation. A missing entry means the node will not be interpreted and the program will fail at runtime.
+If your constructor calls `makeCExpr("my/foo", args)`, then `"my/foo"` must appear in the `nodeKinds` array. The interpreter uses `nodeKinds` to route evaluation. A missing entry means the node will not be interpreted and the program will fail at runtime.
 
-**3. Accept `Expr<T> | T` for all parameters — use `ctx.lift()` to normalize.**
+**3. Primitives auto-lift — constructors receive `CExpr`.**
 
-Every method parameter that could be either a raw JS value or an existing DSL expression must accept the union type `Expr<T> | T`. Inside the method body, call `ctx.lift(value)` to normalize both cases into an `Expr<T>`. This is what makes `$.sub(1, 2)` and `$.sub($.input.x, $.input.y)` both work.
+The `mvfm()` runtime auto-lifts raw JS values (numbers, strings, booleans) to `CExpr` before passing them to constructors. Plugin constructors take `CExpr<T>` parameters and use `makeCExpr(kind, [child1, child2])` to build nodes. You do not need to call `lift()` manually.
 
 **4. Bake config into AST nodes — AST must be self-contained.**
 
-If your plugin requires configuration (API keys, connection strings, options), store the config directly on each AST node. The stripe plugin stores `config` on every `stripe/*` node. This makes the AST portable — an interpreter can evaluate the program without having access to the original plugin closure. Never rely on closure-captured state that is not part of the AST.
+If your plugin requires configuration (API keys, connection strings, options), store the config directly on each AST node via the `out` field of `makeCExpr`. This makes the AST portable — an interpreter can evaluate the program without having access to the original plugin closure. Never rely on closure-captured state that is not part of the AST.
 
-**5. Keep `build()` pure — no side effects.**
+**5. Keep constructors pure — no side effects.**
 
-`build()` must only construct and return an object of builder methods. It must not make HTTP requests, write to files, log to console, or mutate shared state. The methods it returns must only create AST nodes (via `ctx.expr()`) or record statements (via `ctx.emit()`). Everything else happens at interpretation time, not build time.
+Constructors must only create `CExpr` values via `makeCExpr()`. They must not make HTTP requests, write to files, log to console, or mutate shared state. Everything else happens at interpretation time, not build time.
 
-**6. Return `Expr<T>` with accurate types.**
+**6. `KindSpec` must have accurate types.**
 
-Every builder method must return `Expr<T>` where `T` accurately reflects the type of the value the expression will produce at runtime. If a method computes a number, it returns `Expr<number>`. If it computes a string, it returns `Expr<string>`. This is what gives the DSL its type safety — the TypeScript compiler checks that you do not pass an `Expr<string>` where an `Expr<number>` is expected.
+Every entry in `kinds` must accurately reflect the input types (as a tuple) and output type for the node kind. If a node takes two numbers and produces a number, its `KindSpec` is `KindSpec<[number, number], number>`. This provides type-level information for compile-time checking.
 
 **7. Every node kind must have a docs example.**
 
@@ -499,28 +453,34 @@ Add an entry to the corresponding file in `packages/docs/src/examples/<plugin-na
 
 Mvfm plugins come in two shapes:
 
-**Unconfigured plugins** need no configuration. They are exported as a `const` that IS the `PluginDefinition`:
+**Unconfigured plugins** need no configuration. They are exported as a `const` that IS the `Plugin`:
 
 ```ts
-// num IS a PluginDefinition — no function call needed
-export const num: PluginDefinition<NumMethods> = {
+// numPlugin IS a Plugin — no function call needed
+export const numPlugin = {
   name: "num",
+  ctors: { add, sub, neg, numLit },
+  kinds: { /* KindSpec per kind */ },
+  traits: { /* TraitDef per trait */ },
+  lifts: { number: "num/literal" },
   nodeKinds: [...],
-  defaultInterpreter: numInterpreter,
-  build(ctx) { ... },
-};
+  defaultInterpreter: (): Interpreter => ({ /* handlers */ }),
+} as const;
 ```
 
-**Configured plugins** need runtime configuration. They are exported as a factory function that RETURNS a `PluginDefinition`:
+**Configured plugins** need runtime configuration. They are exported as a factory function that RETURNS a `Plugin`:
 
 ```ts
-// stripe is a function that returns a PluginDefinition
-export function stripe(config: StripeConfig): PluginDefinition<StripeMethods> {
+// stripe is a function that returns a Plugin
+export function stripe(config: StripeConfig): Plugin {
   return {
     name: "stripe",
+    ctors: { /* constructors that bake config into nodes */ },
+    kinds: { /* KindSpec per kind */ },
+    traits: {},
+    lifts: {},
     nodeKinds: [...],
     // no defaultInterpreter: requires runtime config/client setup
-    build(ctx) { ... },
   };
 }
 ```
@@ -528,24 +488,24 @@ export function stripe(config: StripeConfig): PluginDefinition<StripeMethods> {
 The `mvfm()` entry point accepts both forms. You compose plugins by passing them as arguments:
 
 ```ts
-import { mvfm, num, str } from "mvfm";
-import { stripe } from "mvfm/plugins/stripe/2025-04-30.basil";
+import { mvfm, prelude } from "@mvfm/core";
+import { stripe } from "@mvfm/plugin-stripe";
 
-const app = mvfm(num, str, stripe({ apiKey: "sk_test_..." }));
+const app = mvfm(prelude, stripe({ apiKey: "sk_test_..." }));
 
-const program = app(($) => {
+const prog = app(($) => {
   const customer = $.stripe.customers.create({ email: "alice@example.com" });
   const total = $.sub($.input.price, $.input.discount);
-  return $.do(customer, total);
+  return $.begin(customer, total);
 });
 ```
 
-Notice the difference: `num` and `str` are passed directly (they are already `PluginDefinition` values). `stripe({ apiKey: "..." })` is called first to produce a `PluginDefinition`. Both end up as the same type by the time `mvfm()` sees them.
+Notice the difference: `prelude` is passed directly (it is a tuple of Plugin values: `[numPlugin, strPlugin, boolPlugin, ordPlugin]`). `stripe({ apiKey: "..." })` is called first to produce a `Plugin`. Both end up as the same type by the time `mvfm()` sees them.
 
 `mvfm()` also accepts grouped plugin collections (including nested tuples/arrays). This is useful for reusable bundles:
 
 ```ts
-import { mvfm, prelude } from "mvfm";
+import { mvfm, prelude } from "@mvfm/core";
 
 const appA = mvfm(prelude);      // pass group as one argument
 const appB = mvfm(...prelude);   // spread group
@@ -562,50 +522,53 @@ The interpreter is where a plugin defines runtime behavior. Step 2 builds AST no
 
 ### The Interpreter type
 
-From `src/fold.ts`:
+From `src/plugin.ts`:
 
 ```ts
-export interface TypedNode<T = unknown> {
-  readonly kind: string;
-  readonly __T?: T;
+/** Untyped mirror of NodeEntry for runtime operations. */
+export interface RuntimeEntry {
+  kind: string;
+  children: string[];
+  out: unknown;
 }
 
-export type Interpreter = Record<
-  string,
-  (node: any) => AsyncGenerator<TypedNode, unknown, unknown>
->;
+/** A handler yields child indices (number), node IDs (string), or scoped effects to the fold. */
+export type Handler = (entry: RuntimeEntry) => AsyncGenerator<FoldYield, unknown, unknown>;
+
+/** Maps node kind strings to their handlers. */
+export type Interpreter = Record<string, Handler>;
 ```
 
-An `Interpreter` is a plain object mapping node kind strings to async generator functions. Each key is a `kind` string (e.g., `"stripe/create_payment_intent"`), and each value is an async generator that evaluates nodes of that kind.
+An `Interpreter` is a plain object mapping node kind strings to async generator functions (`Handler`s). Each key is a `kind` string (e.g., `"num/add"`), and each value is an async generator that evaluates nodes of that kind. Each handler receives a `RuntimeEntry` with three fields: `kind` (the node kind string), `children` (positional child IDs), and `out` (the node's stored output value, used for literals).
 
-### The `eval_<T>()` helper
+### Positional child access with `yield index`
 
-The `eval_<T>()` helper is the **only** place you cast child node results. It yields the child node to the evaluator and returns the typed result:
+Handlers access children by yielding their positional index (a number). The fold trampoline resolves the child and sends the result back:
 
 ```ts
-import { eval_ } from "@mvfm/core";
-
-// Inside an async generator:
-const id = yield* eval_<string>(node.id);
-const params = yield* eval_<Record<string, unknown>>(node.params);
+// Inside an async generator handler:
+const a = (yield 0) as number;   // resolve first child
+const b = (yield 1) as number;   // resolve second child
+return a + b;
 ```
 
-This replaces the old `yield { type: "recurse", child }` pattern. The `yield*` delegates to `eval_`, which yields the child `TypedNode` to `foldAST`. The evaluator resolves the child and feeds the result back.
+For leaf/literal nodes with no children, read the stored value from `e.out`:
+
+```ts
+"num/literal": async function* (e) {
+  return e.out as number;
+},
+```
 
 ### The async generator contract
 
-Each interpreter handler is an `async function*` (async generator). It communicates with the evaluator by yielding `TypedNode` objects (child nodes to resolve) and performing IO directly:
+Each interpreter handler is an `async function*` (async generator). It communicates with the fold trampoline by yielding child indices and performing IO directly:
 
-**To recurse into a child node (typed):**
-
-```ts
-const result = yield* eval_<string>(childNode);
-```
-
-**To recurse into a child node (untyped):**
+**To resolve a child node by position:**
 
 ```ts
-const result = yield childNode;
+const result = (yield 0) as string;   // first child
+const params = (yield 1) as Record<string, unknown>;  // second child
 ```
 
 **To perform IO — call the client directly:**
@@ -622,21 +585,22 @@ IO is performed directly in the async generator via `await` on the injected clie
 return someValue;
 ```
 
-When the generator returns (via `return`), evaluation of this node is complete. The returned value is cached by `foldAST` (unless the node is volatile) and fed to the parent generator.
+When the generator returns (via `return`), evaluation of this node is complete. The returned value is cached by `fold` (unless the node is volatile) and fed to the parent generator.
 
 ### Mvfm-native vs external-service interpreters
 
-**Mvfm-native plugins** (num, str, eq, ord, etc.) export a `const` interpreter:
+**Mvfm-native plugins** (num, str, eq, ord, etc.) provide a `defaultInterpreter` on the plugin:
 
 ```ts
-export const numInterpreter: Interpreter = {
-  "num/add": async function* (node) {
-    const a = yield* eval_<number>(node.left);
-    const b = yield* eval_<number>(node.right);
-    return a + b;
-  },
-  // ...
-};
+export const numPlugin = {
+  // ... ctors, kinds, traits, lifts, nodeKinds ...
+  defaultInterpreter: (): Interpreter => ({
+    "num/add": async function* () {
+      return ((yield 0) as number) + ((yield 1) as number);
+    },
+    // ...
+  }),
+} as const;
 ```
 
 **External-service plugins** (postgres, stripe, openai, etc.) export a factory function that takes a client:
@@ -648,13 +612,13 @@ export interface StripeClient {
 
 export function createStripeInterpreter(client: StripeClient): Interpreter {
   return {
-    "stripe/create_payment_intent": async function* (node) {
-      const params = yield* eval_<Record<string, unknown>>(node.params);
+    "stripe/create_payment_intent": async function* () {
+      const params = (yield 0) as Record<string, unknown>;
       return await client.request("POST", "/v1/payment_intents", params);
     },
 
-    "stripe/retrieve_payment_intent": async function* (node) {
-      const id = yield* eval_<string>(node.id);
+    "stripe/retrieve_payment_intent": async function* () {
+      const id = (yield 0) as string;
       return await client.request("GET", `/v1/payment_intents/${id}`);
     },
 
@@ -667,73 +631,23 @@ Key things to notice:
 
 1. **External-service interpreters are factory functions**, not consts. They take a `client` parameter (the SDK adapter interface). This makes testing possible — pass a mock client.
 2. **IO is performed directly via `await client.xxx()`.** No separate handler or effect — the async generator can do async work directly.
-3. **Child nodes are resolved via `yield* eval_<T>()`.** This is the only place casts appear.
+3. **Children are resolved via `yield index`.** Cast the result to the expected type.
 4. **Each node kind is a separate key.** No `switch` statement, no `canHandle` — the evaluator dispatches by exact kind match.
 
 ### Helper generators with `yield*`
 
-When SQL construction requires inline resolution of sub-expressions, use a helper async generator and delegate to it with `yield*`. From `src/plugins/postgres/3.4.8/interpreter.ts`:
+When complex resolution requires multiple child evaluations, use a helper async generator and delegate to it with `yield*`. This pattern keeps handlers clean when a single node kind requires complex multi-step resolution (like building parameterized SQL from template strings with interleaved sub-expressions).
 
-```ts
-async function* buildSQL(node: PostgresQueryNode): AsyncGenerator<TypedNode, BuiltQuery, unknown> {
-  const strings = node.strings as string[];
-  const paramNodes = node.params as TypedNode[];
-  let sql = "";
-  const params: unknown[] = [];
-
-  for (let i = 0; i < strings.length; i++) {
-    sql += strings[i];
-    if (i < paramNodes.length) {
-      const param = paramNodes[i] as any;
-      if (param.kind === "postgres/identifier") {
-        const name = yield* eval_<string>(param.name);
-        sql += escapeIdentifier(name);
-      } else if (param.kind === "postgres/insert_helper") {
-        const data = yield* eval_<Record<string, unknown> | Record<string, unknown>[]>(param.data);
-        // ... build parameterized INSERT
-      } else {
-        params.push(yield* eval_(param));
-        sql += `$${params.length}`;
-      }
-    }
-  }
-
-  return { sql, params };
-}
-```
-
-The postgres interpreter calls this helper with `yield*`:
-
-```ts
-export function createPostgresInterpreter(client: PostgresClient): Interpreter {
-  return {
-    "postgres/query": async function* (node: PostgresQueryNode) {
-      const { sql, params } = yield* buildSQL(node);
-      return await client.query(sql, params);
-    },
-
-    "postgres/cursor": async function* (node: PostgresCursorNode) {
-      // Cursor handling is done in handler.server.ts
-      throw new Error("postgres/cursor requires serverEvaluate");
-    },
-
-    // ...
-  };
-}
-```
-
-`yield*` delegates to the helper async generator. Every `yield` inside `buildSQL` passes through to the evaluator as if the handler had yielded it directly. The helper's return value becomes the result of the `yield*` expression.
-
-This pattern keeps handlers clean when a single node kind requires complex multi-step resolution (like building parameterized SQL from template strings with interleaved sub-expressions).
+`yield*` delegates to the helper async generator. Every `yield` inside the helper passes through to the fold trampoline as if the handler had yielded it directly. The helper's return value becomes the result of the `yield*` expression.
 
 ### Volatile nodes and taint tracking
 
-`foldAST` caches results by AST node identity (WeakMap). Most nodes produce the same value every time — a `core/literal` always returns its value, a `num/add` always returns the sum of its children. But some nodes must produce a different value on each evaluation:
+`fold` caches results by AST node identity. Most nodes produce the same value every time — a `core/literal` always returns its value, a `num/add` always returns the sum of its children. But some nodes must produce a different value on each evaluation:
 
 - **`core/lambda_param`** — A lambda parameter's value changes each time the lambda is invoked (e.g., in `map`, `filter`, `reduce`).
 - **`postgres/cursor_batch`** — A cursor injects different row batches into this node on each iteration.
 
-`foldAST` uses a `VOLATILE_KINDS` set (defined in `fold.ts`) to identify volatile node kinds. If a node is volatile, its result is never cached. Additionally, **taint propagation** ensures that any ancestor node that depends on a volatile node is also excluded from caching.
+`fold` uses a `VOLATILE_KINDS` set (defined in `fold.ts`) to identify volatile node kinds. If a node is volatile, its result is never cached. Additionally, **taint propagation** ensures that any ancestor node that depends on a volatile node is also excluded from caching.
 
 To register a volatile node kind for your plugin, add it to the `VOLATILE_KINDS` set in `fold.ts`:
 
@@ -762,8 +676,8 @@ When designing your interpreter, you must decide whether the plugin is purely re
 ```ts
 export function createStripeInterpreter(client: StripeClient): Interpreter {
   return {
-    "stripe/create_payment_intent": async function* (node) {
-      const params = yield* eval_<Record<string, unknown>>(node.params);
+    "stripe/create_payment_intent": async function* () {
+      const params = (yield 0) as Record<string, unknown>;
       return await client.request("POST", "/v1/payment_intents", params);
     },
     // ... all operations follow the same pattern
@@ -771,11 +685,11 @@ export function createStripeInterpreter(client: StripeClient): Interpreter {
 }
 ```
 
-Every handler resolves child nodes via `yield*`, then calls `client.request()` directly.
+Every handler resolves child nodes via `yield index`, then calls `client.request()` directly.
 
 **Scoped (transactions, cursors, sessions):** Use this for services where some operations create execution scopes. Postgres is the canonical example — transactions create a new connection context, cursors iterate with injected batch data.
 
-For scoped operations, the interpreter's factory function produces stub handlers that throw, and the real evaluation logic lives in `handler.server.ts` which has access to `foldAST` and can create fresh evaluators for scoped bodies.
+For scoped operations, the interpreter's factory function produces stub handlers that throw, and the real evaluation logic lives in `handler.server.ts` which has access to `fold` and can create fresh evaluators for scoped bodies.
 
 **How to decide:** If every operation is "resolve params, call client, return result," use the simple pattern. If some operations need to evaluate sub-ASTs in a different context (new connection, different cache, injected data), use the scoped pattern with `handler.server.ts`.
 
@@ -828,15 +742,15 @@ External-service plugins provide three files beyond the plugin definition and in
 For **simple (request-response) plugins**, there is no separate server handler — the interpreter performs IO directly via the client. The `handler.server.ts` just exports `serverEvaluate`:
 
 ```ts
-import { type Interpreter, foldAST } from "@mvfm/core";
+import { type Interpreter, fold } from "@mvfm/core";
 import { type StripeClient, createStripeInterpreter } from "./interpreter";
 
 export function serverEvaluate(
   client: StripeClient,
   baseInterpreter: Interpreter,
-): (root: TypedNode) => Promise<unknown> {
+): (prog: Program) => Promise<unknown> {
   const interpreter = { ...createStripeInterpreter(client), ...baseInterpreter };
-  return (root) => foldAST(interpreter, root);
+  return (prog) => fold(interpreter, prog);
 }
 ```
 
@@ -848,19 +762,19 @@ Example from `src/plugins/postgres/3.4.8/handler.server.ts`:
 export function serverEvaluate(
   client: PostgresClient,
   baseInterpreter: Interpreter,
-): (root: TypedNode) => Promise<unknown> {
+): (prog: Program) => Promise<unknown> {
   const postgresInterpreter = createPostgresInterpreter(client);
-  // Override scoped handlers with full implementations that have access to foldAST
+  // Override scoped handlers with full implementations that have access to fold
   const fullInterpreter: Interpreter = {
     ...postgresInterpreter,
     ...baseInterpreter,
-    "postgres/begin": async function* (node) {
+    "postgres/begin": async function* () {
       // Create fresh evaluator inside transaction callback
-      return yield* eval_(node); // simplified — real impl uses client.begin()
+      // ... real impl uses client.begin() with nested fold
     },
     // ... cursor, savepoint overrides
   };
-  return (root) => foldAST(fullInterpreter, root);
+  return (prog) => fold(fullInterpreter, prog);
 }
 ```
 
@@ -871,8 +785,8 @@ The critical difference from the simple pattern: **scoped operations (`begin`, `
 The client handler enables browser-side execution. Instead of calling the real SDK, it implements the `Interpreter` interface but serializes each operation as JSON and sends it to a server endpoint via HTTP. The server endpoint runs the real interpreter and returns the result. From `src/plugins/stripe/2025-04-30.basil/handler.client.ts`:
 
 ```ts
-import type { Interpreter, TypedNode } from "@mvfm/core";
-import { foldAST } from "@mvfm/core";
+import type { Interpreter, RuntimeEntry } from "@mvfm/core";
+import { fold } from "@mvfm/core";
 
 export interface ClientHandlerOptions {
   /** Base URL of the server endpoint (e.g., "https://api.example.com"). */
@@ -892,11 +806,11 @@ export function clientInterpreter(options: ClientHandlerOptions, nodeKinds: stri
   // Builds an Interpreter that proxies node kinds over HTTP
   const interpreter: Interpreter = {};
   for (const kind of nodeKinds) {
-    interpreter[kind] = async function* (node: TypedNode) {
+    interpreter[kind] = async function* (entry: RuntimeEntry) {
       const response = await fetchFn(`${baseUrl}/mvfm/execute`, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...headers },
-        body: JSON.stringify({ contractHash, node }),
+        body: JSON.stringify({ contractHash, entry }),
       });
       if (!response.ok) {
         throw new Error(`Client: server returned ${response.status}`);
@@ -973,7 +887,7 @@ Key things to notice:
 
 ### `serverEvaluate` wrapper
 
-Every external-service plugin must export a `serverEvaluate` function. This is the top-level entry point for server-side evaluation — it composes the plugin's interpreter with a base interpreter and uses `foldAST` to evaluate.
+Every external-service plugin must export a `serverEvaluate` function. This is the top-level entry point for server-side evaluation — it composes the plugin's interpreter with a base interpreter and uses `fold` to evaluate.
 
 **Simple version (stripe):** From `src/plugins/stripe/2025-04-30.basil/handler.server.ts`:
 
@@ -981,46 +895,52 @@ Every external-service plugin must export a `serverEvaluate` function. This is t
 export function serverEvaluate(
   client: StripeClient,
   baseInterpreter: Interpreter,
-): (root: TypedNode) => Promise<unknown> {
+): (prog: Program) => Promise<unknown> {
   const interpreter = { ...createStripeInterpreter(client), ...baseInterpreter };
-  return (root) => foldAST(interpreter, root);
+  return (prog) => fold(interpreter, prog);
 }
 ```
 
-For simple plugins, `serverEvaluate` spreads the plugin interpreter with the base interpreter and calls `foldAST`.
+For simple plugins, `serverEvaluate` spreads the plugin interpreter with the base interpreter and calls `fold`.
 
-**Complex version (postgres):** For scoped plugins, `serverEvaluate` overrides the scoped node handlers with full implementations that have access to `foldAST` and can create fresh evaluators for transaction/cursor scopes.
+**Complex version (postgres):** For scoped plugins, `serverEvaluate` overrides the scoped node handlers with full implementations that have access to `fold` and can create fresh evaluators for transaction/cursor scopes.
 
-**The contract:** `serverEvaluate` always has the same signature — it takes a client and a base `Interpreter`, and returns `(root: TypedNode) => Promise<unknown>`. Callers do not need to know whether the plugin uses the simple or complex pattern. Usage looks the same:
+**The contract:** `serverEvaluate` always has the same signature — it takes a client and a base `Interpreter`, and returns `(prog: Program) => Promise<unknown>`. Callers do not need to know whether the plugin uses the simple or complex pattern. Usage looks the same:
 
 ```ts
-import { coreInterpreter, numInterpreter, strInterpreter } from "@mvfm/core";
+import { defaults, fold } from "@mvfm/core";
 import { serverEvaluate } from "@mvfm/plugin-stripe/2025-04-30.basil/handler.server";
 import { wrapStripeSdk } from "@mvfm/plugin-stripe/2025-04-30.basil/client-stripe-sdk";
 import Stripe from "stripe";
 
 const sdk = new Stripe("sk_test_...");
 const client = wrapStripeSdk(sdk);
-const evaluate = serverEvaluate(client, { ...coreInterpreter, ...numInterpreter, ...strInterpreter });
+const evaluate = serverEvaluate(client, defaults(app));
 
 const result = await evaluate(program);
 ```
 
 ### Interpreter composition
 
-Composition IS the customization mechanism. Interpreters compose via object spread — no framework, no registration, no lifecycle hooks.
+Composition IS the customization mechanism. Interpreters compose via `defaults()` or object spread — no framework, no registration, no lifecycle hooks.
 
-To compose interpreters from multiple plugins:
+The preferred way to compose interpreters is via `defaults(app, overrides?)`:
+
+```ts
+const app = mvfm(prelude, stripe({ apiKey: "sk_test_..." }), pg);
+const interp = defaults(app, { stripe: createStripeInterpreter(stripeClient) });
+const result = await fold(interp, prog);
+```
+
+For manual composition, interpreters compose via object spread:
 
 ```ts
 const interpreter = {
   ...createStripeInterpreter(stripeClient),
   ...createPostgresInterpreter(pgClient),
-  ...coreInterpreter,
-  ...numInterpreter,
-  ...strInterpreter,
+  ...defaults(app),
 };
-const result = await foldAST(interpreter, ast.result);
+const result = await fold(interpreter, prog);
 ```
 
 **Spread order matters for scoped plugins.** If a scoped plugin's `serverEvaluate` overrides some node kinds from the base interpreter (e.g., postgres overrides `"postgres/begin"` with a full implementation), the override must come first in the spread order, or the base interpreter's stub will take precedence.
@@ -1050,162 +970,100 @@ Traits are mvfm's typeclass system. They let generic plugins (like `eq`, `ord`, 
 
 Declare traits when your plugin introduces a type that should participate in generic operations. The `num` plugin introduces numbers, and numbers support equality, ordering, semiring arithmetic, display, and bounds. The `str` plugin introduces strings, and strings support equality, display, concatenation (semigroup), and empty string (monoid). If your plugin does not introduce a new type (e.g., `stripe` operates on opaque records, not a custom type), you do not need traits.
 
-### The TraitImpl interface
+### The TraitDef interface
 
-From `src/core.ts`:
+From `src/plugin.ts`:
 
 ```ts
-export interface TraitImpl {
-  type: string;
-  nodeKinds: Record<string, string>;
+export interface TraitDef<O, Mapping extends Record<string, string>> {
+  readonly output: O;
+  readonly mapping: Mapping;
 }
 ```
 
 Two fields:
 
-- **`type`** — A runtime type string that identifies what type this trait implementation handles. This is the string returned by `typeof` for primitives (`"number"`, `"string"`, `"boolean"`) or a custom type name for complex types. The `inferType` utility uses this to match AST nodes to trait implementations.
+- **`output`** — A phantom value that encodes the output type of the trait operation. For equality, this is `false as boolean` (the trait produces booleans). For `show`, this is `"" as string` (the trait produces strings). The actual runtime value is irrelevant — it exists only for type-level derivation.
 
-- **`nodeKinds`** — A map from operation name to the AST node kind that implements it. Each trait has its own set of expected operation names. For example, the `eq` trait expects an `eq` key; the `ord` trait expects a `compare` key; the `semiring` trait expects `add`, `zero`, `mul`, and `one`.
+- **`mapping`** — A record mapping runtime type strings (e.g., `"number"`, `"string"`) to the node kind that implements the trait for that type. For example, `{ number: "num/eq" }` means "for the `eq` trait on numbers, use the `num/eq` node kind."
 
 ### Available traits
 
-The `traits` field on `PluginDefinition` supports these trait slots:
+The `traits` field on a `Plugin` supports these trait names:
 
-| Trait | Expected operations | Purpose |
-|-------|-------------------|---------|
-| `eq` | `eq` | Structural equality comparison |
-| `ord` | `compare` | Three-way ordering (-1, 0, 1) |
-| `semiring` | `add`, `zero`, `mul`, `one` | Addition and multiplication with identities |
-| `heytingAlgebra` | (varies) | Boolean algebra operations |
-| `show` | `show` | Convert to string representation |
-| `semigroup` | `append` | Associative binary operation (concatenation) |
-| `monoid` | `mempty` | Identity element for semigroup |
-| `bounded` | `top`, `bottom` | Upper and lower bounds |
+| Trait | Purpose |
+|-------|---------|
+| `eq` | Structural equality comparison |
+| `neq` | Structural inequality comparison |
+| `show` | Convert to string representation |
+
+Additional traits (like `ord`, `semigroup`, `monoid`, `semiring`, `bounded`) are supported by custom trait resolution in the plugin system.
 
 ### Code example: num plugin traits
 
-From `src/plugins/num/index.ts`, the `num` plugin declares five traits:
+From `packages/core/src/std-plugins.ts`, the `numPlugin` declares three traits:
 
 ```ts
-export const num: PluginDefinition<NumMethods> = {
+export const numPlugin = {
   name: "num",
-  nodeKinds: [
-    "num/add", "num/sub", "num/mul", "num/div", "num/mod",
-    "num/compare", "num/neg", "num/abs", "num/floor", "num/ceil",
-    "num/round", "num/min", "num/max", "num/eq", "num/zero",
-    "num/one", "num/show", "num/top", "num/bottom",
-  ],
+  // ... ctors, kinds, lifts, nodeKinds ...
   traits: {
-    eq: { type: "number", nodeKinds: { eq: "num/eq" } },
-    ord: { type: "number", nodeKinds: { compare: "num/compare" } },
-    semiring: {
-      type: "number",
-      nodeKinds: { add: "num/add", zero: "num/zero", mul: "num/mul", one: "num/one" },
-    },
-    show: { type: "number", nodeKinds: { show: "num/show" } },
-    bounded: { type: "number", nodeKinds: { top: "num/top", bottom: "num/bottom" } },
+    eq: { output: false as boolean, mapping: { number: "num/eq" } } as TraitDef<
+      boolean, { number: "num/eq" }
+    >,
+    neq: { output: false as boolean, mapping: { number: "num/neq" } } as TraitDef<
+      boolean, { number: "num/neq" }
+    >,
+    show: { output: "" as string, mapping: { number: "num/show" } } as TraitDef<
+      string, { number: "num/show" }
+    >,
   },
-  build(ctx) { /* ... */ },
-};
+  // ... defaultInterpreter ...
+} as const;
 ```
 
 Key things to notice:
 
-1. **Every node kind referenced in `traits` must also appear in `nodeKinds`.** The trait declaration `{ eq: "num/eq" }` means the `eq` plugin will emit `num/eq` nodes. That kind must be in the `nodeKinds` array so the interpreter can handle it.
-2. **The `type` field is `"number"` — matching `typeof` for JS numbers.** This is how `inferType` resolves a `core/literal` with value `42` to the `num` plugin's trait implementation.
-3. **Multiple traits can share node kinds.** The `semiring` trait references `num/add`, which is also a standalone operation in `build()`. A single AST node kind can serve double duty.
+1. **Every node kind referenced in `traits.mapping` must also appear in `nodeKinds`.** The trait mapping `{ number: "num/eq" }` means the trait dispatch will emit `num/eq` nodes. That kind must be in the `nodeKinds` array so the interpreter can handle it.
+2. **The mapping key is a runtime type string** — `"number"` matches `typeof` for JS numbers. This is how the trait system resolves which plugin handles equality for numbers vs. strings.
+3. **The `output` field is a phantom value** — `false as boolean` tells the type system that `eq` produces booleans. The actual value doesn't matter at runtime.
 
 ### Code example: str plugin traits
 
-From `src/plugins/str/index.ts`, the `str` plugin declares four traits:
+From `packages/core/src/std-plugins-str.ts`, the `strPlugin` declares three traits:
 
 ```ts
-export const str: PluginDefinition<StrMethods> = {
+export const strPlugin = {
   name: "str",
-  nodeKinds: [
-    "str/template", "str/concat", "str/upper", "str/lower",
-    "str/trim", "str/slice", "str/includes", "str/startsWith",
-    "str/endsWith", "str/split", "str/join", "str/replace",
-    "str/len", "str/eq", "str/show", "str/append", "str/mempty",
-  ],
+  // ... ctors, kinds, lifts, nodeKinds ...
   traits: {
-    eq: { type: "string", nodeKinds: { eq: "str/eq" } },
-    show: { type: "string", nodeKinds: { show: "str/show" } },
-    semigroup: { type: "string", nodeKinds: { append: "str/append" } },
-    monoid: { type: "string", nodeKinds: { mempty: "str/mempty" } },
+    eq: { output: false as boolean, mapping: { string: "str/eq" } } as TraitDef<
+      boolean, { string: "str/eq" }
+    >,
+    neq: { output: false as boolean, mapping: { string: "str/neq" } } as TraitDef<
+      boolean, { string: "str/neq" }
+    >,
+    show: { output: "" as string, mapping: { string: "str/show" } } as TraitDef<
+      string, { string: "str/show" }
+    >,
   },
-  build(ctx) { /* ... */ },
-};
+  // ... defaultInterpreter ...
+} as const;
 ```
 
-Notice that `str` provides `semigroup` (string concatenation via `append`) and `monoid` (empty string via `mempty`), while `num` provides `semiring` (arithmetic) and `bounded`. Different types participate in different traits based on what operations make mathematical sense.
+Notice that both `num` and `str` provide `eq`, `neq`, and `show` traits but with different type mappings (`number` vs `string`). The trait system merges these mappings so that `$.eq(a, b)` dispatches to the correct node kind based on the operand type.
 
-### Runtime dispatch: how the eq plugin uses traits
+### Runtime dispatch: how traits work
 
-The trait system works because consumer plugins (like `eq`, `ord`, `show`) look up which data plugins (like `num`, `str`) declare trait implementations at build time. Here is how the `eq` plugin dispatches. From `src/plugins/eq/index.ts`:
+In the unified Plugin system, trait dispatch is handled automatically by the `mvfm()` runtime. When you call `$.eq(a, b)`, the system:
 
-```ts
-export const eq: PluginDefinition<EqMethods> = {
-  name: "eq",
-  nodeKinds: ["eq/neq"],
-  build(ctx: PluginContext): EqMethods {
-    // Step 1: Collect all eq trait implementations from loaded plugins
-    const impls = ctx.plugins.filter((p) => p.traits?.eq).map((p) => p.traits!.eq!);
+1. **Collects trait mappings** from all loaded plugins' `traits.eq.mapping` fields. If both `numPlugin` and `strPlugin` are loaded, the merged mapping is `{ number: "num/eq", string: "str/eq" }`.
 
-    function dispatchEq(a: any, b: any): Expr<boolean> {
-      const aNode = ctx.lift(a).__node;
-      const bNode = ctx.lift(b).__node;
+2. **Infers the type** of the operands at build time. For literal values, it uses `typeof`. For plugin-generated expressions, it looks at the `kinds` registry to determine the output type.
 
-      // Step 2: Infer the type of the arguments
-      const type =
-        inferType(aNode, impls, ctx.inputSchema) ??
-        inferType(bNode, impls, ctx.inputSchema);
+3. **Dispatches to the correct node kind** based on the inferred type. For numbers, `$.eq(a, b)` creates a `num/eq` node. For strings, it creates a `str/eq` node.
 
-      // Step 3: Find the matching implementation
-      const impl = type
-        ? impls.find((i) => i.type === type)
-        : impls.length === 1
-          ? impls[0]
-          : undefined;
-
-      if (!impl) {
-        throw new Error(
-          type
-            ? `No eq implementation for type: ${type}`
-            : "Cannot infer type for eq — both arguments are untyped",
-        );
-      }
-
-      // Step 4: Emit the type-specific node kind
-      return ctx.expr<boolean>({
-        kind: impl.nodeKinds.eq,  // e.g., "num/eq" or "str/eq"
-        left: aNode,
-        right: bNode,
-      });
-    }
-
-    return {
-      eq: dispatchEq,
-      neq(a: any, b: any): Expr<boolean> {
-        const inner = dispatchEq(a, b);
-        return ctx.expr<boolean>({ kind: "eq/neq", inner: inner.__node });
-      },
-    } as EqMethods;
-  },
-};
-```
-
-The dispatch algorithm works in four steps:
-
-1. **Collect implementations.** At build time, `ctx.plugins` contains all loaded plugins. The `eq` plugin filters for plugins that declare `traits.eq` and extracts their `TraitImpl` objects. If both `num` and `str` are loaded, `impls` contains `[{ type: "number", nodeKinds: { eq: "num/eq" } }, { type: "string", nodeKinds: { eq: "str/eq" } }]`.
-
-2. **Infer the type.** The `inferType` utility examines AST nodes to determine their runtime type. For `core/literal` nodes, it returns `typeof value` (e.g., `"number"` for `42`). For plugin-prefixed nodes (e.g., `num/add`), it finds the matching trait implementation by prefix. For `core/prop_access` nodes, it resolves the type from the input schema.
-
-3. **Find the implementation.** Once the type is known (e.g., `"number"`), the plugin finds the `TraitImpl` with `type === "number"`. If neither argument's type can be inferred but exactly one trait implementation is loaded, it falls back to that implementation (single-type programs are unambiguous).
-
-4. **Emit the type-specific node.** Instead of emitting a generic `eq/eq` node, the plugin emits the concrete node kind from the trait implementation — `num/eq` for numbers, `str/eq` for strings. This means the `eq` plugin itself does not need its own interpreter for the `eq` operation. The `num` or `str` interpreter handles `num/eq` or `str/eq` respectively. The only node kind the `eq` plugin emits under its own namespace is `eq/neq` (which wraps an inner equality node and negates it).
-
-This pattern — collect, infer, dispatch — is the same across all consumer plugins: `ord`, `show`, `semigroup`, `semiring`, `monoid`, `bounded`. They differ only in which trait slot they query and which operation keys they look up.
+This means trait-consuming operations like `$.eq()`, `$.show()`, and `$.neq()` are automatically generated as constructors by the `mvfm()` runtime — plugin authors only need to declare the `traits` field with the correct `TraitDef` mappings. The node kind for each type is handled by that type's plugin interpreter.
 
 ### The prelude rule
 
@@ -1326,18 +1184,18 @@ Interpretation tests verify that the interpreter fragment yields correct effects
 - Optional parameters are absent in the effect when omitted at build time
 - The handler's return value becomes the program's result
 
-**Pattern:** Create a program, build a mock client that captures calls, compose the interpreter with `coreInterpreter`, and run through `foldAST`. Assert on the captured calls and the final result.
+**Pattern:** Create a program, build a mock client that captures calls, compose the interpreter with `defaults()`, and run through `fold`. Assert on the captured calls and the final result.
 
 From `tests/plugins/stripe/2025-04-30.basil/interpreter.test.ts`:
 
 ```ts
 import { describe, expect, it } from "vitest";
-import { coreInterpreter, foldAST, injectInput, mvfm, num, str } from "@mvfm/core";
+import { defaults, fold, injectInput, mvfm, prelude } from "@mvfm/core";
 import type { Program } from "@mvfm/core";
 import { stripe } from "../../src/2025-04-30.basil";
 import { type StripeClient, createStripeInterpreter } from "../../src/2025-04-30.basil/interpreter";
 
-const app = mvfm(num, str, stripe({ apiKey: "sk_test_123" }));
+const app = mvfm(prelude, stripe({ apiKey: "sk_test_123" }));
 
 async function run(prog: Program, input: Record<string, unknown> = {}) {
   const captured: any[] = [];
@@ -1348,8 +1206,8 @@ async function run(prog: Program, input: Record<string, unknown> = {}) {
       return { id: "mock_id", object: "mock" };
     },
   };
-  const combined = { ...createStripeInterpreter(mockClient), ...coreInterpreter };
-  const result = await foldAST(combined, injected);
+  const interp = defaults(app, { stripe: createStripeInterpreter(mockClient) });
+  const result = await fold(interp, injected);
   return { result, captured };
 }
 
@@ -1365,7 +1223,7 @@ describe("stripe interpreter: create_payment_intent", () => {
 });
 
 describe("stripe interpreter: input resolution", () => {
-  it("resolves input params via eval_", async () => {
+  it("resolves input params via yield index", async () => {
     const prog = app({ amount: "number", currency: "string" }, ($) =>
       $.stripe.paymentIntents.create({
         amount: $.input.amount,
@@ -1382,9 +1240,9 @@ describe("stripe interpreter: input resolution", () => {
 Key things to notice:
 
 1. **Mock client captures calls.** Instead of making real API calls, the mock client pushes each call into a `captured` array and returns a canned response. This lets you assert on exactly what the interpreter called.
-2. **Interpreter composition via spread.** `{ ...createStripeInterpreter(mockClient), ...coreInterpreter }` creates a combined interpreter.
-3. **`foldAST` evaluates the AST.** It accepts either a `Program` or a `TypedNode` directly.
-4. **`injectInput` simulates runtime input.** Exported from `@mvfm/core`, it returns a new `Program` with `__inputData` attached to `core/input` nodes.
+2. **Interpreter composition via `defaults()`.** `defaults(app, overrides)` merges the app's default interpreters with mock overrides.
+3. **`fold` evaluates the Program.** It accepts an interpreter and a `Program`.
+4. **`injectInput` simulates runtime input.** Exported from `@mvfm/core`, it returns a new `Program` with runtime data attached to `core/input` nodes.
 5. **Tests verify client calls, not AST shape.** Tier 1 tests check the AST. Tier 2 tests check what the interpreter sends to the client.
 
 ### Tier 3: Integration (`integration.test.ts`)
@@ -1813,18 +1671,18 @@ From `src/plugins/stripe/2025-04-30.basil/handler.server.ts` -- the `serverEvalu
 ```ts
 /**
  * Creates a unified evaluation function that evaluates an AST against
- * a Stripe client using the provided interpreter and `foldAST`.
+ * a Stripe client using the provided interpreter and `fold`.
  *
  * Composes the Stripe interpreter with a base interpreter via object spread.
  *
  * @param client - The {@link StripeClient} to execute against.
  * @param baseInterpreter - Base interpreter for core/prelude node kinds.
- * @returns An async function that evaluates a TypedNode to its result.
+ * @returns An async function that evaluates a Program to its result.
  */
 export function serverEvaluate(
   client: StripeClient,
   baseInterpreter: Interpreter,
-): (root: TypedNode) => Promise<unknown> {
+): (prog: Program) => Promise<unknown> {
 ```
 
 From `src/plugins/postgres/3.4.8/index.ts` -- the `PostgresMethods` interface:
@@ -1911,7 +1769,7 @@ Interpreters compose by spreading: `{ ...pluginInterpreter, ...coreInterpreter }
 
 **7. Factory functions for configured plugins, const for unconfigured.**
 
-If your plugin needs configuration, export a factory function: `export function myPlugin(config: Config): PluginDefinition<T>`. If your plugin needs no configuration, export a const: `export const myPlugin: PluginDefinition<T> = { ... }`. Do not use a factory function when there is no config -- it adds unnecessary indirection.
+If your plugin needs configuration, export a factory function: `export function myPlugin(config: Config): Plugin`. If your plugin needs no configuration, export a const: `export const myPlugin = { ... } as const`. Do not use a factory function when there is no config -- it adds unnecessary indirection.
 
 **8. The prelude rule is non-negotiable -- reusable logic becomes its own plugin.**
 

@@ -5,6 +5,9 @@
 ```ts
 
 // @public
+export function abs<A>(a: A): CExpr<number, "num/abs", [A]>;
+
+// @public
 export type AccessorOverlay<O> = O extends readonly (infer E)[] ? {
     readonly [k: number]: CExpr<E, "core/access">;
 } : O extends object ? {
@@ -45,27 +48,94 @@ infer O
 ] ? NExpr<O, R, Adj, C> : never> : never;
 
 // @public
+export function boolAnd<A, B>(a: A, b: B): CExpr<boolean, "bool/and", [A, B]>;
+
+// @public
 export function boolLit<V extends boolean>(v: V): V;
 
 // @public
-export const boolPlugin: {
+export function boolNot<A>(a: A): CExpr<boolean, "bool/not", [A]>;
+
+// @public
+export function boolOr<A, B>(a: A, b: B): CExpr<boolean, "bool/or", [A, B]>;
+
+// @public
+const boolPlugin: {
     readonly name: "bool";
     readonly ctors: {
         readonly boolLit: typeof boolLit;
+        readonly and: typeof boolAnd;
+        readonly or: typeof boolOr;
+        readonly not: typeof boolNot;
     };
     readonly kinds: {
         readonly "bool/literal": KindSpec<[], boolean>;
         readonly "bool/eq": KindSpec<[boolean, boolean], boolean>;
+        readonly "bool/neq": KindSpec<[boolean, boolean], boolean>;
+        readonly "bool/and": KindSpec<[boolean, boolean], boolean>;
+        readonly "bool/or": KindSpec<[boolean, boolean], boolean>;
+        readonly "bool/not": KindSpec<[boolean], boolean>;
+        readonly "bool/implies": KindSpec<[boolean, boolean], boolean>;
+        readonly "bool/show": KindSpec<[boolean], string>;
+        readonly "bool/tt": KindSpec<[], boolean>;
+        readonly "bool/ff": KindSpec<[], boolean>;
     };
     readonly traits: {
         readonly eq: TraitDef<boolean, {
             boolean: "bool/eq";
         }>;
+        readonly neq: TraitDef<boolean, {
+            boolean: "bool/neq";
+        }>;
+        readonly show: TraitDef<string, {
+            boolean: "bool/show";
+        }>;
     };
     readonly lifts: {
         readonly boolean: "bool/literal";
     };
-    readonly nodeKinds: readonly ["bool/literal", "bool/eq"];
+    readonly nodeKinds: readonly ["bool/literal", "bool/eq", "bool/neq", "bool/and", "bool/or", "bool/not", "bool/implies", "bool/show", "bool/tt", "bool/ff"];
+    readonly defaultInterpreter: () => Interpreter;
+};
+export { boolPlugin as _boolPluginDef }
+export { boolPlugin }
+
+// @public @deprecated (undocumented)
+export const boolPluginU: {
+    readonly name: "bool";
+    readonly ctors: {
+        readonly boolLit: boolLit;
+        readonly and: boolAnd;
+        readonly or: boolOr;
+        readonly not: boolNot;
+    };
+    readonly kinds: {
+        readonly "bool/literal": KindSpec<[], boolean>;
+        readonly "bool/eq": KindSpec<[boolean, boolean], boolean>;
+        readonly "bool/neq": KindSpec<[boolean, boolean], boolean>;
+        readonly "bool/and": KindSpec<[boolean, boolean], boolean>;
+        readonly "bool/or": KindSpec<[boolean, boolean], boolean>;
+        readonly "bool/not": KindSpec<[boolean], boolean>;
+        readonly "bool/implies": KindSpec<[boolean, boolean], boolean>;
+        readonly "bool/show": KindSpec<[boolean], string>;
+        readonly "bool/tt": KindSpec<[], boolean>;
+        readonly "bool/ff": KindSpec<[], boolean>;
+    };
+    readonly traits: {
+        readonly eq: TraitDef<boolean, {
+        boolean: "bool/eq";
+        }>;
+        readonly neq: TraitDef<boolean, {
+        boolean: "bool/neq";
+        }>;
+        readonly show: TraitDef<string, {
+        boolean: "bool/show";
+        }>;
+    };
+    readonly lifts: {
+        readonly boolean: "bool/literal";
+    };
+    readonly nodeKinds: readonly ["bool/literal", "bool/eq", "bool/neq", "bool/and", "bool/or", "bool/not", "bool/implies", "bool/show", "bool/tt", "bool/ff"];
     readonly defaultInterpreter: () => Interpreter;
 };
 
@@ -94,6 +164,9 @@ export function byName<N extends string>(name: N): NamePred<N>;
 export type CArgsOf<E> = E extends CExpr<any, any, infer A> ? A : never;
 
 // @public
+export function ceil<A>(a: A): CExpr<number, "num/ceil", [A]>;
+
+// @public
 export type CExpr<O, Kind extends string = string, Args extends readonly unknown[] = readonly unknown[]> = {
     readonly [cexprBrand]: {
         readonly o: O;
@@ -117,6 +190,18 @@ export function collectReachable(adj: Record<string, RuntimeEntry>, rootId: stri
 
 // @public
 export function commit<O, R extends string, Adj, C extends string>(d: DirtyExpr<O, R, Adj, C>): NExpr<O, R, Adj, C>;
+
+// @public
+export function concat<A extends readonly unknown[]>(...args: A): CExpr<string, "str/concat", A>;
+
+// @public
+export const control: Plugin_2;
+
+// @public
+export const coreInterpreter: Interpreter;
+
+// @public
+export const corePlugin: Plugin_2;
 
 // @public
 export interface CountPred<N extends number> extends PredBase {
@@ -147,15 +232,15 @@ export type DeepResolve<T> = T extends CExpr<infer O, any, any> ? O : T extends 
 } : T;
 
 // @public
-export function defaults(plugins: readonly PluginDef[], overrides?: Record<string, Interpreter>): Interpreter;
+export function defaults(appOrPlugins: any, overrides?: Record<string, Interpreter>): Interpreter;
 
 // Warning: (ae-forgotten-export) The symbol "InterpreterHandlers" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "RejectAnyParam" needs to be exported by the entry point index.d.ts
 //
-// @public
+// @public @deprecated (undocumented)
 export function defineInterpreter<K extends string>(): <T extends InterpreterHandlers<K>>(handlers: string extends K ? T : T & { [P in K]: P extends keyof T ? RejectAnyParam<P, T[P]> : never; }) => Interpreter;
 
-// @public
+// @public @deprecated (undocumented)
 export function definePlugin<T extends {
     name: string;
     nodeKinds: string[];
@@ -193,6 +278,9 @@ export type DirtyIdOf<D> = D extends DirtyExpr<any, infer R, any, any> ? R : nev
 // @public
 export type DirtyOutOf<D> = D extends DirtyExpr<infer O, any, any, any> ? O : never;
 
+// @public
+export function div<A, B>(a: A, b: B): CExpr<number, "num/div", [A, B]>;
+
 // Warning: (ae-forgotten-export) The symbol "MergeCtors" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "TraitCtors" needs to be exported by the entry point index.d.ts
 //
@@ -209,88 +297,25 @@ infer C2 extends string,
 infer Ch
 ] ? [A2 & Record<C2, SNodeEntry<Kind, Ch, O>>, Increment<C2>, C2, O] : never> : Reg[Kind] extends TraitKindSpec<infer O, infer Mapping> ? ElaborateTraitExpr<Reg, O, Mapping, Args, Adj, Ctr> : never : never;
 
-// @public (undocumented)
-export type ElaborateLeaf<Reg, Value, Expected, Adj, Ctr extends string> = Value extends {
-    __kind: "core/access";
-    __out: infer O;
-} ? O extends Expected ? [Adj & Record<Ctr, SNodeEntry<"core/access", [], O>>, Increment<Ctr>, Ctr] : never : Value extends CExpr<any, infer K extends string, infer A extends readonly unknown[]> ? NeverGuard<ElaborateExpr<Reg, K, A, Adj, Ctr>, ElaborateExpr<Reg, K, A, Adj, Ctr> extends [
-infer A2,
-infer C2 extends string,
-infer Id extends string,
-infer O
-] ? O extends Expected ? [A2, C2, Id] : never : never> : [
-LiftKind<Expected>
-] extends [never] ? ElaborateStructural<Reg, Value, Expected, Adj, Ctr> extends [
-infer A2,
-infer C2 extends string,
-infer CR,
-any
-] ? [A2, C2, CR] : never : Value extends Expected ? [Adj & Record<Ctr, SNodeEntry<LiftKind<Expected>, [], Expected>>, Increment<Ctr>, Ctr] : DeepResolve<Value> extends Expected ? ElaborateStructural<Reg, Value, Expected, Adj, Ctr> extends [
-infer A2,
-infer C2 extends string,
-infer CR,
-any
-] ? [A2, C2, CR] : never : never;
-
-// @public (undocumented)
-export type ElaborateRecordFields<Reg, Value, Expected, Keys extends readonly string[], Adj, Ctr extends string> = Keys extends readonly [] ? [Adj, Ctr, {}] : Keys extends readonly [
-infer K extends string & keyof Expected & keyof Value,
-...infer Rest extends string[]
-] ? NeverGuard<ElaborateLeaf<Reg, Value[K], Expected[K], Adj, Ctr>, ElaborateLeaf<Reg, Value[K], Expected[K], Adj, Ctr> extends [
-infer A2,
-infer C2 extends string,
-infer CR
-] ? NeverGuard<ElaborateRecordFields<Reg, Value, Expected, Rest, A2, C2>, ElaborateRecordFields<Reg, Value, Expected, Rest, A2, C2> extends [
-infer A3,
-infer C3 extends string,
-infer RestMap
-] ? [A3, C3, Record<K, CR> & RestMap] : never> : never> : never;
-
-// @public (undocumented)
-export type ElaborateStructural<Reg, Value, Expected, Adj, Ctr extends string> = Value extends CExpr<any, infer K extends string, infer A extends readonly unknown[]> ? NeverGuard<ElaborateExpr<Reg, K, A, Adj, Ctr>, ElaborateExpr<Reg, K, A, Adj, Ctr> extends [
-infer A2,
-infer C2 extends string,
-infer Id extends string,
-infer O
-] ? [A2, C2, Id, O] : never> : Value extends readonly [] ? Expected extends readonly [] ? [Adj, Ctr, [], []] : never : Value extends readonly [infer H, ...infer Rest] ? Expected extends readonly [infer EH, ...infer ERest] ? NeverGuard<ElaborateLeaf<Reg, H, EH, Adj, Ctr>, ElaborateLeaf<Reg, H, EH, Adj, Ctr> extends [
-infer A2,
-infer C2 extends string,
-infer CR
-] ? NeverGuard<ElaborateStructural<Reg, Rest, ERest, A2, C2>, ElaborateStructural<Reg, Rest, ERest, A2, C2> extends [
-infer A3,
-infer C3 extends string,
-infer CRest extends unknown[],
-any
-] ? [A3, C3, [CR, ...CRest], Expected] : never> : never> : never : Value extends object ? Expected extends object ? NeverGuard<ElaborateRecordFields<Reg, Value, Expected, UnionToTuple<keyof Expected & string> extends infer K extends string[] ? K : [], Adj, Ctr>, ElaborateRecordFields<Reg, Value, Expected, UnionToTuple<keyof Expected & string> extends infer K extends string[] ? K : [], Adj, Ctr> extends [infer A2, infer C2 extends string, infer Map] ? [A2, C2, Map, Expected] : never> : never : Value extends number ? [
-Adj & Record<Ctr, SNodeEntry<"num/literal", [], number>>,
-Increment<Ctr>,
-Ctr,
-number
-] : Value extends string ? [
-Adj & Record<Ctr, SNodeEntry<"str/literal", [], string>>,
-Increment<Ctr>,
-Ctr,
-string
-] : Value extends boolean ? [
-Adj & Record<Ctr, SNodeEntry<"bool/literal", [], boolean>>,
-Increment<Ctr>,
-Ctr,
-boolean
-] : never;
+// @public
+export function endsWith<A, B>(s: A, suffix: B): CExpr<boolean, "str/endsWith", [A, B]>;
 
 // @public
 export function eq<A, B>(a: A, b: B): CExpr<boolean, "eq", [A, B]>;
 
 // @public
+export const error: Plugin_2;
+
+// @public @deprecated (undocumented)
 export function eval_<T>(node: TypedNode<T>): AsyncGenerator<TypedNode, T, unknown>;
 
 // @public
 export type EvalPred<P, Entry, ID extends string = string, Adj = Record<string, any>> = P extends KindPred<infer K> ? Entry extends NodeEntry<K, any, any> ? true : false : P extends KindGlobPred<infer Prefix> ? Entry extends NodeEntry<`${Prefix}${string}`, any, any> ? true : false : P extends LeafPred ? Entry extends NodeEntry<any, [], any> ? true : false : P extends CountPred<infer N> ? Entry extends NodeEntry<any, infer C extends string[], any> ? C["length"] extends N ? true : false : false : P extends NotPred<infer Inner> ? EvalPred<Inner, Entry, ID, Adj> extends true ? false : true : P extends AndPred<infer A, infer B> ? EvalPred<A, Entry, ID, Adj> extends true ? EvalPred<B, Entry, ID, Adj> : false : P extends OrPred<infer A, infer B> ? EvalPred<A, Entry, ID, Adj> extends true ? true : EvalPred<B, Entry, ID, Adj> : P extends NamePred<infer N> ? Adj extends Record<`@${N}`, NodeEntry<any, [infer T extends string, ...any[]], any>> ? ID extends T ? true : false : false : false;
 
-// @public
+// @public @deprecated (undocumented)
 export type Expr<T = unknown> = ExprBase<T>;
 
-// @public
+// @public @deprecated (undocumented)
 export interface ExprBase<T> {
     // (undocumented)
     readonly [key: string]: unknown;
@@ -304,13 +329,13 @@ export interface ExprBase<T> {
 export function extractChildIds(children: unknown): string[];
 
 // @public
-export function fold<E extends NExpr<any, any, any, any>>(expr: E, interp: Interpreter, state?: FoldState): Promise<OutOf<E>>;
+export function floor<A>(a: A): CExpr<number, "num/floor", [A]>;
 
 // @public
-export function fold<T>(rootId: string, adj: Record<string, RuntimeEntry>, interp: Interpreter, state?: FoldState): Promise<T>;
+export function fold(first: any, second: any, third?: any, fourth?: any): Promise<unknown>;
 
-// @public
-export function foldAST<T>(_prog: Program | Record<string, unknown>, _interp: Interpreter | Record<string, unknown>): Promise<T>;
+// @public @deprecated
+export function foldAST<T>(interpOrProg: Interpreter | Record<string, unknown>, progOrInterp: unknown): Promise<T>;
 
 // @public
 export interface FoldState {
@@ -340,6 +365,9 @@ export function hasChildCount<N extends number>(count: N): CountPred<N>;
 export type IdOf<E> = E extends NExpr<any, infer R, any, any> ? R : never;
 
 // @public
+export function includes<A, B>(s: A, search: B): CExpr<boolean, "str/includes", [A, B]>;
+
+// @public
 export type Increment<S extends string> = S extends `${infer Rest}z` ? Rest extends "" ? "aa" : `${Increment<Rest>}a` : IncrementLast<S>;
 
 // @public
@@ -349,6 +377,9 @@ export function incrementId(s: string): string;
 export type IncrementLast<S extends string> = S extends `${infer R}a` ? `${R}b` : S extends `${infer R}b` ? `${R}c` : S extends `${infer R}c` ? `${R}d` : S extends `${infer R}d` ? `${R}e` : S extends `${infer R}e` ? `${R}f` : S extends `${infer R}f` ? `${R}g` : S extends `${infer R}g` ? `${R}h` : S extends `${infer R}h` ? `${R}i` : S extends `${infer R}i` ? `${R}j` : S extends `${infer R}j` ? `${R}k` : S extends `${infer R}k` ? `${R}l` : S extends `${infer R}l` ? `${R}m` : S extends `${infer R}m` ? `${R}n` : S extends `${infer R}n` ? `${R}o` : S extends `${infer R}o` ? `${R}p` : S extends `${infer R}p` ? `${R}q` : S extends `${infer R}q` ? `${R}r` : S extends `${infer R}r` ? `${R}s` : S extends `${infer R}s` ? `${R}t` : S extends `${infer R}t` ? `${R}u` : S extends `${infer R}u` ? `${R}v` : S extends `${infer R}v` ? `${R}w` : S extends `${infer R}w` ? `${R}x` : S extends `${infer R}x` ? `${R}y` : S extends `${infer R}y` ? `${R}z` : never;
 
 // @public
+export function injectInput(prog: Program, data: Record<string, unknown>): Program;
+
+// @public
 export type Interpreter = Record<string, Handler>;
 
 // @public
@@ -356,6 +387,9 @@ export function isCExpr(x: unknown): x is CExpr<unknown>;
 
 // @public
 export function isLeaf(): LeafPred;
+
+// @public
+export function join<A, B>(arr: A, sep: B): CExpr<string, "str/join", [A, B]>;
 
 // @public
 export const KIND_INPUTS: Record<string, string[]>;
@@ -391,6 +425,9 @@ export interface LeafPred extends PredBase {
 }
 
 // @public
+export function len<A>(s: A): CExpr<number, "str/len", [A]>;
+
+// @public
 export const LIFT_MAP: Record<string, string>;
 
 // @public
@@ -403,6 +440,9 @@ export type LiveAdj<Adj, RootID extends string> = {
 
 // @public
 export function liveAdj(adj: Record<string, RuntimeEntry>, rootId: string): Record<string, RuntimeEntry>;
+
+// @public
+export function lower<A>(a: A): CExpr<string, "str/lower", [A]>;
 
 // @public
 export function lt<A, B>(a: A, b: B): CExpr<boolean, "lt", [A, B]>;
@@ -440,7 +480,22 @@ export type MatchingEntries<Adj, P> = {
 }[keyof Adj];
 
 // @public
+export function max<A, B>(a: A, b: B): CExpr<number, "num/max", [A, B]>;
+
+// @public
+export function min<A, B>(a: A, b: B): CExpr<number, "num/min", [A, B]>;
+
+// @public
+export function mod<A, B>(a: A, b: B): CExpr<number, "num/mod", [A, B]>;
+
+// @public
 export function mul<A, B>(a: A, b: B): CExpr<number, "num/mul", [A, B]>;
+
+// @public
+export function mvfm(...pluginInputs: (Plugin_2 | readonly Plugin_2[])[]): {
+    (schemaOrFn: any, maybeFn?: any): Program;
+    plugins: Plugin_2<string, any, any, any, any>[];
+};
 
 // @public
 export function mvfmU<const P extends readonly Plugin_2[]>(...plugins: P): DollarSign<P>;
@@ -463,6 +518,9 @@ export interface NamePred<N extends string> extends PredBase {
     // (undocumented)
     readonly _tag: "name";
 }
+
+// @public
+export function neg<A>(a: A): CExpr<number, "num/neg", [A]>;
 
 // @public
 export type NeverGuard<T, Then> = [T] extends [never] ? never : Then;
@@ -491,7 +549,7 @@ export type NodeEntry<Kind extends string, ChildIDs extends string[], Out> = {
     readonly out: Out;
 };
 
-// @public
+// @public @deprecated (undocumented)
 export interface NodeTypeMap {
 }
 
@@ -516,6 +574,15 @@ export const numPlugin: {
         readonly add: typeof add;
         readonly mul: typeof mul;
         readonly sub: typeof sub;
+        readonly div: typeof div;
+        readonly mod: typeof mod;
+        readonly min: typeof min;
+        readonly max: typeof max;
+        readonly neg: typeof neg;
+        readonly abs: typeof abs;
+        readonly floor: typeof floor;
+        readonly ceil: typeof ceil;
+        readonly round: typeof round;
         readonly numLit: typeof numLit;
     };
     readonly kinds: {
@@ -523,17 +590,98 @@ export const numPlugin: {
         readonly "num/add": KindSpec<[number, number], number>;
         readonly "num/mul": KindSpec<[number, number], number>;
         readonly "num/sub": KindSpec<[number, number], number>;
+        readonly "num/div": KindSpec<[number, number], number>;
+        readonly "num/mod": KindSpec<[number, number], number>;
+        readonly "num/neg": KindSpec<[number], number>;
+        readonly "num/abs": KindSpec<[number], number>;
+        readonly "num/floor": KindSpec<[number], number>;
+        readonly "num/ceil": KindSpec<[number], number>;
+        readonly "num/round": KindSpec<[number], number>;
+        readonly "num/min": KindSpec<[number, number], number>;
+        readonly "num/max": KindSpec<[number, number], number>;
+        readonly "num/show": KindSpec<[number], string>;
+        readonly "num/compare": KindSpec<[number, number], number>;
         readonly "num/eq": KindSpec<[number, number], boolean>;
+        readonly "num/neq": KindSpec<[number, number], boolean>;
+        readonly "num/zero": KindSpec<[], number>;
+        readonly "num/one": KindSpec<[], number>;
+        readonly "num/top": KindSpec<[], number>;
+        readonly "num/bottom": KindSpec<[], number>;
     };
     readonly traits: {
         readonly eq: TraitDef<boolean, {
             number: "num/eq";
         }>;
+        readonly neq: TraitDef<boolean, {
+            number: "num/neq";
+        }>;
+        readonly show: TraitDef<string, {
+            number: "num/show";
+        }>;
     };
     readonly lifts: {
         readonly number: "num/literal";
     };
-    readonly nodeKinds: readonly ["num/literal", "num/add", "num/mul", "num/sub", "num/eq"];
+    readonly nodeKinds: readonly ["num/literal", "num/add", "num/mul", "num/sub", "num/div", "num/mod", "num/neg", "num/abs", "num/floor", "num/ceil", "num/round", "num/min", "num/max", "num/show", "num/compare", "num/eq", "num/neq", "num/zero", "num/one", "num/top", "num/bottom"];
+    readonly defaultInterpreter: () => Interpreter;
+};
+
+// @public @deprecated (undocumented)
+export const numPluginU: {
+    readonly name: "num";
+    readonly ctors: {
+        readonly add: add;
+        readonly mul: mul;
+        readonly sub: sub;
+        readonly div: div;
+        readonly mod: mod;
+        readonly min: min;
+        readonly max: max;
+        readonly neg: neg;
+        readonly abs: abs;
+        readonly floor: floor;
+        readonly ceil: ceil;
+        readonly round: round;
+        readonly numLit: numLit;
+    };
+    readonly kinds: {
+        readonly "num/literal": KindSpec<[], number>;
+        readonly "num/add": KindSpec<[number, number], number>;
+        readonly "num/mul": KindSpec<[number, number], number>;
+        readonly "num/sub": KindSpec<[number, number], number>;
+        readonly "num/div": KindSpec<[number, number], number>;
+        readonly "num/mod": KindSpec<[number, number], number>;
+        readonly "num/neg": KindSpec<[number], number>;
+        readonly "num/abs": KindSpec<[number], number>;
+        readonly "num/floor": KindSpec<[number], number>;
+        readonly "num/ceil": KindSpec<[number], number>;
+        readonly "num/round": KindSpec<[number], number>;
+        readonly "num/min": KindSpec<[number, number], number>;
+        readonly "num/max": KindSpec<[number, number], number>;
+        readonly "num/show": KindSpec<[number], string>;
+        readonly "num/compare": KindSpec<[number, number], number>;
+        readonly "num/eq": KindSpec<[number, number], boolean>;
+        readonly "num/neq": KindSpec<[number, number], boolean>;
+        readonly "num/zero": KindSpec<[], number>;
+        readonly "num/one": KindSpec<[], number>;
+        readonly "num/top": KindSpec<[], number>;
+        readonly "num/bottom": KindSpec<[], number>;
+    };
+    readonly traits: {
+        readonly eq: TraitDef<boolean, {
+        number: "num/eq";
+        }>;
+        readonly neq: TraitDef<boolean, {
+        number: "num/neq";
+        }>;
+        readonly show: TraitDef<string, {
+        number: "num/show";
+        }>;
+    };
+    readonly lifts: {
+        readonly number: "num/literal";
+    };
+    readonly nodeKinds: readonly ["num/literal", "num/add", "num/mul", "num/sub", "num/div", "num/mod", "num/neg", "num/abs", "num/floor", "num/ceil", "num/round", "num/min", "num/max", "num/show", "num/compare", "num/eq", "num/neq", "num/zero", "num/one", "num/top", "num/bottom"];
     readonly defaultInterpreter: () => Interpreter;
 };
 
@@ -541,25 +689,46 @@ export const numPlugin: {
 export function or<A extends PredBase, B extends PredBase>(left: A, right: B): OrPred<A, B>;
 
 // @public
-export const ordPlugin: {
+const ordPlugin: {
     readonly name: "ord";
     readonly ctors: {
         readonly lt: typeof lt;
     };
     readonly kinds: {
         readonly "num/lt": KindSpec<[number, number], boolean>;
+        readonly "num/gt": KindSpec<[number, number], boolean>;
+        readonly "num/gte": KindSpec<[number, number], boolean>;
+        readonly "num/lte": KindSpec<[number, number], boolean>;
         readonly "str/lt": KindSpec<[string, string], boolean>;
+        readonly "str/gt": KindSpec<[string, string], boolean>;
+        readonly "str/gte": KindSpec<[string, string], boolean>;
+        readonly "str/lte": KindSpec<[string, string], boolean>;
+        readonly "str/compare": KindSpec<[string, string], number>;
     };
     readonly traits: {
         readonly lt: TraitDef<boolean, {
             number: "num/lt";
             string: "str/lt";
         }>;
+        readonly gt: TraitDef<boolean, {
+            number: "num/gt";
+            string: "str/gt";
+        }>;
+        readonly gte: TraitDef<boolean, {
+            number: "num/gte";
+            string: "str/gte";
+        }>;
+        readonly lte: TraitDef<boolean, {
+            number: "num/lte";
+            string: "str/lte";
+        }>;
     };
     readonly lifts: {};
-    readonly nodeKinds: readonly ["num/lt", "str/lt"];
+    readonly nodeKinds: readonly ["num/lt", "num/gt", "num/gte", "num/lte", "str/lt", "str/gt", "str/gte", "str/lte", "str/compare"];
     readonly defaultInterpreter: () => Interpreter;
 };
+export { ordPlugin as _ordPluginDef }
+export { ordPlugin }
 
 // @public
 export interface OrPred<A extends PredBase, B extends PredBase> extends PredBase {
@@ -607,7 +776,7 @@ interface Plugin_2<Name extends string = string, Ctors extends Record<string, (.
 }
 export { Plugin_2 as Plugin }
 
-// @public
+// @public @deprecated (undocumented)
 export interface PluginContext {
     // (undocumented)
     emit(node: unknown): void;
@@ -644,22 +813,21 @@ export interface PredBase {
 }
 
 // @public
+export const prelude: readonly Plugin_2[];
+
+// @public
 export type PreserveAliases<Adj> = {
     [K in keyof Adj as K extends `@${string}` ? K : never]: Adj[K];
 };
 
 // @public
-export interface Program<K extends string = string> {
+export interface Program {
     // (undocumented)
-    readonly __kinds?: K;
+    readonly __inputSchema?: Record<string, string>;
     // (undocumented)
-    ast: unknown;
+    readonly __nexpr: NExpr<any, any, any, any>;
     // (undocumented)
-    hash: string;
-    // (undocumented)
-    inputSchema: Record<string, unknown>;
-    // (undocumented)
-    plugins: string[];
+    readonly __plugins: readonly Plugin_2[];
 }
 
 // @public
@@ -695,6 +863,9 @@ export function removeEntry<O, R extends string, Adj, C extends string, Id exten
     [K in keyof Adj as K extends Id ? never : K]: Adj[K];
 }, C>;
 
+// @public
+export function replace<A, B, C>(s: A, search: B, replacement: C): CExpr<string, "str/replace", [A, B, C]>;
+
 // Warning: (ae-forgotten-export) The symbol "ReplaceKind" needs to be exported by the entry point index.d.ts
 //
 // @public
@@ -722,6 +893,9 @@ export interface RewireTypeError<_Msg extends string = string> {
     // (undocumented)
     readonly __rewireTypeError: _Msg;
 }
+
+// @public
+export function round<A>(a: A): CExpr<number, "num/round", [A]>;
 
 // @public
 export interface RuntimeEntry {
@@ -753,6 +927,9 @@ export function selectWhere<O, R extends string, Adj, C extends string, P extend
 export function setRoot<O, R extends string, Adj, C extends string, NewRoot extends string>(d: DirtyExpr<O, R, Adj, C>, newRootId: NewRoot): DirtyExpr<O, NewRoot, Adj, C>;
 
 // @public
+export function slice<A, B, C>(s: A, start: B, end?: C): CExpr<string, "str/slice", [A, B, ...unknown[]]>;
+
+// @public
 export type SNodeEntry<Kind extends string = string, Ch = unknown, O = unknown> = {
     readonly kind: Kind;
     readonly children: Ch;
@@ -781,12 +958,30 @@ export interface SpliceTypeError<_Msg extends string = string> {
 export function spliceWhere<O, R extends string, Adj, C extends string, P extends PredBase, I extends number = 0>(expr: NExpr<O, R, Adj, C>, pred: P, childIndex?: I): SpliceTypeSafe<Adj, SelectKeys<Adj, P>, I> extends true ? NExpr<O, SpliceRoot<R, Adj, SelectKeys<Adj, P>, I>, SpliceAdj<Adj, SelectKeys<Adj, P>, I>, C> : SpliceTypeError<"replacement child output type does not match spliced node output type">;
 
 // @public
+export function split<A, B>(s: A, sep: B): CExpr<string[], "str/split", [A, B]>;
+
+// @public
+export const st: Plugin_2;
+
+// @public
+export function startsWith<A, B>(s: A, prefix: B): CExpr<boolean, "str/startsWith", [A, B]>;
+
+// @public
 export const stdPlugins: readonly [{
     readonly name: "num";
     readonly ctors: {
         readonly add: typeof add;
         readonly mul: typeof mul;
         readonly sub: typeof sub;
+        readonly div: typeof div;
+        readonly mod: typeof mod;
+        readonly min: typeof min;
+        readonly max: typeof max;
+        readonly neg: typeof neg;
+        readonly abs: typeof abs;
+        readonly floor: typeof floor;
+        readonly ceil: typeof ceil;
+        readonly round: typeof round;
         readonly numLit: typeof numLit;
     };
     readonly kinds: {
@@ -794,55 +989,130 @@ export const stdPlugins: readonly [{
         readonly "num/add": KindSpec<[number, number], number>;
         readonly "num/mul": KindSpec<[number, number], number>;
         readonly "num/sub": KindSpec<[number, number], number>;
+        readonly "num/div": KindSpec<[number, number], number>;
+        readonly "num/mod": KindSpec<[number, number], number>;
+        readonly "num/neg": KindSpec<[number], number>;
+        readonly "num/abs": KindSpec<[number], number>;
+        readonly "num/floor": KindSpec<[number], number>;
+        readonly "num/ceil": KindSpec<[number], number>;
+        readonly "num/round": KindSpec<[number], number>;
+        readonly "num/min": KindSpec<[number, number], number>;
+        readonly "num/max": KindSpec<[number, number], number>;
+        readonly "num/show": KindSpec<[number], string>;
+        readonly "num/compare": KindSpec<[number, number], number>;
         readonly "num/eq": KindSpec<[number, number], boolean>;
+        readonly "num/neq": KindSpec<[number, number], boolean>;
+        readonly "num/zero": KindSpec<[], number>;
+        readonly "num/one": KindSpec<[], number>;
+        readonly "num/top": KindSpec<[], number>;
+        readonly "num/bottom": KindSpec<[], number>;
     };
     readonly traits: {
         readonly eq: TraitDef<boolean, {
             number: "num/eq";
         }>;
+        readonly neq: TraitDef<boolean, {
+            number: "num/neq";
+        }>;
+        readonly show: TraitDef<string, {
+            number: "num/show";
+        }>;
     };
     readonly lifts: {
         readonly number: "num/literal";
     };
-    readonly nodeKinds: readonly ["num/literal", "num/add", "num/mul", "num/sub", "num/eq"];
+    readonly nodeKinds: readonly ["num/literal", "num/add", "num/mul", "num/sub", "num/div", "num/mod", "num/neg", "num/abs", "num/floor", "num/ceil", "num/round", "num/min", "num/max", "num/show", "num/compare", "num/eq", "num/neq", "num/zero", "num/one", "num/top", "num/bottom"];
     readonly defaultInterpreter: () => Interpreter;
 }, {
     readonly name: "str";
     readonly ctors: {
-        readonly strLit: typeof strLit;
+        readonly strLit: strLit;
+        readonly concat: concat;
+        readonly upper: upper;
+        readonly lower: lower;
+        readonly trim: trim;
+        readonly slice: slice;
+        readonly includes: includes;
+        readonly startsWith: startsWith;
+        readonly endsWith: endsWith;
+        readonly split: split;
+        readonly join: join;
+        readonly replace: replace;
+        readonly len: len;
+        readonly strShow: strShow;
+        readonly strAppend: strAppend;
     };
     readonly kinds: {
         readonly "str/literal": KindSpec<[], string>;
+        readonly "str/concat": KindSpec<string[], string>;
+        readonly "str/upper": KindSpec<[string], string>;
+        readonly "str/lower": KindSpec<[string], string>;
+        readonly "str/trim": KindSpec<[string], string>;
+        readonly "str/slice": KindSpec<[string, number, number], string>;
+        readonly "str/includes": KindSpec<[string, string], boolean>;
+        readonly "str/startsWith": KindSpec<[string, string], boolean>;
+        readonly "str/endsWith": KindSpec<[string, string], boolean>;
+        readonly "str/split": KindSpec<[string, string], string[]>;
+        readonly "str/join": KindSpec<[string[], string], string>;
+        readonly "str/replace": KindSpec<[string, string, string], string>;
+        readonly "str/len": KindSpec<[string], number>;
+        readonly "str/show": KindSpec<[string], string>;
+        readonly "str/append": KindSpec<[string, string], string>;
+        readonly "str/mempty": KindSpec<[], string>;
         readonly "str/eq": KindSpec<[string, string], boolean>;
+        readonly "str/neq": KindSpec<[string, string], boolean>;
     };
     readonly traits: {
         readonly eq: TraitDef<boolean, {
             string: "str/eq";
         }>;
+        readonly neq: TraitDef<boolean, {
+            string: "str/neq";
+        }>;
+        readonly show: TraitDef<string, {
+            string: "str/show";
+        }>;
     };
     readonly lifts: {
         readonly string: "str/literal";
     };
-    readonly nodeKinds: readonly ["str/literal", "str/eq"];
+    readonly nodeKinds: readonly ["str/literal", "str/concat", "str/upper", "str/lower", "str/trim", "str/slice", "str/includes", "str/startsWith", "str/endsWith", "str/split", "str/join", "str/replace", "str/len", "str/show", "str/append", "str/mempty", "str/eq", "str/neq"];
     readonly defaultInterpreter: () => Interpreter;
 }, {
     readonly name: "bool";
     readonly ctors: {
-        readonly boolLit: typeof boolLit;
+        readonly boolLit: boolLit;
+        readonly and: boolAnd;
+        readonly or: boolOr;
+        readonly not: boolNot;
     };
     readonly kinds: {
         readonly "bool/literal": KindSpec<[], boolean>;
         readonly "bool/eq": KindSpec<[boolean, boolean], boolean>;
+        readonly "bool/neq": KindSpec<[boolean, boolean], boolean>;
+        readonly "bool/and": KindSpec<[boolean, boolean], boolean>;
+        readonly "bool/or": KindSpec<[boolean, boolean], boolean>;
+        readonly "bool/not": KindSpec<[boolean], boolean>;
+        readonly "bool/implies": KindSpec<[boolean, boolean], boolean>;
+        readonly "bool/show": KindSpec<[boolean], string>;
+        readonly "bool/tt": KindSpec<[], boolean>;
+        readonly "bool/ff": KindSpec<[], boolean>;
     };
     readonly traits: {
         readonly eq: TraitDef<boolean, {
             boolean: "bool/eq";
         }>;
+        readonly neq: TraitDef<boolean, {
+            boolean: "bool/neq";
+        }>;
+        readonly show: TraitDef<string, {
+            boolean: "bool/show";
+        }>;
     };
     readonly lifts: {
         readonly boolean: "bool/literal";
     };
-    readonly nodeKinds: readonly ["bool/literal", "bool/eq"];
+    readonly nodeKinds: readonly ["bool/literal", "bool/eq", "bool/neq", "bool/and", "bool/or", "bool/not", "bool/implies", "bool/show", "bool/tt", "bool/ff"];
     readonly defaultInterpreter: () => Interpreter;
 }];
 
@@ -865,29 +1135,131 @@ export type StdRegistry = {
 };
 
 // @public
+export function strAppend<A, B>(a: A, b: B): CExpr<string, "str/append", [A, B]>;
+
+// @public
 export function strLit<V extends string>(v: V): V;
 
 // @public
-export const strPlugin: {
+const strPlugin: {
     readonly name: "str";
     readonly ctors: {
         readonly strLit: typeof strLit;
+        readonly concat: typeof concat;
+        readonly upper: typeof upper;
+        readonly lower: typeof lower;
+        readonly trim: typeof trim;
+        readonly slice: typeof slice;
+        readonly includes: typeof includes;
+        readonly startsWith: typeof startsWith;
+        readonly endsWith: typeof endsWith;
+        readonly split: typeof split;
+        readonly join: typeof join;
+        readonly replace: typeof replace;
+        readonly len: typeof len;
+        readonly strShow: typeof strShow;
+        readonly strAppend: typeof strAppend;
     };
     readonly kinds: {
         readonly "str/literal": KindSpec<[], string>;
+        readonly "str/concat": KindSpec<string[], string>;
+        readonly "str/upper": KindSpec<[string], string>;
+        readonly "str/lower": KindSpec<[string], string>;
+        readonly "str/trim": KindSpec<[string], string>;
+        readonly "str/slice": KindSpec<[string, number, number], string>;
+        readonly "str/includes": KindSpec<[string, string], boolean>;
+        readonly "str/startsWith": KindSpec<[string, string], boolean>;
+        readonly "str/endsWith": KindSpec<[string, string], boolean>;
+        readonly "str/split": KindSpec<[string, string], string[]>;
+        readonly "str/join": KindSpec<[string[], string], string>;
+        readonly "str/replace": KindSpec<[string, string, string], string>;
+        readonly "str/len": KindSpec<[string], number>;
+        readonly "str/show": KindSpec<[string], string>;
+        readonly "str/append": KindSpec<[string, string], string>;
+        readonly "str/mempty": KindSpec<[], string>;
         readonly "str/eq": KindSpec<[string, string], boolean>;
+        readonly "str/neq": KindSpec<[string, string], boolean>;
     };
     readonly traits: {
         readonly eq: TraitDef<boolean, {
             string: "str/eq";
         }>;
+        readonly neq: TraitDef<boolean, {
+            string: "str/neq";
+        }>;
+        readonly show: TraitDef<string, {
+            string: "str/show";
+        }>;
     };
     readonly lifts: {
         readonly string: "str/literal";
     };
-    readonly nodeKinds: readonly ["str/literal", "str/eq"];
+    readonly nodeKinds: readonly ["str/literal", "str/concat", "str/upper", "str/lower", "str/trim", "str/slice", "str/includes", "str/startsWith", "str/endsWith", "str/split", "str/join", "str/replace", "str/len", "str/show", "str/append", "str/mempty", "str/eq", "str/neq"];
     readonly defaultInterpreter: () => Interpreter;
 };
+export { strPlugin as _strPluginDef }
+export { strPlugin }
+
+// @public @deprecated (undocumented)
+export const strPluginU: {
+    readonly name: "str";
+    readonly ctors: {
+        readonly strLit: strLit;
+        readonly concat: concat;
+        readonly upper: upper;
+        readonly lower: lower;
+        readonly trim: trim;
+        readonly slice: slice;
+        readonly includes: includes;
+        readonly startsWith: startsWith;
+        readonly endsWith: endsWith;
+        readonly split: split;
+        readonly join: join;
+        readonly replace: replace;
+        readonly len: len;
+        readonly strShow: strShow;
+        readonly strAppend: strAppend;
+    };
+    readonly kinds: {
+        readonly "str/literal": KindSpec<[], string>;
+        readonly "str/concat": KindSpec<string[], string>;
+        readonly "str/upper": KindSpec<[string], string>;
+        readonly "str/lower": KindSpec<[string], string>;
+        readonly "str/trim": KindSpec<[string], string>;
+        readonly "str/slice": KindSpec<[string, number, number], string>;
+        readonly "str/includes": KindSpec<[string, string], boolean>;
+        readonly "str/startsWith": KindSpec<[string, string], boolean>;
+        readonly "str/endsWith": KindSpec<[string, string], boolean>;
+        readonly "str/split": KindSpec<[string, string], string[]>;
+        readonly "str/join": KindSpec<[string[], string], string>;
+        readonly "str/replace": KindSpec<[string, string, string], string>;
+        readonly "str/len": KindSpec<[string], number>;
+        readonly "str/show": KindSpec<[string], string>;
+        readonly "str/append": KindSpec<[string, string], string>;
+        readonly "str/mempty": KindSpec<[], string>;
+        readonly "str/eq": KindSpec<[string, string], boolean>;
+        readonly "str/neq": KindSpec<[string, string], boolean>;
+    };
+    readonly traits: {
+        readonly eq: TraitDef<boolean, {
+        string: "str/eq";
+        }>;
+        readonly neq: TraitDef<boolean, {
+        string: "str/neq";
+        }>;
+        readonly show: TraitDef<string, {
+        string: "str/show";
+        }>;
+    };
+    readonly lifts: {
+        readonly string: "str/literal";
+    };
+    readonly nodeKinds: readonly ["str/literal", "str/concat", "str/upper", "str/lower", "str/trim", "str/slice", "str/includes", "str/startsWith", "str/endsWith", "str/split", "str/join", "str/replace", "str/len", "str/show", "str/append", "str/mempty", "str/eq", "str/neq"];
+    readonly defaultInterpreter: () => Interpreter;
+};
+
+// @public
+export function strShow<A>(s: A): CExpr<string, "str/show", [A]>;
 
 // @public
 export function sub<A, B>(a: A, b: B): CExpr<number, "num/sub", [A, B]>;
@@ -929,6 +1301,9 @@ export interface TraitKindSpec<O, Mapping extends Record<string, string>> {
 }
 
 // @public
+export function trim<A>(a: A): CExpr<string, "str/trim", [A]>;
+
+// @public @deprecated (undocumented)
 export interface TypedNode<T = unknown> {
     // (undocumented)
     readonly [key: string]: unknown;
@@ -947,6 +1322,9 @@ export type TypeKey<T> = T extends number ? "number" : T extends string ? "strin
 //
 // @public
 export type UnionToTuple<U, Last = _LastOf<U>> = [U] extends [never] ? [] : [...UnionToTuple<Exclude<U, Last>>, Last];
+
+// @public
+export function upper<A>(a: A): CExpr<string, "str/upper", [A]>;
 
 // @public
 export const VOLATILE_KINDS: Set<string>;
