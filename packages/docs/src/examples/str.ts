@@ -117,6 +117,63 @@ const prog = app({ a: "string", b: "string" }, ($) => {
 });
 await fold(defaults(app), injectInput(prog, { a: "hi", b: "hi" }));`,
   },
+  "str/neq": {
+    description: "String inequality — true when two strings differ",
+    code: `const app = mvfm(prelude);
+const prog = app({ a: "string", b: "string" }, ($) => {
+  return $.neq($.input.a, $.input.b);
+});
+await fold(defaults(app), injectInput(prog, { a: "hello", b: "world" }));`,
+  },
+  "str/literal": {
+    description: "Lift a JS string into the DSL as a string literal node",
+    code: `const app = mvfm(prelude);
+const prog = app({ x: "number" }, ($) => {
+  // Raw strings are lifted to str/literal nodes automatically
+  return $.concat("value: ", $.show($.input.x));
+});
+await fold(defaults(app), injectInput(prog, { x: 42 }));`,
+  },
+  "str/compare": {
+    description: "Three-way string comparison returning -1, 0, or 1 via the ord typeclass",
+    code: `const app = mvfm(prelude);
+const prog = app({ a: "string", b: "string" }, ($) => {
+  return $.compare($.input.a, $.input.b);
+});
+await fold(defaults(app), injectInput(prog, { a: "apple", b: "banana" }));`,
+  },
+  "str/gt": {
+    description: "String greater than — lexicographic comparison via the ord typeclass",
+    code: `const app = mvfm(prelude);
+const prog = app({ a: "string", b: "string" }, ($) => {
+  return $.gt($.input.a, $.input.b);
+});
+await fold(defaults(app), injectInput(prog, { a: "banana", b: "apple" }));`,
+  },
+  "str/gte": {
+    description: "String greater than or equal — lexicographic comparison via the ord typeclass",
+    code: `const app = mvfm(prelude);
+const prog = app({ a: "string", b: "string" }, ($) => {
+  return $.gte($.input.a, $.input.b);
+});
+await fold(defaults(app), injectInput(prog, { a: "hello", b: "hello" }));`,
+  },
+  "str/lt": {
+    description: "String less than — lexicographic comparison via the ord typeclass",
+    code: `const app = mvfm(prelude);
+const prog = app({ a: "string", b: "string" }, ($) => {
+  return $.lt($.input.a, $.input.b);
+});
+await fold(defaults(app), injectInput(prog, { a: "apple", b: "banana" }));`,
+  },
+  "str/lte": {
+    description: "String less than or equal — lexicographic comparison via the ord typeclass",
+    code: `const app = mvfm(prelude);
+const prog = app({ a: "string", b: "string" }, ($) => {
+  return $.lte($.input.a, $.input.b);
+});
+await fold(defaults(app), injectInput(prog, { a: "abc", b: "xyz" }));`,
+  },
   "str/show": {
     description: "Convert a string to its Show representation (identity for strings)",
     code: `const app = mvfm(prelude);

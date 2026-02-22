@@ -22,7 +22,7 @@ await fold(
 );`,
   },
 
-  boolean: {
+  bool: {
     content: `<p>Boolean logic operations. Provides typeclass instances that allow boolean values to participate in equality, display, and logical algebra.</p>
 <p>Included on the default interpreter.</p>`,
     code: `const app = mvfm(prelude);

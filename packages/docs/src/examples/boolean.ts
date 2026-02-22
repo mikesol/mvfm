@@ -1,7 +1,7 @@
 import type { NodeExample } from "./types";
 
 const examples: Record<string, NodeExample> = {
-  "boolean/and": {
+  "bool/and": {
     description: "Logical AND — both conditions must be true",
     code: `const app = mvfm(prelude);
 const prog = app({ x: "number", y: "number" }, ($) => {
@@ -9,7 +9,7 @@ const prog = app({ x: "number", y: "number" }, ($) => {
 });
 await fold(defaults(app), injectInput(prog, { x: 5, y: 3 }));`,
   },
-  "boolean/or": {
+  "bool/or": {
     description: "Logical OR — at least one condition must be true",
     code: `const app = mvfm(prelude);
 const prog = app({ x: "number", y: "number" }, ($) => {
@@ -17,7 +17,7 @@ const prog = app({ x: "number", y: "number" }, ($) => {
 });
 await fold(defaults(app), injectInput(prog, { x: 3, y: 15 }));`,
   },
-  "boolean/not": {
+  "bool/not": {
     description: "Logical NOT — negates a boolean expression",
     code: `const app = mvfm(prelude);
 const prog = app({ x: "number" }, ($) => {
@@ -26,7 +26,7 @@ const prog = app({ x: "number" }, ($) => {
 });
 await fold(defaults(app), injectInput(prog, { x: 42 }));`,
   },
-  "boolean/eq": {
+  "bool/eq": {
     description: "Boolean equality — compares two boolean expressions",
     code: `const app = mvfm(prelude);
 const prog = app({ x: "number", y: "number" }, ($) => {
@@ -37,7 +37,17 @@ const prog = app({ x: "number", y: "number" }, ($) => {
 });
 await fold(defaults(app), injectInput(prog, { x: 5, y: -3 }));`,
   },
-  "boolean/ff": {
+  "bool/neq": {
+    description: "Boolean inequality — true when two boolean expressions differ",
+    code: `const app = mvfm(prelude);
+const prog = app({ x: "number", y: "number" }, ($) => {
+  const xPos = $.not($.not($.gt($.input.x, 0)));
+  const yPos = $.not($.not($.gt($.input.y, 0)));
+  return $.neq(xPos, yPos);
+});
+await fold(defaults(app), injectInput(prog, { x: 5, y: -3 }));`,
+  },
+  "bool/ff": {
     description: "Boolean false literal — the heytingAlgebra identity for disjunction",
     code: `const app = mvfm(prelude);
 const prog = app({ x: "number" }, ($) => {
@@ -46,7 +56,7 @@ const prog = app({ x: "number" }, ($) => {
 });
 await fold(defaults(app), injectInput(prog, { x: 42 }));`,
   },
-  "boolean/tt": {
+  "bool/tt": {
     description: "Boolean true literal — the heytingAlgebra identity for conjunction",
     code: `const app = mvfm(prelude);
 const prog = app({ x: "number" }, ($) => {
@@ -55,7 +65,17 @@ const prog = app({ x: "number" }, ($) => {
 });
 await fold(defaults(app), injectInput(prog, { x: 7 }));`,
   },
-  "boolean/implies": {
+  "bool/literal": {
+    description: "Lift a JS boolean into the DSL as a boolean literal node",
+    code: `const app = mvfm(prelude);
+const prog = app({ x: "number" }, ($) => {
+  // Raw booleans are lifted to bool/literal nodes automatically
+  const alwaysTrue = true;
+  return $.and(alwaysTrue, $.gt($.input.x, 0));
+});
+await fold(defaults(app), injectInput(prog, { x: 10 }));`,
+  },
+  "bool/implies": {
     description: "Logical implication — if A then B, equivalent to or(not(A), B)",
     code: `const app = mvfm(prelude);
 const prog = app({ age: "number" }, ($) => {
@@ -66,34 +86,16 @@ const prog = app({ age: "number" }, ($) => {
 });
 await fold(defaults(app), injectInput(prog, { age: 21 }));`,
   },
-  "boolean/show": {
+  "bool/show": {
     description: "Convert a boolean to its string representation via the Show typeclass",
     code: `const app = mvfm(prelude);
 const prog = app({ x: "number" }, ($) => {
   // Wrap in $.not($.not(...)) to produce a boolean-typed node for show dispatch
   const isPositive = $.not($.not($.gt($.input.x, 0)));
-  // $.show dispatches to boolean/show for boolean expressions
+  // $.show dispatches to bool/show for boolean expressions
   return $.concat("positive: ", $.show(isPositive));
 });
 await fold(defaults(app), injectInput(prog, { x: 5 }));`,
-  },
-  "boolean/top": {
-    description: "Bounded top for boolean — the maximum value (true)",
-    code: `const app = mvfm(prelude);
-const prog = app({ x: "number" }, ($) => {
-  // true is the top (maximum) of the boolean bounded type
-  return $.and(true, $.gt($.input.x, 0));
-});
-await fold(defaults(app), injectInput(prog, { x: 10 }));`,
-  },
-  "boolean/bottom": {
-    description: "Bounded bottom for boolean — the minimum value (false)",
-    code: `const app = mvfm(prelude);
-const prog = app({ x: "number" }, ($) => {
-  // false is the bottom (minimum) of the boolean bounded type
-  return $.or(false, $.gt($.input.x, 0));
-});
-await fold(defaults(app), injectInput(prog, { x: 3 }));`,
   },
 };
 

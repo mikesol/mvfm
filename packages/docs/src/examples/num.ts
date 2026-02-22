@@ -113,6 +113,55 @@ const prog = app({ x: "number", y: "number" }, ($) => {
 });
 await fold(defaults(app), injectInput(prog, { x: 42, y: 42 }));`,
   },
+  "num/neq": {
+    description: "Numeric inequality — true when two numbers differ",
+    code: `const app = mvfm(prelude);
+const prog = app({ x: "number", y: "number" }, ($) => {
+  return $.neq($.input.x, $.input.y);
+});
+await fold(defaults(app), injectInput(prog, { x: 10, y: 20 }));`,
+  },
+  "num/literal": {
+    description: "Lift a JS number into the DSL as a numeric literal node",
+    code: `const app = mvfm(prelude);
+const prog = app({ x: "number" }, ($) => {
+  // Raw numbers are lifted to num/literal nodes automatically
+  return $.add($.input.x, 100);
+});
+await fold(defaults(app), injectInput(prog, { x: 5 }));`,
+  },
+  "num/gt": {
+    description: "Numeric greater than — dispatches from the ord typeclass for numbers",
+    code: `const app = mvfm(prelude);
+const prog = app({ x: "number", y: "number" }, ($) => {
+  return $.gt($.input.x, $.input.y);
+});
+await fold(defaults(app), injectInput(prog, { x: 10, y: 5 }));`,
+  },
+  "num/gte": {
+    description: "Numeric greater than or equal — dispatches from the ord typeclass for numbers",
+    code: `const app = mvfm(prelude);
+const prog = app({ x: "number", y: "number" }, ($) => {
+  return $.gte($.input.x, $.input.y);
+});
+await fold(defaults(app), injectInput(prog, { x: 7, y: 7 }));`,
+  },
+  "num/lt": {
+    description: "Numeric less than — dispatches from the ord typeclass for numbers",
+    code: `const app = mvfm(prelude);
+const prog = app({ x: "number", y: "number" }, ($) => {
+  return $.lt($.input.x, $.input.y);
+});
+await fold(defaults(app), injectInput(prog, { x: 3, y: 8 }));`,
+  },
+  "num/lte": {
+    description: "Numeric less than or equal — dispatches from the ord typeclass for numbers",
+    code: `const app = mvfm(prelude);
+const prog = app({ x: "number", y: "number" }, ($) => {
+  return $.lte($.input.x, $.input.y);
+});
+await fold(defaults(app), injectInput(prog, { x: 5, y: 10 }));`,
+  },
   "num/zero": {
     description: "Semiring zero identity — the additive identity for numbers",
     code: `const app = mvfm(prelude);
