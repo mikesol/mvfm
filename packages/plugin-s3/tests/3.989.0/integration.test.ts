@@ -7,7 +7,7 @@ import {
   ListObjectsV2Command,
   PutObjectCommand,
 } from "@aws-sdk/client-s3";
-import { createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
+import { composeDollar, createApp, defaults, fold, numPlugin, strPlugin } from "@mvfm/core";
 import { GenericContainer, type StartedTestContainer } from "testcontainers";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { s3 as s3Factory } from "../../src/3.989.0";
@@ -28,8 +28,8 @@ const commands: Record<string, new (input: unknown) => unknown> = {
 };
 
 const plugin = s3Factory({ region: "us-east-1" });
-const plugins = [numPluginU, strPluginU, plugin] as const;
-const $ = mvfmU(...plugins);
+const plugins = [numPlugin, strPlugin, plugin] as const;
+const $ = composeDollar(...plugins);
 const app = createApp(...plugins);
 
 async function run(expr: unknown) {

@@ -9,7 +9,7 @@
  * - Plugin: unified type carrying type info + runtime interpreter
  * - RegistryOf<P>: type-level registry derived from a plugin tuple
  * - buildLiftMap/buildTraitMap/buildKindInputs: runtime map builders
- * - mvfmU: compose plugins into $ with auto-generated trait ctors
+ * - composeDollar: compose plugins into $ with auto-generated trait ctors
  */
 
 import type { CExpr, RuntimeEntry } from "./expr";
@@ -172,7 +172,7 @@ export function buildStructuralShapes(plugins: readonly Plugin[]): Record<string
   return m;
 }
 
-// ─── mvfmU: compose plugins into $ ─────────────────────────────────
+// ─── composeDollar: compose plugins into $ ──────────────────────────
 
 type MergeCtors<P extends readonly Plugin[]> = P extends readonly []
   ? {}
@@ -188,7 +188,7 @@ type TraitCtors<P extends readonly Plugin[]> = {
 export type DollarSign<P extends readonly Plugin[]> = MergeCtors<P> & TraitCtors<P>;
 
 /** Compose unified plugins into a constructor bag with auto-generated trait ctors. */
-export function mvfmU<const P extends readonly Plugin[]>(...plugins: P): DollarSign<P> {
+export function composeDollar<const P extends readonly Plugin[]>(...plugins: P): DollarSign<P> {
   const allCtors: Record<string, unknown> = {};
   const traitNames: Record<string, true> = {};
   for (const p of plugins) {

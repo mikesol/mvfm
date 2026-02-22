@@ -1,12 +1,20 @@
-import { boolPluginU, createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
+import {
+  boolPlugin,
+  composeDollar,
+  createApp,
+  defaults,
+  fold,
+  numPlugin,
+  strPlugin,
+} from "@mvfm/core";
 import { describe, expect, it, vi } from "vitest";
 import { anthropicInterpreter } from "../../src";
 import { anthropic } from "../../src/0.74.0";
 import { type AnthropicClient, createAnthropicInterpreter } from "../../src/0.74.0/interpreter";
 
 const plugin = anthropic({ apiKey: "sk-ant-test-123" });
-const plugins = [numPluginU, strPluginU, boolPluginU, plugin] as const;
-const $ = mvfmU(...plugins);
+const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
+const $ = composeDollar(...plugins);
 const app = createApp(...plugins);
 
 async function run(expr: unknown) {
@@ -41,7 +49,7 @@ describe("anthropic interpreter: default export", () => {
       max_tokens: 1,
     });
     const nexpr = app(expr as Parameters<typeof app>[0]);
-    const stdInterp = defaults([numPluginU, strPluginU, boolPluginU]);
+    const stdInterp = defaults([numPlugin, strPlugin, boolPlugin]);
     const combined = { ...stdInterp, ...anthropicInterpreter };
     await expect(fold(nexpr, combined)).rejects.toThrow(/ANTHROPIC_API_KEY/);
     vi.unstubAllEnvs();

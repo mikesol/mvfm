@@ -1,5 +1,5 @@
-import type { Interpreter, TypedNode } from "@mvfm/core";
-import { foldAST } from "@mvfm/core";
+import type { Interpreter } from "@mvfm/core";
+import { fold, type Program } from "@mvfm/core";
 import { type AnthropicClient, createAnthropicInterpreter } from "./interpreter";
 
 /**
@@ -17,12 +17,12 @@ export function serverInterpreter(client: AnthropicClient): Interpreter {
  *
  * @param client - The {@link AnthropicClient} to execute against.
  * @param baseInterpreter - Base interpreter for evaluating sub-expressions.
- * @returns An async AST evaluator function.
+ * @returns An async program evaluator function.
  */
 export function serverEvaluate(
   client: AnthropicClient,
   baseInterpreter: Interpreter,
-): (root: TypedNode) => Promise<unknown> {
+): (prog: Program) => Promise<unknown> {
   const interp = { ...baseInterpreter, ...createAnthropicInterpreter(client) };
-  return (root: TypedNode) => foldAST(interp, root);
+  return (prog: Program) => fold(interp, prog);
 }

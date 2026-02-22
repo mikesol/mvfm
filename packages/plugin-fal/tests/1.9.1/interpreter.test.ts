@@ -1,12 +1,20 @@
-import { boolPluginU, createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
+import {
+  boolPlugin,
+  composeDollar,
+  createApp,
+  defaults,
+  fold,
+  numPlugin,
+  strPlugin,
+} from "@mvfm/core";
 import { describe, expect, it, vi } from "vitest";
 import { falInterpreter } from "../../src";
 import { fal } from "../../src/1.9.1";
 import { createFalInterpreter, type FalClient } from "../../src/1.9.1/interpreter";
 
 const plugin = fal({ credentials: "key_test_123" });
-const plugins = [numPluginU, strPluginU, boolPluginU, plugin] as const;
-const $ = mvfmU(...plugins);
+const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
+const $ = composeDollar(...plugins);
 const app = createApp(...plugins);
 
 async function run(expr: unknown) {
@@ -61,7 +69,7 @@ describe("fal interpreter: default export", () => {
     vi.stubEnv("FAL_KEY", "");
     const expr = $.fal.run("fal-ai/flux/dev", { input: { prompt: "a cat" } });
     const nexpr = app(expr as Parameters<typeof app>[0]);
-    const stdInterp = defaults([numPluginU, strPluginU, boolPluginU]);
+    const stdInterp = defaults([numPlugin, strPlugin, boolPlugin]);
     const combined = { ...stdInterp, ...falInterpreter };
     await expect(fold(nexpr, combined)).rejects.toThrow(/FAL_KEY/);
     vi.unstubAllEnvs();

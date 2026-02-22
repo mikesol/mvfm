@@ -1,5 +1,5 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
-import { createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
+import { composeDollar, createApp, defaults, fold, numPlugin, strPlugin } from "@mvfm/core";
 import { PostgreSqlContainer, type StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import pg from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -11,8 +11,8 @@ let container: StartedPostgreSqlContainer;
 let sqlClient: ReturnType<typeof pg>;
 
 const plugin = postgres("postgres://test");
-const plugins = [numPluginU, strPluginU, plugin] as const;
-const $ = mvfmU(...plugins);
+const plugins = [numPlugin, strPlugin, plugin] as const;
+const $ = composeDollar(...plugins);
 const app = createApp(...plugins);
 
 const coreAccessInterpreter: Interpreter = {
@@ -26,7 +26,7 @@ const coreAccessInterpreter: Interpreter = {
 async function run(nexpr: ReturnType<typeof app>): Promise<unknown> {
   const client = wrapPostgresJs(sqlClient);
   const adj = nexpr.__adj;
-  const baseInterp = { ...defaults([numPluginU, strPluginU]), ...coreAccessInterpreter };
+  const baseInterp = { ...defaults([numPlugin, strPlugin]), ...coreAccessInterpreter };
   const pgInterp = createPostgresServerInterpreter(client, adj, baseInterp);
   const fullInterp = { ...baseInterp, ...pgInterp };
   return await fold(nexpr, fullInterp);

@@ -6,6 +6,7 @@ import {
   byKind,
   byName,
   commit,
+  composeDollar,
   defaults,
   dirty,
   fold,
@@ -13,7 +14,6 @@ import {
   type Interpreter,
   isLeaf,
   mul,
-  mvfmU,
   name,
   numLit,
   numPlugin,
@@ -46,7 +46,7 @@ const fpEq = {
 };
 const fullInterp = defaults([...stdPlugins, fpEq]);
 const numInterp = defaults(stdPlugins);
-const $ = mvfmU(numPlugin, strPlugin, boolPlugin);
+const $ = composeDollar(numPlugin, strPlugin, boolPlugin);
 
 // =====================================================================
 // Calculator programs

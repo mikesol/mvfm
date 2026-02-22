@@ -1,4 +1,12 @@
-import { boolPluginU, createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
+import {
+  boolPlugin,
+  composeDollar,
+  createApp,
+  defaults,
+  fold,
+  numPlugin,
+  strPlugin,
+} from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { consoleInterpreter } from "../../src";
 import type { ConsoleMethodName } from "../../src/22.0.0";
@@ -6,8 +14,8 @@ import { consolePlugin } from "../../src/22.0.0";
 import { type ConsoleClient, createConsoleInterpreter } from "../../src/22.0.0/interpreter";
 
 const plugin = consolePlugin();
-const plugins = [numPluginU, strPluginU, boolPluginU, plugin] as const;
-const $ = mvfmU(...plugins);
+const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
+const $ = composeDollar(...plugins);
 const app = createApp(...plugins);
 
 async function run(expr: unknown) {

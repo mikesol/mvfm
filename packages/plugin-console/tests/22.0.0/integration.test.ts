@@ -1,4 +1,4 @@
-import { boolPluginU, createApp, defaults, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
+import { boolPlugin, composeDollar, createApp, defaults, numPlugin, strPlugin } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { consolePlugin } from "../../src/22.0.0";
 import { wrapConsole } from "../../src/22.0.0/client-console";
@@ -40,8 +40,8 @@ function createCapturingConsole() {
 }
 
 const plugin = consolePlugin();
-const plugins = [numPluginU, strPluginU, boolPluginU, plugin] as const;
-const $ = mvfmU(...plugins);
+const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
+const $ = composeDollar(...plugins);
 const app = createApp(...plugins);
 
 describe("console integration", () => {

@@ -1,4 +1,4 @@
-import { createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
+import { composeDollar, createApp, defaults, fold, numPlugin, strPlugin } from "@mvfm/core";
 import Redis from "ioredis";
 import { GenericContainer, type StartedTestContainer } from "testcontainers";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
@@ -10,8 +10,8 @@ let container: StartedTestContainer | undefined;
 let redisClient: Redis | undefined;
 
 const plugin = redisPlugin({ host: "127.0.0.1", port: 6379 });
-const plugins = [numPluginU, strPluginU, plugin] as const;
-const $ = mvfmU(...plugins);
+const plugins = [numPlugin, strPlugin, plugin] as const;
+const $ = composeDollar(...plugins);
 const app = createApp(...plugins);
 
 async function run(expr: unknown) {

@@ -102,10 +102,10 @@ export interface S3Config {
  * @example
  * ```ts
  * const plugin = s3({ region: "us-east-1" });
- * const $ = mvfmU(numPluginU, strPluginU, plugin);
+ * const $ = composeDollar(numPlugin, strPlugin, plugin);
  * const expr = $.s3.putObject({ Bucket: "b", Key: "k", Body: "hello" });
  * const nexpr = app(expr);
- * const interp = defaults([numPluginU, strPluginU, plugin], {
+ * const interp = defaults([numPlugin, strPlugin, plugin], {
  *   s3: createS3Interpreter(myClient),
  * });
  * const result = await fold(nexpr, interp);

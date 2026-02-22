@@ -51,8 +51,8 @@ describe("redis: CExpr construction (list commands)", () => {
 
 describe("redis: defaults() without override", () => {
   it("throws when no override provided for redis plugin", async () => {
-    const { defaults, numPluginU, strPluginU } = await import("@mvfm/core");
-    const plugins = [numPluginU, strPluginU, plugin] as const;
+    const { defaults, numPlugin, strPlugin } = await import("@mvfm/core");
+    const plugins = [numPlugin, strPlugin, plugin] as const;
     expect(() => defaults(plugins)).toThrow(/no defaultInterpreter/i);
   });
 });

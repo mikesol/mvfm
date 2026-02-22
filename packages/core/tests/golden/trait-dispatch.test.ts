@@ -4,13 +4,13 @@ import {
   boolPlugin,
   byKind,
   commit,
+  composeDollar,
   createApp,
   defaults,
   eq,
   fold,
   type Interpreter,
   lt,
-  mvfmU,
   numPlugin,
   ordPlugin,
   pipe,
@@ -139,7 +139,7 @@ describe("nested trait dispatch", () => {
 // Trait dispatch with mvfm
 // ═════════════════════════════════════════════════════════════════
 describe("trait dispatch with mvfm", () => {
-  const $ = mvfmU(numPlugin, strPlugin, boolPlugin);
+  const $ = composeDollar(numPlugin, strPlugin, boolPlugin);
 
   test("$.eq(3, 4) produces CExpr with kind 'eq'", () => {
     const expr = $.eq(3, 4);

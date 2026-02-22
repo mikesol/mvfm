@@ -31,10 +31,10 @@ export type { RedisConfig } from "./types";
  * @example
  * ```ts
  * const plugin = redis({ host: "127.0.0.1" });
- * const $ = mvfmU(numPluginU, strPluginU, plugin);
+ * const $ = composeDollar(numPlugin, strPlugin, plugin);
  * const expr = $.redis.get("mykey");
  * const nexpr = app(expr);
- * const interp = defaults([numPluginU, strPluginU, plugin], {
+ * const interp = defaults([numPlugin, strPlugin, plugin], {
  *   redis: createRedisInterpreter(myClient),
  * });
  * const result = await fold(nexpr, interp);

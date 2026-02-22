@@ -4,10 +4,10 @@ import {
   boolPlugin,
   byKind,
   commit,
+  composeDollar,
   defaults,
   fold,
   type Interpreter,
-  mvfmU,
   numPlugin,
   type PluginDef,
   pipe,
@@ -35,7 +35,7 @@ const fpEq: PluginDef = {
   defaultInterpreter: () => eqInterp,
 };
 const fullInterp = defaults([...stdPlugins, fpEq]);
-const $ = mvfmU(numPlugin, strPlugin, boolPlugin);
+const $ = composeDollar(numPlugin, strPlugin, boolPlugin);
 
 // ── num interpreter for structural tests ─────────────────────────────
 const numInterp = defaults(stdPlugins);

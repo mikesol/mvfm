@@ -1,4 +1,4 @@
-import { createApp, defaults, fold, mvfmU, numPluginU, strPluginU } from "@mvfm/core";
+import { composeDollar, createApp, defaults, fold, numPlugin, strPlugin } from "@mvfm/core";
 import { Miniflare } from "miniflare";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { cloudflareKv } from "../../src/4.20260213.0";
@@ -10,8 +10,8 @@ let mf: Miniflare | undefined;
 let kvNamespace: KVNamespaceLike | undefined;
 
 const plugin = cloudflareKv({ namespaceId: "MY_KV" });
-const plugins = [numPluginU, strPluginU, plugin] as const;
-const $ = mvfmU(...plugins);
+const plugins = [numPlugin, strPlugin, plugin] as const;
+const $ = composeDollar(...plugins);
 const app = createApp(...plugins);
 
 async function run(expr: unknown) {

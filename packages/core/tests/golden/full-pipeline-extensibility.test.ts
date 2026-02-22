@@ -5,13 +5,13 @@ import {
   boolPlugin,
   byKind,
   commit,
+  composeDollar,
   createApp,
   defaults,
   fold,
   type Interpreter,
   lt,
   mul,
-  mvfmU,
   numLit,
   numPlugin,
   ordPlugin,
@@ -42,7 +42,7 @@ const fpEq = {
 };
 const fullInterp = defaults([...stdPlugins, fpEq]);
 const numInterp = defaults(stdPlugins);
-const $ = mvfmU(numPlugin, strPlugin, boolPlugin);
+const $ = composeDollar(numPlugin, strPlugin, boolPlugin);
 
 // =====================================================================
 // createApp extensibility
@@ -62,8 +62,8 @@ describe("createApp extensibility", () => {
     expect(await fold(prog, interp)).toBe(7);
   });
 
-  test("unified plugins via mvfmU -> app -> fold", async () => {
-    const $u = mvfmU(numPlugin, strPlugin, boolPlugin);
+  test("unified plugins via composeDollar -> app -> fold", async () => {
+    const $u = composeDollar(numPlugin, strPlugin, boolPlugin);
     const prog = app($u.mul($u.add(2, 3), 4));
     const interp = defaults(stdPlugins);
     expect(await fold(prog, interp)).toBe(20);

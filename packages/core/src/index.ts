@@ -1,12 +1,11 @@
 /**
  * @mvfm/core — public API surface.
  *
- * Organized into five tiers:
+ * Organized into four tiers:
  *   1. Public API — the main consumer-facing functions
  *   2. Plugins — built-in plugin instances and constructors
  *   3. Types — core type definitions for programs, plugins, expressions
- *   4. Compat shims — legacy API bridge for plugins not yet migrated
- *   5. Advanced / internal — DAG ops, predicates, elaboration internals
+ *   4. Advanced / internal — DAG ops, predicates, elaboration internals
  */
 
 // ─── 1. Public API ──────────────────────────────────────────────────
@@ -52,34 +51,7 @@ export type {
 } from "./registry";
 export type { SchemaToData, SchemaToType } from "./schema-types";
 
-// ─── 4. Compat shims ───────────────────────────────────────────────
-// Legacy API bridge — kept for external plugins not yet migrated (zod, openai, anthropic).
-// These will be removed once all external plugins use the new API.
-
-export {
-  defineInterpreter,
-  definePlugin,
-  type Expr,
-  type ExprBase,
-  eval_,
-  foldAST,
-  type NodeTypeMap,
-  type PluginContext,
-  type TypedNode,
-} from "./compat";
-
-// U-suffixed aliases — deprecated, kept for external plugins not yet migrated.
-import { numPlugin } from "./std-plugins";
-import { boolPlugin } from "./std-plugins-bool";
-import { strPlugin } from "./std-plugins-str";
-/** @deprecated Use numPlugin instead. */
-export const numPluginU = numPlugin;
-/** @deprecated Use strPlugin instead. */
-export const strPluginU = strPlugin;
-/** @deprecated Use boolPlugin instead. */
-export const boolPluginU = boolPlugin;
-
-// ─── 5. Advanced / internal escape hatch ────────────────────────────
+// ─── 4. Advanced / internal escape hatch ────────────────────────────
 // DAG construction, elaboration, predicates, expression helpers.
 // Use these when building custom tooling on top of the core.
 
@@ -126,7 +98,7 @@ export {
   buildLiftMap,
   buildStructuralShapes,
   buildTraitMap,
-  mvfmU,
+  composeDollar,
 } from "./plugin";
 export * from "./predicates";
 export * from "./replace";
