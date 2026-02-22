@@ -131,7 +131,11 @@ export function buildKindInputs(plugins: readonly Plugin[]): Record<string, stri
   const m: Record<string, string[]> = {};
   for (const p of plugins) {
     for (const [kind, spec] of Object.entries(p.kinds)) {
-      m[kind] = ((spec as KindSpec<any, any>).inputs as unknown[]).map((v) => typeof v);
+      m[kind] = ((spec as KindSpec<any, any>).inputs as unknown[]).map((v) => {
+        const t = typeof v;
+        // undefined input means "unknown" (polymorphic) — skip type checking
+        return t === "undefined" ? "unknown" : t;
+      });
     }
   }
   return m;

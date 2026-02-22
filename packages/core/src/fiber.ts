@@ -5,14 +5,14 @@
  * can access the current iteration value during par_map evaluation.
  */
 
-import { isCExpr, makeCExpr } from "./expr";
+import { CREF, isCExpr, makeCExpr, type cexprBrand } from "./expr";
 import type { Interpreter, Plugin } from "./plugin";
 import type { KindSpec } from "./registry";
 
 // ─── fiber plugin ──────────────────────────────────────────────────
 
 /** Fiber plugin: concurrency combinators for the DSL. */
-export const fiber: Plugin = {
+export const fiber = {
   name: "fiber",
   ctors: {
     par: (...args: unknown[]) => {
@@ -48,22 +48,13 @@ export const fiber: Plugin = {
       unknown[],
       unknown[]
     >,
-    "fiber/par_item": {
-      inputs: [undefined] as [unknown],
-      output: undefined as unknown,
-    } as KindSpec<[unknown], unknown>,
+    "fiber/par_item": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
     "fiber/race": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<
       unknown[],
       unknown
     >,
-    "fiber/timeout": {
-      inputs: [undefined, 0] as [unknown, number],
-      output: undefined as unknown,
-    } as KindSpec<[unknown, number], unknown>,
-    "fiber/retry": {
-      inputs: [undefined, 0, 0] as [unknown, number, number],
-      output: undefined as unknown,
-    } as KindSpec<[unknown, number, number], unknown>,
+    "fiber/timeout": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
+    "fiber/retry": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
   },
   traits: {},
   lifts: {},
@@ -116,4 +107,4 @@ export const fiber: Plugin = {
       },
     };
   },
-};
+} satisfies Plugin;

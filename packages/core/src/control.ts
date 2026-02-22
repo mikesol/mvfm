@@ -5,14 +5,14 @@
  * while() creates a control/while node evaluated by the fold engine.
  */
 
-import { makeCExpr } from "./expr";
+import { CREF, makeCExpr, type cexprBrand } from "./expr";
 import type { Interpreter, Plugin } from "./plugin";
 import type { KindSpec } from "./registry";
 
 // ─── control plugin ─────────────────────────────────────────────────
 
 /** Control plugin: each (unrolled) and while (runtime loop). */
-export const control: Plugin = {
+export const control = {
   name: "control",
   ctors: {
     each: (items: unknown[], fn: (item: unknown) => unknown) => {
@@ -27,10 +27,7 @@ export const control: Plugin = {
     }),
   },
   kinds: {
-    "control/while": {
-      inputs: [false, undefined] as [boolean, unknown],
-      output: undefined as unknown,
-    } as KindSpec<[boolean, unknown], unknown>,
+    "control/while": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
   },
   traits: {},
   lifts: {},
@@ -44,4 +41,4 @@ export const control: Plugin = {
       return undefined;
     },
   }),
-};
+} satisfies Plugin;

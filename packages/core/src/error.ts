@@ -5,14 +5,14 @@
  * can access the current error value without recurseScoped.
  */
 
-import { makeCExpr } from "./expr";
+import { CREF, makeCExpr, type cexprBrand } from "./expr";
 import type { Interpreter, Plugin } from "./plugin";
 import type { KindSpec } from "./registry";
 
 // ─── error plugin ───────────────────────────────────────────────────
 
 /** Error plugin: try/catch, fail, guard for error handling in the DSL. */
-export const error: Plugin = {
+export const error = {
   name: "error",
   ctors: {
     try: (expr: unknown) => ({
@@ -28,28 +28,13 @@ export const error: Plugin = {
     settle: (...exprs: unknown[]) => makeCExpr("error/settle", exprs),
   },
   kinds: {
-    "error/try": { inputs: [undefined] as [unknown], output: undefined as unknown } as KindSpec<
-      [unknown],
-      unknown
-    >,
-    "error/fail": { inputs: [""] as [string], output: undefined as unknown } as KindSpec<
-      [string],
-      unknown
-    >,
-    "error/guard": {
-      inputs: [false, ""] as [boolean, string],
-      output: undefined as unknown,
-    } as KindSpec<[boolean, string], unknown>,
-    "error/caught": { inputs: [undefined] as [unknown], output: "" as string } as KindSpec<
-      [unknown],
-      string
-    >,
-    "error/attempt": { inputs: [undefined] as [unknown], output: undefined as unknown } as KindSpec<
-      [unknown],
-      unknown
-    >,
-    "error/settle": { inputs: [undefined] as [unknown], output: undefined as unknown } as KindSpec<
-      [unknown],
+    "error/try": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
+    "error/fail": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
+    "error/guard": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
+    "error/caught": { inputs: [] as unknown[], output: "" as string } as KindSpec<unknown[], string>,
+    "error/attempt": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
+    "error/settle": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<
+      unknown[],
       unknown
     >,
   },
@@ -110,4 +95,4 @@ export const error: Plugin = {
       },
     };
   },
-};
+} satisfies Plugin;

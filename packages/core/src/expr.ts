@@ -42,7 +42,7 @@ export type AccessorOverlay<O> = O extends readonly (infer E)[]
 // O = output type (declared by constructor, validated at app() time)
 // Kind = node kind string
 // Args = raw arguments — CExprs, literals, records, anything
-declare const cexprBrand: unique symbol;
+export declare const cexprBrand: unique symbol;
 
 /** Permissive construction-time expression carrying output type, kind, and raw arguments. */
 export type CExpr<

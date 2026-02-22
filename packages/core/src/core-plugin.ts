@@ -52,7 +52,7 @@ export const coreInterpreter: Interpreter = {
 // ─── Core plugin (for elaborate registration) ──────────────────────
 
 /** Core plugin definition registering core node kinds and shapes. */
-export const corePlugin: Plugin = {
+export const corePlugin = {
   name: "core",
   ctors: {},
   kinds: {
@@ -83,4 +83,4 @@ export const corePlugin: Plugin = {
   lifts: {},
   shapes: { "core/record": "*", "core/tuple": "*" },
   defaultInterpreter: () => coreInterpreter,
-};
+} satisfies Plugin;

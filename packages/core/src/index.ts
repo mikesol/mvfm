@@ -88,7 +88,7 @@ export * from "./constructors";
 export { pipe } from "./dagql";
 export * from "./dirty";
 // Elaboration (CExpr → NExpr)
-export { app, createApp, KIND_INPUTS, LIFT_MAP, TRAIT_MAP } from "./elaborate";
+export { app, createApp, LIFT_MAP, TRAIT_MAP } from "./elaborate";
 export type {
   AppResult,
   DeepResolve,

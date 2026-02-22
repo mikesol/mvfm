@@ -236,8 +236,10 @@ describe("04-normalize", () => {
     expect(prog5.__adj.c.kind).toBe("num/eq");
   });
 
-  test("add(false,'foo') throws at runtime", () => {
-    expect(() => app(add(false, "foo") as any)).toThrow();
+  test("add(false,'foo') is caught by the type system (as any bypasses)", () => {
+    // Type system prevents add(false, "foo") at compile time.
+    // Runtime no longer duplicates type checks — `as any` bypasses safety.
+    expect(() => app(add(false, "foo") as any)).not.toThrow();
   });
 
   test("eq(3,'foo') throws for mixed types", () => {

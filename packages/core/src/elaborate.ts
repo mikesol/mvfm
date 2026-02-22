@@ -4,7 +4,7 @@ import type { CExpr, RuntimeEntry } from "./expr";
 import { isCExpr, makeNExpr } from "./expr";
 import { incrementId } from "./increment";
 import type { Plugin, RegistryOf } from "./plugin";
-import { buildKindInputs, buildLiftMap, buildStructuralShapes, buildTraitMap } from "./plugin";
+import { buildLiftMap, buildStructuralShapes, buildTraitMap } from "./plugin";
 import type { KindSpec } from "./registry";
 import { stdPlugins } from "./std-plugins";
 
@@ -25,16 +25,15 @@ export const LIFT_MAP: Record<string, string> = buildLiftMap(stdPlugins);
 /** Trait map from stdPlugins: maps trait names to type-to-kind mappings. */
 export const TRAIT_MAP: Record<string, Record<string, string>> = buildTraitMap(stdPlugins);
 
-/** Kind-inputs map from stdPlugins: maps kind names to input type arrays. */
-export const KIND_INPUTS: Record<string, string[]> = buildKindInputs(stdPlugins);
-
 // ─── Runtime elaboration ────────────────────────────────────────────
 
 function buildKindOutputs(plugins: readonly Plugin[]): Record<string, string> {
   const m: Record<string, string> = {};
   for (const p of plugins) {
     for (const [kind, spec] of Object.entries(p.kinds)) {
-      m[kind] = typeof (spec as KindSpec<any, any>).output;
+      const t = typeof (spec as KindSpec<any, any>).output;
+      // undefined output means "unknown" (polymorphic) — skip type checking
+      m[kind] = t === "undefined" ? "unknown" : t;
     }
   }
   return m;
@@ -44,7 +43,6 @@ function elaborate(
   expr: CExpr<unknown>,
   liftMap: Record<string, string>,
   traitMap: Record<string, Record<string, string>>,
-  kindInputs: Record<string, string[]>,
   kindOutputs: Record<string, string>,
   structuralShapes: Record<string, unknown>,
 ): { rootId: string; entries: Record<string, RuntimeEntry>; counter: string } {
@@ -112,7 +110,7 @@ function elaborate(
     return nodeId;
   }
 
-  function visit(arg: unknown, expected?: string): [string, string] {
+  function visit(arg: unknown): [string, string] {
     if (isCExpr(arg)) {
       const cached = visitCache.get(arg);
       if (cached) return cached;
@@ -126,7 +124,7 @@ function elaborate(
       };
 
       if (kind === "core/access") {
-        return cache([visitAccess(cexpr), expected ?? "object"]);
+        return cache([visitAccess(cexpr), "object"]);
       }
 
       if (kind in traitMap) {
@@ -176,14 +174,9 @@ function elaborate(
         return cache([nodeId, kindOutputs[kind] ?? "object"]);
       }
 
-      const expectedInputs = kindInputs[kind];
       const childIds: string[] = [];
       for (let i = 0; i < args.length; i++) {
-        const exp = expectedInputs ? expectedInputs[i] : undefined;
-        const [childId, childType] = visit(args[i], exp);
-        if (exp && childType !== exp && childType !== "unknown" && childType !== "object") {
-          throw new Error(`${kind}: expected ${exp} for arg ${i}, got ${childType}`);
-        }
+        const [childId] = visit(args[i]);
         childIds.push(childId);
       }
       const nodeId = counter;
@@ -195,9 +188,6 @@ function elaborate(
     const typeTag = typeof arg;
     const liftKind = liftMap[typeTag];
     if (!liftKind) throw new Error(`Cannot lift value of type "${typeTag}"`);
-    if (expected && typeTag !== expected) {
-      throw new Error(`Expected ${expected}, got ${typeTag} (value: ${String(arg)})`);
-    }
     const nodeId = counter;
     counter = incrementId(counter);
     entries[nodeId] = { kind: liftKind, children: [], out: arg };
@@ -214,13 +204,12 @@ function elaborate(
 export function createApp<const P extends readonly Plugin[]>(...plugins: P) {
   const lm = buildLiftMap(plugins);
   const tm = buildTraitMap(plugins);
-  const ki = buildKindInputs(plugins);
   const ko = buildKindOutputs(plugins);
   const ss = buildStructuralShapes(plugins);
   return <Expr extends CExpr<any, string, readonly unknown[]>>(
     expr: Expr,
   ): import("./elaborate-types").AppResult<RegistryOf<P>, Expr> => {
-    const { rootId, entries, counter } = elaborate(expr, lm, tm, ki, ko, ss);
+    const { rootId, entries, counter } = elaborate(expr, lm, tm, ko, ss);
     return makeNExpr(rootId, entries, counter) as any;
   };
 }
@@ -231,6 +220,6 @@ export function app<
   Reg = import("./registry").StdRegistry,
 >(expr: Expr): import("./elaborate-types").AppResult<Reg, Expr> {
   const ko = buildKindOutputs(stdPlugins);
-  const { rootId, entries, counter } = elaborate(expr, LIFT_MAP, TRAIT_MAP, KIND_INPUTS, ko, {});
+  const { rootId, entries, counter } = elaborate(expr, LIFT_MAP, TRAIT_MAP, ko, {});
   return makeNExpr(rootId, entries, counter) as any;
 }

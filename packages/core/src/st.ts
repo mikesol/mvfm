@@ -8,14 +8,14 @@
  * This avoids the CExpr deduplication problem in elaborate.
  */
 
-import { makeCExpr } from "./expr";
+import { CREF, makeCExpr, type cexprBrand } from "./expr";
 import type { Interpreter, Plugin } from "./plugin";
 import type { KindSpec } from "./registry";
 
 let cellCounter = 0;
 
 /** State plugin: let/get/set/push for mutable cells. */
-export const st: Plugin = {
+export const st = {
   name: "st",
   ctors: {
     let: (initial: unknown) => {
@@ -29,22 +29,10 @@ export const st: Plugin = {
     },
   },
   kinds: {
-    "st/let": {
-      inputs: [undefined, ""] as [unknown, string],
-      output: undefined as unknown,
-    } as KindSpec<[unknown, string], unknown>,
-    "st/get": { inputs: [""] as [string], output: undefined as unknown } as KindSpec<
-      [string],
-      unknown
-    >,
-    "st/set": {
-      inputs: ["", undefined] as [string, unknown],
-      output: undefined as unknown,
-    } as KindSpec<[string, unknown], unknown>,
-    "st/push": {
-      inputs: ["", undefined] as [string, unknown],
-      output: undefined as unknown,
-    } as KindSpec<[string, unknown], unknown>,
+    "st/let": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
+    "st/get": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
+    "st/set": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
+    "st/push": { inputs: [] as unknown[], output: undefined as unknown } as KindSpec<unknown[], unknown>,
   },
   traits: {},
   lifts: {},
@@ -79,4 +67,4 @@ export const st: Plugin = {
       },
     };
   },
-};
+} satisfies Plugin;

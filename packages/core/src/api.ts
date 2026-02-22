@@ -9,8 +9,9 @@ import { corePlugin } from "./core-plugin";
 import { createApp } from "./elaborate";
 import type { CExpr, NExpr, RuntimeEntry } from "./expr";
 import { isCExpr, makeCExpr, makeNExpr } from "./expr";
+import type { FoldState } from "./fold";
 import { defaults as internalDefaults, fold as internalFold } from "./fold";
-import type { Interpreter, Plugin } from "./plugin";
+import type { DollarSign, Interpreter, Plugin } from "./plugin";
 import { mvfmU } from "./plugin";
 import { boolPlugin, numPlugin, ordPlugin, strPlugin } from "./std-plugins";
 
@@ -20,16 +21,64 @@ export { coreInterpreter, corePlugin } from "./core-plugin";
 
 let _cellCounter = 0;
 
+// ─── Type utilities ─────────────────────────────────────────────────
+
+/** Flatten a single plugin input: unwrap arrays recursively, wrap single plugins. */
+type FlattenPluginInput<P> = P extends readonly unknown[]
+  ? FlattenPluginInputs<P>
+  : [P];
+
+/** Recursively flatten a tuple of plugin inputs into a flat plugin tuple. */
+type FlattenPluginInputs<P extends readonly unknown[]> = P extends readonly [
+  infer H,
+  ...infer T,
+]
+  ? [...FlattenPluginInput<H>, ...FlattenPluginInputs<T>]
+  : [];
+
+/** Valid plugin input: a single plugin or a readonly array of plugins (possibly nested). */
+type PluginInput = Plugin | readonly PluginInput[];
+
+// ─── CoreDollar types ───────────────────────────────────────────────
+
+/** State cell returned by $.let() in the mvfm() API. */
+export interface StateCell {
+  get(): CExpr<unknown>;
+  set(val: unknown): CExpr<unknown>;
+  push(val: unknown): CExpr<unknown>;
+}
+
+/** Core methods added by mvfm() on top of plugin constructors. */
+export interface CoreDollar {
+  input: CExpr<Record<string, unknown>>;
+  begin(...exprs: unknown[]): CExpr<unknown>;
+  show(a: unknown): CExpr<string>;
+  cond(pred: unknown): {
+    t(then: unknown): { f(els: unknown): CExpr<unknown> };
+    f(els: unknown): { t(then: unknown): CExpr<unknown> };
+  };
+  let(initial: unknown): StateCell;
+  each(items: unknown[], cb: (item: unknown) => unknown): CExpr<unknown>;
+  while(cond: unknown): { body(fn: () => unknown): CExpr<unknown> };
+}
+
+/** Full $ type: plugin constructors merged + core extensions overriding specific keys. */
+export type MvfmDollar<P extends readonly PluginInput[]> = Omit<
+  DollarSign<[typeof corePlugin, ...FlattenPluginInputs<P>]>,
+  keyof CoreDollar
+> &
+  CoreDollar;
+
 // ─── prelude ────────────────────────────────────────────────────────
 
 /** Standard prelude plugins: num, str, bool, ord. */
-export const prelude: readonly Plugin[] = [numPlugin, strPlugin, boolPlugin, ordPlugin];
+export const prelude = [numPlugin, strPlugin, boolPlugin, ordPlugin] as const;
 
 // ─── Program type ───────────────────────────────────────────────────
 
 /** A compiled program with NExpr, plugin list, and optional input schema. */
 export interface Program {
-  readonly __nexpr: NExpr<any, any, any, any>;
+  readonly __nexpr: NExpr<unknown, string, unknown, string>;
   readonly __plugins: readonly Plugin[];
   readonly __inputSchema?: Record<string, string>;
 }
@@ -67,20 +116,18 @@ function stopRecording(stack: RecordingStack): unknown[] {
 function isConsumedBy(needle: unknown, haystack: unknown, depth = 0): boolean {
   if (depth > 20) return false;
   if (!isCExpr(haystack)) return false;
-  const args = (haystack as any).__args as unknown[];
+  const args = (haystack as CExpr<unknown>).__args;
   for (const arg of args) {
     if (arg === needle) return true;
     if (isCExpr(arg) && isConsumedBy(needle, arg, depth + 1)) return true;
-    // Check arrays (e.g., core/begin args, core/tuple data)
     if (Array.isArray(arg)) {
       for (const item of arg) {
         if (item === needle) return true;
         if (isCExpr(item) && isConsumedBy(needle, item, depth + 1)) return true;
       }
     }
-    // Check plain objects (e.g., core/record data)
     if (typeof arg === "object" && arg !== null && !isCExpr(arg) && !Array.isArray(arg)) {
-      for (const v of Object.values(arg)) {
+      for (const v of Object.values(arg as Record<string, unknown>)) {
         if (v === needle) return true;
         if (isCExpr(v) && isConsumedBy(needle, v, depth + 1)) return true;
       }
@@ -99,13 +146,11 @@ function runBlock(
   const result = fn(...args);
   const recorded = stopRecording(stack);
 
-  // Collect all expressions: recorded + result (if CExpr)
   const all = [...recorded];
   if (result !== undefined && isCExpr(result) && !all.includes(result)) {
     all.push(result);
   }
 
-  // Filter out expressions that are consumed as arguments to other expressions
   const roots = all.filter((expr) => {
     for (const other of all) {
       if (other !== expr && isConsumedBy(expr, other)) return false;
@@ -121,31 +166,39 @@ function runBlock(
 // ─── mvfm ───────────────────────────────────────────────────────────
 
 /** Create an app builder from plugins. Returns a function that takes a schema and builder. */
-export function mvfm(...pluginInputs: (Plugin | readonly Plugin[])[]) {
+export function mvfm<const P extends readonly PluginInput[]>(...pluginInputs: P) {
   const plugins: Plugin[] = [corePlugin];
   for (const p of pluginInputs) {
     if (Array.isArray(p)) plugins.push(...(p as Plugin[]));
     else plugins.push(p as Plugin);
   }
 
-  function define(schemaOrFn: any, maybeFn?: any): Program {
+  function define(fn: ($: MvfmDollar<P>) => unknown): Program;
+  function define(
+    schema: Record<string, string>,
+    fn: ($: MvfmDollar<P>) => unknown,
+  ): Program;
+  function define(
+    schemaOrFn: Record<string, string> | (($: MvfmDollar<P>) => unknown),
+    maybeFn?: ($: MvfmDollar<P>) => unknown,
+  ): Program {
     const schema = typeof schemaOrFn === "function" ? undefined : schemaOrFn;
-    const fn = typeof schemaOrFn === "function" ? schemaOrFn : maybeFn;
+    const fn = typeof schemaOrFn === "function" ? schemaOrFn : maybeFn!;
 
     const effects: unknown[] = [];
     const recording: RecordingStack = [];
     const pluginDollar = mvfmU(...plugins);
 
-    const $ = {
+    // Build $ with core extensions. Runtime uses Record<string, unknown> internally;
+    // the public type exposed to the callback is MvfmDollar<P>.
+    const dollar: Record<string, unknown> = {
       ...pluginDollar,
       input: makeCExpr("core/input", []),
       begin: (...exprs: unknown[]) => makeCExpr("core/begin", exprs),
-      // Override show to be unary (auto-generated trait ctors are binary)
       show: (a: unknown) => makeCExpr("show", [a, a]),
       cond: (pred: unknown) => {
         const mkCond = (p: unknown, t: unknown, e: unknown) => {
           const c = makeCExpr("core/cond", [p, t, e]);
-          // Only record in block context (inside each/while), not at top level
           if (recording.length > 0) {
             recording[recording.length - 1].push(c);
           }
@@ -160,16 +213,15 @@ export function mvfm(...pluginInputs: (Plugin | readonly Plugin[])[]) {
           }),
         };
       },
-    } as Record<string, any>;
+    };
 
-    // Wrap st.let to auto-lift initial, push let-init to effects, and record set/push
-    if ($.let) {
-      $.let = (initial: unknown) => {
+    // Override st.let to auto-lift initial, push let-init to effects, record set/push
+    if (dollar.let) {
+      dollar.let = (initial: unknown) => {
         const lifted = deepAutoLift(initial);
-        // Create unique cell ID
         const cellId = `__cell_${_cellCounter++}`;
         const letExpr = makeCExpr("st/let", [lifted, cellId]);
-        effects.push(letExpr); // ensure let-init runs before the result
+        effects.push(letExpr);
 
         return {
           get: () => makeCExpr("st/get", [cellId]),
@@ -196,7 +248,7 @@ export function mvfm(...pluginInputs: (Plugin | readonly Plugin[])[]) {
     }
 
     // each: unroll + imperative effect
-    $.each = (items: unknown[], cb: (item: unknown) => unknown) => {
+    dollar.each = (items: unknown[], cb: (item: unknown) => unknown) => {
       const results = items.map((item: unknown) => runBlock(recording, cb, [item]));
       const expr = makeCExpr("core/begin", results);
       effects.push(expr);
@@ -204,7 +256,7 @@ export function mvfm(...pluginInputs: (Plugin | readonly Plugin[])[]) {
     };
 
     // while: imperative effect
-    $.while = (cond: unknown) => ({
+    dollar.while = (cond: unknown) => ({
       body: (bodyFn: () => unknown) => {
         const body = runBlock(recording, bodyFn, []);
         const whileExpr = makeCExpr("control/while", [cond, body]);
@@ -213,7 +265,9 @@ export function mvfm(...pluginInputs: (Plugin | readonly Plugin[])[]) {
       },
     });
 
-    let result = fn($);
+    const $ = dollar as MvfmDollar<P>;
+
+    let result: unknown = fn($);
     result = deepAutoLift(result);
 
     // Wrap result with collected imperative effects
@@ -221,12 +275,11 @@ export function mvfm(...pluginInputs: (Plugin | readonly Plugin[])[]) {
       result = makeCExpr("core/begin", [...effects, result]);
     }
 
-    const nexpr = createApp(...plugins)(result as CExpr<any>);
+    const nexpr = createApp(...plugins)(result as CExpr<unknown>);
     return { __nexpr: nexpr, __plugins: plugins, __inputSchema: schema };
   }
 
-  define.plugins = plugins;
-  return define;
+  return Object.assign(define, { plugins });
 }
 
 // ─── injectInput ────────────────────────────────────────────────────
@@ -251,23 +304,57 @@ export function injectInput(prog: Program, data: Record<string, unknown>): Progr
 // ─── Public defaults ────────────────────────────────────────────────
 
 /** Build a merged interpreter from plugins or an app object, with optional overrides. */
-export function defaults(appOrPlugins: any, overrides?: Record<string, Interpreter>): Interpreter {
+export function defaults(
+  appOrPlugins:
+    | readonly Plugin[]
+    | { plugins?: readonly Plugin[]; __plugins?: readonly Plugin[] },
+  overrides?: Record<string, Interpreter>,
+): Interpreter {
   if (Array.isArray(appOrPlugins)) {
-    return internalDefaults(appOrPlugins, overrides);
+    return internalDefaults(appOrPlugins as Plugin[], overrides);
   }
-  const plugins = appOrPlugins.plugins ?? appOrPlugins.__plugins ?? [];
+  const plugins =
+    (appOrPlugins as { plugins?: readonly Plugin[]; __plugins?: readonly Plugin[] }).plugins ??
+    (appOrPlugins as { __plugins?: readonly Plugin[] }).__plugins ??
+    [];
   return internalDefaults(plugins as Plugin[], overrides);
 }
 
 // ─── Public fold ────────────────────────────────────────────────────
 
-/** Evaluate a program/NExpr. Supports fold(interp, prog) and fold(nexpr, interp). */
-export async function fold(first: any, second: any, third?: any, fourth?: any): Promise<unknown> {
+/** Evaluate a program/NExpr. Supports fold(interp, prog), fold(nexpr, interp), and fold(rootId, adj, interp). */
+export async function fold(interp: Interpreter, prog: Program): Promise<unknown>;
+export async function fold(
+  nexpr: NExpr<unknown, string, unknown, string>,
+  interp: Interpreter,
+  state?: FoldState,
+): Promise<unknown>;
+export async function fold(
+  rootId: string,
+  adj: Record<string, RuntimeEntry>,
+  interp: Interpreter,
+  state?: FoldState,
+): Promise<unknown>;
+export async function fold(
+  first: unknown,
+  second: unknown,
+  third?: unknown,
+  fourth?: unknown,
+): Promise<unknown> {
   if (typeof first === "string") {
-    return internalFold(first, second, third, fourth);
+    return internalFold(
+      first,
+      second as Record<string, RuntimeEntry>,
+      third as Interpreter,
+      fourth as FoldState | undefined,
+    );
   }
   if (first && typeof first === "object" && "__id" in first) {
-    return internalFold(first, second, third);
+    return internalFold(
+      first as NExpr<unknown, string, unknown, string>,
+      second as Interpreter,
+      third as FoldState | undefined,
+    );
   }
-  return internalFold(second.__nexpr, first);
+  return internalFold((second as Program).__nexpr, first as Interpreter);
 }
