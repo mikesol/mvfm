@@ -198,7 +198,7 @@ export function eq<A, B>(a: A, b: B): CExpr<boolean, "eq", [A, B]> {
 // ─── Schema descriptors ─────────────────────────────────────────────
 
 /** Describe an array type in an input schema. */
-export function array(type: string): string {
+export function array<T extends string>(type: T): `${T}[]` {
   return `${type}[]`;
 }
 

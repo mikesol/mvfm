@@ -15,6 +15,7 @@ import type { DollarSign, Interpreter, Plugin } from "./plugin";
 import { mvfmU } from "./plugin";
 import type { RecordingStack } from "./recording";
 import { runBlock } from "./recording";
+import type { SchemaToData } from "./schema-types";
 import { boolPlugin, numPlugin, ordPlugin, strPlugin } from "./std-plugins";
 
 export { coreInterpreter, corePlugin } from "./core-plugin";
@@ -74,10 +75,10 @@ export const prelude = [numPlugin, strPlugin, boolPlugin, ordPlugin] as const;
 // ─── Program type ───────────────────────────────────────────────────
 
 /** A compiled program with NExpr, plugin list, and optional input schema. */
-export interface Program {
+export interface Program<S extends Record<string, string> | undefined = undefined> {
   readonly __nexpr: NExpr<unknown, string, unknown, string>;
   readonly __plugins: readonly Plugin[];
-  readonly __inputSchema?: Record<string, string>;
+  readonly __inputSchema?: S extends undefined ? Record<string, string> : S;
 }
 
 // ─── Helper: deep auto-lift ─────────────────────────────────────────
@@ -107,12 +108,15 @@ export function mvfm<const P extends readonly PluginInput[]>(...pluginInputs: P)
     else plugins.push(p as Plugin);
   }
 
-  function define(fn: ($: MvfmDollar<P>) => unknown): Program;
-  function define(schema: Record<string, string>, fn: ($: MvfmDollar<P>) => unknown): Program;
+  function define(fn: ($: MvfmDollar<P>) => unknown): Program<undefined>;
+  function define<const S extends Record<string, string>>(
+    schema: S,
+    fn: ($: MvfmDollar<P>) => unknown,
+  ): Program<S>;
   function define(
     schemaOrFn: Record<string, string> | (($: MvfmDollar<P>) => unknown),
     maybeFn?: ($: MvfmDollar<P>) => unknown,
-  ): Program {
+  ): Program<any> {
     const schema = typeof schemaOrFn === "function" ? undefined : schemaOrFn;
     const fn = typeof schemaOrFn === "function" ? schemaOrFn : maybeFn!;
 
@@ -216,7 +220,11 @@ export function mvfm<const P extends readonly PluginInput[]>(...pluginInputs: P)
 // ─── injectInput ────────────────────────────────────────────────────
 
 /** Inject input data into a compiled program, replacing core/input node outputs. */
-export function injectInput(prog: Program, data: Record<string, unknown>): Program {
+export function injectInput<S extends Record<string, string> | undefined>(
+  prog: Program<S>,
+  data: S extends Record<string, string> ? SchemaToData<S> : Record<string, unknown>,
+): Program<S>;
+export function injectInput(prog: Program<any>, data: Record<string, unknown>): Program<any> {
   const oldAdj = prog.__nexpr.__adj;
   const newAdj: Record<string, RuntimeEntry> = {};
   for (const [id, entry] of Object.entries(oldAdj)) {
@@ -252,7 +260,7 @@ export function defaults(
 // ─── Public fold ────────────────────────────────────────────────────
 
 /** Evaluate a program/NExpr. Supports fold(interp, prog), fold(nexpr, interp), and fold(rootId, adj, interp). */
-export async function fold(interp: Interpreter, prog: Program): Promise<unknown>;
+export async function fold(interp: Interpreter, prog: Program<any>): Promise<unknown>;
 export async function fold(
   nexpr: NExpr<unknown, string, unknown, string>,
   interp: Interpreter,

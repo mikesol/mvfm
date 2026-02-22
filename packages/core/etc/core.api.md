@@ -48,7 +48,7 @@ infer O
 ] ? NExpr<O, R, Adj, C> : never> : never;
 
 // @public
-export function array(type: string): string;
+export function array<T extends string>(type: T): `${T}[]`;
 
 // @public
 export function boolAnd<A, B>(a: A, b: B): CExpr<boolean, "bool/and", [A, B]>;
@@ -540,7 +540,7 @@ export const fiber: {
 export function floor<A>(a: A): CExpr<number, "num/floor", [A]>;
 
 // @public
-export function fold(interp: Interpreter, prog: Program): Promise<unknown>;
+export function fold(interp: Interpreter, prog: Program<any>): Promise<unknown>;
 
 // @public (undocumented)
 export function fold(nexpr: NExpr<unknown, string, unknown, string>, interp: Interpreter, state?: FoldState): Promise<unknown>;
@@ -591,7 +591,7 @@ export function incrementId(s: string): string;
 export type IncrementLast<S extends string> = S extends `${infer R}a` ? `${R}b` : S extends `${infer R}b` ? `${R}c` : S extends `${infer R}c` ? `${R}d` : S extends `${infer R}d` ? `${R}e` : S extends `${infer R}e` ? `${R}f` : S extends `${infer R}f` ? `${R}g` : S extends `${infer R}g` ? `${R}h` : S extends `${infer R}h` ? `${R}i` : S extends `${infer R}i` ? `${R}j` : S extends `${infer R}j` ? `${R}k` : S extends `${infer R}k` ? `${R}l` : S extends `${infer R}l` ? `${R}m` : S extends `${infer R}m` ? `${R}n` : S extends `${infer R}n` ? `${R}o` : S extends `${infer R}o` ? `${R}p` : S extends `${infer R}p` ? `${R}q` : S extends `${infer R}q` ? `${R}r` : S extends `${infer R}r` ? `${R}s` : S extends `${infer R}s` ? `${R}t` : S extends `${infer R}t` ? `${R}u` : S extends `${infer R}u` ? `${R}v` : S extends `${infer R}v` ? `${R}w` : S extends `${infer R}w` ? `${R}x` : S extends `${infer R}x` ? `${R}y` : S extends `${infer R}y` ? `${R}z` : never;
 
 // @public
-export function injectInput(prog: Program, data: Record<string, unknown>): Program;
+export function injectInput<S extends Record<string, string> | undefined>(prog: Program<S>, data: S extends Record<string, string> ? SchemaToData<S> : Record<string, unknown>): Program<S>;
 
 // @public
 export type Interpreter = Record<string, Handler>;
@@ -706,8 +706,8 @@ export function mul<A, B>(a: A, b: B): CExpr<number, "num/mul", [A, B]>;
 //
 // @public
 export function mvfm<const P extends readonly PluginInput[]>(...pluginInputs: P): {
-    (fn: ($: MvfmDollar<P>) => unknown): Program;
-    (schema: Record<string, string>, fn: ($: MvfmDollar<P>) => unknown): Program;
+    (fn: ($: MvfmDollar<P>) => unknown): Program<undefined>;
+    <const S extends Record<string, string>>(schema: S, fn: ($: MvfmDollar<P>) => unknown): Program<S>;
 } & {
     plugins: Plugin_2<string, any, any, any, any>[];
 };
@@ -1225,9 +1225,9 @@ export type PreserveAliases<Adj> = {
 };
 
 // @public
-export interface Program {
+export interface Program<S extends Record<string, string> | undefined = undefined> {
     // (undocumented)
-    readonly __inputSchema?: Record<string, string>;
+    readonly __inputSchema?: S extends undefined ? Record<string, string> : S;
     // (undocumented)
     readonly __nexpr: NExpr<unknown, string, unknown, string>;
     // (undocumented)
@@ -1310,6 +1310,14 @@ export interface RuntimeEntry {
     // (undocumented)
     out: unknown;
 }
+
+// @public
+export type SchemaToData<S extends Record<string, string>> = {
+    [K in keyof S]: SchemaToType<S[K]>;
+};
+
+// @public
+export type SchemaToType<S extends string> = S extends `${infer E}[]` ? SchemaToType<E>[] : S extends "number" ? number : S extends "string" ? string : S extends "boolean" ? boolean : unknown;
 
 // @public
 export interface ScopedBinding {
@@ -1808,7 +1816,7 @@ export type WrapOneResult<Adj, TargetID extends string, WrapperKind extends stri
 
 // Warnings were encountered during analysis:
 //
-// dist/api.d.ts:244:5 - (ae-forgotten-export) The symbol "MvfmDollar" needs to be exported by the entry point index.d.ts
+// dist/api.d.ts:245:5 - (ae-forgotten-export) The symbol "MvfmDollar" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 
