@@ -1,4 +1,4 @@
-export type { AnthropicConfig, AnthropicMethods } from "./0.74.0";
+export type { AnthropicConfig } from "./0.74.0";
 export { anthropic, anthropicPlugin } from "./0.74.0";
 export { wrapAnthropicSdk } from "./0.74.0/client-anthropic-sdk";
 export type { AnthropicClient } from "./0.74.0/interpreter";
