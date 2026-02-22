@@ -39,31 +39,21 @@ export class ZodPrimitiveBuilder<T> extends ZodSchemaBuilder<T> {
   }
 }
 
-export const primitivesNodeKinds: string[] = [
-  "zod/boolean",
-  "zod/null",
-  "zod/undefined",
-  "zod/void",
-  "zod/symbol",
-];
-
-export interface ZodPrimitivesNamespace {
-  boolean(errorOrOpts?: string | { error?: string }): ZodPrimitiveBuilder<boolean>;
-  null(errorOrOpts?: string | { error?: string }): ZodPrimitiveBuilder<null>;
-  undefined(errorOrOpts?: string | { error?: string }): ZodPrimitiveBuilder<undefined>;
-  void(errorOrOpts?: string | { error?: string }): ZodPrimitiveBuilder<void>;
-  symbol(errorOrOpts?: string | { error?: string }): ZodPrimitiveBuilder<symbol>;
-}
-
+/** Build the primitives namespace factory methods. */
 export function primitivesNamespace(
   parseError: (errorOrOpts?: string | { error?: string }) => string | undefined,
-): ZodPrimitivesNamespace {
+) {
   return {
-    boolean: (e) => new ZodPrimitiveBuilder<boolean>("zod/boolean", [], [], parseError(e)),
-    null: (e) => new ZodPrimitiveBuilder<null>("zod/null", [], [], parseError(e)),
-    undefined: (e) => new ZodPrimitiveBuilder<undefined>("zod/undefined", [], [], parseError(e)),
-    void: (e) => new ZodPrimitiveBuilder<void>("zod/void", [], [], parseError(e)),
-    symbol: (e) => new ZodPrimitiveBuilder<symbol>("zod/symbol", [], [], parseError(e)),
+    boolean: (e?: string | { error?: string }) =>
+      new ZodPrimitiveBuilder<boolean>("zod/boolean", [], [], parseError(e)),
+    null: (e?: string | { error?: string }) =>
+      new ZodPrimitiveBuilder<null>("zod/null", [], [], parseError(e)),
+    undefined: (e?: string | { error?: string }) =>
+      new ZodPrimitiveBuilder<undefined>("zod/undefined", [], [], parseError(e)),
+    void: (e?: string | { error?: string }) =>
+      new ZodPrimitiveBuilder<void>("zod/void", [], [], parseError(e)),
+    symbol: (e?: string | { error?: string }) =>
+      new ZodPrimitiveBuilder<symbol>("zod/symbol", [], [], parseError(e)),
   };
 }
 

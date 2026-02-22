@@ -46,22 +46,10 @@ export function optionsToAST(
   return options.map((builder) => builder.__schemaNode);
 }
 
-export const unionNodeKinds: string[] = ["zod/union", "zod/xor"];
-
-export interface ZodUnionNamespace {
-  union<T extends unknown[]>(
-    options: { [K in keyof T]: ZodSchemaBuilder<T[K]> },
-    errorOrOpts?: string | { error?: string },
-  ): ZodUnionBuilder<T[number]>;
-  xor<T extends unknown[]>(
-    options: { [K in keyof T]: ZodSchemaBuilder<T[K]> },
-    errorOrOpts?: string | { error?: string },
-  ): ZodUnionBuilder<T[number]>;
-}
-
+/** Build the union namespace factory methods. */
 export function unionNamespace(
   parseError: (errorOrOpts?: string | { error?: string }) => string | undefined,
-): ZodUnionNamespace {
+) {
   return {
     union: <T extends unknown[]>(
       options: { [K in keyof T]: ZodSchemaBuilder<T[K]> },

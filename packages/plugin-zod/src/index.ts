@@ -1,53 +1,30 @@
-import type { Interpreter, KindSpec } from "@mvfm/core";
+import type { Interpreter, KindSpec, Plugin } from "@mvfm/core";
 
 export { z } from "zod";
 
-import type { ZodArrayNamespace } from "./array";
 import { arrayNamespace } from "./array";
-import type { ZodBigIntNamespace } from "./bigint";
 import { bigintNamespace } from "./bigint";
-import type { ZodCoerceNamespace } from "./coerce";
 import { coerceNamespace } from "./coerce";
-import type { ZodDateNamespace } from "./date";
 import { dateNamespace } from "./date";
-import type { ZodDiscriminatedUnionNamespace } from "./discriminated-union";
 import { discriminatedUnionNamespace } from "./discriminated-union";
-import type { ZodEnumNamespace } from "./enum";
 import { enumNamespace } from "./enum";
-import type { ZodFromNamespace } from "./from-zod";
 import { fromZodNamespace } from "./from-zod";
 import { createZodInterpreter } from "./interpreter";
-import type { ZodIntersectionNamespace } from "./intersection";
 import { intersectionNamespace } from "./intersection";
-import type { ZodLazyNamespace } from "./lazy";
 import { lazyNamespace } from "./lazy";
-import type { ZodLiteralNamespace } from "./literal";
 import { literalNamespace } from "./literal";
-import type { ZodMapSetNamespace } from "./map-set";
 import { mapSetNamespace } from "./map-set";
-import type { ZodNumberNamespace } from "./number";
 import { numberNamespace } from "./number";
-import type { ZodObjectNamespace } from "./object";
 import { objectNamespace } from "./object";
-import type { ZodPrimitivesNamespace } from "./primitives";
 import { primitivesNamespace } from "./primitives";
-import type { ZodRecordNamespace } from "./record";
 import { recordNamespace } from "./record";
-import type { ZodSpecialNamespace } from "./special";
 import { specialNamespace } from "./special";
-import type { ZodStringNamespace } from "./string";
 import { stringNamespace } from "./string";
-import type { ZodStringFormatsNamespace } from "./string-formats";
 import { stringFormatsNamespace } from "./string-formats";
-import type { ZodStringboolNamespace } from "./stringbool";
 import { stringboolNamespace } from "./stringbool";
-import type { ZodTemplateLiteralNamespace } from "./template-literal";
 import { templateLiteralNamespace } from "./template-literal";
-import type { ZodTransformNamespace } from "./transform";
 import { transformNamespace } from "./transform";
-import type { ZodTupleNamespace } from "./tuple";
 import { tupleNamespace } from "./tuple";
-import type { ZodUnionNamespace } from "./union";
 import { unionNamespace } from "./union";
 
 // Re-export types, builders, and interpreter for consumers
@@ -92,44 +69,6 @@ function parseError(errorOrOpts?: string | { error?: string }): string | undefin
   return typeof errorOrOpts === "string" ? errorOrOpts : errorOrOpts?.error;
 }
 
-/**
- * The `$.zod` namespace contributed by the Zod plugin.
- *
- * Provides factory methods for creating Zod schema builders:
- * `$.zod.string()`, `$.zod.number()`, `$.zod.object(...)`, etc.
- *
- * Each factory returns a schema builder with chainable methods
- * for adding checks, refinements, and wrappers. Call `.parse()`
- * or `.safeParse()` to produce a validation AST node.
- */
-export interface ZodNamespace
-  extends ZodArrayNamespace,
-    ZodStringNamespace,
-    ZodBigIntNamespace,
-    ZodDateNamespace,
-    ZodDiscriminatedUnionNamespace,
-    ZodEnumNamespace,
-    ZodIntersectionNamespace,
-    ZodLazyNamespace,
-    ZodLiteralNamespace,
-    ZodMapSetNamespace,
-    ZodNumberNamespace,
-    ZodObjectNamespace,
-    ZodPrimitivesNamespace,
-    ZodRecordNamespace,
-    ZodSpecialNamespace,
-    ZodStringboolNamespace,
-    ZodStringFormatsNamespace,
-    ZodTemplateLiteralNamespace,
-    ZodTransformNamespace,
-    ZodTupleNamespace,
-    ZodUnionNamespace,
-    ZodFromNamespace {
-  /** Coercion constructors -- convert input before validating. */
-  coerce: ZodCoerceNamespace;
-  // ^^^ Each new schema type adds ONE extends clause here
-}
-
 /** Safe-parse result shape. */
 type SafeParseResult = { success: boolean; data?: unknown; error?: unknown };
 
@@ -171,7 +110,7 @@ export function zod() {
         ...tupleNamespace(parseError),
         ...unionNamespace(parseError),
         // ^^^ Each new schema type adds ONE spread here
-      } as ZodNamespace,
+      },
     },
     kinds: {
       "zod/parse": {
@@ -194,5 +133,5 @@ export function zod() {
     traits: {},
     lifts: {},
     defaultInterpreter: (): Interpreter => createZodInterpreter(),
-  };
+  } satisfies Plugin;
 }

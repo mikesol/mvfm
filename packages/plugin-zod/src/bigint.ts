@@ -95,15 +95,10 @@ export class ZodBigIntBuilder extends ZodSchemaBuilder<bigint> {
   }
 }
 
-export const bigintNodeKinds: string[] = ["zod/bigint"];
-
-export interface ZodBigIntNamespace {
-  bigint(errorOrOpts?: string | { error?: string }): ZodBigIntBuilder;
-}
-
+/** Build the bigint namespace factory methods. */
 export function bigintNamespace(
   parseError: (errorOrOpts?: string | { error?: string }) => string | undefined,
-): ZodBigIntNamespace {
+) {
   return {
     bigint(errorOrOpts?: string | { error?: string }): ZodBigIntBuilder {
       return new ZodBigIntBuilder([], [], parseError(errorOrOpts));

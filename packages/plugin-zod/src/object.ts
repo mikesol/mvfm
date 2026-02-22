@@ -115,26 +115,10 @@ export class ZodObjectBuilder<T extends Record<string, unknown>> extends ZodSche
   }
 }
 
-export const objectNodeKinds: string[] = ["zod/object"];
-
-export interface ZodObjectNamespace {
-  object(
-    shape: ShapeInput,
-    errorOrOpts?: string | { error?: string },
-  ): ZodObjectBuilder<Record<string, unknown>>;
-  strictObject(
-    shape: ShapeInput,
-    errorOrOpts?: string | { error?: string },
-  ): ZodObjectBuilder<Record<string, unknown>>;
-  looseObject(
-    shape: ShapeInput,
-    errorOrOpts?: string | { error?: string },
-  ): ZodObjectBuilder<Record<string, unknown>>;
-}
-
+/** Build the object namespace factory methods. */
 export function objectNamespace(
   parseError: (errorOrOpts?: string | { error?: string }) => string | undefined,
-): ZodObjectNamespace {
+) {
   return {
     object(shape: ShapeInput, errorOrOpts?: string | { error?: string }) {
       return new ZodObjectBuilder([], [], parseError(errorOrOpts), {

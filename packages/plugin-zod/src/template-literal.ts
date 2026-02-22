@@ -42,15 +42,8 @@ export class ZodTemplateLiteralBuilder<T extends string> extends ZodSchemaBuilde
   }
 }
 
-export const templateLiteralNodeKinds: string[] = ["zod/template_literal"];
-
-export interface ZodTemplateLiteralNamespace {
-  templateLiteral<T extends string>(
-    parts: (string | ZodSchemaBuilder<unknown>)[],
-  ): ZodTemplateLiteralBuilder<T>;
-}
-
-export function templateLiteralNamespace(): ZodTemplateLiteralNamespace {
+/** Build the template literal namespace factory methods. */
+export function templateLiteralNamespace() {
   return {
     templateLiteral: <T extends string>(parts: (string | ZodSchemaBuilder<unknown>)[]) => {
       const astParts: TemplatePart[] = parts.map((p) =>

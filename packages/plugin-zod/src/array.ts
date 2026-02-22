@@ -64,18 +64,10 @@ export class ZodArrayBuilder<T> extends ZodSchemaBuilder<T[]> {
   }
 }
 
-export const arrayNodeKinds: string[] = ["zod/array"];
-
-export interface ZodArrayNamespace {
-  array<T>(
-    element: ZodSchemaBuilder<T>,
-    errorOrOpts?: string | { error?: string },
-  ): ZodArrayBuilder<T>;
-}
-
+/** Build the array namespace factory methods. */
 export function arrayNamespace(
   parseError: (errorOrOpts?: string | { error?: string }) => string | undefined,
-): ZodArrayNamespace {
+) {
   return {
     array<T>(
       element: ZodSchemaBuilder<T>,

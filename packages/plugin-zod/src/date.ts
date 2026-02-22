@@ -49,15 +49,10 @@ export class ZodDateBuilder extends ZodSchemaBuilder<Date> {
   }
 }
 
-export const dateNodeKinds: string[] = ["zod/date"];
-
-export interface ZodDateNamespace {
-  date(errorOrOpts?: string | { error?: string }): ZodDateBuilder;
-}
-
+/** Build the date namespace factory methods. */
 export function dateNamespace(
   parseError: (errorOrOpts?: string | { error?: string }) => string | undefined,
-): ZodDateNamespace {
+) {
   return {
     date(errorOrOpts?: string | { error?: string }): ZodDateBuilder {
       return new ZodDateBuilder([], [], parseError(errorOrOpts));

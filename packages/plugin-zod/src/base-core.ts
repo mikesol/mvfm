@@ -89,34 +89,45 @@ export abstract class ZodSchemaBuilderCore<T> {
     return makeCExpr<R, string, unknown[]>(opKind, [serialized, input, ...refs]);
   }
 
-  parse(input: unknown, opts?: { error?: ErrorConfig }): CExpr<T> {
-    return this._buildValidationCExpr<T>("zod/parse", input, opts);
+  parse(input: unknown, opts?: { error?: ErrorConfig }): CExpr<T, "zod/parse"> {
+    return this._buildValidationCExpr<T>("zod/parse", input, opts) as CExpr<T, "zod/parse">;
   }
 
   safeParse(
     input: unknown,
     opts?: { error?: ErrorConfig },
-  ): CExpr<{ success: boolean; data: T; error: unknown }> {
+  ): CExpr<{ success: boolean; data: T; error: unknown }, "zod/safe_parse"> {
     return this._buildValidationCExpr<{ success: boolean; data: T; error: unknown }>(
       "zod/safe_parse",
       input,
       opts,
-    );
+    ) as CExpr<{ success: boolean; data: T; error: unknown }, "zod/safe_parse">;
   }
 
-  parseAsync(input: unknown, opts?: { error?: ErrorConfig }): CExpr<Promise<T>> {
-    return this._buildValidationCExpr<Promise<T>>("zod/parse_async", input, opts);
+  parseAsync(
+    input: unknown,
+    opts?: { error?: ErrorConfig },
+  ): CExpr<Promise<T>, "zod/parse_async"> {
+    return this._buildValidationCExpr<Promise<T>>(
+      "zod/parse_async",
+      input,
+      opts,
+    ) as CExpr<Promise<T>, "zod/parse_async">;
   }
 
   safeParseAsync(
     input: unknown,
     opts?: { error?: ErrorConfig },
-  ): CExpr<Promise<{ success: boolean; data: T; error: unknown }>> {
-    return this._buildValidationCExpr<Promise<{ success: boolean; data: T; error: unknown }>>(
-      "zod/safe_parse_async",
-      input,
-      opts,
-    );
+  ): CExpr<
+    Promise<{ success: boolean; data: T; error: unknown }>,
+    "zod/safe_parse_async"
+  > {
+    return this._buildValidationCExpr<
+      Promise<{ success: boolean; data: T; error: unknown }>
+    >("zod/safe_parse_async", input, opts) as CExpr<
+      Promise<{ success: boolean; data: T; error: unknown }>,
+      "zod/safe_parse_async"
+    >;
   }
 
   private _buildRefinement(

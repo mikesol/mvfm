@@ -43,19 +43,10 @@ export function optionsToAST(
   return options.map((builder) => builder.__schemaNode);
 }
 
-export const discriminatedUnionNodeKinds: string[] = ["zod/discriminated_union"];
-
-export interface ZodDiscriminatedUnionNamespace {
-  discriminatedUnion<T extends [unknown, unknown, ...unknown[]]>(
-    discriminator: string,
-    options: { [K in keyof T]: ZodSchemaBuilder<T[K]> },
-    errorOrOpts?: string | { error?: string },
-  ): ZodDiscriminatedUnionBuilder<T[number]>;
-}
-
+/** Build the discriminated union namespace factory methods. */
 export function discriminatedUnionNamespace(
   parseError: (errorOrOpts?: string | { error?: string }) => string | undefined,
-): ZodDiscriminatedUnionNamespace {
+) {
   return {
     discriminatedUnion: <T extends [unknown, unknown, ...unknown[]]>(
       discriminator: string,

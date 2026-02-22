@@ -38,29 +38,10 @@ export class ZodRecordBuilder<K extends string, V> extends ZodSchemaBuilder<Reco
   }
 }
 
-export const recordNodeKinds: string[] = ["zod/record"];
-
-export interface ZodRecordNamespace {
-  record<K extends string, V>(
-    k: ZodSchemaBuilder<K>,
-    v: ZodSchemaBuilder<V>,
-    e?: string | { error?: string },
-  ): ZodRecordBuilder<K, V>;
-  partialRecord<K extends string, V>(
-    k: ZodSchemaBuilder<K>,
-    v: ZodSchemaBuilder<V>,
-    e?: string | { error?: string },
-  ): ZodRecordBuilder<K, V>;
-  looseRecord<K extends string, V>(
-    k: ZodSchemaBuilder<K>,
-    v: ZodSchemaBuilder<V>,
-    e?: string | { error?: string },
-  ): ZodRecordBuilder<K, V>;
-}
-
+/** Build the record namespace factory methods. */
 export function recordNamespace(
   parseError: (errorOrOpts?: string | { error?: string }) => string | undefined,
-): ZodRecordNamespace {
+) {
   function buildRecord<K extends string, V>(
     k: ZodSchemaBuilder<K>,
     v: ZodSchemaBuilder<V>,
@@ -74,9 +55,21 @@ export function recordNamespace(
     });
   }
   return {
-    record: (k, v, e) => buildRecord(k, v, "strict", e),
-    partialRecord: (k, v, e) => buildRecord(k, v, "partial", e),
-    looseRecord: (k, v, e) => buildRecord(k, v, "loose", e),
+    record: <K extends string, V>(
+      k: ZodSchemaBuilder<K>,
+      v: ZodSchemaBuilder<V>,
+      e?: string | { error?: string },
+    ) => buildRecord(k, v, "strict", e),
+    partialRecord: <K extends string, V>(
+      k: ZodSchemaBuilder<K>,
+      v: ZodSchemaBuilder<V>,
+      e?: string | { error?: string },
+    ) => buildRecord(k, v, "partial", e),
+    looseRecord: <K extends string, V>(
+      k: ZodSchemaBuilder<K>,
+      v: ZodSchemaBuilder<V>,
+      e?: string | { error?: string },
+    ) => buildRecord(k, v, "loose", e),
   };
 }
 

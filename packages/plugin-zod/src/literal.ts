@@ -40,13 +40,8 @@ export class ZodLiteralBuilder<T extends LiteralValue> extends ZodSchemaBuilder<
   }
 }
 
-export const literalNodeKinds: string[] = ["zod/literal"];
-
-export interface ZodLiteralNamespace {
-  literal<T extends LiteralValue>(value: T | T[]): ZodLiteralBuilder<T>;
-}
-
-export function literalNamespace(): ZodLiteralNamespace {
+/** Build the literal namespace factory methods. */
+export function literalNamespace() {
   return {
     literal: <T extends LiteralValue>(value: T | T[]) =>
       new ZodLiteralBuilder<T>([], [], undefined, { value }),

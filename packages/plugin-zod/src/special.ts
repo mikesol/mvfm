@@ -62,28 +62,10 @@ export function buildCustom<T>(
   });
 }
 
-export const specialNodeKinds: string[] = [
-  "zod/any",
-  "zod/unknown",
-  "zod/never",
-  "zod/promise",
-  "zod/custom",
-];
-
-export interface ZodSpecialNamespace {
-  any(): ZodSimpleBuilder<any>;
-  unknown(): ZodSimpleBuilder<unknown>;
-  never(): ZodSimpleBuilder<never>;
-  promise<T>(inner: ZodSchemaBuilder<T>): ZodWrappedBuilder<Promise<T>>;
-  custom<T = unknown>(
-    fn: (val: CExpr<unknown>) => CExpr<boolean>,
-    errorOrOpts?: string | { error?: string },
-  ): ZodSimpleBuilder<T>;
-}
-
+/** Build the special namespace factory methods. */
 export function specialNamespace(
   _parseError: (errorOrOpts?: string | { error?: string }) => string | undefined,
-): ZodSpecialNamespace {
+) {
   return {
     any: () => new ZodSimpleBuilder<any>("zod/any"),
     unknown: () => new ZodSimpleBuilder<unknown>("zod/unknown"),

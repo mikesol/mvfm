@@ -36,19 +36,10 @@ export class ZodIntersectionBuilder<T> extends ZodSchemaBuilder<T> {
   }
 }
 
-export const intersectionNodeKinds: string[] = ["zod/intersection"];
-
-export interface ZodIntersectionNamespace {
-  intersection<A, B>(
-    left: ZodSchemaBuilder<A>,
-    right: ZodSchemaBuilder<B>,
-    errorOrOpts?: string | { error?: string },
-  ): ZodIntersectionBuilder<A & B>;
-}
-
+/** Build the intersection namespace factory methods. */
 export function intersectionNamespace(
   parseError: (errorOrOpts?: string | { error?: string }) => string | undefined,
-): ZodIntersectionNamespace {
+) {
   return {
     intersection: <A, B>(
       left: ZodSchemaBuilder<A>,

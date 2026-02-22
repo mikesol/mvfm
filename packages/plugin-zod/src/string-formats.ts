@@ -83,8 +83,6 @@ export interface ZodStringFormatsNamespace {
   iso: ZodIsoNamespace;
 }
 
-/** Node kinds contributed by string formats -- none; they reuse zod/string. */
-export const stringFormatsNodeKinds: string[] = [];
 
 /** Create a string builder with a format descriptor in extra. */
 function formatBuilder(

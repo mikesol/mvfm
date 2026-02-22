@@ -40,19 +40,14 @@ export class ZodStringboolBuilder extends ZodSchemaBuilder<boolean> {
   }
 }
 
-export const stringboolNodeKinds: string[] = ["zod/stringbool"];
-
 export interface StringboolOptions {
   truthy?: string[];
   falsy?: string[];
   coerce?: boolean;
 }
 
-export interface ZodStringboolNamespace {
-  stringbool(opts?: StringboolOptions): ZodStringboolBuilder;
-}
-
-export function stringboolNamespace(): ZodStringboolNamespace {
+/** Build the stringbool namespace factory methods. */
+export function stringboolNamespace() {
   return {
     stringbool(opts?: StringboolOptions): ZodStringboolBuilder {
       const extra: Record<string, unknown> = {};

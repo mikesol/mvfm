@@ -55,17 +55,8 @@ export function buildPreprocess<T>(
   return new ZodWrappedBuilder<T>(wrapperNode);
 }
 
-export const transformNodeKinds: string[] = ["zod/transform", "zod/pipe", "zod/preprocess"];
-
-export interface ZodTransformNamespace {
-  transform<T>(fn: (val: CExpr<unknown>) => CExpr<T>): ZodTransformBuilder<T>;
-  preprocess<T>(
-    fn: (val: CExpr<unknown>) => CExpr<unknown>,
-    schema: ZodSchemaBuilder<T>,
-  ): ZodWrappedBuilder<T>;
-}
-
-export function transformNamespace(): ZodTransformNamespace {
+/** Build the transform namespace factory methods. */
+export function transformNamespace() {
   return {
     transform: <T>(fn: (val: CExpr<unknown>) => CExpr<T>) => buildStandaloneTransform(fn),
     preprocess: <T>(fn: (val: CExpr<unknown>) => CExpr<unknown>, schema: ZodSchemaBuilder<T>) =>

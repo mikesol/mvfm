@@ -45,17 +45,9 @@ class ZodImportedBuilder<T> extends ZodSchemaBuilder<T> {
 }
 
 /**
- * Namespace fragment for converting runtime Zod schemas into mvfm schema builders.
- */
-export interface ZodFromNamespace {
-  /** Convert a runtime Zod schema into an mvfm `$.zod` schema builder. */
-  from<T>(schema: z.ZodType<T>, options?: ZodFromOptions): ZodSchemaBuilder<T>;
-}
-
-/**
  * Build the `$.zod.from(...)` converter method.
  */
-export function fromZodNamespace(): ZodFromNamespace {
+export function fromZodNamespace() {
   return {
     from<T>(schema: z.ZodType<T>, options?: ZodFromOptions): ZodSchemaBuilder<T> {
       const state: ConvertState = {

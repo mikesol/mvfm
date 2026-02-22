@@ -124,21 +124,10 @@ export class ZodStringBuilder extends ZodSchemaBuilder<string> {
   }
 }
 
-/** Node kinds contributed by the string schema. */
-export const stringNodeKinds: string[] = ["zod/string"];
-
-/**
- * Namespace fragment for string schema factories.
- */
-export interface ZodStringNamespace {
-  /** Create a string schema builder. */
-  string(errorOrOpts?: string | { error?: string }): ZodStringBuilder;
-}
-
 /** Build the string namespace factory methods. */
 export function stringNamespace(
   parseError: (errorOrOpts?: string | { error?: string }) => string | undefined,
-): ZodStringNamespace {
+) {
   return {
     string(errorOrOpts?: string | { error?: string }): ZodStringBuilder {
       return new ZodStringBuilder([], [], parseError(errorOrOpts));

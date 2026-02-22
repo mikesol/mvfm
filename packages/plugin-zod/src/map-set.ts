@@ -70,20 +70,10 @@ export class ZodSetBuilder<T> extends ZodSchemaBuilder<Set<T>> {
   }
 }
 
-export const mapSetNodeKinds: string[] = ["zod/map", "zod/set"];
-
-export interface ZodMapSetNamespace {
-  map<K, V>(
-    k: ZodSchemaBuilder<K>,
-    v: ZodSchemaBuilder<V>,
-    e?: string | { error?: string },
-  ): ZodMapBuilder<K, V>;
-  set<T>(v: ZodSchemaBuilder<T>, e?: string | { error?: string }): ZodSetBuilder<T>;
-}
-
+/** Build the map/set namespace factory methods. */
 export function mapSetNamespace(
   parseError: (errorOrOpts?: string | { error?: string }) => string | undefined,
-): ZodMapSetNamespace {
+) {
   return {
     map: <K, V>(k: ZodSchemaBuilder<K>, v: ZodSchemaBuilder<V>, e?: string | { error?: string }) =>
       new ZodMapBuilder<K, V>([], [], parseError(e), {

@@ -67,11 +67,6 @@ export class ZodLazyBuilder<T> extends ZodSchemaBuilder<T> {
   }
 }
 
-export const lazyNodeKinds: string[] = ["zod/lazy", "zod/lazy_ref"];
-
-export interface ZodLazyNamespace {
-  lazy<T>(getter: () => ZodSchemaBuilder<T>): ZodLazyBuilder<T>;
-}
 
 type LazyRegistry = Map<string, () => ZodSchemaBuilder<unknown>>;
 
@@ -131,7 +126,7 @@ function resolveLazySchemaNode(
 }
 
 /** Build the lazy namespace factory method. */
-export function lazyNamespace(): ZodLazyNamespace {
+export function lazyNamespace() {
   const registry: LazyRegistry = new Map();
   setLazyResolver(
     (schema) =>

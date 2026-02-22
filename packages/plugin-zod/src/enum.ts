@@ -82,19 +82,10 @@ export class ZodNativeEnumBuilder<T> extends ZodSchemaBuilder<T> {
   }
 }
 
-export const enumNodeKinds: string[] = ["zod/enum", "zod/native_enum"];
-
-export interface ZodEnumNamespace {
-  enum<T extends string>(values: T[], errorOrOpts?: string | { error?: string }): ZodEnumBuilder<T>;
-  nativeEnum<T extends Record<string, string | number>>(
-    enumObj: T,
-    errorOrOpts?: string | { error?: string },
-  ): ZodNativeEnumBuilder<T[keyof T]>;
-}
-
+/** Build the enum namespace factory methods. */
 export function enumNamespace(
   parseError: (errorOrOpts?: string | { error?: string }) => string | undefined,
-): ZodEnumNamespace {
+) {
   return {
     enum: <T extends string>(values: T[], e?: string | { error?: string }) =>
       new ZodEnumBuilder<T>([], [], parseError(e), { values }),

@@ -94,23 +94,10 @@ export class ZodNumberBuilder extends ZodSchemaBuilder<number> {
   }
 }
 
-export const numberNodeKinds: string[] = ["zod/number", "zod/nan"];
-
-export interface ZodNumberNamespace {
-  number(errorOrOpts?: string | { error?: string }): ZodNumberBuilder;
-  int(errorOrOpts?: string | { error?: string }): ZodNumberBuilder;
-  int32(errorOrOpts?: string | { error?: string }): ZodNumberBuilder;
-  int64(errorOrOpts?: string | { error?: string }): ZodNumberBuilder;
-  uint32(errorOrOpts?: string | { error?: string }): ZodNumberBuilder;
-  uint64(errorOrOpts?: string | { error?: string }): ZodNumberBuilder;
-  float32(errorOrOpts?: string | { error?: string }): ZodNumberBuilder;
-  float64(errorOrOpts?: string | { error?: string }): ZodNumberBuilder;
-  nan(errorOrOpts?: string | { error?: string }): ZodNumberBuilder;
-}
-
+/** Build the number namespace factory methods. */
 export function numberNamespace(
   parseError: (errorOrOpts?: string | { error?: string }) => string | undefined,
-): ZodNumberNamespace {
+) {
   return {
     number(errorOrOpts?: string | { error?: string }): ZodNumberBuilder {
       return new ZodNumberBuilder([], [], parseError(errorOrOpts));

@@ -36,19 +36,10 @@ export function itemsToAST(items: ZodSchemaBuilder<unknown>[]): (SchemaASTNode |
   return items.map((builder) => builder.__schemaNode);
 }
 
-export const tupleNodeKinds: string[] = ["zod/tuple"];
-
-export interface ZodTupleNamespace {
-  tuple<T extends unknown[]>(
-    items: { [K in keyof T]: ZodSchemaBuilder<T[K]> },
-    rest?: ZodSchemaBuilder<unknown>,
-    errorOrOpts?: string | { error?: string },
-  ): ZodTupleBuilder<T>;
-}
-
+/** Build the tuple namespace factory methods. */
 export function tupleNamespace(
   parseError: (errorOrOpts?: string | { error?: string }) => string | undefined,
-): ZodTupleNamespace {
+) {
   return {
     tuple: <T extends unknown[]>(
       items: { [K in keyof T]: ZodSchemaBuilder<T[K]> },
