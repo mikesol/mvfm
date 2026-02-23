@@ -3,3 +3,5 @@ export { stripe, stripePlugin } from "./2025-04-30.basil";
 export { wrapStripeSdk } from "./2025-04-30.basil/client-stripe-sdk";
 export type { StripeClient } from "./2025-04-30.basil/interpreter";
 export { createStripeInterpreter, stripeInterpreter } from "./2025-04-30.basil/interpreter";
+export type { ArgPattern, OpDef, ResourceDef } from "./2025-04-30.basil/registry";
+export { flatResourceDefs } from "./2025-04-30.basil/resources";

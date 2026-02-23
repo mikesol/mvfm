@@ -2,6 +2,6 @@
   {
     "name": "@mvfm/plugin-stripe",
     "path": "dist/index.js",
-    "limit": "3 kB"
+    "limit": "8 kB"
   }
 ]

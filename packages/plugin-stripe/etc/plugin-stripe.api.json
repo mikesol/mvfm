@@ -189,6 +189,32 @@
       "preserveMemberOrder": false,
       "members": [
         {
+          "kind": "TypeAlias",
+          "canonicalReference": "@mvfm/plugin-stripe!ArgPattern:type",
+          "docComment": "/**\n * Argument pattern for an operation.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export type ArgPattern = "
+            },
+            {
+              "kind": "Content",
+              "text": "\"params\" | \"id\" | \"id,params\" | \"id,params?\" | \"params?\" | \"del\" | \"\" | \"singleton,params\" | \"id,childId\" | \"id,childId,params\" | \"id,childId,del\" | \"id,nestedParams?\" | \"id,nestedParams\""
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/2025-04-30.basil/registry.d.ts",
+          "releaseTag": "Public",
+          "name": "ArgPattern",
+          "typeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
           "kind": "Function",
           "canonicalReference": "@mvfm/plugin-stripe!createStripeInterpreter:function(1)",
           "docComment": "/**\n * Creates an interpreter for `stripe/*` node kinds using the registry-driven handler generation.\n *\n * Config (apiKey, apiVersion) is captured in the closure, not stored on AST nodes.\n *\n * @param client - The {@link StripeClient} to execute against.\n *\n * @returns An Interpreter handling all stripe node kinds.\n */\n",
@@ -234,6 +260,229 @@
             }
           ],
           "name": "createStripeInterpreter"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@mvfm/plugin-stripe!flatResourceDefs:function(1)",
+          "docComment": "/**\n * Flat list of all ResourceDefs for generating kinds and handlers.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export declare function flatResourceDefs(): "
+            },
+            {
+              "kind": "Reference",
+              "text": "ResourceDef",
+              "canonicalReference": "@mvfm/plugin-stripe!ResourceDef:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "[]"
+            },
+            {
+              "kind": "Content",
+              "text": ";"
+            }
+          ],
+          "fileUrlPath": "dist/2025-04-30.basil/resources/index.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 3
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [],
+          "name": "flatResourceDefs"
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@mvfm/plugin-stripe!OpDef:interface",
+          "docComment": "/**\n * Single operation definition.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface OpDef "
+            }
+          ],
+          "fileUrlPath": "dist/2025-04-30.basil/registry.d.ts",
+          "releaseTag": "Public",
+          "name": "OpDef",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@mvfm/plugin-stripe!OpDef#argPattern:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "argPattern: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "ArgPattern",
+                  "canonicalReference": "@mvfm/plugin-stripe!ArgPattern:type"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "argPattern",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@mvfm/plugin-stripe!OpDef#httpMethod:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "httpMethod: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "\"GET\" | \"POST\" | \"DELETE\""
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "httpMethod",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@mvfm/plugin-stripe!OpDef#kind:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "kind: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "kind",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@mvfm/plugin-stripe!OpDef#path:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "path: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": false,
+              "releaseTag": "Public",
+              "name": "path",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
+            }
+          ],
+          "extendsTokenRanges": []
+        },
+        {
+          "kind": "Interface",
+          "canonicalReference": "@mvfm/plugin-stripe!ResourceDef:interface",
+          "docComment": "/**\n * Resource definition: a named group of operations.\n */\n",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "export interface ResourceDef "
+            }
+          ],
+          "fileUrlPath": "dist/2025-04-30.basil/registry.d.ts",
+          "releaseTag": "Public",
+          "name": "ResourceDef",
+          "preserveMemberOrder": false,
+          "members": [
+            {
+              "kind": "IndexSignature",
+              "canonicalReference": "@mvfm/plugin-stripe!ResourceDef:index(1)",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "[method: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string"
+                },
+                {
+                  "kind": "Content",
+                  "text": "]: "
+                },
+                {
+                  "kind": "Reference",
+                  "text": "OpDef",
+                  "canonicalReference": "@mvfm/plugin-stripe!OpDef:interface"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "returnTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "releaseTag": "Public",
+              "overloadIndex": 1,
+              "parameters": [
+                {
+                  "parameterName": "method",
+                  "parameterTypeTokenRange": {
+                    "startIndex": 1,
+                    "endIndex": 2
+                  },
+                  "isOptional": false
+                }
+              ]
+            }
+          ],
+          "extendsTokenRanges": []
         },
         {
           "kind": "Function",

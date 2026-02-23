@@ -6,10 +6,34 @@
 
 import type Stripe from 'stripe';
 
+// @public
+export type ArgPattern = "params" | "id" | "id,params" | "id,params?" | "params?" | "del" | "" | "singleton,params" | "id,childId" | "id,childId,params" | "id,childId,del" | "id,nestedParams?" | "id,nestedParams";
+
 // Warning: (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
 //
 // @public
 export function createStripeInterpreter(client: StripeClient): Interpreter;
+
+// @public
+export function flatResourceDefs(): ResourceDef[];
+
+// @public
+export interface OpDef {
+    // (undocumented)
+    argPattern: ArgPattern;
+    // (undocumented)
+    httpMethod: "GET" | "POST" | "DELETE";
+    // (undocumented)
+    kind: string;
+    // (undocumented)
+    path: string;
+}
+
+// @public
+export interface ResourceDef {
+    // (undocumented)
+    [method: string]: OpDef;
+}
 
 // @public
 export function stripe(config: StripeConfig): {
