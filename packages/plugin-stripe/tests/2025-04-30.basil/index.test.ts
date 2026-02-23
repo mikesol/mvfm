@@ -144,8 +144,8 @@ describe("stripe plugin: unified Plugin shape", () => {
     expect(plugin.name).toBe("stripe");
   });
 
-  it("has 12 node kinds (10 core + record + array)", () => {
-    expect(Object.keys(plugin.kinds)).toHaveLength(12);
+  it("has 469 node kinds (467 resource ops + record + array)", () => {
+    expect(Object.keys(plugin.kinds)).toHaveLength(469);
   });
 
   it("kinds are all namespaced", () => {

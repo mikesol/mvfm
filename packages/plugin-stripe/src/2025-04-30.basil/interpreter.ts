@@ -1,5 +1,7 @@
-import type { Interpreter, RuntimeEntry } from "@mvfm/core";
+import type { Interpreter } from "@mvfm/core";
 import { wrapStripeSdk } from "./client-stripe-sdk";
+import { makeHandlers, structuralHandlers } from "./registry";
+import { flatResourceDefs } from "./resources";
 
 /**
  * Stripe client interface consumed by the stripe handler.
@@ -13,8 +15,8 @@ export interface StripeClient {
 }
 
 /**
- * Creates an interpreter for `stripe/*` node kinds using the new
- * RuntimeEntry + positional yield pattern.
+ * Creates an interpreter for `stripe/*` node kinds using the
+ * registry-driven handler generation.
  *
  * Config (apiKey, apiVersion) is captured in the closure,
  * not stored on AST nodes.
@@ -23,77 +25,12 @@ export interface StripeClient {
  * @returns An Interpreter handling all stripe node kinds.
  */
 export function createStripeInterpreter(client: StripeClient): Interpreter {
-  return {
-    "stripe/create_payment_intent": async function* (_entry: RuntimeEntry) {
-      const params = yield 0;
-      return await client.request("POST", "/v1/payment_intents", params as Record<string, unknown>);
-    },
-
-    "stripe/retrieve_payment_intent": async function* (_entry: RuntimeEntry) {
-      const id = yield 0;
-      return await client.request("GET", `/v1/payment_intents/${id}`);
-    },
-
-    "stripe/confirm_payment_intent": async function* (entry: RuntimeEntry) {
-      const id = yield 0;
-      const params = entry.children.length > 1 ? ((yield 1) as Record<string, unknown>) : undefined;
-      return await client.request("POST", `/v1/payment_intents/${id}/confirm`, params);
-    },
-
-    "stripe/create_customer": async function* (_entry: RuntimeEntry) {
-      const params = yield 0;
-      return await client.request("POST", "/v1/customers", params as Record<string, unknown>);
-    },
-
-    "stripe/retrieve_customer": async function* (_entry: RuntimeEntry) {
-      const id = yield 0;
-      return await client.request("GET", `/v1/customers/${id}`);
-    },
-
-    "stripe/update_customer": async function* (_entry: RuntimeEntry) {
-      const id = yield 0;
-      const params = yield 1;
-      return await client.request("POST", `/v1/customers/${id}`, params as Record<string, unknown>);
-    },
-
-    "stripe/list_customers": async function* (entry: RuntimeEntry) {
-      const params = entry.children.length > 0 ? ((yield 0) as Record<string, unknown>) : undefined;
-      return await client.request("GET", "/v1/customers", params);
-    },
-
-    "stripe/create_charge": async function* (_entry: RuntimeEntry) {
-      const params = yield 0;
-      return await client.request("POST", "/v1/charges", params as Record<string, unknown>);
-    },
-
-    "stripe/retrieve_charge": async function* (_entry: RuntimeEntry) {
-      const id = yield 0;
-      return await client.request("GET", `/v1/charges/${id}`);
-    },
-
-    "stripe/list_charges": async function* (entry: RuntimeEntry) {
-      const params = entry.children.length > 0 ? ((yield 0) as Record<string, unknown>) : undefined;
-      return await client.request("GET", "/v1/charges", params);
-    },
-
-    "stripe/record": async function* (entry: RuntimeEntry) {
-      const result: Record<string, unknown> = {};
-      for (let i = 0; i < entry.children.length; i += 2) {
-        const key = (yield i) as string;
-        const value = yield i + 1;
-        result[key] = value;
-      }
-      return result;
-    },
-
-    "stripe/array": async function* (entry: RuntimeEntry) {
-      const result: unknown[] = [];
-      for (let i = 0; i < entry.children.length; i++) {
-        result.push(yield i);
-      }
-      return result;
-    },
-  };
+  const handlers: Interpreter = {};
+  for (const def of flatResourceDefs()) {
+    Object.assign(handlers, makeHandlers(def, client));
+  }
+  Object.assign(handlers, structuralHandlers(client));
+  return handlers;
 }
 
 function requiredEnv(name: "STRIPE_API_KEY"): string {
