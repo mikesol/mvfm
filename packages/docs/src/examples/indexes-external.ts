@@ -4,7 +4,7 @@ const externalIndexes: Record<string, NamespaceIndex> = {
   anthropic: {
     content: `<p>Implementation of the <a href="https://docs.anthropic.com/en/api/messages">Anthropic Messages API</a>. There is no default interpreter because this plugin requires API credentials.</p>
 <p>Use <code>anthropic({ apiKey })</code> in your app and provide a configured interpreter at runtime.</p>`,
-    staticCode: `import { anthropic, wrapAnthropicSdk } from "@mvfm/plugin-anthropic";
+    staticCode: `import { anthropic, wrapAnthropicSdk, createAnthropicInterpreter } from "@mvfm/plugin-anthropic";
 import Anthropic from "@anthropic-ai/sdk";
 
 // 1. Create an Anthropic SDK client
@@ -46,8 +46,8 @@ await fold(
   fal: {
     content: `<p>Implementation of the <a href="https://fal.ai/models">Fal AI API</a>. There is no default interpreter because calls require credentials and network access.</p>
 <p>Examples use mocked responses via <code>mockInterpreter</code> so each node kind remains runnable in docs.</p>`,
-    staticCode: `import { fal, wrapFalSdk } from "@mvfm/plugin-fal";
-import * as falSdk from "@fal-ai/serverless-client";
+    staticCode: `import { fal, wrapFalSdk, createFalInterpreter } from "@mvfm/plugin-fal";
+import { fal as falSdk } from "@fal-ai/client";
 
 // 1. Configure the Fal SDK
 falSdk.config({ credentials: process.env.FAL_KEY });
@@ -88,7 +88,7 @@ await fold(
   openai: {
     content: `<p>Implementation of the <a href="https://platform.openai.com/docs/api-reference">OpenAI API</a>. There is no default interpreter because this plugin requires an API key.</p>
 <p>Examples run with mocked interpreters to make output deterministic while preserving realistic call shapes.</p>`,
-    staticCode: `import { openai, wrapOpenAISdk } from "@mvfm/plugin-openai";
+    staticCode: `import { openai, wrapOpenAISdk, createOpenAIInterpreter } from "@mvfm/plugin-openai";
 import OpenAI from "openai";
 
 // 1. Create an OpenAI SDK client
@@ -139,7 +139,8 @@ import postgresJs from "postgres";
 const sql = postgresJs("postgres://user:pass@localhost:5432/mydb");
 const client = wrapPostgresJs(sql);
 
-// 2. Build a base interpreter for sub-expressions
+// 2. Build the app and base interpreter
+const app = mvfm(prelude, postgres());
 const baseInterp = defaults(app);
 
 // 3. Create the postgres interpreter
