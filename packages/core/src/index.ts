@@ -87,7 +87,7 @@ export type {
 // Expression constructors and inspectors
 export { CREF, isCExpr, makeCExpr, makeNExpr } from "./expr";
 // Fold internals
-export { createFoldState, recurseScoped, VOLATILE_KINDS } from "./fold";
+export { createFoldState, recurseScoped, resolveStructured, VOLATILE_KINDS } from "./fold";
 export * from "./gc";
 export * from "./increment";
 export * from "./map";

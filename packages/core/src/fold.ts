@@ -55,6 +55,41 @@ export function recurseScoped(
   return { type: "recurse_scoped", childId, bindings };
 }
 
+// ─── resolveStructured: recursive structural child resolution ────────
+
+/**
+ * Recursively resolve a structural child map by yielding node IDs to the fold.
+ *
+ * Used by plugin interpreters that handle structural shapes. Walks the
+ * child structure (objects, arrays, node ID strings) and yields each
+ * node ID to get its resolved value from the fold trampoline.
+ *
+ * @example
+ * ```typescript
+ * "myPlugin/create": async function* (entry) {
+ *   const body = yield* resolveStructured(entry.children[0]);
+ *   return await doSomething(body);
+ * }
+ * ```
+ */
+export async function* resolveStructured(
+  structure: unknown,
+): AsyncGenerator<string, unknown, unknown> {
+  if (typeof structure === "string") return yield structure;
+  if (Array.isArray(structure)) {
+    const result: unknown[] = [];
+    for (const item of structure) result.push(yield* resolveStructured(item));
+    return result;
+  }
+  if (typeof structure === "object" && structure !== null) {
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(structure))
+      result[key] = yield* resolveStructured(value);
+    return result;
+  }
+  return structure;
+}
+
 // ─── Frame ──────────────────────────────────────────────────────────
 
 interface Frame {
