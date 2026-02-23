@@ -1,4 +1,5 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
+import { resolveStructured } from "@mvfm/core";
 import { wrapOpenAISdk } from "./client-openai-sdk";
 import type { OpenAIConfig } from "./index";
 
@@ -25,8 +26,8 @@ export interface OpenAIClient {
  */
 export function createOpenAIInterpreter(client: OpenAIClient): Interpreter {
   return {
-    "openai/create_chat_completion": async function* (_entry: RuntimeEntry) {
-      const body = yield 0;
+    "openai/create_chat_completion": async function* (entry: RuntimeEntry) {
+      const body = yield* resolveStructured(entry.children[0]);
       return await client.request("POST", "/chat/completions", body as Record<string, unknown>);
     },
 
@@ -36,13 +37,15 @@ export function createOpenAIInterpreter(client: OpenAIClient): Interpreter {
     },
 
     "openai/list_chat_completions": async function* (entry: RuntimeEntry) {
-      const body = entry.children.length > 0 ? ((yield 0) as Record<string, unknown>) : undefined;
+      const body = entry.children.length > 0
+        ? ((yield* resolveStructured(entry.children[0])) as Record<string, unknown>)
+        : undefined;
       return await client.request("GET", "/chat/completions", body);
     },
 
-    "openai/update_chat_completion": async function* (_entry: RuntimeEntry) {
+    "openai/update_chat_completion": async function* (entry: RuntimeEntry) {
       const id = yield 0;
-      const body = yield 1;
+      const body = yield* resolveStructured(entry.children[1]);
       return await client.request(
         "POST",
         `/chat/completions/${id}`,
@@ -55,37 +58,19 @@ export function createOpenAIInterpreter(client: OpenAIClient): Interpreter {
       return await client.request("DELETE", `/chat/completions/${id}`);
     },
 
-    "openai/create_embedding": async function* (_entry: RuntimeEntry) {
-      const body = yield 0;
+    "openai/create_embedding": async function* (entry: RuntimeEntry) {
+      const body = yield* resolveStructured(entry.children[0]);
       return await client.request("POST", "/embeddings", body as Record<string, unknown>);
     },
 
-    "openai/create_moderation": async function* (_entry: RuntimeEntry) {
-      const body = yield 0;
+    "openai/create_moderation": async function* (entry: RuntimeEntry) {
+      const body = yield* resolveStructured(entry.children[0]);
       return await client.request("POST", "/moderations", body as Record<string, unknown>);
     },
 
-    "openai/create_completion": async function* (_entry: RuntimeEntry) {
-      const body = yield 0;
+    "openai/create_completion": async function* (entry: RuntimeEntry) {
+      const body = yield* resolveStructured(entry.children[0]);
       return await client.request("POST", "/completions", body as Record<string, unknown>);
-    },
-
-    "openai/record": async function* (entry: RuntimeEntry) {
-      const result: Record<string, unknown> = {};
-      for (let i = 0; i < entry.children.length; i += 2) {
-        const key = (yield i) as string;
-        const value = yield i + 1;
-        result[key] = value;
-      }
-      return result;
-    },
-
-    "openai/array": async function* (entry: RuntimeEntry) {
-      const result: unknown[] = [];
-      for (let i = 0; i < entry.children.length; i++) {
-        result.push(yield i);
-      }
-      return result;
     },
   };
 }
