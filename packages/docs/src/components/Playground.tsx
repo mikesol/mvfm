@@ -7,6 +7,9 @@ import type { ConsoleInstance } from "@mvfm/plugin-console";
 
 import { MONO_THEME } from "../themes/mono";
 
+// Prefetch playground scope so the module tree is cached before the user clicks Run
+import("../playground-scope");
+
 interface PlaygroundProps {
   code: string;
   pglite?: { seedSQL: string };
