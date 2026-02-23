@@ -5,10 +5,16 @@
 ```ts
 
 import type { ChatCompletion } from 'openai/resources/chat/completions/completions';
+import type { ChatCompletionCreateParamsNonStreaming } from 'openai/resources/chat/completions/completions';
 import type { ChatCompletionDeleted } from 'openai/resources/chat/completions/completions';
+import type { ChatCompletionListParams } from 'openai/resources/chat/completions/completions';
 import type { ChatCompletionsPage } from 'openai/resources/chat/completions/completions';
+import type { ChatCompletionUpdateParams } from 'openai/resources/chat/completions/completions';
 import type { Completion } from 'openai/resources/completions';
+import type { CompletionCreateParamsNonStreaming } from 'openai/resources/completions';
 import type { CreateEmbeddingResponse } from 'openai/resources/embeddings';
+import type { EmbeddingCreateParams } from 'openai/resources/embeddings';
+import type { ModerationCreateParams } from 'openai/resources/moderations';
 import type { ModerationCreateResponse } from 'openai/resources/moderations';
 import type OpenAI from 'openai';
 
@@ -24,35 +30,41 @@ export function openai(config: OpenAIConfig): {
         openai: {
             chat: {
                 completions: {
-                    create<A>(params: A): CExpr<ChatCompletion, "openai/create_chat_completion", [A]>;
-                    retrieve<A>(id: A): CExpr<ChatCompletion, "openai/retrieve_chat_completion", [A]>;
-                    list<A extends readonly unknown[]>(...params: A): CExpr<ChatCompletionsPage, "openai/list_chat_completions", A>;
-                    update<A, B>(id: A, params: B): CExpr<ChatCompletion, "openai/update_chat_completion", [A, B]>;
-                    delete<A>(id: A): CExpr<ChatCompletionDeleted, "openai/delete_chat_completion", [A]>;
+                    create(params: Liftable<ChatCompletionCreateParamsNonStreaming>): CExpr<ChatCompletion, "openai/create_chat_completion", [Liftable<ChatCompletionCreateParamsNonStreaming>]>;
+                    retrieve(id: string | CExpr<string>): CExpr<ChatCompletion, "openai/retrieve_chat_completion", [string | CExpr<string>]>;
+                    list(...params: [] | [Liftable<ChatCompletionListParams>]): CExpr<ChatCompletionsPage, "openai/list_chat_completions", [] | [Liftable<ChatCompletionListParams>]>;
+                    update(id: string | CExpr<string>, params: Liftable<ChatCompletionUpdateParams>): CExpr<ChatCompletion, "openai/update_chat_completion", [string | CExpr<string>, Liftable<ChatCompletionUpdateParams>]>;
+                    delete(id: string | CExpr<string>): CExpr<ChatCompletionDeleted, "openai/delete_chat_completion", [string | CExpr<string>]>;
                 };
             };
             embeddings: {
-                create<A>(params: A): CExpr<CreateEmbeddingResponse, "openai/create_embedding", [A]>;
+                create(params: Liftable<EmbeddingCreateParams>): CExpr<CreateEmbeddingResponse, "openai/create_embedding", [Liftable<EmbeddingCreateParams>]>;
             };
             moderations: {
-                create<A>(params: A): CExpr<ModerationCreateResponse, "openai/create_moderation", [A]>;
+                create(params: Liftable<ModerationCreateParams>): CExpr<ModerationCreateResponse, "openai/create_moderation", [Liftable<ModerationCreateParams>]>;
             };
             completions: {
-                create<A>(params: A): CExpr<Completion, "openai/create_completion", [A]>;
+                create(params: Liftable<CompletionCreateParamsNonStreaming>): CExpr<Completion, "openai/create_completion", [Liftable<CompletionCreateParamsNonStreaming>]>;
             };
         };
     };
     kinds: {
-        "openai/create_chat_completion": KindSpec<[unknown], unknown>;
-        "openai/retrieve_chat_completion": KindSpec<[unknown], unknown>;
-        "openai/list_chat_completions": KindSpec<unknown[], unknown>;
-        "openai/update_chat_completion": KindSpec<[unknown, unknown], unknown>;
-        "openai/delete_chat_completion": KindSpec<[unknown], unknown>;
-        "openai/create_embedding": KindSpec<[unknown], unknown>;
-        "openai/create_moderation": KindSpec<[unknown], unknown>;
-        "openai/create_completion": KindSpec<[unknown], unknown>;
-        "openai/record": KindSpec<unknown[], Record<string, unknown>>;
-        "openai/array": KindSpec<unknown[], unknown[]>;
+        "openai/create_chat_completion": KindSpec<[ChatCompletionCreateParamsNonStreaming], ChatCompletion>;
+        "openai/retrieve_chat_completion": KindSpec<[string], ChatCompletion>;
+        "openai/list_chat_completions": KindSpec<ChatCompletionListParams[], ChatCompletionsPage>;
+        "openai/update_chat_completion": KindSpec<[string, ChatCompletionUpdateParams], ChatCompletion>;
+        "openai/delete_chat_completion": KindSpec<[string], ChatCompletionDeleted>;
+        "openai/create_embedding": KindSpec<[EmbeddingCreateParams], CreateEmbeddingResponse>;
+        "openai/create_moderation": KindSpec<[ModerationCreateParams], ModerationCreateResponse>;
+        "openai/create_completion": KindSpec<[CompletionCreateParamsNonStreaming], Completion>;
+    };
+    shapes: {
+        "openai/create_chat_completion": string;
+        "openai/list_chat_completions": string;
+        "openai/update_chat_completion": (string | null)[];
+        "openai/create_embedding": string;
+        "openai/create_moderation": string;
+        "openai/create_completion": string;
     };
     traits: {};
     lifts: {};
@@ -82,6 +94,7 @@ export function wrapOpenAISdk(client: OpenAI): OpenAIClient;
 
 // Warnings were encountered during analysis:
 //
+// dist/6.21.0/index.d.ts:33:21 - (ae-forgotten-export) The symbol "Liftable" needs to be exported by the entry point index.d.ts
 // dist/6.21.0/index.d.ts:33:21 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
 // dist/6.21.0/index.d.ts:59:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 

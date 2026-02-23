@@ -29,7 +29,7 @@ async function run(expr: unknown) {
       return { id: "mock_id", object: "mock" };
     },
   };
-  const nexpr = app(expr as Parameters<typeof app>[0]);
+  const nexpr = app(expr);
   const interp = defaults(plugins, {
     openai: createOpenAIInterpreter(mockClient),
   });
@@ -48,7 +48,7 @@ describe("openai interpreter: default export", () => {
       model: "gpt-4o",
       messages: [{ role: "user", content: "Hello" }],
     });
-    const nexpr = app(expr as Parameters<typeof app>[0]);
+    const nexpr = app(expr);
     const stdInterp = defaults([numPlugin, strPlugin, boolPlugin]);
     const combined = { ...stdInterp, ...openaiInterpreter };
     await expect(fold(nexpr, combined)).rejects.toThrow(/OPENAI_API_KEY/);

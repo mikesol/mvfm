@@ -167,10 +167,28 @@ function elaborate(
 
       // Structural kind — walk args with shape descriptor
       if (kind in structuralShapes) {
-        const childRef = visitStructural(args[0], structuralShapes[kind]);
+        const shape = structuralShapes[kind];
         const nodeId = counter;
         counter = incrementId(counter);
-        entries[nodeId] = { kind, children: [childRef] as any, out: undefined };
+        if (Array.isArray(shape) && shape.includes(null)) {
+          // Per-arg shapes: [null, "*"] means arg0=normal visit, arg1=structural
+          const childRefs: unknown[] = [];
+          for (let i = 0; i < args.length; i++) {
+            if (shape[i]) {
+              childRefs.push(visitStructural(args[i], shape[i]));
+            } else {
+              childRefs.push(visit(args[i])[0]);
+            }
+          }
+          entries[nodeId] = { kind, children: childRefs as string[], out: undefined };
+        } else if (args.length > 0) {
+          // Single shape for args[0] (existing behavior for core/record, core/tuple)
+          const childRef = visitStructural(args[0], shape);
+          entries[nodeId] = { kind, children: [childRef] as any, out: undefined };
+        } else {
+          // No args — skip structural elaboration (e.g., list() with no params)
+          entries[nodeId] = { kind, children: [], out: undefined };
+        }
         return cache([nodeId, kindOutputs[kind] ?? "object"]);
       }
 

@@ -22,7 +22,7 @@ const $ = composeDollar(...plugins);
 const app = createApp(...plugins);
 
 async function run(expr: unknown) {
-  const nexpr = app(expr as Parameters<typeof app>[0]);
+  const nexpr = app(expr);
   const interp = defaults(plugins, {
     openai: createOpenAIInterpreter(fixtureClient),
   });

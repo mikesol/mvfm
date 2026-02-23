@@ -29,6 +29,7 @@ export { boolPlugin, numPlugin, ordPlugin, strPlugin } from "./std-plugins";
 export type { Program } from "./api";
 export type { CExpr, NExpr, RuntimeEntry } from "./expr";
 export type { FoldState, PluginDef } from "./fold";
+export type { Liftable } from "./liftable";
 export type {
   DollarSign,
   ExtractKinds,
@@ -86,7 +87,7 @@ export type {
 // Expression constructors and inspectors
 export { CREF, isCExpr, makeCExpr, makeNExpr } from "./expr";
 // Fold internals
-export { createFoldState, recurseScoped, VOLATILE_KINDS } from "./fold";
+export { createFoldState, recurseScoped, resolveStructured, VOLATILE_KINDS } from "./fold";
 export * from "./gc";
 export * from "./increment";
 export * from "./map";
