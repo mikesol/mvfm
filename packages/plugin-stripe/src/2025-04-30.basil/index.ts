@@ -9,7 +9,7 @@
 import type { Interpreter, KindSpec, Plugin } from "@mvfm/core";
 import { wrapStripeSdk } from "./client-stripe-sdk";
 import { createStripeInterpreter, type StripeClient } from "./interpreter";
-import { makeCtors, makeKindSpecs, structuralKinds, type ResourceDef } from "./registry";
+import { makeCtors, makeKindSpecs, type ResourceDef, structuralKinds } from "./registry";
 import { allResources, flatResourceDefs } from "./resources";
 
 // ---- Configuration ----------------------------------------

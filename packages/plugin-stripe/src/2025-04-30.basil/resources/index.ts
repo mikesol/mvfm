@@ -1,26 +1,42 @@
 import type { ResourceDef } from "../registry";
-import { paymentResources } from "./payments";
-import { customerResources } from "./customers";
 import { billingResourcesA } from "./billing";
+import { billingInvoiceResources } from "./billing-invoices";
 import { billingResourcesB } from "./billing-more";
-import { connectResources } from "./connect";
-import { serviceResources } from "./services";
-import { financeResources } from "./finance";
+import { billingResourcesC } from "./billing-tax";
+import { connectResourcesA } from "./connect";
+import { connectResourcesB } from "./connect-more";
+import { customerResources } from "./customers";
+import { financeIssuingResources } from "./finance";
+import { financeTreasuryResources } from "./finance-treasury";
 import { miscResourcesA } from "./misc";
+import { miscResourcesE } from "./misc-apps";
 import { miscResourcesB } from "./misc-more";
+import { miscResourcesD } from "./misc-reporting";
 import { miscResourcesC } from "./misc-terminal";
+import { paymentResourcesA } from "./payments";
+import { paymentResourcesB } from "./payments-more";
+import { serviceResourcesA } from "./services";
+import { serviceResourcesB } from "./services-billing";
 
 /** All resource definitions, organized to mirror Stripe SDK structure. */
 export const allResources = {
-  ...paymentResources,
+  ...paymentResourcesA,
+  ...paymentResourcesB,
   ...customerResources,
   ...billingResourcesA,
+  ...billingInvoiceResources,
   ...billingResourcesB,
-  ...connectResources,
-  ...serviceResources,
-  ...financeResources,
+  ...billingResourcesC,
+  ...connectResourcesA,
+  ...connectResourcesB,
+  ...serviceResourcesA,
+  ...serviceResourcesB,
+  ...financeIssuingResources,
+  ...financeTreasuryResources,
   ...miscResourcesA,
+  ...miscResourcesD,
   ...miscResourcesB,
+  ...miscResourcesE,
   ...miscResourcesC,
 };
 
@@ -30,7 +46,12 @@ export function flatResourceDefs(): ResourceDef[] {
   function collect(obj: unknown) {
     if (obj && typeof obj === "object" && !Array.isArray(obj)) {
       const values = Object.values(obj);
-      if (values.length > 0 && values[0] && typeof values[0] === "object" && "kind" in (values[0] as object)) {
+      if (
+        values.length > 0 &&
+        values[0] &&
+        typeof values[0] === "object" &&
+        "kind" in (values[0] as object)
+      ) {
         result.push(obj as ResourceDef);
       } else {
         for (const v of values) collect(v);
@@ -41,13 +62,21 @@ export function flatResourceDefs(): ResourceDef[] {
   return result;
 }
 
-export { paymentResources } from "./payments";
-export { customerResources } from "./customers";
 export { billingResourcesA } from "./billing";
+export { billingInvoiceResources } from "./billing-invoices";
 export { billingResourcesB } from "./billing-more";
-export { connectResources } from "./connect";
-export { serviceResources } from "./services";
-export { financeResources } from "./finance";
+export { billingResourcesC } from "./billing-tax";
+export { connectResourcesA } from "./connect";
+export { connectResourcesB } from "./connect-more";
+export { customerResources } from "./customers";
+export { financeIssuingResources } from "./finance";
+export { financeTreasuryResources } from "./finance-treasury";
 export { miscResourcesA } from "./misc";
+export { miscResourcesE } from "./misc-apps";
 export { miscResourcesB } from "./misc-more";
+export { miscResourcesD } from "./misc-reporting";
 export { miscResourcesC } from "./misc-terminal";
+export { paymentResourcesA } from "./payments";
+export { paymentResourcesB } from "./payments-more";
+export { serviceResourcesA } from "./services";
+export { serviceResourcesB } from "./services-billing";

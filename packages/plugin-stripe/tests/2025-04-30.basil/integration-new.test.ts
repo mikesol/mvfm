@@ -62,17 +62,19 @@ afterAll(async () => {
 
 describe("stripe integration: refunds", () => {
   it("create refund", async () => {
-    const result = (await run(
-      $.stripe.refunds.create({ charge: "ch_xxxxxxxxxxxxx" }),
-    )) as Record<string, unknown>;
+    const result = (await run($.stripe.refunds.create({ charge: "ch_xxxxxxxxxxxxx" }))) as Record<
+      string,
+      unknown
+    >;
     expect(result.object).toBe("refund");
     expect(result.id).toBeDefined();
   });
 
   it("retrieve refund", async () => {
-    const result = (await run(
-      $.stripe.refunds.retrieve("re_xxxxxxxxxxxxx"),
-    )) as Record<string, unknown>;
+    const result = (await run($.stripe.refunds.retrieve("re_xxxxxxxxxxxxx"))) as Record<
+      string,
+      unknown
+    >;
     expect(result.object).toBe("refund");
   });
 });
@@ -148,9 +150,10 @@ describe("stripe integration: coupons", () => {
 
 describe("stripe integration: payment methods", () => {
   it("create payment method", async () => {
-    const result = (await run(
-      $.stripe.paymentMethods.create({ type: "card" }),
-    )) as Record<string, unknown>;
+    const result = (await run($.stripe.paymentMethods.create({ type: "card" }))) as Record<
+      string,
+      unknown
+    >;
     expect(result.object).toBe("payment_method");
     expect(result.id).toBeDefined();
   });
@@ -162,9 +165,10 @@ describe("stripe integration: payment methods", () => {
 
 describe("stripe integration: accounts", () => {
   it("create account", async () => {
-    const result = (await run(
-      $.stripe.accounts.create({ type: "express" }),
-    )) as Record<string, unknown>;
+    const result = (await run($.stripe.accounts.create({ type: "express" }))) as Record<
+      string,
+      unknown
+    >;
     expect(result.object).toBe("account");
     expect(result.id).toBeDefined();
   });

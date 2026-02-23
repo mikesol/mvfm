@@ -59,7 +59,10 @@ describe("stripe interpreter: refunds", () => {
 
 describe("stripe interpreter: subscriptions", () => {
   it("create subscription", async () => {
-    const expr = $.stripe.subscriptions.create({ customer: "cus_123", items: [{ price: "price_1" }] });
+    const expr = $.stripe.subscriptions.create({
+      customer: "cus_123",
+      items: [{ price: "price_1" }],
+    });
     const { captured } = await run(expr);
     expect(captured[0]).toMatchObject({ method: "POST", path: "/v1/subscriptions" });
   });
@@ -126,14 +129,20 @@ describe("stripe interpreter: accounts", () => {
 
 describe("stripe interpreter: checkout sessions", () => {
   it("create checkout session", async () => {
-    const expr = $.stripe.checkout.sessions.create({ mode: "payment", success_url: "https://x.com" });
+    const expr = $.stripe.checkout.sessions.create({
+      mode: "payment",
+      success_url: "https://x.com",
+    });
     const { captured } = await run(expr);
     expect(captured[0]).toMatchObject({ method: "POST", path: "/v1/checkout/sessions" });
   });
 
   it("expire checkout session", async () => {
     const { captured } = await run($.stripe.checkout.sessions.expire("cs_123"));
-    expect(captured[0]).toMatchObject({ method: "POST", path: "/v1/checkout/sessions/cs_123/expire" });
+    expect(captured[0]).toMatchObject({
+      method: "POST",
+      path: "/v1/checkout/sessions/cs_123/expire",
+    });
   });
 });
 
@@ -143,7 +152,11 @@ describe("stripe interpreter: checkout sessions", () => {
 
 describe("stripe interpreter: issuing cards", () => {
   it("create issuing card", async () => {
-    const expr = $.stripe.issuing.cards.create({ cardholder: "ich_123", currency: "usd", type: "virtual" });
+    const expr = $.stripe.issuing.cards.create({
+      cardholder: "ich_123",
+      currency: "usd",
+      type: "virtual",
+    });
     const { captured } = await run(expr);
     expect(captured[0]).toMatchObject({ method: "POST", path: "/v1/issuing/cards" });
   });
@@ -155,7 +168,10 @@ describe("stripe interpreter: issuing cards", () => {
 
 describe("stripe interpreter: treasury financial accounts", () => {
   it("create treasury financial account", async () => {
-    const expr = $.stripe.treasury.financialAccounts.create({ supported_currencies: ["usd"], features: {} });
+    const expr = $.stripe.treasury.financialAccounts.create({
+      supported_currencies: ["usd"],
+      features: {},
+    });
     const { captured } = await run(expr);
     expect(captured[0]).toMatchObject({ method: "POST", path: "/v1/treasury/financial_accounts" });
   });
@@ -178,14 +194,19 @@ describe("stripe interpreter: balance", () => {
 
 describe("stripe interpreter: nested resources", () => {
   it("customers.createSource (id,nestedParams)", async () => {
-    const { captured } = await run($.stripe.customers.createSource("cus_123", { source: "tok_visa" }));
+    const { captured } = await run(
+      $.stripe.customers.createSource("cus_123", { source: "tok_visa" }),
+    );
     expect(captured[0]).toMatchObject({ method: "POST", path: "/v1/customers/cus_123/sources" });
     expect(captured[0].params).toEqual({ source: "tok_visa" });
   });
 
   it("customers.retrieveSource (id,childId)", async () => {
     const { captured } = await run($.stripe.customers.retrieveSource("cus_123", "src_456"));
-    expect(captured[0]).toMatchObject({ method: "GET", path: "/v1/customers/cus_123/sources/src_456" });
+    expect(captured[0]).toMatchObject({
+      method: "GET",
+      path: "/v1/customers/cus_123/sources/src_456",
+    });
   });
 
   it("transfers.createReversal (id,nestedParams)", async () => {

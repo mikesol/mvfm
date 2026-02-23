@@ -172,14 +172,20 @@ describe("registry: handler HTTP calls", () => {
 
   it('"id,params?" without params: POST /v1/payment_intents/{id}/cancel', async () => {
     const { captured } = await run($.stripe.paymentIntents.cancel("pi_123"));
-    expect(captured[0]).toMatchObject({ method: "POST", path: "/v1/payment_intents/pi_123/cancel" });
+    expect(captured[0]).toMatchObject({
+      method: "POST",
+      path: "/v1/payment_intents/pi_123/cancel",
+    });
     expect(captured[0].params).toBeUndefined();
   });
 
   it('"id,params?" with params: POST /v1/payment_intents/{id}/cancel', async () => {
     const expr = $.stripe.paymentIntents.cancel("pi_123", { cancellation_reason: "requested" });
     const { captured } = await run(expr);
-    expect(captured[0]).toMatchObject({ method: "POST", path: "/v1/payment_intents/pi_123/cancel" });
+    expect(captured[0]).toMatchObject({
+      method: "POST",
+      path: "/v1/payment_intents/pi_123/cancel",
+    });
     expect(captured[0].params).toEqual({ cancellation_reason: "requested" });
   });
 
@@ -213,18 +219,26 @@ describe("registry: handler HTTP calls", () => {
 
   it('"id,childId": GET /v1/customers/{id}/sources/{childId}', async () => {
     const { captured } = await run($.stripe.customers.retrieveSource("cus_123", "src_456"));
-    expect(captured[0]).toMatchObject({ method: "GET", path: "/v1/customers/cus_123/sources/src_456" });
+    expect(captured[0]).toMatchObject({
+      method: "GET",
+      path: "/v1/customers/cus_123/sources/src_456",
+    });
   });
 
   it('"id,childId,params": POST /v1/customers/{id}/sources/{childId}', async () => {
     const expr = $.stripe.customers.updateSource("cus_123", "src_456", { metadata: {} });
     const { captured } = await run(expr);
-    expect(captured[0]).toMatchObject({ method: "POST", path: "/v1/customers/cus_123/sources/src_456" });
+    expect(captured[0]).toMatchObject({
+      method: "POST",
+      path: "/v1/customers/cus_123/sources/src_456",
+    });
     expect(captured[0].params).toEqual({ metadata: {} });
   });
 
   it('"id,nestedParams": POST /v1/customers/{id}/sources', async () => {
-    const { captured } = await run($.stripe.customers.createSource("cus_123", { source: "tok_visa" }));
+    const { captured } = await run(
+      $.stripe.customers.createSource("cus_123", { source: "tok_visa" }),
+    );
     expect(captured[0]).toMatchObject({ method: "POST", path: "/v1/customers/cus_123/sources" });
     expect(captured[0].params).toEqual({ source: "tok_visa" });
   });
@@ -237,6 +251,9 @@ describe("registry: handler HTTP calls", () => {
 
   it('"id,childId,del": DELETE /v1/customers/{id}/sources/{childId}', async () => {
     const { captured } = await run($.stripe.customers.deleteSource("cus_123", "src_456"));
-    expect(captured[0]).toMatchObject({ method: "DELETE", path: "/v1/customers/cus_123/sources/src_456" });
+    expect(captured[0]).toMatchObject({
+      method: "DELETE",
+      path: "/v1/customers/cus_123/sources/src_456",
+    });
   });
 });
