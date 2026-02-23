@@ -29,6 +29,7 @@ export { boolPlugin, numPlugin, ordPlugin, strPlugin } from "./std-plugins";
 export type { Program } from "./api";
 export type { CExpr, NExpr, RuntimeEntry } from "./expr";
 export type { FoldState, PluginDef } from "./fold";
+export type { Liftable } from "./liftable";
 export type {
   DollarSign,
   ExtractKinds,
@@ -49,7 +50,6 @@ export type {
   TraitKindSpec,
   TypeKey,
 } from "./registry";
-export type { Liftable } from "./liftable";
 export type { SchemaToData, SchemaToType } from "./schema-types";
 
 // ─── 4. Advanced / internal escape hatch ────────────────────────────

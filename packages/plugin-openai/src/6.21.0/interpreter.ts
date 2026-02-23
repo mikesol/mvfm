@@ -37,9 +37,10 @@ export function createOpenAIInterpreter(client: OpenAIClient): Interpreter {
     },
 
     "openai/list_chat_completions": async function* (entry: RuntimeEntry) {
-      const body = entry.children.length > 0
-        ? ((yield* resolveStructured(entry.children[0])) as Record<string, unknown>)
-        : undefined;
+      const body =
+        entry.children.length > 0
+          ? ((yield* resolveStructured(entry.children[0])) as Record<string, unknown>)
+          : undefined;
       return await client.request("GET", "/chat/completions", body);
     },
 

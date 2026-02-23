@@ -19,10 +19,7 @@ describe("resolveStructured", () => {
   });
 
   it("resolves flat objects", async () => {
-    const result = await resolve(
-      { model: "a", temperature: "b" },
-      { a: "gpt-4o", b: 0.7 },
-    );
+    const result = await resolve({ model: "a", temperature: "b" }, { a: "gpt-4o", b: 0.7 });
     expect(result).toEqual({ model: "gpt-4o", temperature: 0.7 });
   });
 

@@ -20,14 +20,11 @@ import type {
   ChatCompletionCreateParamsNonStreaming,
   ChatCompletionDeleted,
   ChatCompletionListParams,
-  ChatCompletionUpdateParams,
   ChatCompletionsPage,
+  ChatCompletionUpdateParams,
 } from "openai/resources/chat/completions/completions";
 import type { Completion, CompletionCreateParamsNonStreaming } from "openai/resources/completions";
-import type {
-  CreateEmbeddingResponse,
-  EmbeddingCreateParams,
-} from "openai/resources/embeddings";
+import type { CreateEmbeddingResponse, EmbeddingCreateParams } from "openai/resources/embeddings";
 import type {
   ModerationCreateParams,
   ModerationCreateResponse,
@@ -67,7 +64,11 @@ function buildOpenAIApi() {
         /** Create a chat completion (non-streaming). */
         create(
           params: Liftable<ChatCompletionCreateParamsNonStreaming>,
-        ): CExpr<ChatCompletion, "openai/create_chat_completion", [Liftable<ChatCompletionCreateParamsNonStreaming>]> {
+        ): CExpr<
+          ChatCompletion,
+          "openai/create_chat_completion",
+          [Liftable<ChatCompletionCreateParamsNonStreaming>]
+        > {
           return makeCExpr("openai/create_chat_completion", [params]) as any;
         },
         /** Retrieve a chat completion by ID. */
@@ -79,14 +80,22 @@ function buildOpenAIApi() {
         /** List chat completions with optional filter params. */
         list(
           ...params: [] | [Liftable<ChatCompletionListParams>]
-        ): CExpr<ChatCompletionsPage, "openai/list_chat_completions", [] | [Liftable<ChatCompletionListParams>]> {
+        ): CExpr<
+          ChatCompletionsPage,
+          "openai/list_chat_completions",
+          [] | [Liftable<ChatCompletionListParams>]
+        > {
           return makeCExpr("openai/list_chat_completions", params as unknown[]) as any;
         },
         /** Update a chat completion by ID. */
         update(
           id: string | CExpr<string>,
           params: Liftable<ChatCompletionUpdateParams>,
-        ): CExpr<ChatCompletion, "openai/update_chat_completion", [string | CExpr<string>, Liftable<ChatCompletionUpdateParams>]> {
+        ): CExpr<
+          ChatCompletion,
+          "openai/update_chat_completion",
+          [string | CExpr<string>, Liftable<ChatCompletionUpdateParams>]
+        > {
           return makeCExpr("openai/update_chat_completion", [id, params]) as any;
         },
         /** Delete a chat completion by ID. */
@@ -101,7 +110,11 @@ function buildOpenAIApi() {
       /** Create embeddings for the given input. */
       create(
         params: Liftable<EmbeddingCreateParams>,
-      ): CExpr<CreateEmbeddingResponse, "openai/create_embedding", [Liftable<EmbeddingCreateParams>]> {
+      ): CExpr<
+        CreateEmbeddingResponse,
+        "openai/create_embedding",
+        [Liftable<EmbeddingCreateParams>]
+      > {
         return makeCExpr("openai/create_embedding", [params]) as any;
       },
     },
@@ -109,7 +122,11 @@ function buildOpenAIApi() {
       /** Classify text for policy compliance. */
       create(
         params: Liftable<ModerationCreateParams>,
-      ): CExpr<ModerationCreateResponse, "openai/create_moderation", [Liftable<ModerationCreateParams>]> {
+      ): CExpr<
+        ModerationCreateResponse,
+        "openai/create_moderation",
+        [Liftable<ModerationCreateParams>]
+      > {
         return makeCExpr("openai/create_moderation", [params]) as any;
       },
     },
@@ -117,7 +134,11 @@ function buildOpenAIApi() {
       /** Create a legacy completion (non-streaming). */
       create(
         params: Liftable<CompletionCreateParamsNonStreaming>,
-      ): CExpr<Completion, "openai/create_completion", [Liftable<CompletionCreateParamsNonStreaming>]> {
+      ): CExpr<
+        Completion,
+        "openai/create_completion",
+        [Liftable<CompletionCreateParamsNonStreaming>]
+      > {
         return makeCExpr("openai/create_completion", [params]) as any;
       },
     },

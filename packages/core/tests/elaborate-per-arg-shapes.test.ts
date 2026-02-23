@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { CExpr, Interpreter, KindSpec, Plugin } from "../src";
 import {
   boolPlugin,
   composeDollar,
@@ -9,7 +10,6 @@ import {
   resolveStructured,
   strPlugin,
 } from "../src";
-import type { CExpr, Interpreter, KindSpec, Plugin } from "../src";
 import { makeCExpr } from "../src/expr";
 
 /**
