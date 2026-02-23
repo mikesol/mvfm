@@ -6,8 +6,11 @@ import { isNamespaceIndex } from "../examples/types";
 const allExamples = getAllExamples();
 const allKinds = Object.keys(allExamples).sort();
 const coreKinds = allKinds.filter((k) => k.startsWith("core/") || k === "core");
-const rest = allKinds.filter((k) => !k.startsWith("core/") && k !== "core");
-const kinds = [...coreKinds, ...rest];
+const dagqlKinds = allKinds.filter((k) => k.startsWith("dagql/") || k === "dagql");
+const rest = allKinds.filter(
+  (k) => !k.startsWith("core/") && k !== "core" && !k.startsWith("dagql/") && k !== "dagql"
+);
+const kinds = [...coreKinds, ...dagqlKinds, ...rest];
 ---
 
 <Base>

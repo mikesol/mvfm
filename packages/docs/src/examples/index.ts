@@ -4,6 +4,7 @@ import { examples as cloudflareKv } from "./cloudflare-kv";
 import { examples as console_ } from "./console";
 import { examples as control } from "./control";
 import { examples as core } from "./core";
+import { examples as dagql } from "./dagql";
 import { examples as eq } from "./eq";
 import { examples as error } from "./error";
 import { examples as fal } from "./fal";
@@ -33,6 +34,7 @@ import { examples as zodWrappers } from "./zod-wrappers";
 
 const modules: Record<string, ExampleEntry>[] = [
   core,
+  dagql,
   boolean,
   num,
   str,
