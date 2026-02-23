@@ -1,8 +1,10 @@
-import type { NodeExample } from "./types";
+import { generateStripeExamples } from "./stripe-gen";
+import type { ExampleEntry, NodeExample } from "./types";
 
 const STRIPE = ["@mvfm/plugin-stripe"];
 
-const examples: Record<string, NodeExample> = {
+/** Hand-crafted examples for the 10 most common Stripe operations. */
+const handCrafted: Record<string, NodeExample> = {
   "stripe/create_payment_intent": {
     description: "Create a PaymentIntent for a given amount and currency",
     code: `const app = mvfm(prelude, console_, stripe_);
@@ -126,6 +128,12 @@ const prog = app({}, ($) => {
 await fold(defaults(app, { stripe: crystalBallStripeInterpreter }), prog);`,
     plugins: STRIPE,
   },
+};
+
+/** All stripe examples: hand-crafted take priority over generated. */
+const examples: Record<string, ExampleEntry> = {
+  ...generateStripeExamples(),
+  ...handCrafted,
 };
 
 export { examples };
