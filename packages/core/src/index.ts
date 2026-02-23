@@ -49,6 +49,7 @@ export type {
   TraitKindSpec,
   TypeKey,
 } from "./registry";
+export type { Liftable } from "./liftable";
 export type { SchemaToData, SchemaToType } from "./schema-types";
 
 // ─── 4. Advanced / internal escape hatch ────────────────────────────
