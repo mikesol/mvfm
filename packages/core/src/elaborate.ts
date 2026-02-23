@@ -181,10 +181,13 @@ function elaborate(
             }
           }
           entries[nodeId] = { kind, children: childRefs as string[], out: undefined };
-        } else {
+        } else if (args.length > 0) {
           // Single shape for args[0] (existing behavior for core/record, core/tuple)
           const childRef = visitStructural(args[0], shape);
           entries[nodeId] = { kind, children: [childRef] as any, out: undefined };
+        } else {
+          // No args — skip structural elaboration (e.g., list() with no params)
+          entries[nodeId] = { kind, children: [], out: undefined };
         }
         return cache([nodeId, kindOutputs[kind] ?? "object"]);
       }

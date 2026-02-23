@@ -16,8 +16,10 @@ describe("openai: chat.completions.create", () => {
     });
     expect(expr.__kind).toBe("openai/create_chat_completion");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("openai/record");
+    expect(expr.__args[0]).toEqual({
+      model: "gpt-4o",
+      messages: [{ role: "user", content: "Hello" }],
+    });
   });
 });
 
@@ -44,8 +46,7 @@ describe("openai: chat.completions.list", () => {
     const expr = api.chat.completions.list({ model: "gpt-4o", limit: 10 });
     expect(expr.__kind).toBe("openai/list_chat_completions");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("openai/record");
+    expect(expr.__args[0]).toEqual({ model: "gpt-4o", limit: 10 });
   });
 
   it("produces CExpr with no args when omitted", () => {
@@ -63,8 +64,7 @@ describe("openai: chat.completions.update", () => {
     expect(expr.__kind).toBe("openai/update_chat_completion");
     expect(expr.__args).toHaveLength(2);
     expect(expr.__args[0]).toBe("cmpl_123");
-    const paramsArg = expr.__args[1] as { __kind: string };
-    expect(paramsArg.__kind).toBe("openai/record");
+    expect(expr.__args[1]).toEqual({ metadata: { key: "value" } });
   });
 });
 
@@ -89,8 +89,10 @@ describe("openai: embeddings.create", () => {
     });
     expect(expr.__kind).toBe("openai/create_embedding");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("openai/record");
+    expect(expr.__args[0]).toEqual({
+      model: "text-embedding-3-small",
+      input: "Hello world",
+    });
   });
 });
 
@@ -106,8 +108,10 @@ describe("openai: moderations.create", () => {
     });
     expect(expr.__kind).toBe("openai/create_moderation");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("openai/record");
+    expect(expr.__args[0]).toEqual({
+      model: "omni-moderation-latest",
+      input: "some text to moderate",
+    });
   });
 });
 
@@ -123,8 +127,10 @@ describe("openai: completions.create", () => {
     });
     expect(expr.__kind).toBe("openai/create_completion");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("openai/record");
+    expect(expr.__args[0]).toEqual({
+      model: "gpt-3.5-turbo-instruct",
+      prompt: "Say hello",
+    });
   });
 });
 
@@ -137,8 +143,8 @@ describe("openai plugin: unified Plugin shape", () => {
     expect(plugin.name).toBe("openai");
   });
 
-  it("has 10 node kinds (8 core + record + array)", () => {
-    expect(Object.keys(plugin.kinds)).toHaveLength(10);
+  it("has 8 node kinds", () => {
+    expect(Object.keys(plugin.kinds)).toHaveLength(8);
   });
 
   it("kinds are all namespaced", () => {

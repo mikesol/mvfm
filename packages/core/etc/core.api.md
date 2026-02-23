@@ -102,44 +102,6 @@ const boolPlugin: {
 export { boolPlugin as _boolPluginDef }
 export { boolPlugin }
 
-// @public @deprecated (undocumented)
-export const boolPluginU: {
-    readonly name: "bool";
-    readonly ctors: {
-        readonly boolLit: boolLit;
-        readonly and: boolAnd;
-        readonly or: boolOr;
-        readonly not: boolNot;
-    };
-    readonly kinds: {
-        readonly "bool/literal": KindSpec<[], boolean>;
-        readonly "bool/eq": KindSpec<[boolean, boolean], boolean>;
-        readonly "bool/neq": KindSpec<[boolean, boolean], boolean>;
-        readonly "bool/and": KindSpec<[boolean, boolean], boolean>;
-        readonly "bool/or": KindSpec<[boolean, boolean], boolean>;
-        readonly "bool/not": KindSpec<[boolean], boolean>;
-        readonly "bool/implies": KindSpec<[boolean, boolean], boolean>;
-        readonly "bool/show": KindSpec<[boolean], string>;
-        readonly "bool/tt": KindSpec<[], boolean>;
-        readonly "bool/ff": KindSpec<[], boolean>;
-    };
-    readonly traits: {
-        readonly eq: TraitDef<boolean, {
-        boolean: "bool/eq";
-        }>;
-        readonly neq: TraitDef<boolean, {
-        boolean: "bool/neq";
-        }>;
-        readonly show: TraitDef<string, {
-        boolean: "bool/show";
-        }>;
-    };
-    readonly lifts: {
-        readonly boolean: "bool/literal";
-    };
-    readonly defaultInterpreter: () => Interpreter;
-};
-
 // @public
 export function buildKindInputs(plugins: readonly Plugin_2[]): Record<string, string[]>;
 
@@ -191,6 +153,9 @@ export function collectReachable(adj: Record<string, RuntimeEntry>, rootId: stri
 
 // @public
 export function commit<O, R extends string, Adj, C extends string>(d: DirtyExpr<O, R, Adj, C>): NExpr<O, R, Adj, C>;
+
+// @public
+export function composeDollar<const P extends readonly Plugin_2[]>(...plugins: P): DollarSign<P>;
 
 // @public
 export function concat<A extends readonly unknown[]>(...args: A): CExpr<string, "str/concat", A>;
@@ -290,18 +255,6 @@ export function defaults(appOrPlugins: readonly Plugin_2[] | {
     plugins?: readonly Plugin_2[];
     __plugins?: readonly Plugin_2[];
 }, overrides?: Record<string, Interpreter>): Interpreter;
-
-// Warning: (ae-forgotten-export) The symbol "InterpreterHandlers" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "RejectAnyParam" needs to be exported by the entry point index.d.ts
-//
-// @public @deprecated (undocumented)
-export function defineInterpreter<K extends string>(): <T extends InterpreterHandlers<K>>(handlers: string extends K ? T : T & { [P in K]: P extends keyof T ? RejectAnyParam<P, T[P]> : never; }) => Interpreter;
-
-// @public @deprecated (undocumented)
-export function definePlugin<T extends {
-    name: string;
-    kinds: Record<string, unknown>;
-}>(def: T): T;
 
 // @public
 export function dirty<O, R extends string, Adj, C extends string>(expr: NExpr<O, R, Adj, C>): DirtyExpr<O, R, Adj, C>;
@@ -435,24 +388,8 @@ export const error: {
     defaultInterpreter: () => Interpreter;
 };
 
-// @public @deprecated (undocumented)
-export function eval_<T>(node: TypedNode<T>): AsyncGenerator<TypedNode, T, unknown>;
-
 // @public
 export type EvalPred<P, Entry, ID extends string = string, Adj = Record<string, any>> = P extends KindPred<infer K> ? Entry extends NodeEntry<K, any, any> ? true : false : P extends KindGlobPred<infer Prefix> ? Entry extends NodeEntry<`${Prefix}${string}`, any, any> ? true : false : P extends LeafPred ? Entry extends NodeEntry<any, [], any> ? true : false : P extends CountPred<infer N> ? Entry extends NodeEntry<any, infer C extends string[], any> ? C["length"] extends N ? true : false : false : P extends NotPred<infer Inner> ? EvalPred<Inner, Entry, ID, Adj> extends true ? false : true : P extends AndPred<infer A, infer B> ? EvalPred<A, Entry, ID, Adj> extends true ? EvalPred<B, Entry, ID, Adj> : false : P extends OrPred<infer A, infer B> ? EvalPred<A, Entry, ID, Adj> extends true ? true : EvalPred<B, Entry, ID, Adj> : P extends NamePred<infer N> ? Adj extends Record<`@${N}`, NodeEntry<any, [infer T extends string, ...any[]], any>> ? ID extends T ? true : false : false : false;
-
-// @public @deprecated (undocumented)
-export type Expr<T = unknown> = ExprBase<T>;
-
-// @public @deprecated (undocumented)
-export interface ExprBase<T> {
-    // (undocumented)
-    readonly [key: string]: unknown;
-    // (undocumented)
-    readonly __node: TypedNode<T>;
-    // (undocumented)
-    readonly __type: T;
-}
 
 // @public
 export function extractChildIds(children: unknown): string[];
@@ -548,9 +485,6 @@ export function fold(nexpr: NExpr<unknown, string, unknown, string>, interp: Int
 // @public (undocumented)
 export function fold(rootId: string, adj: Record<string, RuntimeEntry>, interp: Interpreter, state?: FoldState): Promise<unknown>;
 
-// @public @deprecated
-export function foldAST<T>(interpOrProg: Interpreter | Record<string, unknown>, progOrInterp: unknown): Promise<T>;
-
 // @public
 export interface FoldState {
     // (undocumented)
@@ -642,6 +576,11 @@ export function len<A>(s: A): CExpr<number, "str/len", [A]>;
 export const LIFT_MAP: Record<string, string>;
 
 // @public
+export type Liftable<T> = T extends CExpr<any, any, any> ? T : T extends string ? T | CExpr<string, any, any> : T extends number ? T | CExpr<number, any, any> : T extends boolean ? T | CExpr<boolean, any, any> : T extends null | undefined ? T : T extends readonly (infer E)[] ? readonly Liftable<E>[] | CExpr<T, any, any> : T extends object ? {
+    [K in keyof T]: Liftable<T[K]>;
+} | CExpr<T, any, any> : T | CExpr<T, any, any>;
+
+// @public
 export type LiftKind<T> = T extends number ? "num/literal" : T extends string ? "str/literal" : T extends boolean ? "bool/literal" : never;
 
 // @public
@@ -712,9 +651,6 @@ export function mvfm<const P extends readonly PluginInput[]>(...pluginInputs: P)
     plugins: Plugin_2<string, any, any, any, any>[];
 };
 
-// @public
-export function mvfmU<const P extends readonly Plugin_2[]>(...plugins: P): DollarSign<P>;
-
 // Warning: (ae-forgotten-export) The symbol "TargetOut" needs to be exported by the entry point index.d.ts
 //
 // @public
@@ -763,10 +699,6 @@ export type NodeEntry<Kind extends string, ChildIDs extends string[], Out> = {
     readonly children: ChildIDs;
     readonly out: Out;
 };
-
-// @public @deprecated (undocumented)
-export interface NodeTypeMap {
-}
 
 // @public
 export function not<P extends PredBase>(pred: P): NotPred<P>;
@@ -832,64 +764,6 @@ export const numPlugin: {
         }>;
         readonly show: TraitDef<string, {
             number: "num/show";
-        }>;
-    };
-    readonly lifts: {
-        readonly number: "num/literal";
-    };
-    readonly defaultInterpreter: () => Interpreter;
-};
-
-// @public @deprecated (undocumented)
-export const numPluginU: {
-    readonly name: "num";
-    readonly ctors: {
-        readonly add: add;
-        readonly mul: mul;
-        readonly sub: sub;
-        readonly div: div;
-        readonly mod: mod;
-        readonly min: min;
-        readonly max: max;
-        readonly neg: neg;
-        readonly abs: abs;
-        readonly floor: floor;
-        readonly ceil: ceil;
-        readonly round: round;
-        readonly numLit: numLit;
-    };
-    readonly kinds: {
-        readonly "num/literal": KindSpec<[], number>;
-        readonly "num/add": KindSpec<[number, number], number>;
-        readonly "num/mul": KindSpec<[number, number], number>;
-        readonly "num/sub": KindSpec<[number, number], number>;
-        readonly "num/div": KindSpec<[number, number], number>;
-        readonly "num/mod": KindSpec<[number, number], number>;
-        readonly "num/neg": KindSpec<[number], number>;
-        readonly "num/abs": KindSpec<[number], number>;
-        readonly "num/floor": KindSpec<[number], number>;
-        readonly "num/ceil": KindSpec<[number], number>;
-        readonly "num/round": KindSpec<[number], number>;
-        readonly "num/min": KindSpec<[number, number], number>;
-        readonly "num/max": KindSpec<[number, number], number>;
-        readonly "num/show": KindSpec<[number], string>;
-        readonly "num/compare": KindSpec<[number, number], number>;
-        readonly "num/eq": KindSpec<[number, number], boolean>;
-        readonly "num/neq": KindSpec<[number, number], boolean>;
-        readonly "num/zero": KindSpec<[], number>;
-        readonly "num/one": KindSpec<[], number>;
-        readonly "num/top": KindSpec<[], number>;
-        readonly "num/bottom": KindSpec<[], number>;
-    };
-    readonly traits: {
-        readonly eq: TraitDef<boolean, {
-        number: "num/eq";
-        }>;
-        readonly neq: TraitDef<boolean, {
-        number: "num/neq";
-        }>;
-        readonly show: TraitDef<string, {
-        number: "num/show";
         }>;
     };
     readonly lifts: {
@@ -990,26 +864,6 @@ interface Plugin_2<Name extends string = string, Ctors = any, Kinds extends Reco
     readonly traits: Traits;
 }
 export { Plugin_2 as Plugin }
-
-// @public @deprecated (undocumented)
-export interface PluginContext {
-    // (undocumented)
-    emit(node: unknown): void;
-    // (undocumented)
-    expr<T>(opts: Record<string, unknown>): Expr<T>;
-    // (undocumented)
-    inputSchema: unknown;
-    // (undocumented)
-    isExpr(value: unknown): value is ExprBase<unknown>;
-    // (undocumented)
-    lift<T>(value: T | Expr<T>): ExprBase<T>;
-    // (undocumented)
-    plugins: unknown[];
-    // (undocumented)
-    _registry: Map<number, unknown>;
-    // (undocumented)
-    statements: unknown[];
-}
 
 // @public
 export interface PluginDef {
@@ -1274,6 +1128,9 @@ export function replace<A, B, C>(s: A, search: B, replacement: C): CExpr<string,
 //
 // @public
 export function replaceWhere<O, R extends string, Adj, C extends string, P extends PredBase, NewKind extends string>(expr: NExpr<O, R, Adj, C> | DirtyExpr<O, R, Adj, C>, pred: P, newKind: NewKind): DirtyExpr<MapOut<O, Adj, R, P, ReplaceKind<MatchingEntries<Adj, P>, NewKind>>, R, MapAdj<Adj, P, ReplaceKind<MatchingEntries<Adj, P>, NewKind>>, C>;
+
+// @public
+export function resolveStructured(structure: unknown): AsyncGenerator<string, unknown, unknown>;
 
 // Warning: (ae-forgotten-export) The symbol "RewireList" needs to be exported by the entry point index.d.ts
 //
@@ -1667,67 +1524,6 @@ const strPlugin: {
 export { strPlugin as _strPluginDef }
 export { strPlugin }
 
-// @public @deprecated (undocumented)
-export const strPluginU: {
-    readonly name: "str";
-    readonly ctors: {
-        readonly strLit: strLit;
-        readonly str: str;
-        readonly concat: concat;
-        readonly upper: upper;
-        readonly lower: lower;
-        readonly trim: trim;
-        readonly slice: slice;
-        readonly includes: includes;
-        readonly startsWith: startsWith;
-        readonly endsWith: endsWith;
-        readonly split: split;
-        readonly join: join;
-        readonly replace: replace;
-        readonly len: len;
-        readonly strShow: strShow;
-        readonly strAppend: strAppend;
-    };
-    readonly kinds: {
-        readonly "str/literal": KindSpec<[], string>;
-        readonly "str/concat": KindSpec<string[], string>;
-        readonly "str/upper": KindSpec<[string], string>;
-        readonly "str/lower": KindSpec<[string], string>;
-        readonly "str/trim": KindSpec<[string], string>;
-        readonly "str/slice": KindSpec<[string, number, number], string>;
-        readonly "str/includes": KindSpec<[string, string], boolean>;
-        readonly "str/startsWith": KindSpec<[string, string], boolean>;
-        readonly "str/endsWith": KindSpec<[string, string], boolean>;
-        readonly "str/split": KindSpec<[string, string], string[]>;
-        readonly "str/join": KindSpec<[string[], string], string>;
-        readonly "str/replace": KindSpec<[string, string, string], string>;
-        readonly "str/len": KindSpec<[string], number>;
-        readonly "str/show": KindSpec<[string], string>;
-        readonly "str/append": KindSpec<[string, string], string>;
-        readonly "str/mempty": KindSpec<[], string>;
-        readonly "str/eq": KindSpec<[string, string], boolean>;
-        readonly "str/neq": KindSpec<[string, string], boolean>;
-    };
-    readonly traits: {
-        readonly eq: TraitDef<boolean, {
-        string: "str/eq";
-        }>;
-        readonly neq: TraitDef<boolean, {
-        string: "str/neq";
-        }>;
-        readonly show: TraitDef<string, {
-        string: "str/show";
-        }>;
-        readonly append: TraitDef<string, {
-        string: "str/append";
-        }>;
-    };
-    readonly lifts: {
-        readonly string: "str/literal";
-    };
-    readonly defaultInterpreter: () => Interpreter;
-};
-
 // @public
 export function strShow<A>(s: A): CExpr<string, "str/show", [A]>;
 
@@ -1772,18 +1568,6 @@ export interface TraitKindSpec<O, Mapping extends Record<string, string>> {
 
 // @public
 export function trim<A>(a: A): CExpr<string, "str/trim", [A]>;
-
-// @public @deprecated (undocumented)
-export interface TypedNode<T = unknown> {
-    // (undocumented)
-    readonly [key: string]: unknown;
-    // (undocumented)
-    readonly __T?: T;
-    // (undocumented)
-    readonly args?: TypedNode[];
-    // (undocumented)
-    readonly kind: string;
-}
 
 // @public
 export type TypeKey<T> = T extends number ? "number" : T extends string ? "string" : T extends boolean ? "boolean" : never;
