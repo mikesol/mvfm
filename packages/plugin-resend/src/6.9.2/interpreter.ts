@@ -1,4 +1,5 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
+import { resolveStructured } from "@mvfm/core";
 import { wrapResendSdk } from "./client-resend-sdk";
 
 /**
@@ -21,8 +22,8 @@ export interface ResendClient {
  */
 export function createResendInterpreter(client: ResendClient): Interpreter {
   return {
-    "resend/send_email": async function* (_entry: RuntimeEntry) {
-      const params = yield 0;
+    "resend/send_email": async function* (entry: RuntimeEntry) {
+      const params = yield* resolveStructured(entry.children[0]);
       return await client.request("POST", "/emails", params);
     },
 
@@ -31,13 +32,13 @@ export function createResendInterpreter(client: ResendClient): Interpreter {
       return await client.request("GET", `/emails/${id}`);
     },
 
-    "resend/send_batch": async function* (_entry: RuntimeEntry) {
-      const emails = yield 0;
+    "resend/send_batch": async function* (entry: RuntimeEntry) {
+      const emails = yield* resolveStructured(entry.children[0]);
       return await client.request("POST", "/emails/batch", emails);
     },
 
-    "resend/create_contact": async function* (_entry: RuntimeEntry) {
-      const params = yield 0;
+    "resend/create_contact": async function* (entry: RuntimeEntry) {
+      const params = yield* resolveStructured(entry.children[0]);
       return await client.request("POST", "/contacts", params);
     },
 
@@ -53,24 +54,6 @@ export function createResendInterpreter(client: ResendClient): Interpreter {
     "resend/remove_contact": async function* (_entry: RuntimeEntry) {
       const id = yield 0;
       return await client.request("DELETE", `/contacts/${id}`);
-    },
-
-    "resend/record": async function* (entry: RuntimeEntry) {
-      const result: Record<string, unknown> = {};
-      for (let i = 0; i < entry.children.length; i += 2) {
-        const key = (yield i) as string;
-        const value = yield i + 1;
-        result[key] = value;
-      }
-      return result;
-    },
-
-    "resend/array": async function* (entry: RuntimeEntry) {
-      const result: unknown[] = [];
-      for (let i = 0; i < entry.children.length; i++) {
-        result.push(yield i);
-      }
-      return result;
     },
   };
 }
