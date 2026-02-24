@@ -6,7 +6,7 @@ Typescript reimplemented in Typescript.
 
 When the Typescript compiler compiles a program, it represents it as an Abstract Syntax Tree (AST). Manipulating the tree itself is traditionally called metaprogramming.
 
-In some languages like `nim` and `haxe`, metaprogramming is a first-class citizen. They offer an expressive macro system that allows you to rewrite programs at compile time. `lisp` takes this concept even farther, treating programs as data.
+In languages like `nim` and `haxe`, metaprogramming is a first-class citizen. They offer an expressive macro system that allows you to rewrite programs at compile time. `lisp` takes this concept even farther, treating programs as data.
 
 `mvfm` follows the `lisp` philosophy, but with types and using a syntax that resembles traditional Typescript. The result is that you can separate a program's construction, manipulation, and interpretation in-code with minimal fuss.
 
