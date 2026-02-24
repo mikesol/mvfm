@@ -1,4 +1,5 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
+import { resolveStructured } from "@mvfm/core";
 import { wrapStripeSdk } from "./client-stripe-sdk";
 
 /**
@@ -24,8 +25,8 @@ export interface StripeClient {
  */
 export function createStripeInterpreter(client: StripeClient): Interpreter {
   return {
-    "stripe/create_payment_intent": async function* (_entry: RuntimeEntry) {
-      const params = yield 0;
+    "stripe/create_payment_intent": async function* (entry: RuntimeEntry) {
+      const params = yield* resolveStructured(entry.children[0]);
       return await client.request("POST", "/v1/payment_intents", params as Record<string, unknown>);
     },
 
@@ -36,12 +37,15 @@ export function createStripeInterpreter(client: StripeClient): Interpreter {
 
     "stripe/confirm_payment_intent": async function* (entry: RuntimeEntry) {
       const id = yield 0;
-      const params = entry.children.length > 1 ? ((yield 1) as Record<string, unknown>) : undefined;
+      const params =
+        entry.children.length > 1
+          ? ((yield* resolveStructured(entry.children[1])) as Record<string, unknown>)
+          : undefined;
       return await client.request("POST", `/v1/payment_intents/${id}/confirm`, params);
     },
 
-    "stripe/create_customer": async function* (_entry: RuntimeEntry) {
-      const params = yield 0;
+    "stripe/create_customer": async function* (entry: RuntimeEntry) {
+      const params = yield* resolveStructured(entry.children[0]);
       return await client.request("POST", "/v1/customers", params as Record<string, unknown>);
     },
 
@@ -50,19 +54,22 @@ export function createStripeInterpreter(client: StripeClient): Interpreter {
       return await client.request("GET", `/v1/customers/${id}`);
     },
 
-    "stripe/update_customer": async function* (_entry: RuntimeEntry) {
+    "stripe/update_customer": async function* (entry: RuntimeEntry) {
       const id = yield 0;
-      const params = yield 1;
+      const params = yield* resolveStructured(entry.children[1]);
       return await client.request("POST", `/v1/customers/${id}`, params as Record<string, unknown>);
     },
 
     "stripe/list_customers": async function* (entry: RuntimeEntry) {
-      const params = entry.children.length > 0 ? ((yield 0) as Record<string, unknown>) : undefined;
+      const params =
+        entry.children.length > 0
+          ? ((yield* resolveStructured(entry.children[0])) as Record<string, unknown>)
+          : undefined;
       return await client.request("GET", "/v1/customers", params);
     },
 
-    "stripe/create_charge": async function* (_entry: RuntimeEntry) {
-      const params = yield 0;
+    "stripe/create_charge": async function* (entry: RuntimeEntry) {
+      const params = yield* resolveStructured(entry.children[0]);
       return await client.request("POST", "/v1/charges", params as Record<string, unknown>);
     },
 
@@ -72,26 +79,11 @@ export function createStripeInterpreter(client: StripeClient): Interpreter {
     },
 
     "stripe/list_charges": async function* (entry: RuntimeEntry) {
-      const params = entry.children.length > 0 ? ((yield 0) as Record<string, unknown>) : undefined;
+      const params =
+        entry.children.length > 0
+          ? ((yield* resolveStructured(entry.children[0])) as Record<string, unknown>)
+          : undefined;
       return await client.request("GET", "/v1/charges", params);
-    },
-
-    "stripe/record": async function* (entry: RuntimeEntry) {
-      const result: Record<string, unknown> = {};
-      for (let i = 0; i < entry.children.length; i += 2) {
-        const key = (yield i) as string;
-        const value = yield i + 1;
-        result[key] = value;
-      }
-      return result;
-    },
-
-    "stripe/array": async function* (entry: RuntimeEntry) {
-      const result: unknown[] = [];
-      for (let i = 0; i < entry.children.length; i++) {
-        result.push(yield i);
-      }
-      return result;
     },
   };
 }
