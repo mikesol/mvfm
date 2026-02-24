@@ -176,15 +176,10 @@ export function redis(config?: RedisConfig | string) {
         inputs: ["", "", "", ""] as [string, string, string, string],
         output: 0 as number,
       } as KindSpec<[string, string, string, string], number>,
-      // Structural helpers (produced by liftArg)
-      "redis/record": {
-        inputs: [] as unknown[],
-        output: {} as Record<string, unknown>,
-      } as KindSpec<unknown[], Record<string, unknown>>,
-      "redis/array": { inputs: [] as unknown[], output: [] as unknown[] } as KindSpec<
-        unknown[],
-        unknown[]
-      >,
+    },
+    shapes: {
+      "redis/mset": "*",
+      "redis/hset": [null, "*"],
     },
     traits: {},
     lifts: {},

@@ -35,8 +35,7 @@ describe("redis: CExpr construction (strings)", () => {
     const msetExpr = api.mset({ k1: "v1", k2: "v2" });
     expect(msetExpr.__kind).toBe("redis/mset");
     expect(msetExpr.__args).toHaveLength(1);
-    const recordArg = msetExpr.__args[0] as { __kind: string };
-    expect(recordArg.__kind).toBe("redis/record");
+    expect(msetExpr.__args[0]).toEqual({ k1: "v1", k2: "v2" });
     expect(api.append("mykey", "extra").__kind).toBe("redis/append");
     expect(api.getrange("mykey", 0, 5).__kind).toBe("redis/getrange");
     expect(api.setrange("mykey", 3, "abc").__kind).toBe("redis/setrange");
@@ -57,8 +56,8 @@ describe("redis plugin: unified Plugin shape", () => {
     expect(plugin.name).toBe("redis");
   });
 
-  it("has 39 node kinds (37 commands + record + array)", () => {
-    expect(Object.keys(plugin.kinds)).toHaveLength(39);
+  it("has 37 node kinds (structural helpers removed)", () => {
+    expect(Object.keys(plugin.kinds)).toHaveLength(37);
   });
 
   it("kinds are all namespaced", () => {
