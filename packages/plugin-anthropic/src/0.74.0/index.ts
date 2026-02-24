@@ -13,51 +13,27 @@
 // ============================================================
 
 import type {
+  BatchCreateParams,
+  BatchListParams,
   DeletedMessageBatch,
   MessageBatch,
   MessageBatchesPage,
 } from "@anthropic-ai/sdk/resources/messages/batches";
-import type { Message, MessageTokensCount } from "@anthropic-ai/sdk/resources/messages/messages";
-import type { ModelInfo, ModelInfosPage } from "@anthropic-ai/sdk/resources/models";
-import type { CExpr, Interpreter, KindSpec, Plugin } from "@mvfm/core";
-import { isCExpr, makeCExpr } from "@mvfm/core";
+import type {
+  Message,
+  MessageCountTokensParams,
+  MessageCreateParamsNonStreaming,
+  MessageTokensCount,
+} from "@anthropic-ai/sdk/resources/messages/messages";
+import type {
+  ModelInfo,
+  ModelInfosPage,
+  ModelListParams,
+} from "@anthropic-ai/sdk/resources/models";
+import type { CExpr, Interpreter, KindSpec, Liftable, Plugin } from "@mvfm/core";
+import { makeCExpr } from "@mvfm/core";
 import { wrapAnthropicSdk } from "./client-anthropic-sdk";
 import { type AnthropicClient, createAnthropicInterpreter } from "./interpreter";
-
-// ---- liftArg: recursive plain-value -> CExpr lifting --------
-
-/**
- * Recursively lifts a plain value into a CExpr tree.
- * - CExpr values are returned as-is.
- * - Primitives are returned as-is (elaborate lifts them).
- * - Plain objects become `anthropic/record` CExprs with key-value child pairs.
- * - Arrays become `anthropic/array` CExprs.
- */
-function liftArg(value: unknown): unknown {
-  if (isCExpr(value)) return value;
-  if (typeof value === "string") return value;
-  if (typeof value === "number") return value;
-  if (typeof value === "boolean") return value;
-  if (value === null || value === undefined) return value;
-  if (Array.isArray(value)) {
-    return makeCExpr("anthropic/array", value.map(liftArg));
-  }
-  if (typeof value === "object") {
-    const pairs: unknown[] = [];
-    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
-      pairs.push(k, liftArg(v));
-    }
-    return makeCExpr("anthropic/record", pairs);
-  }
-  return value;
-}
-
-// liftArg erases generic type info at runtime (returns unknown).
-// Cast helper restores the declared CExpr Args types for ExtractKinds.
-const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]>(
-  kind: Kind,
-  args: readonly unknown[],
-) => CExpr<O, Kind, Args>;
 
 // ---- Configuration ----------------------------------------
 
@@ -77,63 +53,91 @@ export interface AnthropicConfig {
 // ---- Constructor builder ----------------------------------
 
 /**
- * Builds the anthropic constructor methods using makeCExpr + liftArg.
+ * Builds the anthropic constructor methods using makeCExpr.
  *
- * Constructors use permissive generics so any argument type is accepted
- * at construction time. Validation happens at `app()` time via KindSpec.
+ * Constructors use Liftable<T> for object params and string | CExpr<string>
+ * for ID params. Validation happens at `app()` time via KindSpec.
  */
 function buildAnthropicApi() {
   return {
     messages: {
       /** Create a message (chat completion). */
-      create<A>(params: A): CExpr<Message, "anthropic/create_message", [A]> {
-        return mk("anthropic/create_message", [liftArg(params)]);
+      create(
+        params: Liftable<MessageCreateParamsNonStreaming>,
+      ): CExpr<
+        Message,
+        "anthropic/create_message",
+        [Liftable<MessageCreateParamsNonStreaming>]
+      > {
+        return makeCExpr("anthropic/create_message", [params]) as any;
       },
       /** Count tokens for a message request. */
-      countTokens<A>(params: A): CExpr<MessageTokensCount, "anthropic/count_tokens", [A]> {
-        return mk("anthropic/count_tokens", [liftArg(params)]);
+      countTokens(
+        params: Liftable<MessageCountTokensParams>,
+      ): CExpr<
+        MessageTokensCount,
+        "anthropic/count_tokens",
+        [Liftable<MessageCountTokensParams>]
+      > {
+        return makeCExpr("anthropic/count_tokens", [params]) as any;
       },
       batches: {
         /** Create a message batch. */
-        create<A>(params: A): CExpr<MessageBatch, "anthropic/create_message_batch", [A]> {
-          return mk("anthropic/create_message_batch", [liftArg(params)]);
+        create(
+          params: Liftable<BatchCreateParams>,
+        ): CExpr<
+          MessageBatch,
+          "anthropic/create_message_batch",
+          [Liftable<BatchCreateParams>]
+        > {
+          return makeCExpr("anthropic/create_message_batch", [params]) as any;
         },
         /** Retrieve a message batch by ID. */
-        retrieve<A>(id: A): CExpr<MessageBatch, "anthropic/retrieve_message_batch", [A]> {
-          return mk("anthropic/retrieve_message_batch", [id]);
+        retrieve(
+          id: string | CExpr<string>,
+        ): CExpr<MessageBatch, "anthropic/retrieve_message_batch", [string | CExpr<string>]> {
+          return makeCExpr("anthropic/retrieve_message_batch", [id]) as any;
         },
         /** List message batches with optional filter params. */
-        list<A extends readonly unknown[]>(
-          ...params: A
-        ): CExpr<MessageBatchesPage, "anthropic/list_message_batches", A> {
-          return mk(
-            "anthropic/list_message_batches",
-            params.map((p) => liftArg(p)),
-          );
+        list(
+          ...params: [] | [Liftable<BatchListParams>]
+        ): CExpr<
+          MessageBatchesPage,
+          "anthropic/list_message_batches",
+          [] | [Liftable<BatchListParams>]
+        > {
+          return makeCExpr("anthropic/list_message_batches", params as unknown[]) as any;
         },
         /** Delete a message batch by ID. */
-        delete<A>(id: A): CExpr<DeletedMessageBatch, "anthropic/delete_message_batch", [A]> {
-          return mk("anthropic/delete_message_batch", [id]);
+        delete(
+          id: string | CExpr<string>,
+        ): CExpr<DeletedMessageBatch, "anthropic/delete_message_batch", [string | CExpr<string>]> {
+          return makeCExpr("anthropic/delete_message_batch", [id]) as any;
         },
         /** Cancel a message batch by ID. */
-        cancel<A>(id: A): CExpr<MessageBatch, "anthropic/cancel_message_batch", [A]> {
-          return mk("anthropic/cancel_message_batch", [id]);
+        cancel(
+          id: string | CExpr<string>,
+        ): CExpr<MessageBatch, "anthropic/cancel_message_batch", [string | CExpr<string>]> {
+          return makeCExpr("anthropic/cancel_message_batch", [id]) as any;
         },
       },
     },
     models: {
       /** Retrieve a model by ID. */
-      retrieve<A>(id: A): CExpr<ModelInfo, "anthropic/retrieve_model", [A]> {
-        return mk("anthropic/retrieve_model", [id]);
+      retrieve(
+        id: string | CExpr<string>,
+      ): CExpr<ModelInfo, "anthropic/retrieve_model", [string | CExpr<string>]> {
+        return makeCExpr("anthropic/retrieve_model", [id]) as any;
       },
       /** List models with optional filter params. */
-      list<A extends readonly unknown[]>(
-        ...params: A
-      ): CExpr<ModelInfosPage, "anthropic/list_models", A> {
-        return mk(
-          "anthropic/list_models",
-          params.map((p) => liftArg(p)),
-        );
+      list(
+        ...params: [] | [Liftable<ModelListParams>]
+      ): CExpr<
+        ModelInfosPage,
+        "anthropic/list_models",
+        [] | [Liftable<ModelListParams>]
+      > {
+        return makeCExpr("anthropic/list_models", params as unknown[]) as any;
       },
     },
   };
@@ -187,50 +191,48 @@ export function anthropic(config: AnthropicConfig) {
     ctors: { anthropic: buildAnthropicApi() },
     kinds: {
       "anthropic/create_message": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
+        inputs: [undefined as unknown as MessageCreateParamsNonStreaming],
+        output: undefined as unknown as Message,
+      } as KindSpec<[MessageCreateParamsNonStreaming], Message>,
       "anthropic/count_tokens": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
+        inputs: [undefined as unknown as MessageCountTokensParams],
+        output: undefined as unknown as MessageTokensCount,
+      } as KindSpec<[MessageCountTokensParams], MessageTokensCount>,
       "anthropic/create_message_batch": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
+        inputs: [undefined as unknown as BatchCreateParams],
+        output: undefined as unknown as MessageBatch,
+      } as KindSpec<[BatchCreateParams], MessageBatch>,
       "anthropic/retrieve_message_batch": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
+        inputs: [""] as [string],
+        output: undefined as unknown as MessageBatch,
+      } as KindSpec<[string], MessageBatch>,
       "anthropic/list_message_batches": {
-        inputs: [] as unknown[],
-        output: undefined as unknown,
-      } as KindSpec<unknown[], unknown>,
+        inputs: [] as BatchListParams[],
+        output: undefined as unknown as MessageBatchesPage,
+      } as KindSpec<BatchListParams[], MessageBatchesPage>,
       "anthropic/delete_message_batch": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
+        inputs: [""] as [string],
+        output: undefined as unknown as DeletedMessageBatch,
+      } as KindSpec<[string], DeletedMessageBatch>,
       "anthropic/cancel_message_batch": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
+        inputs: [""] as [string],
+        output: undefined as unknown as MessageBatch,
+      } as KindSpec<[string], MessageBatch>,
       "anthropic/retrieve_model": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
+        inputs: [""] as [string],
+        output: undefined as unknown as ModelInfo,
+      } as KindSpec<[string], ModelInfo>,
       "anthropic/list_models": {
-        inputs: [] as unknown[],
-        output: undefined as unknown,
-      } as KindSpec<unknown[], unknown>,
-      // Structural helpers (produced by liftArg)
-      "anthropic/record": {
-        inputs: [] as unknown[],
-        output: {} as Record<string, unknown>,
-      } as KindSpec<unknown[], Record<string, unknown>>,
-      "anthropic/array": {
-        inputs: [] as unknown[],
-        output: [] as unknown[],
-      } as KindSpec<unknown[], unknown[]>,
+        inputs: [] as ModelListParams[],
+        output: undefined as unknown as ModelInfosPage,
+      } as KindSpec<ModelListParams[], ModelInfosPage>,
+    },
+    shapes: {
+      "anthropic/create_message": "*",
+      "anthropic/count_tokens": "*",
+      "anthropic/create_message_batch": "*",
+      "anthropic/list_message_batches": "*",
+      "anthropic/list_models": "*",
     },
     traits: {},
     lifts: {},
