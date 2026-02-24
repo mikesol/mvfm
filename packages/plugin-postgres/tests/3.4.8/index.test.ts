@@ -151,7 +151,7 @@ describe("postgres: plugin structure", () => {
     expect(Object.keys(plugin.kinds)).toContain("postgres/query");
     expect(Object.keys(plugin.kinds)).toContain("postgres/begin");
     expect(Object.keys(plugin.kinds)).toContain("postgres/cursor");
-    expect(Object.keys(plugin.kinds)).toHaveLength(10);
+    expect(Object.keys(plugin.kinds)).toHaveLength(8);
   });
 
   it("string config accepted", () => {

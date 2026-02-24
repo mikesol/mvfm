@@ -1,41 +1,8 @@
-import type { CExpr } from "@mvfm/core";
-import { isCExpr, makeCExpr } from "@mvfm/core";
+import type { CExpr, Liftable } from "@mvfm/core";
+import { makeCExpr } from "@mvfm/core";
 
 /**
- * Recursively lifts a plain value into a CExpr tree.
- * - CExpr values are returned as-is.
- * - Primitives are returned as-is (elaborate lifts them via liftMap).
- * - Plain objects become `postgres/record` CExprs with key-value pairs.
- * - Arrays become `postgres/array` CExprs.
- */
-function liftArg(value: unknown): unknown {
-  if (isCExpr(value)) return value;
-  if (typeof value === "string") return value;
-  if (typeof value === "number") return value;
-  if (typeof value === "boolean") return value;
-  if (value === null || value === undefined) return value;
-  if (Array.isArray(value)) {
-    return makeCExpr("postgres/array", value.map(liftArg));
-  }
-  if (typeof value === "object") {
-    const pairs: unknown[] = [];
-    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
-      pairs.push(k, liftArg(v));
-    }
-    return makeCExpr("postgres/record", pairs);
-  }
-  return value;
-}
-
-// liftArg erases generic type info at runtime (returns unknown).
-// Cast helper restores the declared CExpr Args types for ExtractKinds.
-const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]>(
-  kind: Kind,
-  args: readonly unknown[],
-) => CExpr<O, Kind, Args>;
-
-/**
- * Builds the postgres constructor methods using makeCExpr + liftArg.
+ * Builds the postgres constructor methods using makeCExpr.
  *
  * Each method produces a CExpr node with positional children.
  * Config is NOT stored on AST nodes -- it's captured by the interpreter.
@@ -52,8 +19,6 @@ const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]
  * - savepoint:     [modeStr, ...bodyOrQueries]
  * - cursor:        [queryExpr, batchSizeExpr, bodyExpr]
  * - cursor_batch:  [] (sentinel)
- * - record:        [key0, val0, key1, val1, ...]
- * - array:         [elem0, elem1, ...]
  */
 export function buildPostgresApi() {
   function makeSql(scope: "top" | "transaction" | "savepoint") {
@@ -61,25 +26,28 @@ export function buildPostgresApi() {
       strings: TemplateStringsArray,
       ...values: unknown[]
     ): CExpr<T[], "postgres/query", unknown[]> =>
-      mk("postgres/query", [strings.length, ...Array.from(strings), ...values]);
+      makeCExpr("postgres/query", [strings.length, ...Array.from(strings), ...values]) as any;
 
     const props: Record<string, unknown> = {
       /** Dynamic identifier escaping. */
       id<A>(name: A): CExpr<unknown, "postgres/identifier", [A]> {
-        return mk("postgres/identifier", [name]);
+        return makeCExpr("postgres/identifier", [name]) as any;
       },
 
       /** Dynamic INSERT helper. */
-      insert<A>(
-        data: A,
+      insert(
+        data: Liftable<Record<string, unknown>>,
         columns?: string[],
-      ): CExpr<unknown, "postgres/insert_helper", [A, string]> {
-        return mk("postgres/insert_helper", [liftArg(data), JSON.stringify(columns ?? null)]);
+      ): CExpr<unknown, "postgres/insert_helper", [Liftable<Record<string, unknown>>, string]> {
+        return makeCExpr("postgres/insert_helper", [data, JSON.stringify(columns ?? null)]) as any;
       },
 
       /** Dynamic SET helper. */
-      set<A>(data: A, columns?: string[]): CExpr<unknown, "postgres/set_helper", [A, string]> {
-        return mk("postgres/set_helper", [liftArg(data), JSON.stringify(columns ?? null)]);
+      set(
+        data: Liftable<Record<string, unknown>>,
+        columns?: string[],
+      ): CExpr<unknown, "postgres/set_helper", [Liftable<Record<string, unknown>>, string]> {
+        return makeCExpr("postgres/set_helper", [data, JSON.stringify(columns ?? null)]) as any;
       },
 
       /** Cursor iteration. */
@@ -89,7 +57,7 @@ export function buildPostgresApi() {
         fn: (batch: CExpr<T[]>) => unknown,
       ): CExpr<void, "postgres/cursor", [CExpr<T[]>, unknown, unknown]> {
         const batchProxy = makeCExpr("postgres/cursor_batch", []);
-        return mk("postgres/cursor", [query, batchSize, fn(batchProxy as CExpr<T[]>)]);
+        return makeCExpr("postgres/cursor", [query, batchSize, fn(batchProxy as CExpr<T[]>)]) as any;
       },
     };
 
@@ -101,9 +69,9 @@ export function buildPostgresApi() {
         const txSql = makeSql("transaction");
         const result = fn(txSql);
         if (Array.isArray(result)) {
-          return mk("postgres/begin", ["pipeline", ...result]);
+          return makeCExpr("postgres/begin", ["pipeline", ...result]) as any;
         }
-        return mk("postgres/begin", ["callback", result]);
+        return makeCExpr("postgres/begin", ["callback", result]) as any;
       };
     }
 
@@ -115,9 +83,9 @@ export function buildPostgresApi() {
         const spSql = makeSql("savepoint");
         const result = fn(spSql);
         if (Array.isArray(result)) {
-          return mk("postgres/savepoint", ["pipeline", ...result]);
+          return makeCExpr("postgres/savepoint", ["pipeline", ...result]) as any;
         }
-        return mk("postgres/savepoint", ["callback", result]);
+        return makeCExpr("postgres/savepoint", ["callback", result]) as any;
       };
     }
 

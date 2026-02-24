@@ -92,15 +92,10 @@ export function postgres(config?: PostgresConfig | string) {
         inputs: [] as [],
         output: [] as unknown[],
       } as KindSpec<[], unknown[]>,
-      // Structural helpers (produced by liftArg)
-      "postgres/record": {
-        inputs: [] as unknown[],
-        output: {} as Record<string, unknown>,
-      } as KindSpec<unknown[], Record<string, unknown>>,
-      "postgres/array": {
-        inputs: [] as unknown[],
-        output: [] as unknown[],
-      } as KindSpec<unknown[], unknown[]>,
+    },
+    shapes: {
+      "postgres/insert_helper": ["*", null],
+      "postgres/set_helper": ["*", null],
     },
     traits: {},
     lifts: {},
