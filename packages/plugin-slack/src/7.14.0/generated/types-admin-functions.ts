@@ -9,16 +9,8 @@ import type {
 
 export interface SlackMethodsAdminFunctions {
   permissions: {
-    lookup<A>(
-      params: A,
-    ): CExpr<
-      AdminFunctionsPermissionsLookupResponse,
-      "slack/admin_functions_permissions_lookup",
-      [A]
-    >;
-    set<A>(
-      params: A,
-    ): CExpr<AdminFunctionsPermissionsSetResponse, "slack/admin_functions_permissions_set", [A]>;
+    lookup<A>(params: A): CExpr<AdminFunctionsPermissionsLookupResponse, "slack/admin_functions_permissions_lookup", [A]>;
+    set<A>(params: A): CExpr<AdminFunctionsPermissionsSetResponse, "slack/admin_functions_permissions_set", [A]>;
   };
   list<A>(params: A): CExpr<AdminFunctionsListResponse, "slack/admin_functions_list", [A]>;
 }

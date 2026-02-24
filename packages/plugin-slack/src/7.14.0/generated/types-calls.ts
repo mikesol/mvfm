@@ -13,9 +13,7 @@ import type {
 export interface SlackMethodsCalls {
   participants: {
     add<A>(params: A): CExpr<CallsParticipantsAddResponse, "slack/calls_participants_add", [A]>;
-    remove<A>(
-      params: A,
-    ): CExpr<CallsParticipantsRemoveResponse, "slack/calls_participants_remove", [A]>;
+    remove<A>(params: A): CExpr<CallsParticipantsRemoveResponse, "slack/calls_participants_remove", [A]>;
   };
   add<A>(params: A): CExpr<CallsAddResponse, "slack/calls_add", [A]>;
   end<A>(params: A): CExpr<CallsEndResponse, "slack/calls_end", [A]>;

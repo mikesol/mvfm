@@ -22,36 +22,12 @@ export interface SlackMethodsAdminTeams {
     list<A>(params: A): CExpr<AdminTeamsOwnersListResponse, "slack/admin_teams_owners_list", [A]>;
   };
   settings: {
-    info<A>(
-      params: A,
-    ): CExpr<AdminTeamsSettingsInfoResponse, "slack/admin_teams_settings_info", [A]>;
-    setDefaultChannels<A>(
-      params: A,
-    ): CExpr<
-      AdminTeamsSettingsSetDefaultChannelsResponse,
-      "slack/admin_teams_settings_setDefaultChannels",
-      [A]
-    >;
-    setDescription<A>(
-      params: A,
-    ): CExpr<
-      AdminTeamsSettingsSetDescriptionResponse,
-      "slack/admin_teams_settings_setDescription",
-      [A]
-    >;
-    setDiscoverability<A>(
-      params: A,
-    ): CExpr<
-      AdminTeamsSettingsSetDiscoverabilityResponse,
-      "slack/admin_teams_settings_setDiscoverability",
-      [A]
-    >;
-    setIcon<A>(
-      params: A,
-    ): CExpr<AdminTeamsSettingsSetIconResponse, "slack/admin_teams_settings_setIcon", [A]>;
-    setName<A>(
-      params: A,
-    ): CExpr<AdminTeamsSettingsSetNameResponse, "slack/admin_teams_settings_setName", [A]>;
+    info<A>(params: A): CExpr<AdminTeamsSettingsInfoResponse, "slack/admin_teams_settings_info", [A]>;
+    setDefaultChannels<A>(params: A): CExpr<AdminTeamsSettingsSetDefaultChannelsResponse, "slack/admin_teams_settings_setDefaultChannels", [A]>;
+    setDescription<A>(params: A): CExpr<AdminTeamsSettingsSetDescriptionResponse, "slack/admin_teams_settings_setDescription", [A]>;
+    setDiscoverability<A>(params: A): CExpr<AdminTeamsSettingsSetDiscoverabilityResponse, "slack/admin_teams_settings_setDiscoverability", [A]>;
+    setIcon<A>(params: A): CExpr<AdminTeamsSettingsSetIconResponse, "slack/admin_teams_settings_setIcon", [A]>;
+    setName<A>(params: A): CExpr<AdminTeamsSettingsSetNameResponse, "slack/admin_teams_settings_setName", [A]>;
   };
   create<A>(params: A): CExpr<AdminTeamsCreateResponse, "slack/admin_teams_create", [A]>;
   list<A = void>(params?: A): CExpr<AdminTeamsListResponse, "slack/admin_teams_list", [A]>;

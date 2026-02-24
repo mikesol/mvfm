@@ -2,8 +2,8 @@
 
 import type { CExpr } from "@mvfm/core";
 import type {
-  AdminInviteRequestsApprovedListResponse,
   AdminInviteRequestsApproveResponse,
+  AdminInviteRequestsApprovedListResponse,
   AdminInviteRequestsDeniedListResponse,
   AdminInviteRequestsDenyResponse,
   AdminInviteRequestsListResponse,
@@ -11,26 +11,12 @@ import type {
 
 export interface SlackMethodsAdminInviteRequests {
   approved: {
-    list<A>(
-      params: A,
-    ): CExpr<
-      AdminInviteRequestsApprovedListResponse,
-      "slack/admin_inviteRequests_approved_list",
-      [A]
-    >;
+    list<A>(params: A): CExpr<AdminInviteRequestsApprovedListResponse, "slack/admin_inviteRequests_approved_list", [A]>;
   };
   denied: {
-    list<A>(
-      params: A,
-    ): CExpr<AdminInviteRequestsDeniedListResponse, "slack/admin_inviteRequests_denied_list", [A]>;
+    list<A>(params: A): CExpr<AdminInviteRequestsDeniedListResponse, "slack/admin_inviteRequests_denied_list", [A]>;
   };
-  approve<A>(
-    params: A,
-  ): CExpr<AdminInviteRequestsApproveResponse, "slack/admin_inviteRequests_approve", [A]>;
-  deny<A>(
-    params: A,
-  ): CExpr<AdminInviteRequestsDenyResponse, "slack/admin_inviteRequests_deny", [A]>;
-  list<A>(
-    params: A,
-  ): CExpr<AdminInviteRequestsListResponse, "slack/admin_inviteRequests_list", [A]>;
+  approve<A>(params: A): CExpr<AdminInviteRequestsApproveResponse, "slack/admin_inviteRequests_approve", [A]>;
+  deny<A>(params: A): CExpr<AdminInviteRequestsDenyResponse, "slack/admin_inviteRequests_deny", [A]>;
+  list<A>(params: A): CExpr<AdminInviteRequestsListResponse, "slack/admin_inviteRequests_list", [A]>;
 }

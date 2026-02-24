@@ -365,34 +365,13 @@ function generateTypesIndex(groups: GroupData[]): string {
 function generateBuildMethodsGroup(group: GroupData): string {
   const lines: string[] = [HEADER];
   lines.push(`import type { CExpr } from "@mvfm/core";`);
-  lines.push(`import { isCExpr, makeCExpr } from "@mvfm/core";`);
+  lines.push(`import { makeCExpr } from "@mvfm/core";`);
 
   const pascal = slugToPascal(group.fileSlug);
   lines.push(`import type { SlackMethods${pascal} } from "./types-${group.fileSlug}";`);
   lines.push("");
 
-  // liftArg function
-  lines.push("function liftArg(value: unknown): unknown {");
-  lines.push('  if (isCExpr(value)) return value;');
-  lines.push('  if (typeof value === "string") return value;');
-  lines.push('  if (typeof value === "number") return value;');
-  lines.push('  if (typeof value === "boolean") return value;');
-  lines.push("  if (value === null || value === undefined) return value;");
-  lines.push("  if (Array.isArray(value)) {");
-  lines.push('    return makeCExpr("slack/array", value.map(liftArg));');
-  lines.push("  }");
-  lines.push('  if (typeof value === "object") {');
-  lines.push("    const pairs: unknown[] = [];");
-  lines.push("    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {");
-  lines.push("      pairs.push(k, liftArg(v));");
-  lines.push("    }");
-  lines.push('    return makeCExpr("slack/record", pairs);');
-  lines.push("  }");
-  lines.push("  return value;");
-  lines.push("}");
-  lines.push("");
-
-  // mk cast helper — restores CExpr generic type info erased by liftArg
+  // mk cast helper — restores CExpr generic type info
   lines.push("const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]>(");
   lines.push("  kind: Kind,");
   lines.push("  args: readonly unknown[],");
@@ -419,7 +398,7 @@ function generateBuildMethodsGroup(group: GroupData): string {
       const methodName = m.path[m.path.length - 1];
       const paramSig = m.optional ? "params?" : "params";
       lines.push(`${indent}${methodName}(${paramSig}) {`);
-      lines.push(`${indent}  if (params != null) return mk("${m.nodeKind}", [liftArg(params)]);`);
+      lines.push(`${indent}  if (params != null) return mk("${m.nodeKind}", [params]);`);
       lines.push(`${indent}  return mk("${m.nodeKind}", []);`);
       lines.push(`${indent}},`);
     }
@@ -507,6 +486,7 @@ function generateInterpreterGroup(group: GroupData): string {
   const pascal = slugToPascal(group.fileSlug);
 
   lines.push(`import type { Interpreter, RuntimeEntry } from "@mvfm/core";`);
+  lines.push(`import { resolveStructured } from "@mvfm/core";`);
   lines.push("");
 
   lines.push(`export const NODE_TO_METHOD_${constSuffix}: Record<string, string> = {`);
@@ -527,8 +507,10 @@ function generateInterpreterGroup(group: GroupData): string {
   lines.push("");
   lines.push(`  for (const [kind, method] of Object.entries(NODE_TO_METHOD_${constSuffix})) {`);
   lines.push("    handlers[kind] = async function* (entry: RuntimeEntry) {");
-  lines.push("      const params = entry.children.length > 0 ? yield 0 : undefined;");
-  lines.push("      return await client.apiCall(method, params as Record<string, unknown>);");
+  lines.push("      const params = entry.children.length > 0");
+  lines.push("        ? (yield* resolveStructured(entry.children[0])) as Record<string, unknown>");
+  lines.push("        : undefined;");
+  lines.push("      return await client.apiCall(method, params);");
   lines.push("    };");
   lines.push("  }");
   lines.push("");
@@ -541,7 +523,7 @@ function generateInterpreterGroup(group: GroupData): string {
 
 function generateInterpreterIndex(groups: GroupData[]): string {
   const lines: string[] = [HEADER];
-  lines.push(`import type { Interpreter, RuntimeEntry } from "@mvfm/core";`);
+  lines.push(`import type { Interpreter } from "@mvfm/core";`);
   lines.push("");
 
   for (const g of groups) {
@@ -572,23 +554,6 @@ function generateInterpreterIndex(groups: GroupData[]): string {
 
   // Create per-group sub-interpreters and merge with spread
   lines.push("  return {");
-  // Add record and array handlers
-  lines.push('    "slack/record": async function* (entry: RuntimeEntry) {');
-  lines.push("      const result: Record<string, unknown> = {};");
-  lines.push("      for (let i = 0; i < entry.children.length; i += 2) {");
-  lines.push("        const key = (yield i) as string;");
-  lines.push("        const value = yield i + 1;");
-  lines.push("        result[key] = value;");
-  lines.push("      }");
-  lines.push("      return result;");
-  lines.push("    },");
-  lines.push('    "slack/array": async function* (entry: RuntimeEntry) {');
-  lines.push("      const result: unknown[] = [];");
-  lines.push("      for (let i = 0; i < entry.children.length; i++) {");
-  lines.push("        result.push(yield i);");
-  lines.push("      }");
-  lines.push("      return result;");
-  lines.push("    },");
 
   for (const g of groups) {
     const pascal = slugToPascal(g.fileSlug);
