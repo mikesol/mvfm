@@ -1,4 +1,5 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
+import { resolveStructured } from "@mvfm/core";
 import { wrapTwilioSdk } from "./client-twilio-sdk";
 
 /**
@@ -31,8 +32,8 @@ export function createTwilioInterpreter(
   const getBase = () => `/2010-04-01/Accounts/${getSid()}`;
 
   return {
-    "twilio/create_message": async function* (_entry: RuntimeEntry) {
-      const params = yield 0;
+    "twilio/create_message": async function* (entry: RuntimeEntry) {
+      const params = yield* resolveStructured(entry.children[0]);
       return await client.request(
         "POST",
         `${getBase()}/Messages.json`,
@@ -46,12 +47,15 @@ export function createTwilioInterpreter(
     },
 
     "twilio/list_messages": async function* (entry: RuntimeEntry) {
-      const params = entry.children.length > 0 ? ((yield 0) as Record<string, unknown>) : undefined;
+      const params =
+        entry.children.length > 0
+          ? ((yield* resolveStructured(entry.children[0])) as Record<string, unknown>)
+          : undefined;
       return await client.request("GET", `${getBase()}/Messages.json`, params);
     },
 
-    "twilio/create_call": async function* (_entry: RuntimeEntry) {
-      const params = yield 0;
+    "twilio/create_call": async function* (entry: RuntimeEntry) {
+      const params = yield* resolveStructured(entry.children[0]);
       return await client.request(
         "POST",
         `${getBase()}/Calls.json`,
@@ -65,26 +69,11 @@ export function createTwilioInterpreter(
     },
 
     "twilio/list_calls": async function* (entry: RuntimeEntry) {
-      const params = entry.children.length > 0 ? ((yield 0) as Record<string, unknown>) : undefined;
+      const params =
+        entry.children.length > 0
+          ? ((yield* resolveStructured(entry.children[0])) as Record<string, unknown>)
+          : undefined;
       return await client.request("GET", `${getBase()}/Calls.json`, params);
-    },
-
-    "twilio/record": async function* (entry: RuntimeEntry) {
-      const result: Record<string, unknown> = {};
-      for (let i = 0; i < entry.children.length; i += 2) {
-        const key = (yield i) as string;
-        const value = yield i + 1;
-        result[key] = value;
-      }
-      return result;
-    },
-
-    "twilio/array": async function* (entry: RuntimeEntry) {
-      const result: unknown[] = [];
-      for (let i = 0; i < entry.children.length; i++) {
-        result.push(yield i);
-      }
-      return result;
     },
   };
 }
