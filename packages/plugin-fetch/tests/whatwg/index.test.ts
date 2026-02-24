@@ -59,8 +59,8 @@ describe("fetch plugin: unified Plugin shape", () => {
     expect(plugin.name).toBe("fetch");
   });
 
-  it("has 7 node kinds (5 core + record + array)", () => {
-    expect(Object.keys(plugin.kinds)).toHaveLength(7);
+  it("has 5 node kinds (record + array removed, handled by shapes)", () => {
+    expect(Object.keys(plugin.kinds)).toHaveLength(5);
   });
 
   it("kinds are all namespaced", () => {
