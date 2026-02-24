@@ -59,7 +59,7 @@ const handlePrompt = app(
 );
 ```
 
-To interpret this program, you construct a gaggle of interpreters that are called as `mvfm` traverses the AST. This pattern is borrowed from pure functional languages like PureScript, where it is used extensively, for example via the [tagless final](https://okmij.org/ftp/tagless-final/index.html) patterns and via [free monads](https://github.com/purescript/purescript-free).
+To interpret this program, you construct a gaggle of interpreters that are called as `mvfm` traverses the AST. This pattern is borrowed from pure functional languages like PureScript, where it is used extensively, for example via the [tagless final](https://okmij.org/ftp/tagless-final/index.html) pattern and via [free monads](https://github.com/purescript/purescript-free).
 
 ```typescript
 import pgClient from "postgres";
