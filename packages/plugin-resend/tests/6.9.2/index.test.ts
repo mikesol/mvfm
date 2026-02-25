@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { resend, resendPlugin } from "../../src/6.9.2";
 
-const plugin = resend({ apiKey: "re_test_123" });
+const plugin = resend;
 const api = plugin.ctors.resend;
 
 // ============================================================
@@ -140,8 +140,8 @@ describe("resend plugin: unified Plugin shape", () => {
     expect(plugin.lifts).toEqual({});
   });
 
-  it("has a defaultInterpreter factory", () => {
-    expect(typeof plugin.defaultInterpreter).toBe("function");
+  it("has NO defaultInterpreter", () => {
+    expect(plugin.defaultInterpreter).toBeUndefined();
   });
 });
 

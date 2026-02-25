@@ -12,7 +12,7 @@ import type Stripe from 'stripe';
 export function createStripeInterpreter(client: StripeClient): Interpreter;
 
 // @public
-export function stripe(config: StripeConfig): {
+export const stripe: {
     name: "stripe";
     ctors: {
         stripe: {
@@ -50,7 +50,6 @@ export function stripe(config: StripeConfig): {
     };
     traits: {};
     lifts: {};
-    defaultInterpreter: () => Interpreter;
 };
 
 // @public
@@ -68,7 +67,45 @@ export interface StripeConfig {
 export const stripeInterpreter: Interpreter;
 
 // @public
-export const stripePlugin: typeof stripe;
+export const stripePlugin: {
+    name: "stripe";
+    ctors: {
+        stripe: {
+            paymentIntents: {
+                create<A>(params: A): CExpr<Record<string, unknown>, "stripe/create_payment_intent", [A]>;
+                retrieve<A>(id: A): CExpr<Record<string, unknown>, "stripe/retrieve_payment_intent", [A]>;
+                confirm<A, B extends readonly unknown[]>(id: A, ...params: B): CExpr<Record<string, unknown>, "stripe/confirm_payment_intent", [A, ...B]>;
+            };
+            customers: {
+                create<A>(params: A): CExpr<Record<string, unknown>, "stripe/create_customer", [A]>;
+                retrieve<A>(id: A): CExpr<Record<string, unknown>, "stripe/retrieve_customer", [A]>;
+                update<A, B>(id: A, params: B): CExpr<Record<string, unknown>, "stripe/update_customer", [A, B]>;
+                list<A extends readonly unknown[]>(...params: A): CExpr<Record<string, unknown>, "stripe/list_customers", A>;
+            };
+            charges: {
+                create<A>(params: A): CExpr<Record<string, unknown>, "stripe/create_charge", [A]>;
+                retrieve<A>(id: A): CExpr<Record<string, unknown>, "stripe/retrieve_charge", [A]>;
+                list<A extends readonly unknown[]>(...params: A): CExpr<Record<string, unknown>, "stripe/list_charges", A>;
+            };
+        };
+    };
+    kinds: {
+        "stripe/create_payment_intent": KindSpec<[unknown], unknown>;
+        "stripe/retrieve_payment_intent": KindSpec<[unknown], unknown>;
+        "stripe/confirm_payment_intent": KindSpec<[unknown], unknown>;
+        "stripe/create_customer": KindSpec<[unknown], unknown>;
+        "stripe/retrieve_customer": KindSpec<[unknown], unknown>;
+        "stripe/update_customer": KindSpec<[unknown, unknown], unknown>;
+        "stripe/list_customers": KindSpec<unknown[], unknown>;
+        "stripe/create_charge": KindSpec<[unknown], unknown>;
+        "stripe/retrieve_charge": KindSpec<[unknown], unknown>;
+        "stripe/list_charges": KindSpec<unknown[], unknown>;
+        "stripe/record": KindSpec<unknown[], Record<string, unknown>>;
+        "stripe/array": KindSpec<unknown[], unknown[]>;
+    };
+    traits: {};
+    lifts: {};
+};
 
 // @public
 export function wrapStripeSdk(stripe: Stripe): StripeClient;

@@ -452,22 +452,13 @@
           "name": "createFetchInterpreter"
         },
         {
-          "kind": "Function",
-          "canonicalReference": "@mvfm/plugin-fetch!fetch_2:function(1)",
-          "docComment": "/**\n * Creates the fetch plugin definition (unified Plugin type).\n *\n * @param config - Optional {@link FetchConfig} with baseUrl and defaultHeaders.\n *\n * @returns A unified Plugin that contributes `$.fetch`.\n */\n",
+          "kind": "Variable",
+          "canonicalReference": "@mvfm/plugin-fetch!fetch_2:var",
+          "docComment": "/**\n * Fetch plugin definition (unified Plugin type).\n *\n * Uses `globalThis.fetch` — no config required.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare function fetch(config?: "
-            },
-            {
-              "kind": "Reference",
-              "text": "FetchConfig",
-              "canonicalReference": "@mvfm/plugin-fetch!FetchConfig:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "): "
+              "text": "fetch: "
             },
             {
               "kind": "Content",
@@ -616,30 +607,16 @@
             {
               "kind": "Content",
               "text": ";\n}"
-            },
-            {
-              "kind": "Content",
-              "text": ";"
             }
           ],
           "fileUrlPath": "dist/whatwg/index.d.ts",
-          "returnTypeTokenRange": {
-            "startIndex": 3,
-            "endIndex": 36
-          },
+          "isReadonly": true,
           "releaseTag": "Public",
-          "overloadIndex": 1,
-          "parameters": [
-            {
-              "parameterName": "config",
-              "parameterTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isOptional": true
-            }
-          ],
-          "name": "fetch_2"
+          "name": "fetch_2",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 34
+          }
         },
         {
           "kind": "Interface",

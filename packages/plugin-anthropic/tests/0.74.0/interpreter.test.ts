@@ -12,7 +12,7 @@ import { anthropicInterpreter } from "../../src";
 import { anthropic } from "../../src/0.74.0";
 import { type AnthropicClient, createAnthropicInterpreter } from "../../src/0.74.0/interpreter";
 
-const plugin = anthropic({ apiKey: "sk-ant-test-123" });
+const plugin = anthropic;
 const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
 const $ = composeDollar(...plugins);
 const app = createApp(...plugins);

@@ -17,9 +17,9 @@ import type { Interpreter } from "@mvfm/core";
 export const app = mvfm(
   prelude,
   error,
-  openai({ apiKey: "unused-at-construction-time" }),
-  postgres(),
-  stripe({ apiKey: "unused-at-construction-time" }),
+  openai,
+  postgres,
+  stripe,
 );
 
 export const handlePrompt = app(

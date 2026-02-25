@@ -43,69 +43,60 @@ export interface PostgresConfig {
 // ---- Plugin factory ---------------------------------------
 
 /**
- * Creates the postgres plugin definition (unified Plugin type).
+ * Postgres plugin definition (unified Plugin type).
  *
- * This plugin has NO defaultInterpreter. You must provide one
- * via `defaults(plugins, { postgres: createPostgresServerInterpreter(...) })`.
- *
- * @param config - A connection string or {@link PostgresConfig} object.
- *   Config is captured by the interpreter, not stored on AST nodes.
- * @returns A unified Plugin that contributes `$.sql`.
+ * This plugin has no defaultInterpreter. You must provide one
+ * via `defaults(app, { postgres: createPostgresServerInterpreter(...) })`.
  */
-export function postgres(config?: PostgresConfig | string) {
-  const _resolvedConfig: PostgresConfig =
-    typeof config === "string" ? { connectionString: config } : (config ?? {});
-
-  return {
-    name: "postgres" as const,
-    ctors: { sql: buildPostgresApi() },
-    kinds: {
-      "postgres/query": {
-        inputs: [0] as [number, ...unknown[]],
-        output: [] as unknown[],
-      } as KindSpec<[number, ...unknown[]], unknown[]>,
-      "postgres/identifier": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
-      "postgres/insert_helper": {
-        inputs: [undefined, ""] as [unknown, string],
-        output: undefined as unknown,
-      } as KindSpec<[unknown, string], unknown>,
-      "postgres/set_helper": {
-        inputs: [undefined, ""] as [unknown, string],
-        output: undefined as unknown,
-      } as KindSpec<[unknown, string], unknown>,
-      "postgres/begin": {
-        inputs: [""] as [string, ...unknown[]],
-        output: undefined as unknown,
-      } as KindSpec<[string, ...unknown[]], unknown>,
-      "postgres/savepoint": {
-        inputs: [""] as [string, ...unknown[]],
-        output: undefined as unknown,
-      } as KindSpec<[string, ...unknown[]], unknown>,
-      "postgres/cursor": {
-        inputs: [undefined, undefined, undefined] as [unknown, unknown, unknown],
-        output: undefined as unknown as undefined,
-      } as KindSpec<[unknown, unknown, unknown], void>,
-      "postgres/cursor_batch": {
-        inputs: [] as [],
-        output: [] as unknown[],
-      } as KindSpec<[], unknown[]>,
-      // Structural helpers (produced by liftArg)
-      "postgres/record": {
-        inputs: [] as unknown[],
-        output: {} as Record<string, unknown>,
-      } as KindSpec<unknown[], Record<string, unknown>>,
-      "postgres/array": {
-        inputs: [] as unknown[],
-        output: [] as unknown[],
-      } as KindSpec<unknown[], unknown[]>,
-    },
-    traits: {},
-    lifts: {},
-  } satisfies Plugin;
-}
+export const postgres = {
+  name: "postgres" as const,
+  ctors: { sql: buildPostgresApi() },
+  kinds: {
+    "postgres/query": {
+      inputs: [0] as [number, ...unknown[]],
+      output: [] as unknown[],
+    } as KindSpec<[number, ...unknown[]], unknown[]>,
+    "postgres/identifier": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "postgres/insert_helper": {
+      inputs: [undefined, ""] as [unknown, string],
+      output: undefined as unknown,
+    } as KindSpec<[unknown, string], unknown>,
+    "postgres/set_helper": {
+      inputs: [undefined, ""] as [unknown, string],
+      output: undefined as unknown,
+    } as KindSpec<[unknown, string], unknown>,
+    "postgres/begin": {
+      inputs: [""] as [string, ...unknown[]],
+      output: undefined as unknown,
+    } as KindSpec<[string, ...unknown[]], unknown>,
+    "postgres/savepoint": {
+      inputs: [""] as [string, ...unknown[]],
+      output: undefined as unknown,
+    } as KindSpec<[string, ...unknown[]], unknown>,
+    "postgres/cursor": {
+      inputs: [undefined, undefined, undefined] as [unknown, unknown, unknown],
+      output: undefined as unknown as undefined,
+    } as KindSpec<[unknown, unknown, unknown], void>,
+    "postgres/cursor_batch": {
+      inputs: [] as [],
+      output: [] as unknown[],
+    } as KindSpec<[], unknown[]>,
+    // Structural helpers (produced by liftArg)
+    "postgres/record": {
+      inputs: [] as unknown[],
+      output: {} as Record<string, unknown>,
+    } as KindSpec<unknown[], Record<string, unknown>>,
+    "postgres/array": {
+      inputs: [] as unknown[],
+      output: [] as unknown[],
+    } as KindSpec<unknown[], unknown[]>,
+  },
+  traits: {},
+  lifts: {},
+} satisfies Plugin;
 
 /** Alias for {@link postgres}, kept for readability at call sites. */
 export const postgresPlugin = postgres;

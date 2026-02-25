@@ -21,7 +21,7 @@ export function clientInterpreter(options: ClientHandlerOptions, kinds: string[]
 export function createFetchInterpreter(client?: FetchClient, config?: FetchConfig): Interpreter;
 
 // @public
-function fetch_2(config?: FetchConfig): {
+const fetch_2: {
     name: "fetch";
     ctors: {
         fetch: {
@@ -100,8 +100,8 @@ export function wrapFetch(fetchFn?: typeof globalThis.fetch): FetchClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/whatwg/index.d.ts:42:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-// dist/whatwg/index.d.ts:50:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/whatwg/index.d.ts:41:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/whatwg/index.d.ts:49:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

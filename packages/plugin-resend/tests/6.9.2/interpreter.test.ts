@@ -12,7 +12,7 @@ import { resendInterpreter } from "../../src";
 import { resend } from "../../src/6.9.2";
 import { createResendInterpreter, type ResendClient } from "../../src/6.9.2/interpreter";
 
-const plugin = resend({ apiKey: "re_test_123" });
+const plugin = resend;
 const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
 const $ = composeDollar(...plugins);
 const app = createApp(...plugins);

@@ -24,7 +24,7 @@ function mockResponse(body: unknown, status = 200, headers: Record<string, strin
   } as unknown as Response;
 }
 
-const plugin = fetchPlugin({ baseUrl: "https://api.test.com" });
+const plugin = fetchPlugin;
 const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
 const $ = composeDollar(...plugins);
 const app = createApp(...plugins);

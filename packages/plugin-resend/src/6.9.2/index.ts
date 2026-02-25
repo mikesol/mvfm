@@ -12,10 +12,8 @@
 //   - Contacts: create, get, list, remove
 // ============================================================
 
-import type { CExpr, Interpreter, KindSpec, Plugin } from "@mvfm/core";
+import type { CExpr, KindSpec, Plugin } from "@mvfm/core";
 import { isCExpr, makeCExpr } from "@mvfm/core";
-import { wrapResendSdk } from "./client-resend-sdk";
-import { createResendInterpreter, type ResendClient } from "./interpreter";
 
 // ---- liftArg: recursive plain-value → CExpr lifting --------
 
@@ -122,91 +120,58 @@ function buildResendApi() {
   };
 }
 
-// ---- Default interpreter wiring ---------------------------
-
-const dynamicImport = new Function("m", "return import(m)") as (
-  moduleName: string,
-) => Promise<Record<string, unknown>>;
-
-function createDefaultInterpreter(config: ResendConfig): Interpreter {
-  let clientPromise: Promise<ResendClient> | undefined;
-  const getClient = async (): Promise<ResendClient> => {
-    if (!clientPromise) {
-      clientPromise = dynamicImport("resend").then((moduleValue) => {
-        const Resend = moduleValue.Resend as new (key: string) => Record<string, unknown>;
-        return wrapResendSdk(
-          new Resend(config.apiKey) as unknown as Parameters<typeof wrapResendSdk>[0],
-        );
-      });
-    }
-    return clientPromise;
-  };
-
-  const lazyClient: ResendClient = {
-    async request(method: string, path: string, params?: unknown): Promise<unknown> {
-      const client = await getClient();
-      return client.request(method, path, params);
-    },
-  };
-
-  return createResendInterpreter(lazyClient);
-}
-
-// ---- Plugin factory ---------------------------------------
+// ---- Plugin definition ------------------------------------
 
 /**
- * Creates the resend plugin definition (unified Plugin type).
+ * Resend plugin definition (unified Plugin type).
  *
- * @param config - A {@link ResendConfig} with apiKey.
- * @returns A unified Plugin that contributes `$.resend`.
+ * This plugin has no defaultInterpreter — you must provide one
+ * via `defaults(app, { resend: createResendInterpreter(wrapResendSdk(client)) })`.
  */
-export function resend(config: ResendConfig) {
-  return {
-    name: "resend" as const,
-    ctors: { resend: buildResendApi() },
-    kinds: {
-      "resend/send_email": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
-      "resend/get_email": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
-      "resend/send_batch": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
-      "resend/create_contact": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
-      "resend/get_contact": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
-      "resend/list_contacts": {
-        inputs: [] as [],
-        output: undefined as unknown,
-      } as KindSpec<[], unknown>,
-      "resend/remove_contact": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
-      "resend/record": {
-        inputs: [] as unknown[],
-        output: {} as Record<string, unknown>,
-      } as KindSpec<unknown[], Record<string, unknown>>,
-      "resend/array": {
-        inputs: [] as unknown[],
-        output: [] as unknown[],
-      } as KindSpec<unknown[], unknown[]>,
-    },
-    traits: {},
-    lifts: {},
-    defaultInterpreter: (): Interpreter => createDefaultInterpreter(config),
-  } satisfies Plugin;
-}
+export const resend = {
+  name: "resend" as const,
+  ctors: { resend: buildResendApi() },
+  kinds: {
+    "resend/send_email": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "resend/get_email": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "resend/send_batch": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "resend/create_contact": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "resend/get_contact": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "resend/list_contacts": {
+      inputs: [] as [],
+      output: undefined as unknown,
+    } as KindSpec<[], unknown>,
+    "resend/remove_contact": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "resend/record": {
+      inputs: [] as unknown[],
+      output: {} as Record<string, unknown>,
+    } as KindSpec<unknown[], Record<string, unknown>>,
+    "resend/array": {
+      inputs: [] as unknown[],
+      output: [] as unknown[],
+    } as KindSpec<unknown[], unknown[]>,
+  },
+  traits: {},
+  lifts: {},
+} satisfies Plugin;
 
 /**
  * Alias for {@link resend}, kept for readability at call sites.

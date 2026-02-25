@@ -16,7 +16,7 @@ import { createFixtureClient } from "./fixture-client";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const fixtureClient = createFixtureClient(join(__dirname, "fixtures"));
-const plugin = openai({ apiKey: "sk-openai-fixture" });
+const plugin = openai;
 const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
 const $ = composeDollar(...plugins);
 const app = createApp(...plugins);

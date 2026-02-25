@@ -4,7 +4,7 @@ import { postgres } from "../../src/3.4.8";
 
 describe("plugin isolation", () => {
   it("postgres plugin works with minimal plugins (num + str)", () => {
-    const plugin = postgres("postgres://localhost/test");
+    const plugin = postgres;
     const plugins = [numPlugin, strPlugin, plugin] as const;
     const $ = composeDollar(...plugins);
     const app = createApp(...plugins);
@@ -15,7 +15,7 @@ describe("plugin isolation", () => {
   });
 
   it("postgres plugin requires num + str for elaboration (string parts need str/literal)", () => {
-    const plugin = postgres("postgres://localhost/test");
+    const plugin = postgres;
     const plugins = [numPlugin, plugin] as const;
     const $ = composeDollar(...plugins);
     const app = createApp(...plugins);

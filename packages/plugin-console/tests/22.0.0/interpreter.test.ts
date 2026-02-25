@@ -13,7 +13,7 @@ import type { ConsoleMethodName } from "../../src/22.0.0";
 import { consolePlugin } from "../../src/22.0.0";
 import { type ConsoleClient, createConsoleInterpreter } from "../../src/22.0.0/interpreter";
 
-const plugin = consolePlugin();
+const plugin = consolePlugin;
 const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
 const $ = composeDollar(...plugins);
 const app = createApp(...plugins);

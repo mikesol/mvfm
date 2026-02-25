@@ -21,7 +21,7 @@ export function clientInterpreter(options: ClientHandlerOptions, kinds: string[]
 export function createPinoInterpreter(client?: PinoClient, _config?: PinoConfig): Interpreter;
 
 // @public
-export function pino(config?: PinoConfig): {
+export const pino: {
     name: "pino";
     ctors: {
         pino: PinoLogger;
@@ -38,7 +38,6 @@ export function pino(config?: PinoConfig): {
     };
     traits: {};
     lifts: {};
-    defaultInterpreter: () => Interpreter;
 };
 
 // @public
@@ -120,7 +119,24 @@ export interface PinoMethods {
 }
 
 // @public
-export const pinoPlugin: typeof pino;
+export const pinoPlugin: {
+    name: "pino";
+    ctors: {
+        pino: PinoLogger;
+    };
+    kinds: {
+        "pino/trace": KindSpec<[unknown, ...unknown[]], void>;
+        "pino/debug": KindSpec<[unknown, ...unknown[]], void>;
+        "pino/info": KindSpec<[unknown, ...unknown[]], void>;
+        "pino/warn": KindSpec<[unknown, ...unknown[]], void>;
+        "pino/error": KindSpec<[unknown, ...unknown[]], void>;
+        "pino/fatal": KindSpec<[unknown, ...unknown[]], void>;
+        "pino/record": KindSpec<unknown[], Record<string, unknown>>;
+        "pino/array": KindSpec<unknown[], unknown[]>;
+    };
+    traits: {};
+    lifts: {};
+};
 
 // Warning: (ae-forgotten-export) The symbol "NExpr" needs to be exported by the entry point index.d.ts
 //
@@ -135,7 +151,7 @@ export function wrapPino(logger: PinoInstance): PinoClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/10.3.1/index.d.ts:66:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/10.3.1/index.d.ts:62:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

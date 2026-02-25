@@ -17,7 +17,7 @@ import {
 } from "@mvfm/core";
 import { zod } from "../src/index";
 
-const zodPlugin = zod();
+const zodPlugin = zod;
 const plugins = [numPlugin, strPlugin, boolPlugin, zodPlugin] as const;
 
 /** The composed constructor bag with $.zod namespace. */

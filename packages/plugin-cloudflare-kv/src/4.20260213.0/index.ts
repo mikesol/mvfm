@@ -161,66 +161,48 @@ function buildKvApi() {
 // ---- Plugin factory ---------------------------------------
 
 /**
- * Creates the cloudflare-kv plugin definition (unified Plugin type).
+ * Cloudflare KV plugin definition (unified Plugin type).
  *
- * This plugin has NO defaultInterpreter. You must provide one
- * via `defaults(plugins, { "cloudflare-kv": createCloudflareKvInterpreter(client) })`.
- *
- * @param _config - A {@link CloudflareKvConfig} with namespaceId.
- *   Config is captured by the interpreter, not stored on AST nodes.
- * @returns A unified Plugin that contributes `$.kv`.
- *
- * @example
- * ```ts
- * const plugin = cloudflareKv({ namespaceId: "MY_KV" });
- * const $ = composeDollar(numPlugin, strPlugin, plugin);
- * const expr = $.kv.get("my-key");
- * const nexpr = app(expr);
- * const interp = defaults([numPlugin, strPlugin, plugin], {
- *   "cloudflare-kv": createCloudflareKvInterpreter(myClient),
- * });
- * const result = await fold(nexpr, interp);
- * ```
+ * This plugin has no defaultInterpreter. You must provide one
+ * via `defaults(app, { "cloudflare-kv": createCloudflareKvInterpreter(client) })`.
  */
-export function cloudflareKv(_config: CloudflareKvConfig) {
-  return {
-    name: "cloudflare-kv" as const,
-    ctors: { kv: buildKvApi() },
-    kinds: {
-      "cloudflare-kv/get": {
-        inputs: [""] as [string],
-        output: null as string | null,
-      } as KindSpec<[string], string | null>,
-      "cloudflare-kv/get_json": {
-        inputs: [""] as [string],
-        output: undefined as unknown,
-      } as KindSpec<[string], unknown>,
-      "cloudflare-kv/put": {
-        inputs: ["", ""] as [string, string],
-        output: undefined as unknown as undefined,
-      } as KindSpec<[string, string], void>,
-      "cloudflare-kv/delete": {
-        inputs: [""] as [string],
-        output: undefined as unknown as undefined,
-      } as KindSpec<[string], void>,
-      "cloudflare-kv/list": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
-      // Structural helpers (produced by liftArg)
-      "cloudflare-kv/record": {
-        inputs: [] as unknown[],
-        output: {} as Record<string, unknown>,
-      } as KindSpec<unknown[], Record<string, unknown>>,
-      "cloudflare-kv/array": {
-        inputs: [] as unknown[],
-        output: [] as unknown[],
-      } as KindSpec<unknown[], unknown[]>,
-    },
-    traits: {},
-    lifts: {},
-  } satisfies Plugin;
-}
+export const cloudflareKv = {
+  name: "cloudflare-kv" as const,
+  ctors: { kv: buildKvApi() },
+  kinds: {
+    "cloudflare-kv/get": {
+      inputs: [""] as [string],
+      output: null as string | null,
+    } as KindSpec<[string], string | null>,
+    "cloudflare-kv/get_json": {
+      inputs: [""] as [string],
+      output: undefined as unknown,
+    } as KindSpec<[string], unknown>,
+    "cloudflare-kv/put": {
+      inputs: ["", ""] as [string, string],
+      output: undefined as unknown as undefined,
+    } as KindSpec<[string, string], void>,
+    "cloudflare-kv/delete": {
+      inputs: [""] as [string],
+      output: undefined as unknown as undefined,
+    } as KindSpec<[string], void>,
+    "cloudflare-kv/list": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    // Structural helpers (produced by liftArg)
+    "cloudflare-kv/record": {
+      inputs: [] as unknown[],
+      output: {} as Record<string, unknown>,
+    } as KindSpec<unknown[], Record<string, unknown>>,
+    "cloudflare-kv/array": {
+      inputs: [] as unknown[],
+      output: [] as unknown[],
+    } as KindSpec<unknown[], unknown[]>,
+  },
+  traits: {},
+  lifts: {},
+} satisfies Plugin;
 
 /**
  * Alias for {@link cloudflareKv}, kept for readability at call sites.

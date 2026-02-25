@@ -16,10 +16,7 @@ import { createFixtureClient } from "./fixture-client";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const fixtureClient = createFixtureClient(join(__dirname, "fixtures"));
-const plugin = twilio({
-  accountSid: "AC_test_123",
-  authToken: "auth_test_456",
-});
+const plugin = twilio;
 const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
 const $ = composeDollar(...plugins);
 const app = createApp(...plugins);

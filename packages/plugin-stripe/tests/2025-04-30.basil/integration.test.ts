@@ -17,7 +17,7 @@ import { createStripeInterpreter } from "../../src/2025-04-30.basil/interpreter"
 let container: StartedTestContainer;
 let sdk: Stripe;
 
-const plugin = stripePlugin({ apiKey: "sk_test_fake" });
+const plugin = stripePlugin;
 const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
 const $ = composeDollar(...plugins);
 const app = createApp(...plugins);

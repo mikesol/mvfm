@@ -17,9 +17,8 @@
 //   [key0, val0, key1, val1, ...]
 // ============================================================
 
-import type { CExpr, Interpreter, KindSpec, Plugin } from "@mvfm/core";
+import type { CExpr, KindSpec, Plugin } from "@mvfm/core";
 import { isCExpr, makeCExpr } from "@mvfm/core";
-import { createPinoInterpreter } from "./interpreter";
 
 // ---- Constants -----------------------------------------------
 
@@ -182,34 +181,27 @@ const arrayKind = {
 // ---- Plugin factory ---------------------------------------
 
 /**
- * Pino plugin factory. Namespace: `pino/`.
+ * Pino plugin definition (unified Plugin type).
  *
- * Creates a plugin that exposes structured logging methods
- * mirroring the real pino API. Log calls produce AST nodes
- * that yield `pino/<level>` effects at interpretation time.
- *
- * @param config - A {@link PinoConfig} with optional level and base bindings.
- * @returns A unified Plugin that contributes `$.pino`.
+ * This plugin has no defaultInterpreter — you must provide one
+ * via `defaults(app, { pino: createPinoInterpreter(logger, config) })`.
  */
-export function pino(config: PinoConfig = {}) {
-  return {
-    name: "pino" as const,
-    ctors: { pino: buildPinoApi() },
-    kinds: {
-      "pino/trace": voidKind,
-      "pino/debug": voidKind,
-      "pino/info": voidKind,
-      "pino/warn": voidKind,
-      "pino/error": voidKind,
-      "pino/fatal": voidKind,
-      "pino/record": recordKind,
-      "pino/array": arrayKind,
-    },
-    traits: {},
-    lifts: {},
-    defaultInterpreter: (): Interpreter => createPinoInterpreter(undefined, config),
-  } satisfies Plugin;
-}
+export const pino = {
+  name: "pino" as const,
+  ctors: { pino: buildPinoApi() },
+  kinds: {
+    "pino/trace": voidKind,
+    "pino/debug": voidKind,
+    "pino/info": voidKind,
+    "pino/warn": voidKind,
+    "pino/error": voidKind,
+    "pino/fatal": voidKind,
+    "pino/record": recordKind,
+    "pino/array": arrayKind,
+  },
+  traits: {},
+  lifts: {},
+} satisfies Plugin;
 
 /**
  * Alias for {@link pino}, kept for readability at call sites.

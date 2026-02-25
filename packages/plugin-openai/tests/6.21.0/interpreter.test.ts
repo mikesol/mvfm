@@ -12,7 +12,7 @@ import { openaiInterpreter } from "../../src";
 import { openai } from "../../src/6.21.0";
 import { createOpenAIInterpreter, type OpenAIClient } from "../../src/6.21.0/interpreter";
 
-const plugin = openai({ apiKey: "sk-test-123" });
+const plugin = openai;
 const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
 const $ = composeDollar(...plugins);
 const app = createApp(...plugins);

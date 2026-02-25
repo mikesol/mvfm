@@ -114,35 +114,35 @@ export function createPlaygroundScope(
   const { app: _app, ...coreRest } = { ...core } as Record<string, unknown>;
   const injected: Record<string, unknown> = {
     ...coreRest,
-    console_: pluginConsole.consolePlugin(),
+    console_: pluginConsole.consolePlugin,
     ...consoleRest,
-    zod: pluginZod.zod(),
+    zod: pluginZod.zod,
     z: pluginZod.z,
     createZodInterpreter: pluginZod.createZodInterpreter,
     consoleInterpreter: fakeConsoleInterpreter,
-    fetch_: pluginFetch.fetch(),
-    pino_: pluginPino.pino(),
+    fetch_: pluginFetch.fetch,
+    pino_: pluginPino.pino,
     createPinoInterpreter: pluginPino.createPinoInterpreter,
-    openai_: pluginOpenAI.openai({ apiKey: "sk-crystal-ball" }),
+    openai_: pluginOpenAI.openai,
     crystalBallOpenAIInterpreter,
-    anthropic_: pluginAnthropic.anthropic({ apiKey: "sk-ant-crystal-ball" }),
+    anthropic_: pluginAnthropic.anthropic,
     crystalBallAnthropicInterpreter,
-    fal_: pluginFal.fal({ credentials: "key-crystal-ball" }),
+    fal_: pluginFal.fal,
     crystalBallFalInterpreter,
 
-    stripe_: pluginStripe.stripe({ apiKey: "sk_test_crystal_ball" }),
+    stripe_: pluginStripe.stripe,
     crystalBallStripeInterpreter,
     twilio_: pluginTwilio.twilio,
     crystalBallTwilioInterpreter,
-    slack_: pluginSlack.slack({ token: "xoxb-mock-token" }),
+    slack_: pluginSlack.slack,
 
-    resend_: pluginResend.resend({ apiKey: "re_crystal_ball" }),
+    resend_: pluginResend.resend,
     crystalBallResendInterpreter,
   };
 
   // Wire PGLite-backed postgres when a db instance is provided
   if (pgliteDb) {
-    const pg = pluginPostgres.postgres();
+    const pg = pluginPostgres.postgres;
     const client = wrapPgLite(pgliteDb);
     injected.pg = pg;
     injected.wasmPgInterpreter = pluginPostgres.createPostgresServerInterpreter(client);
@@ -171,7 +171,7 @@ export function createPlaygroundScope(
   // Wire in-memory Redis when redis flag is set
   if (redis) {
     const client = new MemoryRedisClient();
-    injected.redis = pluginRedis.redis();
+    injected.redis = pluginRedis.redis;
     injected.memoryRedisInterpreter = pluginRedis.createRedisInterpreter(client);
   }
 
@@ -185,7 +185,7 @@ export function createPlaygroundScope(
   // Wire in-memory S3 when s3 flag is set
   if (s3) {
     const client = new MemoryS3Client();
-    injected.s3_ = pluginS3.s3({ region: "us-east-1" });
+    injected.s3_ = pluginS3.s3;
     injected.memoryS3Interpreter = pluginS3.createS3Interpreter(client);
   }
 

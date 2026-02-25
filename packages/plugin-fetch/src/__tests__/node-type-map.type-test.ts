@@ -1,8 +1,8 @@
 import type { CExpr, Interpreter, RuntimeEntry } from "@mvfm/core";
 import { fetch } from "../whatwg";
 
-// Verify the plugin returns the correct shape
-const plugin = fetch();
+// Verify the plugin has the correct shape
+const plugin = fetch;
 
 // Name is the literal "fetch"
 const _name: "fetch" = plugin.name;

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { redis, redisPlugin } from "../../src/5.4.1";
 
-const plugin = redis({ host: "127.0.0.1", port: 6379 });
+const plugin = redis;
 const api = plugin.ctors.redis;
 
 describe("redis: CExpr construction (strings)", () => {
@@ -45,7 +45,7 @@ describe("redis: CExpr construction (strings)", () => {
 
 describe("redis: string URL config", () => {
   it("accepts string config", () => {
-    const urlPlugin = redis("redis://localhost:6379/0");
+    const urlPlugin = redis;
     expect(urlPlugin.name).toBe("redis");
     const urlApi = urlPlugin.ctors.redis;
     expect(urlApi.get("test").__kind).toBe("redis/get");

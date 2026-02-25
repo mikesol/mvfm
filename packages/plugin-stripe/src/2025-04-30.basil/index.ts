@@ -12,10 +12,8 @@
 //   - Charges: create, retrieve, list
 // ============================================================
 
-import type { CExpr, Interpreter, KindSpec, Plugin } from "@mvfm/core";
+import type { CExpr, KindSpec, Plugin } from "@mvfm/core";
 import { isCExpr, makeCExpr } from "@mvfm/core";
-import { wrapStripeSdk } from "./client-stripe-sdk";
-import { createStripeInterpreter, type StripeClient } from "./interpreter";
 
 // ---- liftArg: recursive plain-value → CExpr lifting --------
 
@@ -65,43 +63,6 @@ export interface StripeConfig {
   apiKey: string;
   /** Stripe API version override. Defaults to `2025-04-30.basil`. */
   apiVersion?: string;
-}
-
-// ---- Default interpreter wiring ---------------------------
-
-const dynamicImport = new Function("m", "return import(m)") as (
-  moduleName: string,
-) => Promise<Record<string, unknown>>;
-
-function createDefaultInterpreter(config: StripeConfig): Interpreter {
-  let clientPromise: Promise<StripeClient> | undefined;
-  const getClient = async (): Promise<StripeClient> => {
-    if (!clientPromise) {
-      clientPromise = dynamicImport("stripe").then((moduleValue) => {
-        const Stripe = moduleValue.default as new (
-          apiKey: string,
-          opts?: Record<string, unknown>,
-        ) => Parameters<typeof wrapStripeSdk>[0];
-        const opts: Record<string, unknown> = {};
-        if (config.apiVersion) opts.apiVersion = config.apiVersion;
-        return wrapStripeSdk(new Stripe(config.apiKey, opts));
-      });
-    }
-    return clientPromise;
-  };
-
-  const lazyClient: StripeClient = {
-    async request(
-      method: string,
-      path: string,
-      params?: Record<string, unknown>,
-    ): Promise<unknown> {
-      const client = await getClient();
-      return client.request(method, path, params);
-    },
-  };
-
-  return createStripeInterpreter(lazyClient);
 }
 
 // ---- Constructor builder ----------------------------------
@@ -186,70 +147,67 @@ function buildStripeApi() {
 // ---- Plugin factory ---------------------------------------
 
 /**
- * Creates the stripe plugin definition (unified Plugin type).
+ * Stripe plugin definition (unified Plugin type).
  *
- * @param config - A {@link StripeConfig} with apiKey and optional apiVersion.
- * @returns A unified Plugin that contributes `$.stripe`.
+ * This plugin has no defaultInterpreter — you must provide one
+ * via `defaults(app, { stripe: createStripeInterpreter(wrapStripeSdk(client)) })`.
  */
-export function stripe(config: StripeConfig) {
-  return {
-    name: "stripe" as const,
-    ctors: { stripe: buildStripeApi() },
-    kinds: {
-      "stripe/create_payment_intent": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
-      "stripe/retrieve_payment_intent": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
-      "stripe/confirm_payment_intent": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
-      "stripe/create_customer": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
-      "stripe/retrieve_customer": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
-      "stripe/update_customer": {
-        inputs: [undefined, undefined] as [unknown, unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown, unknown], unknown>,
-      "stripe/list_customers": {
-        inputs: [] as unknown[],
-        output: undefined as unknown,
-      } as KindSpec<unknown[], unknown>,
-      "stripe/create_charge": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
-      "stripe/retrieve_charge": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
-      "stripe/list_charges": {
-        inputs: [] as unknown[],
-        output: undefined as unknown,
-      } as KindSpec<unknown[], unknown>,
-      "stripe/record": {
-        inputs: [] as unknown[],
-        output: {} as Record<string, unknown>,
-      } as KindSpec<unknown[], Record<string, unknown>>,
-      "stripe/array": {
-        inputs: [] as unknown[],
-        output: [] as unknown[],
-      } as KindSpec<unknown[], unknown[]>,
-    },
-    traits: {},
-    lifts: {},
-    defaultInterpreter: (): Interpreter => createDefaultInterpreter(config),
-  } satisfies Plugin;
-}
+export const stripe = {
+  name: "stripe" as const,
+  ctors: { stripe: buildStripeApi() },
+  kinds: {
+    "stripe/create_payment_intent": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "stripe/retrieve_payment_intent": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "stripe/confirm_payment_intent": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "stripe/create_customer": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "stripe/retrieve_customer": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "stripe/update_customer": {
+      inputs: [undefined, undefined] as [unknown, unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown, unknown], unknown>,
+    "stripe/list_customers": {
+      inputs: [] as unknown[],
+      output: undefined as unknown,
+    } as KindSpec<unknown[], unknown>,
+    "stripe/create_charge": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "stripe/retrieve_charge": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "stripe/list_charges": {
+      inputs: [] as unknown[],
+      output: undefined as unknown,
+    } as KindSpec<unknown[], unknown>,
+    "stripe/record": {
+      inputs: [] as unknown[],
+      output: {} as Record<string, unknown>,
+    } as KindSpec<unknown[], Record<string, unknown>>,
+    "stripe/array": {
+      inputs: [] as unknown[],
+      output: [] as unknown[],
+    } as KindSpec<unknown[], unknown[]>,
+  },
+  traits: {},
+  lifts: {},
+} satisfies Plugin;
 
 /**
  * Alias for {@link stripe}, kept for readability at call sites.

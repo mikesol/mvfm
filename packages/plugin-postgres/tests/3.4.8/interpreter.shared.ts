@@ -10,7 +10,7 @@ import { createPostgresServerInterpreter } from "../../src/3.4.8/handler.server"
 let container: StartedPostgreSqlContainer;
 let sqlClient: ReturnType<typeof pg>;
 
-const plugin = postgres("postgres://test");
+const plugin = postgres;
 const plugins = [numPlugin, strPlugin, plugin] as const;
 const $ = composeDollar(...plugins);
 const app = createApp(...plugins);

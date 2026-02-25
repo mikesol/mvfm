@@ -10,7 +10,7 @@
 export function createTwilioInterpreter(client: TwilioClient, accountSid: string | (() => string)): Interpreter;
 
 // @public
-export function twilio(config: TwilioConfig): {
+export const twilio: {
     name: "twilio";
     ctors: {
         twilio: {
@@ -40,7 +40,6 @@ export function twilio(config: TwilioConfig): {
     };
     traits: {};
     lifts: {};
-    defaultInterpreter: () => Interpreter;
 };
 
 // @public
@@ -58,7 +57,37 @@ export interface TwilioConfig {
 export const twilioInterpreter: Interpreter;
 
 // @public
-export const twilioPlugin: typeof twilio;
+export const twilioPlugin: {
+    name: "twilio";
+    ctors: {
+        twilio: {
+            messages: (<A>(sid: A) => {
+                fetch(): CExpr<Record<string, unknown>, "twilio/fetch_message", [A]>;
+            }) & {
+                create<A>(params: A): CExpr<Record<string, unknown>, "twilio/create_message", [A]>;
+                list<A>(params?: A): CExpr<Record<string, unknown>, "twilio/list_messages", [A]>;
+            };
+            calls: (<A>(sid: A) => {
+                fetch(): CExpr<Record<string, unknown>, "twilio/fetch_call", [A]>;
+            }) & {
+                create<A>(params: A): CExpr<Record<string, unknown>, "twilio/create_call", [A]>;
+                list<A>(params?: A): CExpr<Record<string, unknown>, "twilio/list_calls", [A]>;
+            };
+        };
+    };
+    kinds: {
+        "twilio/create_message": KindSpec<[unknown], unknown>;
+        "twilio/fetch_message": KindSpec<[unknown], unknown>;
+        "twilio/list_messages": KindSpec<unknown[], unknown>;
+        "twilio/create_call": KindSpec<[unknown], unknown>;
+        "twilio/fetch_call": KindSpec<[unknown], unknown>;
+        "twilio/list_calls": KindSpec<unknown[], unknown>;
+        "twilio/record": KindSpec<unknown[], Record<string, unknown>>;
+        "twilio/array": KindSpec<unknown[], unknown[]>;
+    };
+    traits: {};
+    lifts: {};
+};
 
 // Warning: (ae-forgotten-export) The symbol "TwilioSdkClient" needs to be exported by the entry point index.d.ts
 //

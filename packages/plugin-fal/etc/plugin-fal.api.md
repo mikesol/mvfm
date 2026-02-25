@@ -15,7 +15,7 @@ import type { Result } from '@fal-ai/client';
 export function createFalInterpreter(client: FalClient): Interpreter;
 
 // @public
-export function fal(config: FalConfig): {
+export const fal: {
     name: "fal";
     ctors: {
         fal: {
@@ -41,7 +41,6 @@ export function fal(config: FalConfig): {
     };
     traits: {};
     lifts: {};
-    defaultInterpreter: () => Interpreter;
 };
 
 // @public
@@ -63,7 +62,33 @@ export interface FalConfig {
 export const falInterpreter: Interpreter;
 
 // @public
-export const falPlugin: typeof fal;
+export const falPlugin: {
+    name: "fal";
+    ctors: {
+        fal: {
+            run<A, B>(endpointId: A, options?: B): CExpr<Awaited<ReturnType<FalClient_2["run"]>>, "fal/run", [A, ...unknown[]]>;
+            subscribe<A, B>(endpointId: A, options?: B): CExpr<Awaited<ReturnType<FalClient_2["subscribe"]>>, "fal/subscribe", [A, ...unknown[]]>;
+            queue: {
+                submit<A, B>(endpointId: A, options: B): CExpr<Awaited<ReturnType<QueueClient["submit"]>>, "fal/queue_submit", [A, B]>;
+                status<A, B>(endpointId: A, options: B): CExpr<Awaited<ReturnType<QueueClient["status"]>>, "fal/queue_status", [A, B]>;
+                result<A, B>(endpointId: A, options: B): CExpr<Awaited<ReturnType<QueueClient["result"]>>, "fal/queue_result", [A, B]>;
+                cancel<A, B>(endpointId: A, options: B): CExpr<void, "fal/queue_cancel", [A, B]>;
+            };
+        };
+    };
+    kinds: {
+        "fal/run": KindSpec<[unknown], unknown>;
+        "fal/subscribe": KindSpec<[unknown], unknown>;
+        "fal/queue_submit": KindSpec<[unknown, unknown], unknown>;
+        "fal/queue_status": KindSpec<[unknown, unknown], unknown>;
+        "fal/queue_result": KindSpec<[unknown, unknown], unknown>;
+        "fal/queue_cancel": KindSpec<[unknown, unknown], void>;
+        "fal/record": KindSpec<unknown[], Record<string, unknown>>;
+        "fal/array": KindSpec<unknown[], unknown[]>;
+    };
+    traits: {};
+    lifts: {};
+};
 
 // Warning: (ae-forgotten-export) The symbol "QueueCancelOptionsShape" needs to be exported by the entry point index.d.ts
 //

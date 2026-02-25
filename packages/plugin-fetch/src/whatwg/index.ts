@@ -122,53 +122,47 @@ function buildFetchApi() {
 }
 
 /**
- * Creates the fetch plugin definition (unified Plugin type).
+ * Fetch plugin definition (unified Plugin type).
  *
- * @param config - Optional {@link FetchConfig} with baseUrl and defaultHeaders.
- * @returns A unified Plugin that contributes `$.fetch`.
+ * Uses `globalThis.fetch` — no config required.
  */
-export function fetch(config?: FetchConfig) {
-  const resolvedConfig = config ?? {};
-
-  return {
-    name: "fetch" as const,
-    ctors: { fetch: buildFetchApi() },
-    kinds: {
-      "fetch/request": {
-        inputs: ["", undefined] as [string, ...unknown[]],
-        output: undefined as unknown,
-      } as KindSpec<[string, ...unknown[]], unknown>,
-      "fetch/json": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
-      "fetch/text": {
-        inputs: [undefined] as [unknown],
-        output: "" as string,
-      } as KindSpec<[unknown], string>,
-      "fetch/status": {
-        inputs: [undefined] as [unknown],
-        output: 0 as number,
-      } as KindSpec<[unknown], number>,
-      "fetch/headers": {
-        inputs: [undefined] as [unknown],
-        output: {} as Record<string, string>,
-      } as KindSpec<[unknown], Record<string, string>>,
-      "fetch/record": {
-        inputs: [] as unknown[],
-        output: {} as Record<string, unknown>,
-      } as KindSpec<unknown[], Record<string, unknown>>,
-      "fetch/array": {
-        inputs: [] as unknown[],
-        output: [] as unknown[],
-      } as KindSpec<unknown[], unknown[]>,
-    },
-    traits: {},
-    lifts: {},
-    defaultInterpreter: (): Interpreter =>
-      createFetchInterpreter(wrapFetch(globalThis.fetch), resolvedConfig),
-  } satisfies Plugin;
-}
+export const fetch = {
+  name: "fetch" as const,
+  ctors: { fetch: buildFetchApi() },
+  kinds: {
+    "fetch/request": {
+      inputs: ["", undefined] as [string, ...unknown[]],
+      output: undefined as unknown,
+    } as KindSpec<[string, ...unknown[]], unknown>,
+    "fetch/json": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "fetch/text": {
+      inputs: [undefined] as [unknown],
+      output: "" as string,
+    } as KindSpec<[unknown], string>,
+    "fetch/status": {
+      inputs: [undefined] as [unknown],
+      output: 0 as number,
+    } as KindSpec<[unknown], number>,
+    "fetch/headers": {
+      inputs: [undefined] as [unknown],
+      output: {} as Record<string, string>,
+    } as KindSpec<[unknown], Record<string, string>>,
+    "fetch/record": {
+      inputs: [] as unknown[],
+      output: {} as Record<string, unknown>,
+    } as KindSpec<unknown[], Record<string, unknown>>,
+    "fetch/array": {
+      inputs: [] as unknown[],
+      output: [] as unknown[],
+    } as KindSpec<unknown[], unknown[]>,
+  },
+  traits: {},
+  lifts: {},
+  defaultInterpreter: (): Interpreter => createFetchInterpreter(wrapFetch(globalThis.fetch), {}),
+} satisfies Plugin;
 
 /**
  * Alias for {@link fetch}, kept for readability at call sites.

@@ -3,7 +3,7 @@ import type { NamespaceIndex } from "./types";
 const externalIndexes: Record<string, NamespaceIndex> = {
   anthropic: {
     content: `<p>Implementation of the <a href="https://docs.anthropic.com/en/api/messages">Anthropic Messages API</a>. There is no default interpreter because this plugin requires API credentials.</p>
-<p>Use <code>anthropic({ apiKey })</code> in your app and provide a configured interpreter at runtime.</p>`,
+<p>Use <code>anthropic</code> in your app and provide a configured interpreter at runtime.</p>`,
     staticCode: `import { anthropic, wrapAnthropicSdk, createAnthropicInterpreter } from "@mvfm/plugin-anthropic";
 import Anthropic from "@anthropic-ai/sdk";
 
@@ -15,12 +15,9 @@ const client = wrapAnthropicSdk(sdk);
 const anthropicInterp = createAnthropicInterpreter(client);
 
 // 3. Merge and run
-const app = mvfm(prelude, anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }));
-const baseInterp = defaults(app);
-await fold(
-  { ...baseInterp, ...anthropicInterp },
-  prog
-);`,
+const app = mvfm(prelude, anthropic);
+const baseInterp = defaults(app, { anthropic: anthropicInterp });
+await fold(baseInterp, prog);`,
   },
 
   "cloudflare-kv": {
@@ -57,12 +54,9 @@ const client = wrapFalSdk(falSdk);
 const falInterp = createFalInterpreter(client);
 
 // 3. Merge and run
-const app = mvfm(prelude, fal({ credentials: process.env.FAL_KEY }));
-const baseInterp = defaults(app);
-await fold(
-  { ...baseInterp, ...falInterp },
-  prog
-);`,
+const app = mvfm(prelude, fal);
+const baseInterp = defaults(app, { fal: falInterp });
+await fold(baseInterp, prog);`,
   },
 
   fetch: {
@@ -77,12 +71,9 @@ const client = wrapFetch(globalThis.fetch);
 const fetchInterp = createFetchInterpreter(client);
 
 // 3. Merge and run
-const app = mvfm(prelude, fetch());
+const app = mvfm(prelude, fetch);
 const baseInterp = defaults(app);
-await fold(
-  { ...baseInterp, ...fetchInterp },
-  prog
-);`,
+await fold(baseInterp, prog);`,
   },
 
   openai: {
@@ -99,12 +90,9 @@ const client = wrapOpenAISdk(sdk);
 const openaiInterp = createOpenAIInterpreter(client);
 
 // 3. Merge and run
-const app = mvfm(prelude, openai({ apiKey: process.env.OPENAI_API_KEY }));
-const baseInterp = defaults(app);
-await fold(
-  { ...baseInterp, ...openaiInterp },
-  prog
-);`,
+const app = mvfm(prelude, openai);
+const baseInterp = defaults(app, { openai: openaiInterp });
+await fold(baseInterp, prog);`,
   },
 
   pino: {
@@ -121,12 +109,9 @@ const client = wrapPino(logger);
 const pinoInterp = createPinoInterpreter(client);
 
 // 3. Merge and run
-const app = mvfm(prelude, pino());
-const baseInterp = defaults(app);
-await fold(
-  { ...baseInterp, ...pinoInterp },
-  prog
-);`,
+const app = mvfm(prelude, pino);
+const baseInterp = defaults(app, { pino: pinoInterp });
+await fold(baseInterp, prog);`,
   },
 
   postgres: {
@@ -140,7 +125,7 @@ const sql = postgresJs("postgres://user:pass@localhost:5432/mydb");
 const client = wrapPostgresJs(sql);
 
 // 2. Build the app and base interpreter
-const app = mvfm(prelude, postgres());
+const app = mvfm(prelude, postgres);
 const baseInterp = defaults(app);
 
 // 3. Create the postgres interpreter
@@ -149,7 +134,7 @@ const pgInterp = serverInterpreter(client, baseInterp);
 // 4. Merge and run
 await fold(
   { ...baseInterp, ...pgInterp },
-  injectInput(prog, { userId: 42 })
+  injectInput(prog, { userId: 42 }),
 );`,
   },
 
@@ -167,12 +152,9 @@ const client = wrapIoredis(ioredis);
 const redisInterp = createRedisInterpreter(client);
 
 // 3. Merge and run
-const app = mvfm(prelude, redis());
-const baseInterp = defaults(app);
-await fold(
-  { ...baseInterp, ...redisInterp },
-  prog
-);`,
+const app = mvfm(prelude, redis);
+const baseInterp = defaults(app, { redis: redisInterp });
+await fold(baseInterp, prog);`,
   },
 
   resend: {
@@ -189,12 +171,9 @@ const client = wrapResendSdk(sdk);
 const resendInterp = createResendInterpreter(client);
 
 // 3. Merge and run
-const app = mvfm(prelude, resend({ apiKey: process.env.RESEND_API_KEY }));
-const baseInterp = defaults(app);
-await fold(
-  { ...baseInterp, ...resendInterp },
-  prog
-);`,
+const app = mvfm(prelude, resend);
+const baseInterp = defaults(app, { resend: resendInterp });
+await fold(baseInterp, prog);`,
   },
 
   s3: {
@@ -211,12 +190,9 @@ const client = wrapAwsSdk(awsClient);
 const s3Interp = createS3Interpreter(client);
 
 // 3. Merge and run
-const app = mvfm(prelude, s3({ region: "us-east-1" }));
-const baseInterp = defaults(app);
-await fold(
-  { ...baseInterp, ...s3Interp },
-  prog
-);`,
+const app = mvfm(prelude, s3);
+const baseInterp = defaults(app, { s3: s3Interp });
+await fold(baseInterp, prog);`,
   },
 
   slack: {
@@ -233,12 +209,9 @@ const client = wrapSlackWebClient(webClient);
 const slackInterp = createSlackInterpreter(client);
 
 // 3. Merge and run
-const app = mvfm(prelude, slack({ token: process.env.SLACK_BOT_TOKEN }));
-const baseInterp = defaults(app);
-await fold(
-  { ...baseInterp, ...slackInterp },
-  prog
-);`,
+const app = mvfm(prelude, slack);
+const baseInterp = defaults(app, { slack: slackInterp });
+await fold(baseInterp, prog);`,
   },
 
   stripe: {
@@ -255,12 +228,9 @@ const client = wrapStripeSdk(sdk);
 const stripeInterp = createStripeInterpreter(client);
 
 // 3. Merge and run
-const app = mvfm(prelude, stripe({ apiKey: process.env.STRIPE_API_KEY }));
-const baseInterp = defaults(app);
-await fold(
-  { ...baseInterp, ...stripeInterp },
-  prog
-);`,
+const app = mvfm(prelude, stripe);
+const baseInterp = defaults(app, { stripe: stripeInterp });
+await fold(baseInterp, prog);`,
   },
 
   twilio: {

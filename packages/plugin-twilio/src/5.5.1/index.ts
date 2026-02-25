@@ -11,10 +11,8 @@
 //   - Calls: create, fetch, list
 // ============================================================
 
-import type { CExpr, Interpreter, KindSpec, Plugin } from "@mvfm/core";
+import type { CExpr, KindSpec, Plugin } from "@mvfm/core";
 import { isCExpr, makeCExpr } from "@mvfm/core";
-import { wrapTwilioSdk } from "./client-twilio-sdk";
-import { createTwilioInterpreter, type TwilioClient } from "./interpreter";
 
 // ---- liftArg: recursive plain-value → CExpr lifting --------
 
@@ -125,110 +123,54 @@ function buildTwilioApi() {
   return { messages, calls };
 }
 
-// ---- Default interpreter wiring ---------------------------
-
-function createDefaultInterpreter(config: TwilioConfig): Interpreter {
-  let clientPromise: Promise<TwilioClient> | undefined;
-  const getClient = async (): Promise<TwilioClient> => {
-    if (!clientPromise) {
-      clientPromise = Promise.resolve(wrapTwilioSdk(createDefaultTwilioSdkClient(config)));
-    }
-    return clientPromise;
-  };
-
-  const lazyClient: TwilioClient = {
-    async request(
-      method: string,
-      path: string,
-      params?: Record<string, unknown>,
-    ): Promise<unknown> {
-      const client = await getClient();
-      return client.request(method, path, params);
-    },
-  };
-
-  return createTwilioInterpreter(lazyClient, config.accountSid);
-}
-
-function createDefaultTwilioSdkClient(config: TwilioConfig): {
-  request(opts: {
-    method: string;
-    uri: string;
-    data?: Record<string, unknown>;
-  }): Promise<{ body: unknown }>;
-} {
-  return {
-    async request(opts) {
-      const encodedAuth = btoa(`${config.accountSid}:${config.authToken}`);
-      const response = await fetch(opts.uri, {
-        method: opts.method,
-        headers: {
-          Authorization: `Basic ${encodedAuth}`,
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body:
-          opts.data == null
-            ? undefined
-            : new URLSearchParams(
-                Object.entries(opts.data).map(([key, value]) => [key, String(value)]),
-              ).toString(),
-      });
-      return { body: await response.json() };
-    },
-  };
-}
-
-// ---- Plugin factory ---------------------------------------
+// ---- Plugin definition ------------------------------------
 
 /**
- * Creates the twilio plugin definition (unified Plugin type).
+ * Twilio plugin definition (unified Plugin type).
  *
- * @param config - A {@link TwilioConfig} with accountSid and authToken.
- * @returns A unified Plugin that contributes `$.twilio`.
+ * This plugin has no defaultInterpreter — you must provide one
+ * via `defaults(app, { twilio: createTwilioInterpreter(wrapTwilioSdk(client), accountSid) })`.
  */
-export function twilio(config: TwilioConfig) {
-  return {
-    name: "twilio" as const,
-    ctors: { twilio: buildTwilioApi() },
-    kinds: {
-      "twilio/create_message": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
-      "twilio/fetch_message": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
-      "twilio/list_messages": {
-        inputs: [] as unknown[],
-        output: undefined as unknown,
-      } as KindSpec<unknown[], unknown>,
-      "twilio/create_call": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
-      "twilio/fetch_call": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
-      "twilio/list_calls": {
-        inputs: [] as unknown[],
-        output: undefined as unknown,
-      } as KindSpec<unknown[], unknown>,
-      "twilio/record": {
-        inputs: [] as unknown[],
-        output: {} as Record<string, unknown>,
-      } as KindSpec<unknown[], Record<string, unknown>>,
-      "twilio/array": {
-        inputs: [] as unknown[],
-        output: [] as unknown[],
-      } as KindSpec<unknown[], unknown[]>,
-    },
-    traits: {},
-    lifts: {},
-    defaultInterpreter: (): Interpreter => createDefaultInterpreter(config),
-  } satisfies Plugin;
-}
+export const twilio = {
+  name: "twilio" as const,
+  ctors: { twilio: buildTwilioApi() },
+  kinds: {
+    "twilio/create_message": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "twilio/fetch_message": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "twilio/list_messages": {
+      inputs: [] as unknown[],
+      output: undefined as unknown,
+    } as KindSpec<unknown[], unknown>,
+    "twilio/create_call": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "twilio/fetch_call": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "twilio/list_calls": {
+      inputs: [] as unknown[],
+      output: undefined as unknown,
+    } as KindSpec<unknown[], unknown>,
+    "twilio/record": {
+      inputs: [] as unknown[],
+      output: {} as Record<string, unknown>,
+    } as KindSpec<unknown[], Record<string, unknown>>,
+    "twilio/array": {
+      inputs: [] as unknown[],
+      output: [] as unknown[],
+    } as KindSpec<unknown[], unknown[]>,
+  },
+  traits: {},
+  lifts: {},
+} satisfies Plugin;
 
 /**
  * Alias for {@link twilio}, kept for readability at call sites.

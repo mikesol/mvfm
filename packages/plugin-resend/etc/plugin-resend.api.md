@@ -21,7 +21,7 @@ export function clientInterpreter(options: ClientHandlerOptions, kinds: string[]
 export function createResendInterpreter(client: ResendClient): Interpreter;
 
 // @public
-export function resend(config: ResendConfig): {
+export const resend: {
     name: "resend";
     ctors: {
         resend: {
@@ -53,7 +53,6 @@ export function resend(config: ResendConfig): {
     };
     traits: {};
     lifts: {};
-    defaultInterpreter: () => Interpreter;
 };
 
 // @public
@@ -70,7 +69,39 @@ export interface ResendConfig {
 export const resendInterpreter: Interpreter;
 
 // @public
-export const resendPlugin: typeof resend;
+export const resendPlugin: {
+    name: "resend";
+    ctors: {
+        resend: {
+            emails: {
+                send<A>(params: A): CExpr<unknown, "resend/send_email", [A]>;
+                get<A>(id: A): CExpr<unknown, "resend/get_email", [A]>;
+            };
+            batch: {
+                send<A>(emails: A): CExpr<unknown, "resend/send_batch", [A]>;
+            };
+            contacts: {
+                create<A>(params: A): CExpr<unknown, "resend/create_contact", [A]>;
+                get<A>(id: A): CExpr<unknown, "resend/get_contact", [A]>;
+                list(): CExpr<unknown, "resend/list_contacts", []>;
+                remove<A>(id: A): CExpr<unknown, "resend/remove_contact", [A]>;
+            };
+        };
+    };
+    kinds: {
+        "resend/send_email": KindSpec<[unknown], unknown>;
+        "resend/get_email": KindSpec<[unknown], unknown>;
+        "resend/send_batch": KindSpec<[unknown], unknown>;
+        "resend/create_contact": KindSpec<[unknown], unknown>;
+        "resend/get_contact": KindSpec<[unknown], unknown>;
+        "resend/list_contacts": KindSpec<[], unknown>;
+        "resend/remove_contact": KindSpec<[unknown], unknown>;
+        "resend/record": KindSpec<unknown[], Record<string, unknown>>;
+        "resend/array": KindSpec<unknown[], unknown[]>;
+    };
+    traits: {};
+    lifts: {};
+};
 
 // @public
 export function serverInterpreter(client: ResendClient): Interpreter;

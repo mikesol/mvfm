@@ -27,7 +27,7 @@ const commands: Record<string, new (input: unknown) => unknown> = {
   ListObjectsV2: ListObjectsV2Command,
 };
 
-const plugin = s3Factory({ region: "us-east-1" });
+const plugin = s3Factory;
 const plugins = [numPlugin, strPlugin, plugin] as const;
 const $ = composeDollar(...plugins);
 const app = createApp(...plugins);

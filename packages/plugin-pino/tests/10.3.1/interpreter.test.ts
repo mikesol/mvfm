@@ -12,7 +12,7 @@ import { pinoInterpreter } from "../../src";
 import { pino } from "../../src/10.3.1";
 import { createPinoInterpreter, type PinoClient } from "../../src/10.3.1/interpreter";
 
-const plugin = pino({ level: "info" });
+const plugin = pino;
 const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
 const $ = composeDollar(...plugins);
 const app = createApp(...plugins);

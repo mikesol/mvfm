@@ -1,6 +1,5 @@
 import { defaults, fold } from "@mvfm/core";
-import { describe, expect, it, vi } from "vitest";
-import { slackInterpreter } from "../../src";
+import { describe, expect, it } from "vitest";
 import { createSlackInterpreter, type SlackClient } from "../../src/7.14.0/generated/interpreter";
 import { $, app, plugins } from "./slack.shared";
 
@@ -17,24 +16,6 @@ async function run(expr: unknown) {
   const result = await fold(nexpr, interp);
   return { result, captured };
 }
-
-describe("slack interpreter: default export", () => {
-  it("throws when SLACK_BOT_TOKEN is missing", async () => {
-    vi.stubEnv("SLACK_BOT_TOKEN", "");
-    const expr = $.slack.chat.postMessage({ channel: "#general", text: "Hello" });
-    const nexpr = app(expr as Parameters<typeof app>[0]);
-    const stdInterp = defaults(plugins.slice(0, 3) as any);
-    const combined = { ...stdInterp, ...slackInterpreter };
-    await expect(fold(nexpr, combined)).rejects.toThrow(/SLACK_BOT_TOKEN/);
-    vi.unstubAllEnvs();
-  });
-
-  it("exports a default ready-to-use interpreter when SLACK_BOT_TOKEN is set", () => {
-    vi.stubEnv("SLACK_BOT_TOKEN", "xoxb-test-default");
-    expect(typeof slackInterpreter["slack/chat_postMessage"]).toBe("function");
-    vi.unstubAllEnvs();
-  });
-});
 
 // ---- chat ----
 

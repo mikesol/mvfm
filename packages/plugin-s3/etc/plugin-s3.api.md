@@ -28,7 +28,7 @@ export function clientInterpreter(options: ClientHandlerOptions, kinds: string[]
 export function createS3Interpreter(client: S3Client): Interpreter;
 
 // @public
-export function s3(_config: S3Config): {
+export const s3: {
     name: "s3";
     ctors: {
         s3: {
@@ -70,7 +70,29 @@ export interface S3Config {
 }
 
 // @public
-export const s3Plugin: typeof s3;
+export const s3Plugin: {
+    name: "s3";
+    ctors: {
+        s3: {
+            putObject<A>(input: A): CExpr<PutObjectCommandOutput, "s3/put_object", [A]>;
+            getObject<A>(input: A): CExpr<GetObjectCommandOutput, "s3/get_object", [A]>;
+            deleteObject<A>(input: A): CExpr<DeleteObjectCommandOutput, "s3/delete_object", [A]>;
+            headObject<A>(input: A): CExpr<HeadObjectCommandOutput, "s3/head_object", [A]>;
+            listObjectsV2<A>(input: A): CExpr<ListObjectsV2CommandOutput, "s3/list_objects_v2", [A]>;
+        };
+    };
+    kinds: {
+        "s3/put_object": KindSpec<[unknown], unknown>;
+        "s3/get_object": KindSpec<[unknown], unknown>;
+        "s3/delete_object": KindSpec<[unknown], unknown>;
+        "s3/head_object": KindSpec<[unknown], unknown>;
+        "s3/list_objects_v2": KindSpec<[unknown], unknown>;
+        "s3/record": KindSpec<unknown[], Record<string, unknown>>;
+        "s3/array": KindSpec<unknown[], unknown[]>;
+    };
+    traits: {};
+    lifts: {};
+};
 
 // @public
 export function serverEvaluate(client: S3Client, baseInterpreter: Interpreter): Interpreter;
@@ -85,8 +107,8 @@ export function wrapAwsSdk(client: S3Client_2, commands: Record<string, CommandC
 
 // Warnings were encountered during analysis:
 //
-// dist/3.989.0/index.d.ts:51:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-// dist/3.989.0/index.d.ts:63:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/3.989.0/index.d.ts:35:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/3.989.0/index.d.ts:47:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

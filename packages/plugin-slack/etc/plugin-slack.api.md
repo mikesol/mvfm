@@ -305,13 +305,12 @@ export function serverEvaluate(client: SlackClient, baseInterpreter: Interpreter
 export function serverInterpreter(client: SlackClient): Interpreter;
 
 // @public
-export function slack(_config: SlackConfig): {
+export const slack: {
     name: "slack";
     ctors: SlackMethods;
     kinds: Record<string, KindSpec<any, any>>;
     traits: {};
     lifts: {};
-    defaultInterpreter: () => Interpreter;
 };
 
 // @public (undocumented)
@@ -325,9 +324,6 @@ export interface SlackConfig {
     // (undocumented)
     token: string;
 }
-
-// @public
-export const slackInterpreter: Interpreter;
 
 // @public (undocumented)
 export interface SlackMethods {
@@ -433,7 +429,7 @@ export function wrapSlackWebClient(client: WebClient): SlackClient;
 // dist/7.14.0/generated/types.d.ts:140:9 - (ae-forgotten-export) The symbol "SlackMethodsUsers" needs to be exported by the entry point index.d.ts
 // dist/7.14.0/generated/types.d.ts:141:9 - (ae-forgotten-export) The symbol "SlackMethodsViews" needs to be exported by the entry point index.d.ts
 // dist/7.14.0/generated/types.d.ts:142:9 - (ae-forgotten-export) The symbol "SlackMethodsWorkflows" needs to be exported by the entry point index.d.ts
-// dist/7.14.0/index.d.ts:23:5 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/index.d.ts:15:5 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

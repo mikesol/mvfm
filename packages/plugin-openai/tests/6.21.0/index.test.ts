@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { openai, openaiPlugin } from "../../src/6.21.0";
 
-const plugin = openai({ apiKey: "sk-test-123" });
+const plugin = openai;
 const api = plugin.ctors.openai;
 
 // ============================================================
@@ -164,8 +164,8 @@ describe("openai plugin: unified Plugin shape", () => {
     expect(plugin.lifts).toEqual({});
   });
 
-  it("has a defaultInterpreter factory", () => {
-    expect(typeof plugin.defaultInterpreter).toBe("function");
+  it("has NO defaultInterpreter", () => {
+    expect(plugin.defaultInterpreter).toBeUndefined();
   });
 });
 

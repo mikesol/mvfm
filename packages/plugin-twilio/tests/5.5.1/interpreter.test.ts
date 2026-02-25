@@ -12,10 +12,7 @@ import { twilioInterpreter } from "../../src";
 import { twilio } from "../../src/5.5.1";
 import { createTwilioInterpreter, type TwilioClient } from "../../src/5.5.1/interpreter";
 
-const plugin = twilio({
-  accountSid: "AC_test_123",
-  authToken: "auth_test_456",
-});
+const plugin = twilio;
 const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
 const $ = composeDollar(...plugins);
 const app = createApp(...plugins);

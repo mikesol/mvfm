@@ -236,22 +236,13 @@
           "name": "createStripeInterpreter"
         },
         {
-          "kind": "Function",
-          "canonicalReference": "@mvfm/plugin-stripe!stripe:function(1)",
-          "docComment": "/**\n * Creates the stripe plugin definition (unified Plugin type).\n *\n * @param config - A {@link StripeConfig} with apiKey and optional apiVersion.\n *\n * @returns A unified Plugin that contributes `$.stripe`.\n */\n",
+          "kind": "Variable",
+          "canonicalReference": "@mvfm/plugin-stripe!stripe:var",
+          "docComment": "/**\n * Stripe plugin definition (unified Plugin type).\n *\n * This plugin has no defaultInterpreter — you must provide one via `defaults(app, { stripe: createStripeInterpreter(wrapStripeSdk(client)) })`.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare function stripe(config: "
-            },
-            {
-              "kind": "Reference",
-              "text": "StripeConfig",
-              "canonicalReference": "@mvfm/plugin-stripe!StripeConfig:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "): "
+              "text": "stripe: "
             },
             {
               "kind": "Content",
@@ -552,40 +543,17 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown[], unknown[]>;\n    };\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
-            },
-            {
-              "kind": "Reference",
-              "text": "Interpreter",
-              "canonicalReference": "@mvfm/plugin-stripe!~Interpreter:type"
-            },
-            {
-              "kind": "Content",
-              "text": ";\n}"
-            },
-            {
-              "kind": "Content",
-              "text": ";"
+              "text": "<unknown[], unknown[]>;\n    };\n    traits: {};\n    lifts: {};\n}"
             }
           ],
           "fileUrlPath": "dist/2025-04-30.basil/index.d.ts",
-          "returnTypeTokenRange": {
-            "startIndex": 3,
-            "endIndex": 72
-          },
+          "isReadonly": true,
           "releaseTag": "Public",
-          "overloadIndex": 1,
-          "parameters": [
-            {
-              "parameterName": "config",
-              "parameterTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isOptional": false
-            }
-          ],
-          "name": "stripe"
+          "name": "stripe",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 68
+          }
         },
         {
           "kind": "Interface",
@@ -799,12 +767,304 @@
             },
             {
               "kind": "Content",
-              "text": "typeof "
+              "text": "{\n    name: \"stripe\";\n    ctors: {\n        stripe: {\n            paymentIntents: {\n                create<A>(params: A): "
             },
             {
               "kind": "Reference",
-              "text": "stripe",
-              "canonicalReference": "@mvfm/plugin-stripe!stripe:function"
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-stripe!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, unknown>, \"stripe/create_payment_intent\", [A]>;\n                retrieve<A>(id: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-stripe!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, unknown>, \"stripe/retrieve_payment_intent\", [A]>;\n                confirm<A, B extends readonly unknown[]>(id: A, ...params: B): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-stripe!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, unknown>, \"stripe/confirm_payment_intent\", [A, ...B]>;\n            };\n            customers: {\n                create<A>(params: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-stripe!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, unknown>, \"stripe/create_customer\", [A]>;\n                retrieve<A>(id: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-stripe!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, unknown>, \"stripe/retrieve_customer\", [A]>;\n                update<A, B>(id: A, params: B): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-stripe!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, unknown>, \"stripe/update_customer\", [A, B]>;\n                list<A extends readonly unknown[]>(...params: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-stripe!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, unknown>, \"stripe/list_customers\", A>;\n            };\n            charges: {\n                create<A>(params: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-stripe!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, unknown>, \"stripe/create_charge\", [A]>;\n                retrieve<A>(id: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-stripe!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, unknown>, \"stripe/retrieve_charge\", [A]>;\n                list<A extends readonly unknown[]>(...params: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-stripe!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, unknown>, \"stripe/list_charges\", A>;\n            };\n        };\n    };\n    kinds: {\n        \"stripe/create_payment_intent\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-stripe!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"stripe/retrieve_payment_intent\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-stripe!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"stripe/confirm_payment_intent\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-stripe!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"stripe/create_customer\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-stripe!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"stripe/retrieve_customer\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-stripe!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"stripe/update_customer\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-stripe!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown, unknown], unknown>;\n        \"stripe/list_customers\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-stripe!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown>;\n        \"stripe/create_charge\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-stripe!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"stripe/retrieve_charge\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-stripe!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<[unknown], unknown>;\n        \"stripe/list_charges\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-stripe!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown>;\n        \"stripe/record\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-stripe!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], "
+            },
+            {
+              "kind": "Reference",
+              "text": "Record",
+              "canonicalReference": "!Record:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string, unknown>>;\n        \"stripe/array\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-stripe!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], unknown[]>;\n    };\n    traits: {};\n    lifts: {};\n}"
             }
           ],
           "fileUrlPath": "dist/2025-04-30.basil/index.d.ts",
@@ -813,7 +1073,7 @@
           "name": "stripePlugin",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 3
+            "endIndex": 68
           }
         },
         {

@@ -19,7 +19,7 @@ const isRecording = !!process.env.FAL_RECORD;
 
 let client: FixtureClient;
 
-const plugin = falPlugin({ credentials: "fixture" });
+const plugin = falPlugin;
 const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
 const app = createApp(...plugins);
 

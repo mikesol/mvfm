@@ -6,7 +6,7 @@ import {
   createCloudflareKvInterpreter,
 } from "../../src/4.20260213.0/interpreter";
 
-const plugin = cloudflareKv({ namespaceId: "MY_KV" });
+const plugin = cloudflareKv;
 const plugins = [numPlugin, strPlugin, plugin] as const;
 const $ = composeDollar(...plugins);
 const app = createApp(...plugins);
