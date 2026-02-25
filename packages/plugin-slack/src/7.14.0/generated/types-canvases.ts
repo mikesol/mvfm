@@ -16,11 +16,9 @@ export interface SlackMethodsCanvases {
     set<A>(params: A): CExpr<CanvasesAccessSetResponse, "slack/canvases_access_set", [A]>;
   };
   sections: {
-    lookup<A>(params: A): CExpr<
-      CanvasesSectionsLookupResponse,
-      "slack/canvases_sections_lookup",
-      [A]
-    >;
+    lookup<A>(
+      params: A,
+    ): CExpr<CanvasesSectionsLookupResponse, "slack/canvases_sections_lookup", [A]>;
   };
   create<A = void>(params?: A): CExpr<CanvasesCreateResponse, "slack/canvases_create", [A]>;
   delete<A>(params: A): CExpr<CanvasesDeleteResponse, "slack/canvases_delete", [A]>;

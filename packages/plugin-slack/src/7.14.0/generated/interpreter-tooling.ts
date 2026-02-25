@@ -16,9 +16,10 @@ export function createSlackToolingInterpreter(client: SlackClientLike): Interpre
 
   for (const [kind, method] of Object.entries(NODE_TO_METHOD_TOOLING)) {
     handlers[kind] = async function* (entry: RuntimeEntry) {
-      const params = entry.children.length > 0
-        ? (yield* resolveStructured(entry.children[0])) as Record<string, unknown>
-        : undefined;
+      const params =
+        entry.children.length > 0
+          ? ((yield* resolveStructured(entry.children[0])) as Record<string, unknown>)
+          : undefined;
       return await client.apiCall(method, params);
     };
   }

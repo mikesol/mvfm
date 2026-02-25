@@ -9,20 +9,14 @@ import type {
 
 export interface SlackMethodsAdminAuth {
   policy: {
-    assignEntities<A>(params: A): CExpr<
-      AdminAuthPolicyAssignEntitiesResponse,
-      "slack/admin_auth_policy_assignEntities",
-      [A]
-    >;
-    getEntities<A>(params: A): CExpr<
-      AdminAuthPolicyGetEntitiesResponse,
-      "slack/admin_auth_policy_getEntities",
-      [A]
-    >;
-    removeEntities<A>(params: A): CExpr<
-      AdminAuthPolicyRemoveEntitiesResponse,
-      "slack/admin_auth_policy_removeEntities",
-      [A]
-    >;
+    assignEntities<A>(
+      params: A,
+    ): CExpr<AdminAuthPolicyAssignEntitiesResponse, "slack/admin_auth_policy_assignEntities", [A]>;
+    getEntities<A>(
+      params: A,
+    ): CExpr<AdminAuthPolicyGetEntitiesResponse, "slack/admin_auth_policy_getEntities", [A]>;
+    removeEntities<A>(
+      params: A,
+    ): CExpr<AdminAuthPolicyRemoveEntitiesResponse, "slack/admin_auth_policy_removeEntities", [A]>;
   };
 }

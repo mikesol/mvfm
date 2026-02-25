@@ -12,6 +12,8 @@
 //   - Contacts: create, get, list, remove
 // ============================================================
 
+import type { CExpr, Interpreter, KindSpec, Liftable, Plugin } from "@mvfm/core";
+import { makeCExpr } from "@mvfm/core";
 import type {
   CreateBatchOptions,
   CreateContactOptions,
@@ -23,8 +25,6 @@ import type {
   ListContactsResponseSuccess,
   RemoveContactsResponseSuccess,
 } from "resend";
-import type { CExpr, Interpreter, KindSpec, Liftable, Plugin } from "@mvfm/core";
-import { makeCExpr } from "@mvfm/core";
 import { wrapResendSdk } from "./client-resend-sdk";
 import { createResendInterpreter, type ResendClient } from "./interpreter";
 
@@ -55,11 +55,7 @@ function buildResendApi() {
       /** Send an email. */
       send(
         params: Liftable<CreateEmailOptions>,
-      ): CExpr<
-        CreateEmailResponseSuccess,
-        "resend/send_email",
-        [Liftable<CreateEmailOptions>]
-      > {
+      ): CExpr<CreateEmailResponseSuccess, "resend/send_email", [Liftable<CreateEmailOptions>]> {
         return makeCExpr("resend/send_email", [params]) as any;
       },
       /** Get an email by ID. */
@@ -73,11 +69,7 @@ function buildResendApi() {
       /** Send a batch of emails. */
       send(
         emails: Liftable<CreateBatchOptions>,
-      ): CExpr<
-        CreateEmailResponseSuccess[],
-        "resend/send_batch",
-        [Liftable<CreateBatchOptions>]
-      > {
+      ): CExpr<CreateEmailResponseSuccess[], "resend/send_batch", [Liftable<CreateBatchOptions>]> {
         return makeCExpr("resend/send_batch", [emails]) as any;
       },
     },

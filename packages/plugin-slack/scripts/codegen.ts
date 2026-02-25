@@ -282,11 +282,24 @@ function generateTypesGroup(group: GroupData): string {
       if (singleLine.length <= 100) {
         lines.push(singleLine);
       } else {
-        lines.push(`${indent}${methodName}${optSig}: CExpr<`);
-        lines.push(`${indent}  ${m.responseType},`);
-        lines.push(`${indent}  "${m.nodeKind}",`);
-        lines.push(`${indent}  [A]`);
-        lines.push(`${indent}>;`);
+        // Biome-preferred format: break params, single-line CExpr return type
+        const paramSig = m.optional ? "params?: A" : "params: A";
+        const generic = m.optional ? "<A = void>" : "<A>";
+        const returnLine = `${indent}): CExpr<${m.responseType}, "${m.nodeKind}", [A]>;`;
+        if (returnLine.length <= 100) {
+          lines.push(`${indent}${methodName}${generic}(`);
+          lines.push(`${indent}  ${paramSig},`);
+          lines.push(returnLine);
+        } else {
+          // Both params and return need breaking
+          lines.push(`${indent}${methodName}${generic}(`);
+          lines.push(`${indent}  ${paramSig},`);
+          lines.push(`${indent}): CExpr<`);
+          lines.push(`${indent}  ${m.responseType},`);
+          lines.push(`${indent}  "${m.nodeKind}",`);
+          lines.push(`${indent}  [A]`);
+          lines.push(`${indent}>;`);
+        }
       }
     }
   }
@@ -526,9 +539,10 @@ function generateInterpreterGroup(group: GroupData): string {
   lines.push("");
   lines.push(`  for (const [kind, method] of Object.entries(NODE_TO_METHOD_${constSuffix})) {`);
   lines.push("    handlers[kind] = async function* (entry: RuntimeEntry) {");
-  lines.push("      const params = entry.children.length > 0");
-  lines.push("        ? (yield* resolveStructured(entry.children[0])) as Record<string, unknown>");
-  lines.push("        : undefined;");
+  lines.push("      const params =");
+  lines.push("        entry.children.length > 0");
+  lines.push("          ? ((yield* resolveStructured(entry.children[0])) as Record<string, unknown>)");
+  lines.push("          : undefined;");
   lines.push("      return await client.apiCall(method, params);");
   lines.push("    };");
   lines.push("  }");

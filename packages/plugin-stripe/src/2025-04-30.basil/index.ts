@@ -12,9 +12,9 @@
 //   - Charges: create, retrieve, list
 // ============================================================
 
-import type Stripe from "stripe";
 import type { CExpr, Interpreter, KindSpec, Liftable, Plugin } from "@mvfm/core";
 import { makeCExpr } from "@mvfm/core";
+import type Stripe from "stripe";
 import { wrapStripeSdk } from "./client-stripe-sdk";
 import { createStripeInterpreter, type StripeClient } from "./interpreter";
 
@@ -114,11 +114,7 @@ function buildStripeApi() {
       /** Create a Customer. */
       create(
         params: Liftable<Stripe.CustomerCreateParams>,
-      ): CExpr<
-        Stripe.Customer,
-        "stripe/create_customer",
-        [Liftable<Stripe.CustomerCreateParams>]
-      > {
+      ): CExpr<Stripe.Customer, "stripe/create_customer", [Liftable<Stripe.CustomerCreateParams>]> {
         return makeCExpr("stripe/create_customer", [params]) as any;
       },
       /** Retrieve a Customer by ID. */
@@ -153,11 +149,7 @@ function buildStripeApi() {
       /** Create a Charge. */
       create(
         params: Liftable<Stripe.ChargeCreateParams>,
-      ): CExpr<
-        Stripe.Charge,
-        "stripe/create_charge",
-        [Liftable<Stripe.ChargeCreateParams>]
-      > {
+      ): CExpr<Stripe.Charge, "stripe/create_charge", [Liftable<Stripe.ChargeCreateParams>]> {
         return makeCExpr("stripe/create_charge", [params]) as any;
       },
       /** Retrieve a Charge by ID. */

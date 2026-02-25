@@ -1,4 +1,4 @@
-import type { CExpr, Liftable } from "@mvfm/core";
+import type { CExpr } from "@mvfm/core";
 import { makeCExpr } from "@mvfm/core";
 
 /**

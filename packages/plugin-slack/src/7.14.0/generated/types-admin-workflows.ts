@@ -11,32 +11,34 @@ import type {
 
 export interface SlackMethodsAdminWorkflows {
   collaborators: {
-    add<A>(params: A): CExpr<
+    add<A>(
+      params: A,
+    ): CExpr<
       AdminWorkflowsCollaboratorsAddResponse,
       "slack/admin_workflows_collaborators_add",
       [A]
     >;
-    remove<A>(params: A): CExpr<
+    remove<A>(
+      params: A,
+    ): CExpr<
       AdminWorkflowsCollaboratorsRemoveResponse,
       "slack/admin_workflows_collaborators_remove",
       [A]
     >;
   };
   permissions: {
-    lookup<A>(params: A): CExpr<
+    lookup<A>(
+      params: A,
+    ): CExpr<
       AdminWorkflowsPermissionsLookupResponse,
       "slack/admin_workflows_permissions_lookup",
       [A]
     >;
   };
-  search<A = void>(params?: A): CExpr<
-    AdminWorkflowsSearchResponse,
-    "slack/admin_workflows_search",
-    [A]
-  >;
-  unpublish<A>(params: A): CExpr<
-    AdminWorkflowsUnpublishResponse,
-    "slack/admin_workflows_unpublish",
-    [A]
-  >;
+  search<A = void>(
+    params?: A,
+  ): CExpr<AdminWorkflowsSearchResponse, "slack/admin_workflows_search", [A]>;
+  unpublish<A>(
+    params: A,
+  ): CExpr<AdminWorkflowsUnpublishResponse, "slack/admin_workflows_unpublish", [A]>;
 }

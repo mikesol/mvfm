@@ -20,9 +20,10 @@ export function createSlackDndInterpreter(client: SlackClientLike): Interpreter 
 
   for (const [kind, method] of Object.entries(NODE_TO_METHOD_DND)) {
     handlers[kind] = async function* (entry: RuntimeEntry) {
-      const params = entry.children.length > 0
-        ? (yield* resolveStructured(entry.children[0])) as Record<string, unknown>
-        : undefined;
+      const params =
+        entry.children.length > 0
+          ? ((yield* resolveStructured(entry.children[0])) as Record<string, unknown>)
+          : undefined;
       return await client.apiCall(method, params);
     };
   }

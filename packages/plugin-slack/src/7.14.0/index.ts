@@ -87,9 +87,10 @@ const slackKinds = Object.fromEntries(
   SLACK_NODE_KINDS.map((k) => [k, slackMethodKind] as const),
 ) as Record<string, KindSpec<any, any>>;
 
-const slackShapes = Object.fromEntries(
-  SLACK_NODE_KINDS.map((k) => [k, "*" as const]),
-) as Record<string, "*">;
+const slackShapes = Object.fromEntries(SLACK_NODE_KINDS.map((k) => [k, "*" as const])) as Record<
+  string,
+  "*"
+>;
 
 // ---- Plugin factory -------------------------------------------------------
 

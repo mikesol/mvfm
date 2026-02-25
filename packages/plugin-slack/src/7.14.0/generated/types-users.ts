@@ -18,7 +18,9 @@ import type {
 
 export interface SlackMethodsUsers {
   discoverableContacts: {
-    lookup<A>(params: A): CExpr<
+    lookup<A>(
+      params: A,
+    ): CExpr<
       UsersDiscoverableContactsLookupResponse,
       "slack/users_discoverableContacts_lookup",
       [A]

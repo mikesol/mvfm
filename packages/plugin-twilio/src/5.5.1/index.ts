@@ -82,11 +82,7 @@ function buildTwilioApi() {
       /** Initiate an outbound call. */
       create(
         params: Liftable<Record<string, unknown>>,
-      ): CExpr<
-        Record<string, unknown>,
-        "twilio/create_call",
-        [Liftable<Record<string, unknown>>]
-      > {
+      ): CExpr<Record<string, unknown>, "twilio/create_call", [Liftable<Record<string, unknown>>]> {
         return makeCExpr("twilio/create_call", [params]) as any;
       },
       /** List calls with optional filter params. */

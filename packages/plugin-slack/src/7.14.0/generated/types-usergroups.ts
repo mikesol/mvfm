@@ -14,11 +14,9 @@ import type {
 export interface SlackMethodsUsergroups {
   users: {
     list<A>(params: A): CExpr<UsergroupsUsersListResponse, "slack/usergroups_users_list", [A]>;
-    update<A>(params: A): CExpr<
-      UsergroupsUsersUpdateResponse,
-      "slack/usergroups_users_update",
-      [A]
-    >;
+    update<A>(
+      params: A,
+    ): CExpr<UsergroupsUsersUpdateResponse, "slack/usergroups_users_update", [A]>;
   };
   create<A>(params: A): CExpr<UsergroupsCreateResponse, "slack/usergroups_create", [A]>;
   disable<A>(params: A): CExpr<UsergroupsDisableResponse, "slack/usergroups_disable", [A]>;

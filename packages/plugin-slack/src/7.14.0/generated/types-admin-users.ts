@@ -22,44 +22,36 @@ import type {
 
 export interface SlackMethodsAdminUsers {
   session: {
-    clearSettings<A>(params: A): CExpr<
+    clearSettings<A>(
+      params: A,
+    ): CExpr<
       AdminUsersSessionClearSettingsResponse,
       "slack/admin_users_session_clearSettings",
       [A]
     >;
-    getSettings<A>(params: A): CExpr<
-      AdminUsersSessionGetSettingsResponse,
-      "slack/admin_users_session_getSettings",
-      [A]
-    >;
-    invalidate<A>(params: A): CExpr<
-      AdminUsersSessionInvalidateResponse,
-      "slack/admin_users_session_invalidate",
-      [A]
-    >;
-    list<A = void>(params?: A): CExpr<
-      AdminUsersSessionListResponse,
-      "slack/admin_users_session_list",
-      [A]
-    >;
-    reset<A>(params: A): CExpr<
-      AdminUsersSessionResetResponse,
-      "slack/admin_users_session_reset",
-      [A]
-    >;
-    resetBulk<A>(params: A): CExpr<
-      AdminUsersSessionResetBulkResponse,
-      "slack/admin_users_session_resetBulk",
-      [A]
-    >;
-    setSettings<A>(params: A): CExpr<
-      AdminUsersSessionSetSettingsResponse,
-      "slack/admin_users_session_setSettings",
-      [A]
-    >;
+    getSettings<A>(
+      params: A,
+    ): CExpr<AdminUsersSessionGetSettingsResponse, "slack/admin_users_session_getSettings", [A]>;
+    invalidate<A>(
+      params: A,
+    ): CExpr<AdminUsersSessionInvalidateResponse, "slack/admin_users_session_invalidate", [A]>;
+    list<A = void>(
+      params?: A,
+    ): CExpr<AdminUsersSessionListResponse, "slack/admin_users_session_list", [A]>;
+    reset<A>(
+      params: A,
+    ): CExpr<AdminUsersSessionResetResponse, "slack/admin_users_session_reset", [A]>;
+    resetBulk<A>(
+      params: A,
+    ): CExpr<AdminUsersSessionResetBulkResponse, "slack/admin_users_session_resetBulk", [A]>;
+    setSettings<A>(
+      params: A,
+    ): CExpr<AdminUsersSessionSetSettingsResponse, "slack/admin_users_session_setSettings", [A]>;
   };
   unsupportedVersions: {
-    export<A>(params: A): CExpr<
+    export<A>(
+      params: A,
+    ): CExpr<
       AdminUsersUnsupportedVersionsExportResponse,
       "slack/admin_users_unsupportedVersions_export",
       [A]
@@ -70,15 +62,11 @@ export interface SlackMethodsAdminUsers {
   list<A = void>(params?: A): CExpr<AdminUsersListResponse, "slack/admin_users_list", [A]>;
   remove<A>(params: A): CExpr<AdminUsersRemoveResponse, "slack/admin_users_remove", [A]>;
   setAdmin<A>(params: A): CExpr<AdminUsersSetAdminResponse, "slack/admin_users_setAdmin", [A]>;
-  setExpiration<A>(params: A): CExpr<
-    AdminUsersSetExpirationResponse,
-    "slack/admin_users_setExpiration",
-    [A]
-  >;
+  setExpiration<A>(
+    params: A,
+  ): CExpr<AdminUsersSetExpirationResponse, "slack/admin_users_setExpiration", [A]>;
   setOwner<A>(params: A): CExpr<AdminUsersSetOwnerResponse, "slack/admin_users_setOwner", [A]>;
-  setRegular<A>(params: A): CExpr<
-    AdminUsersSetRegularResponse,
-    "slack/admin_users_setRegular",
-    [A]
-  >;
+  setRegular<A>(
+    params: A,
+  ): CExpr<AdminUsersSetRegularResponse, "slack/admin_users_setRegular", [A]>;
 }
