@@ -69,26 +69,34 @@ export function createFalInterpreter(client: FalClient): Interpreter {
       const endpointId = (yield 0) as string;
       const options =
         entry.children.length > 1
-          ? ((yield* resolveStructured(entry.children[1])) as Parameters<FalSdkClient["subscribe"]>[1])
+          ? ((yield* resolveStructured(entry.children[1])) as Parameters<
+              FalSdkClient["subscribe"]
+            >[1])
           : undefined;
       return await client.subscribe(endpointId, options);
     },
 
     "fal/queue_submit": async function* (entry: RuntimeEntry) {
       const endpointId = (yield 0) as string;
-      const options = (yield* resolveStructured(entry.children[1])) as Parameters<FalSdkQueueClient["submit"]>[1];
+      const options = (yield* resolveStructured(entry.children[1])) as Parameters<
+        FalSdkQueueClient["submit"]
+      >[1];
       return await client.queueSubmit(endpointId, options);
     },
 
     "fal/queue_status": async function* (entry: RuntimeEntry) {
       const endpointId = (yield 0) as string;
-      const options = (yield* resolveStructured(entry.children[1])) as Parameters<FalSdkQueueClient["status"]>[1];
+      const options = (yield* resolveStructured(entry.children[1])) as Parameters<
+        FalSdkQueueClient["status"]
+      >[1];
       return await client.queueStatus(endpointId, options);
     },
 
     "fal/queue_result": async function* (entry: RuntimeEntry) {
       const endpointId = (yield 0) as string;
-      const options = (yield* resolveStructured(entry.children[1])) as Parameters<FalSdkQueueClient["result"]>[1];
+      const options = (yield* resolveStructured(entry.children[1])) as Parameters<
+        FalSdkQueueClient["result"]
+      >[1];
       return await client.queueResult(endpointId, options);
     },
 
