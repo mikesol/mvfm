@@ -9,6 +9,10 @@ import type {
 export interface SlackMethodsOpenid {
   connect: {
     token<A>(params: A): CExpr<OpenIDConnectTokenResponse, "slack/openid_connect_token", [A]>;
-    userInfo<A = void>(params?: A): CExpr<OpenIDConnectUserInfoResponse, "slack/openid_connect_userInfo", [A]>;
+    userInfo<A = void>(params?: A): CExpr<
+      OpenIDConnectUserInfoResponse,
+      "slack/openid_connect_userInfo",
+      [A]
+    >;
   };
 }

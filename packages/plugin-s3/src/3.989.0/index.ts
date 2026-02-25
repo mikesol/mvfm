@@ -101,7 +101,11 @@ export function s3(_config: S3Config) {
         /** Delete an object from S3. */
         deleteObject(
           input: Liftable<DeleteObjectCommandInput>,
-        ): CExpr<DeleteObjectCommandOutput, "s3/delete_object", [Liftable<DeleteObjectCommandInput>]> {
+        ): CExpr<
+          DeleteObjectCommandOutput,
+          "s3/delete_object",
+          [Liftable<DeleteObjectCommandInput>]
+        > {
           return makeCExpr("s3/delete_object", [input]) as any;
         },
         /** Check existence and retrieve metadata for an object. */
@@ -113,7 +117,11 @@ export function s3(_config: S3Config) {
         /** List objects in a bucket (v2). */
         listObjectsV2(
           input: Liftable<ListObjectsV2CommandInput>,
-        ): CExpr<ListObjectsV2CommandOutput, "s3/list_objects_v2", [Liftable<ListObjectsV2CommandInput>]> {
+        ): CExpr<
+          ListObjectsV2CommandOutput,
+          "s3/list_objects_v2",
+          [Liftable<ListObjectsV2CommandInput>]
+        > {
           return makeCExpr("s3/list_objects_v2", [input]) as any;
         },
       },

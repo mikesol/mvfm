@@ -57,7 +57,10 @@ export function buildPostgresApi() {
         fn: (batch: CExpr<T[]>) => unknown,
       ): CExpr<void, "postgres/cursor", [CExpr<T[]>, unknown, unknown]> {
         const batchProxy = makeCExpr("postgres/cursor_batch", []);
-        return makeCExpr("postgres/cursor", [query, batchSize, fn(batchProxy as CExpr<T[]>)]) as any;
+        return makeCExpr(
+          "postgres/cursor",
+          [query, batchSize, fn(batchProxy as CExpr<T[]>)],
+        ) as any;
       },
     };
 

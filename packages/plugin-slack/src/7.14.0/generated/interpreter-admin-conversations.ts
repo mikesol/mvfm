@@ -13,7 +13,8 @@ export const NODE_TO_METHOD_ADMIN_CONVERSATIONS: Record<string, string> = {
   "slack/admin_conversations_create": "admin.conversations.create",
   "slack/admin_conversations_delete": "admin.conversations.delete",
   "slack/admin_conversations_disconnectShared": "admin.conversations.disconnectShared",
-  "slack/admin_conversations_ekm_listOriginalConnectedChannelInfo": "admin.conversations.ekm.listOriginalConnectedChannelInfo",
+  "slack/admin_conversations_ekm_listOriginalConnectedChannelInfo":
+    "admin.conversations.ekm.listOriginalConnectedChannelInfo",
   "slack/admin_conversations_getConversationPrefs": "admin.conversations.getConversationPrefs",
   "slack/admin_conversations_getCustomRetention": "admin.conversations.getCustomRetention",
   "slack/admin_conversations_getTeams": "admin.conversations.getTeams",
@@ -21,9 +22,12 @@ export const NODE_TO_METHOD_ADMIN_CONVERSATIONS: Record<string, string> = {
   "slack/admin_conversations_lookup": "admin.conversations.lookup",
   "slack/admin_conversations_removeCustomRetention": "admin.conversations.removeCustomRetention",
   "slack/admin_conversations_rename": "admin.conversations.rename",
-  "slack/admin_conversations_restrictAccess_addGroup": "admin.conversations.restrictAccess.addGroup",
-  "slack/admin_conversations_restrictAccess_listGroups": "admin.conversations.restrictAccess.listGroups",
-  "slack/admin_conversations_restrictAccess_removeGroup": "admin.conversations.restrictAccess.removeGroup",
+  "slack/admin_conversations_restrictAccess_addGroup":
+    "admin.conversations.restrictAccess.addGroup",
+  "slack/admin_conversations_restrictAccess_listGroups":
+    "admin.conversations.restrictAccess.listGroups",
+  "slack/admin_conversations_restrictAccess_removeGroup":
+    "admin.conversations.restrictAccess.removeGroup",
   "slack/admin_conversations_search": "admin.conversations.search",
   "slack/admin_conversations_setConversationPrefs": "admin.conversations.setConversationPrefs",
   "slack/admin_conversations_setCustomRetention": "admin.conversations.setCustomRetention",

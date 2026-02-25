@@ -32,9 +32,10 @@ export function createFetchInterpreter(
   return {
     "fetch/request": async function* (entry: RuntimeEntry) {
       const url = (yield 0) as string;
-      const init = entry.children.length > 1
-        ? ((yield* resolveStructured(entry.children[1])) as RequestInit | undefined)
-        : undefined;
+      const init =
+        entry.children.length > 1
+          ? ((yield* resolveStructured(entry.children[1])) as RequestInit | undefined)
+          : undefined;
 
       let resolvedUrl = url;
       if (config?.baseUrl && !url.startsWith("http://") && !url.startsWith("https://")) {

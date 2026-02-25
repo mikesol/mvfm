@@ -19,7 +19,8 @@ export function buildSlackConversations(): SlackMethodsConversations {
     },
     externalInvitePermissions: {
       set(params) {
-        if (params != null) return mk("slack/conversations_externalInvitePermissions_set", [params]);
+        if (params != null)
+          return mk("slack/conversations_externalInvitePermissions_set", [params]);
         return mk("slack/conversations_externalInvitePermissions_set", []);
       },
     },

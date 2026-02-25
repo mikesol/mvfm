@@ -278,9 +278,16 @@ function generateTypesGroup(group: GroupData): string {
     for (const m of node.methods) {
       const methodName = m.path[m.path.length - 1];
       const optSig = m.optional ? "<A = void>(params?: A)" : "<A>(params: A)";
-      lines.push(
-        `${indent}${methodName}${optSig}: CExpr<${m.responseType}, "${m.nodeKind}", [A]>;`,
-      );
+      const singleLine = `${indent}${methodName}${optSig}: CExpr<${m.responseType}, "${m.nodeKind}", [A]>;`;
+      if (singleLine.length <= 100) {
+        lines.push(singleLine);
+      } else {
+        lines.push(`${indent}${methodName}${optSig}: CExpr<`);
+        lines.push(`${indent}  ${m.responseType},`);
+        lines.push(`${indent}  "${m.nodeKind}",`);
+        lines.push(`${indent}  [A]`);
+        lines.push(`${indent}>;`);
+      }
     }
   }
 
@@ -398,7 +405,13 @@ function generateBuildMethodsGroup(group: GroupData): string {
       const methodName = m.path[m.path.length - 1];
       const paramSig = m.optional ? "params?" : "params";
       lines.push(`${indent}${methodName}(${paramSig}) {`);
-      lines.push(`${indent}  if (params != null) return mk("${m.nodeKind}", [params]);`);
+      const mkCall = `${indent}  if (params != null) return mk("${m.nodeKind}", [params]);`;
+      if (mkCall.length <= 100) {
+        lines.push(mkCall);
+      } else {
+        lines.push(`${indent}  if (params != null)`);
+        lines.push(`${indent}    return mk("${m.nodeKind}", [params]);`);
+      }
       lines.push(`${indent}  return mk("${m.nodeKind}", []);`);
       lines.push(`${indent}},`);
     }
@@ -491,7 +504,13 @@ function generateInterpreterGroup(group: GroupData): string {
 
   lines.push(`export const NODE_TO_METHOD_${constSuffix}: Record<string, string> = {`);
   for (const m of group.methods) {
-    lines.push(`  "${m.nodeKind}": "${m.apiMethod}",`);
+    const entry = `  "${m.nodeKind}": "${m.apiMethod}",`;
+    if (entry.length <= 100) {
+      lines.push(entry);
+    } else {
+      lines.push(`  "${m.nodeKind}":`);
+      lines.push(`    "${m.apiMethod}",`);
+    }
   }
   lines.push("};");
   lines.push("");
@@ -529,9 +548,15 @@ function generateInterpreterIndex(groups: GroupData[]): string {
   for (const g of groups) {
     const pascal = slugToPascal(g.fileSlug);
     const constSuffix = slugToConstSuffix(g.fileSlug);
-    lines.push(
-      `import { createSlack${pascal}Interpreter, NODE_TO_METHOD_${constSuffix} } from "./interpreter-${g.fileSlug}";`,
-    );
+    const importLine = `import { createSlack${pascal}Interpreter, NODE_TO_METHOD_${constSuffix} } from "./interpreter-${g.fileSlug}";`;
+    if (importLine.length <= 100) {
+      lines.push(importLine);
+    } else {
+      lines.push(`import {`);
+      lines.push(`  createSlack${pascal}Interpreter,`);
+      lines.push(`  NODE_TO_METHOD_${constSuffix},`);
+      lines.push(`} from "./interpreter-${g.fileSlug}";`);
+    }
   }
   lines.push("");
 

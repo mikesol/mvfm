@@ -51,13 +51,21 @@ function buildTwilioApi() {
       /** Send an SMS/MMS message. */
       create(
         params: Liftable<Record<string, unknown>>,
-      ): CExpr<Record<string, unknown>, "twilio/create_message", [Liftable<Record<string, unknown>>]> {
+      ): CExpr<
+        Record<string, unknown>,
+        "twilio/create_message",
+        [Liftable<Record<string, unknown>>]
+      > {
         return makeCExpr("twilio/create_message", [params]) as any;
       },
       /** List messages with optional filter params. */
       list(
         ...params: [] | [Liftable<Record<string, unknown>>]
-      ): CExpr<Record<string, unknown>, "twilio/list_messages", [] | [Liftable<Record<string, unknown>>]> {
+      ): CExpr<
+        Record<string, unknown>,
+        "twilio/list_messages",
+        [] | [Liftable<Record<string, unknown>>]
+      > {
         return makeCExpr("twilio/list_messages", params as unknown[]) as any;
       },
     },
@@ -74,13 +82,21 @@ function buildTwilioApi() {
       /** Initiate an outbound call. */
       create(
         params: Liftable<Record<string, unknown>>,
-      ): CExpr<Record<string, unknown>, "twilio/create_call", [Liftable<Record<string, unknown>>]> {
+      ): CExpr<
+        Record<string, unknown>,
+        "twilio/create_call",
+        [Liftable<Record<string, unknown>>]
+      > {
         return makeCExpr("twilio/create_call", [params]) as any;
       },
       /** List calls with optional filter params. */
       list(
         ...params: [] | [Liftable<Record<string, unknown>>]
-      ): CExpr<Record<string, unknown>, "twilio/list_calls", [] | [Liftable<Record<string, unknown>>]> {
+      ): CExpr<
+        Record<string, unknown>,
+        "twilio/list_calls",
+        [] | [Liftable<Record<string, unknown>>]
+      > {
         return makeCExpr("twilio/list_calls", params as unknown[]) as any;
       },
     },

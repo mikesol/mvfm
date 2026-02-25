@@ -14,11 +14,19 @@ import type {
 
 export interface SlackMethodsApps {
   connections: {
-    open<A = void>(params?: A): CExpr<AppsConnectionsOpenResponse, "slack/apps_connections_open", [A]>;
+    open<A = void>(params?: A): CExpr<
+      AppsConnectionsOpenResponse,
+      "slack/apps_connections_open",
+      [A]
+    >;
   };
   event: {
     authorizations: {
-      list<A>(params: A): CExpr<AppsEventAuthorizationsListResponse, "slack/apps_event_authorizations_list", [A]>;
+      list<A>(params: A): CExpr<
+        AppsEventAuthorizationsListResponse,
+        "slack/apps_event_authorizations_list",
+        [A]
+      >;
     };
   };
   manifest: {
@@ -26,7 +34,11 @@ export interface SlackMethodsApps {
     delete<A>(params: A): CExpr<AppsManifestDeleteResponse, "slack/apps_manifest_delete", [A]>;
     export<A>(params: A): CExpr<AppsManifestExportResponse, "slack/apps_manifest_export", [A]>;
     update<A>(params: A): CExpr<AppsManifestUpdateResponse, "slack/apps_manifest_update", [A]>;
-    validate<A>(params: A): CExpr<AppsManifestValidateResponse, "slack/apps_manifest_validate", [A]>;
+    validate<A>(params: A): CExpr<
+      AppsManifestValidateResponse,
+      "slack/apps_manifest_validate",
+      [A]
+    >;
   };
   uninstall<A>(params: A): CExpr<AppsUninstallResponse, "slack/apps_uninstall", [A]>;
 }

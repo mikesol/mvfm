@@ -97,7 +97,9 @@ export function createPostgresInterpreter(client: PostgresClient): Interpreter {
     },
 
     "postgres/insert_helper": async function* (entry: RuntimeEntry) {
-      const data = (yield* resolveStructured(entry.children[0])) as Record<string, unknown> | Record<string, unknown>[];
+      const data = (yield* resolveStructured(entry.children[0])) as
+        | Record<string, unknown>
+        | Record<string, unknown>[];
       const columnsJson = (yield 1) as string;
       const parsedColumns = JSON.parse(columnsJson) as string[] | null;
       const columns = parsedColumns ?? Object.keys(Array.isArray(data) ? data[0] : data);
@@ -146,19 +148,22 @@ export function createPostgresInterpreter(client: PostgresClient): Interpreter {
 
     "postgres/savepoint": async function* (_entry: RuntimeEntry) {
       throw new Error(
-        "postgres/savepoint requires the server interpreter — use createPostgresServerInterpreter",
+        "postgres/savepoint requires the server interpreter" +
+          " — use createPostgresServerInterpreter",
       );
     },
 
     "postgres/cursor": async function* (_entry: RuntimeEntry) {
       throw new Error(
-        "postgres/cursor requires the server interpreter — use createPostgresServerInterpreter",
+        "postgres/cursor requires the server interpreter" +
+          " — use createPostgresServerInterpreter",
       );
     },
 
     "postgres/cursor_batch": async function* (_entry: RuntimeEntry) {
       throw new Error(
-        "postgres/cursor_batch requires the server interpreter — use createPostgresServerInterpreter",
+        "postgres/cursor_batch requires the server interpreter" +
+          " — use createPostgresServerInterpreter",
       );
     },
 

@@ -13,21 +13,25 @@ export function buildSlackAdminConversations(): SlackMethodsAdminConversations {
   return {
     ekm: {
       listOriginalConnectedChannelInfo(params?) {
-        if (params != null) return mk("slack/admin_conversations_ekm_listOriginalConnectedChannelInfo", [params]);
+        if (params != null)
+          return mk("slack/admin_conversations_ekm_listOriginalConnectedChannelInfo", [params]);
         return mk("slack/admin_conversations_ekm_listOriginalConnectedChannelInfo", []);
       },
     },
     restrictAccess: {
       addGroup(params) {
-        if (params != null) return mk("slack/admin_conversations_restrictAccess_addGroup", [params]);
+        if (params != null)
+          return mk("slack/admin_conversations_restrictAccess_addGroup", [params]);
         return mk("slack/admin_conversations_restrictAccess_addGroup", []);
       },
       listGroups(params) {
-        if (params != null) return mk("slack/admin_conversations_restrictAccess_listGroups", [params]);
+        if (params != null)
+          return mk("slack/admin_conversations_restrictAccess_listGroups", [params]);
         return mk("slack/admin_conversations_restrictAccess_listGroups", []);
       },
       removeGroup(params) {
-        if (params != null) return mk("slack/admin_conversations_restrictAccess_removeGroup", [params]);
+        if (params != null)
+          return mk("slack/admin_conversations_restrictAccess_removeGroup", [params]);
         return mk("slack/admin_conversations_restrictAccess_removeGroup", []);
       },
     },

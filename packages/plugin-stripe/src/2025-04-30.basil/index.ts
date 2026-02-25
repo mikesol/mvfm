@@ -104,7 +104,8 @@ function buildStripeApi() {
       ): CExpr<
         Stripe.PaymentIntent,
         "stripe/confirm_payment_intent",
-        [string | CExpr<string>] | [string | CExpr<string>, Liftable<Stripe.PaymentIntentConfirmParams>]
+        | [string | CExpr<string>]
+        | [string | CExpr<string>, Liftable<Stripe.PaymentIntentConfirmParams>]
       > {
         return makeCExpr("stripe/confirm_payment_intent", [id, ...params] as unknown[]) as any;
       },
@@ -213,7 +214,10 @@ export function stripe(config: StripeConfig) {
         output: undefined as unknown as Stripe.Customer,
       } as KindSpec<[string], Stripe.Customer>,
       "stripe/update_customer": {
-        inputs: ["", undefined as unknown as Stripe.CustomerUpdateParams] as [string, Stripe.CustomerUpdateParams],
+        inputs: ["", undefined as unknown as Stripe.CustomerUpdateParams] as [
+          string,
+          Stripe.CustomerUpdateParams,
+        ],
         output: undefined as unknown as Stripe.Customer,
       } as KindSpec<[string, Stripe.CustomerUpdateParams], Stripe.Customer>,
       "stripe/list_customers": {

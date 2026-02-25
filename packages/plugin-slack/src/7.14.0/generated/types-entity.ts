@@ -6,5 +6,9 @@ import type {
 } from "@slack/web-api";
 
 export interface SlackMethodsEntity {
-  presentDetails<A>(params: A): CExpr<EntityPresentDetailsResponse, "slack/entity_presentDetails", [A]>;
+  presentDetails<A>(params: A): CExpr<
+    EntityPresentDetailsResponse,
+    "slack/entity_presentDetails",
+    [A]
+  >;
 }

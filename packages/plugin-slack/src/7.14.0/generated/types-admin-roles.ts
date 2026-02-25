@@ -8,7 +8,19 @@ import type {
 } from "@slack/web-api";
 
 export interface SlackMethodsAdminRoles {
-  addAssignments<A>(params: A): CExpr<AdminRolesAddAssignmentsResponse, "slack/admin_roles_addAssignments", [A]>;
-  listAssignments<A = void>(params?: A): CExpr<AdminRolesListAssignmentsResponse, "slack/admin_roles_listAssignments", [A]>;
-  removeAssignments<A>(params: A): CExpr<AdminRolesRemoveAssignmentsResponse, "slack/admin_roles_removeAssignments", [A]>;
+  addAssignments<A>(params: A): CExpr<
+    AdminRolesAddAssignmentsResponse,
+    "slack/admin_roles_addAssignments",
+    [A]
+  >;
+  listAssignments<A = void>(params?: A): CExpr<
+    AdminRolesListAssignmentsResponse,
+    "slack/admin_roles_listAssignments",
+    [A]
+  >;
+  removeAssignments<A>(params: A): CExpr<
+    AdminRolesRemoveAssignmentsResponse,
+    "slack/admin_roles_removeAssignments",
+    [A]
+  >;
 }

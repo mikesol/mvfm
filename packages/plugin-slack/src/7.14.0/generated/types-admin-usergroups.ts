@@ -9,8 +9,24 @@ import type {
 } from "@slack/web-api";
 
 export interface SlackMethodsAdminUsergroups {
-  addChannels<A>(params: A): CExpr<AdminUsergroupsAddChannelsResponse, "slack/admin_usergroups_addChannels", [A]>;
-  addTeams<A>(params: A): CExpr<AdminUsergroupsAddTeamsResponse, "slack/admin_usergroups_addTeams", [A]>;
-  listChannels<A>(params: A): CExpr<AdminUsergroupsListChannelsResponse, "slack/admin_usergroups_listChannels", [A]>;
-  removeChannels<A>(params: A): CExpr<AdminUsergroupsRemoveChannelsResponse, "slack/admin_usergroups_removeChannels", [A]>;
+  addChannels<A>(params: A): CExpr<
+    AdminUsergroupsAddChannelsResponse,
+    "slack/admin_usergroups_addChannels",
+    [A]
+  >;
+  addTeams<A>(params: A): CExpr<
+    AdminUsergroupsAddTeamsResponse,
+    "slack/admin_usergroups_addTeams",
+    [A]
+  >;
+  listChannels<A>(params: A): CExpr<
+    AdminUsergroupsListChannelsResponse,
+    "slack/admin_usergroups_listChannels",
+    [A]
+  >;
+  removeChannels<A>(params: A): CExpr<
+    AdminUsergroupsRemoveChannelsResponse,
+    "slack/admin_usergroups_removeChannels",
+    [A]
+  >;
 }

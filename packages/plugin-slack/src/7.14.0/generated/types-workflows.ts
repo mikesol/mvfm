@@ -15,10 +15,18 @@ export interface SlackMethodsWorkflows {
   featured: {
     add<A>(params: A): CExpr<WorkflowsFeaturedAddResponse, "slack/workflows_featured_add", [A]>;
     list<A>(params: A): CExpr<WorkflowsFeaturedListResponse, "slack/workflows_featured_list", [A]>;
-    remove<A>(params: A): CExpr<WorkflowsFeaturedRemoveResponse, "slack/workflows_featured_remove", [A]>;
+    remove<A>(params: A): CExpr<
+      WorkflowsFeaturedRemoveResponse,
+      "slack/workflows_featured_remove",
+      [A]
+    >;
     set<A>(params: A): CExpr<WorkflowsFeaturedSetResponse, "slack/workflows_featured_set", [A]>;
   };
-  stepCompleted<A>(params: A): CExpr<WorkflowsStepCompletedResponse, "slack/workflows_stepCompleted", [A]>;
+  stepCompleted<A>(params: A): CExpr<
+    WorkflowsStepCompletedResponse,
+    "slack/workflows_stepCompleted",
+    [A]
+  >;
   stepFailed<A>(params: A): CExpr<WorkflowsStepFailedResponse, "slack/workflows_stepFailed", [A]>;
   updateStep<A>(params: A): CExpr<WorkflowsUpdateStepResponse, "slack/workflows_updateStep", [A]>;
 }
