@@ -15,61 +15,57 @@ In languages like `nim` and `haxe`, metaprogramming is a first-class citizen. Th
 Here's what a typical `mvfm` program looks like.
 
 ```typescript
-import { mvfm, prelude, error, st, fold, defaults, injectInput } from "@mvfm/core";
+import { mvfm, prelude, error, fold, defaults, injectInput } from "@mvfm/core";
 import { openai } from "@mvfm/plugin-openai";
 import { postgres } from "@mvfm/plugin-postgres";
 import { stripe } from "@mvfm/plugin-stripe";
 
-const app = mvfm(prelude, st, error, openai(), postgres(), stripe());
+const app = mvfm(prelude, error, openai, postgres, stripe);
 
 const handlePrompt = app(
   { userId: "string", prompt: "string", paymentMethodId: "string" },
   ($) => {
-    // look up the user's remaining credits
     const rows = $.sql`SELECT credits FROM users WHERE id = ${$.input.userId}`;
-    const credits = $.let(0);
-    $.each([rows], (row) => {
-      credits.set(row);
-    });
-
-    // bail if they're out
-    $.try($.guard($.gt(credits.get(), 0), "no credits remaining")).catch(
-      (err) => $.fail(err),
+    const credits = rows[0].credits;
+    return $.begin(
+      $.guard($.gt(credits, 0), "no credits remaining"),
+      $.sql`UPDATE users SET credits = credits - 1 WHERE id = ${$.input.userId}`,
+      $.stripe.paymentIntents.create({
+        amount: 500,
+        currency: "usd",
+        payment_method: $.input.paymentMethodId,
+        confirm: true,
+      }),
+      $.openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [{ role: "user", content: $.input.prompt }],
+      }),
     );
-
-    // call openai
-    const completion = $.openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [{ role: "user", content: $.input.prompt }],
-    });
-
-    // deduct one credit
-    $.sql`UPDATE users SET credits = credits - 1 WHERE id = ${$.input.userId}`;
-
-    // charge via stripe
-    $.stripe.paymentIntents.create({
-      amount: 500,
-      currency: "usd",
-      payment_method: $.input.paymentMethodId,
-      confirm: true,
-    });
-
-    return completion;
   },
 );
 ```
 
-To interpret this program, you construct a gaggle of interpreters that are called as `mvfm` traverses the AST. This pattern is borrowed from pure functional languages like PureScript, where it is used extensively, for example via the [tagless final](https://okmij.org/ftp/tagless-final/index.html) pattern and via [free monads](https://github.com/purescript/purescript-free).
+To interpret this program, you construct interpreters that are called as `mvfm` traverses the AST. This pattern is borrowed from pure functional languages like PureScript, where it is used extensively, for example via the [tagless final](https://okmij.org/ftp/tagless-final/index.html) pattern and via [free monads](https://github.com/purescript/purescript-free).
 
 ```typescript
 import pgClient from "postgres";
+import Stripe from "stripe";
+import OpenAI from "openai";
 import { wrapPostgresJs, createPostgresServerInterpreter } from "@mvfm/plugin-postgres";
-
-const pg = pgClient(process.env.DATABASE_URL!);
+import { wrapStripeSdk, createStripeInterpreter } from "@mvfm/plugin-stripe";
+import { wrapOpenAISdk, createOpenAIInterpreter } from "@mvfm/plugin-openai";
 
 const result = await fold(
   defaults(app, {
-    postgres: createPostgresServerInterpreter(wrapPostgresJs(pg)),
+    postgres: createPostgresServerInterpreter(
+      wrapPostgresJs(pgClient(process.env.DATABASE_URL!)),
+    ),
+    stripe: createStripeInterpreter(
+      wrapStripeSdk(new Stripe(process.env.STRIPE_API_KEY!)),
+    ),
+    openai: createOpenAIInterpreter(
+      wrapOpenAISdk(new OpenAI({ apiKey: process.env.OPENAI_API_KEY! })),
+    ),
   }),
   injectInput(handlePrompt, {
     userId: "usr_abc123",
@@ -79,7 +75,7 @@ const result = await fold(
 );
 ```
 
-Those are the default interpreters, but writing your own is quite straightforward. This is useful for mocking, program splitting, debugging, and basically everything you need to do that is not just running the program. Of course, it is equally good at just running the program.
+Writing your own interpreters is straightforward. This is useful for mocking, program splitting, debugging, and basically everything you need to do that is not just running the program. Of course, it is equally good at just running the program.
 
 ## Why
 

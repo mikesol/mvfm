@@ -47,13 +47,15 @@ export const handlePrompt = app(
 // -- Block 2: Interpretation helper -----------------------------------------
 
 export async function runExample(
-  postgresInterpreter: Interpreter,
+  interpreters: {
+    postgres: Interpreter;
+    openai: Interpreter;
+    stripe: Interpreter;
+  },
   input: { userId: string; prompt: string; paymentMethodId: string },
 ) {
   return await fold(
-    defaults(app, {
-      postgres: postgresInterpreter,
-    }),
+    defaults(app, interpreters),
     injectInput(handlePrompt, input),
   );
 }
