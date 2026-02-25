@@ -17,7 +17,7 @@
 // NO defaultInterpreter — requires createCloudflareKvInterpreter(client).
 // ============================================================
 
-import type { CExpr, KindSpec, Liftable, Plugin } from "@mvfm/core";
+import type { CExpr, KindSpec, Plugin } from "@mvfm/core";
 import { makeCExpr } from "@mvfm/core";
 
 // ---- Supporting types -------------------------------------
@@ -87,7 +87,7 @@ function kvGet<A>(key: A, type?: "text" | "json") {
  * Each method produces a CExpr node with positional children.
  * Config is NOT stored on AST nodes — it's captured by the interpreter.
  *
- * Constructors use Liftable<T> for structured params and string | CExpr<string>
+ * Constructors use string | CExpr<string>
  * for key params. Validation happens at `app()` time via KindSpec.
  */
 function buildKvApi() {

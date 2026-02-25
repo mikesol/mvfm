@@ -64,32 +64,20 @@ function buildAnthropicApi() {
       /** Create a message (chat completion). */
       create(
         params: Liftable<MessageCreateParamsNonStreaming>,
-      ): CExpr<
-        Message,
-        "anthropic/create_message",
-        [Liftable<MessageCreateParamsNonStreaming>]
-      > {
+      ): CExpr<Message, "anthropic/create_message", [Liftable<MessageCreateParamsNonStreaming>]> {
         return makeCExpr("anthropic/create_message", [params]) as any;
       },
       /** Count tokens for a message request. */
       countTokens(
         params: Liftable<MessageCountTokensParams>,
-      ): CExpr<
-        MessageTokensCount,
-        "anthropic/count_tokens",
-        [Liftable<MessageCountTokensParams>]
-      > {
+      ): CExpr<MessageTokensCount, "anthropic/count_tokens", [Liftable<MessageCountTokensParams>]> {
         return makeCExpr("anthropic/count_tokens", [params]) as any;
       },
       batches: {
         /** Create a message batch. */
         create(
           params: Liftable<BatchCreateParams>,
-        ): CExpr<
-          MessageBatch,
-          "anthropic/create_message_batch",
-          [Liftable<BatchCreateParams>]
-        > {
+        ): CExpr<MessageBatch, "anthropic/create_message_batch", [Liftable<BatchCreateParams>]> {
           return makeCExpr("anthropic/create_message_batch", [params]) as any;
         },
         /** Retrieve a message batch by ID. */
@@ -132,11 +120,7 @@ function buildAnthropicApi() {
       /** List models with optional filter params. */
       list(
         ...params: [] | [Liftable<ModelListParams>]
-      ): CExpr<
-        ModelInfosPage,
-        "anthropic/list_models",
-        [] | [Liftable<ModelListParams>]
-      > {
+      ): CExpr<ModelInfosPage, "anthropic/list_models", [] | [Liftable<ModelListParams>]> {
         return makeCExpr("anthropic/list_models", params as unknown[]) as any;
       },
     },

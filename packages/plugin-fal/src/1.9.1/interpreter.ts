@@ -94,7 +94,9 @@ export function createFalInterpreter(client: FalClient): Interpreter {
 
     "fal/queue_cancel": async function* (entry: RuntimeEntry) {
       const endpointId = (yield 0) as string;
-      const options = (yield* resolveStructured(entry.children[1])) as Parameters<FalSdkQueueClient["cancel"]>[1];
+      const options = (yield* resolveStructured(entry.children[1])) as Parameters<
+        FalSdkQueueClient["cancel"]
+      >[1];
       await client.queueCancel(endpointId, options);
       return undefined;
     },
