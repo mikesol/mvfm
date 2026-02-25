@@ -199,6 +199,5 @@ export function createRedisInterpreter(client: RedisClient): Interpreter {
 
     // ---- List commands (delegated to interpreter-list.ts) ----
     ...buildListHandlers(client),
-
   };
 }

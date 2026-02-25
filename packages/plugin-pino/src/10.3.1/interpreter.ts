@@ -52,9 +52,10 @@ export function createPinoInterpreter(client?: PinoClient, _config: PinoConfig =
       const mergeObject = hasMergeObj
         ? ((yield* resolveStructured(entry.children[3])) as Record<string, unknown>)
         : undefined;
-      const bindingsRaw = (yield* resolveStructured(
-        entry.children[4],
-      )) as Record<string, unknown>[];
+      const bindingsRaw = (yield* resolveStructured(entry.children[4])) as Record<
+        string,
+        unknown
+      >[];
 
       await resolvedClient.log(level, bindingsRaw, mergeObject, msg);
       return undefined;

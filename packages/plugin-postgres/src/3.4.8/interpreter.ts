@@ -166,6 +166,5 @@ export function createPostgresInterpreter(client: PostgresClient): Interpreter {
           " — use createPostgresServerInterpreter",
       );
     },
-
   };
 }
