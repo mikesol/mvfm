@@ -47,8 +47,8 @@ export interface StateCell {
 }
 
 /** Core methods added by mvfm() on top of plugin constructors. */
-export interface CoreDollar {
-  input: CExpr<Record<string, unknown>>;
+export interface CoreDollar<S extends Record<string, string> = Record<string, string>> {
+  input: CExpr<SchemaToData<S>>;
   begin(...exprs: unknown[]): CExpr<unknown>;
   show(a: unknown): CExpr<string>;
   cond(pred: unknown): {
@@ -61,11 +61,14 @@ export interface CoreDollar {
 }
 
 /** Full $ type: plugin constructors merged + core extensions overriding specific keys. */
-export type MvfmDollar<P extends readonly PluginInput[]> = Omit<
+export type MvfmDollar<
+  P extends readonly PluginInput[],
+  S extends Record<string, string> = Record<string, string>,
+> = Omit<
   DollarSign<[typeof corePlugin, ...FlattenPluginInputs<P>]>,
   keyof CoreDollar
 > &
-  CoreDollar;
+  CoreDollar<S>;
 
 // ─── prelude ────────────────────────────────────────────────────────
 
@@ -111,7 +114,7 @@ export function mvfm<const P extends readonly PluginInput[]>(...pluginInputs: P)
   function define(fn: ($: MvfmDollar<P>) => unknown): Program<undefined>;
   function define<const S extends Record<string, string>>(
     schema: S,
-    fn: ($: MvfmDollar<P>) => unknown,
+    fn: ($: MvfmDollar<P, S>) => unknown,
   ): Program<S>;
   function define(
     schemaOrFn: Record<string, string> | (($: MvfmDollar<P>) => unknown),

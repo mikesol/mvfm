@@ -24,7 +24,7 @@ export const app = mvfm(
 
 export const handlePrompt = app(
   { userId: "string", prompt: "string", paymentMethodId: "string" },
-  ($ : any) => {
+  ($) => {
     const rows = $.sql`SELECT credits FROM users WHERE id = ${$.input.userId}`;
     const credits = rows[0].credits;
     return $.begin(
