@@ -1,4 +1,5 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
+import { resolveStructured } from "@mvfm/core";
 import { buildListHandlers } from "./interpreter-list";
 
 /**
@@ -72,8 +73,8 @@ export function createRedisInterpreter(client: RedisClient): Interpreter {
       return (await client.command("MGET", ...keys)) as (string | null)[];
     },
 
-    "redis/mset": async function* (_entry: RuntimeEntry) {
-      const mapping = (yield 0) as Record<string, unknown>;
+    "redis/mset": async function* (entry: RuntimeEntry) {
+      const mapping = (yield* resolveStructured(entry.children[0])) as Record<string, unknown>;
       return (await client.command("MSET", ...flattenRecord(mapping))) as "OK";
     },
 
@@ -143,9 +144,9 @@ export function createRedisInterpreter(client: RedisClient): Interpreter {
       return (await client.command("HGET", key, field)) as string | null;
     },
 
-    "redis/hset": async function* (_entry: RuntimeEntry) {
+    "redis/hset": async function* (entry: RuntimeEntry) {
       const key = yield 0;
-      const mapping = (yield 1) as Record<string, unknown>;
+      const mapping = (yield* resolveStructured(entry.children[1])) as Record<string, unknown>;
       return (await client.command("HSET", key, ...flattenRecord(mapping))) as number;
     },
 
@@ -198,25 +199,5 @@ export function createRedisInterpreter(client: RedisClient): Interpreter {
 
     // ---- List commands (delegated to interpreter-list.ts) ----
     ...buildListHandlers(client),
-
-    // ---- Internal structural kinds ----
-
-    "redis/record": async function* (entry: RuntimeEntry) {
-      const result: Record<string, unknown> = {};
-      for (let i = 0; i < entry.children.length; i += 2) {
-        const key = (yield i) as string;
-        const value = yield i + 1;
-        result[key] = value;
-      }
-      return result;
-    },
-
-    "redis/array": async function* (entry: RuntimeEntry) {
-      const result: unknown[] = [];
-      for (let i = 0; i < entry.children.length; i++) {
-        result.push(yield i);
-      }
-      return result;
-    },
   };
 }

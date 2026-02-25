@@ -21,37 +21,40 @@ describe("pino: CExpr construction for log methods", () => {
 });
 
 describe("pino: msg-only children layout", () => {
-  it("msg-only: [1, 0, msg]", () => {
+  it("msg-only: [1, 0, msg, {}, []]", () => {
     const expr = api.info("user logged in");
     expect(expr.__kind).toBe("pino/info");
     expect(expr.__args[0]).toBe(1); // hasMsg
     expect(expr.__args[1]).toBe(0); // hasMergeObj
     expect(expr.__args[2]).toBe("user logged in"); // msg
-    expect(expr.__args).toHaveLength(3);
+    expect(expr.__args[3]).toEqual({}); // placeholder mergeObj
+    expect(expr.__args[4]).toEqual([]); // no bindings
+    expect(expr.__args).toHaveLength(5);
   });
 });
 
 describe("pino: mergeObject + msg children layout", () => {
-  it("two args: [1, 1, msg, mergeObj]", () => {
+  it("two args: [1, 1, msg, mergeObj, []]", () => {
     const expr = api.info({ userId: 123 }, "user logged in");
     expect(expr.__kind).toBe("pino/info");
     expect(expr.__args[0]).toBe(1); // hasMsg
     expect(expr.__args[1]).toBe(1); // hasMergeObj
-    // args[2] = msg (string)
-    expect(expr.__args[2]).toBe("user logged in");
-    // args[3] = mergeObj (pino/record CExpr)
-    expect((expr.__args[3] as any).__kind).toBe("pino/record");
+    expect(expr.__args[2]).toBe("user logged in"); // msg
+    expect(expr.__args[3]).toEqual({ userId: 123 }); // mergeObj (plain)
+    expect(expr.__args[4]).toEqual([]); // no bindings
   });
 });
 
 describe("pino: object-only logging", () => {
-  it("raw object single arg: [0, 1, mergeObj]", () => {
+  it("raw object single arg: [0, 1, '', mergeObj, []]", () => {
     const expr = api.info({ userId: 123 });
     expect(expr.__kind).toBe("pino/info");
     expect(expr.__args[0]).toBe(0); // hasMsg
     expect(expr.__args[1]).toBe(1); // hasMergeObj
-    expect((expr.__args[2] as any).__kind).toBe("pino/record");
-    expect(expr.__args).toHaveLength(3);
+    expect(expr.__args[2]).toBe(""); // placeholder msg
+    expect(expr.__args[3]).toEqual({ userId: 123 }); // mergeObj
+    expect(expr.__args[4]).toEqual([]); // no bindings
+    expect(expr.__args).toHaveLength(5);
   });
 
   it("CExpr single arg is treated as msg", () => {
@@ -67,24 +70,25 @@ describe("pino: object-only logging", () => {
 // ============================================================
 
 describe("pino: child logger", () => {
-  it("child bindings appear as extra children", () => {
+  it("child bindings appear in bindings array", () => {
     const expr = api.child({ requestId: "abc" }).info("handling request");
     expect(expr.__kind).toBe("pino/info");
-    // [hasMsg=1, hasMergeObj=0, msg, binding0]
+    // [hasMsg=1, hasMergeObj=0, msg, {}, [binding0]]
     expect(expr.__args[0]).toBe(1);
     expect(expr.__args[1]).toBe(0);
     expect(expr.__args[2]).toBe("handling request");
-    expect((expr.__args[3] as any).__kind).toBe("pino/record");
-    expect(expr.__args).toHaveLength(4);
+    expect(expr.__args[3]).toEqual({}); // placeholder mergeObj
+    expect(expr.__args[4]).toEqual([{ requestId: "abc" }]);
+    expect(expr.__args).toHaveLength(5);
   });
 
-  it("nested child loggers accumulate bindings", () => {
+  it("nested child loggers accumulate bindings in array", () => {
     const expr = api.child({ requestId: "abc" }).child({ userId: 42 }).warn("slow query");
     expect(expr.__kind).toBe("pino/warn");
-    // [hasMsg=1, hasMergeObj=0, msg, binding0, binding1]
+    // [hasMsg=1, hasMergeObj=0, msg, {}, [binding0, binding1]]
     expect(expr.__args).toHaveLength(5);
-    expect((expr.__args[3] as any).__kind).toBe("pino/record");
-    expect((expr.__args[4] as any).__kind).toBe("pino/record");
+    expect(expr.__args[3]).toEqual({}); // placeholder mergeObj
+    expect(expr.__args[4]).toEqual([{ requestId: "abc" }, { userId: 42 }]);
   });
 });
 
@@ -97,8 +101,8 @@ describe("pino: unified Plugin shape", () => {
     expect(plugin.name).toBe("pino");
   });
 
-  it("has 8 node kinds (6 levels + record + array)", () => {
-    expect(Object.keys(plugin.kinds)).toHaveLength(8);
+  it("has 6 node kinds (one per log level)", () => {
+    expect(Object.keys(plugin.kinds)).toHaveLength(6);
   });
 
   it("kinds are all namespaced", () => {

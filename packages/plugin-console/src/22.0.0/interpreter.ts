@@ -1,4 +1,5 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
+import { resolveStructured } from "@mvfm/core";
 import { type ConsoleInstance, wrapConsole } from "./client-console";
 import type { ConsoleMethodName } from "./index";
 
@@ -16,21 +17,22 @@ export interface ConsoleClient {
   call(method: ConsoleMethodName, args: unknown[]): Promise<void>;
 }
 
-const METHOD_NAMES: ReadonlyArray<ConsoleMethodName> = [
+/** Methods whose args are packed into a single structural array. */
+const STRUCTURAL_METHODS: ReadonlyArray<ConsoleMethodName> = ["dir", "dirxml", "table"];
+
+/** Methods with normal positional children. */
+const POSITIONAL_METHODS: ReadonlyArray<ConsoleMethodName> = [
   "assert",
   "clear",
   "count",
   "countReset",
   "debug",
-  "dir",
-  "dirxml",
   "error",
   "group",
   "groupCollapsed",
   "groupEnd",
   "info",
   "log",
-  "table",
   "time",
   "timeEnd",
   "timeLog",
@@ -49,13 +51,20 @@ export function createConsoleInterpreter(
   client: ConsoleClient = wrapConsole(globalThis.console as unknown as ConsoleInstance),
 ): Interpreter {
   const interp: Interpreter = {};
-  for (const method of METHOD_NAMES) {
+  for (const method of POSITIONAL_METHODS) {
     interp[`console/${method}`] = async function* (entry: RuntimeEntry) {
       const args: unknown[] = [];
       for (let i = 0; i < entry.children.length; i++) {
         args.push(yield i);
       }
       await client.call(method, args);
+      return undefined;
+    };
+  }
+  for (const method of STRUCTURAL_METHODS) {
+    interp[`console/${method}`] = async function* (entry: RuntimeEntry) {
+      const resolved = (yield* resolveStructured(entry.children[0])) as unknown[];
+      await client.call(method, resolved);
       return undefined;
     };
   }

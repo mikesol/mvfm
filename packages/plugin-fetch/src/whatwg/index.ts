@@ -14,44 +14,10 @@
 //   - fetch/headers: response.headers — get response headers
 // ============================================================
 
-import type { CExpr, Interpreter, KindSpec, Plugin } from "@mvfm/core";
-import { isCExpr, makeCExpr } from "@mvfm/core";
+import type { CExpr, Interpreter, KindSpec, Liftable, Plugin } from "@mvfm/core";
+import { makeCExpr } from "@mvfm/core";
 import { wrapFetch } from "./client-fetch";
 import { createFetchInterpreter } from "./interpreter";
-
-/**
- * Recursively lifts a plain value into a CExpr tree.
- * - CExpr values are returned as-is.
- * - Primitives (string, number, boolean) become literal CExprs via makeCExpr.
- * - Plain objects become `fetch/record` CExprs with key-value child pairs.
- * - Arrays become `fetch/array` CExprs.
- */
-function liftArg(value: unknown): unknown {
-  if (isCExpr(value)) return value;
-  if (typeof value === "string") return value; // elaborate lifts strings via str/literal
-  if (typeof value === "number") return value; // elaborate lifts numbers via num/literal
-  if (typeof value === "boolean") return value; // elaborate lifts booleans via bool/literal
-  if (value === null || value === undefined) return value;
-  if (Array.isArray(value)) {
-    return makeCExpr("fetch/array", value.map(liftArg));
-  }
-  if (typeof value === "object") {
-    // Convert {key: val, ...} → makeCExpr("fetch/record", [key1, val1, key2, val2, ...])
-    const pairs: unknown[] = [];
-    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
-      pairs.push(k, liftArg(v));
-    }
-    return makeCExpr("fetch/record", pairs);
-  }
-  return value;
-}
-
-// liftArg erases generic type info at runtime (returns unknown).
-// Cast helpers restore the declared CExpr Args types for ExtractKinds.
-const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]>(
-  kind: Kind,
-  args: readonly unknown[],
-) => CExpr<O, Kind, Args>;
 
 /**
  * Request initialization options, mirroring the WHATWG RequestInit interface.
@@ -97,26 +63,32 @@ export interface FetchConfig {
  * All return types include kind strings for ExtractKinds.
  */
 function buildFetchApi() {
-  const fetchFn = <A, B extends readonly unknown[]>(
-    url: A,
-    ...init: B
-  ): CExpr<unknown, "fetch/request", [A, ...B]> =>
-    init.length > 0 ? mk("fetch/request", [url, liftArg(init[0])]) : mk("fetch/request", [url]);
+  const fetchFn = (
+    url: string | CExpr<string>,
+    ...init: [] | [Liftable<FetchRequestInit>]
+  ): CExpr<
+    unknown,
+    "fetch/request",
+    [string | CExpr<string>] | [string | CExpr<string>, Liftable<FetchRequestInit>]
+  > => {
+    return makeCExpr("fetch/request", [url, ...init] as unknown[]) as any;
+  };
 
   /** Parse the response body as JSON. Mirrors `response.json()`. */
   fetchFn.json = <A>(response: A): CExpr<unknown, "fetch/json", [A]> =>
-    mk("fetch/json", [response]);
+    makeCExpr("fetch/json", [response]) as any;
 
   /** Read the response body as text. Mirrors `response.text()`. */
-  fetchFn.text = <A>(response: A): CExpr<string, "fetch/text", [A]> => mk("fetch/text", [response]);
+  fetchFn.text = <A>(response: A): CExpr<string, "fetch/text", [A]> =>
+    makeCExpr("fetch/text", [response]) as any;
 
   /** Get the HTTP status code. Mirrors `response.status`. */
   fetchFn.status = <A>(response: A): CExpr<number, "fetch/status", [A]> =>
-    mk("fetch/status", [response]);
+    makeCExpr("fetch/status", [response]) as any;
 
   /** Get the response headers as a record. Mirrors `response.headers`. */
   fetchFn.headers = <A>(response: A): CExpr<Record<string, string>, "fetch/headers", [A]> =>
-    mk("fetch/headers", [response]);
+    makeCExpr("fetch/headers", [response]) as any;
 
   return fetchFn;
 }
@@ -154,14 +126,9 @@ export function fetch(config?: FetchConfig) {
         inputs: [undefined] as [unknown],
         output: {} as Record<string, string>,
       } as KindSpec<[unknown], Record<string, string>>,
-      "fetch/record": {
-        inputs: [] as unknown[],
-        output: {} as Record<string, unknown>,
-      } as KindSpec<unknown[], Record<string, unknown>>,
-      "fetch/array": {
-        inputs: [] as unknown[],
-        output: [] as unknown[],
-      } as KindSpec<unknown[], unknown[]>,
+    },
+    shapes: {
+      "fetch/request": [null, "*"] as [null, "*"],
     },
     traits: {},
     lifts: {},

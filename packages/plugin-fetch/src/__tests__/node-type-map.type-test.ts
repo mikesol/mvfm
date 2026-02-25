@@ -18,9 +18,11 @@ const _handler: (entry: RuntimeEntry) => AsyncGenerator<unknown, unknown, unknow
   _interp["fetch/request"];
 
 // ctors.fetch is callable with kind strings in return types
-const _fetchExpr: CExpr<unknown, "fetch/request", [string]> = plugin.ctors.fetch("url");
-const _fetchWithInit: CExpr<unknown, "fetch/request", [string, { method: string }]> =
-  plugin.ctors.fetch("url", { method: "POST" });
+const _fetchExpr = plugin.ctors.fetch("url");
+// Verify it produces a fetch/request CExpr
+const _fetchExprKind: "fetch/request" = _fetchExpr.__kind;
+const _fetchWithInit = plugin.ctors.fetch("url", { method: "POST" });
+const _fetchWithInitKind: "fetch/request" = _fetchWithInit.__kind;
 const _jsonExpr: CExpr<unknown, "fetch/json", [typeof _fetchExpr]> =
   plugin.ctors.fetch.json(_fetchExpr);
 const _textExpr: CExpr<string, "fetch/text", [typeof _fetchExpr]> =
@@ -39,7 +41,9 @@ void _kinds;
 void _interp;
 void _handler;
 void _fetchExpr;
+void _fetchExprKind;
 void _fetchWithInit;
+void _fetchWithInitKind;
 void _jsonExpr;
 void _textExpr;
 void _statusExpr;

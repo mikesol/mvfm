@@ -1,4 +1,5 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
+import { resolveStructured } from "@mvfm/core";
 import { wrapAnthropicSdk } from "./client-anthropic-sdk";
 import type { AnthropicConfig } from "./index";
 
@@ -25,13 +26,13 @@ export interface AnthropicClient {
  */
 export function createAnthropicInterpreter(client: AnthropicClient): Interpreter {
   return {
-    "anthropic/create_message": async function* (_entry: RuntimeEntry) {
-      const body = yield 0;
+    "anthropic/create_message": async function* (entry: RuntimeEntry) {
+      const body = yield* resolveStructured(entry.children[0]);
       return await client.request("POST", "/v1/messages", body as Record<string, unknown>);
     },
 
-    "anthropic/count_tokens": async function* (_entry: RuntimeEntry) {
-      const body = yield 0;
+    "anthropic/count_tokens": async function* (entry: RuntimeEntry) {
+      const body = yield* resolveStructured(entry.children[0]);
       return await client.request(
         "POST",
         "/v1/messages/count_tokens",
@@ -39,8 +40,8 @@ export function createAnthropicInterpreter(client: AnthropicClient): Interpreter
       );
     },
 
-    "anthropic/create_message_batch": async function* (_entry: RuntimeEntry) {
-      const body = yield 0;
+    "anthropic/create_message_batch": async function* (entry: RuntimeEntry) {
+      const body = yield* resolveStructured(entry.children[0]);
       return await client.request("POST", "/v1/messages/batches", body as Record<string, unknown>);
     },
 
@@ -50,7 +51,10 @@ export function createAnthropicInterpreter(client: AnthropicClient): Interpreter
     },
 
     "anthropic/list_message_batches": async function* (entry: RuntimeEntry) {
-      const body = entry.children.length > 0 ? ((yield 0) as Record<string, unknown>) : undefined;
+      const body =
+        entry.children.length > 0
+          ? ((yield* resolveStructured(entry.children[0])) as Record<string, unknown>)
+          : undefined;
       return await client.request("GET", "/v1/messages/batches", body);
     },
 
@@ -70,26 +74,11 @@ export function createAnthropicInterpreter(client: AnthropicClient): Interpreter
     },
 
     "anthropic/list_models": async function* (entry: RuntimeEntry) {
-      const body = entry.children.length > 0 ? ((yield 0) as Record<string, unknown>) : undefined;
+      const body =
+        entry.children.length > 0
+          ? ((yield* resolveStructured(entry.children[0])) as Record<string, unknown>)
+          : undefined;
       return await client.request("GET", "/v1/models", body);
-    },
-
-    "anthropic/record": async function* (entry: RuntimeEntry) {
-      const result: Record<string, unknown> = {};
-      for (let i = 0; i < entry.children.length; i += 2) {
-        const key = (yield i) as string;
-        const value = yield i + 1;
-        result[key] = value;
-      }
-      return result;
-    },
-
-    "anthropic/array": async function* (entry: RuntimeEntry) {
-      const result: unknown[] = [];
-      for (let i = 0; i < entry.children.length; i++) {
-        result.push(yield i);
-      }
-      return result;
     },
   };
 }

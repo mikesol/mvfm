@@ -9,7 +9,7 @@ const api = plugin.ctors.twilio;
 // ============================================================
 
 describe("twilio: messages.create", () => {
-  it("produces twilio/create_message CExpr", () => {
+  it("produces twilio/create_message CExpr with plain object param", () => {
     const expr = api.messages.create({
       to: "+15551234567",
       from: "+15559876543",
@@ -17,8 +17,12 @@ describe("twilio: messages.create", () => {
     });
     expect(expr.__kind).toBe("twilio/create_message");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("twilio/record");
+    const paramsArg = expr.__args[0] as Record<string, unknown>;
+    expect(paramsArg).toEqual({
+      to: "+15551234567",
+      from: "+15559876543",
+      body: "Hello",
+    });
   });
 });
 
@@ -41,12 +45,12 @@ describe("twilio: messages(sid).fetch", () => {
 });
 
 describe("twilio: messages.list", () => {
-  it("produces twilio/list_messages CExpr with params", () => {
+  it("produces twilio/list_messages CExpr with plain object param", () => {
     const expr = api.messages.list({ limit: 10 });
     expect(expr.__kind).toBe("twilio/list_messages");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("twilio/record");
+    const paramsArg = expr.__args[0] as Record<string, unknown>;
+    expect(paramsArg).toEqual({ limit: 10 });
   });
 
   it("produces CExpr with no args when omitted", () => {
@@ -61,7 +65,7 @@ describe("twilio: messages.list", () => {
 // ============================================================
 
 describe("twilio: calls.create", () => {
-  it("produces twilio/create_call CExpr", () => {
+  it("produces twilio/create_call CExpr with plain object param", () => {
     const expr = api.calls.create({
       to: "+15551234567",
       from: "+15559876543",
@@ -69,8 +73,12 @@ describe("twilio: calls.create", () => {
     });
     expect(expr.__kind).toBe("twilio/create_call");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("twilio/record");
+    const paramsArg = expr.__args[0] as Record<string, unknown>;
+    expect(paramsArg).toEqual({
+      to: "+15551234567",
+      from: "+15559876543",
+      url: "https://example.com/twiml",
+    });
   });
 });
 
@@ -84,12 +92,12 @@ describe("twilio: calls(sid).fetch", () => {
 });
 
 describe("twilio: calls.list", () => {
-  it("produces twilio/list_calls CExpr with params", () => {
+  it("produces twilio/list_calls CExpr with plain object param", () => {
     const expr = api.calls.list({ limit: 20 });
     expect(expr.__kind).toBe("twilio/list_calls");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("twilio/record");
+    const paramsArg = expr.__args[0] as Record<string, unknown>;
+    expect(paramsArg).toEqual({ limit: 20 });
   });
 
   it("produces CExpr with no args when omitted", () => {
@@ -108,8 +116,8 @@ describe("twilio plugin: unified Plugin shape", () => {
     expect(plugin.name).toBe("twilio");
   });
 
-  it("has 8 node kinds (6 core + record + array)", () => {
-    expect(Object.keys(plugin.kinds)).toHaveLength(8);
+  it("has 6 node kinds", () => {
+    expect(Object.keys(plugin.kinds)).toHaveLength(6);
   });
 
   it("kinds are all namespaced", () => {

@@ -16,45 +16,10 @@
 // ============================================================
 
 import type { FalClient as FalSdkClient, QueueClient as FalSdkQueueClient } from "@fal-ai/client";
-import type { CExpr, Interpreter, KindSpec, Plugin } from "@mvfm/core";
-import { isCExpr, makeCExpr } from "@mvfm/core";
+import type { CExpr, Interpreter, KindSpec, Liftable, Plugin } from "@mvfm/core";
+import { makeCExpr } from "@mvfm/core";
 import { wrapFalSdk } from "./client-fal-sdk";
 import { createFalInterpreter, type FalClient } from "./interpreter";
-
-// ---- liftArg: recursive plain-value → CExpr lifting --------
-
-/**
- * Recursively lifts a plain value into a CExpr tree.
- * - CExpr values are returned as-is.
- * - Primitives are returned as-is (elaborate lifts them).
- * - Plain objects become `fal/record` CExprs with key-value child pairs.
- * - Arrays become `fal/array` CExprs.
- */
-function liftArg(value: unknown): unknown {
-  if (isCExpr(value)) return value;
-  if (typeof value === "string") return value;
-  if (typeof value === "number") return value;
-  if (typeof value === "boolean") return value;
-  if (value === null || value === undefined) return value;
-  if (Array.isArray(value)) {
-    return makeCExpr("fal/array", value.map(liftArg));
-  }
-  if (typeof value === "object") {
-    const pairs: unknown[] = [];
-    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
-      pairs.push(k, liftArg(v));
-    }
-    return makeCExpr("fal/record", pairs);
-  }
-  return value;
-}
-
-// liftArg erases generic type info at runtime (returns unknown).
-// Cast helper restores the declared CExpr Args types for ExtractKinds.
-const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]>(
-  kind: Kind,
-  args: readonly unknown[],
-) => CExpr<O, Kind, Args>;
 
 // ---- Option type aliases ----------------------------------
 
@@ -77,17 +42,17 @@ type QueueCancelOptionsShape = Omit<
 >;
 
 /** SDK-aligned run options, excluding unsupported runtime-only fields. */
-export type FalRunOptions = RunOptionsShape | CExpr<RunOptionsShape>;
+export type FalRunOptions = Liftable<RunOptionsShape>;
 /** SDK-aligned subscribe options, excluding unsupported runtime-only fields. */
-export type FalSubscribeOptions = SubscribeOptionsShape | CExpr<SubscribeOptionsShape>;
+export type FalSubscribeOptions = Liftable<SubscribeOptionsShape>;
 /** SDK-aligned queue.submit options, excluding unsupported runtime-only fields. */
-export type FalSubmitOptions = SubmitOptionsShape | CExpr<SubmitOptionsShape>;
+export type FalSubmitOptions = Liftable<SubmitOptionsShape>;
 /** SDK-aligned queue.status options, excluding unsupported runtime-only fields. */
-export type FalQueueStatusOptions = QueueStatusOptionsShape | CExpr<QueueStatusOptionsShape>;
+export type FalQueueStatusOptions = Liftable<QueueStatusOptionsShape>;
 /** SDK-aligned queue.result options, excluding unsupported runtime-only fields. */
-export type FalQueueResultOptions = QueueResultOptionsShape | CExpr<QueueResultOptionsShape>;
+export type FalQueueResultOptions = Liftable<QueueResultOptionsShape>;
 /** SDK-aligned queue.cancel options, excluding unsupported runtime-only fields. */
-export type FalQueueCancelOptions = QueueCancelOptionsShape | CExpr<QueueCancelOptionsShape>;
+export type FalQueueCancelOptions = Liftable<QueueCancelOptionsShape>;
 
 // ---- Configuration ----------------------------------------
 
@@ -167,57 +132,52 @@ export function fal(config: FalConfig) {
     ctors: {
       fal: {
         /** Run an endpoint synchronously. Mirrors `fal.run(endpointId, { input })`. */
-        run<A, B>(
-          endpointId: A,
-          options?: B,
-        ): CExpr<Awaited<ReturnType<FalSdkClient["run"]>>, "fal/run", [A, ...unknown[]]> {
-          const children: unknown[] = [endpointId];
-          if (options != null) children.push(liftArg(options));
-          return mk("fal/run", children);
+        run(
+          endpointId: string | CExpr<string>,
+          ...options: [] | [Liftable<RunOptionsShape>]
+        ): CExpr<Awaited<ReturnType<FalSdkClient["run"]>>, "fal/run"> {
+          return makeCExpr("fal/run", [endpointId, ...options] as unknown[]) as any;
         },
 
         /** Subscribe to an endpoint (queue submit + poll + result). */
-        subscribe<A, B>(
-          endpointId: A,
-          options?: B,
-        ): CExpr<
-          Awaited<ReturnType<FalSdkClient["subscribe"]>>,
-          "fal/subscribe",
-          [A, ...unknown[]]
-        > {
-          const children: unknown[] = [endpointId];
-          if (options != null) children.push(liftArg(options));
-          return mk("fal/subscribe", children);
+        subscribe(
+          endpointId: string | CExpr<string>,
+          ...options: [] | [Liftable<SubscribeOptionsShape>]
+        ): CExpr<Awaited<ReturnType<FalSdkClient["subscribe"]>>, "fal/subscribe"> {
+          return makeCExpr("fal/subscribe", [endpointId, ...options] as unknown[]) as any;
         },
 
         queue: {
           /** Submit a request to the queue. */
-          submit<A, B>(
-            endpointId: A,
-            options: B,
-          ): CExpr<Awaited<ReturnType<FalSdkQueueClient["submit"]>>, "fal/queue_submit", [A, B]> {
-            return mk("fal/queue_submit", [endpointId, liftArg(options)]);
+          submit(
+            endpointId: string | CExpr<string>,
+            options: Liftable<SubmitOptionsShape>,
+          ): CExpr<Awaited<ReturnType<FalSdkQueueClient["submit"]>>, "fal/queue_submit"> {
+            return makeCExpr("fal/queue_submit", [endpointId, options] as unknown[]) as any;
           },
 
           /** Check the status of a queued request. */
-          status<A, B>(
-            endpointId: A,
-            options: B,
-          ): CExpr<Awaited<ReturnType<FalSdkQueueClient["status"]>>, "fal/queue_status", [A, B]> {
-            return mk("fal/queue_status", [endpointId, liftArg(options)]);
+          status(
+            endpointId: string | CExpr<string>,
+            options: Liftable<QueueStatusOptionsShape>,
+          ): CExpr<Awaited<ReturnType<FalSdkQueueClient["status"]>>, "fal/queue_status"> {
+            return makeCExpr("fal/queue_status", [endpointId, options] as unknown[]) as any;
           },
 
           /** Retrieve the result of a completed queued request. */
-          result<A, B>(
-            endpointId: A,
-            options: B,
-          ): CExpr<Awaited<ReturnType<FalSdkQueueClient["result"]>>, "fal/queue_result", [A, B]> {
-            return mk("fal/queue_result", [endpointId, liftArg(options)]);
+          result(
+            endpointId: string | CExpr<string>,
+            options: Liftable<QueueResultOptionsShape>,
+          ): CExpr<Awaited<ReturnType<FalSdkQueueClient["result"]>>, "fal/queue_result"> {
+            return makeCExpr("fal/queue_result", [endpointId, options] as unknown[]) as any;
           },
 
           /** Cancel a queued request. */
-          cancel<A, B>(endpointId: A, options: B): CExpr<void, "fal/queue_cancel", [A, B]> {
-            return mk("fal/queue_cancel", [endpointId, liftArg(options)]);
+          cancel(
+            endpointId: string | CExpr<string>,
+            options: Liftable<QueueCancelOptionsShape>,
+          ): CExpr<void, "fal/queue_cancel"> {
+            return makeCExpr("fal/queue_cancel", [endpointId, options] as unknown[]) as any;
           },
         },
       },
@@ -247,14 +207,14 @@ export function fal(config: FalConfig) {
         inputs: [undefined, undefined] as [unknown, unknown],
         output: undefined as unknown as undefined,
       } as KindSpec<[unknown, unknown], void>,
-      "fal/record": {
-        inputs: [] as unknown[],
-        output: {} as Record<string, unknown>,
-      } as KindSpec<unknown[], Record<string, unknown>>,
-      "fal/array": {
-        inputs: [] as unknown[],
-        output: [] as unknown[],
-      } as KindSpec<unknown[], unknown[]>,
+    },
+    shapes: {
+      "fal/run": [null, "*"] as [null, "*"],
+      "fal/subscribe": [null, "*"] as [null, "*"],
+      "fal/queue_submit": [null, "*"] as [null, "*"],
+      "fal/queue_status": [null, "*"] as [null, "*"],
+      "fal/queue_result": [null, "*"] as [null, "*"],
+      "fal/queue_cancel": [null, "*"] as [null, "*"],
     },
     traits: {},
     lifts: {},

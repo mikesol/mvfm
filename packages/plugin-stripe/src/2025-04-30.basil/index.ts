@@ -12,45 +12,11 @@
 //   - Charges: create, retrieve, list
 // ============================================================
 
-import type { CExpr, Interpreter, KindSpec, Plugin } from "@mvfm/core";
-import { isCExpr, makeCExpr } from "@mvfm/core";
+import type { CExpr, Interpreter, KindSpec, Liftable, Plugin } from "@mvfm/core";
+import { makeCExpr } from "@mvfm/core";
+import type Stripe from "stripe";
 import { wrapStripeSdk } from "./client-stripe-sdk";
 import { createStripeInterpreter, type StripeClient } from "./interpreter";
-
-// ---- liftArg: recursive plain-value → CExpr lifting --------
-
-/**
- * Recursively lifts a plain value into a CExpr tree.
- * - CExpr values are returned as-is.
- * - Primitives are returned as-is (elaborate lifts them).
- * - Plain objects become `stripe/record` CExprs with key-value child pairs.
- * - Arrays become `stripe/array` CExprs.
- */
-function liftArg(value: unknown): unknown {
-  if (isCExpr(value)) return value;
-  if (typeof value === "string") return value;
-  if (typeof value === "number") return value;
-  if (typeof value === "boolean") return value;
-  if (value === null || value === undefined) return value;
-  if (Array.isArray(value)) {
-    return makeCExpr("stripe/array", value.map(liftArg));
-  }
-  if (typeof value === "object") {
-    const pairs: unknown[] = [];
-    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
-      pairs.push(k, liftArg(v));
-    }
-    return makeCExpr("stripe/record", pairs);
-  }
-  return value;
-}
-
-// liftArg erases generic type info at runtime (returns unknown).
-// Cast helper restores the declared CExpr Args types for ExtractKinds.
-const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]>(
-  kind: Kind,
-  args: readonly unknown[],
-) => CExpr<O, Kind, Args>;
 
 // ---- Configuration ----------------------------------------
 
@@ -78,13 +44,13 @@ function createDefaultInterpreter(config: StripeConfig): Interpreter {
   const getClient = async (): Promise<StripeClient> => {
     if (!clientPromise) {
       clientPromise = dynamicImport("stripe").then((moduleValue) => {
-        const Stripe = moduleValue.default as new (
+        const StripeCtor = moduleValue.default as new (
           apiKey: string,
           opts?: Record<string, unknown>,
         ) => Parameters<typeof wrapStripeSdk>[0];
         const opts: Record<string, unknown> = {};
         if (config.apiVersion) opts.apiVersion = config.apiVersion;
-        return wrapStripeSdk(new Stripe(config.apiKey, opts));
+        return wrapStripeSdk(new StripeCtor(config.apiKey, opts));
       });
     }
     return clientPromise;
@@ -107,77 +73,100 @@ function createDefaultInterpreter(config: StripeConfig): Interpreter {
 // ---- Constructor builder ----------------------------------
 
 /**
- * Builds the stripe constructor methods using makeCExpr + liftArg.
+ * Builds the stripe constructor methods using makeCExpr.
  *
- * Each method produces a CExpr node with positional children.
- * Config is NOT stored on AST nodes — it's captured by the interpreter.
- *
- * Constructors use permissive generics so any argument type is accepted
- * at construction time. Validation happens at `app()` time via KindSpec.
+ * Constructors use Liftable<T> for object params and string | CExpr<string>
+ * for ID params. Validation happens at `app()` time via KindSpec.
  */
 function buildStripeApi() {
   return {
     paymentIntents: {
       /** Create a PaymentIntent. */
-      create<A>(params: A): CExpr<Record<string, unknown>, "stripe/create_payment_intent", [A]> {
-        return mk("stripe/create_payment_intent", [liftArg(params)]);
+      create(
+        params: Liftable<Stripe.PaymentIntentCreateParams>,
+      ): CExpr<
+        Stripe.PaymentIntent,
+        "stripe/create_payment_intent",
+        [Liftable<Stripe.PaymentIntentCreateParams>]
+      > {
+        return makeCExpr("stripe/create_payment_intent", [params]) as any;
       },
       /** Retrieve a PaymentIntent by ID. */
-      retrieve<A>(id: A): CExpr<Record<string, unknown>, "stripe/retrieve_payment_intent", [A]> {
-        return mk("stripe/retrieve_payment_intent", [id]);
+      retrieve(
+        id: string | CExpr<string>,
+      ): CExpr<Stripe.PaymentIntent, "stripe/retrieve_payment_intent", [string | CExpr<string>]> {
+        return makeCExpr("stripe/retrieve_payment_intent", [id]) as any;
       },
       /** Confirm a PaymentIntent, optionally with additional params. */
-      confirm<A, B extends readonly unknown[]>(
-        id: A,
-        ...params: B
-      ): CExpr<Record<string, unknown>, "stripe/confirm_payment_intent", [A, ...B]> {
-        const lifted = params.map((p) => liftArg(p));
-        return mk("stripe/confirm_payment_intent", [id, ...lifted]);
+      confirm(
+        id: string | CExpr<string>,
+        ...params: [] | [Liftable<Stripe.PaymentIntentConfirmParams>]
+      ): CExpr<
+        Stripe.PaymentIntent,
+        "stripe/confirm_payment_intent",
+        | [string | CExpr<string>]
+        | [string | CExpr<string>, Liftable<Stripe.PaymentIntentConfirmParams>]
+      > {
+        return makeCExpr("stripe/confirm_payment_intent", [id, ...params] as unknown[]) as any;
       },
     },
     customers: {
       /** Create a Customer. */
-      create<A>(params: A): CExpr<Record<string, unknown>, "stripe/create_customer", [A]> {
-        return mk("stripe/create_customer", [liftArg(params)]);
+      create(
+        params: Liftable<Stripe.CustomerCreateParams>,
+      ): CExpr<Stripe.Customer, "stripe/create_customer", [Liftable<Stripe.CustomerCreateParams>]> {
+        return makeCExpr("stripe/create_customer", [params]) as any;
       },
       /** Retrieve a Customer by ID. */
-      retrieve<A>(id: A): CExpr<Record<string, unknown>, "stripe/retrieve_customer", [A]> {
-        return mk("stripe/retrieve_customer", [id]);
+      retrieve(
+        id: string | CExpr<string>,
+      ): CExpr<Stripe.Customer, "stripe/retrieve_customer", [string | CExpr<string>]> {
+        return makeCExpr("stripe/retrieve_customer", [id]) as any;
       },
       /** Update a Customer by ID. */
-      update<A, B>(
-        id: A,
-        params: B,
-      ): CExpr<Record<string, unknown>, "stripe/update_customer", [A, B]> {
-        return mk("stripe/update_customer", [id, liftArg(params)]);
+      update(
+        id: string | CExpr<string>,
+        params: Liftable<Stripe.CustomerUpdateParams>,
+      ): CExpr<
+        Stripe.Customer,
+        "stripe/update_customer",
+        [string | CExpr<string>, Liftable<Stripe.CustomerUpdateParams>]
+      > {
+        return makeCExpr("stripe/update_customer", [id, params]) as any;
       },
       /** List Customers with optional filter params. */
-      list<A extends readonly unknown[]>(
-        ...params: A
-      ): CExpr<Record<string, unknown>, "stripe/list_customers", A> {
-        return mk(
-          "stripe/list_customers",
-          params.map((p) => liftArg(p)),
-        );
+      list(
+        ...params: [] | [Liftable<Stripe.CustomerListParams>]
+      ): CExpr<
+        Stripe.ApiList<Stripe.Customer>,
+        "stripe/list_customers",
+        [] | [Liftable<Stripe.CustomerListParams>]
+      > {
+        return makeCExpr("stripe/list_customers", params as unknown[]) as any;
       },
     },
     charges: {
       /** Create a Charge. */
-      create<A>(params: A): CExpr<Record<string, unknown>, "stripe/create_charge", [A]> {
-        return mk("stripe/create_charge", [liftArg(params)]);
+      create(
+        params: Liftable<Stripe.ChargeCreateParams>,
+      ): CExpr<Stripe.Charge, "stripe/create_charge", [Liftable<Stripe.ChargeCreateParams>]> {
+        return makeCExpr("stripe/create_charge", [params]) as any;
       },
       /** Retrieve a Charge by ID. */
-      retrieve<A>(id: A): CExpr<Record<string, unknown>, "stripe/retrieve_charge", [A]> {
-        return mk("stripe/retrieve_charge", [id]);
+      retrieve(
+        id: string | CExpr<string>,
+      ): CExpr<Stripe.Charge, "stripe/retrieve_charge", [string | CExpr<string>]> {
+        return makeCExpr("stripe/retrieve_charge", [id]) as any;
       },
       /** List Charges with optional filter params. */
-      list<A extends readonly unknown[]>(
-        ...params: A
-      ): CExpr<Record<string, unknown>, "stripe/list_charges", A> {
-        return mk(
-          "stripe/list_charges",
-          params.map((p) => liftArg(p)),
-        );
+      list(
+        ...params: [] | [Liftable<Stripe.ChargeListParams>]
+      ): CExpr<
+        Stripe.ApiList<Stripe.Charge>,
+        "stripe/list_charges",
+        [] | [Liftable<Stripe.ChargeListParams>]
+      > {
+        return makeCExpr("stripe/list_charges", params as unknown[]) as any;
       },
     },
   };
@@ -197,53 +186,57 @@ export function stripe(config: StripeConfig) {
     ctors: { stripe: buildStripeApi() },
     kinds: {
       "stripe/create_payment_intent": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
+        inputs: [undefined as unknown as Stripe.PaymentIntentCreateParams],
+        output: undefined as unknown as Stripe.PaymentIntent,
+      } as KindSpec<[Stripe.PaymentIntentCreateParams], Stripe.PaymentIntent>,
       "stripe/retrieve_payment_intent": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
+        inputs: [""] as [string],
+        output: undefined as unknown as Stripe.PaymentIntent,
+      } as KindSpec<[string], Stripe.PaymentIntent>,
       "stripe/confirm_payment_intent": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
+        inputs: [""] as [string],
+        output: undefined as unknown as Stripe.PaymentIntent,
+      } as KindSpec<[string], Stripe.PaymentIntent>,
       "stripe/create_customer": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
+        inputs: [undefined as unknown as Stripe.CustomerCreateParams],
+        output: undefined as unknown as Stripe.Customer,
+      } as KindSpec<[Stripe.CustomerCreateParams], Stripe.Customer>,
       "stripe/retrieve_customer": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
+        inputs: [""] as [string],
+        output: undefined as unknown as Stripe.Customer,
+      } as KindSpec<[string], Stripe.Customer>,
       "stripe/update_customer": {
-        inputs: [undefined, undefined] as [unknown, unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown, unknown], unknown>,
+        inputs: ["", undefined as unknown as Stripe.CustomerUpdateParams] as [
+          string,
+          Stripe.CustomerUpdateParams,
+        ],
+        output: undefined as unknown as Stripe.Customer,
+      } as KindSpec<[string, Stripe.CustomerUpdateParams], Stripe.Customer>,
       "stripe/list_customers": {
-        inputs: [] as unknown[],
-        output: undefined as unknown,
-      } as KindSpec<unknown[], unknown>,
+        inputs: [] as Stripe.CustomerListParams[],
+        output: undefined as unknown as Stripe.ApiList<Stripe.Customer>,
+      } as KindSpec<Stripe.CustomerListParams[], Stripe.ApiList<Stripe.Customer>>,
       "stripe/create_charge": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
+        inputs: [undefined as unknown as Stripe.ChargeCreateParams],
+        output: undefined as unknown as Stripe.Charge,
+      } as KindSpec<[Stripe.ChargeCreateParams], Stripe.Charge>,
       "stripe/retrieve_charge": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
+        inputs: [""] as [string],
+        output: undefined as unknown as Stripe.Charge,
+      } as KindSpec<[string], Stripe.Charge>,
       "stripe/list_charges": {
-        inputs: [] as unknown[],
-        output: undefined as unknown,
-      } as KindSpec<unknown[], unknown>,
-      "stripe/record": {
-        inputs: [] as unknown[],
-        output: {} as Record<string, unknown>,
-      } as KindSpec<unknown[], Record<string, unknown>>,
-      "stripe/array": {
-        inputs: [] as unknown[],
-        output: [] as unknown[],
-      } as KindSpec<unknown[], unknown[]>,
+        inputs: [] as Stripe.ChargeListParams[],
+        output: undefined as unknown as Stripe.ApiList<Stripe.Charge>,
+      } as KindSpec<Stripe.ChargeListParams[], Stripe.ApiList<Stripe.Charge>>,
+    },
+    shapes: {
+      "stripe/create_payment_intent": "*",
+      "stripe/confirm_payment_intent": [null, "*"],
+      "stripe/create_customer": "*",
+      "stripe/update_customer": [null, "*"],
+      "stripe/list_customers": "*",
+      "stripe/create_charge": "*",
+      "stripe/list_charges": "*",
     },
     traits: {},
     lifts: {},

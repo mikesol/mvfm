@@ -21,8 +21,7 @@ describe("redis: CExpr construction (hash commands)", () => {
     const hsetExpr = api.hset("myhash", { field1: "val1" });
     expect(hsetExpr.__kind).toBe("redis/hset");
     expect(hsetExpr.__args).toHaveLength(2);
-    const recordArg = hsetExpr.__args[1] as { __kind: string };
-    expect(recordArg.__kind).toBe("redis/record");
+    expect(hsetExpr.__args[1]).toEqual({ field1: "val1" });
     expect(api.hmget("myhash", "f1", "f2").__kind).toBe("redis/hmget");
     expect(api.hgetall("myhash").__kind).toBe("redis/hgetall");
     expect(api.hdel("myhash", "f1", "f2").__kind).toBe("redis/hdel");

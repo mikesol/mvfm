@@ -1,4 +1,5 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
+import { resolveStructured } from "@mvfm/core";
 import { wrapFetch } from "./client-fetch";
 import type { FetchConfig } from "./index";
 
@@ -31,14 +32,17 @@ export function createFetchInterpreter(
   return {
     "fetch/request": async function* (entry: RuntimeEntry) {
       const url = (yield 0) as string;
-      const init = entry.children.length > 1 ? yield 1 : undefined;
+      const init =
+        entry.children.length > 1
+          ? ((yield* resolveStructured(entry.children[1])) as RequestInit | undefined)
+          : undefined;
 
       let resolvedUrl = url;
       if (config?.baseUrl && !url.startsWith("http://") && !url.startsWith("https://")) {
         resolvedUrl = `${config.baseUrl.replace(/\/$/, "")}/${url.replace(/^\//, "")}`;
       }
 
-      const mergedInit: RequestInit = { ...(init as RequestInit | undefined) };
+      const mergedInit: RequestInit = { ...init };
       if (config?.defaultHeaders) {
         mergedInit.headers = {
           ...config.defaultHeaders,
@@ -71,26 +75,6 @@ export function createFetchInterpreter(
         headers[k] = v;
       });
       return headers;
-    },
-
-    "fetch/record": async function* (entry: RuntimeEntry) {
-      // Children are key-value pairs: [key0, val0, key1, val1, ...]
-      // Keys are string literals (out field), values need yielding.
-      const result: Record<string, unknown> = {};
-      for (let i = 0; i < entry.children.length; i += 2) {
-        const key = (yield i) as string;
-        const value = yield i + 1;
-        result[key] = value;
-      }
-      return result;
-    },
-
-    "fetch/array": async function* (entry: RuntimeEntry) {
-      const result: unknown[] = [];
-      for (let i = 0; i < entry.children.length; i++) {
-        result.push(yield i);
-      }
-      return result;
     },
   };
 }
