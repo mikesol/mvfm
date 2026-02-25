@@ -76,7 +76,6 @@ export function createFetchInterpreter(
       });
       return headers;
     },
-
   };
 }
 
