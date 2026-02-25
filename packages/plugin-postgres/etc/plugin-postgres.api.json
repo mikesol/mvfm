@@ -529,7 +529,7 @@
         {
           "kind": "Variable",
           "canonicalReference": "@mvfm/plugin-postgres!postgres:var",
-          "docComment": "/**\n * Postgres plugin definition (unified Plugin type).\n *\n * This plugin has no defaultInterpreter. You must provide one via `defaults(app, { postgres: createPostgresServerInterpreter(...) })`.\n */\n",
+          "docComment": "/**\n * The postgres plugin definition (unified Plugin type).\n *\n * This plugin has NO defaultInterpreter. You must provide one via `defaults(plugins, { postgres: createPostgresServerInterpreter(...) })`.\n *\n * Contributes `$.sql`.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -645,34 +645,7 @@
             },
             {
               "kind": "Content",
-              "text": "<[], unknown[]>;\n        \"postgres/record\": "
-            },
-            {
-              "kind": "Reference",
-              "text": "KindSpec",
-              "canonicalReference": "@mvfm/plugin-postgres!~KindSpec:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<unknown[], "
-            },
-            {
-              "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string, unknown>>;\n        \"postgres/array\": "
-            },
-            {
-              "kind": "Reference",
-              "text": "KindSpec",
-              "canonicalReference": "@mvfm/plugin-postgres!~KindSpec:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<unknown[], unknown[]>;\n    };\n    traits: {};\n    lifts: {};\n}"
+              "text": "<[], unknown[]>;\n    };\n    shapes: {\n        \"postgres/insert_helper\": (string | null)[];\n        \"postgres/set_helper\": (string | null)[];\n    };\n    traits: {};\n    lifts: {};\n}"
             }
           ],
           "fileUrlPath": "dist/3.4.8/index.d.ts",
@@ -681,7 +654,7 @@
           "name": "postgres",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 32
+            "endIndex": 26
           }
         },
         {
@@ -1038,267 +1011,6 @@
           "extendsTokenRanges": []
         },
         {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/plugin-postgres!PostgresConfig:interface",
-          "docComment": "/**\n * Connection configuration for the postgres plugin.\n *\n * Accepts the same options as postgres.js: connection string or individual host/port/database/username/password fields, plus SSL, connection pool size, and column name transforms.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export interface PostgresConfig "
-            }
-          ],
-          "fileUrlPath": "dist/3.4.8/index.d.ts",
-          "releaseTag": "Public",
-          "name": "PostgresConfig",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresConfig#connectionString:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "connectionString?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "connectionString",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresConfig#database:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "database?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "database",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresConfig#host:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "host?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "host",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresConfig#max:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "max?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "number"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "max",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresConfig#password:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "password?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "password",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresConfig#port:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "port?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "number"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "port",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresConfig#ssl:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "ssl?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "boolean | object"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "ssl",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresConfig#transform:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "transform?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "{\n        column?: {\n            to?: string;\n            from?: string;\n        };\n    }"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "transform",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-postgres!PostgresConfig#username:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "username?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "username",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            }
-          ],
-          "extendsTokenRanges": []
-        },
-        {
           "kind": "Variable",
           "canonicalReference": "@mvfm/plugin-postgres!postgresPlugin:var",
           "docComment": "/**\n * Alias for {@link postgres}, kept for readability at call sites.\n */\n",
@@ -1417,34 +1129,7 @@
             },
             {
               "kind": "Content",
-              "text": "<[], unknown[]>;\n        \"postgres/record\": "
-            },
-            {
-              "kind": "Reference",
-              "text": "KindSpec",
-              "canonicalReference": "@mvfm/plugin-postgres!~KindSpec:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<unknown[], "
-            },
-            {
-              "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string, unknown>>;\n        \"postgres/array\": "
-            },
-            {
-              "kind": "Reference",
-              "text": "KindSpec",
-              "canonicalReference": "@mvfm/plugin-postgres!~KindSpec:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<unknown[], unknown[]>;\n    };\n    traits: {};\n    lifts: {};\n}"
+              "text": "<[], unknown[]>;\n    };\n    shapes: {\n        \"postgres/insert_helper\": (string | null)[];\n        \"postgres/set_helper\": (string | null)[];\n    };\n    traits: {};\n    lifts: {};\n}"
             }
           ],
           "fileUrlPath": "dist/3.4.8/index.d.ts",
@@ -1453,7 +1138,7 @@
           "name": "postgresPlugin",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 32
+            "endIndex": 26
           }
         },
         {

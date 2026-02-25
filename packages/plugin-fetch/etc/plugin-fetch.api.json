@@ -454,7 +454,7 @@
         {
           "kind": "Variable",
           "canonicalReference": "@mvfm/plugin-fetch!fetch_2:var",
-          "docComment": "/**\n * Fetch plugin definition (unified Plugin type).\n *\n * Uses `globalThis.fetch` — no config required.\n */\n",
+          "docComment": "/**\n * The fetch plugin definition (unified Plugin type).\n *\n * Contributes `$.fetch` with request, json, text, status, and headers methods. Uses the global `fetch` function as its default interpreter.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -462,7 +462,7 @@
             },
             {
               "kind": "Content",
-              "text": "{\n    name: \"fetch\";\n    ctors: {\n        fetch: {\n            <A, B extends readonly unknown[]>(url: A, ...init: B): "
+              "text": "{\n    name: \"fetch\";\n    ctors: {\n        fetch: {\n            (url: string | "
             },
             {
               "kind": "Reference",
@@ -471,7 +471,70 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown, \"fetch/request\", [A, ...B]>;\n            json<A>(response: A): "
+              "text": "<string>, ...init: [] | ["
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-fetch!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FetchRequestInit",
+              "canonicalReference": "@mvfm/plugin-fetch!FetchRequestInit:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">]): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-fetch!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown, \"fetch/request\", [string | "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-fetch!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string>] | [string | "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-fetch!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string>, "
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-fetch!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "FetchRequestInit",
+              "canonicalReference": "@mvfm/plugin-fetch!FetchRequestInit:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">]>;\n            json<A>(response: A): "
             },
             {
               "kind": "Reference",
@@ -570,34 +633,7 @@
             },
             {
               "kind": "Content",
-              "text": "<string, string>>;\n        \"fetch/record\": "
-            },
-            {
-              "kind": "Reference",
-              "text": "KindSpec",
-              "canonicalReference": "@mvfm/plugin-fetch!~KindSpec:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<unknown[], "
-            },
-            {
-              "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string, unknown>>;\n        \"fetch/array\": "
-            },
-            {
-              "kind": "Reference",
-              "text": "KindSpec",
-              "canonicalReference": "@mvfm/plugin-fetch!~KindSpec:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<unknown[], unknown[]>;\n    };\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
+              "text": "<string, string>>;\n    };\n    shapes: {\n        \"fetch/request\": [null, \"*\"];\n    };\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
             },
             {
               "kind": "Reference",
@@ -615,7 +651,7 @@
           "name": "fetch_2",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 34
+            "endIndex": 42
           }
         },
         {
@@ -715,7 +751,7 @@
         {
           "kind": "Interface",
           "canonicalReference": "@mvfm/plugin-fetch!FetchConfig:interface",
-          "docComment": "/**\n * Configuration for the fetch plugin.\n *\n * All fields are optional. When provided, `baseUrl` is prepended to relative URLs and `defaultHeaders` are merged into every request.\n */\n",
+          "docComment": "/**\n * Configuration for the fetch plugin interpreter.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",

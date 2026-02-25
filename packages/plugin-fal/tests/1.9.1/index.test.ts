@@ -16,8 +16,12 @@ describe("fal: run", () => {
     expect(expr.__kind).toBe("fal/run");
     expect(expr.__args).toHaveLength(2);
     expect(expr.__args[0]).toBe("fal-ai/flux/dev");
-    const optionsArg = expr.__args[1] as { __kind: string };
-    expect(optionsArg.__kind).toBe("fal/record");
+    // Options are now passed as-is (Liftable), not wrapped in fal/record
+    expect(expr.__args[1]).toEqual({
+      input: { prompt: "a cat" },
+      method: "post",
+      startTimeout: 30,
+    });
   });
 
   it("produces fal/run CExpr with no options", () => {
@@ -40,8 +44,12 @@ describe("fal: subscribe", () => {
     expect(expr.__kind).toBe("fal/subscribe");
     expect(expr.__args).toHaveLength(2);
     expect(expr.__args[0]).toBe("fal-ai/flux/dev");
-    const optionsArg = expr.__args[1] as { __kind: string };
-    expect(optionsArg.__kind).toBe("fal/record");
+    // Options are now passed as-is (Liftable), not wrapped in fal/record
+    expect(expr.__args[1]).toEqual({
+      input: { prompt: "a cat" },
+      mode: "polling",
+      logs: true,
+    });
   });
 });
 
@@ -57,8 +65,12 @@ describe("fal: queue.submit", () => {
     expect(expr.__kind).toBe("fal/queue_submit");
     expect(expr.__args).toHaveLength(2);
     expect(expr.__args[0]).toBe("fal-ai/flux/dev");
-    const optionsArg = expr.__args[1] as { __kind: string };
-    expect(optionsArg.__kind).toBe("fal/record");
+    // Options are now passed as-is (Liftable), not wrapped in fal/record
+    expect(expr.__args[1]).toEqual({
+      input: { prompt: "a cat" },
+      priority: "low",
+      hint: "gpu",
+    });
   });
 });
 
@@ -73,8 +85,11 @@ describe("fal: queue.status", () => {
     expect(expr.__kind).toBe("fal/queue_status");
     expect(expr.__args).toHaveLength(2);
     expect(expr.__args[0]).toBe("fal-ai/flux/dev");
-    const optionsArg = expr.__args[1] as { __kind: string };
-    expect(optionsArg.__kind).toBe("fal/record");
+    // Options are now passed as-is (Liftable), not wrapped in fal/record
+    expect(expr.__args[1]).toEqual({
+      requestId: "req_123",
+      logs: true,
+    });
   });
 });
 
@@ -107,8 +122,15 @@ describe("fal plugin: unified Plugin shape", () => {
     expect(plugin.name).toBe("fal");
   });
 
-  it("has 8 node kinds (6 core + record + array)", () => {
-    expect(Object.keys(plugin.kinds)).toHaveLength(8);
+  it("has 6 node kinds", () => {
+    expect(Object.keys(plugin.kinds)).toHaveLength(6);
+  });
+
+  it("has shapes for all 6 kinds", () => {
+    expect(Object.keys(plugin.shapes)).toHaveLength(6);
+    for (const kind of Object.keys(plugin.shapes)) {
+      expect(plugin.shapes[kind]).toEqual([null, "*"]);
+    }
   });
 
   it("kinds are all namespaced", () => {

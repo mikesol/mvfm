@@ -390,7 +390,7 @@
         {
           "kind": "Function",
           "canonicalReference": "@mvfm/plugin-pino!createPinoInterpreter:function(1)",
-          "docComment": "/**\n * Creates an interpreter for `pino/*` node kinds using the new RuntimeEntry + positional yield pattern.\n *\n * Children layout for pino/<level> nodes: [hasMsg(0|1), hasMergeObj(0|1), msg?, mergeObj?, ...bindings]\n *\n * Config is captured in the closure, not stored on AST nodes.\n *\n * @param client - The {@link PinoClient} to execute against.\n *\n * @param _config - Plugin config (captured in closure for future use).\n *\n * @returns An Interpreter handling all pino node kinds.\n */\n",
+          "docComment": "/**\n * Creates an interpreter for `pino/*` node kinds using the new RuntimeEntry + positional yield pattern.\n *\n * Fixed-position children layout for pino/<level> nodes: [hasMsg(0|1), hasMergeObj(0|1), msg|\"\", mergeObj|{}, bindingsArray]\n *\n * Positions 3 (mergeObj) and 4 (bindings) are structural — resolved via resolveStructured() at interpretation time.\n *\n * Config is captured in the closure, not stored on AST nodes.\n *\n * @param client - The {@link PinoClient} to execute against.\n *\n * @param _config - Plugin config (captured in closure for future use).\n *\n * @returns An Interpreter handling all pino node kinds.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -454,7 +454,7 @@
         {
           "kind": "Variable",
           "canonicalReference": "@mvfm/plugin-pino!pino:var",
-          "docComment": "/**\n * Pino plugin definition (unified Plugin type).\n *\n * This plugin has no defaultInterpreter — you must provide one via `defaults(app, { pino: createPinoInterpreter(logger, config) })`.\n */\n",
+          "docComment": "/**\n * The pino plugin definition (unified Plugin type).\n *\n * Contributes `$.pino` with structured logging methods mirroring the real pino API. Log calls produce AST nodes that yield `pino/<level>` effects at interpretation time.\n *\n * Requires an interpreter provided via `defaults(plugins, { pino: createPinoInterpreter(...) })`.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -525,34 +525,7 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown, ...unknown[]], void>;\n        \"pino/record\": "
-            },
-            {
-              "kind": "Reference",
-              "text": "KindSpec",
-              "canonicalReference": "@mvfm/plugin-pino!~KindSpec:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<unknown[], "
-            },
-            {
-              "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string, unknown>>;\n        \"pino/array\": "
-            },
-            {
-              "kind": "Reference",
-              "text": "KindSpec",
-              "canonicalReference": "@mvfm/plugin-pino!~KindSpec:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<unknown[], unknown[]>;\n    };\n    traits: {};\n    lifts: {};\n}"
+              "text": "<[unknown, ...unknown[]], void>;\n    };\n    shapes: {\n        \"pino/trace\": (string | null)[];\n        \"pino/debug\": (string | null)[];\n        \"pino/info\": (string | null)[];\n        \"pino/warn\": (string | null)[];\n        \"pino/error\": (string | null)[];\n        \"pino/fatal\": (string | null)[];\n    };\n    traits: {};\n    lifts: {};\n}"
             }
           ],
           "fileUrlPath": "dist/10.3.1/index.d.ts",
@@ -561,7 +534,7 @@
           "name": "pino",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 22
+            "endIndex": 16
           }
         },
         {
@@ -693,7 +666,7 @@
         {
           "kind": "Interface",
           "canonicalReference": "@mvfm/plugin-pino!PinoConfig:interface",
-          "docComment": "/**\n * Configuration for the pino plugin.\n */\n",
+          "docComment": "/**\n * Configuration for the pino interpreter.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -1587,8 +1560,8 @@
                 },
                 {
                   "kind": "Reference",
-                  "text": "CExpr",
-                  "canonicalReference": "@mvfm/plugin-pino!~CExpr:type"
+                  "text": "Liftable",
+                  "canonicalReference": "@mvfm/plugin-pino!~Liftable:type"
                 },
                 {
                   "kind": "Content",
@@ -1601,16 +1574,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<string, unknown>> | "
-                },
-                {
-                  "kind": "Reference",
-                  "text": "Record",
-                  "canonicalReference": "!Record:type"
-                },
-                {
-                  "kind": "Content",
-                  "text": "<string, unknown>"
+                  "text": "<string, unknown>>"
                 },
                 {
                   "kind": "Content",
@@ -1628,8 +1592,8 @@
               ],
               "isOptional": false,
               "returnTypeTokenRange": {
-                "startIndex": 8,
-                "endIndex": 9
+                "startIndex": 6,
+                "endIndex": 7
               },
               "releaseTag": "Public",
               "overloadIndex": 1,
@@ -1638,7 +1602,7 @@
                   "parameterName": "bindings",
                   "parameterTypeTokenRange": {
                     "startIndex": 1,
-                    "endIndex": 7
+                    "endIndex": 5
                   },
                   "isOptional": false
                 }
@@ -1669,7 +1633,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<void, \"pino/debug\", [number, number, A]>"
+                  "text": "<void, \"pino/debug\">"
                 },
                 {
                   "kind": "Content",
@@ -1740,7 +1704,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<void, \"pino/debug\", [number, number, B, A]>"
+                  "text": "<void, \"pino/debug\">"
                 },
                 {
                   "kind": "Content",
@@ -1822,7 +1786,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<void, \"pino/error\", [number, number, A]>"
+                  "text": "<void, \"pino/error\">"
                 },
                 {
                   "kind": "Content",
@@ -1893,7 +1857,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<void, \"pino/error\", [number, number, B, A]>"
+                  "text": "<void, \"pino/error\">"
                 },
                 {
                   "kind": "Content",
@@ -1975,7 +1939,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<void, \"pino/fatal\", [number, number, A]>"
+                  "text": "<void, \"pino/fatal\">"
                 },
                 {
                   "kind": "Content",
@@ -2046,7 +2010,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<void, \"pino/fatal\", [number, number, B, A]>"
+                  "text": "<void, \"pino/fatal\">"
                 },
                 {
                   "kind": "Content",
@@ -2128,7 +2092,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<void, \"pino/info\", [number, number, A]>"
+                  "text": "<void, \"pino/info\">"
                 },
                 {
                   "kind": "Content",
@@ -2199,7 +2163,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<void, \"pino/info\", [number, number, B, A]>"
+                  "text": "<void, \"pino/info\">"
                 },
                 {
                   "kind": "Content",
@@ -2281,7 +2245,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<void, \"pino/trace\", [number, number, A]>"
+                  "text": "<void, \"pino/trace\">"
                 },
                 {
                   "kind": "Content",
@@ -2352,7 +2316,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<void, \"pino/trace\", [number, number, B, A]>"
+                  "text": "<void, \"pino/trace\">"
                 },
                 {
                   "kind": "Content",
@@ -2434,7 +2398,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<void, \"pino/warn\", [number, number, A]>"
+                  "text": "<void, \"pino/warn\">"
                 },
                 {
                   "kind": "Content",
@@ -2505,7 +2469,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<void, \"pino/warn\", [number, number, B, A]>"
+                  "text": "<void, \"pino/warn\">"
                 },
                 {
                   "kind": "Content",
@@ -2686,34 +2650,7 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown, ...unknown[]], void>;\n        \"pino/record\": "
-            },
-            {
-              "kind": "Reference",
-              "text": "KindSpec",
-              "canonicalReference": "@mvfm/plugin-pino!~KindSpec:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<unknown[], "
-            },
-            {
-              "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string, unknown>>;\n        \"pino/array\": "
-            },
-            {
-              "kind": "Reference",
-              "text": "KindSpec",
-              "canonicalReference": "@mvfm/plugin-pino!~KindSpec:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<unknown[], unknown[]>;\n    };\n    traits: {};\n    lifts: {};\n}"
+              "text": "<[unknown, ...unknown[]], void>;\n    };\n    shapes: {\n        \"pino/trace\": (string | null)[];\n        \"pino/debug\": (string | null)[];\n        \"pino/info\": (string | null)[];\n        \"pino/warn\": (string | null)[];\n        \"pino/error\": (string | null)[];\n        \"pino/fatal\": (string | null)[];\n    };\n    traits: {};\n    lifts: {};\n}"
             }
           ],
           "fileUrlPath": "dist/10.3.1/index.d.ts",
@@ -2722,7 +2659,7 @@
           "name": "pinoPlugin",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 22
+            "endIndex": 16
           }
         },
         {

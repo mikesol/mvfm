@@ -437,7 +437,7 @@
         {
           "kind": "Variable",
           "canonicalReference": "@mvfm/plugin-s3!s3:var",
-          "docComment": "/**\n * S3 plugin definition (unified Plugin type).\n *\n * This plugin has no defaultInterpreter. You must provide one via `defaults(app, { s3: createS3Interpreter(client) })`.\n */\n",
+          "docComment": "/**\n * The s3 plugin definition (unified Plugin type).\n *\n * This plugin has NO defaultInterpreter. You must provide one via `defaults(plugins, { s3: createS3Interpreter(client) })`.\n *\n * Contributes `$.s3`.\n *\n * @example\n * ```ts\n * const $ = composeDollar(numPlugin, strPlugin, s3);\n * const expr = $.s3.putObject({ Bucket: \"b\", Key: \"k\", Body: \"hello\" });\n * const nexpr = app(expr);\n * const interp = defaults([numPlugin, strPlugin, s3], {\n *   s3: createS3Interpreter(myClient),\n * });\n * const result = await fold(nexpr, interp);\n * ```\n *\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -445,7 +445,25 @@
             },
             {
               "kind": "Content",
-              "text": "{\n    name: \"s3\";\n    ctors: {\n        s3: {\n            putObject<A>(input: A): "
+              "text": "{\n    name: \"s3\";\n    ctors: {\n        s3: {\n            putObject(input: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-s3!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "PutObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!PutObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">): "
             },
             {
               "kind": "Reference",
@@ -463,7 +481,43 @@
             },
             {
               "kind": "Content",
-              "text": ", \"s3/put_object\", [A]>;\n            getObject<A>(input: A): "
+              "text": ", \"s3/put_object\", ["
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-s3!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "PutObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!PutObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">]>;\n            getObject(input: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-s3!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "GetObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!GetObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">): "
             },
             {
               "kind": "Reference",
@@ -481,7 +535,43 @@
             },
             {
               "kind": "Content",
-              "text": ", \"s3/get_object\", [A]>;\n            deleteObject<A>(input: A): "
+              "text": ", \"s3/get_object\", ["
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-s3!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "GetObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!GetObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">]>;\n            deleteObject(input: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-s3!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DeleteObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!DeleteObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">): "
             },
             {
               "kind": "Reference",
@@ -499,7 +589,43 @@
             },
             {
               "kind": "Content",
-              "text": ", \"s3/delete_object\", [A]>;\n            headObject<A>(input: A): "
+              "text": ", \"s3/delete_object\", ["
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-s3!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DeleteObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!DeleteObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">]>;\n            headObject(input: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-s3!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HeadObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!HeadObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">): "
             },
             {
               "kind": "Reference",
@@ -517,7 +643,43 @@
             },
             {
               "kind": "Content",
-              "text": ", \"s3/head_object\", [A]>;\n            listObjectsV2<A>(input: A): "
+              "text": ", \"s3/head_object\", ["
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-s3!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HeadObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!HeadObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">]>;\n            listObjectsV2(input: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-s3!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "ListObjectsV2CommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!ListObjectsV2CommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">): "
             },
             {
               "kind": "Reference",
@@ -535,7 +697,25 @@
             },
             {
               "kind": "Content",
-              "text": ", \"s3/list_objects_v2\", [A]>;\n        };\n    };\n    kinds: {\n        \"s3/put_object\": "
+              "text": ", \"s3/list_objects_v2\", ["
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-s3!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "ListObjectsV2CommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!ListObjectsV2CommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">]>;\n        };\n    };\n    kinds: {\n        \"s3/put_object\": "
             },
             {
               "kind": "Reference",
@@ -544,7 +724,25 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown], unknown>;\n        \"s3/get_object\": "
+              "text": "<["
+            },
+            {
+              "kind": "Reference",
+              "text": "PutObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!PutObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "], "
+            },
+            {
+              "kind": "Reference",
+              "text": "PutObjectCommandOutput",
+              "canonicalReference": "@aws-sdk/client-s3!PutObjectCommandOutput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n        \"s3/get_object\": "
             },
             {
               "kind": "Reference",
@@ -553,7 +751,25 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown], unknown>;\n        \"s3/delete_object\": "
+              "text": "<["
+            },
+            {
+              "kind": "Reference",
+              "text": "GetObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!GetObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "], "
+            },
+            {
+              "kind": "Reference",
+              "text": "GetObjectCommandOutput",
+              "canonicalReference": "@aws-sdk/client-s3!GetObjectCommandOutput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n        \"s3/delete_object\": "
             },
             {
               "kind": "Reference",
@@ -562,7 +778,25 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown], unknown>;\n        \"s3/head_object\": "
+              "text": "<["
+            },
+            {
+              "kind": "Reference",
+              "text": "DeleteObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!DeleteObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "], "
+            },
+            {
+              "kind": "Reference",
+              "text": "DeleteObjectCommandOutput",
+              "canonicalReference": "@aws-sdk/client-s3!DeleteObjectCommandOutput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n        \"s3/head_object\": "
             },
             {
               "kind": "Reference",
@@ -571,7 +805,25 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown], unknown>;\n        \"s3/list_objects_v2\": "
+              "text": "<["
+            },
+            {
+              "kind": "Reference",
+              "text": "HeadObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!HeadObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "], "
+            },
+            {
+              "kind": "Reference",
+              "text": "HeadObjectCommandOutput",
+              "canonicalReference": "@aws-sdk/client-s3!HeadObjectCommandOutput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n        \"s3/list_objects_v2\": "
             },
             {
               "kind": "Reference",
@@ -580,34 +832,25 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown], unknown>;\n        \"s3/record\": "
+              "text": "<["
             },
             {
               "kind": "Reference",
-              "text": "KindSpec",
-              "canonicalReference": "@mvfm/plugin-s3!~KindSpec:interface"
+              "text": "ListObjectsV2CommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!ListObjectsV2CommandInput:interface"
             },
             {
               "kind": "Content",
-              "text": "<unknown[], "
+              "text": "], "
             },
             {
               "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
+              "text": "ListObjectsV2CommandOutput",
+              "canonicalReference": "@aws-sdk/client-s3!ListObjectsV2CommandOutput:interface"
             },
             {
               "kind": "Content",
-              "text": "<string, unknown>>;\n        \"s3/array\": "
-            },
-            {
-              "kind": "Reference",
-              "text": "KindSpec",
-              "canonicalReference": "@mvfm/plugin-s3!~KindSpec:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<unknown[], unknown[]>;\n    };\n    traits: {};\n    lifts: {};\n}"
+              "text": ">;\n    };\n    shapes: {\n        \"s3/put_object\": string;\n        \"s3/get_object\": string;\n        \"s3/delete_object\": string;\n        \"s3/head_object\": string;\n        \"s3/list_objects_v2\": string;\n    };\n    traits: {};\n    lifts: {};\n}"
             }
           ],
           "fileUrlPath": "dist/3.989.0/index.d.ts",
@@ -616,7 +859,7 @@
           "name": "s3",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 38
+            "endIndex": 92
           }
         },
         {
@@ -709,132 +952,6 @@
           "extendsTokenRanges": []
         },
         {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/plugin-s3!S3Config:interface",
-          "docComment": "/**\n * Configuration for the s3 plugin.\n *\n * Requires a region. Optionally accepts credentials, a custom endpoint (for S3-compatible services like MinIO/LocalStack), and forcePathStyle for local development.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export interface S3Config "
-            }
-          ],
-          "fileUrlPath": "dist/3.989.0/index.d.ts",
-          "releaseTag": "Public",
-          "name": "S3Config",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-s3!S3Config#credentials:member",
-              "docComment": "/**\n * AWS credentials. If omitted, the SDK uses default credential resolution.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "credentials?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "{\n        accessKeyId: string;\n        secretAccessKey: string;\n        sessionToken?: string;\n    }"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "credentials",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-s3!S3Config#endpoint:member",
-              "docComment": "/**\n * Custom endpoint URL for S3-compatible services (e.g. LocalStack, MinIO).\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "endpoint?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "endpoint",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-s3!S3Config#forcePathStyle:member",
-              "docComment": "/**\n * Use path-style addressing (required for LocalStack/MinIO).\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "forcePathStyle?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "boolean"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "forcePathStyle",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            },
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-s3!S3Config#region:member",
-              "docComment": "/**\n * AWS region (e.g. `us-east-1`).\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "region: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "region",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            }
-          ],
-          "extendsTokenRanges": []
-        },
-        {
           "kind": "Variable",
           "canonicalReference": "@mvfm/plugin-s3!s3Plugin:var",
           "docComment": "/**\n * Alias for {@link s3}, kept for readability at call sites.\n */\n",
@@ -845,7 +962,25 @@
             },
             {
               "kind": "Content",
-              "text": "{\n    name: \"s3\";\n    ctors: {\n        s3: {\n            putObject<A>(input: A): "
+              "text": "{\n    name: \"s3\";\n    ctors: {\n        s3: {\n            putObject(input: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-s3!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "PutObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!PutObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">): "
             },
             {
               "kind": "Reference",
@@ -863,7 +998,43 @@
             },
             {
               "kind": "Content",
-              "text": ", \"s3/put_object\", [A]>;\n            getObject<A>(input: A): "
+              "text": ", \"s3/put_object\", ["
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-s3!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "PutObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!PutObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">]>;\n            getObject(input: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-s3!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "GetObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!GetObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">): "
             },
             {
               "kind": "Reference",
@@ -881,7 +1052,43 @@
             },
             {
               "kind": "Content",
-              "text": ", \"s3/get_object\", [A]>;\n            deleteObject<A>(input: A): "
+              "text": ", \"s3/get_object\", ["
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-s3!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "GetObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!GetObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">]>;\n            deleteObject(input: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-s3!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DeleteObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!DeleteObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">): "
             },
             {
               "kind": "Reference",
@@ -899,7 +1106,43 @@
             },
             {
               "kind": "Content",
-              "text": ", \"s3/delete_object\", [A]>;\n            headObject<A>(input: A): "
+              "text": ", \"s3/delete_object\", ["
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-s3!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "DeleteObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!DeleteObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">]>;\n            headObject(input: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-s3!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HeadObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!HeadObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">): "
             },
             {
               "kind": "Reference",
@@ -917,7 +1160,43 @@
             },
             {
               "kind": "Content",
-              "text": ", \"s3/head_object\", [A]>;\n            listObjectsV2<A>(input: A): "
+              "text": ", \"s3/head_object\", ["
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-s3!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "HeadObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!HeadObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">]>;\n            listObjectsV2(input: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-s3!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "ListObjectsV2CommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!ListObjectsV2CommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">): "
             },
             {
               "kind": "Reference",
@@ -935,7 +1214,25 @@
             },
             {
               "kind": "Content",
-              "text": ", \"s3/list_objects_v2\", [A]>;\n        };\n    };\n    kinds: {\n        \"s3/put_object\": "
+              "text": ", \"s3/list_objects_v2\", ["
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-s3!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "ListObjectsV2CommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!ListObjectsV2CommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">]>;\n        };\n    };\n    kinds: {\n        \"s3/put_object\": "
             },
             {
               "kind": "Reference",
@@ -944,7 +1241,25 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown], unknown>;\n        \"s3/get_object\": "
+              "text": "<["
+            },
+            {
+              "kind": "Reference",
+              "text": "PutObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!PutObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "], "
+            },
+            {
+              "kind": "Reference",
+              "text": "PutObjectCommandOutput",
+              "canonicalReference": "@aws-sdk/client-s3!PutObjectCommandOutput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n        \"s3/get_object\": "
             },
             {
               "kind": "Reference",
@@ -953,7 +1268,25 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown], unknown>;\n        \"s3/delete_object\": "
+              "text": "<["
+            },
+            {
+              "kind": "Reference",
+              "text": "GetObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!GetObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "], "
+            },
+            {
+              "kind": "Reference",
+              "text": "GetObjectCommandOutput",
+              "canonicalReference": "@aws-sdk/client-s3!GetObjectCommandOutput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n        \"s3/delete_object\": "
             },
             {
               "kind": "Reference",
@@ -962,7 +1295,25 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown], unknown>;\n        \"s3/head_object\": "
+              "text": "<["
+            },
+            {
+              "kind": "Reference",
+              "text": "DeleteObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!DeleteObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "], "
+            },
+            {
+              "kind": "Reference",
+              "text": "DeleteObjectCommandOutput",
+              "canonicalReference": "@aws-sdk/client-s3!DeleteObjectCommandOutput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n        \"s3/head_object\": "
             },
             {
               "kind": "Reference",
@@ -971,7 +1322,25 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown], unknown>;\n        \"s3/list_objects_v2\": "
+              "text": "<["
+            },
+            {
+              "kind": "Reference",
+              "text": "HeadObjectCommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!HeadObjectCommandInput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "], "
+            },
+            {
+              "kind": "Reference",
+              "text": "HeadObjectCommandOutput",
+              "canonicalReference": "@aws-sdk/client-s3!HeadObjectCommandOutput:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n        \"s3/list_objects_v2\": "
             },
             {
               "kind": "Reference",
@@ -980,34 +1349,25 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown], unknown>;\n        \"s3/record\": "
+              "text": "<["
             },
             {
               "kind": "Reference",
-              "text": "KindSpec",
-              "canonicalReference": "@mvfm/plugin-s3!~KindSpec:interface"
+              "text": "ListObjectsV2CommandInput",
+              "canonicalReference": "@aws-sdk/client-s3!ListObjectsV2CommandInput:interface"
             },
             {
               "kind": "Content",
-              "text": "<unknown[], "
+              "text": "], "
             },
             {
               "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
+              "text": "ListObjectsV2CommandOutput",
+              "canonicalReference": "@aws-sdk/client-s3!ListObjectsV2CommandOutput:interface"
             },
             {
               "kind": "Content",
-              "text": "<string, unknown>>;\n        \"s3/array\": "
-            },
-            {
-              "kind": "Reference",
-              "text": "KindSpec",
-              "canonicalReference": "@mvfm/plugin-s3!~KindSpec:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<unknown[], unknown[]>;\n    };\n    traits: {};\n    lifts: {};\n}"
+              "text": ">;\n    };\n    shapes: {\n        \"s3/put_object\": string;\n        \"s3/get_object\": string;\n        \"s3/delete_object\": string;\n        \"s3/head_object\": string;\n        \"s3/list_objects_v2\": string;\n    };\n    traits: {};\n    lifts: {};\n}"
             }
           ],
           "fileUrlPath": "dist/3.989.0/index.d.ts",
@@ -1016,7 +1376,7 @@
           "name": "s3Plugin",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 38
+            "endIndex": 92
           }
         },
         {

@@ -437,7 +437,7 @@
         {
           "kind": "Variable",
           "canonicalReference": "@mvfm/plugin-resend!resend:var",
-          "docComment": "/**\n * Resend plugin definition (unified Plugin type).\n *\n * This plugin has no defaultInterpreter — you must provide one via `defaults(app, { resend: createResendInterpreter(wrapResendSdk(client)) })`.\n */\n",
+          "docComment": "/**\n * The resend plugin definition (unified Plugin type).\n *\n * Contributes `$.resend` with emails, batch, and contacts API. Requires an interpreter provided via `defaults(plugins, { resend: createResendInterpreter(client) })`.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -445,7 +445,25 @@
             },
             {
               "kind": "Content",
-              "text": "{\n    name: \"resend\";\n    ctors: {\n        resend: {\n            emails: {\n                send<A>(params: A): "
+              "text": "{\n    name: \"resend\";\n    ctors: {\n        resend: {\n            emails: {\n                send(params: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-resend!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateEmailOptions",
+              "canonicalReference": "resend!CreateEmailOptions:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">): "
             },
             {
               "kind": "Reference",
@@ -454,7 +472,34 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown, \"resend/send_email\", [A]>;\n                get<A>(id: A): "
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateEmailResponseSuccess",
+              "canonicalReference": "resend!CreateEmailResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", \"resend/send_email\", ["
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-resend!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateEmailOptions",
+              "canonicalReference": "resend!CreateEmailOptions:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">]>;\n                get(id: string | "
             },
             {
               "kind": "Reference",
@@ -463,7 +508,7 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown, \"resend/get_email\", [A]>;\n            };\n            batch: {\n                send<A>(emails: A): "
+              "text": "<string>): "
             },
             {
               "kind": "Reference",
@@ -472,7 +517,16 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown, \"resend/send_batch\", [A]>;\n            };\n            contacts: {\n                create<A>(params: A): "
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "GetEmailResponseSuccess",
+              "canonicalReference": "resend!GetEmailResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", \"resend/get_email\", [string | "
             },
             {
               "kind": "Reference",
@@ -481,7 +535,25 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown, \"resend/create_contact\", [A]>;\n                get<A>(id: A): "
+              "text": "<string>]>;\n            };\n            batch: {\n                send(emails: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-resend!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateBatchOptions",
+              "canonicalReference": "resend!CreateBatchOptions:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">): "
             },
             {
               "kind": "Reference",
@@ -490,7 +562,52 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown, \"resend/get_contact\", [A]>;\n                list(): "
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateEmailResponseSuccess",
+              "canonicalReference": "resend!CreateEmailResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "[], \"resend/send_batch\", ["
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-resend!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateBatchOptions",
+              "canonicalReference": "resend!CreateBatchOptions:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">]>;\n            };\n            contacts: {\n                create(params: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-resend!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateContactOptions",
+              "canonicalReference": "resend!CreateContactOptions:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">): "
             },
             {
               "kind": "Reference",
@@ -499,7 +616,34 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown, \"resend/list_contacts\", []>;\n                remove<A>(id: A): "
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateContactResponseSuccess",
+              "canonicalReference": "resend!CreateContactResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", \"resend/create_contact\", ["
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-resend!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateContactOptions",
+              "canonicalReference": "resend!CreateContactOptions:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">]>;\n                get(id: string | "
             },
             {
               "kind": "Reference",
@@ -508,7 +652,88 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown, \"resend/remove_contact\", [A]>;\n            };\n        };\n    };\n    kinds: {\n        \"resend/send_email\": "
+              "text": "<string>): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-resend!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "GetContactResponseSuccess",
+              "canonicalReference": "resend!GetContactResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", \"resend/get_contact\", [string | "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-resend!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string>]>;\n                list(): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-resend!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "ListContactsResponseSuccess",
+              "canonicalReference": "resend!ListContactsResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", \"resend/list_contacts\", []>;\n                remove(id: string | "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-resend!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string>): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-resend!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "RemoveContactsResponseSuccess",
+              "canonicalReference": "resend!RemoveContactsResponseSuccess:type"
+            },
+            {
+              "kind": "Content",
+              "text": ", \"resend/remove_contact\", [string | "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-resend!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string>]>;\n            };\n        };\n    };\n    kinds: {\n        \"resend/send_email\": "
             },
             {
               "kind": "Reference",
@@ -517,7 +742,25 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown], unknown>;\n        \"resend/get_email\": "
+              "text": "<["
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateEmailOptions",
+              "canonicalReference": "resend!CreateEmailOptions:type"
+            },
+            {
+              "kind": "Content",
+              "text": "], "
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateEmailResponseSuccess",
+              "canonicalReference": "resend!CreateEmailResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n        \"resend/get_email\": "
             },
             {
               "kind": "Reference",
@@ -526,7 +769,16 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown], unknown>;\n        \"resend/send_batch\": "
+              "text": "<[string], "
+            },
+            {
+              "kind": "Reference",
+              "text": "GetEmailResponseSuccess",
+              "canonicalReference": "resend!GetEmailResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n        \"resend/send_batch\": "
             },
             {
               "kind": "Reference",
@@ -535,7 +787,25 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown], unknown>;\n        \"resend/create_contact\": "
+              "text": "<["
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateBatchOptions",
+              "canonicalReference": "resend!CreateBatchOptions:type"
+            },
+            {
+              "kind": "Content",
+              "text": "], "
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateEmailResponseSuccess",
+              "canonicalReference": "resend!CreateEmailResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "[]>;\n        \"resend/create_contact\": "
             },
             {
               "kind": "Reference",
@@ -544,7 +814,25 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown], unknown>;\n        \"resend/get_contact\": "
+              "text": "<["
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateContactOptions",
+              "canonicalReference": "resend!CreateContactOptions:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "], "
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateContactResponseSuccess",
+              "canonicalReference": "resend!CreateContactResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n        \"resend/get_contact\": "
             },
             {
               "kind": "Reference",
@@ -553,7 +841,16 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown], unknown>;\n        \"resend/list_contacts\": "
+              "text": "<[string], "
+            },
+            {
+              "kind": "Reference",
+              "text": "GetContactResponseSuccess",
+              "canonicalReference": "resend!GetContactResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n        \"resend/list_contacts\": "
             },
             {
               "kind": "Reference",
@@ -562,7 +859,16 @@
             },
             {
               "kind": "Content",
-              "text": "<[], unknown>;\n        \"resend/remove_contact\": "
+              "text": "<[], "
+            },
+            {
+              "kind": "Reference",
+              "text": "ListContactsResponseSuccess",
+              "canonicalReference": "resend!ListContactsResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n        \"resend/remove_contact\": "
             },
             {
               "kind": "Reference",
@@ -571,34 +877,16 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown], unknown>;\n        \"resend/record\": "
+              "text": "<[string], "
             },
             {
               "kind": "Reference",
-              "text": "KindSpec",
-              "canonicalReference": "@mvfm/plugin-resend!~KindSpec:interface"
+              "text": "RemoveContactsResponseSuccess",
+              "canonicalReference": "resend!RemoveContactsResponseSuccess:type"
             },
             {
               "kind": "Content",
-              "text": "<unknown[], "
-            },
-            {
-              "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string, unknown>>;\n        \"resend/array\": "
-            },
-            {
-              "kind": "Reference",
-              "text": "KindSpec",
-              "canonicalReference": "@mvfm/plugin-resend!~KindSpec:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<unknown[], unknown[]>;\n    };\n    traits: {};\n    lifts: {};\n}"
+              "text": ">;\n    };\n    shapes: {\n        \"resend/send_email\": string;\n        \"resend/send_batch\": string;\n        \"resend/create_contact\": string;\n    };\n    traits: {};\n    lifts: {};\n}"
             }
           ],
           "fileUrlPath": "dist/6.9.2/index.d.ts",
@@ -607,7 +895,7 @@
           "name": "resend",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 36
+            "endIndex": 100
           }
         },
         {
@@ -711,51 +999,6 @@
           "extendsTokenRanges": []
         },
         {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/plugin-resend!ResendConfig:interface",
-          "docComment": "/**\n * Configuration for the resend plugin.\n *\n * Requires an API key. The key is captured in the interpreter closure, not stored on AST nodes.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export interface ResendConfig "
-            }
-          ],
-          "fileUrlPath": "dist/6.9.2/index.d.ts",
-          "releaseTag": "Public",
-          "name": "ResendConfig",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-resend!ResendConfig#apiKey:member",
-              "docComment": "/**\n * Resend API key (e.g. `re_123...`).\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "apiKey: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "apiKey",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
-            }
-          ],
-          "extendsTokenRanges": []
-        },
-        {
           "kind": "Variable",
           "canonicalReference": "@mvfm/plugin-resend!resendInterpreter:var",
           "docComment": "/**\n * Default Resend interpreter that uses `RESEND_API_KEY`.\n */\n",
@@ -790,7 +1033,25 @@
             },
             {
               "kind": "Content",
-              "text": "{\n    name: \"resend\";\n    ctors: {\n        resend: {\n            emails: {\n                send<A>(params: A): "
+              "text": "{\n    name: \"resend\";\n    ctors: {\n        resend: {\n            emails: {\n                send(params: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-resend!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateEmailOptions",
+              "canonicalReference": "resend!CreateEmailOptions:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">): "
             },
             {
               "kind": "Reference",
@@ -799,7 +1060,34 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown, \"resend/send_email\", [A]>;\n                get<A>(id: A): "
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateEmailResponseSuccess",
+              "canonicalReference": "resend!CreateEmailResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", \"resend/send_email\", ["
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-resend!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateEmailOptions",
+              "canonicalReference": "resend!CreateEmailOptions:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">]>;\n                get(id: string | "
             },
             {
               "kind": "Reference",
@@ -808,7 +1096,7 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown, \"resend/get_email\", [A]>;\n            };\n            batch: {\n                send<A>(emails: A): "
+              "text": "<string>): "
             },
             {
               "kind": "Reference",
@@ -817,7 +1105,16 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown, \"resend/send_batch\", [A]>;\n            };\n            contacts: {\n                create<A>(params: A): "
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "GetEmailResponseSuccess",
+              "canonicalReference": "resend!GetEmailResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", \"resend/get_email\", [string | "
             },
             {
               "kind": "Reference",
@@ -826,7 +1123,25 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown, \"resend/create_contact\", [A]>;\n                get<A>(id: A): "
+              "text": "<string>]>;\n            };\n            batch: {\n                send(emails: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-resend!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateBatchOptions",
+              "canonicalReference": "resend!CreateBatchOptions:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">): "
             },
             {
               "kind": "Reference",
@@ -835,7 +1150,52 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown, \"resend/get_contact\", [A]>;\n                list(): "
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateEmailResponseSuccess",
+              "canonicalReference": "resend!CreateEmailResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "[], \"resend/send_batch\", ["
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-resend!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateBatchOptions",
+              "canonicalReference": "resend!CreateBatchOptions:type"
+            },
+            {
+              "kind": "Content",
+              "text": ">]>;\n            };\n            contacts: {\n                create(params: "
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-resend!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateContactOptions",
+              "canonicalReference": "resend!CreateContactOptions:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">): "
             },
             {
               "kind": "Reference",
@@ -844,7 +1204,34 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown, \"resend/list_contacts\", []>;\n                remove<A>(id: A): "
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateContactResponseSuccess",
+              "canonicalReference": "resend!CreateContactResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", \"resend/create_contact\", ["
+            },
+            {
+              "kind": "Reference",
+              "text": "Liftable",
+              "canonicalReference": "@mvfm/plugin-resend!~Liftable:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateContactOptions",
+              "canonicalReference": "resend!CreateContactOptions:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">]>;\n                get(id: string | "
             },
             {
               "kind": "Reference",
@@ -853,7 +1240,88 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown, \"resend/remove_contact\", [A]>;\n            };\n        };\n    };\n    kinds: {\n        \"resend/send_email\": "
+              "text": "<string>): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-resend!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "GetContactResponseSuccess",
+              "canonicalReference": "resend!GetContactResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", \"resend/get_contact\", [string | "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-resend!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string>]>;\n                list(): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-resend!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "ListContactsResponseSuccess",
+              "canonicalReference": "resend!ListContactsResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ", \"resend/list_contacts\", []>;\n                remove(id: string | "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-resend!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string>): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-resend!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<"
+            },
+            {
+              "kind": "Reference",
+              "text": "RemoveContactsResponseSuccess",
+              "canonicalReference": "resend!RemoveContactsResponseSuccess:type"
+            },
+            {
+              "kind": "Content",
+              "text": ", \"resend/remove_contact\", [string | "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-resend!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<string>]>;\n            };\n        };\n    };\n    kinds: {\n        \"resend/send_email\": "
             },
             {
               "kind": "Reference",
@@ -862,7 +1330,25 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown], unknown>;\n        \"resend/get_email\": "
+              "text": "<["
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateEmailOptions",
+              "canonicalReference": "resend!CreateEmailOptions:type"
+            },
+            {
+              "kind": "Content",
+              "text": "], "
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateEmailResponseSuccess",
+              "canonicalReference": "resend!CreateEmailResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n        \"resend/get_email\": "
             },
             {
               "kind": "Reference",
@@ -871,7 +1357,16 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown], unknown>;\n        \"resend/send_batch\": "
+              "text": "<[string], "
+            },
+            {
+              "kind": "Reference",
+              "text": "GetEmailResponseSuccess",
+              "canonicalReference": "resend!GetEmailResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n        \"resend/send_batch\": "
             },
             {
               "kind": "Reference",
@@ -880,7 +1375,25 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown], unknown>;\n        \"resend/create_contact\": "
+              "text": "<["
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateBatchOptions",
+              "canonicalReference": "resend!CreateBatchOptions:type"
+            },
+            {
+              "kind": "Content",
+              "text": "], "
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateEmailResponseSuccess",
+              "canonicalReference": "resend!CreateEmailResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "[]>;\n        \"resend/create_contact\": "
             },
             {
               "kind": "Reference",
@@ -889,7 +1402,25 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown], unknown>;\n        \"resend/get_contact\": "
+              "text": "<["
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateContactOptions",
+              "canonicalReference": "resend!CreateContactOptions:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "], "
+            },
+            {
+              "kind": "Reference",
+              "text": "CreateContactResponseSuccess",
+              "canonicalReference": "resend!CreateContactResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n        \"resend/get_contact\": "
             },
             {
               "kind": "Reference",
@@ -898,7 +1429,16 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown], unknown>;\n        \"resend/list_contacts\": "
+              "text": "<[string], "
+            },
+            {
+              "kind": "Reference",
+              "text": "GetContactResponseSuccess",
+              "canonicalReference": "resend!GetContactResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n        \"resend/list_contacts\": "
             },
             {
               "kind": "Reference",
@@ -907,7 +1447,16 @@
             },
             {
               "kind": "Content",
-              "text": "<[], unknown>;\n        \"resend/remove_contact\": "
+              "text": "<[], "
+            },
+            {
+              "kind": "Reference",
+              "text": "ListContactsResponseSuccess",
+              "canonicalReference": "resend!ListContactsResponseSuccess:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ">;\n        \"resend/remove_contact\": "
             },
             {
               "kind": "Reference",
@@ -916,34 +1465,16 @@
             },
             {
               "kind": "Content",
-              "text": "<[unknown], unknown>;\n        \"resend/record\": "
+              "text": "<[string], "
             },
             {
               "kind": "Reference",
-              "text": "KindSpec",
-              "canonicalReference": "@mvfm/plugin-resend!~KindSpec:interface"
+              "text": "RemoveContactsResponseSuccess",
+              "canonicalReference": "resend!RemoveContactsResponseSuccess:type"
             },
             {
               "kind": "Content",
-              "text": "<unknown[], "
-            },
-            {
-              "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string, unknown>>;\n        \"resend/array\": "
-            },
-            {
-              "kind": "Reference",
-              "text": "KindSpec",
-              "canonicalReference": "@mvfm/plugin-resend!~KindSpec:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<unknown[], unknown[]>;\n    };\n    traits: {};\n    lifts: {};\n}"
+              "text": ">;\n    };\n    shapes: {\n        \"resend/send_email\": string;\n        \"resend/send_batch\": string;\n        \"resend/create_contact\": string;\n    };\n    traits: {};\n    lifts: {};\n}"
             }
           ],
           "fileUrlPath": "dist/6.9.2/index.d.ts",
@@ -952,7 +1483,7 @@
           "name": "resendPlugin",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 36
+            "endIndex": 100
           }
         },
         {

@@ -33,8 +33,14 @@ export const pino: {
         "pino/warn": KindSpec<[unknown, ...unknown[]], void>;
         "pino/error": KindSpec<[unknown, ...unknown[]], void>;
         "pino/fatal": KindSpec<[unknown, ...unknown[]], void>;
-        "pino/record": KindSpec<unknown[], Record<string, unknown>>;
-        "pino/array": KindSpec<unknown[], unknown[]>;
+    };
+    shapes: {
+        "pino/trace": (string | null)[];
+        "pino/debug": (string | null)[];
+        "pino/info": (string | null)[];
+        "pino/warn": (string | null)[];
+        "pino/error": (string | null)[];
+        "pino/fatal": (string | null)[];
     };
     traits: {};
     lifts: {};
@@ -91,26 +97,27 @@ export type PinoLevel = (typeof LEVELS)[number];
 
 // @public
 export interface PinoLogger {
-    child(bindings: CExpr<Record<string, unknown>> | Record<string, unknown>): PinoLogger;
-    debug<A>(msg: A): CExpr<void, "pino/debug", [number, number, A]>;
+    // Warning: (ae-forgotten-export) The symbol "Liftable" needs to be exported by the entry point index.d.ts
+    child(bindings: Liftable<Record<string, unknown>>): PinoLogger;
+    debug<A>(msg: A): CExpr<void, "pino/debug">;
     // (undocumented)
-    debug<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/debug", [number, number, B, A]>;
-    error<A>(msg: A): CExpr<void, "pino/error", [number, number, A]>;
+    debug<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/debug">;
+    error<A>(msg: A): CExpr<void, "pino/error">;
     // (undocumented)
-    error<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/error", [number, number, B, A]>;
-    fatal<A>(msg: A): CExpr<void, "pino/fatal", [number, number, A]>;
+    error<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/error">;
+    fatal<A>(msg: A): CExpr<void, "pino/fatal">;
     // (undocumented)
-    fatal<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/fatal", [number, number, B, A]>;
-    info<A>(msg: A): CExpr<void, "pino/info", [number, number, A]>;
+    fatal<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/fatal">;
+    info<A>(msg: A): CExpr<void, "pino/info">;
     // (undocumented)
-    info<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/info", [number, number, B, A]>;
+    info<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/info">;
     // Warning: (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-    trace<A>(msg: A): CExpr<void, "pino/trace", [number, number, A]>;
+    trace<A>(msg: A): CExpr<void, "pino/trace">;
     // (undocumented)
-    trace<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/trace", [number, number, B, A]>;
-    warn<A>(msg: A): CExpr<void, "pino/warn", [number, number, A]>;
+    trace<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/trace">;
+    warn<A>(msg: A): CExpr<void, "pino/warn">;
     // (undocumented)
-    warn<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/warn", [number, number, B, A]>;
+    warn<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/warn">;
 }
 
 // @public
@@ -131,8 +138,14 @@ export const pinoPlugin: {
         "pino/warn": KindSpec<[unknown, ...unknown[]], void>;
         "pino/error": KindSpec<[unknown, ...unknown[]], void>;
         "pino/fatal": KindSpec<[unknown, ...unknown[]], void>;
-        "pino/record": KindSpec<unknown[], Record<string, unknown>>;
-        "pino/array": KindSpec<unknown[], unknown[]>;
+    };
+    shapes: {
+        "pino/trace": (string | null)[];
+        "pino/debug": (string | null)[];
+        "pino/info": (string | null)[];
+        "pino/warn": (string | null)[];
+        "pino/error": (string | null)[];
+        "pino/fatal": (string | null)[];
     };
     traits: {};
     lifts: {};
@@ -151,7 +164,7 @@ export function wrapPino(logger: PinoInstance): PinoClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/10.3.1/index.d.ts:62:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/10.3.1/index.d.ts:66:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

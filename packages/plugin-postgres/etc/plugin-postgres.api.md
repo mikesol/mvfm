@@ -43,8 +43,10 @@ export const postgres: {
         "postgres/savepoint": KindSpec<[string, ...unknown[]], unknown>;
         "postgres/cursor": KindSpec<[unknown, unknown, unknown], void>;
         "postgres/cursor_batch": KindSpec<[], unknown[]>;
-        "postgres/record": KindSpec<unknown[], Record<string, unknown>>;
-        "postgres/array": KindSpec<unknown[], unknown[]>;
+    };
+    shapes: {
+        "postgres/insert_helper": (string | null)[];
+        "postgres/set_helper": (string | null)[];
     };
     traits: {};
     lifts: {};
@@ -63,33 +65,6 @@ export interface PostgresClient {
 }
 
 // @public
-export interface PostgresConfig {
-    // (undocumented)
-    connectionString?: string;
-    // (undocumented)
-    database?: string;
-    // (undocumented)
-    host?: string;
-    // (undocumented)
-    max?: number;
-    // (undocumented)
-    password?: string;
-    // (undocumented)
-    port?: number;
-    // (undocumented)
-    ssl?: boolean | object;
-    // (undocumented)
-    transform?: {
-        column?: {
-            to?: string;
-            from?: string;
-        };
-    };
-    // (undocumented)
-    username?: string;
-}
-
-// @public
 export const postgresPlugin: {
     name: "postgres";
     ctors: {
@@ -104,8 +79,10 @@ export const postgresPlugin: {
         "postgres/savepoint": KindSpec<[string, ...unknown[]], unknown>;
         "postgres/cursor": KindSpec<[unknown, unknown, unknown], void>;
         "postgres/cursor_batch": KindSpec<[], unknown[]>;
-        "postgres/record": KindSpec<unknown[], Record<string, unknown>>;
-        "postgres/array": KindSpec<unknown[], unknown[]>;
+    };
+    shapes: {
+        "postgres/insert_helper": (string | null)[];
+        "postgres/set_helper": (string | null)[];
     };
     traits: {};
     lifts: {};
@@ -119,8 +96,8 @@ export function wrapPostgresJs(sql: Sql | TransactionSql): PostgresClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/3.4.8/index.d.ts:34:9 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-// dist/3.4.8/index.d.ts:37:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/3.4.8/index.d.ts:13:9 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/3.4.8/index.d.ts:16:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

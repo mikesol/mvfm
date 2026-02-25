@@ -27,15 +27,15 @@ const console_2: {
             count<A>(...args: [label: A] | []): CExpr<void, "console/count", unknown[]>;
             countReset<A>(...args: [label: A] | []): CExpr<void, "console/countReset", unknown[]>;
             debug<A extends readonly unknown[]>(...data: A): CExpr<void, "console/debug", A>;
-            dir<A, B>(...args: [item: A, options: B] | [item: A] | []): CExpr<void, "console/dir", unknown[]>;
-            dirxml<A extends readonly unknown[]>(...data: A): CExpr<void, "console/dirxml", A>;
+            dir<A, B>(...args: [item: A, options: B] | [item: A] | []): CExpr<void, "console/dir", [unknown[]]>;
+            dirxml<A extends readonly unknown[]>(...data: A): CExpr<void, "console/dirxml", [unknown[]]>;
             error<A extends readonly unknown[]>(...data: A): CExpr<void, "console/error", A>;
             group<A extends readonly unknown[]>(...data: A): CExpr<void, "console/group", A>;
             groupCollapsed<A extends readonly unknown[]>(...data: A): CExpr<void, "console/groupCollapsed", A>;
             groupEnd(): CExpr<void, "console/groupEnd", []>;
             info<A extends readonly unknown[]>(...data: A): CExpr<void, "console/info", A>;
             log<A extends readonly unknown[]>(...data: A): CExpr<void, "console/log", A>;
-            table<A, B>(...args: [tabularData: A, properties: B] | [tabularData: A] | []): CExpr<void, "console/table", unknown[]>;
+            table<A, B>(...args: [tabularData: A, properties: B] | [tabularData: A] | []): CExpr<void, "console/table", [unknown[]]>;
             time<A>(...args: [label: A] | []): CExpr<void, "console/time", unknown[]>;
             timeEnd<A>(...args: [label: A] | []): CExpr<void, "console/timeEnd", unknown[]>;
             timeLog<A, B extends readonly unknown[]>(...args: [label: A, ...data: B] | []): CExpr<void, "console/timeLog", unknown[]>;
@@ -64,6 +64,11 @@ const console_2: {
         "console/trace": KindSpec<unknown[], void>;
         "console/warn": KindSpec<unknown[], void>;
     };
+    shapes: {
+        "console/dir": "*";
+        "console/dirxml": "*";
+        "console/table": "*";
+    };
     traits: {};
     lifts: {};
     defaultInterpreter: () => Interpreter;
@@ -73,11 +78,6 @@ export { console_2 as console }
 // @public
 export interface ConsoleClient {
     call(method: ConsoleMethodName, args: unknown[]): Promise<void>;
-}
-
-// @public
-export interface ConsoleConfig {
-    tag?: string;
 }
 
 // @public
@@ -119,15 +119,15 @@ export const consolePlugin: {
             count<A>(...args: [label: A] | []): CExpr<void, "console/count", unknown[]>;
             countReset<A>(...args: [label: A] | []): CExpr<void, "console/countReset", unknown[]>;
             debug<A extends readonly unknown[]>(...data: A): CExpr<void, "console/debug", A>;
-            dir<A, B>(...args: [item: A, options: B] | [item: A] | []): CExpr<void, "console/dir", unknown[]>;
-            dirxml<A extends readonly unknown[]>(...data: A): CExpr<void, "console/dirxml", A>;
+            dir<A, B>(...args: [item: A, options: B] | [item: A] | []): CExpr<void, "console/dir", [unknown[]]>;
+            dirxml<A extends readonly unknown[]>(...data: A): CExpr<void, "console/dirxml", [unknown[]]>;
             error<A extends readonly unknown[]>(...data: A): CExpr<void, "console/error", A>;
             group<A extends readonly unknown[]>(...data: A): CExpr<void, "console/group", A>;
             groupCollapsed<A extends readonly unknown[]>(...data: A): CExpr<void, "console/groupCollapsed", A>;
             groupEnd(): CExpr<void, "console/groupEnd", []>;
             info<A extends readonly unknown[]>(...data: A): CExpr<void, "console/info", A>;
             log<A extends readonly unknown[]>(...data: A): CExpr<void, "console/log", A>;
-            table<A, B>(...args: [tabularData: A, properties: B] | [tabularData: A] | []): CExpr<void, "console/table", unknown[]>;
+            table<A, B>(...args: [tabularData: A, properties: B] | [tabularData: A] | []): CExpr<void, "console/table", [unknown[]]>;
             time<A>(...args: [label: A] | []): CExpr<void, "console/time", unknown[]>;
             timeEnd<A>(...args: [label: A] | []): CExpr<void, "console/timeEnd", unknown[]>;
             timeLog<A, B extends readonly unknown[]>(...args: [label: A, ...data: B] | []): CExpr<void, "console/timeLog", unknown[]>;
@@ -156,6 +156,11 @@ export const consolePlugin: {
         "console/trace": KindSpec<unknown[], void>;
         "console/warn": KindSpec<unknown[], void>;
     };
+    shapes: {
+        "console/dir": "*";
+        "console/dirxml": "*";
+        "console/table": "*";
+    };
     traits: {};
     lifts: {};
     defaultInterpreter: () => Interpreter;
@@ -177,8 +182,8 @@ export function wrapConsole(instance: ConsoleInstance): ConsoleClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/22.0.0/index.d.ts:23:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-// dist/22.0.0/index.d.ts:63:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/22.0.0/index.d.ts:16:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/22.0.0/index.d.ts:56:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

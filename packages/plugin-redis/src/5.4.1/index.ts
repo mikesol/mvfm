@@ -17,10 +17,23 @@ export type { RedisConfig } from "./types";
 // ---- Plugin definition ------------------------------------
 
 /**
- * Redis plugin definition (unified Plugin type).
+ * The redis plugin definition (unified Plugin type).
  *
- * This plugin has no defaultInterpreter. You must provide one
- * via `defaults(app, { redis: createRedisInterpreter(client) })`.
+ * This plugin has NO defaultInterpreter. You must provide one
+ * via `defaults(plugins, { redis: createRedisInterpreter(client) })`.
+ *
+ * Contributes `$.redis`.
+ *
+ * @example
+ * ```ts
+ * const $ = composeDollar(numPlugin, strPlugin, redis);
+ * const expr = $.redis.get("mykey");
+ * const nexpr = app(expr);
+ * const interp = defaults([numPlugin, strPlugin, redis], {
+ *   redis: createRedisInterpreter(myClient),
+ * });
+ * const result = await fold(nexpr, interp);
+ * ```
  */
 export const redis = {
   name: "redis" as const,
@@ -151,15 +164,10 @@ export const redis = {
       inputs: ["", "", "", ""] as [string, string, string, string],
       output: 0 as number,
     } as KindSpec<[string, string, string, string], number>,
-    // Structural helpers (produced by liftArg)
-    "redis/record": {
-      inputs: [] as unknown[],
-      output: {} as Record<string, unknown>,
-    } as KindSpec<unknown[], Record<string, unknown>>,
-    "redis/array": { inputs: [] as unknown[], output: [] as unknown[] } as KindSpec<
-      unknown[],
-      unknown[]
-    >,
+  },
+  shapes: {
+    "redis/mset": "*",
+    "redis/hset": [null, "*"],
   },
   traits: {},
   lifts: {},

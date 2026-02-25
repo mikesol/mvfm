@@ -1,4 +1,5 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
+import { resolveStructured } from "@mvfm/core";
 import { wrapPino } from "./client-pino";
 import type { PinoConfig, PinoLevel } from "./index";
 
@@ -24,8 +25,11 @@ const LEVELS: ReadonlyArray<PinoLevel> = ["trace", "debug", "info", "warn", "err
  * Creates an interpreter for `pino/*` node kinds using the new
  * RuntimeEntry + positional yield pattern.
  *
- * Children layout for pino/<level> nodes:
- *   [hasMsg(0|1), hasMergeObj(0|1), msg?, mergeObj?, ...bindings]
+ * Fixed-position children layout for pino/<level> nodes:
+ *   [hasMsg(0|1), hasMergeObj(0|1), msg|"", mergeObj|{}, bindingsArray]
+ *
+ * Positions 3 (mergeObj) and 4 (bindings) are structural —
+ * resolved via resolveStructured() at interpretation time.
  *
  * Config is captured in the closure, not stored on AST nodes.
  *
@@ -40,41 +44,23 @@ export function createPinoInterpreter(client?: PinoClient, _config: PinoConfig =
 
   for (const level of LEVELS) {
     interp[`pino/${level}`] = async function* (entry: RuntimeEntry) {
+      // Fixed-position children layout:
+      //   [hasMsg(0|1), hasMergeObj(0|1), msg|null, mergeObj|null, bindingsArray]
       const hasMsg = (yield 0) as number;
       const hasMergeObj = (yield 1) as number;
+      const msg = hasMsg ? ((yield 2) as string) : undefined;
+      const mergeObject = hasMergeObj
+        ? ((yield* resolveStructured(entry.children[3])) as Record<string, unknown>)
+        : undefined;
+      const bindingsRaw = (yield* resolveStructured(entry.children[4])) as Record<
+        string,
+        unknown
+      >[];
 
-      let idx = 2;
-      const msg = hasMsg ? ((yield idx++) as string) : undefined;
-      const mergeObject = hasMergeObj ? ((yield idx++) as Record<string, unknown>) : undefined;
-
-      const bindings: Record<string, unknown>[] = [];
-      while (idx < entry.children.length) {
-        bindings.push((yield idx++) as Record<string, unknown>);
-      }
-
-      await resolvedClient.log(level, bindings, mergeObject, msg);
+      await resolvedClient.log(level, bindingsRaw, mergeObject, msg);
       return undefined;
     };
   }
-
-  interp["pino/record"] = async function* (entry: RuntimeEntry) {
-    // Children are key-value pairs: [key0, val0, key1, val1, ...]
-    const result: Record<string, unknown> = {};
-    for (let i = 0; i < entry.children.length; i += 2) {
-      const key = (yield i) as string;
-      const value = yield i + 1;
-      result[key] = value;
-    }
-    return result;
-  };
-
-  interp["pino/array"] = async function* (entry: RuntimeEntry) {
-    const result: unknown[] = [];
-    for (let i = 0; i < entry.children.length; i++) {
-      result.push(yield i);
-    }
-    return result;
-  };
 
   return interp;
 }

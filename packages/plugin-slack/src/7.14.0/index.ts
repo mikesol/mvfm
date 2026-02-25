@@ -15,36 +15,31 @@ const slackMethodKind: KindSpec<[unknown], unknown> = {
   output: undefined as unknown,
 };
 
-const slackKinds = Object.fromEntries([
-  ...SLACK_NODE_KINDS.map((k) => [k, slackMethodKind] as const),
-  [
-    "slack/record",
-    {
-      inputs: [] as unknown[],
-      output: {} as Record<string, unknown>,
-    } as KindSpec<unknown[], Record<string, unknown>>,
-  ],
-  [
-    "slack/array",
-    {
-      inputs: [] as unknown[],
-      output: [] as unknown[],
-    } as KindSpec<unknown[], unknown[]>,
-  ],
-]) as Record<string, KindSpec<any, any>>;
+const slackKinds = Object.fromEntries(
+  SLACK_NODE_KINDS.map((k) => [k, slackMethodKind] as const),
+) as Record<string, KindSpec<any, any>>;
 
-// ---- Plugin factory -------------------------------------------------------
+const slackShapes = Object.fromEntries(SLACK_NODE_KINDS.map((k) => [k, "*" as const])) as Record<
+  string,
+  "*"
+>;
+
+// ---- Plugin definition -------------------------------------------------------
 
 /**
- * Slack plugin definition (unified Plugin type).
+ * The slack plugin definition (unified Plugin type).
  *
- * This plugin has no defaultInterpreter — you must provide one
- * via `defaults(app, { slack: createSlackInterpreter(wrapSlackWebClient(client)) })`.
+ * Contributes chat, conversations, users, reactions, and files
+ * resource methods for building parameterized Slack API call AST nodes.
+ *
+ * Requires an interpreter provided via
+ * `defaults(plugins, { slack: createSlackInterpreter(client) })`.
  */
 export const slack = {
   name: "slack" as const,
   ctors: buildSlackMethods(),
   kinds: slackKinds,
+  shapes: slackShapes,
   traits: {},
   lifts: {},
 } satisfies Plugin;

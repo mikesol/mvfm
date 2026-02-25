@@ -102,8 +102,10 @@ export const redis: {
         "redis/lset": KindSpec<[string, number, string], string>;
         "redis/lrem": KindSpec<[string, number, string], number>;
         "redis/linsert": KindSpec<[string, string, string, string], number>;
-        "redis/record": KindSpec<unknown[], Record<string, unknown>>;
-        "redis/array": KindSpec<unknown[], unknown[]>;
+    };
+    shapes: {
+        "redis/mset": string;
+        "redis/hset": (string | null)[];
     };
     traits: {};
     lifts: {};
@@ -207,8 +209,10 @@ export const redisPlugin: {
         "redis/lset": KindSpec<[string, number, string], string>;
         "redis/lrem": KindSpec<[string, number, string], number>;
         "redis/linsert": KindSpec<[string, string, string, string], number>;
-        "redis/record": KindSpec<unknown[], Record<string, unknown>>;
-        "redis/array": KindSpec<unknown[], unknown[]>;
+    };
+    shapes: {
+        "redis/mset": string;
+        "redis/hset": (string | null)[];
     };
     traits: {};
     lifts: {};
@@ -224,8 +228,8 @@ export function wrapIoredis(redis: {
 
 // Warnings were encountered during analysis:
 //
-// dist/5.4.1/index.d.ts:13:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-// dist/5.4.1/index.d.ts:53:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/5.4.1/index.d.ts:26:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/5.4.1/index.d.ts:66:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

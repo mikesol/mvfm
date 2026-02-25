@@ -6,7 +6,7 @@ Typescript reimplemented in Typescript.
 
 When the Typescript compiler compiles a program, it represents it as an Abstract Syntax Tree (AST). Manipulating the tree itself is traditionally called metaprogramming.
 
-In some languages like `nim` and `haxe`, metaprogramming is a first-class citizen. They offer an expressive macro system that allows you to rewrite programs at compile time. `lisp` takes this concept even farther, treating programs as data.
+In languages like `nim` and `haxe`, metaprogramming is a first-class citizen. They offer an expressive macro system that allows you to rewrite programs at compile time. `lisp` takes this concept even farther, treating programs as data.
 
 `mvfm` follows the `lisp` philosophy, but with types and using a syntax that resembles traditional Typescript. The result is that you can separate a program's construction, manipulation, and interpretation in-code with minimal fuss.
 
@@ -59,7 +59,7 @@ const handlePrompt = app(
 );
 ```
 
-To interpret this program, you construct a gaggle of interpreters that interpret it.
+To interpret this program, you construct a gaggle of interpreters that are called as `mvfm` traverses the AST. This pattern is borrowed from pure functional languages like PureScript, where it is used extensively, for example via the [tagless final](https://okmij.org/ftp/tagless-final/index.html) pattern and via [free monads](https://github.com/purescript/purescript-free).
 
 ```typescript
 import pgClient from "postgres";

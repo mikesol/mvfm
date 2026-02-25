@@ -437,7 +437,7 @@
         {
           "kind": "Variable",
           "canonicalReference": "@mvfm/plugin-redis!redis:var",
-          "docComment": "/**\n * Redis plugin definition (unified Plugin type).\n *\n * This plugin has no defaultInterpreter. You must provide one via `defaults(app, { redis: createRedisInterpreter(client) })`.\n */\n",
+          "docComment": "/**\n * The redis plugin definition (unified Plugin type).\n *\n * This plugin has NO defaultInterpreter. You must provide one via `defaults(plugins, { redis: createRedisInterpreter(client) })`.\n *\n * Contributes `$.redis`.\n *\n * @example\n * ```ts\n * const $ = composeDollar(numPlugin, strPlugin, redis);\n * const expr = $.redis.get(\"mykey\");\n * const nexpr = app(expr);\n * const interp = defaults([numPlugin, strPlugin, redis], {\n *   redis: createRedisInterpreter(myClient),\n * });\n * const result = await fold(nexpr, interp);\n * ```\n *\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -1120,34 +1120,7 @@
             },
             {
               "kind": "Content",
-              "text": "<[string, string, string, string], number>;\n        \"redis/record\": "
-            },
-            {
-              "kind": "Reference",
-              "text": "KindSpec",
-              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<unknown[], "
-            },
-            {
-              "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string, unknown>>;\n        \"redis/array\": "
-            },
-            {
-              "kind": "Reference",
-              "text": "KindSpec",
-              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<unknown[], unknown[]>;\n    };\n    traits: {};\n    lifts: {};\n}"
+              "text": "<[string, string, string, string], number>;\n    };\n    shapes: {\n        \"redis/mset\": string;\n        \"redis/hset\": (string | null)[];\n    };\n    traits: {};\n    lifts: {};\n}"
             }
           ],
           "fileUrlPath": "dist/5.4.1/index.d.ts",
@@ -1156,7 +1129,7 @@
           "name": "redis",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 158
+            "endIndex": 152
           }
         },
         {
@@ -2136,34 +2109,7 @@
             },
             {
               "kind": "Content",
-              "text": "<[string, string, string, string], number>;\n        \"redis/record\": "
-            },
-            {
-              "kind": "Reference",
-              "text": "KindSpec",
-              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<unknown[], "
-            },
-            {
-              "kind": "Reference",
-              "text": "Record",
-              "canonicalReference": "!Record:type"
-            },
-            {
-              "kind": "Content",
-              "text": "<string, unknown>>;\n        \"redis/array\": "
-            },
-            {
-              "kind": "Reference",
-              "text": "KindSpec",
-              "canonicalReference": "@mvfm/plugin-redis!~KindSpec:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "<unknown[], unknown[]>;\n    };\n    traits: {};\n    lifts: {};\n}"
+              "text": "<[string, string, string, string], number>;\n    };\n    shapes: {\n        \"redis/mset\": string;\n        \"redis/hset\": (string | null)[];\n    };\n    traits: {};\n    lifts: {};\n}"
             }
           ],
           "fileUrlPath": "dist/5.4.1/index.d.ts",
@@ -2172,7 +2118,7 @@
           "name": "redisPlugin",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 158
+            "endIndex": 152
           }
         },
         {

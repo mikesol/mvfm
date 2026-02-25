@@ -6,8 +6,9 @@ describe("slack: chat.postMessage", () => {
     const expr = $.slack.chat.postMessage({ channel: "#general", text: "Hello" });
     expect(expr.__kind).toBe("slack/chat_postMessage");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("slack/record");
+    const paramsArg = expr.__args[0] as { channel: string; text: string };
+    expect(paramsArg.channel).toBe("#general");
+    expect(paramsArg.text).toBe("Hello");
   });
 
   it("accepts CExpr params", () => {
@@ -16,8 +17,9 @@ describe("slack: chat.postMessage", () => {
       text: "Hello",
     });
     expect(expr.__kind).toBe("slack/chat_postMessage");
-    const paramsArg = expr.__args[0] as { __kind: string; __args: unknown[] };
-    expect(paramsArg.__kind).toBe("slack/record");
+    const paramsArg = expr.__args[0] as Record<string, unknown>;
+    expect(paramsArg.text).toBe("Hello");
+    expect((paramsArg.channel as { __kind: string }).__kind).toBe("core/access");
   });
 
   it("elaborates without error", () => {

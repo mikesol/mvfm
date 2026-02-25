@@ -309,6 +309,7 @@ export const slack: {
     name: "slack";
     ctors: SlackMethods;
     kinds: Record<string, KindSpec<any, any>>;
+    shapes: Record<string, "*">;
     traits: {};
     lifts: {};
 };
@@ -429,7 +430,7 @@ export function wrapSlackWebClient(client: WebClient): SlackClient;
 // dist/7.14.0/generated/types.d.ts:140:9 - (ae-forgotten-export) The symbol "SlackMethodsUsers" needs to be exported by the entry point index.d.ts
 // dist/7.14.0/generated/types.d.ts:141:9 - (ae-forgotten-export) The symbol "SlackMethodsViews" needs to be exported by the entry point index.d.ts
 // dist/7.14.0/generated/types.d.ts:142:9 - (ae-forgotten-export) The symbol "SlackMethodsWorkflows" needs to be exported by the entry point index.d.ts
-// dist/7.14.0/index.d.ts:15:5 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/7.14.0/index.d.ts:18:5 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

@@ -42,15 +42,17 @@ describe("console plugin: special argument behavior", () => {
     expect(api.groupEnd().__args).toHaveLength(0);
   });
 
-  it("dir captures optional second parameter", () => {
+  it("dir captures optional second parameter in packed array", () => {
     const expr = api.dir("item", { depth: 2 });
     expect(expr.__kind).toBe("console/dir");
-    expect(expr.__args).toHaveLength(2);
+    expect(expr.__args).toHaveLength(1);
+    expect(expr.__args[0]).toEqual(["item", { depth: 2 }]);
   });
 
-  it("dir with no args produces zero-arg CExpr", () => {
+  it("dir with no args produces single empty-array arg", () => {
     const expr = api.dir();
-    expect(expr.__args).toHaveLength(0);
+    expect(expr.__args).toHaveLength(1);
+    expect(expr.__args[0]).toEqual([]);
   });
 
   it("timeLog captures label plus extra args", () => {

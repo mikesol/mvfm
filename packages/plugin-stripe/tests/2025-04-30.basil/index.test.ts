@@ -13,8 +13,8 @@ describe("stripe: paymentIntents.create", () => {
     const expr = api.paymentIntents.create({ amount: 2000, currency: "usd" });
     expect(expr.__kind).toBe("stripe/create_payment_intent");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("stripe/record");
+    // With Liftable, plain objects are passed directly (not wrapped in stripe/record)
+    expect(expr.__args[0]).toEqual({ amount: 2000, currency: "usd" });
   });
 });
 
@@ -42,8 +42,8 @@ describe("stripe: paymentIntents.confirm", () => {
     expect(expr.__kind).toBe("stripe/confirm_payment_intent");
     expect(expr.__args).toHaveLength(2);
     expect(expr.__args[0]).toBe("pi_123");
-    const paramsArg = expr.__args[1] as { __kind: string };
-    expect(paramsArg.__kind).toBe("stripe/record");
+    // With Liftable, plain objects are passed directly
+    expect(expr.__args[1]).toEqual({ payment_method: "pm_abc" });
   });
 
   it("produces CExpr with 1 arg when params omitted", () => {
@@ -59,8 +59,7 @@ describe("stripe: customers.create", () => {
     const expr = api.customers.create({ email: "test@example.com" });
     expect(expr.__kind).toBe("stripe/create_customer");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("stripe/record");
+    expect(expr.__args[0]).toEqual({ email: "test@example.com" });
   });
 });
 
@@ -79,8 +78,7 @@ describe("stripe: customers.update", () => {
     expect(expr.__kind).toBe("stripe/update_customer");
     expect(expr.__args).toHaveLength(2);
     expect(expr.__args[0]).toBe("cus_123");
-    const paramsArg = expr.__args[1] as { __kind: string };
-    expect(paramsArg.__kind).toBe("stripe/record");
+    expect(expr.__args[1]).toEqual({ name: "Updated Name" });
   });
 });
 
@@ -89,8 +87,7 @@ describe("stripe: customers.list", () => {
     const expr = api.customers.list({ limit: 10 });
     expect(expr.__kind).toBe("stripe/list_customers");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("stripe/record");
+    expect(expr.__args[0]).toEqual({ limit: 10 });
   });
 
   it("produces CExpr with no args when omitted", () => {
@@ -105,8 +102,7 @@ describe("stripe: charges.create", () => {
     const expr = api.charges.create({ amount: 5000, currency: "usd", source: "tok_visa" });
     expect(expr.__kind).toBe("stripe/create_charge");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("stripe/record");
+    expect(expr.__args[0]).toEqual({ amount: 5000, currency: "usd", source: "tok_visa" });
   });
 });
 
@@ -124,8 +120,7 @@ describe("stripe: charges.list", () => {
     const expr = api.charges.list({ limit: 25 });
     expect(expr.__kind).toBe("stripe/list_charges");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("stripe/record");
+    expect(expr.__args[0]).toEqual({ limit: 25 });
   });
 
   it("produces CExpr with no args when omitted", () => {
@@ -144,8 +139,8 @@ describe("stripe plugin: unified Plugin shape", () => {
     expect(plugin.name).toBe("stripe");
   });
 
-  it("has 12 node kinds (10 core + record + array)", () => {
-    expect(Object.keys(plugin.kinds)).toHaveLength(12);
+  it("has 10 node kinds (no record/array)", () => {
+    expect(Object.keys(plugin.kinds)).toHaveLength(10);
   });
 
   it("kinds are all namespaced", () => {
@@ -158,6 +153,14 @@ describe("stripe plugin: unified Plugin shape", () => {
     for (const kind of Object.keys(plugin.kinds)) {
       expect(plugin.kinds[kind]).toBeDefined();
     }
+  });
+
+  it("has shapes for structural kinds", () => {
+    expect(plugin.shapes).toBeDefined();
+    expect(plugin.shapes["stripe/create_payment_intent"]).toBe("*");
+    expect(plugin.shapes["stripe/create_customer"]).toBe("*");
+    expect(plugin.shapes["stripe/confirm_payment_intent"]).toEqual([null, "*"]);
+    expect(plugin.shapes["stripe/update_customer"]).toEqual([null, "*"]);
   });
 
   it("has empty traits and lifts", () => {

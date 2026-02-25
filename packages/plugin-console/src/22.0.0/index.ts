@@ -7,19 +7,9 @@
 // ============================================================
 
 import type { CExpr, Interpreter, KindSpec, Plugin } from "@mvfm/core";
-import { isCExpr, makeCExpr } from "@mvfm/core";
+import { makeCExpr } from "@mvfm/core";
 import { createConsoleInterpreter } from "./interpreter";
 
-/** Lift plain objects/arrays to structural CExpr nodes so elaborate can process them. */
-function liftConsoleArg(value: unknown): unknown {
-  if (value === null || value === undefined) return value;
-  if (isCExpr(value)) return value;
-  if (typeof value !== "object") return value;
-  if (Array.isArray(value)) return makeCExpr("core/tuple", [value]);
-  return makeCExpr("core/record", [value]);
-}
-
-// liftConsoleArg erases generic type info at runtime (returns unknown).
 // Cast helper restores the declared CExpr Args types for ExtractKinds.
 const mk = makeCExpr as <O, Kind extends string, Args extends readonly unknown[]>(
   kind: Kind,
@@ -49,14 +39,6 @@ export type ConsoleMethodName =
   | "timeLog"
   | "trace"
   | "warn";
-
-/**
- * Configuration for the console plugin.
- */
-export interface ConsoleConfig {
-  /** Optional tag for metadata propagation by custom handlers. */
-  tag?: string;
-}
 
 /** Variadic KindSpec for console methods: unknown[] inputs, void output. */
 const variadicVoidKind: KindSpec<unknown[], void> = {
@@ -93,15 +75,12 @@ function buildConsoleApi() {
     /** Calls `console.dir(item, options?)`. */
     dir<A, B>(
       ...args: [item: A, options: B] | [item: A] | []
-    ): CExpr<void, "console/dir", unknown[]> {
-      const lifted: unknown[] = [];
-      if (args.length > 0) lifted.push(liftConsoleArg(args[0]));
-      if (args.length > 1) lifted.push(liftConsoleArg(args[1]));
-      return mk("console/dir", lifted);
+    ): CExpr<void, "console/dir", [unknown[]]> {
+      return mk("console/dir", [[...args]]);
     },
     /** Calls `console.dirxml(...data)`. */
-    dirxml<A extends readonly unknown[]>(...data: A): CExpr<void, "console/dirxml", A> {
-      return mk("console/dirxml", data.map(liftConsoleArg));
+    dirxml<A extends readonly unknown[]>(...data: A): CExpr<void, "console/dirxml", [unknown[]]> {
+      return mk("console/dirxml", [[...data]]);
     },
     /** Calls `console.error(...data)`. */
     error<A extends readonly unknown[]>(...data: A): CExpr<void, "console/error", A> {
@@ -132,11 +111,8 @@ function buildConsoleApi() {
     /** Calls `console.table(tabularData, properties?)`. */
     table<A, B>(
       ...args: [tabularData: A, properties: B] | [tabularData: A] | []
-    ): CExpr<void, "console/table", unknown[]> {
-      const lifted: unknown[] = [];
-      if (args.length > 0) lifted.push(liftConsoleArg(args[0]));
-      if (args.length > 1) lifted.push(liftConsoleArg(args[1]));
-      return mk("console/table", lifted);
+    ): CExpr<void, "console/table", [unknown[]]> {
+      return mk("console/table", [[...args]]);
     },
     /** Calls `console.time(label?)`. */
     time<A>(...args: [label: A] | []): CExpr<void, "console/time", unknown[]> {
@@ -164,9 +140,9 @@ function buildConsoleApi() {
 }
 
 /**
- * Console plugin definition (unified Plugin type).
+ * The console plugin definition (unified Plugin type).
  *
- * Uses `globalThis.console` — no config required.
+ * Contributes `$.console` with all standard console methods.
  */
 export const console = {
   name: "console" as const,
@@ -191,6 +167,11 @@ export const console = {
     "console/timeLog": variadicVoidKind,
     "console/trace": variadicVoidKind,
     "console/warn": variadicVoidKind,
+  },
+  shapes: {
+    "console/dir": "*" as const,
+    "console/dirxml": "*" as const,
+    "console/table": "*" as const,
   },
   traits: {},
   lifts: {},

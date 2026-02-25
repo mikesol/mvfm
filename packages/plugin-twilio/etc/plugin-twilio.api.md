@@ -14,29 +14,33 @@ export const twilio: {
     name: "twilio";
     ctors: {
         twilio: {
-            messages: (<A>(sid: A) => {
-                fetch(): CExpr<Record<string, unknown>, "twilio/fetch_message", [A]>;
+            messages: ((sid: string | CExpr<string>) => {
+                fetch(): CExpr<Record<string, unknown>, "twilio/fetch_message", [string | CExpr<string>]>;
             }) & {
-                create<A>(params: A): CExpr<Record<string, unknown>, "twilio/create_message", [A]>;
-                list<A>(params?: A): CExpr<Record<string, unknown>, "twilio/list_messages", [A]>;
+                create(params: Liftable<Record<string, unknown>>): CExpr<Record<string, unknown>, "twilio/create_message", [Liftable<Record<string, unknown>>]>;
+                list(...params: [] | [Liftable<Record<string, unknown>>]): CExpr<Record<string, unknown>, "twilio/list_messages", [] | [Liftable<Record<string, unknown>>]>;
             };
-            calls: (<A>(sid: A) => {
-                fetch(): CExpr<Record<string, unknown>, "twilio/fetch_call", [A]>;
+            calls: ((sid: string | CExpr<string>) => {
+                fetch(): CExpr<Record<string, unknown>, "twilio/fetch_call", [string | CExpr<string>]>;
             }) & {
-                create<A>(params: A): CExpr<Record<string, unknown>, "twilio/create_call", [A]>;
-                list<A>(params?: A): CExpr<Record<string, unknown>, "twilio/list_calls", [A]>;
+                create(params: Liftable<Record<string, unknown>>): CExpr<Record<string, unknown>, "twilio/create_call", [Liftable<Record<string, unknown>>]>;
+                list(...params: [] | [Liftable<Record<string, unknown>>]): CExpr<Record<string, unknown>, "twilio/list_calls", [] | [Liftable<Record<string, unknown>>]>;
             };
         };
     };
     kinds: {
-        "twilio/create_message": KindSpec<[unknown], unknown>;
-        "twilio/fetch_message": KindSpec<[unknown], unknown>;
-        "twilio/list_messages": KindSpec<unknown[], unknown>;
-        "twilio/create_call": KindSpec<[unknown], unknown>;
-        "twilio/fetch_call": KindSpec<[unknown], unknown>;
-        "twilio/list_calls": KindSpec<unknown[], unknown>;
-        "twilio/record": KindSpec<unknown[], Record<string, unknown>>;
-        "twilio/array": KindSpec<unknown[], unknown[]>;
+        "twilio/create_message": KindSpec<[Record<string, unknown>], Record<string, unknown>>;
+        "twilio/fetch_message": KindSpec<[string], Record<string, unknown>>;
+        "twilio/list_messages": KindSpec<Record<string, unknown>[], Record<string, unknown>>;
+        "twilio/create_call": KindSpec<[Record<string, unknown>], Record<string, unknown>>;
+        "twilio/fetch_call": KindSpec<[string], Record<string, unknown>>;
+        "twilio/list_calls": KindSpec<Record<string, unknown>[], Record<string, unknown>>;
+    };
+    shapes: {
+        "twilio/create_message": string;
+        "twilio/create_call": string;
+        "twilio/list_messages": string;
+        "twilio/list_calls": string;
     };
     traits: {};
     lifts: {};
@@ -48,12 +52,6 @@ export interface TwilioClient {
 }
 
 // @public
-export interface TwilioConfig {
-    accountSid: string;
-    authToken: string;
-}
-
-// @public
 export const twilioInterpreter: Interpreter;
 
 // @public
@@ -61,29 +59,33 @@ export const twilioPlugin: {
     name: "twilio";
     ctors: {
         twilio: {
-            messages: (<A>(sid: A) => {
-                fetch(): CExpr<Record<string, unknown>, "twilio/fetch_message", [A]>;
+            messages: ((sid: string | CExpr<string>) => {
+                fetch(): CExpr<Record<string, unknown>, "twilio/fetch_message", [string | CExpr<string>]>;
             }) & {
-                create<A>(params: A): CExpr<Record<string, unknown>, "twilio/create_message", [A]>;
-                list<A>(params?: A): CExpr<Record<string, unknown>, "twilio/list_messages", [A]>;
+                create(params: Liftable<Record<string, unknown>>): CExpr<Record<string, unknown>, "twilio/create_message", [Liftable<Record<string, unknown>>]>;
+                list(...params: [] | [Liftable<Record<string, unknown>>]): CExpr<Record<string, unknown>, "twilio/list_messages", [] | [Liftable<Record<string, unknown>>]>;
             };
-            calls: (<A>(sid: A) => {
-                fetch(): CExpr<Record<string, unknown>, "twilio/fetch_call", [A]>;
+            calls: ((sid: string | CExpr<string>) => {
+                fetch(): CExpr<Record<string, unknown>, "twilio/fetch_call", [string | CExpr<string>]>;
             }) & {
-                create<A>(params: A): CExpr<Record<string, unknown>, "twilio/create_call", [A]>;
-                list<A>(params?: A): CExpr<Record<string, unknown>, "twilio/list_calls", [A]>;
+                create(params: Liftable<Record<string, unknown>>): CExpr<Record<string, unknown>, "twilio/create_call", [Liftable<Record<string, unknown>>]>;
+                list(...params: [] | [Liftable<Record<string, unknown>>]): CExpr<Record<string, unknown>, "twilio/list_calls", [] | [Liftable<Record<string, unknown>>]>;
             };
         };
     };
     kinds: {
-        "twilio/create_message": KindSpec<[unknown], unknown>;
-        "twilio/fetch_message": KindSpec<[unknown], unknown>;
-        "twilio/list_messages": KindSpec<unknown[], unknown>;
-        "twilio/create_call": KindSpec<[unknown], unknown>;
-        "twilio/fetch_call": KindSpec<[unknown], unknown>;
-        "twilio/list_calls": KindSpec<unknown[], unknown>;
-        "twilio/record": KindSpec<unknown[], Record<string, unknown>>;
-        "twilio/array": KindSpec<unknown[], unknown[]>;
+        "twilio/create_message": KindSpec<[Record<string, unknown>], Record<string, unknown>>;
+        "twilio/fetch_message": KindSpec<[string], Record<string, unknown>>;
+        "twilio/list_messages": KindSpec<Record<string, unknown>[], Record<string, unknown>>;
+        "twilio/create_call": KindSpec<[Record<string, unknown>], Record<string, unknown>>;
+        "twilio/fetch_call": KindSpec<[string], Record<string, unknown>>;
+        "twilio/list_calls": KindSpec<Record<string, unknown>[], Record<string, unknown>>;
+    };
+    shapes: {
+        "twilio/create_message": string;
+        "twilio/create_call": string;
+        "twilio/list_messages": string;
+        "twilio/list_calls": string;
     };
     traits: {};
     lifts: {};
@@ -96,8 +98,9 @@ export function wrapTwilioSdk(client: TwilioSdkClient): TwilioClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/5.5.1/index.d.ts:26:17 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-// dist/5.5.1/index.d.ts:45:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/5.5.1/index.d.ts:13:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/5.5.1/index.d.ts:18:17 - (ae-forgotten-export) The symbol "Liftable" needs to be exported by the entry point index.d.ts
+// dist/5.5.1/index.d.ts:34:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

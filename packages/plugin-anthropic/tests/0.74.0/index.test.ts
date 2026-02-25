@@ -17,8 +17,6 @@ describe("anthropic: messages.create", () => {
     });
     expect(expr.__kind).toBe("anthropic/create_message");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("anthropic/record");
   });
 });
 
@@ -30,8 +28,6 @@ describe("anthropic: messages.countTokens", () => {
     });
     expect(expr.__kind).toBe("anthropic/count_tokens");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("anthropic/record");
   });
 });
 
@@ -51,8 +47,6 @@ describe("anthropic: messages.batches.create", () => {
     });
     expect(expr.__kind).toBe("anthropic/create_message_batch");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("anthropic/record");
   });
 });
 
@@ -79,8 +73,6 @@ describe("anthropic: messages.batches.list", () => {
     const expr = api.messages.batches.list({ limit: 10 });
     expect(expr.__kind).toBe("anthropic/list_message_batches");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("anthropic/record");
   });
 
   it("produces CExpr with no args when omitted", () => {
@@ -122,8 +114,6 @@ describe("anthropic: models.list", () => {
     const expr = api.models.list({ limit: 5 });
     expect(expr.__kind).toBe("anthropic/list_models");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("anthropic/record");
   });
 
   it("produces CExpr with no args when omitted", () => {
@@ -142,8 +132,8 @@ describe("anthropic plugin: unified Plugin shape", () => {
     expect(plugin.name).toBe("anthropic");
   });
 
-  it("has 11 node kinds (9 core + record + array)", () => {
-    expect(Object.keys(plugin.kinds)).toHaveLength(11);
+  it("has 9 node kinds", () => {
+    expect(Object.keys(plugin.kinds)).toHaveLength(9);
   });
 
   it("kinds are all namespaced", () => {

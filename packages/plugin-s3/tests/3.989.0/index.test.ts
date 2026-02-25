@@ -13,8 +13,9 @@ describe("s3: putObject", () => {
     const expr = api.putObject({ Bucket: "my-bucket", Key: "file.txt", Body: "hello" });
     expect(expr.__kind).toBe("s3/put_object");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("s3/record");
+    // With Liftable<T>, plain objects are passed directly (no s3/record wrapping)
+    const paramsArg = expr.__args[0] as Record<string, unknown>;
+    expect(paramsArg.Bucket).toBe("my-bucket");
   });
 
   it("accepts CExpr params (proxy chained value)", () => {
@@ -34,8 +35,8 @@ describe("s3: getObject", () => {
     const expr = api.getObject({ Bucket: "my-bucket", Key: "file.txt" });
     expect(expr.__kind).toBe("s3/get_object");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("s3/record");
+    const paramsArg = expr.__args[0] as Record<string, unknown>;
+    expect(paramsArg.Bucket).toBe("my-bucket");
   });
 });
 
@@ -60,8 +61,8 @@ describe("s3: listObjectsV2", () => {
     const expr = api.listObjectsV2({ Bucket: "my-bucket", Prefix: "uploads/" });
     expect(expr.__kind).toBe("s3/list_objects_v2");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("s3/record");
+    const paramsArg = expr.__args[0] as Record<string, unknown>;
+    expect(paramsArg.Bucket).toBe("my-bucket");
   });
 });
 
@@ -74,8 +75,8 @@ describe("s3 plugin: unified Plugin shape", () => {
     expect(plugin.name).toBe("s3");
   });
 
-  it("has 7 node kinds (5 core + record + array)", () => {
-    expect(Object.keys(plugin.kinds)).toHaveLength(7);
+  it("has 5 node kinds (no record/array with Liftable)", () => {
+    expect(Object.keys(plugin.kinds)).toHaveLength(5);
   });
 
   it("kinds are all namespaced", () => {

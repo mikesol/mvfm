@@ -1,23 +1,22 @@
 /**
  * Type-safety tests for the stripe plugin.
  *
- * Most stripe kinds output `unknown`, so we contrast against
- * `stripe/record` (output: Record<string, unknown>) and
- * `stripe/array` (output: unknown[]) to create type mismatches,
- * and also use `num/literal` (output: number) as an external
+ * After the Liftable<T> migration, stripe/record and stripe/array
+ * no longer exist. Tests use stripe kinds with their Stripe SDK
+ * output types, and `num/literal` (output: number) as an external
  * contrasting type.
  */
 
 import type { DirtyExpr, NodeEntry } from "@mvfm/core";
 import { rewireChildren, swapEntry } from "@mvfm/core";
+import type Stripe from "stripe";
 import { describe, it } from "vitest";
 
 // ─── Known adj shape for type-level tests ────────────────────────
 
 type StripeAdj = {
-  p1: NodeEntry<"stripe/create_payment_intent", ["rec1"], unknown>;
-  rec1: NodeEntry<"stripe/record", [], Record<string, unknown>>;
-  arr1: NodeEntry<"stripe/array", [], unknown[]>;
+  p1: NodeEntry<"stripe/create_payment_intent", ["c1"], Stripe.PaymentIntent>;
+  c1: NodeEntry<"stripe/create_customer", [], Stripe.Customer>;
   n1: NodeEntry<"num/literal", [], number>;
 };
 
@@ -26,9 +25,8 @@ function makeFakeDirty(): DirtyExpr<unknown, "p1", StripeAdj, "n5"> {
   return {
     __id: "p1",
     __adj: {
-      p1: { kind: "stripe/create_payment_intent", children: ["rec1"], out: undefined },
-      rec1: { kind: "stripe/record", children: [], out: {} },
-      arr1: { kind: "stripe/array", children: [], out: [] },
+      p1: { kind: "stripe/create_payment_intent", children: ["c1"], out: undefined },
+      c1: { kind: "stripe/create_customer", children: [], out: undefined },
       n1: { kind: "num/literal", children: [], out: 0 },
     },
     __counter: "n5",
@@ -38,18 +36,18 @@ function makeFakeDirty(): DirtyExpr<unknown, "p1", StripeAdj, "n5"> {
 // ─── Type-level tests ────────────────────────────────────────────
 
 describe("stripe plugin type safety", () => {
-  it("swapEntry preserving Record output on record compiles", () => {
-    const swapped = swapEntry(makeFakeDirty(), "rec1", {
-      kind: "stripe/record" as const,
+  it("swapEntry preserving Customer output compiles", () => {
+    const swapped = swapEntry(makeFakeDirty(), "c1", {
+      kind: "stripe/create_customer" as const,
       children: [] as [],
-      out: {} as Record<string, unknown>,
+      out: undefined as unknown as Stripe.Customer,
     });
     const _check: DirtyExpr<any, any, any, any> = swapped;
     void _check;
   });
 
-  it("swapEntry changing Record to number is error", () => {
-    const swapped = swapEntry(makeFakeDirty(), "rec1", {
+  it("swapEntry changing Customer to number is error", () => {
+    const swapped = swapEntry(makeFakeDirty(), "c1", {
       kind: "num/literal" as const,
       children: [] as [],
       out: 0 as number,
@@ -69,11 +67,11 @@ describe("stripe plugin type safety", () => {
     void _check;
   });
 
-  it("swapEntry changing number to array is error", () => {
+  it("swapEntry changing number to Customer is error", () => {
     const swapped = swapEntry(makeFakeDirty(), "n1", {
-      kind: "stripe/array" as const,
+      kind: "stripe/create_customer" as const,
       children: [] as [],
-      out: [] as unknown[],
+      out: undefined as unknown as Stripe.Customer,
     });
     // @ts-expect-error — SwapTypeError, not DirtyExpr
     const _check: DirtyExpr<any, any, any, any> = swapped;
@@ -81,13 +79,13 @@ describe("stripe plugin type safety", () => {
   });
 
   it("rewireChildren same output type compiles", () => {
-    const rewired = rewireChildren(makeFakeDirty(), "rec1", "rec1");
+    const rewired = rewireChildren(makeFakeDirty(), "c1", "c1");
     const _check: DirtyExpr<any, any, any, any> = rewired;
     void _check;
   });
 
-  it("rewireChildren Record to number is error", () => {
-    const rewired = rewireChildren(makeFakeDirty(), "rec1", "n1");
+  it("rewireChildren Customer to number is error", () => {
+    const rewired = rewireChildren(makeFakeDirty(), "c1", "n1");
     // @ts-expect-error — RewireTypeError, not DirtyExpr
     const _check: DirtyExpr<any, any, any, any> = rewired;
     void _check;

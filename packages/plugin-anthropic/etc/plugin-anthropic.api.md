@@ -5,13 +5,18 @@
 ```ts
 
 import type Anthropic from '@anthropic-ai/sdk';
+import type { BatchCreateParams } from '@anthropic-ai/sdk/resources/messages/batches';
+import type { BatchListParams } from '@anthropic-ai/sdk/resources/messages/batches';
 import type { DeletedMessageBatch } from '@anthropic-ai/sdk/resources/messages/batches';
 import type { Message } from '@anthropic-ai/sdk/resources/messages/messages';
 import type { MessageBatch } from '@anthropic-ai/sdk/resources/messages/batches';
 import type { MessageBatchesPage } from '@anthropic-ai/sdk/resources/messages/batches';
+import type { MessageCountTokensParams } from '@anthropic-ai/sdk/resources/messages/messages';
+import type { MessageCreateParamsNonStreaming } from '@anthropic-ai/sdk/resources/messages/messages';
 import type { MessageTokensCount } from '@anthropic-ai/sdk/resources/messages/messages';
 import type { ModelInfo } from '@anthropic-ai/sdk/resources/models';
 import type { ModelInfosPage } from '@anthropic-ai/sdk/resources/models';
+import type { ModelListParams } from '@anthropic-ai/sdk/resources/models';
 
 // @public
 export const anthropic: {
@@ -19,34 +24,39 @@ export const anthropic: {
     ctors: {
         anthropic: {
             messages: {
-                create<A>(params: A): CExpr<Message, "anthropic/create_message", [A]>;
-                countTokens<A>(params: A): CExpr<MessageTokensCount, "anthropic/count_tokens", [A]>;
+                create(params: Liftable<MessageCreateParamsNonStreaming>): CExpr<Message, "anthropic/create_message", [Liftable<MessageCreateParamsNonStreaming>]>;
+                countTokens(params: Liftable<MessageCountTokensParams>): CExpr<MessageTokensCount, "anthropic/count_tokens", [Liftable<MessageCountTokensParams>]>;
                 batches: {
-                    create<A>(params: A): CExpr<MessageBatch, "anthropic/create_message_batch", [A]>;
-                    retrieve<A>(id: A): CExpr<MessageBatch, "anthropic/retrieve_message_batch", [A]>;
-                    list<A extends readonly unknown[]>(...params: A): CExpr<MessageBatchesPage, "anthropic/list_message_batches", A>;
-                    delete<A>(id: A): CExpr<DeletedMessageBatch, "anthropic/delete_message_batch", [A]>;
-                    cancel<A>(id: A): CExpr<MessageBatch, "anthropic/cancel_message_batch", [A]>;
+                    create(params: Liftable<BatchCreateParams>): CExpr<MessageBatch, "anthropic/create_message_batch", [Liftable<BatchCreateParams>]>;
+                    retrieve(id: string | CExpr<string>): CExpr<MessageBatch, "anthropic/retrieve_message_batch", [string | CExpr<string>]>;
+                    list(...params: [] | [Liftable<BatchListParams>]): CExpr<MessageBatchesPage, "anthropic/list_message_batches", [] | [Liftable<BatchListParams>]>;
+                    delete(id: string | CExpr<string>): CExpr<DeletedMessageBatch, "anthropic/delete_message_batch", [string | CExpr<string>]>;
+                    cancel(id: string | CExpr<string>): CExpr<MessageBatch, "anthropic/cancel_message_batch", [string | CExpr<string>]>;
                 };
             };
             models: {
-                retrieve<A>(id: A): CExpr<ModelInfo, "anthropic/retrieve_model", [A]>;
-                list<A extends readonly unknown[]>(...params: A): CExpr<ModelInfosPage, "anthropic/list_models", A>;
+                retrieve(id: string | CExpr<string>): CExpr<ModelInfo, "anthropic/retrieve_model", [string | CExpr<string>]>;
+                list(...params: [] | [Liftable<ModelListParams>]): CExpr<ModelInfosPage, "anthropic/list_models", [] | [Liftable<ModelListParams>]>;
             };
         };
     };
     kinds: {
-        "anthropic/create_message": KindSpec<[unknown], unknown>;
-        "anthropic/count_tokens": KindSpec<[unknown], unknown>;
-        "anthropic/create_message_batch": KindSpec<[unknown], unknown>;
-        "anthropic/retrieve_message_batch": KindSpec<[unknown], unknown>;
-        "anthropic/list_message_batches": KindSpec<unknown[], unknown>;
-        "anthropic/delete_message_batch": KindSpec<[unknown], unknown>;
-        "anthropic/cancel_message_batch": KindSpec<[unknown], unknown>;
-        "anthropic/retrieve_model": KindSpec<[unknown], unknown>;
-        "anthropic/list_models": KindSpec<unknown[], unknown>;
-        "anthropic/record": KindSpec<unknown[], Record<string, unknown>>;
-        "anthropic/array": KindSpec<unknown[], unknown[]>;
+        "anthropic/create_message": KindSpec<[MessageCreateParamsNonStreaming], Message>;
+        "anthropic/count_tokens": KindSpec<[MessageCountTokensParams], MessageTokensCount>;
+        "anthropic/create_message_batch": KindSpec<[BatchCreateParams], MessageBatch>;
+        "anthropic/retrieve_message_batch": KindSpec<[string], MessageBatch>;
+        "anthropic/list_message_batches": KindSpec<BatchListParams[], MessageBatchesPage>;
+        "anthropic/delete_message_batch": KindSpec<[string], DeletedMessageBatch>;
+        "anthropic/cancel_message_batch": KindSpec<[string], MessageBatch>;
+        "anthropic/retrieve_model": KindSpec<[string], ModelInfo>;
+        "anthropic/list_models": KindSpec<ModelListParams[], ModelInfosPage>;
+    };
+    shapes: {
+        "anthropic/create_message": string;
+        "anthropic/count_tokens": string;
+        "anthropic/create_message_batch": string;
+        "anthropic/list_message_batches": string;
+        "anthropic/list_models": string;
     };
     traits: {};
     lifts: {};
@@ -55,12 +65,6 @@ export const anthropic: {
 // @public
 export interface AnthropicClient {
     request(method: string, path: string, params?: Record<string, unknown>): Promise<unknown>;
-}
-
-// @public
-export interface AnthropicConfig {
-    apiKey: string;
-    baseURL?: string;
 }
 
 // Warning: (ae-forgotten-export) The symbol "Interpreter" needs to be exported by the entry point index.d.ts
@@ -74,34 +78,39 @@ export const anthropicPlugin: {
     ctors: {
         anthropic: {
             messages: {
-                create<A>(params: A): CExpr<Message, "anthropic/create_message", [A]>;
-                countTokens<A>(params: A): CExpr<MessageTokensCount, "anthropic/count_tokens", [A]>;
+                create(params: Liftable<MessageCreateParamsNonStreaming>): CExpr<Message, "anthropic/create_message", [Liftable<MessageCreateParamsNonStreaming>]>;
+                countTokens(params: Liftable<MessageCountTokensParams>): CExpr<MessageTokensCount, "anthropic/count_tokens", [Liftable<MessageCountTokensParams>]>;
                 batches: {
-                    create<A>(params: A): CExpr<MessageBatch, "anthropic/create_message_batch", [A]>;
-                    retrieve<A>(id: A): CExpr<MessageBatch, "anthropic/retrieve_message_batch", [A]>;
-                    list<A extends readonly unknown[]>(...params: A): CExpr<MessageBatchesPage, "anthropic/list_message_batches", A>;
-                    delete<A>(id: A): CExpr<DeletedMessageBatch, "anthropic/delete_message_batch", [A]>;
-                    cancel<A>(id: A): CExpr<MessageBatch, "anthropic/cancel_message_batch", [A]>;
+                    create(params: Liftable<BatchCreateParams>): CExpr<MessageBatch, "anthropic/create_message_batch", [Liftable<BatchCreateParams>]>;
+                    retrieve(id: string | CExpr<string>): CExpr<MessageBatch, "anthropic/retrieve_message_batch", [string | CExpr<string>]>;
+                    list(...params: [] | [Liftable<BatchListParams>]): CExpr<MessageBatchesPage, "anthropic/list_message_batches", [] | [Liftable<BatchListParams>]>;
+                    delete(id: string | CExpr<string>): CExpr<DeletedMessageBatch, "anthropic/delete_message_batch", [string | CExpr<string>]>;
+                    cancel(id: string | CExpr<string>): CExpr<MessageBatch, "anthropic/cancel_message_batch", [string | CExpr<string>]>;
                 };
             };
             models: {
-                retrieve<A>(id: A): CExpr<ModelInfo, "anthropic/retrieve_model", [A]>;
-                list<A extends readonly unknown[]>(...params: A): CExpr<ModelInfosPage, "anthropic/list_models", A>;
+                retrieve(id: string | CExpr<string>): CExpr<ModelInfo, "anthropic/retrieve_model", [string | CExpr<string>]>;
+                list(...params: [] | [Liftable<ModelListParams>]): CExpr<ModelInfosPage, "anthropic/list_models", [] | [Liftable<ModelListParams>]>;
             };
         };
     };
     kinds: {
-        "anthropic/create_message": KindSpec<[unknown], unknown>;
-        "anthropic/count_tokens": KindSpec<[unknown], unknown>;
-        "anthropic/create_message_batch": KindSpec<[unknown], unknown>;
-        "anthropic/retrieve_message_batch": KindSpec<[unknown], unknown>;
-        "anthropic/list_message_batches": KindSpec<unknown[], unknown>;
-        "anthropic/delete_message_batch": KindSpec<[unknown], unknown>;
-        "anthropic/cancel_message_batch": KindSpec<[unknown], unknown>;
-        "anthropic/retrieve_model": KindSpec<[unknown], unknown>;
-        "anthropic/list_models": KindSpec<unknown[], unknown>;
-        "anthropic/record": KindSpec<unknown[], Record<string, unknown>>;
-        "anthropic/array": KindSpec<unknown[], unknown[]>;
+        "anthropic/create_message": KindSpec<[MessageCreateParamsNonStreaming], Message>;
+        "anthropic/count_tokens": KindSpec<[MessageCountTokensParams], MessageTokensCount>;
+        "anthropic/create_message_batch": KindSpec<[BatchCreateParams], MessageBatch>;
+        "anthropic/retrieve_message_batch": KindSpec<[string], MessageBatch>;
+        "anthropic/list_message_batches": KindSpec<BatchListParams[], MessageBatchesPage>;
+        "anthropic/delete_message_batch": KindSpec<[string], DeletedMessageBatch>;
+        "anthropic/cancel_message_batch": KindSpec<[string], MessageBatch>;
+        "anthropic/retrieve_model": KindSpec<[string], ModelInfo>;
+        "anthropic/list_models": KindSpec<ModelListParams[], ModelInfosPage>;
+    };
+    shapes: {
+        "anthropic/create_message": string;
+        "anthropic/count_tokens": string;
+        "anthropic/create_message_batch": string;
+        "anthropic/list_message_batches": string;
+        "anthropic/list_models": string;
     };
     traits: {};
     lifts: {};
@@ -115,8 +124,9 @@ export function wrapAnthropicSdk(client: Anthropic): AnthropicClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/0.74.0/index.d.ts:29:17 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-// dist/0.74.0/index.d.ts:54:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/0.74.0/index.d.ts:18:17 - (ae-forgotten-export) The symbol "Liftable" needs to be exported by the entry point index.d.ts
+// dist/0.74.0/index.d.ts:18:17 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/0.74.0/index.d.ts:43:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

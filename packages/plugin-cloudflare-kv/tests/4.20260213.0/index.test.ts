@@ -52,8 +52,7 @@ describe("cloudflare-kv: put", () => {
     const expr = api.put("key", "val", { expirationTtl: 3600 });
     expect(expr.__kind).toBe("cloudflare-kv/put");
     expect(expr.__args).toHaveLength(3);
-    const optionsArg = expr.__args[2] as { __kind: string };
-    expect(optionsArg.__kind).toBe("cloudflare-kv/record");
+    expect(expr.__args[2]).toEqual({ expirationTtl: 3600 });
   });
 });
 
@@ -71,8 +70,7 @@ describe("cloudflare-kv: list", () => {
     const expr = api.list({ prefix: "user:", limit: 100 });
     expect(expr.__kind).toBe("cloudflare-kv/list");
     expect(expr.__args).toHaveLength(1);
-    const optionsArg = expr.__args[0] as { __kind: string };
-    expect(optionsArg.__kind).toBe("cloudflare-kv/record");
+    expect(expr.__args[0]).toEqual({ prefix: "user:", limit: 100 });
   });
 
   it("produces cloudflare-kv/list CExpr with no children when options omitted", () => {
@@ -91,8 +89,8 @@ describe("cloudflare-kv plugin: unified Plugin shape", () => {
     expect(plugin.name).toBe("cloudflare-kv");
   });
 
-  it("has 7 node kinds (5 core + record + array)", () => {
-    expect(Object.keys(plugin.kinds)).toHaveLength(7);
+  it("has 5 node kinds", () => {
+    expect(Object.keys(plugin.kinds)).toHaveLength(5);
   });
 
   it("kinds are all namespaced", () => {

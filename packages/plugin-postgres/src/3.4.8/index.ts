@@ -17,36 +17,15 @@
 import type { KindSpec, Plugin } from "@mvfm/core";
 import { buildPostgresApi } from "./build-methods";
 
-// ---- Configuration ----------------------------------------
+// ---- Plugin definition ------------------------------------
 
 /**
- * Connection configuration for the postgres plugin.
+ * The postgres plugin definition (unified Plugin type).
  *
- * Accepts the same options as postgres.js: connection string or
- * individual host/port/database/username/password fields, plus
- * SSL, connection pool size, and column name transforms.
- */
-export interface PostgresConfig {
-  connectionString?: string;
-  host?: string;
-  port?: number;
-  database?: string;
-  username?: string;
-  password?: string;
-  ssl?: boolean | object;
-  max?: number;
-  transform?: {
-    column?: { to?: string; from?: string };
-  };
-}
-
-// ---- Plugin factory ---------------------------------------
-
-/**
- * Postgres plugin definition (unified Plugin type).
+ * This plugin has NO defaultInterpreter. You must provide one
+ * via `defaults(plugins, { postgres: createPostgresServerInterpreter(...) })`.
  *
- * This plugin has no defaultInterpreter. You must provide one
- * via `defaults(app, { postgres: createPostgresServerInterpreter(...) })`.
+ * Contributes `$.sql`.
  */
 export const postgres = {
   name: "postgres" as const,
@@ -84,15 +63,10 @@ export const postgres = {
       inputs: [] as [],
       output: [] as unknown[],
     } as KindSpec<[], unknown[]>,
-    // Structural helpers (produced by liftArg)
-    "postgres/record": {
-      inputs: [] as unknown[],
-      output: {} as Record<string, unknown>,
-    } as KindSpec<unknown[], Record<string, unknown>>,
-    "postgres/array": {
-      inputs: [] as unknown[],
-      output: [] as unknown[],
-    } as KindSpec<unknown[], unknown[]>,
+  },
+  shapes: {
+    "postgres/insert_helper": ["*", null],
+    "postgres/set_helper": ["*", null],
   },
   traits: {},
   lifts: {},

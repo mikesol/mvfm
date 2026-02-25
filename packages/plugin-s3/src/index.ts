@@ -1,4 +1,3 @@
-export type { S3Config } from "./3.989.0";
 export { s3, s3Plugin } from "./3.989.0";
 export { wrapAwsSdk } from "./3.989.0/client-aws-sdk";
 export type { ClientHandlerOptions } from "./3.989.0/handler.client";

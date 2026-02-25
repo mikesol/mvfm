@@ -34,8 +34,10 @@ export const cloudflareKv: {
         "cloudflare-kv/put": KindSpec<[string, string], void>;
         "cloudflare-kv/delete": KindSpec<[string], void>;
         "cloudflare-kv/list": KindSpec<[unknown], unknown>;
-        "cloudflare-kv/record": KindSpec<unknown[], Record<string, unknown>>;
-        "cloudflare-kv/array": KindSpec<unknown[], unknown[]>;
+    };
+    shapes: {
+        "cloudflare-kv/put": (string | null)[];
+        "cloudflare-kv/list": string;
     };
     traits: {};
     lifts: {};
@@ -66,11 +68,6 @@ export interface CloudflareKvClient {
 }
 
 // @public
-export interface CloudflareKvConfig {
-    namespaceId: string;
-}
-
-// @public
 export const cloudflareKvPlugin: {
     name: "cloudflare-kv";
     ctors: {
@@ -87,8 +84,10 @@ export const cloudflareKvPlugin: {
         "cloudflare-kv/put": KindSpec<[string, string], void>;
         "cloudflare-kv/delete": KindSpec<[string], void>;
         "cloudflare-kv/list": KindSpec<[unknown], unknown>;
-        "cloudflare-kv/record": KindSpec<unknown[], Record<string, unknown>>;
-        "cloudflare-kv/array": KindSpec<unknown[], unknown[]>;
+    };
+    shapes: {
+        "cloudflare-kv/put": (string | null)[];
+        "cloudflare-kv/list": string;
     };
     traits: {};
     lifts: {};
@@ -163,9 +162,9 @@ export function wrapKVNamespace(kv: KVNamespaceLike): CloudflareKvClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/4.20260213.0/index.d.ts:58:13 - (ae-forgotten-export) The symbol "kvGet" needs to be exported by the entry point index.d.ts
-// dist/4.20260213.0/index.d.ts:60:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-// dist/4.20260213.0/index.d.ts:68:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/4.20260213.0/index.d.ts:62:13 - (ae-forgotten-export) The symbol "kvGet" needs to be exported by the entry point index.d.ts
+// dist/4.20260213.0/index.d.ts:64:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/4.20260213.0/index.d.ts:72:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

@@ -18,9 +18,9 @@ describe("resend: emails.send", () => {
     });
     expect(expr.__kind).toBe("resend/send_email");
     expect(expr.__args).toHaveLength(1);
-    // The params arg should be a resend/record CExpr
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("resend/record");
+    // The params arg is passed directly (no liftArg wrapping)
+    const paramsArg = expr.__args[0] as Record<string, unknown>;
+    expect(paramsArg.from).toBe("onboarding@resend.dev");
   });
 });
 
@@ -48,7 +48,7 @@ describe("resend: emails.get", () => {
 });
 
 describe("resend: batch.send", () => {
-  it("produces resend/send_batch CExpr with array wrapped as resend/array", () => {
+  it("produces resend/send_batch CExpr with array passed directly", () => {
     const expr = api.batch.send([
       {
         from: "onboarding@resend.dev",
@@ -65,9 +65,8 @@ describe("resend: batch.send", () => {
     ]);
     expect(expr.__kind).toBe("resend/send_batch");
     expect(expr.__args).toHaveLength(1);
-    const arrayArg = expr.__args[0] as { __kind: string; __args: unknown[] };
-    expect(arrayArg.__kind).toBe("resend/array");
-    expect(arrayArg.__args).toHaveLength(2);
+    const arrayArg = expr.__args[0] as unknown[];
+    expect(arrayArg).toHaveLength(2);
   });
 });
 
@@ -79,8 +78,8 @@ describe("resend: contacts.create", () => {
     });
     expect(expr.__kind).toBe("resend/create_contact");
     expect(expr.__args).toHaveLength(1);
-    const paramsArg = expr.__args[0] as { __kind: string };
-    expect(paramsArg.__kind).toBe("resend/record");
+    const paramsArg = expr.__args[0] as Record<string, unknown>;
+    expect(paramsArg.email).toBe("user@example.com");
   });
 });
 
@@ -119,8 +118,8 @@ describe("resend plugin: unified Plugin shape", () => {
     expect(plugin.name).toBe("resend");
   });
 
-  it("has 9 node kinds (7 core + record + array)", () => {
-    expect(Object.keys(plugin.kinds)).toHaveLength(9);
+  it("has 7 node kinds", () => {
+    expect(Object.keys(plugin.kinds)).toHaveLength(7);
   });
 
   it("kinds are all namespaced", () => {
