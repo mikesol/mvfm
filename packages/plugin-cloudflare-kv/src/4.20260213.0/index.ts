@@ -17,7 +17,7 @@
 // NO defaultInterpreter — requires createCloudflareKvInterpreter(client).
 // ============================================================
 
-import type { CExpr, KindSpec, Plugin } from "@mvfm/core";
+import type { CExpr, KindSpec, Liftable, Plugin } from "@mvfm/core";
 import { makeCExpr } from "@mvfm/core";
 
 // ---- Supporting types -------------------------------------
@@ -84,12 +84,12 @@ function buildKvApi() {
     get: kvGet,
 
     /** Store a string value at key with optional expiration settings. */
-    put<A, B, C extends readonly unknown[]>(
-      key: A,
-      value: B,
-      ...args: C
-    ): CExpr<void, "cloudflare-kv/put", [A, B, ...C]> {
-      return makeCExpr("cloudflare-kv/put", [key, value, ...args]) as any;
+    put(
+      key: string | CExpr<string>,
+      value: string | CExpr<string>,
+      ...args: [] | [Liftable<KvPutOptions>]
+    ): CExpr<void, "cloudflare-kv/put", [string | CExpr<string>, string | CExpr<string>, ...([] | [Liftable<KvPutOptions>])]> {
+      return makeCExpr("cloudflare-kv/put", [key, value, ...args] as unknown as [string, string]) as any;
     },
 
     /** Delete a key. */
@@ -98,7 +98,7 @@ function buildKvApi() {
     },
 
     /** List keys with optional prefix filter and pagination cursor. */
-    list<A extends readonly unknown[]>(...args: A): CExpr<KvListResult, "cloudflare-kv/list", A> {
+    list(...args: [] | [Liftable<KvListOptions>]): CExpr<KvListResult, "cloudflare-kv/list", [] | [Liftable<KvListOptions>]> {
       return makeCExpr("cloudflare-kv/list", args as unknown as unknown[]) as any;
     },
   };
