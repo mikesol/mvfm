@@ -64,10 +64,7 @@ export interface CoreDollar<S extends Record<string, string> = Record<string, st
 export type MvfmDollar<
   P extends readonly PluginInput[],
   S extends Record<string, string> = Record<string, string>,
-> = Omit<
-  DollarSign<[typeof corePlugin, ...FlattenPluginInputs<P>]>,
-  keyof CoreDollar
-> &
+> = Omit<DollarSign<[typeof corePlugin, ...FlattenPluginInputs<P>]>, keyof CoreDollar> &
   CoreDollar<S>;
 
 // ─── prelude ────────────────────────────────────────────────────────
