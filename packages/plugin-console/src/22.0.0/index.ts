@@ -40,14 +40,6 @@ export type ConsoleMethodName =
   | "trace"
   | "warn";
 
-/**
- * Configuration for the console plugin.
- */
-export interface ConsoleConfig {
-  /** Optional tag for metadata propagation by custom handlers. */
-  tag?: string;
-}
-
 /** Variadic KindSpec for console methods: unknown[] inputs, void output. */
 const variadicVoidKind: KindSpec<unknown[], void> = {
   inputs: [] as unknown[],
@@ -148,46 +140,43 @@ function buildConsoleApi() {
 }
 
 /**
- * Creates the console plugin definition (unified Plugin type).
+ * The console plugin definition (unified Plugin type).
  *
- * @param _config - Optional plugin configuration.
- * @returns A unified Plugin that contributes `$.console`.
+ * Contributes `$.console` with all standard console methods.
  */
-export function console(_config: ConsoleConfig = {}) {
-  return {
-    name: "console" as const,
-    ctors: { console: buildConsoleApi() },
-    kinds: {
-      "console/assert": variadicVoidKind,
-      "console/clear": variadicVoidKind,
-      "console/count": variadicVoidKind,
-      "console/countReset": variadicVoidKind,
-      "console/debug": variadicVoidKind,
-      "console/dir": variadicVoidKind,
-      "console/dirxml": variadicVoidKind,
-      "console/error": variadicVoidKind,
-      "console/group": variadicVoidKind,
-      "console/groupCollapsed": variadicVoidKind,
-      "console/groupEnd": variadicVoidKind,
-      "console/info": variadicVoidKind,
-      "console/log": variadicVoidKind,
-      "console/table": variadicVoidKind,
-      "console/time": variadicVoidKind,
-      "console/timeEnd": variadicVoidKind,
-      "console/timeLog": variadicVoidKind,
-      "console/trace": variadicVoidKind,
-      "console/warn": variadicVoidKind,
-    },
-    shapes: {
-      "console/dir": "*" as const,
-      "console/dirxml": "*" as const,
-      "console/table": "*" as const,
-    },
-    traits: {},
-    lifts: {},
-    defaultInterpreter: (): Interpreter => createConsoleInterpreter(),
-  } satisfies Plugin;
-}
+export const console = {
+  name: "console" as const,
+  ctors: { console: buildConsoleApi() },
+  kinds: {
+    "console/assert": variadicVoidKind,
+    "console/clear": variadicVoidKind,
+    "console/count": variadicVoidKind,
+    "console/countReset": variadicVoidKind,
+    "console/debug": variadicVoidKind,
+    "console/dir": variadicVoidKind,
+    "console/dirxml": variadicVoidKind,
+    "console/error": variadicVoidKind,
+    "console/group": variadicVoidKind,
+    "console/groupCollapsed": variadicVoidKind,
+    "console/groupEnd": variadicVoidKind,
+    "console/info": variadicVoidKind,
+    "console/log": variadicVoidKind,
+    "console/table": variadicVoidKind,
+    "console/time": variadicVoidKind,
+    "console/timeEnd": variadicVoidKind,
+    "console/timeLog": variadicVoidKind,
+    "console/trace": variadicVoidKind,
+    "console/warn": variadicVoidKind,
+  },
+  shapes: {
+    "console/dir": "*" as const,
+    "console/dirxml": "*" as const,
+    "console/table": "*" as const,
+  },
+  traits: {},
+  lifts: {},
+  defaultInterpreter: (): Interpreter => createConsoleInterpreter(),
+} satisfies Plugin;
 
 /**
  * Alias for {@link console}, kept for readability at call sites.

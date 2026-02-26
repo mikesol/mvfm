@@ -12,45 +12,51 @@ import type Stripe from 'stripe';
 export function createStripeInterpreter(client: StripeClient): Interpreter;
 
 // @public
-export function stripe(config: StripeConfig): {
+export const stripe: {
     name: "stripe";
     ctors: {
         stripe: {
             paymentIntents: {
-                create<A>(params: A): CExpr<Record<string, unknown>, "stripe/create_payment_intent", [A]>;
-                retrieve<A>(id: A): CExpr<Record<string, unknown>, "stripe/retrieve_payment_intent", [A]>;
-                confirm<A, B extends readonly unknown[]>(id: A, ...params: B): CExpr<Record<string, unknown>, "stripe/confirm_payment_intent", [A, ...B]>;
+                create(params: Liftable<Stripe.PaymentIntentCreateParams>): CExpr<Stripe.PaymentIntent, "stripe/create_payment_intent", [Liftable<Stripe.PaymentIntentCreateParams>]>;
+                retrieve(id: string | CExpr<string>): CExpr<Stripe.PaymentIntent, "stripe/retrieve_payment_intent", [string | CExpr<string>]>;
+                confirm(id: string | CExpr<string>, ...params: [] | [Liftable<Stripe.PaymentIntentConfirmParams>]): CExpr<Stripe.PaymentIntent, "stripe/confirm_payment_intent", [string | CExpr<string>] | [string | CExpr<string>, Liftable<Stripe.PaymentIntentConfirmParams>]>;
             };
             customers: {
-                create<A>(params: A): CExpr<Record<string, unknown>, "stripe/create_customer", [A]>;
-                retrieve<A>(id: A): CExpr<Record<string, unknown>, "stripe/retrieve_customer", [A]>;
-                update<A, B>(id: A, params: B): CExpr<Record<string, unknown>, "stripe/update_customer", [A, B]>;
-                list<A extends readonly unknown[]>(...params: A): CExpr<Record<string, unknown>, "stripe/list_customers", A>;
+                create(params: Liftable<Stripe.CustomerCreateParams>): CExpr<Stripe.Customer, "stripe/create_customer", [Liftable<Stripe.CustomerCreateParams>]>;
+                retrieve(id: string | CExpr<string>): CExpr<Stripe.Customer, "stripe/retrieve_customer", [string | CExpr<string>]>;
+                update(id: string | CExpr<string>, params: Liftable<Stripe.CustomerUpdateParams>): CExpr<Stripe.Customer, "stripe/update_customer", [string | CExpr<string>, Liftable<Stripe.CustomerUpdateParams>]>;
+                list(...params: [] | [Liftable<Stripe.CustomerListParams>]): CExpr<Stripe.ApiList<Stripe.Customer>, "stripe/list_customers", [] | [Liftable<Stripe.CustomerListParams>]>;
             };
             charges: {
-                create<A>(params: A): CExpr<Record<string, unknown>, "stripe/create_charge", [A]>;
-                retrieve<A>(id: A): CExpr<Record<string, unknown>, "stripe/retrieve_charge", [A]>;
-                list<A extends readonly unknown[]>(...params: A): CExpr<Record<string, unknown>, "stripe/list_charges", A>;
+                create(params: Liftable<Stripe.ChargeCreateParams>): CExpr<Stripe.Charge, "stripe/create_charge", [Liftable<Stripe.ChargeCreateParams>]>;
+                retrieve(id: string | CExpr<string>): CExpr<Stripe.Charge, "stripe/retrieve_charge", [string | CExpr<string>]>;
+                list(...params: [] | [Liftable<Stripe.ChargeListParams>]): CExpr<Stripe.ApiList<Stripe.Charge>, "stripe/list_charges", [] | [Liftable<Stripe.ChargeListParams>]>;
             };
         };
     };
     kinds: {
-        "stripe/create_payment_intent": KindSpec<[unknown], unknown>;
-        "stripe/retrieve_payment_intent": KindSpec<[unknown], unknown>;
-        "stripe/confirm_payment_intent": KindSpec<[unknown], unknown>;
-        "stripe/create_customer": KindSpec<[unknown], unknown>;
-        "stripe/retrieve_customer": KindSpec<[unknown], unknown>;
-        "stripe/update_customer": KindSpec<[unknown, unknown], unknown>;
-        "stripe/list_customers": KindSpec<unknown[], unknown>;
-        "stripe/create_charge": KindSpec<[unknown], unknown>;
-        "stripe/retrieve_charge": KindSpec<[unknown], unknown>;
-        "stripe/list_charges": KindSpec<unknown[], unknown>;
-        "stripe/record": KindSpec<unknown[], Record<string, unknown>>;
-        "stripe/array": KindSpec<unknown[], unknown[]>;
+        "stripe/create_payment_intent": KindSpec<[Stripe.PaymentIntentCreateParams], Stripe.PaymentIntent>;
+        "stripe/retrieve_payment_intent": KindSpec<[string], Stripe.PaymentIntent>;
+        "stripe/confirm_payment_intent": KindSpec<[string], Stripe.PaymentIntent>;
+        "stripe/create_customer": KindSpec<[Stripe.CustomerCreateParams], Stripe.Customer>;
+        "stripe/retrieve_customer": KindSpec<[string], Stripe.Customer>;
+        "stripe/update_customer": KindSpec<[string, Stripe.CustomerUpdateParams], Stripe.Customer>;
+        "stripe/list_customers": KindSpec<Stripe.CustomerListParams[], Stripe.ApiList<Stripe.Customer>>;
+        "stripe/create_charge": KindSpec<[Stripe.ChargeCreateParams], Stripe.Charge>;
+        "stripe/retrieve_charge": KindSpec<[string], Stripe.Charge>;
+        "stripe/list_charges": KindSpec<Stripe.ChargeListParams[], Stripe.ApiList<Stripe.Charge>>;
+    };
+    shapes: {
+        "stripe/create_payment_intent": string;
+        "stripe/confirm_payment_intent": (string | null)[];
+        "stripe/create_customer": string;
+        "stripe/update_customer": (string | null)[];
+        "stripe/list_customers": string;
+        "stripe/create_charge": string;
+        "stripe/list_charges": string;
     };
     traits: {};
     lifts: {};
-    defaultInterpreter: () => Interpreter;
 };
 
 // @public
@@ -59,24 +65,64 @@ export interface StripeClient {
 }
 
 // @public
-export interface StripeConfig {
-    apiKey: string;
-    apiVersion?: string;
-}
-
-// @public
 export const stripeInterpreter: Interpreter;
 
 // @public
-export const stripePlugin: typeof stripe;
+export const stripePlugin: {
+    name: "stripe";
+    ctors: {
+        stripe: {
+            paymentIntents: {
+                create(params: Liftable<Stripe.PaymentIntentCreateParams>): CExpr<Stripe.PaymentIntent, "stripe/create_payment_intent", [Liftable<Stripe.PaymentIntentCreateParams>]>;
+                retrieve(id: string | CExpr<string>): CExpr<Stripe.PaymentIntent, "stripe/retrieve_payment_intent", [string | CExpr<string>]>;
+                confirm(id: string | CExpr<string>, ...params: [] | [Liftable<Stripe.PaymentIntentConfirmParams>]): CExpr<Stripe.PaymentIntent, "stripe/confirm_payment_intent", [string | CExpr<string>] | [string | CExpr<string>, Liftable<Stripe.PaymentIntentConfirmParams>]>;
+            };
+            customers: {
+                create(params: Liftable<Stripe.CustomerCreateParams>): CExpr<Stripe.Customer, "stripe/create_customer", [Liftable<Stripe.CustomerCreateParams>]>;
+                retrieve(id: string | CExpr<string>): CExpr<Stripe.Customer, "stripe/retrieve_customer", [string | CExpr<string>]>;
+                update(id: string | CExpr<string>, params: Liftable<Stripe.CustomerUpdateParams>): CExpr<Stripe.Customer, "stripe/update_customer", [string | CExpr<string>, Liftable<Stripe.CustomerUpdateParams>]>;
+                list(...params: [] | [Liftable<Stripe.CustomerListParams>]): CExpr<Stripe.ApiList<Stripe.Customer>, "stripe/list_customers", [] | [Liftable<Stripe.CustomerListParams>]>;
+            };
+            charges: {
+                create(params: Liftable<Stripe.ChargeCreateParams>): CExpr<Stripe.Charge, "stripe/create_charge", [Liftable<Stripe.ChargeCreateParams>]>;
+                retrieve(id: string | CExpr<string>): CExpr<Stripe.Charge, "stripe/retrieve_charge", [string | CExpr<string>]>;
+                list(...params: [] | [Liftable<Stripe.ChargeListParams>]): CExpr<Stripe.ApiList<Stripe.Charge>, "stripe/list_charges", [] | [Liftable<Stripe.ChargeListParams>]>;
+            };
+        };
+    };
+    kinds: {
+        "stripe/create_payment_intent": KindSpec<[Stripe.PaymentIntentCreateParams], Stripe.PaymentIntent>;
+        "stripe/retrieve_payment_intent": KindSpec<[string], Stripe.PaymentIntent>;
+        "stripe/confirm_payment_intent": KindSpec<[string], Stripe.PaymentIntent>;
+        "stripe/create_customer": KindSpec<[Stripe.CustomerCreateParams], Stripe.Customer>;
+        "stripe/retrieve_customer": KindSpec<[string], Stripe.Customer>;
+        "stripe/update_customer": KindSpec<[string, Stripe.CustomerUpdateParams], Stripe.Customer>;
+        "stripe/list_customers": KindSpec<Stripe.CustomerListParams[], Stripe.ApiList<Stripe.Customer>>;
+        "stripe/create_charge": KindSpec<[Stripe.ChargeCreateParams], Stripe.Charge>;
+        "stripe/retrieve_charge": KindSpec<[string], Stripe.Charge>;
+        "stripe/list_charges": KindSpec<Stripe.ChargeListParams[], Stripe.ApiList<Stripe.Charge>>;
+    };
+    shapes: {
+        "stripe/create_payment_intent": string;
+        "stripe/confirm_payment_intent": (string | null)[];
+        "stripe/create_customer": string;
+        "stripe/update_customer": (string | null)[];
+        "stripe/list_customers": string;
+        "stripe/create_charge": string;
+        "stripe/list_charges": string;
+    };
+    traits: {};
+    lifts: {};
+};
 
 // @public
 export function wrapStripeSdk(stripe: Stripe): StripeClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/2025-04-30.basil/index.d.ts:26:17 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-// dist/2025-04-30.basil/index.d.ts:53:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/2025-04-30.basil/index.d.ts:16:17 - (ae-forgotten-export) The symbol "Liftable" needs to be exported by the entry point index.d.ts
+// dist/2025-04-30.basil/index.d.ts:16:17 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/2025-04-30.basil/index.d.ts:43:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

@@ -1,0 +1,21 @@
+{
+  "name": "@mvfm/e2e",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "build": "echo 'no build needed'"
+  },
+  "devDependencies": {
+    "@mvfm/core": "workspace:*",
+    "@mvfm/plugin-openai": "workspace:*",
+    "@mvfm/plugin-postgres": "workspace:*",
+    "@mvfm/plugin-stripe": "workspace:*",
+    "@testcontainers/postgresql": "^11.11.0",
+    "openai": "^6.21.0",
+    "postgres": "^3.4.8",
+    "stripe": "^17.0.0",
+    "testcontainers": "^10.0.0"
+  }
+}

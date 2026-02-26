@@ -21,11 +21,11 @@ export function clientInterpreter(options: ClientHandlerOptions, kinds: string[]
 export function createFetchInterpreter(client?: FetchClient, config?: FetchConfig): Interpreter;
 
 // @public
-function fetch_2(config?: FetchConfig): {
+const fetch_2: {
     name: "fetch";
     ctors: {
         fetch: {
-            <A, B extends readonly unknown[]>(url: A, ...init: B): CExpr<unknown, "fetch/request", [A, ...B]>;
+            (url: string | CExpr<string>, ...init: [] | [Liftable<FetchRequestInit>]): CExpr<unknown, "fetch/request", [string | CExpr<string>] | [string | CExpr<string>, Liftable<FetchRequestInit>]>;
             json<A>(response: A): CExpr<unknown, "fetch/json", [A]>;
             text<A>(response: A): CExpr<string, "fetch/text", [A]>;
             status<A>(response: A): CExpr<number, "fetch/status", [A]>;
@@ -38,8 +38,9 @@ function fetch_2(config?: FetchConfig): {
         "fetch/text": KindSpec<[unknown], string>;
         "fetch/status": KindSpec<[unknown], number>;
         "fetch/headers": KindSpec<[unknown], Record<string, string>>;
-        "fetch/record": KindSpec<unknown[], Record<string, unknown>>;
-        "fetch/array": KindSpec<unknown[], unknown[]>;
+    };
+    shapes: {
+        "fetch/request": [null, "*"];
     };
     traits: {};
     lifts: {};
@@ -100,8 +101,9 @@ export function wrapFetch(fetchFn?: typeof globalThis.fetch): FetchClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/whatwg/index.d.ts:42:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-// dist/whatwg/index.d.ts:50:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/whatwg/index.d.ts:39:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/whatwg/index.d.ts:39:13 - (ae-forgotten-export) The symbol "Liftable" needs to be exported by the entry point index.d.ts
+// dist/whatwg/index.d.ts:47:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

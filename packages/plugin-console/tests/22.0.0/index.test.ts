@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { consolePlugin } from "../../src/22.0.0";
 
-const plugin = consolePlugin();
+const plugin = consolePlugin;
 const api = plugin.ctors.console;
 
 const cases: ReadonlyArray<{ method: string; args: unknown[] }> = [

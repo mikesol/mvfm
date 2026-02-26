@@ -16,7 +16,7 @@ import { createResendInterpreter } from "../../src/6.9.2/interpreter";
 let server: http.Server;
 let port: number;
 
-const plugin = resendPlugin({ apiKey: "re_test_fake" });
+const plugin = resendPlugin;
 const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
 const $ = composeDollar(...plugins);
 const app = createApp(...plugins);

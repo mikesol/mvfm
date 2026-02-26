@@ -5,7 +5,7 @@ const CF_KV = ["@mvfm/plugin-cloudflare-kv"];
 const examples: Record<string, NodeExample> = {
   "cloudflare-kv/get": {
     description: "Get a text value by key, returning null if missing",
-    code: `const app = mvfm(prelude, cloudflareKv({ namespaceId: "MY_KV" }));
+    code: `const app = mvfm(prelude, cloudflareKv);
 const prog = app({}, ($) => {
   return $.begin(
     $.kv.put("greeting", "hello"),
@@ -22,7 +22,7 @@ await fold(
 
   "cloudflare-kv/get_json": {
     description: "Get a JSON-parsed value by key, returning null if missing",
-    code: `const app = mvfm(prelude, cloudflareKv({ namespaceId: "MY_KV" }));
+    code: `const app = mvfm(prelude, cloudflareKv);
 const prog = app({}, ($) => {
   return $.begin(
     $.kv.put("user", JSON.stringify({ name: "Alice", age: 30 })),
@@ -39,7 +39,7 @@ await fold(
 
   "cloudflare-kv/put": {
     description: "Store a string value at a key with optional expiration",
-    code: `const app = mvfm(prelude, cloudflareKv({ namespaceId: "MY_KV" }));
+    code: `const app = mvfm(prelude, cloudflareKv);
 const prog = app({}, ($) => {
   return $.begin(
     $.kv.put("session", "abc123", { expirationTtl: 3600 }),
@@ -56,7 +56,7 @@ await fold(
 
   "cloudflare-kv/delete": {
     description: "Remove a key from the KV namespace",
-    code: `const app = mvfm(prelude, cloudflareKv({ namespaceId: "MY_KV" }));
+    code: `const app = mvfm(prelude, cloudflareKv);
 const prog = app({}, ($) => {
   return $.begin(
     $.kv.put("temp", "data"),
@@ -74,7 +74,7 @@ await fold(
 
   "cloudflare-kv/list": {
     description: "List keys with optional prefix filter and pagination",
-    code: `const app = mvfm(prelude, cloudflareKv({ namespaceId: "MY_KV" }));
+    code: `const app = mvfm(prelude, cloudflareKv);
 const prog = app({}, ($) => {
   return $.begin(
     $.kv.put("user:1", "Alice"),

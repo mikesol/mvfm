@@ -12,7 +12,7 @@ import { falInterpreter } from "../../src";
 import { fal } from "../../src/1.9.1";
 import { createFalInterpreter, type FalClient } from "../../src/1.9.1/interpreter";
 
-const plugin = fal({ credentials: "key_test_123" });
+const plugin = fal;
 const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
 const $ = composeDollar(...plugins);
 const app = createApp(...plugins);

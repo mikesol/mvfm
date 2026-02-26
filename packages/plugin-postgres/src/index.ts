@@ -1,4 +1,3 @@
-export type { PostgresConfig } from "./3.4.8";
 export { postgres, postgresPlugin } from "./3.4.8";
 export { wrapPostgresJs } from "./3.4.8/client-postgres-js";
 export type { ClientHandlerOptions } from "./3.4.8/handler.client";

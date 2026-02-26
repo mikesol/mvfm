@@ -132,6 +132,36 @@ importers:
         specifier: ^4.21.0
         version: 4.21.0
 
+  packages/e2e:
+    devDependencies:
+      '@mvfm/core':
+        specifier: workspace:*
+        version: link:../core
+      '@mvfm/plugin-openai':
+        specifier: workspace:*
+        version: link:../plugin-openai
+      '@mvfm/plugin-postgres':
+        specifier: workspace:*
+        version: link:../plugin-postgres
+      '@mvfm/plugin-stripe':
+        specifier: workspace:*
+        version: link:../plugin-stripe
+      '@testcontainers/postgresql':
+        specifier: ^11.11.0
+        version: 11.11.0
+      openai:
+        specifier: ^6.21.0
+        version: 6.22.0(ws@8.18.0)(zod@4.3.6)
+      postgres:
+        specifier: ^3.4.8
+        version: 3.4.8
+      stripe:
+        specifier: ^17.0.0
+        version: 17.7.0
+      testcontainers:
+        specifier: ^10.0.0
+        version: 10.28.0
+
   packages/plugin-anthropic:
     devDependencies:
       '@anthropic-ai/sdk':
@@ -3704,6 +3734,10 @@ packages:
   strip-json-comments@3.1.1:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
+
+  stripe@17.7.0:
+    resolution: {integrity: sha512-aT2BU9KkizY9SATf14WhhYVv2uOapBWX0OFWF4xvcj1mPaNotlSc2CsxpS4DS46ZueSppmCF5BX1sNYBtwBvfw==}
+    engines: {node: '>=12.*'}
 
   stripe@20.3.1:
     resolution: {integrity: sha512-k990yOT5G5rhX3XluRPw5Y8RLdJDW4dzQ29wWT66piHrbnM2KyamJ1dKgPsw4HzGHRWjDiSSdcI2WdxQUPV3aQ==}
@@ -8352,6 +8386,11 @@ snapshots:
       ansi-regex: 6.2.2
 
   strip-json-comments@3.1.1: {}
+
+  stripe@17.7.0:
+    dependencies:
+      '@types/node': 25.2.3
+      qs: 6.15.0
 
   stripe@20.3.1(@types/node@25.2.3):
     optionalDependencies:

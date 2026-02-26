@@ -30,25 +30,8 @@ import type {
   ModelInfosPage,
   ModelListParams,
 } from "@anthropic-ai/sdk/resources/models";
-import type { CExpr, Interpreter, KindSpec, Liftable, Plugin } from "@mvfm/core";
+import type { CExpr, KindSpec, Liftable, Plugin } from "@mvfm/core";
 import { makeCExpr } from "@mvfm/core";
-import { wrapAnthropicSdk } from "./client-anthropic-sdk";
-import { type AnthropicClient, createAnthropicInterpreter } from "./interpreter";
-
-// ---- Configuration ----------------------------------------
-
-/**
- * Configuration for the anthropic plugin.
- *
- * Requires an API key. Optionally accepts a baseURL to override
- * the default Anthropic API endpoint.
- */
-export interface AnthropicConfig {
-  /** Anthropic API key (e.g. `sk-ant-api03-...`). */
-  apiKey: string;
-  /** Base URL override for the Anthropic API. */
-  baseURL?: string;
-}
 
 // ---- Constructor builder ----------------------------------
 
@@ -127,102 +110,66 @@ function buildAnthropicApi() {
   };
 }
 
-// ---- Default interpreter wiring ---------------------------
-
-const dynamicImport = new Function("m", "return import(m)") as (
-  moduleName: string,
-) => Promise<Record<string, unknown>>;
-
-function createDefaultInterpreter(config: AnthropicConfig): Interpreter {
-  let clientPromise: Promise<AnthropicClient> | undefined;
-  const getClient = async (): Promise<AnthropicClient> => {
-    if (!clientPromise) {
-      clientPromise = dynamicImport("@anthropic-ai/sdk").then((moduleValue) => {
-        const Anthropic = moduleValue.default as new (
-          opts: AnthropicConfig,
-        ) => Parameters<typeof wrapAnthropicSdk>[0];
-        return wrapAnthropicSdk(new Anthropic(config));
-      });
-    }
-    return clientPromise;
-  };
-
-  const lazyClient: AnthropicClient = {
-    async request(
-      method: string,
-      path: string,
-      params?: Record<string, unknown>,
-    ): Promise<unknown> {
-      const client = await getClient();
-      return client.request(method, path, params);
-    },
-  };
-
-  return createAnthropicInterpreter(lazyClient);
-}
-
-// ---- Plugin factory ---------------------------------------
+// ---- Plugin definition ------------------------------------
 
 /**
- * Creates the anthropic plugin definition (unified Plugin type).
+ * The anthropic plugin definition (unified Plugin type).
  *
- * @param config - An {@link AnthropicConfig} with apiKey and optional baseURL.
- * @returns A unified Plugin that contributes `$.anthropic`.
+ * Contributes `$.anthropic` with messages and models API.
+ * Requires an interpreter provided via
+ * `defaults(plugins, { anthropic: createAnthropicInterpreter(client) })`.
  */
-export function anthropic(config: AnthropicConfig) {
-  return {
-    name: "anthropic" as const,
-    ctors: { anthropic: buildAnthropicApi() },
-    kinds: {
-      "anthropic/create_message": {
-        inputs: [undefined as unknown as MessageCreateParamsNonStreaming],
-        output: undefined as unknown as Message,
-      } as KindSpec<[MessageCreateParamsNonStreaming], Message>,
-      "anthropic/count_tokens": {
-        inputs: [undefined as unknown as MessageCountTokensParams],
-        output: undefined as unknown as MessageTokensCount,
-      } as KindSpec<[MessageCountTokensParams], MessageTokensCount>,
-      "anthropic/create_message_batch": {
-        inputs: [undefined as unknown as BatchCreateParams],
-        output: undefined as unknown as MessageBatch,
-      } as KindSpec<[BatchCreateParams], MessageBatch>,
-      "anthropic/retrieve_message_batch": {
-        inputs: [""] as [string],
-        output: undefined as unknown as MessageBatch,
-      } as KindSpec<[string], MessageBatch>,
-      "anthropic/list_message_batches": {
-        inputs: [] as BatchListParams[],
-        output: undefined as unknown as MessageBatchesPage,
-      } as KindSpec<BatchListParams[], MessageBatchesPage>,
-      "anthropic/delete_message_batch": {
-        inputs: [""] as [string],
-        output: undefined as unknown as DeletedMessageBatch,
-      } as KindSpec<[string], DeletedMessageBatch>,
-      "anthropic/cancel_message_batch": {
-        inputs: [""] as [string],
-        output: undefined as unknown as MessageBatch,
-      } as KindSpec<[string], MessageBatch>,
-      "anthropic/retrieve_model": {
-        inputs: [""] as [string],
-        output: undefined as unknown as ModelInfo,
-      } as KindSpec<[string], ModelInfo>,
-      "anthropic/list_models": {
-        inputs: [] as ModelListParams[],
-        output: undefined as unknown as ModelInfosPage,
-      } as KindSpec<ModelListParams[], ModelInfosPage>,
-    },
-    shapes: {
-      "anthropic/create_message": "*",
-      "anthropic/count_tokens": "*",
-      "anthropic/create_message_batch": "*",
-      "anthropic/list_message_batches": "*",
-      "anthropic/list_models": "*",
-    },
-    traits: {},
-    lifts: {},
-    defaultInterpreter: (): Interpreter => createDefaultInterpreter(config),
-  } satisfies Plugin;
-}
+export const anthropic = {
+  name: "anthropic" as const,
+  ctors: { anthropic: buildAnthropicApi() },
+  kinds: {
+    "anthropic/create_message": {
+      inputs: [undefined as unknown as MessageCreateParamsNonStreaming],
+      output: undefined as unknown as Message,
+    } as KindSpec<[MessageCreateParamsNonStreaming], Message>,
+    "anthropic/count_tokens": {
+      inputs: [undefined as unknown as MessageCountTokensParams],
+      output: undefined as unknown as MessageTokensCount,
+    } as KindSpec<[MessageCountTokensParams], MessageTokensCount>,
+    "anthropic/create_message_batch": {
+      inputs: [undefined as unknown as BatchCreateParams],
+      output: undefined as unknown as MessageBatch,
+    } as KindSpec<[BatchCreateParams], MessageBatch>,
+    "anthropic/retrieve_message_batch": {
+      inputs: [""] as [string],
+      output: undefined as unknown as MessageBatch,
+    } as KindSpec<[string], MessageBatch>,
+    "anthropic/list_message_batches": {
+      inputs: [] as BatchListParams[],
+      output: undefined as unknown as MessageBatchesPage,
+    } as KindSpec<BatchListParams[], MessageBatchesPage>,
+    "anthropic/delete_message_batch": {
+      inputs: [""] as [string],
+      output: undefined as unknown as DeletedMessageBatch,
+    } as KindSpec<[string], DeletedMessageBatch>,
+    "anthropic/cancel_message_batch": {
+      inputs: [""] as [string],
+      output: undefined as unknown as MessageBatch,
+    } as KindSpec<[string], MessageBatch>,
+    "anthropic/retrieve_model": {
+      inputs: [""] as [string],
+      output: undefined as unknown as ModelInfo,
+    } as KindSpec<[string], ModelInfo>,
+    "anthropic/list_models": {
+      inputs: [] as ModelListParams[],
+      output: undefined as unknown as ModelInfosPage,
+    } as KindSpec<ModelListParams[], ModelInfosPage>,
+  },
+  shapes: {
+    "anthropic/create_message": "*",
+    "anthropic/count_tokens": "*",
+    "anthropic/create_message_batch": "*",
+    "anthropic/list_message_batches": "*",
+    "anthropic/list_models": "*",
+  },
+  traits: {},
+  lifts: {},
+} satisfies Plugin;
 
 /**
  * Alias for {@link anthropic}, kept for readability at call sites.

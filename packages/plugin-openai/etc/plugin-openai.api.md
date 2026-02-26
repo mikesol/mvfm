@@ -24,7 +24,7 @@ import type OpenAI from 'openai';
 export function createOpenAIInterpreter(client: OpenAIClient): Interpreter;
 
 // @public
-export function openai(config: OpenAIConfig): {
+export const openai: {
     name: "openai";
     ctors: {
         openai: {
@@ -68,7 +68,6 @@ export function openai(config: OpenAIConfig): {
     };
     traits: {};
     lifts: {};
-    defaultInterpreter: () => Interpreter;
 };
 
 // @public
@@ -87,7 +86,51 @@ export interface OpenAIConfig {
 export const openaiInterpreter: Interpreter;
 
 // @public
-export const openaiPlugin: typeof openai;
+export const openaiPlugin: {
+    name: "openai";
+    ctors: {
+        openai: {
+            chat: {
+                completions: {
+                    create(params: Liftable<ChatCompletionCreateParamsNonStreaming>): CExpr<ChatCompletion, "openai/create_chat_completion", [Liftable<ChatCompletionCreateParamsNonStreaming>]>;
+                    retrieve(id: string | CExpr<string>): CExpr<ChatCompletion, "openai/retrieve_chat_completion", [string | CExpr<string>]>;
+                    list(...params: [] | [Liftable<ChatCompletionListParams>]): CExpr<ChatCompletionsPage, "openai/list_chat_completions", [] | [Liftable<ChatCompletionListParams>]>;
+                    update(id: string | CExpr<string>, params: Liftable<ChatCompletionUpdateParams>): CExpr<ChatCompletion, "openai/update_chat_completion", [string | CExpr<string>, Liftable<ChatCompletionUpdateParams>]>;
+                    delete(id: string | CExpr<string>): CExpr<ChatCompletionDeleted, "openai/delete_chat_completion", [string | CExpr<string>]>;
+                };
+            };
+            embeddings: {
+                create(params: Liftable<EmbeddingCreateParams>): CExpr<CreateEmbeddingResponse, "openai/create_embedding", [Liftable<EmbeddingCreateParams>]>;
+            };
+            moderations: {
+                create(params: Liftable<ModerationCreateParams>): CExpr<ModerationCreateResponse, "openai/create_moderation", [Liftable<ModerationCreateParams>]>;
+            };
+            completions: {
+                create(params: Liftable<CompletionCreateParamsNonStreaming>): CExpr<Completion, "openai/create_completion", [Liftable<CompletionCreateParamsNonStreaming>]>;
+            };
+        };
+    };
+    kinds: {
+        "openai/create_chat_completion": KindSpec<[ChatCompletionCreateParamsNonStreaming], ChatCompletion>;
+        "openai/retrieve_chat_completion": KindSpec<[string], ChatCompletion>;
+        "openai/list_chat_completions": KindSpec<ChatCompletionListParams[], ChatCompletionsPage>;
+        "openai/update_chat_completion": KindSpec<[string, ChatCompletionUpdateParams], ChatCompletion>;
+        "openai/delete_chat_completion": KindSpec<[string], ChatCompletionDeleted>;
+        "openai/create_embedding": KindSpec<[EmbeddingCreateParams], CreateEmbeddingResponse>;
+        "openai/create_moderation": KindSpec<[ModerationCreateParams], ModerationCreateResponse>;
+        "openai/create_completion": KindSpec<[CompletionCreateParamsNonStreaming], Completion>;
+    };
+    shapes: {
+        "openai/create_chat_completion": string;
+        "openai/list_chat_completions": string;
+        "openai/update_chat_completion": (string | null)[];
+        "openai/create_embedding": string;
+        "openai/create_moderation": string;
+        "openai/create_completion": string;
+    };
+    traits: {};
+    lifts: {};
+};
 
 // @public
 export function wrapOpenAISdk(client: OpenAI): OpenAIClient;

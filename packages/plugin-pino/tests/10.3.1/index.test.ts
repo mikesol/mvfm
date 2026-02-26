@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { pino, pinoPlugin } from "../../src/10.3.1";
 
-const plugin = pino({ level: "info" });
+const plugin = pino;
 const api = plugin.ctors.pino;
 
 // ============================================================
@@ -122,12 +122,8 @@ describe("pino: unified Plugin shape", () => {
     expect(plugin.lifts).toEqual({});
   });
 
-  it("has a defaultInterpreter factory", () => {
-    expect(typeof plugin.defaultInterpreter).toBe("function");
-    const interp = plugin.defaultInterpreter();
-    for (const kind of Object.keys(plugin.kinds)) {
-      expect(typeof interp[kind]).toBe("function");
-    }
+  it("has NO defaultInterpreter", () => {
+    expect(plugin.defaultInterpreter).toBeUndefined();
   });
 
   it("pinoPlugin is an alias for pino", () => {

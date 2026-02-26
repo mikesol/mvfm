@@ -12,7 +12,7 @@ import { stripeInterpreter } from "../../src";
 import { stripe } from "../../src/2025-04-30.basil";
 import { createStripeInterpreter, type StripeClient } from "../../src/2025-04-30.basil/interpreter";
 
-const plugin = stripe({ apiKey: "sk_test_123" });
+const plugin = stripe;
 const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
 const $ = composeDollar(...plugins);
 const app = createApp(...plugins);

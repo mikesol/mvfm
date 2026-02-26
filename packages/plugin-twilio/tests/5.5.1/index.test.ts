@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { twilio, twilioPlugin } from "../../src/5.5.1";
 
-const plugin = twilio({ accountSid: "AC_test_123", authToken: "auth_test_456" });
+const plugin = twilio;
 const api = plugin.ctors.twilio;
 
 // ============================================================
@@ -137,8 +137,8 @@ describe("twilio plugin: unified Plugin shape", () => {
     expect(plugin.lifts).toEqual({});
   });
 
-  it("has a defaultInterpreter factory", () => {
-    expect(typeof plugin.defaultInterpreter).toBe("function");
+  it("has NO defaultInterpreter", () => {
+    expect(plugin.defaultInterpreter).toBeUndefined();
   });
 });
 

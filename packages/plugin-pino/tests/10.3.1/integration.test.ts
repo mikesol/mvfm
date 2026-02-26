@@ -6,7 +6,7 @@ import { pino } from "../../src/10.3.1";
 import { wrapPino } from "../../src/10.3.1/client-pino";
 import { serverEvaluate } from "../../src/10.3.1/handler.server";
 
-const plugin = pino({ level: "trace" });
+const plugin = pino;
 const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
 const $ = composeDollar(...plugins);
 const app = createApp(...plugins);
@@ -26,7 +26,7 @@ function createCapturingLogger() {
 async function run(expr: unknown, logger: unknown) {
   const nexpr = app(expr as any);
   const client = wrapPino(logger as Parameters<typeof wrapPino>[0]);
-  const baseInterp = defaults(plugins);
+  const baseInterp = defaults([numPlugin, strPlugin, boolPlugin]);
   const evaluate = serverEvaluate(client, baseInterp);
   return await evaluate(nexpr);
 }

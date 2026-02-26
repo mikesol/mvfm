@@ -1,7 +1,6 @@
 import type { Interpreter, RuntimeEntry } from "@mvfm/core";
 import { resolveStructured } from "@mvfm/core";
 import { wrapAnthropicSdk } from "./client-anthropic-sdk";
-import type { AnthropicConfig } from "./index";
 
 /**
  * Anthropic client interface consumed by the anthropic handler.
@@ -137,9 +136,9 @@ export const anthropicInterpreter: Interpreter = lazyInterpreter(() =>
         if (!clientPromise) {
           const apiKey = requiredEnv("ANTHROPIC_API_KEY");
           clientPromise = dynamicImport("@anthropic-ai/sdk").then((moduleValue) => {
-            const Anthropic = moduleValue.default as new (
-              opts: AnthropicConfig,
-            ) => Parameters<typeof wrapAnthropicSdk>[0];
+            const Anthropic = moduleValue.default as new (opts: {
+              apiKey: string;
+            }) => Parameters<typeof wrapAnthropicSdk>[0];
             return wrapAnthropicSdk(new Anthropic({ apiKey }));
           });
         }

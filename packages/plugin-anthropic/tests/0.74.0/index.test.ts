@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { anthropic, anthropicPlugin } from "../../src/0.74.0";
 
-const plugin = anthropic({ apiKey: "sk-ant-test-123" });
+const plugin = anthropic;
 const api = plugin.ctors.anthropic;
 
 // ============================================================
@@ -153,8 +153,8 @@ describe("anthropic plugin: unified Plugin shape", () => {
     expect(plugin.lifts).toEqual({});
   });
 
-  it("has a defaultInterpreter factory", () => {
-    expect(typeof plugin.defaultInterpreter).toBe("function");
+  it("has NO defaultInterpreter", () => {
+    expect(plugin.defaultInterpreter).toBeUndefined();
   });
 });
 

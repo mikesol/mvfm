@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { s3, s3Plugin } from "../../src/3.989.0";
 
-const plugin = s3({ region: "us-east-1" });
+const plugin = s3;
 const api = plugin.ctors.s3;
 
 // ============================================================

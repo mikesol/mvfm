@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { cloudflareKv, cloudflareKvPlugin } from "../../src/4.20260213.0";
 
-const plugin = cloudflareKv({ namespaceId: "MY_KV" });
+const plugin = cloudflareKv;
 const api = plugin.ctors.kv;
 
 // ============================================================

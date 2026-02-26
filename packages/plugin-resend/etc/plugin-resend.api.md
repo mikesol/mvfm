@@ -4,6 +4,16 @@
 
 ```ts
 
+import type { CreateBatchOptions } from 'resend';
+import type { CreateContactOptions } from 'resend';
+import type { CreateContactResponseSuccess } from 'resend';
+import type { CreateEmailOptions } from 'resend';
+import type { CreateEmailResponseSuccess } from 'resend';
+import type { GetContactResponseSuccess } from 'resend';
+import type { GetEmailResponseSuccess } from 'resend';
+import type { ListContactsResponseSuccess } from 'resend';
+import type { RemoveContactsResponseSuccess } from 'resend';
+
 // @public
 export interface ClientHandlerOptions {
     baseUrl: string;
@@ -21,39 +31,41 @@ export function clientInterpreter(options: ClientHandlerOptions, kinds: string[]
 export function createResendInterpreter(client: ResendClient): Interpreter;
 
 // @public
-export function resend(config: ResendConfig): {
+export const resend: {
     name: "resend";
     ctors: {
         resend: {
             emails: {
-                send<A>(params: A): CExpr<unknown, "resend/send_email", [A]>;
-                get<A>(id: A): CExpr<unknown, "resend/get_email", [A]>;
+                send(params: Liftable<CreateEmailOptions>): CExpr<CreateEmailResponseSuccess, "resend/send_email", [Liftable<CreateEmailOptions>]>;
+                get(id: string | CExpr<string>): CExpr<GetEmailResponseSuccess, "resend/get_email", [string | CExpr<string>]>;
             };
             batch: {
-                send<A>(emails: A): CExpr<unknown, "resend/send_batch", [A]>;
+                send(emails: Liftable<CreateBatchOptions>): CExpr<CreateEmailResponseSuccess[], "resend/send_batch", [Liftable<CreateBatchOptions>]>;
             };
             contacts: {
-                create<A>(params: A): CExpr<unknown, "resend/create_contact", [A]>;
-                get<A>(id: A): CExpr<unknown, "resend/get_contact", [A]>;
-                list(): CExpr<unknown, "resend/list_contacts", []>;
-                remove<A>(id: A): CExpr<unknown, "resend/remove_contact", [A]>;
+                create(params: Liftable<CreateContactOptions>): CExpr<CreateContactResponseSuccess, "resend/create_contact", [Liftable<CreateContactOptions>]>;
+                get(id: string | CExpr<string>): CExpr<GetContactResponseSuccess, "resend/get_contact", [string | CExpr<string>]>;
+                list(): CExpr<ListContactsResponseSuccess, "resend/list_contacts", []>;
+                remove(id: string | CExpr<string>): CExpr<RemoveContactsResponseSuccess, "resend/remove_contact", [string | CExpr<string>]>;
             };
         };
     };
     kinds: {
-        "resend/send_email": KindSpec<[unknown], unknown>;
-        "resend/get_email": KindSpec<[unknown], unknown>;
-        "resend/send_batch": KindSpec<[unknown], unknown>;
-        "resend/create_contact": KindSpec<[unknown], unknown>;
-        "resend/get_contact": KindSpec<[unknown], unknown>;
-        "resend/list_contacts": KindSpec<[], unknown>;
-        "resend/remove_contact": KindSpec<[unknown], unknown>;
-        "resend/record": KindSpec<unknown[], Record<string, unknown>>;
-        "resend/array": KindSpec<unknown[], unknown[]>;
+        "resend/send_email": KindSpec<[CreateEmailOptions], CreateEmailResponseSuccess>;
+        "resend/get_email": KindSpec<[string], GetEmailResponseSuccess>;
+        "resend/send_batch": KindSpec<[CreateBatchOptions], CreateEmailResponseSuccess[]>;
+        "resend/create_contact": KindSpec<[CreateContactOptions], CreateContactResponseSuccess>;
+        "resend/get_contact": KindSpec<[string], GetContactResponseSuccess>;
+        "resend/list_contacts": KindSpec<[], ListContactsResponseSuccess>;
+        "resend/remove_contact": KindSpec<[string], RemoveContactsResponseSuccess>;
+    };
+    shapes: {
+        "resend/send_email": string;
+        "resend/send_batch": string;
+        "resend/create_contact": string;
     };
     traits: {};
     lifts: {};
-    defaultInterpreter: () => Interpreter;
 };
 
 // @public
@@ -62,15 +74,45 @@ export interface ResendClient {
 }
 
 // @public
-export interface ResendConfig {
-    apiKey: string;
-}
-
-// @public
 export const resendInterpreter: Interpreter;
 
 // @public
-export const resendPlugin: typeof resend;
+export const resendPlugin: {
+    name: "resend";
+    ctors: {
+        resend: {
+            emails: {
+                send(params: Liftable<CreateEmailOptions>): CExpr<CreateEmailResponseSuccess, "resend/send_email", [Liftable<CreateEmailOptions>]>;
+                get(id: string | CExpr<string>): CExpr<GetEmailResponseSuccess, "resend/get_email", [string | CExpr<string>]>;
+            };
+            batch: {
+                send(emails: Liftable<CreateBatchOptions>): CExpr<CreateEmailResponseSuccess[], "resend/send_batch", [Liftable<CreateBatchOptions>]>;
+            };
+            contacts: {
+                create(params: Liftable<CreateContactOptions>): CExpr<CreateContactResponseSuccess, "resend/create_contact", [Liftable<CreateContactOptions>]>;
+                get(id: string | CExpr<string>): CExpr<GetContactResponseSuccess, "resend/get_contact", [string | CExpr<string>]>;
+                list(): CExpr<ListContactsResponseSuccess, "resend/list_contacts", []>;
+                remove(id: string | CExpr<string>): CExpr<RemoveContactsResponseSuccess, "resend/remove_contact", [string | CExpr<string>]>;
+            };
+        };
+    };
+    kinds: {
+        "resend/send_email": KindSpec<[CreateEmailOptions], CreateEmailResponseSuccess>;
+        "resend/get_email": KindSpec<[string], GetEmailResponseSuccess>;
+        "resend/send_batch": KindSpec<[CreateBatchOptions], CreateEmailResponseSuccess[]>;
+        "resend/create_contact": KindSpec<[CreateContactOptions], CreateContactResponseSuccess>;
+        "resend/get_contact": KindSpec<[string], GetContactResponseSuccess>;
+        "resend/list_contacts": KindSpec<[], ListContactsResponseSuccess>;
+        "resend/remove_contact": KindSpec<[string], RemoveContactsResponseSuccess>;
+    };
+    shapes: {
+        "resend/send_email": string;
+        "resend/send_batch": string;
+        "resend/create_contact": string;
+    };
+    traits: {};
+    lifts: {};
+};
 
 // @public
 export function serverInterpreter(client: ResendClient): Interpreter;
@@ -82,8 +124,9 @@ export function wrapResendSdk(resend: ResendSdk): ResendClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/6.9.2/index.d.ts:24:17 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-// dist/6.9.2/index.d.ts:45:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/6.9.2/index.d.ts:16:17 - (ae-forgotten-export) The symbol "Liftable" needs to be exported by the entry point index.d.ts
+// dist/6.9.2/index.d.ts:16:17 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/6.9.2/index.d.ts:37:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

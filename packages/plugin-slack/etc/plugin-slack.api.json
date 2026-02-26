@@ -591,22 +591,13 @@
           "name": "serverInterpreter"
         },
         {
-          "kind": "Function",
-          "canonicalReference": "@mvfm/plugin-slack!slack:function(1)",
-          "docComment": "/**\n * Slack plugin factory. Namespace: `slack/`.\n *\n * Creates a plugin that exposes chat, conversations, users, reactions, and files resource methods for building parameterized Slack API call AST nodes.\n *\n * @param config - A {@link SlackConfig} with a token.\n *\n * @returns A unified Plugin for the slack plugin.\n */\n",
+          "kind": "Variable",
+          "canonicalReference": "@mvfm/plugin-slack!slack:var",
+          "docComment": "/**\n * The slack plugin definition (unified Plugin type).\n *\n * Contributes chat, conversations, users, reactions, and files resource methods for building parameterized Slack API call AST nodes.\n *\n * Requires an interpreter provided via `defaults(plugins, { slack: createSlackInterpreter(client) })`.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare function slack(_config: "
-            },
-            {
-              "kind": "Reference",
-              "text": "SlackConfig",
-              "canonicalReference": "@mvfm/plugin-slack!SlackConfig:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "): "
+              "text": "slack: "
             },
             {
               "kind": "Content",
@@ -637,40 +628,26 @@
             },
             {
               "kind": "Content",
-              "text": "<any, any>>;\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
+              "text": "<any, any>>;\n    shapes: "
             },
             {
               "kind": "Reference",
-              "text": "Interpreter",
-              "canonicalReference": "@mvfm/plugin-slack!~Interpreter:type"
+              "text": "Record",
+              "canonicalReference": "!Record:type"
             },
             {
               "kind": "Content",
-              "text": ";\n}"
-            },
-            {
-              "kind": "Content",
-              "text": ";"
+              "text": "<string, \"*\">;\n    traits: {};\n    lifts: {};\n}"
             }
           ],
           "fileUrlPath": "dist/7.14.0/index.d.ts",
-          "returnTypeTokenRange": {
-            "startIndex": 3,
-            "endIndex": 12
-          },
+          "isReadonly": true,
           "releaseTag": "Public",
-          "overloadIndex": 1,
-          "parameters": [
-            {
-              "parameterName": "_config",
-              "parameterTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isOptional": false
-            }
-          ],
-          "name": "slack"
+          "name": "slack",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 10
+          }
         },
         {
           "kind": "Interface",
@@ -805,30 +782,6 @@
             }
           ],
           "extendsTokenRanges": []
-        },
-        {
-          "kind": "Variable",
-          "canonicalReference": "@mvfm/plugin-slack!slackInterpreter:var",
-          "docComment": "/**\n * Default Slack interpreter that uses `SLACK_BOT_TOKEN`.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "slackInterpreter: "
-            },
-            {
-              "kind": "Reference",
-              "text": "Interpreter",
-              "canonicalReference": "@mvfm/plugin-slack!~Interpreter:type"
-            }
-          ],
-          "fileUrlPath": "dist/7.14.0/index.d.ts",
-          "isReadonly": true,
-          "releaseTag": "Public",
-          "name": "slackInterpreter",
-          "variableTypeTokenRange": {
-            "startIndex": 1,
-            "endIndex": 2
-          }
         },
         {
           "kind": "Interface",

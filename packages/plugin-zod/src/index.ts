@@ -81,57 +81,55 @@ type SafeParseResult = { success: boolean; data?: unknown; error?: unknown };
  *
  * Requires `zod` v4+ as a peer dependency.
  */
-export function zod() {
-  return {
-    name: "zod" as const,
-    ctors: {
-      zod: {
-        ...arrayNamespace(parseError),
-        ...stringNamespace(parseError),
-        ...bigintNamespace(parseError),
-        ...dateNamespace(parseError),
-        ...discriminatedUnionNamespace(parseError),
-        ...enumNamespace(parseError),
-        ...fromZodNamespace(),
-        ...intersectionNamespace(parseError),
-        ...lazyNamespace(),
-        ...literalNamespace(),
-        ...mapSetNamespace(parseError),
-        ...numberNamespace(parseError),
-        ...objectNamespace(parseError),
-        ...primitivesNamespace(parseError),
-        ...coerceNamespace(parseError),
-        ...recordNamespace(parseError),
-        ...specialNamespace(parseError),
-        ...stringboolNamespace(),
-        ...stringFormatsNamespace(parseError),
-        ...templateLiteralNamespace(),
-        ...transformNamespace(),
-        ...tupleNamespace(parseError),
-        ...unionNamespace(parseError),
-        // ^^^ Each new schema type adds ONE spread here
-      },
+export const zod = {
+  name: "zod" as const,
+  ctors: {
+    zod: {
+      ...arrayNamespace(parseError),
+      ...stringNamespace(parseError),
+      ...bigintNamespace(parseError),
+      ...dateNamespace(parseError),
+      ...discriminatedUnionNamespace(parseError),
+      ...enumNamespace(parseError),
+      ...fromZodNamespace(),
+      ...intersectionNamespace(parseError),
+      ...lazyNamespace(),
+      ...literalNamespace(),
+      ...mapSetNamespace(parseError),
+      ...numberNamespace(parseError),
+      ...objectNamespace(parseError),
+      ...primitivesNamespace(parseError),
+      ...coerceNamespace(parseError),
+      ...recordNamespace(parseError),
+      ...specialNamespace(parseError),
+      ...stringboolNamespace(),
+      ...stringFormatsNamespace(parseError),
+      ...templateLiteralNamespace(),
+      ...transformNamespace(),
+      ...tupleNamespace(parseError),
+      ...unionNamespace(parseError),
+      // ^^^ Each new schema type adds ONE spread here
     },
-    kinds: {
-      "zod/parse": {
-        inputs: [undefined, undefined] as [unknown, unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown, unknown], unknown>,
-      "zod/safe_parse": {
-        inputs: [undefined, undefined] as [unknown, unknown],
-        output: {} as SafeParseResult,
-      } as KindSpec<[unknown, unknown], SafeParseResult>,
-      "zod/parse_async": {
-        inputs: [undefined, undefined] as [unknown, unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown, unknown], unknown>,
-      "zod/safe_parse_async": {
-        inputs: [undefined, undefined] as [unknown, unknown],
-        output: {} as SafeParseResult,
-      } as KindSpec<[unknown, unknown], SafeParseResult>,
-    },
-    traits: {},
-    lifts: {},
-    defaultInterpreter: (): Interpreter => createZodInterpreter(),
-  } satisfies Plugin;
-}
+  },
+  kinds: {
+    "zod/parse": {
+      inputs: [undefined, undefined] as [unknown, unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown, unknown], unknown>,
+    "zod/safe_parse": {
+      inputs: [undefined, undefined] as [unknown, unknown],
+      output: {} as SafeParseResult,
+    } as KindSpec<[unknown, unknown], SafeParseResult>,
+    "zod/parse_async": {
+      inputs: [undefined, undefined] as [unknown, unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown, unknown], unknown>,
+    "zod/safe_parse_async": {
+      inputs: [undefined, undefined] as [unknown, unknown],
+      output: {} as SafeParseResult,
+    } as KindSpec<[unknown, unknown], SafeParseResult>,
+  },
+  traits: {},
+  lifts: {},
+  defaultInterpreter: (): Interpreter => createZodInterpreter(),
+} satisfies Plugin;

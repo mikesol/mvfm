@@ -39,7 +39,7 @@ function createCapturingConsole() {
   return { target, calls };
 }
 
-const plugin = consolePlugin();
+const plugin = consolePlugin;
 const plugins = [numPlugin, strPlugin, boolPlugin, plugin] as const;
 const $ = composeDollar(...plugins);
 const app = createApp(...plugins);

@@ -29,7 +29,7 @@ export function createPostgresServerInterpreter(client: PostgresClient): Interpr
 export function escapeIdentifier(name: string): string;
 
 // @public
-export function postgres(config?: PostgresConfig | string): {
+export const postgres: {
     name: "postgres";
     ctors: {
         sql: (<T = Record<string, unknown>>(strings: TemplateStringsArray, ...values: unknown[]) => CExpr<T[], "postgres/query", unknown[]>) & Record<string, unknown>;
@@ -43,8 +43,10 @@ export function postgres(config?: PostgresConfig | string): {
         "postgres/savepoint": KindSpec<[string, ...unknown[]], unknown>;
         "postgres/cursor": KindSpec<[unknown, unknown, unknown], void>;
         "postgres/cursor_batch": KindSpec<[], unknown[]>;
-        "postgres/record": KindSpec<unknown[], Record<string, unknown>>;
-        "postgres/array": KindSpec<unknown[], unknown[]>;
+    };
+    shapes: {
+        "postgres/insert_helper": (string | null)[];
+        "postgres/set_helper": (string | null)[];
     };
     traits: {};
     lifts: {};
@@ -63,34 +65,28 @@ export interface PostgresClient {
 }
 
 // @public
-export interface PostgresConfig {
-    // (undocumented)
-    connectionString?: string;
-    // (undocumented)
-    database?: string;
-    // (undocumented)
-    host?: string;
-    // (undocumented)
-    max?: number;
-    // (undocumented)
-    password?: string;
-    // (undocumented)
-    port?: number;
-    // (undocumented)
-    ssl?: boolean | object;
-    // (undocumented)
-    transform?: {
-        column?: {
-            to?: string;
-            from?: string;
-        };
+export const postgresPlugin: {
+    name: "postgres";
+    ctors: {
+        sql: (<T = Record<string, unknown>>(strings: TemplateStringsArray, ...values: unknown[]) => CExpr<T[], "postgres/query", unknown[]>) & Record<string, unknown>;
     };
-    // (undocumented)
-    username?: string;
-}
-
-// @public
-export const postgresPlugin: typeof postgres;
+    kinds: {
+        "postgres/query": KindSpec<[number, ...unknown[]], unknown[]>;
+        "postgres/identifier": KindSpec<[unknown], unknown>;
+        "postgres/insert_helper": KindSpec<[unknown, string], unknown>;
+        "postgres/set_helper": KindSpec<[unknown, string], unknown>;
+        "postgres/begin": KindSpec<[string, ...unknown[]], unknown>;
+        "postgres/savepoint": KindSpec<[string, ...unknown[]], unknown>;
+        "postgres/cursor": KindSpec<[unknown, unknown, unknown], void>;
+        "postgres/cursor_batch": KindSpec<[], unknown[]>;
+    };
+    shapes: {
+        "postgres/insert_helper": (string | null)[];
+        "postgres/set_helper": (string | null)[];
+    };
+    traits: {};
+    lifts: {};
+};
 
 // Warning: (ae-forgotten-export) The symbol "Sql" needs to be exported by the entry point index.d.ts
 // Warning: (ae-forgotten-export) The symbol "TransactionSql" needs to be exported by the entry point index.d.ts
@@ -100,8 +96,8 @@ export function wrapPostgresJs(sql: Sql | TransactionSql): PostgresClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/3.4.8/index.d.ts:38:9 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-// dist/3.4.8/index.d.ts:41:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/3.4.8/index.d.ts:13:9 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/3.4.8/index.d.ts:16:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

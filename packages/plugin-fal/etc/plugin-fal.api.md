@@ -15,17 +15,17 @@ import type { Result } from '@fal-ai/client';
 export function createFalInterpreter(client: FalClient): Interpreter;
 
 // @public
-export function fal(config: FalConfig): {
+export const fal: {
     name: "fal";
     ctors: {
         fal: {
-            run<A, B>(endpointId: A, options?: B): CExpr<Awaited<ReturnType<FalClient_2["run"]>>, "fal/run", [A, ...unknown[]]>;
-            subscribe<A, B>(endpointId: A, options?: B): CExpr<Awaited<ReturnType<FalClient_2["subscribe"]>>, "fal/subscribe", [A, ...unknown[]]>;
+            run(endpointId: string | CExpr<string>, ...options: [] | [Liftable<RunOptionsShape>]): CExpr<Awaited<ReturnType<FalClient_2["run"]>>, "fal/run">;
+            subscribe(endpointId: string | CExpr<string>, ...options: [] | [Liftable<SubscribeOptionsShape>]): CExpr<Awaited<ReturnType<FalClient_2["subscribe"]>>, "fal/subscribe">;
             queue: {
-                submit<A, B>(endpointId: A, options: B): CExpr<Awaited<ReturnType<QueueClient["submit"]>>, "fal/queue_submit", [A, B]>;
-                status<A, B>(endpointId: A, options: B): CExpr<Awaited<ReturnType<QueueClient["status"]>>, "fal/queue_status", [A, B]>;
-                result<A, B>(endpointId: A, options: B): CExpr<Awaited<ReturnType<QueueClient["result"]>>, "fal/queue_result", [A, B]>;
-                cancel<A, B>(endpointId: A, options: B): CExpr<void, "fal/queue_cancel", [A, B]>;
+                submit(endpointId: string | CExpr<string>, options: Liftable<SubmitOptionsShape>): CExpr<Awaited<ReturnType<QueueClient["submit"]>>, "fal/queue_submit">;
+                status(endpointId: string | CExpr<string>, options: Liftable<QueueStatusOptionsShape>): CExpr<Awaited<ReturnType<QueueClient["status"]>>, "fal/queue_status">;
+                result(endpointId: string | CExpr<string>, options: Liftable<QueueResultOptionsShape>): CExpr<Awaited<ReturnType<QueueClient["result"]>>, "fal/queue_result">;
+                cancel(endpointId: string | CExpr<string>, options: Liftable<QueueCancelOptionsShape>): CExpr<void, "fal/queue_cancel">;
             };
         };
     };
@@ -36,12 +36,17 @@ export function fal(config: FalConfig): {
         "fal/queue_status": KindSpec<[unknown, unknown], unknown>;
         "fal/queue_result": KindSpec<[unknown, unknown], unknown>;
         "fal/queue_cancel": KindSpec<[unknown, unknown], void>;
-        "fal/record": KindSpec<unknown[], Record<string, unknown>>;
-        "fal/array": KindSpec<unknown[], unknown[]>;
+    };
+    shapes: {
+        "fal/run": [null, "*"];
+        "fal/subscribe": [null, "*"];
+        "fal/queue_submit": [null, "*"];
+        "fal/queue_status": [null, "*"];
+        "fal/queue_result": [null, "*"];
+        "fal/queue_cancel": [null, "*"];
     };
     traits: {};
     lifts: {};
-    defaultInterpreter: () => Interpreter;
 };
 
 // @public
@@ -55,53 +60,75 @@ export interface FalClient {
 }
 
 // @public
-export interface FalConfig {
-    credentials: string;
-}
-
-// @public
 export const falInterpreter: Interpreter;
 
 // @public
-export const falPlugin: typeof fal;
+export const falPlugin: {
+    name: "fal";
+    ctors: {
+        fal: {
+            run(endpointId: string | CExpr<string>, ...options: [] | [Liftable<RunOptionsShape>]): CExpr<Awaited<ReturnType<FalClient_2["run"]>>, "fal/run">;
+            subscribe(endpointId: string | CExpr<string>, ...options: [] | [Liftable<SubscribeOptionsShape>]): CExpr<Awaited<ReturnType<FalClient_2["subscribe"]>>, "fal/subscribe">;
+            queue: {
+                submit(endpointId: string | CExpr<string>, options: Liftable<SubmitOptionsShape>): CExpr<Awaited<ReturnType<QueueClient["submit"]>>, "fal/queue_submit">;
+                status(endpointId: string | CExpr<string>, options: Liftable<QueueStatusOptionsShape>): CExpr<Awaited<ReturnType<QueueClient["status"]>>, "fal/queue_status">;
+                result(endpointId: string | CExpr<string>, options: Liftable<QueueResultOptionsShape>): CExpr<Awaited<ReturnType<QueueClient["result"]>>, "fal/queue_result">;
+                cancel(endpointId: string | CExpr<string>, options: Liftable<QueueCancelOptionsShape>): CExpr<void, "fal/queue_cancel">;
+            };
+        };
+    };
+    kinds: {
+        "fal/run": KindSpec<[unknown], unknown>;
+        "fal/subscribe": KindSpec<[unknown], unknown>;
+        "fal/queue_submit": KindSpec<[unknown, unknown], unknown>;
+        "fal/queue_status": KindSpec<[unknown, unknown], unknown>;
+        "fal/queue_result": KindSpec<[unknown, unknown], unknown>;
+        "fal/queue_cancel": KindSpec<[unknown, unknown], void>;
+    };
+    shapes: {
+        "fal/run": [null, "*"];
+        "fal/subscribe": [null, "*"];
+        "fal/queue_submit": [null, "*"];
+        "fal/queue_status": [null, "*"];
+        "fal/queue_result": [null, "*"];
+        "fal/queue_cancel": [null, "*"];
+    };
+    traits: {};
+    lifts: {};
+};
 
-// Warning: (ae-forgotten-export) The symbol "QueueCancelOptionsShape" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FalQueueCancelOptions = QueueCancelOptionsShape | CExpr<QueueCancelOptionsShape>;
+export type FalQueueCancelOptions = Liftable<QueueCancelOptionsShape>;
 
-// Warning: (ae-forgotten-export) The symbol "QueueResultOptionsShape" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FalQueueResultOptions = QueueResultOptionsShape | CExpr<QueueResultOptionsShape>;
+export type FalQueueResultOptions = Liftable<QueueResultOptionsShape>;
 
-// Warning: (ae-forgotten-export) The symbol "QueueStatusOptionsShape" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FalQueueStatusOptions = QueueStatusOptionsShape | CExpr<QueueStatusOptionsShape>;
+export type FalQueueStatusOptions = Liftable<QueueStatusOptionsShape>;
 
-// Warning: (ae-forgotten-export) The symbol "RunOptionsShape" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FalRunOptions = RunOptionsShape | CExpr<RunOptionsShape>;
+export type FalRunOptions = Liftable<RunOptionsShape>;
 
-// Warning: (ae-forgotten-export) The symbol "SubmitOptionsShape" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FalSubmitOptions = SubmitOptionsShape | CExpr<SubmitOptionsShape>;
+export type FalSubmitOptions = Liftable<SubmitOptionsShape>;
 
-// Warning: (ae-forgotten-export) The symbol "SubscribeOptionsShape" needs to be exported by the entry point index.d.ts
-//
 // @public
-export type FalSubscribeOptions = SubscribeOptionsShape | CExpr<SubscribeOptionsShape>;
+export type FalSubscribeOptions = Liftable<SubscribeOptionsShape>;
 
 // @public
 export function wrapFalSdk(client: FalClient_2): FalClient;
 
 // Warnings were encountered during analysis:
 //
-// dist/1.9.1/index.d.ts:43:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-// dist/1.9.1/index.d.ts:59:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/1.9.1/index.d.ts:34:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/1.9.1/index.d.ts:34:13 - (ae-forgotten-export) The symbol "Liftable" needs to be exported by the entry point index.d.ts
+// dist/1.9.1/index.d.ts:34:13 - (ae-forgotten-export) The symbol "RunOptionsShape" needs to be exported by the entry point index.d.ts
+// dist/1.9.1/index.d.ts:36:13 - (ae-forgotten-export) The symbol "SubscribeOptionsShape" needs to be exported by the entry point index.d.ts
+// dist/1.9.1/index.d.ts:39:17 - (ae-forgotten-export) The symbol "SubmitOptionsShape" needs to be exported by the entry point index.d.ts
+// dist/1.9.1/index.d.ts:41:17 - (ae-forgotten-export) The symbol "QueueStatusOptionsShape" needs to be exported by the entry point index.d.ts
+// dist/1.9.1/index.d.ts:43:17 - (ae-forgotten-export) The symbol "QueueResultOptionsShape" needs to be exported by the entry point index.d.ts
+// dist/1.9.1/index.d.ts:45:17 - (ae-forgotten-export) The symbol "QueueCancelOptionsShape" needs to be exported by the entry point index.d.ts
+// dist/1.9.1/index.d.ts:50:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

@@ -9,7 +9,7 @@ import { createRedisInterpreter } from "../../src/5.4.1/interpreter";
 let container: StartedTestContainer | undefined;
 let redisClient: Redis | undefined;
 
-const plugin = redisPlugin({ host: "127.0.0.1", port: 6379 });
+const plugin = redisPlugin;
 const plugins = [numPlugin, strPlugin, plugin] as const;
 const $ = composeDollar(...plugins);
 const app = createApp(...plugins);

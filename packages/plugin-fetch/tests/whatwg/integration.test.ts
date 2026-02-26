@@ -61,7 +61,7 @@ afterAll(async () => {
 
 // Helper: build plugins, $, app, and run for a given config
 function setup(config?: { baseUrl?: string; defaultHeaders?: Record<string, string> }) {
-  const plugin = fetchPlugin(config);
+  const plugin = fetchPlugin;
   const plugins = [numPlugin, strPlugin, plugin] as const;
   const $ = composeDollar(...plugins);
   const app = createApp(...plugins);

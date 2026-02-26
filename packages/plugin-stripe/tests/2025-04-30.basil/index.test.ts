@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { stripe, stripePlugin } from "../../src/2025-04-30.basil";
 
-const plugin = stripe({ apiKey: "sk_test_123" });
+const plugin = stripe;
 const api = plugin.ctors.stripe;
 
 // ============================================================
@@ -168,8 +168,8 @@ describe("stripe plugin: unified Plugin shape", () => {
     expect(plugin.lifts).toEqual({});
   });
 
-  it("has a defaultInterpreter factory", () => {
-    expect(typeof plugin.defaultInterpreter).toBe("function");
+  it("has NO defaultInterpreter", () => {
+    expect(plugin.defaultInterpreter).toBeUndefined();
   });
 });
 

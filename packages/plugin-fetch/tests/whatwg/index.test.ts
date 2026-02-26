@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { fetch, fetchPlugin } from "../../src/whatwg";
 
-const plugin = fetchPlugin();
+const plugin = fetchPlugin;
 const api = plugin.ctors.fetch;
 
 // ============================================================
@@ -90,7 +90,7 @@ describe("fetch plugin: unified Plugin shape", () => {
 });
 
 // ============================================================
-// fetch() and fetchPlugin() are the same
+// fetch and fetchPlugin are the same
 // ============================================================
 
 describe("fetch plugin: factory aliases", () => {

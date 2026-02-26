@@ -388,22 +388,13 @@
           "name": "clientInterpreter"
         },
         {
-          "kind": "Function",
-          "canonicalReference": "@mvfm/plugin-console!console_2:function(1)",
-          "docComment": "/**\n * Creates the console plugin definition (unified Plugin type).\n *\n * @param _config - Optional plugin configuration.\n *\n * @returns A unified Plugin that contributes `$.console`.\n */\n",
+          "kind": "Variable",
+          "canonicalReference": "@mvfm/plugin-console!console_2:var",
+          "docComment": "/**\n * The console plugin definition (unified Plugin type).\n *\n * Contributes `$.console` with all standard console methods.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "export declare function console(_config?: "
-            },
-            {
-              "kind": "Reference",
-              "text": "ConsoleConfig",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleConfig:interface"
-            },
-            {
-              "kind": "Content",
-              "text": "): "
+              "text": "console: "
             },
             {
               "kind": "Content",
@@ -461,7 +452,7 @@
             },
             {
               "kind": "Content",
-              "text": "<void, \"console/dir\", unknown[]>;\n            dirxml<A extends readonly unknown[]>(...data: A): "
+              "text": "<void, \"console/dir\", [unknown[]]>;\n            dirxml<A extends readonly unknown[]>(...data: A): "
             },
             {
               "kind": "Reference",
@@ -470,7 +461,7 @@
             },
             {
               "kind": "Content",
-              "text": "<void, \"console/dirxml\", A>;\n            error<A extends readonly unknown[]>(...data: A): "
+              "text": "<void, \"console/dirxml\", [unknown[]]>;\n            error<A extends readonly unknown[]>(...data: A): "
             },
             {
               "kind": "Reference",
@@ -533,7 +524,7 @@
             },
             {
               "kind": "Content",
-              "text": "<void, \"console/table\", unknown[]>;\n            time<A>(...args: [label: A] | []): "
+              "text": "<void, \"console/table\", [unknown[]]>;\n            time<A>(...args: [label: A] | []): "
             },
             {
               "kind": "Reference",
@@ -749,7 +740,7 @@
             },
             {
               "kind": "Content",
-              "text": "<unknown[], void>;\n    };\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
+              "text": "<unknown[], void>;\n    };\n    shapes: {\n        \"console/dir\": \"*\";\n        \"console/dirxml\": \"*\";\n        \"console/table\": \"*\";\n    };\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
             },
             {
               "kind": "Reference",
@@ -759,30 +750,16 @@
             {
               "kind": "Content",
               "text": ";\n}"
-            },
-            {
-              "kind": "Content",
-              "text": ";"
             }
           ],
           "fileUrlPath": "dist/22.0.0/index.d.ts",
-          "returnTypeTokenRange": {
-            "startIndex": 3,
-            "endIndex": 82
-          },
+          "isReadonly": true,
           "releaseTag": "Public",
-          "overloadIndex": 1,
-          "parameters": [
-            {
-              "parameterName": "_config",
-              "parameterTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isOptional": true
-            }
-          ],
-          "name": "console_2"
+          "name": "console_2",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 80
+          }
         },
         {
           "kind": "Interface",
@@ -865,51 +842,6 @@
                 }
               ],
               "name": "call"
-            }
-          ],
-          "extendsTokenRanges": []
-        },
-        {
-          "kind": "Interface",
-          "canonicalReference": "@mvfm/plugin-console!ConsoleConfig:interface",
-          "docComment": "/**\n * Configuration for the console plugin.\n */\n",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "export interface ConsoleConfig "
-            }
-          ],
-          "fileUrlPath": "dist/22.0.0/index.d.ts",
-          "releaseTag": "Public",
-          "name": "ConsoleConfig",
-          "preserveMemberOrder": false,
-          "members": [
-            {
-              "kind": "PropertySignature",
-              "canonicalReference": "@mvfm/plugin-console!ConsoleConfig#tag:member",
-              "docComment": "/**\n * Optional tag for metadata propagation by custom handlers.\n */\n",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "tag?: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "string"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": true,
-              "releaseTag": "Public",
-              "name": "tag",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              }
             }
           ],
           "extendsTokenRanges": []
@@ -1506,12 +1438,358 @@
             },
             {
               "kind": "Content",
-              "text": "typeof "
+              "text": "{\n    name: \"console\";\n    ctors: {\n        console: {\n            assert<A, B extends readonly unknown[]>(condition: A, ...data: B): "
             },
             {
               "kind": "Reference",
-              "text": "console",
-              "canonicalReference": "@mvfm/plugin-console!console_2:function"
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/assert\", [A, ...B]>;\n            clear(): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/clear\", []>;\n            count<A>(...args: [label: A] | []): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/count\", unknown[]>;\n            countReset<A>(...args: [label: A] | []): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/countReset\", unknown[]>;\n            debug<A extends readonly unknown[]>(...data: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/debug\", A>;\n            dir<A, B>(...args: [item: A, options: B] | [item: A] | []): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/dir\", [unknown[]]>;\n            dirxml<A extends readonly unknown[]>(...data: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/dirxml\", [unknown[]]>;\n            error<A extends readonly unknown[]>(...data: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/error\", A>;\n            group<A extends readonly unknown[]>(...data: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/group\", A>;\n            groupCollapsed<A extends readonly unknown[]>(...data: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/groupCollapsed\", A>;\n            groupEnd(): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/groupEnd\", []>;\n            info<A extends readonly unknown[]>(...data: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/info\", A>;\n            log<A extends readonly unknown[]>(...data: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/log\", A>;\n            table<A, B>(...args: [tabularData: A, properties: B] | [tabularData: A] | []): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/table\", [unknown[]]>;\n            time<A>(...args: [label: A] | []): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/time\", unknown[]>;\n            timeEnd<A>(...args: [label: A] | []): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/timeEnd\", unknown[]>;\n            timeLog<A, B extends readonly unknown[]>(...args: [label: A, ...data: B] | []): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/timeLog\", unknown[]>;\n            trace<A extends readonly unknown[]>(...data: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/trace\", A>;\n            warn<A extends readonly unknown[]>(...data: A): "
+            },
+            {
+              "kind": "Reference",
+              "text": "CExpr",
+              "canonicalReference": "@mvfm/plugin-console!~CExpr:type"
+            },
+            {
+              "kind": "Content",
+              "text": "<void, \"console/warn\", A>;\n        };\n    };\n    kinds: {\n        \"console/assert\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/clear\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/count\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/countReset\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/debug\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/dir\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/dirxml\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/error\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/group\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/groupCollapsed\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/groupEnd\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/info\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/log\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/table\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/time\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/timeEnd\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/timeLog\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/trace\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n        \"console/warn\": "
+            },
+            {
+              "kind": "Reference",
+              "text": "KindSpec",
+              "canonicalReference": "@mvfm/plugin-console!~KindSpec:interface"
+            },
+            {
+              "kind": "Content",
+              "text": "<unknown[], void>;\n    };\n    shapes: {\n        \"console/dir\": \"*\";\n        \"console/dirxml\": \"*\";\n        \"console/table\": \"*\";\n    };\n    traits: {};\n    lifts: {};\n    defaultInterpreter: () => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Interpreter",
+              "canonicalReference": "@mvfm/plugin-console!~Interpreter:type"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
             }
           ],
           "fileUrlPath": "dist/22.0.0/index.d.ts",
@@ -1520,7 +1798,7 @@
           "name": "consolePlugin",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 3
+            "endIndex": 80
           }
         },
         {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { redis } from "../../src/5.4.1";
 
-const plugin = redis({ host: "127.0.0.1", port: 6379 });
+const plugin = redis;
 const api = plugin.ctors.redis;
 
 describe("redis: CExpr construction (key commands)", () => {

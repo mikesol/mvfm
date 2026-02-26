@@ -21,7 +21,7 @@ export function clientInterpreter(options: ClientHandlerOptions, kinds: string[]
 export function createPinoInterpreter(client?: PinoClient, _config?: PinoConfig): Interpreter;
 
 // @public
-export function pino(config?: PinoConfig): {
+export const pino: {
     name: "pino";
     ctors: {
         pino: PinoLogger;
@@ -33,12 +33,17 @@ export function pino(config?: PinoConfig): {
         "pino/warn": KindSpec<[unknown, ...unknown[]], void>;
         "pino/error": KindSpec<[unknown, ...unknown[]], void>;
         "pino/fatal": KindSpec<[unknown, ...unknown[]], void>;
-        "pino/record": KindSpec<unknown[], Record<string, unknown>>;
-        "pino/array": KindSpec<unknown[], unknown[]>;
+    };
+    shapes: {
+        "pino/trace": (string | null)[];
+        "pino/debug": (string | null)[];
+        "pino/info": (string | null)[];
+        "pino/warn": (string | null)[];
+        "pino/error": (string | null)[];
+        "pino/fatal": (string | null)[];
     };
     traits: {};
     lifts: {};
-    defaultInterpreter: () => Interpreter;
 };
 
 // @public
@@ -92,26 +97,27 @@ export type PinoLevel = (typeof LEVELS)[number];
 
 // @public
 export interface PinoLogger {
-    child(bindings: CExpr<Record<string, unknown>> | Record<string, unknown>): PinoLogger;
-    debug<A>(msg: A): CExpr<void, "pino/debug", [number, number, A]>;
+    // Warning: (ae-forgotten-export) The symbol "Liftable" needs to be exported by the entry point index.d.ts
+    child(bindings: Liftable<Record<string, unknown>>): PinoLogger;
+    debug<A>(msg: A): CExpr<void, "pino/debug">;
     // (undocumented)
-    debug<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/debug", [number, number, B, A]>;
-    error<A>(msg: A): CExpr<void, "pino/error", [number, number, A]>;
+    debug<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/debug">;
+    error<A>(msg: A): CExpr<void, "pino/error">;
     // (undocumented)
-    error<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/error", [number, number, B, A]>;
-    fatal<A>(msg: A): CExpr<void, "pino/fatal", [number, number, A]>;
+    error<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/error">;
+    fatal<A>(msg: A): CExpr<void, "pino/fatal">;
     // (undocumented)
-    fatal<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/fatal", [number, number, B, A]>;
-    info<A>(msg: A): CExpr<void, "pino/info", [number, number, A]>;
+    fatal<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/fatal">;
+    info<A>(msg: A): CExpr<void, "pino/info">;
     // (undocumented)
-    info<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/info", [number, number, B, A]>;
+    info<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/info">;
     // Warning: (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-    trace<A>(msg: A): CExpr<void, "pino/trace", [number, number, A]>;
+    trace<A>(msg: A): CExpr<void, "pino/trace">;
     // (undocumented)
-    trace<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/trace", [number, number, B, A]>;
-    warn<A>(msg: A): CExpr<void, "pino/warn", [number, number, A]>;
+    trace<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/trace">;
+    warn<A>(msg: A): CExpr<void, "pino/warn">;
     // (undocumented)
-    warn<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/warn", [number, number, B, A]>;
+    warn<A, B>(mergeObject: A, msg: B): CExpr<void, "pino/warn">;
 }
 
 // @public
@@ -120,7 +126,30 @@ export interface PinoMethods {
 }
 
 // @public
-export const pinoPlugin: typeof pino;
+export const pinoPlugin: {
+    name: "pino";
+    ctors: {
+        pino: PinoLogger;
+    };
+    kinds: {
+        "pino/trace": KindSpec<[unknown, ...unknown[]], void>;
+        "pino/debug": KindSpec<[unknown, ...unknown[]], void>;
+        "pino/info": KindSpec<[unknown, ...unknown[]], void>;
+        "pino/warn": KindSpec<[unknown, ...unknown[]], void>;
+        "pino/error": KindSpec<[unknown, ...unknown[]], void>;
+        "pino/fatal": KindSpec<[unknown, ...unknown[]], void>;
+    };
+    shapes: {
+        "pino/trace": (string | null)[];
+        "pino/debug": (string | null)[];
+        "pino/info": (string | null)[];
+        "pino/warn": (string | null)[];
+        "pino/error": (string | null)[];
+        "pino/fatal": (string | null)[];
+    };
+    traits: {};
+    lifts: {};
+};
 
 // Warning: (ae-forgotten-export) The symbol "NExpr" needs to be exported by the entry point index.d.ts
 //

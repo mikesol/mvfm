@@ -4,10 +4,15 @@
 
 ```ts
 
+import type { DeleteObjectCommandInput } from '@aws-sdk/client-s3';
 import type { DeleteObjectCommandOutput } from '@aws-sdk/client-s3';
+import type { GetObjectCommandInput } from '@aws-sdk/client-s3';
 import type { GetObjectCommandOutput } from '@aws-sdk/client-s3';
+import type { HeadObjectCommandInput } from '@aws-sdk/client-s3';
 import type { HeadObjectCommandOutput } from '@aws-sdk/client-s3';
+import type { ListObjectsV2CommandInput } from '@aws-sdk/client-s3';
 import type { ListObjectsV2CommandOutput } from '@aws-sdk/client-s3';
+import type { PutObjectCommandInput } from '@aws-sdk/client-s3';
 import type { PutObjectCommandOutput } from '@aws-sdk/client-s3';
 import type { S3Client as S3Client_2 } from '@aws-sdk/client-s3';
 
@@ -28,25 +33,30 @@ export function clientInterpreter(options: ClientHandlerOptions, kinds: string[]
 export function createS3Interpreter(client: S3Client): Interpreter;
 
 // @public
-export function s3(_config: S3Config): {
+export const s3: {
     name: "s3";
     ctors: {
         s3: {
-            putObject<A>(input: A): CExpr<PutObjectCommandOutput, "s3/put_object", [A]>;
-            getObject<A>(input: A): CExpr<GetObjectCommandOutput, "s3/get_object", [A]>;
-            deleteObject<A>(input: A): CExpr<DeleteObjectCommandOutput, "s3/delete_object", [A]>;
-            headObject<A>(input: A): CExpr<HeadObjectCommandOutput, "s3/head_object", [A]>;
-            listObjectsV2<A>(input: A): CExpr<ListObjectsV2CommandOutput, "s3/list_objects_v2", [A]>;
+            putObject(input: Liftable<PutObjectCommandInput>): CExpr<PutObjectCommandOutput, "s3/put_object", [Liftable<PutObjectCommandInput>]>;
+            getObject(input: Liftable<GetObjectCommandInput>): CExpr<GetObjectCommandOutput, "s3/get_object", [Liftable<GetObjectCommandInput>]>;
+            deleteObject(input: Liftable<DeleteObjectCommandInput>): CExpr<DeleteObjectCommandOutput, "s3/delete_object", [Liftable<DeleteObjectCommandInput>]>;
+            headObject(input: Liftable<HeadObjectCommandInput>): CExpr<HeadObjectCommandOutput, "s3/head_object", [Liftable<HeadObjectCommandInput>]>;
+            listObjectsV2(input: Liftable<ListObjectsV2CommandInput>): CExpr<ListObjectsV2CommandOutput, "s3/list_objects_v2", [Liftable<ListObjectsV2CommandInput>]>;
         };
     };
     kinds: {
-        "s3/put_object": KindSpec<[unknown], unknown>;
-        "s3/get_object": KindSpec<[unknown], unknown>;
-        "s3/delete_object": KindSpec<[unknown], unknown>;
-        "s3/head_object": KindSpec<[unknown], unknown>;
-        "s3/list_objects_v2": KindSpec<[unknown], unknown>;
-        "s3/record": KindSpec<unknown[], Record<string, unknown>>;
-        "s3/array": KindSpec<unknown[], unknown[]>;
+        "s3/put_object": KindSpec<[PutObjectCommandInput], PutObjectCommandOutput>;
+        "s3/get_object": KindSpec<[GetObjectCommandInput], GetObjectCommandOutput>;
+        "s3/delete_object": KindSpec<[DeleteObjectCommandInput], DeleteObjectCommandOutput>;
+        "s3/head_object": KindSpec<[HeadObjectCommandInput], HeadObjectCommandOutput>;
+        "s3/list_objects_v2": KindSpec<[ListObjectsV2CommandInput], ListObjectsV2CommandOutput>;
+    };
+    shapes: {
+        "s3/put_object": string;
+        "s3/get_object": string;
+        "s3/delete_object": string;
+        "s3/head_object": string;
+        "s3/list_objects_v2": string;
     };
     traits: {};
     lifts: {};
@@ -58,19 +68,34 @@ export interface S3Client {
 }
 
 // @public
-export interface S3Config {
-    credentials?: {
-        accessKeyId: string;
-        secretAccessKey: string;
-        sessionToken?: string;
+export const s3Plugin: {
+    name: "s3";
+    ctors: {
+        s3: {
+            putObject(input: Liftable<PutObjectCommandInput>): CExpr<PutObjectCommandOutput, "s3/put_object", [Liftable<PutObjectCommandInput>]>;
+            getObject(input: Liftable<GetObjectCommandInput>): CExpr<GetObjectCommandOutput, "s3/get_object", [Liftable<GetObjectCommandInput>]>;
+            deleteObject(input: Liftable<DeleteObjectCommandInput>): CExpr<DeleteObjectCommandOutput, "s3/delete_object", [Liftable<DeleteObjectCommandInput>]>;
+            headObject(input: Liftable<HeadObjectCommandInput>): CExpr<HeadObjectCommandOutput, "s3/head_object", [Liftable<HeadObjectCommandInput>]>;
+            listObjectsV2(input: Liftable<ListObjectsV2CommandInput>): CExpr<ListObjectsV2CommandOutput, "s3/list_objects_v2", [Liftable<ListObjectsV2CommandInput>]>;
+        };
     };
-    endpoint?: string;
-    forcePathStyle?: boolean;
-    region: string;
-}
-
-// @public
-export const s3Plugin: typeof s3;
+    kinds: {
+        "s3/put_object": KindSpec<[PutObjectCommandInput], PutObjectCommandOutput>;
+        "s3/get_object": KindSpec<[GetObjectCommandInput], GetObjectCommandOutput>;
+        "s3/delete_object": KindSpec<[DeleteObjectCommandInput], DeleteObjectCommandOutput>;
+        "s3/head_object": KindSpec<[HeadObjectCommandInput], HeadObjectCommandOutput>;
+        "s3/list_objects_v2": KindSpec<[ListObjectsV2CommandInput], ListObjectsV2CommandOutput>;
+    };
+    shapes: {
+        "s3/put_object": string;
+        "s3/get_object": string;
+        "s3/delete_object": string;
+        "s3/head_object": string;
+        "s3/list_objects_v2": string;
+    };
+    traits: {};
+    lifts: {};
+};
 
 // @public
 export function serverEvaluate(client: S3Client, baseInterpreter: Interpreter): Interpreter;
@@ -85,8 +110,9 @@ export function wrapAwsSdk(client: S3Client_2, commands: Record<string, CommandC
 
 // Warnings were encountered during analysis:
 //
-// dist/3.989.0/index.d.ts:51:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
-// dist/3.989.0/index.d.ts:63:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
+// dist/3.989.0/index.d.ts:27:13 - (ae-forgotten-export) The symbol "Liftable" needs to be exported by the entry point index.d.ts
+// dist/3.989.0/index.d.ts:27:13 - (ae-forgotten-export) The symbol "CExpr" needs to be exported by the entry point index.d.ts
+// dist/3.989.0/index.d.ts:39:9 - (ae-forgotten-export) The symbol "KindSpec" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

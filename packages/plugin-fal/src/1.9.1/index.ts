@@ -16,10 +16,8 @@
 // ============================================================
 
 import type { FalClient as FalSdkClient, QueueClient as FalSdkQueueClient } from "@fal-ai/client";
-import type { CExpr, Interpreter, KindSpec, Liftable, Plugin } from "@mvfm/core";
+import type { CExpr, KindSpec, Liftable, Plugin } from "@mvfm/core";
 import { makeCExpr } from "@mvfm/core";
-import { wrapFalSdk } from "./client-fal-sdk";
-import { createFalInterpreter, type FalClient } from "./interpreter";
 
 // ---- Option type aliases ----------------------------------
 
@@ -54,173 +52,107 @@ export type FalQueueResultOptions = Liftable<QueueResultOptionsShape>;
 /** SDK-aligned queue.cancel options, excluding unsupported runtime-only fields. */
 export type FalQueueCancelOptions = Liftable<QueueCancelOptionsShape>;
 
-// ---- Configuration ----------------------------------------
+// ---- Plugin definition ------------------------------------
 
 /**
- * Configuration for the fal plugin.
+ * The fal plugin definition (unified Plugin type).
  *
- * Requires credentials (API key). Uses `FAL_KEY` env var by default
- * in the real SDK, but Mvfm requires explicit config.
+ * Contributes `$.fal` with run, subscribe, and queue methods.
+ * Requires an interpreter provided via
+ * `defaults(plugins, { fal: createFalInterpreter(client) })`.
  */
-export interface FalConfig {
-  /** Fal API key (e.g. `key_...`). */
-  credentials: string;
-}
+export const fal = {
+  name: "fal" as const,
+  ctors: {
+    fal: {
+      /** Run an endpoint synchronously. Mirrors `fal.run(endpointId, { input })`. */
+      run(
+        endpointId: string | CExpr<string>,
+        ...options: [] | [Liftable<RunOptionsShape>]
+      ): CExpr<Awaited<ReturnType<FalSdkClient["run"]>>, "fal/run"> {
+        return makeCExpr("fal/run", [endpointId, ...options] as unknown[]) as any;
+      },
 
-// ---- Default interpreter wiring ---------------------------
+      /** Subscribe to an endpoint (queue submit + poll + result). */
+      subscribe(
+        endpointId: string | CExpr<string>,
+        ...options: [] | [Liftable<SubscribeOptionsShape>]
+      ): CExpr<Awaited<ReturnType<FalSdkClient["subscribe"]>>, "fal/subscribe"> {
+        return makeCExpr("fal/subscribe", [endpointId, ...options] as unknown[]) as any;
+      },
 
-const dynamicImport = new Function("m", "return import(m)") as (
-  moduleName: string,
-) => Promise<Record<string, unknown>>;
-
-function createDefaultInterpreter(config: FalConfig): Interpreter {
-  let clientPromise: Promise<FalClient> | undefined;
-  const getClient = async (): Promise<FalClient> => {
-    if (!clientPromise) {
-      clientPromise = dynamicImport("@fal-ai/client").then((moduleValue) => {
-        const falClient = moduleValue.fal as FalSdkClient;
-        (falClient as unknown as { config: (o: { credentials: string }) => void }).config({
-          credentials: config.credentials,
-        });
-        return wrapFalSdk(falClient);
-      });
-    }
-    return clientPromise;
-  };
-
-  const lazyClient: FalClient = {
-    async run(endpointId, options) {
-      const client = await getClient();
-      return client.run(endpointId, options);
-    },
-    async subscribe(endpointId, options) {
-      const client = await getClient();
-      return client.subscribe(endpointId, options);
-    },
-    async queueSubmit(endpointId, options) {
-      const client = await getClient();
-      return client.queueSubmit(endpointId, options);
-    },
-    async queueStatus(endpointId, options) {
-      const client = await getClient();
-      return client.queueStatus(endpointId, options);
-    },
-    async queueResult(endpointId, options) {
-      const client = await getClient();
-      return client.queueResult(endpointId, options);
-    },
-    async queueCancel(endpointId, options) {
-      const client = await getClient();
-      return client.queueCancel(endpointId, options);
-    },
-  };
-
-  return createFalInterpreter(lazyClient);
-}
-
-// ---- Plugin factory ---------------------------------------
-
-/**
- * Creates the fal plugin definition (unified Plugin type).
- *
- * @param config - A {@link FalConfig} with credentials.
- * @returns A unified Plugin that contributes `$.fal`.
- */
-export function fal(config: FalConfig) {
-  return {
-    name: "fal" as const,
-    ctors: {
-      fal: {
-        /** Run an endpoint synchronously. Mirrors `fal.run(endpointId, { input })`. */
-        run(
+      queue: {
+        /** Submit a request to the queue. */
+        submit(
           endpointId: string | CExpr<string>,
-          ...options: [] | [Liftable<RunOptionsShape>]
-        ): CExpr<Awaited<ReturnType<FalSdkClient["run"]>>, "fal/run"> {
-          return makeCExpr("fal/run", [endpointId, ...options] as unknown[]) as any;
+          options: Liftable<SubmitOptionsShape>,
+        ): CExpr<Awaited<ReturnType<FalSdkQueueClient["submit"]>>, "fal/queue_submit"> {
+          return makeCExpr("fal/queue_submit", [endpointId, options] as unknown[]) as any;
         },
 
-        /** Subscribe to an endpoint (queue submit + poll + result). */
-        subscribe(
+        /** Check the status of a queued request. */
+        status(
           endpointId: string | CExpr<string>,
-          ...options: [] | [Liftable<SubscribeOptionsShape>]
-        ): CExpr<Awaited<ReturnType<FalSdkClient["subscribe"]>>, "fal/subscribe"> {
-          return makeCExpr("fal/subscribe", [endpointId, ...options] as unknown[]) as any;
+          options: Liftable<QueueStatusOptionsShape>,
+        ): CExpr<Awaited<ReturnType<FalSdkQueueClient["status"]>>, "fal/queue_status"> {
+          return makeCExpr("fal/queue_status", [endpointId, options] as unknown[]) as any;
         },
 
-        queue: {
-          /** Submit a request to the queue. */
-          submit(
-            endpointId: string | CExpr<string>,
-            options: Liftable<SubmitOptionsShape>,
-          ): CExpr<Awaited<ReturnType<FalSdkQueueClient["submit"]>>, "fal/queue_submit"> {
-            return makeCExpr("fal/queue_submit", [endpointId, options] as unknown[]) as any;
-          },
+        /** Retrieve the result of a completed queued request. */
+        result(
+          endpointId: string | CExpr<string>,
+          options: Liftable<QueueResultOptionsShape>,
+        ): CExpr<Awaited<ReturnType<FalSdkQueueClient["result"]>>, "fal/queue_result"> {
+          return makeCExpr("fal/queue_result", [endpointId, options] as unknown[]) as any;
+        },
 
-          /** Check the status of a queued request. */
-          status(
-            endpointId: string | CExpr<string>,
-            options: Liftable<QueueStatusOptionsShape>,
-          ): CExpr<Awaited<ReturnType<FalSdkQueueClient["status"]>>, "fal/queue_status"> {
-            return makeCExpr("fal/queue_status", [endpointId, options] as unknown[]) as any;
-          },
-
-          /** Retrieve the result of a completed queued request. */
-          result(
-            endpointId: string | CExpr<string>,
-            options: Liftable<QueueResultOptionsShape>,
-          ): CExpr<Awaited<ReturnType<FalSdkQueueClient["result"]>>, "fal/queue_result"> {
-            return makeCExpr("fal/queue_result", [endpointId, options] as unknown[]) as any;
-          },
-
-          /** Cancel a queued request. */
-          cancel(
-            endpointId: string | CExpr<string>,
-            options: Liftable<QueueCancelOptionsShape>,
-          ): CExpr<void, "fal/queue_cancel"> {
-            return makeCExpr("fal/queue_cancel", [endpointId, options] as unknown[]) as any;
-          },
+        /** Cancel a queued request. */
+        cancel(
+          endpointId: string | CExpr<string>,
+          options: Liftable<QueueCancelOptionsShape>,
+        ): CExpr<void, "fal/queue_cancel"> {
+          return makeCExpr("fal/queue_cancel", [endpointId, options] as unknown[]) as any;
         },
       },
     },
-    kinds: {
-      "fal/run": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
-      "fal/subscribe": {
-        inputs: [undefined] as [unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown], unknown>,
-      "fal/queue_submit": {
-        inputs: [undefined, undefined] as [unknown, unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown, unknown], unknown>,
-      "fal/queue_status": {
-        inputs: [undefined, undefined] as [unknown, unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown, unknown], unknown>,
-      "fal/queue_result": {
-        inputs: [undefined, undefined] as [unknown, unknown],
-        output: undefined as unknown,
-      } as KindSpec<[unknown, unknown], unknown>,
-      "fal/queue_cancel": {
-        inputs: [undefined, undefined] as [unknown, unknown],
-        output: undefined as unknown as undefined,
-      } as KindSpec<[unknown, unknown], void>,
-    },
-    shapes: {
-      "fal/run": [null, "*"] as [null, "*"],
-      "fal/subscribe": [null, "*"] as [null, "*"],
-      "fal/queue_submit": [null, "*"] as [null, "*"],
-      "fal/queue_status": [null, "*"] as [null, "*"],
-      "fal/queue_result": [null, "*"] as [null, "*"],
-      "fal/queue_cancel": [null, "*"] as [null, "*"],
-    },
-    traits: {},
-    lifts: {},
-    defaultInterpreter: (): Interpreter => createDefaultInterpreter(config),
-  } satisfies Plugin;
-}
+  },
+  kinds: {
+    "fal/run": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "fal/subscribe": {
+      inputs: [undefined] as [unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown], unknown>,
+    "fal/queue_submit": {
+      inputs: [undefined, undefined] as [unknown, unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown, unknown], unknown>,
+    "fal/queue_status": {
+      inputs: [undefined, undefined] as [unknown, unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown, unknown], unknown>,
+    "fal/queue_result": {
+      inputs: [undefined, undefined] as [unknown, unknown],
+      output: undefined as unknown,
+    } as KindSpec<[unknown, unknown], unknown>,
+    "fal/queue_cancel": {
+      inputs: [undefined, undefined] as [unknown, unknown],
+      output: undefined as unknown as undefined,
+    } as KindSpec<[unknown, unknown], void>,
+  },
+  shapes: {
+    "fal/run": [null, "*"] as [null, "*"],
+    "fal/subscribe": [null, "*"] as [null, "*"],
+    "fal/queue_submit": [null, "*"] as [null, "*"],
+    "fal/queue_status": [null, "*"] as [null, "*"],
+    "fal/queue_result": [null, "*"] as [null, "*"],
+    "fal/queue_cancel": [null, "*"] as [null, "*"],
+  },
+  traits: {},
+  lifts: {},
+} satisfies Plugin;
 
 /**
  * Alias for {@link fal}, kept for readability at call sites.

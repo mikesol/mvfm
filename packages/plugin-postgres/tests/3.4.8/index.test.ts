@@ -2,7 +2,7 @@ import { composeDollar, createApp, numPlugin, strPlugin } from "@mvfm/core";
 import { describe, expect, it } from "vitest";
 import { postgres } from "../../src/3.4.8";
 
-const plugin = postgres("postgres://localhost/test");
+const plugin = postgres;
 const plugins = [numPlugin, strPlugin, plugin] as const;
 const $ = composeDollar(...plugins);
 const app = createApp(...plugins);
@@ -155,7 +155,7 @@ describe("postgres: plugin structure", () => {
   });
 
   it("string config accepted", () => {
-    const p = postgres("postgres://localhost:5432/mydb");
+    const p = postgres;
     expect(p.name).toBe("postgres");
   });
 });

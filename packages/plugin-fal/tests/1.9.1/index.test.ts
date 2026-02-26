@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { fal, falPlugin } from "../../src/1.9.1";
 
-const plugin = fal({ credentials: "key_test_123" });
+const plugin = fal;
 const api = plugin.ctors.fal;
 
 // ---- fal.run ----
@@ -150,8 +150,8 @@ describe("fal plugin: unified Plugin shape", () => {
     expect(plugin.lifts).toEqual({});
   });
 
-  it("has a defaultInterpreter factory", () => {
-    expect(typeof plugin.defaultInterpreter).toBe("function");
+  it("has NO defaultInterpreter", () => {
+    expect(plugin.defaultInterpreter).toBeUndefined();
   });
 });
 

@@ -13,7 +13,7 @@
 //   - Completions (legacy): create
 // ============================================================
 
-import type { CExpr, Interpreter, KindSpec, Liftable, Plugin } from "@mvfm/core";
+import type { CExpr, KindSpec, Liftable, Plugin } from "@mvfm/core";
 import { makeCExpr } from "@mvfm/core";
 import type {
   ChatCompletion,
@@ -29,8 +29,6 @@ import type {
   ModerationCreateParams,
   ModerationCreateResponse,
 } from "openai/resources/moderations";
-import { wrapOpenAISdk } from "./client-openai-sdk";
-import { createOpenAIInterpreter, type OpenAIClient } from "./interpreter";
 
 // ---- Configuration ----------------------------------------
 
@@ -145,95 +143,62 @@ function buildOpenAIApi() {
   };
 }
 
-// ---- Default interpreter wiring ---------------------------
-
-const dynamicImport = new Function("m", "return import(m)") as (
-  moduleName: string,
-) => Promise<Record<string, unknown>>;
-
-function createDefaultInterpreter(config: OpenAIConfig): Interpreter {
-  let clientPromise: Promise<OpenAIClient> | undefined;
-  const getClient = async (): Promise<OpenAIClient> => {
-    if (!clientPromise) {
-      clientPromise = dynamicImport("openai").then((moduleValue) => {
-        const OpenAI = moduleValue.default as new (
-          opts: OpenAIConfig,
-        ) => Parameters<typeof wrapOpenAISdk>[0];
-        return wrapOpenAISdk(new OpenAI(config));
-      });
-    }
-    return clientPromise;
-  };
-
-  const lazyClient: OpenAIClient = {
-    async request(method: string, path: string, body?: Record<string, unknown>): Promise<unknown> {
-      const client = await getClient();
-      return client.request(method, path, body);
-    },
-  };
-
-  return createOpenAIInterpreter(lazyClient);
-}
-
-// ---- Plugin factory ---------------------------------------
+// ---- Plugin definition ------------------------------------
 
 /**
- * Creates the openai plugin definition (unified Plugin type).
+ * OpenAI plugin definition (unified Plugin type).
  *
- * @param config - An {@link OpenAIConfig} with apiKey and optional org/project.
- * @returns A unified Plugin that contributes `$.openai`.
+ * This plugin has no defaultInterpreter — you must provide one
+ * via `defaults(app, { openai: createOpenAIInterpreter(wrapOpenAISdk(client)) })`.
  */
-export function openai(config: OpenAIConfig) {
-  return {
-    name: "openai" as const,
-    ctors: { openai: buildOpenAIApi() },
-    kinds: {
-      "openai/create_chat_completion": {
-        inputs: [undefined as unknown as ChatCompletionCreateParamsNonStreaming],
-        output: undefined as unknown as ChatCompletion,
-      } as KindSpec<[ChatCompletionCreateParamsNonStreaming], ChatCompletion>,
-      "openai/retrieve_chat_completion": {
-        inputs: [""] as [string],
-        output: undefined as unknown as ChatCompletion,
-      } as KindSpec<[string], ChatCompletion>,
-      "openai/list_chat_completions": {
-        inputs: [] as ChatCompletionListParams[],
-        output: undefined as unknown as ChatCompletionsPage,
-      } as KindSpec<ChatCompletionListParams[], ChatCompletionsPage>,
-      "openai/update_chat_completion": {
-        inputs: ["", undefined as unknown as ChatCompletionUpdateParams],
-        output: undefined as unknown as ChatCompletion,
-      } as KindSpec<[string, ChatCompletionUpdateParams], ChatCompletion>,
-      "openai/delete_chat_completion": {
-        inputs: [""] as [string],
-        output: undefined as unknown as ChatCompletionDeleted,
-      } as KindSpec<[string], ChatCompletionDeleted>,
-      "openai/create_embedding": {
-        inputs: [undefined as unknown as EmbeddingCreateParams],
-        output: undefined as unknown as CreateEmbeddingResponse,
-      } as KindSpec<[EmbeddingCreateParams], CreateEmbeddingResponse>,
-      "openai/create_moderation": {
-        inputs: [undefined as unknown as ModerationCreateParams],
-        output: undefined as unknown as ModerationCreateResponse,
-      } as KindSpec<[ModerationCreateParams], ModerationCreateResponse>,
-      "openai/create_completion": {
-        inputs: [undefined as unknown as CompletionCreateParamsNonStreaming],
-        output: undefined as unknown as Completion,
-      } as KindSpec<[CompletionCreateParamsNonStreaming], Completion>,
-    },
-    shapes: {
-      "openai/create_chat_completion": "*",
-      "openai/list_chat_completions": "*",
-      "openai/update_chat_completion": [null, "*"],
-      "openai/create_embedding": "*",
-      "openai/create_moderation": "*",
-      "openai/create_completion": "*",
-    },
-    traits: {},
-    lifts: {},
-    defaultInterpreter: (): Interpreter => createDefaultInterpreter(config),
-  } satisfies Plugin;
-}
+export const openai = {
+  name: "openai" as const,
+  ctors: { openai: buildOpenAIApi() },
+  kinds: {
+    "openai/create_chat_completion": {
+      inputs: [undefined as unknown as ChatCompletionCreateParamsNonStreaming],
+      output: undefined as unknown as ChatCompletion,
+    } as KindSpec<[ChatCompletionCreateParamsNonStreaming], ChatCompletion>,
+    "openai/retrieve_chat_completion": {
+      inputs: [""] as [string],
+      output: undefined as unknown as ChatCompletion,
+    } as KindSpec<[string], ChatCompletion>,
+    "openai/list_chat_completions": {
+      inputs: [] as ChatCompletionListParams[],
+      output: undefined as unknown as ChatCompletionsPage,
+    } as KindSpec<ChatCompletionListParams[], ChatCompletionsPage>,
+    "openai/update_chat_completion": {
+      inputs: ["", undefined as unknown as ChatCompletionUpdateParams],
+      output: undefined as unknown as ChatCompletion,
+    } as KindSpec<[string, ChatCompletionUpdateParams], ChatCompletion>,
+    "openai/delete_chat_completion": {
+      inputs: [""] as [string],
+      output: undefined as unknown as ChatCompletionDeleted,
+    } as KindSpec<[string], ChatCompletionDeleted>,
+    "openai/create_embedding": {
+      inputs: [undefined as unknown as EmbeddingCreateParams],
+      output: undefined as unknown as CreateEmbeddingResponse,
+    } as KindSpec<[EmbeddingCreateParams], CreateEmbeddingResponse>,
+    "openai/create_moderation": {
+      inputs: [undefined as unknown as ModerationCreateParams],
+      output: undefined as unknown as ModerationCreateResponse,
+    } as KindSpec<[ModerationCreateParams], ModerationCreateResponse>,
+    "openai/create_completion": {
+      inputs: [undefined as unknown as CompletionCreateParamsNonStreaming],
+      output: undefined as unknown as Completion,
+    } as KindSpec<[CompletionCreateParamsNonStreaming], Completion>,
+  },
+  shapes: {
+    "openai/create_chat_completion": "*",
+    "openai/list_chat_completions": "*",
+    "openai/update_chat_completion": [null, "*"],
+    "openai/create_embedding": "*",
+    "openai/create_moderation": "*",
+    "openai/create_completion": "*",
+  },
+  traits: {},
+  lifts: {},
+} satisfies Plugin;
 
 /**
  * Alias for {@link openai}, kept for readability at call sites.

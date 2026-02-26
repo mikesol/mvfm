@@ -12,7 +12,7 @@
 //   - Contacts: create, get, list, remove
 // ============================================================
 
-import type { CExpr, Interpreter, KindSpec, Liftable, Plugin } from "@mvfm/core";
+import type { CExpr, KindSpec, Liftable, Plugin } from "@mvfm/core";
 import { makeCExpr } from "@mvfm/core";
 import type {
   CreateBatchOptions,
@@ -25,21 +25,6 @@ import type {
   ListContactsResponseSuccess,
   RemoveContactsResponseSuccess,
 } from "resend";
-import { wrapResendSdk } from "./client-resend-sdk";
-import { createResendInterpreter, type ResendClient } from "./interpreter";
-
-// ---- Configuration ----------------------------------------
-
-/**
- * Configuration for the resend plugin.
- *
- * Requires an API key. The key is captured in the interpreter closure,
- * not stored on AST nodes.
- */
-export interface ResendConfig {
-  /** Resend API key (e.g. `re_123...`). */
-  apiKey: string;
-}
 
 // ---- Constructor builder ----------------------------------
 
@@ -104,88 +89,56 @@ function buildResendApi() {
   };
 }
 
-// ---- Default interpreter wiring ---------------------------
-
-const dynamicImport = new Function("m", "return import(m)") as (
-  moduleName: string,
-) => Promise<Record<string, unknown>>;
-
-function createDefaultInterpreter(config: ResendConfig): Interpreter {
-  let clientPromise: Promise<ResendClient> | undefined;
-  const getClient = async (): Promise<ResendClient> => {
-    if (!clientPromise) {
-      clientPromise = dynamicImport("resend").then((moduleValue) => {
-        const Resend = moduleValue.Resend as new (key: string) => Record<string, unknown>;
-        return wrapResendSdk(
-          new Resend(config.apiKey) as unknown as Parameters<typeof wrapResendSdk>[0],
-        );
-      });
-    }
-    return clientPromise;
-  };
-
-  const lazyClient: ResendClient = {
-    async request(method: string, path: string, params?: unknown): Promise<unknown> {
-      const client = await getClient();
-      return client.request(method, path, params);
-    },
-  };
-
-  return createResendInterpreter(lazyClient);
-}
-
-// ---- Plugin factory ---------------------------------------
+// ---- Plugin definition ------------------------------------
 
 /**
- * Creates the resend plugin definition (unified Plugin type).
+ * The resend plugin definition (unified Plugin type).
  *
- * @param config - A {@link ResendConfig} with apiKey.
- * @returns A unified Plugin that contributes `$.resend`.
+ * Contributes `$.resend` with emails, batch, and contacts API.
+ * Requires an interpreter provided via
+ * `defaults(plugins, { resend: createResendInterpreter(client) })`.
  */
-export function resend(config: ResendConfig) {
-  return {
-    name: "resend" as const,
-    ctors: { resend: buildResendApi() },
-    kinds: {
-      "resend/send_email": {
-        inputs: [undefined as unknown as CreateEmailOptions],
-        output: undefined as unknown as CreateEmailResponseSuccess,
-      } as KindSpec<[CreateEmailOptions], CreateEmailResponseSuccess>,
-      "resend/get_email": {
-        inputs: [""] as [string],
-        output: undefined as unknown as GetEmailResponseSuccess,
-      } as KindSpec<[string], GetEmailResponseSuccess>,
-      "resend/send_batch": {
-        inputs: [undefined as unknown as CreateBatchOptions],
-        output: undefined as unknown as CreateEmailResponseSuccess[],
-      } as KindSpec<[CreateBatchOptions], CreateEmailResponseSuccess[]>,
-      "resend/create_contact": {
-        inputs: [undefined as unknown as CreateContactOptions],
-        output: undefined as unknown as CreateContactResponseSuccess,
-      } as KindSpec<[CreateContactOptions], CreateContactResponseSuccess>,
-      "resend/get_contact": {
-        inputs: [""] as [string],
-        output: undefined as unknown as GetContactResponseSuccess,
-      } as KindSpec<[string], GetContactResponseSuccess>,
-      "resend/list_contacts": {
-        inputs: [] as [],
-        output: undefined as unknown as ListContactsResponseSuccess,
-      } as KindSpec<[], ListContactsResponseSuccess>,
-      "resend/remove_contact": {
-        inputs: [""] as [string],
-        output: undefined as unknown as RemoveContactsResponseSuccess,
-      } as KindSpec<[string], RemoveContactsResponseSuccess>,
-    },
-    shapes: {
-      "resend/send_email": "*",
-      "resend/send_batch": "*",
-      "resend/create_contact": "*",
-    },
-    traits: {},
-    lifts: {},
-    defaultInterpreter: (): Interpreter => createDefaultInterpreter(config),
-  } satisfies Plugin;
-}
+export const resend = {
+  name: "resend" as const,
+  ctors: { resend: buildResendApi() },
+  kinds: {
+    "resend/send_email": {
+      inputs: [undefined as unknown as CreateEmailOptions],
+      output: undefined as unknown as CreateEmailResponseSuccess,
+    } as KindSpec<[CreateEmailOptions], CreateEmailResponseSuccess>,
+    "resend/get_email": {
+      inputs: [""] as [string],
+      output: undefined as unknown as GetEmailResponseSuccess,
+    } as KindSpec<[string], GetEmailResponseSuccess>,
+    "resend/send_batch": {
+      inputs: [undefined as unknown as CreateBatchOptions],
+      output: undefined as unknown as CreateEmailResponseSuccess[],
+    } as KindSpec<[CreateBatchOptions], CreateEmailResponseSuccess[]>,
+    "resend/create_contact": {
+      inputs: [undefined as unknown as CreateContactOptions],
+      output: undefined as unknown as CreateContactResponseSuccess,
+    } as KindSpec<[CreateContactOptions], CreateContactResponseSuccess>,
+    "resend/get_contact": {
+      inputs: [""] as [string],
+      output: undefined as unknown as GetContactResponseSuccess,
+    } as KindSpec<[string], GetContactResponseSuccess>,
+    "resend/list_contacts": {
+      inputs: [] as [],
+      output: undefined as unknown as ListContactsResponseSuccess,
+    } as KindSpec<[], ListContactsResponseSuccess>,
+    "resend/remove_contact": {
+      inputs: [""] as [string],
+      output: undefined as unknown as RemoveContactsResponseSuccess,
+    } as KindSpec<[string], RemoveContactsResponseSuccess>,
+  },
+  shapes: {
+    "resend/send_email": "*",
+    "resend/send_batch": "*",
+    "resend/create_contact": "*",
+  },
+  traits: {},
+  lifts: {},
+} satisfies Plugin;
 
 /**
  * Alias for {@link resend}, kept for readability at call sites.

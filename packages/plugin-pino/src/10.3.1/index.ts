@@ -17,9 +17,18 @@
 // resolved at interpretation time via resolveStructured().
 // ============================================================
 
-import type { CExpr, Interpreter, KindSpec, Liftable, Plugin } from "@mvfm/core";
+import type { CExpr, KindSpec, Liftable, Plugin } from "@mvfm/core";
 import { isCExpr, makeCExpr } from "@mvfm/core";
-import { createPinoInterpreter } from "./interpreter";
+
+/**
+ * Configuration for the pino interpreter.
+ */
+export interface PinoConfig {
+  /** Minimum log level. Defaults to `"info"`. */
+  level?: string;
+  /** Base bindings merged into every log line. */
+  base?: Record<string, unknown>;
+}
 
 // ---- Constants -----------------------------------------------
 
@@ -66,18 +75,6 @@ export interface PinoLogger {
 export interface PinoMethods {
   /** Pino structured logger, accessed via `$.pino`. */
   pino: PinoLogger;
-}
-
-// ---- Configuration ----------------------------------------
-
-/**
- * Configuration for the pino plugin.
- */
-export interface PinoConfig {
-  /** Minimum log level. Defaults to `"info"`. */
-  level?: string;
-  /** Base bindings merged into every log line. */
-  base?: Record<string, unknown>;
 }
 
 // ---- Constructor builder ----------------------------------
@@ -144,43 +141,40 @@ const voidKind = {
   output: undefined as unknown as undefined,
 } as KindSpec<[unknown, ...unknown[]], void>;
 
-// ---- Plugin factory ---------------------------------------
+// ---- Plugin definition ------------------------------------
 
 /**
- * Pino plugin factory. Namespace: `pino/`.
+ * The pino plugin definition (unified Plugin type).
  *
- * Creates a plugin that exposes structured logging methods
+ * Contributes `$.pino` with structured logging methods
  * mirroring the real pino API. Log calls produce AST nodes
  * that yield `pino/<level>` effects at interpretation time.
  *
- * @param config - A {@link PinoConfig} with optional level and base bindings.
- * @returns A unified Plugin that contributes `$.pino`.
+ * Requires an interpreter provided via
+ * `defaults(plugins, { pino: createPinoInterpreter(...) })`.
  */
-export function pino(config: PinoConfig = {}) {
-  return {
-    name: "pino" as const,
-    ctors: { pino: buildPinoApi() },
-    kinds: {
-      "pino/trace": voidKind,
-      "pino/debug": voidKind,
-      "pino/info": voidKind,
-      "pino/warn": voidKind,
-      "pino/error": voidKind,
-      "pino/fatal": voidKind,
-    },
-    shapes: {
-      "pino/trace": [null, null, null, "*", "*"],
-      "pino/debug": [null, null, null, "*", "*"],
-      "pino/info": [null, null, null, "*", "*"],
-      "pino/warn": [null, null, null, "*", "*"],
-      "pino/error": [null, null, null, "*", "*"],
-      "pino/fatal": [null, null, null, "*", "*"],
-    },
-    traits: {},
-    lifts: {},
-    defaultInterpreter: (): Interpreter => createPinoInterpreter(undefined, config),
-  } satisfies Plugin;
-}
+export const pino = {
+  name: "pino" as const,
+  ctors: { pino: buildPinoApi() },
+  kinds: {
+    "pino/trace": voidKind,
+    "pino/debug": voidKind,
+    "pino/info": voidKind,
+    "pino/warn": voidKind,
+    "pino/error": voidKind,
+    "pino/fatal": voidKind,
+  },
+  shapes: {
+    "pino/trace": [null, null, null, "*", "*"],
+    "pino/debug": [null, null, null, "*", "*"],
+    "pino/info": [null, null, null, "*", "*"],
+    "pino/warn": [null, null, null, "*", "*"],
+    "pino/error": [null, null, null, "*", "*"],
+    "pino/fatal": [null, null, null, "*", "*"],
+  },
+  traits: {},
+  lifts: {},
+} satisfies Plugin;
 
 /**
  * Alias for {@link pino}, kept for readability at call sites.
