@@ -151,20 +151,26 @@ export function createPlaygroundScope(
       plugins: readonly PluginDef[],
       overrides?: Record<string, Interpreter>,
     ) => {
-      const merged = { ...mockOverrides, ...overrides };
-      const interp = core.defaults(plugins, merged);
-      Object.assign(interp, fakeConsoleInterpreter, fakePinoInterpreter);
-      return interp;
+      const merged = {
+        ...mockOverrides,
+        console: fakeConsoleInterpreter,
+        pino: fakePinoInterpreter,
+        ...overrides,
+      };
+      return core.defaults(plugins, merged);
     };
   } else {
     injected.defaults = (
       plugins: readonly PluginDef[],
       overrides?: Record<string, Interpreter>,
     ) => {
-      const merged = { ...mockOverrides, ...overrides };
-      const interp = core.defaults(plugins, merged);
-      Object.assign(interp, fakeConsoleInterpreter, fakePinoInterpreter);
-      return interp;
+      const merged = {
+        ...mockOverrides,
+        console: fakeConsoleInterpreter,
+        pino: fakePinoInterpreter,
+        ...overrides,
+      };
+      return core.defaults(plugins, merged);
     };
   }
 
