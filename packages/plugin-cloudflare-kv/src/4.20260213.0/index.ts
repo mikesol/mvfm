@@ -88,8 +88,15 @@ function buildKvApi() {
       key: string | CExpr<string>,
       value: string | CExpr<string>,
       ...args: [] | [Liftable<KvPutOptions>]
-    ): CExpr<void, "cloudflare-kv/put", [string | CExpr<string>, string | CExpr<string>, ...([] | [Liftable<KvPutOptions>])]> {
-      return makeCExpr("cloudflare-kv/put", [key, value, ...args] as unknown as [string, string]) as any;
+    ): CExpr<
+      void,
+      "cloudflare-kv/put",
+      [string | CExpr<string>, string | CExpr<string>, ...([] | [Liftable<KvPutOptions>])]
+    > {
+      return makeCExpr("cloudflare-kv/put", [key, value, ...args] as unknown as [
+        string,
+        string,
+      ]) as any;
     },
 
     /** Delete a key. */
@@ -98,7 +105,9 @@ function buildKvApi() {
     },
 
     /** List keys with optional prefix filter and pagination cursor. */
-    list(...args: [] | [Liftable<KvListOptions>]): CExpr<KvListResult, "cloudflare-kv/list", [] | [Liftable<KvListOptions>]> {
+    list(
+      ...args: [] | [Liftable<KvListOptions>]
+    ): CExpr<KvListResult, "cloudflare-kv/list", [] | [Liftable<KvListOptions>]> {
       return makeCExpr("cloudflare-kv/list", args as unknown as unknown[]) as any;
     },
   };

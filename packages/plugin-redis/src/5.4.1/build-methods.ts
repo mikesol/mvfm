@@ -51,7 +51,9 @@ export function buildRedisApi() {
       return makeCExpr("redis/mget", [...keys]) as any;
     },
     /** Set multiple key-value pairs. */
-    mset(mapping: Liftable<Record<string, string>>): CExpr<"OK", "redis/mset", [Liftable<Record<string, string>>]> {
+    mset(
+      mapping: Liftable<Record<string, string>>,
+    ): CExpr<"OK", "redis/mset", [Liftable<Record<string, string>>]> {
       return makeCExpr("redis/mset", [mapping]) as any;
     },
     /** Append a value to a key. */
@@ -95,7 +97,10 @@ export function buildRedisApi() {
       return makeCExpr("redis/hget", [key, field]) as any;
     },
     /** Set fields in a hash. */
-    hset(key: string | CExpr<string>, mapping: Liftable<Record<string, string>>): CExpr<number, "redis/hset", [string | CExpr<string>, Liftable<Record<string, string>>]> {
+    hset(
+      key: string | CExpr<string>,
+      mapping: Liftable<Record<string, string>>,
+    ): CExpr<number, "redis/hset", [string | CExpr<string>, Liftable<Record<string, string>>]> {
       return makeCExpr("redis/hset", [key, mapping]) as any;
     },
     /** Get the values of multiple hash fields. */
